@@ -5,7 +5,28 @@ odoo.define('terminal.AbstractTerminal12', function (require) {
 
     var rpc = require('web.rpc');
     var AbstractTerminal = require('terminal.AbstractTerminal');
+    var AbstractTerminalStorage = require('terminal.AbstractTerminalStorage');
 
+
+    AbstractTerminalStorage.include({
+        _parent: null,
+
+        init: function (parent) {
+            this._parent = parent;
+        },
+
+        getItem: function (item) {
+            return this._parent.call('session_storage', 'getItem', item);
+        },
+
+        setItem: function (item, value) {
+            return this._parent.call('session_storage', 'setItem', item, value);
+        },
+
+        removeItem: function (item) {
+            return this._parent.call('session_storage', 'removeItem', item);
+        },
+    });
 
     AbstractTerminal.include({
         _getCommandErrorMessage: function (emsg) {

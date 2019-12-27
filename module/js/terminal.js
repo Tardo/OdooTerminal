@@ -130,8 +130,7 @@ odoo.define('terminal.Terminal', function (require) {
             $(QWeb.render('terminal')).prependTo("body");
 
             this._lazyStorageTerminalScreen = _.debounce(function () {
-                this.call('session_storage', 'setItem',
-                    'terminal_screen', this.$term.html());
+                this._storage.setItem('terminal_screen', this.$term.html());
             }.bind(this), 350);
         },
 
@@ -148,16 +147,14 @@ odoo.define('terminal.Terminal', function (require) {
             core.bus.on('keydown', this, this._onCoreKeyDown);
             core.bus.on('click', this, this._onCoreClick);
 
-            var cachedScreen = this.call('session_storage', 'getItem',
-                'terminal_screen');
+            var cachedScreen = this._storage.getItem('terminal_screen');
             if (_.isUndefined(cachedScreen)) {
                 this._printWelcomeMessage();
                 this.print('');
             } else {
                 this._printHTML(cachedScreen);
             }
-            var cachedHistory = this.call('session_storage', 'getItem',
-                'terminal_history');
+            var cachedHistory = this._storage.getItem('terminal_history');
             if (!_.isUndefined(cachedHistory)) {
                 this._inputHistory = cachedHistory;
                 this._searchHistoryIter = this._inputHistory.length;
@@ -203,7 +200,7 @@ odoo.define('terminal.Terminal', function (require) {
         /* BASIC FUNCTIONS */
         clean: function () {
             this.$term.html('');
-            this.call('session_storage', 'removeItem', 'terminal_screen');
+            this._storage.removeItem('terminal_screen');
         },
 
         cleanInput: function () {
@@ -212,7 +209,7 @@ odoo.define('terminal.Terminal', function (require) {
 
         cleanInputHistory: function () {
             this._inputHistory = [];
-            this.call('session_storage', 'removeItem', 'terminal_screen');
+            this._storage.removeItem('terminal_screen');
         },
 
         registerCommand: function (cmd, cmdDef) {
@@ -403,8 +400,7 @@ odoo.define('terminal.Terminal', function (require) {
                     cmd:cmd,
                 }));
                 this._inputHistory.push(cmd);
-                this.call('session_storage', 'setItem',
-                    'terminal_history', this._inputHistory);
+                this._storage.setItem('terminal_history', this._inputHistory);
                 this.cleanInput();
                 this.executeCommand(cmd);
             }

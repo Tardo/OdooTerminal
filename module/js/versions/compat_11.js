@@ -4,6 +4,23 @@ odoo.define('terminal.AbstractTerminal11', function (require) {
     'use strict';
 
     var AbstractTerminal = require('terminal.AbstractTerminal');
+    var AbstractTerminalStorage = require('terminal.AbstractTerminalStorage');
+    var local_storage = require('web.local_storage');
+
+    AbstractTerminalStorage.include({
+        getItem: function (item) {
+            return JSON.parse(local_storage.getItem(item)) || undefined;
+        },
+
+        setItem: function (item, value) {
+            return local_storage.setItem(item, JSON.stringify(value)) ||
+                undefined;
+        },
+
+        removeItem: function (item) {
+            return local_storage.removeItem(item) || undefined;
+        },
+    });
 
 
     AbstractTerminal.include({

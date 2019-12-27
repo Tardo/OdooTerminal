@@ -82,6 +82,7 @@
                 const to_inject = {
                     'css': ['module/css/terminal.css'],
                     'js': [
+                        'module/js/abstract_terminal_storage.js',
                         'module/js/abstract_terminal.js',
                         'module/js/terminal.js',
                         'module/js/terminal_core_funcs.js',

@@ -6,12 +6,13 @@ odoo.define('terminal.AbstractTerminal', function (require) {
 
     var core = require('web.core');
     var Widget = require('web.Widget');
+    var AbstractTerminalStorage = require('terminal.AbstractTerminalStorage');
 
     var QWeb = core.qweb;
 
 
     return Widget.extend({
-        VERSION: '1.0.0',
+        VERSION: '1.0.1',
         PROMPT: '>',
 
         _registeredCmds: {},
@@ -22,6 +23,8 @@ odoo.define('terminal.AbstractTerminal', function (require) {
 
         _active_widget: null,
         _active_action: null,
+
+        _storage: null,
 
 
         init: function () {
@@ -38,6 +41,8 @@ odoo.define('terminal.AbstractTerminal', function (require) {
                     </div>
                 </t>
             </templates>`);
+
+            this._storage = new AbstractTerminalStorage(this);
             this._super.apply(this, arguments);
         },
 
