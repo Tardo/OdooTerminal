@@ -1,20 +1,20 @@
 // Copyright 2018-2019 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 odoo.define('terminal.Terminal', function (require) {
     'use strict';
 
-    var core = require('web.core');
-    var rpc = require('web.rpc');
-    var session = require('web.session');
-    var WebClient = require('web.WebClient');
-    var Class = require('web.Class');
-    var AbstractTerminal = require('terminal.AbstractTerminal');
+    const core = require('web.core');
+    const rpc = require('web.rpc');
+    const session = require('web.session');
+    const Class = require('web.Class');
+    const AbstractTerminal = require('terminal.AbstractTerminal');
 
-    var QWeb = core.qweb;
+    const QWeb = core.qweb;
 
 
-    var ParameterReader = Class.extend({
+    const ParameterReader = Class.extend({
         INPUT_GROUP_DELIMETERS: ['"', "'"],
 
         _regexSanitize: null,
@@ -24,18 +24,18 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         parse: function (strParams) {
-            var scmd = strParams.split(' ');
+            let scmd = strParams.split(' ');
             const rawParams = scmd.slice(1).join(' ');
             scmd = _.filter(scmd, function (item) {
                 return item;
             });
 
-            var c_group = [false, false];
-            var mdeli = '';
-            var params = [];
-            for (var i in scmd) {
-                var startChar = scmd[i].charAt(0);
-                var endChar = scmd[i].charAt(scmd[i].length-1);
+            const c_group = [false, false];
+            let mdeli = '';
+            const params = [];
+            for (const i in scmd) {
+                const startChar = scmd[i].charAt(0);
+                const endChar = scmd[i].charAt(scmd[i].length-1);
                 if (c_group[0] === false &&
                     this.INPUT_GROUP_DELIMETERS.indexOf(startChar) !== -1) {
                     c_group[0] = i;
@@ -71,7 +71,7 @@ odoo.define('terminal.Terminal', function (require) {
         },
     });
 
-    var ParameterChecker = Class.extend({
+    const ParameterChecker = Class.extend({
         _validators: {},
 
         init: function () {
@@ -80,17 +80,17 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         validate: function (args, params) {
-            var curParamIndex = 0;
-            for (var i=0; i < args.length; ++i) {
-                var carg = args[i];
-                var optional = false;
+            let curParamIndex = 0;
+            for (let i=0; i < args.length; ++i) {
+                let carg = args[i];
+                let optional = false;
                 if (carg === '?') {
                     optional = true;
                     carg = args[++i];
                 }
 
-                var isInvalidNO = !optional && curParamIndex >= params.length;
-                var isInvalidO = curParamIndex < params.length &&
+                const isInvalidNO = !optional && curParamIndex >= params.length;
+                const isInvalidO = curParamIndex < params.length &&
                     !this._validators[carg](params[curParamIndex]);
                 if (isInvalidNO || isInvalidO) {
                     return false;
@@ -110,11 +110,12 @@ odoo.define('terminal.Terminal', function (require) {
         },
     });
 
-    var Terminal = AbstractTerminal.extend({
+    const Terminal = AbstractTerminal.terminal.extend({
         events: {
             "keydown #terminal_input": "_onInputKeyDown",
             "click #terminal_screen": "_preventLostInputFocus",
             "click .o_terminal_cmd": "_onClickTerminalCommand",
+            "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
         },
 
         _parameterChecker: null,
@@ -137,6 +138,14 @@ odoo.define('terminal.Terminal', function (require) {
         start: function () {
             this._super.apply(this, arguments);
 
+            const isMaximized = this._storage.getItem('screen_maximized');
+            if (isMaximized) {
+                document.documentElement.style
+                    .setProperty('--terminal-screen-height', '90vh');
+                this.$('.terminal-screen-icon-maximize')
+                    .css('backgroundColor', '#555');
+            }
+
             this.$el[0].addEventListener('toggle', this.do_toggle.bind(this));
 
             this.$('.terminal-prompt').val(this.PROMPT);
@@ -147,14 +156,14 @@ odoo.define('terminal.Terminal', function (require) {
             core.bus.on('keydown', this, this._onCoreKeyDown);
             core.bus.on('click', this, this._onCoreClick);
 
-            var cachedScreen = this._storage.getItem('terminal_screen');
+            const cachedScreen = this._storage.getItem('terminal_screen');
             if (_.isUndefined(cachedScreen)) {
                 this._printWelcomeMessage();
                 this.print('');
             } else {
                 this._printHTML(cachedScreen);
             }
-            var cachedHistory = this._storage.getItem('terminal_history');
+            const cachedHistory = this._storage.getItem('terminal_history');
             if (!_.isUndefined(cachedHistory)) {
                 this._inputHistory = cachedHistory;
                 this._searchHistoryIter = this._inputHistory.length;
@@ -216,34 +225,32 @@ odoo.define('terminal.Terminal', function (require) {
             this._registeredCmds[cmd] = _.extend({
                 definition: 'Undefined command',
                 callback: this._fallbackExecuteCommand,
-                detail: "This command hasn't a properly detailed information",
+                detail:
+                    "This command hasn't a properly detailed information",
                 syntaxis: 'Unknown',
                 args: '',
             }, cmdDef);
         },
 
         executeCommand: function (cmd) {
-            var self = this;
-            var scmd = this._parameterReader.parse(cmd);
+            const self = this;
+            const scmd = this._parameterReader.parse(cmd);
             if (Object.prototype.hasOwnProperty.call(this._registeredCmds,
                 scmd.cmd)) {
                 var cmdDef = this._registeredCmds[scmd.cmd];
                 if (this._parameterChecker.validate(cmdDef.args, scmd.params)) {
                     cmdDef.callback.bind(this)(scmd.params)
-                        .then(null, function (emsg) {
+                        .then(null, (emsg) => {
                             var errorMessage =
                                 self._getCommandErrorMessage(emsg);
-                            self.eprint(_.template("[!] Error executing " +
-                                "'<%= cmd %>': <%= error %>")({
-                                cmd: cmd,
-                                error: errorMessage,
-                            }));
+                            self.eprint(`[!] Error executing '${cmd}': ` +
+                                `${errorMessage}`);
                             return false;
                         });
                 } else {
-                    this.print(_.template("<span class='o_terminal_click " +
-                        "o_terminal_cmd' data-cmd='help <%= cmd %>'>[!] " +
-                        "Invalid command parameters!</span>")({cmd:scmd.cmd}));
+                    this.print(`<span class='o_terminal_click ` +
+                        `o_terminal_cmd' data-cmd='help ${scmd.cmd}'>[!] ` +
+                        `Invalid command parameters!</span>`);
                     return false;
                 }
             } else {
@@ -344,13 +351,13 @@ odoo.define('terminal.Terminal', function (require) {
 
             const sanitized_in_cmd = in_cmd.toLowerCase()
                 .replace(/^[^a-z]+|[^a-z]+$/g, '').trim();
-            var sortedCmdKeys = _.keys(this._registeredCmds).sort();
-            var min_score = [0, ''];
-            for (var cmd of sortedCmdKeys) {
+            const sortedCmdKeys = _.keys(this._registeredCmds).sort();
+            const min_score = [0, ''];
+            for (const cmd of sortedCmdKeys) {
                 // Penalize word length diff
-                var cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length);
+                let cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length);
                 // Analize letter key distances
-                for (var i=0; i<sanitized_in_cmd.length; ++i) {
+                for (let i=0; i<sanitized_in_cmd.length; ++i) {
                     if (i < cmd.length) {
                         cmd_score += _get_key_dist(
                             sanitized_in_cmd.charAt(i), cmd.charAt(i));
@@ -374,8 +381,8 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         _doSearchCommand: function () {
-            var self = this;
-            var matchCmds = _.filter(
+            const self = this;
+            const matchCmds = _.filter(
                 _.keys(this._registeredCmds).sort(), function (item) {
                     return item.indexOf(self._searchCommandQuery) === 0;
                 });
@@ -390,9 +397,9 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         _processInputCommand: function () {
-            var cmd = this.$input.val();
+            const cmd = this.$input.val();
             if (cmd) {
-                var self = this;
+                const self = this;
                 self.$input.append(
                     _.template("<option><%= cmd %></option>")({cmd:cmd}));
                 self.eprint(_.template("<%= prompt %> <%= cmd %>")({
@@ -408,17 +415,17 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         _callAlias: function (alias, params) {
-            var self = this;
+            const self = this;
             return rpc.query({
                 method: 'search_read',
                 domain: [['name', '=', alias]],
                 model: 'terminal.alias',
                 fields: ['command'],
                 kwargs: {context: session.user_context},
-            }).then(function (results) {
+            }).then((results) => {
                 if (results.length) {
                     var cmd = results[0].command;
-                    for (var i in params) {
+                    for (const i in params) {
                         cmd = cmd.replace('$'+(Number(i)+1), params[i]);
                     }
                     self.executeCommand(cmd);
@@ -431,7 +438,7 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         _fallbackExecuteCommand: function () {
-            var defer = $.Deferred(function (d) {
+            const defer = $.Deferred((d) => {
                 d.reject("Invalid command definition!");
             });
             return $.when(defer);
@@ -445,13 +452,28 @@ odoo.define('terminal.Terminal', function (require) {
         _onClickTerminalCommand: function (ev) {
             if (Object.prototype.hasOwnProperty.call(ev.target.dataset,
                 'cmd')) {
-                var cmd = ev.target.dataset.cmd;
+                const cmd = ev.target.dataset.cmd;
                 this.eprint(_.template("<%= prompt %> <%= cmd %>")({
                     prompt: this.PROMPT,
                     cmd:cmd,
                 }));
                 this.executeCommand(cmd);
             }
+        },
+
+        _onClickToggleMaximize: function (ev) {
+            const $target = $(ev.currentTarget);
+            const isMaximized = this._storage.getItem('screen_maximized');
+            if (isMaximized) {
+                document.documentElement.style
+                    .setProperty('--terminal-screen-height', '40vh');
+                $target.css('backgroundColor', '');
+            } else {
+                document.documentElement.style
+                    .setProperty('--terminal-screen-height', '90vh');
+                $target.css('backgroundColor', '#555');
+            }
+            this._storage.setItem('screen_maximized', !isMaximized);
         },
 
         _onInputKeyDown: function (ev) {
@@ -484,7 +506,7 @@ odoo.define('terminal.Terminal', function (require) {
                     if (!this._searchCommandQuery) {
                         this._searchCommandQuery = this.$input.val();
                     }
-                    var found_cmd = this._doSearchCommand();
+                    const found_cmd = this._doSearchCommand();
                     if (found_cmd) {
                         this.$input.val(found_cmd + ' ');
                     }
@@ -507,34 +529,6 @@ odoo.define('terminal.Terminal', function (require) {
                 // Press Ctrl + 1
                 ev.preventDefault();
                 this.do_toggle();
-            }
-        },
-    });
-
-    /* Instantiate Terminal */
-    WebClient.include({
-        terminal: null,
-
-        show_application: function () {
-            this.terminal = new Terminal(this);
-            this.terminal.setElement(this.$el.parents().find('#terminal'));
-            this.terminal.start();
-            core.bus.on('toggle_terminal', this, function () {
-                this.terminal.do_toggle();
-            });
-            return this._super.apply(this, arguments);
-        },
-
-        current_action_updated: function (action, controller) {
-            this._super.apply(this, arguments);
-            if (this.terminal) {
-                if (controller && controller.widget) {
-                    this.terminal.setActiveWidget(
-                        controller && controller.widget);
-                } else {
-                    this.terminal.setActiveWidget(action.widget);
-                }
-                this.terminal.setActiveAction(action);
             }
         },
     });

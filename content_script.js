@@ -13,11 +13,11 @@
 
     const BrowserObj = typeof chrome === 'undefined' ? browser : chrome;
     const OdooInfoObj = {
-        'isOpenERP': false,
         'isOdoo': false,
         'isLoaded': false,
         'serverVersion': null,
         'isCompatible': false,
+        'isFrontend': false,
     };
 
     /* Helper function to inject an script */
@@ -75,26 +75,28 @@
         if (event.source !== window) {
             return;
         }
-        if (event.data.odooInfo && event.data.type === "INITIALIZE") {
+        if (event.data.odooInfo && event.data.type === "ODOO_TERM_INIT") {
             var info = event.data.odooInfo;
             _updateOdooInfo(info);
             if (info.isCompatible) {
                 const to_inject = {
                     'css': ['module/css/terminal.css'],
                     'js': [
-                        'module/js/abstract_terminal_storage.js',
                         'module/js/abstract_terminal.js',
                         'module/js/terminal.js',
-                        'module/js/terminal_core_funcs.js',
-                        'module/js/terminal_basic_funcs.js',
+                        'module/js/funcs/core.js',
+                        'module/js/funcs/common.js',
+                        `module/js/compat/v${info.serverVersionMajor}.js`,
                     ],
                 };
-                const compatibility_js = {
-                    '11': 'module/js/versions/compat_11.js',
-                    '12': 'module/js/versions/compat_12.js',
-                    '13': 'module/js/versions/compat_13.js',
-                };
-                to_inject.js.push(compatibility_js[info.serverVersionMajor]);
+                if (info.isFrontend) {
+                    to_inject.js.push('module/js/loaders/frontend.js');
+                } else {
+                    to_inject.js = [
+                        'module/js/funcs/backend.js',
+                        'module/js/loaders/backend.js',
+                    ].concat(to_inject.js);
+                }
                 _injector(to_inject);
             } else {
                 console.warn("[OdooTerminal] Incompatible server version!");

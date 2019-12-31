@@ -17,7 +17,7 @@
   top: -100%;
   transform: translate(-50%, 0);
   width: var(--terminal-screen-width);
-  z-index: 11;
+  z-index: 1001;
   display: grid; /* Here to force BS4 behavior */
 }
 
@@ -102,4 +102,15 @@
 .o_terminal .print-table thead th:last-child,
 .o_terminal .print-table tbody td:last-child {
   border-right-width: 0;
+}
+
+.o_terminal .terminal-screen-icon-maximize {
+  margin: 1em;
+  position: absolute;
+  right: 1em;
+  top: 0;
+}
+.o_terminal .terminal-screen-icon-maximize i {
+  color: white;
+  padding: 0.6em;
 }

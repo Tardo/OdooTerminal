@@ -1,5 +1,7 @@
 // Copyright 2018-2019 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+
 odoo.define('terminal.CoreFunctions', function (require) {
     'use strict';
 
@@ -38,19 +40,17 @@ odoo.define('terminal.CoreFunctions', function (require) {
 
         _printHelp: function (params) {
             if (!params || params.length === 0) {
-                var sortedCmdKeys = _.keys(this._registeredCmds).sort();
-                for (var index in sortedCmdKeys) {
-                    var cmdDef = this._registeredCmds[sortedCmdKeys[index]];
-                    this._printHelpSimple(sortedCmdKeys[index], cmdDef);
+                const sortedCmdKeys = _.keys(this._registeredCmds).sort();
+                for (const cmd of sortedCmdKeys) {
+                    this._printHelpSimple(cmd, this._registeredCmds[cmd]);
                 }
             } else {
-                var cmd = params[0];
+                const cmd = params[0];
                 if (Object.prototype.hasOwnProperty.call(this._registeredCmds,
                     cmd)) {
                     this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
                 } else {
-                    this.print(_.template(
-                        "[!] '<%= cmd %>'' command doesn't exists")({cmd:cmd}));
+                    this.print(`[!] '${cmd}' command doesn't exists`);
                 }
             }
 
@@ -69,10 +69,7 @@ odoo.define('terminal.CoreFunctions', function (require) {
         _printHelpDetailed: function (cmd, cmdDef) {
             this.print(cmdDef.detail);
             this.print(" ");
-            this.eprint(_.template("Syntaxis: <%= cmd %> <%= syntax %>")({
-                cmd:cmd,
-                syntax:cmdDef.syntaxis,
-            }));
+            this.eprint(`Syntaxis: ${cmd} ${cmdDef.syntaxis}`);
         },
 
 
@@ -85,8 +82,8 @@ odoo.define('terminal.CoreFunctions', function (require) {
         },
 
         _clear: function (params) {
-            var self = this;
-            var defer_clean = $.Deferred(function (d) {
+            const self = this;
+            const defer_clean = $.Deferred((d) => {
                 if (params.length && params[0] === 'history') {
                     self.cleanInputHistory();
                 } else {
@@ -98,9 +95,9 @@ odoo.define('terminal.CoreFunctions', function (require) {
         },
 
         _printEval: function (params) {
-            var self = this;
-            return $.when($.Deferred(function (d) {
-                var msg = params.join(' ');
+            const self = this;
+            return $.when($.Deferred((d) => {
+                let msg = params.join(' ');
                 try {
                     // Ignore linter warning
                     // eslint-disable-next-line

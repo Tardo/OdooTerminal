@@ -1,18 +1,37 @@
 // Copyright 2019 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 odoo.define('terminal.AbstractTerminal', function (require) {
     'use strict';
 
-    var core = require('web.core');
-    var Widget = require('web.Widget');
-    var AbstractTerminalStorage = require('terminal.AbstractTerminalStorage');
+    const core = require('web.core');
+    const Widget = require('web.Widget');
+    const Class = require('web.Class');
 
-    var QWeb = core.qweb;
+    const QWeb = core.qweb;
 
 
-    return Widget.extend({
-        VERSION: '1.0.1',
+    const AbstractStorage = Class.extend({
+        // eslint-disable-next-line
+        getItem: function (item) {
+            throw Error("Not Implemented!");
+        },
+
+        // eslint-disable-next-line
+        setItem: function (item, value) {
+            throw Error("Not Implemented!");
+        },
+
+        // eslint-disable-next-line
+        removeItem: function (item) {
+            throw Error("Not Implemented!");
+        },
+    });
+
+
+    const AbstractTerminal = Widget.extend({
+        VERSION: '2.0.0',
         PROMPT: '>',
 
         _registeredCmds: {},
@@ -38,11 +57,15 @@ odoo.define('terminal.AbstractTerminal', function (require) {
                             <input type='edit' id='terminal_input'
                                    class='flex-fill' />
                         </div>
+                        <div class='btn btn-sm terminal-screen-icon-maximize'
+                             role='button'>
+                            <i class='fa fa-window-maximize'></i>
+                        </div>
                     </div>
                 </t>
             </templates>`);
 
-            this._storage = new AbstractTerminalStorage(this);
+            this._storage = new AbstractStorage(this);
             this._super.apply(this, arguments);
         },
 
@@ -63,4 +86,9 @@ odoo.define('terminal.AbstractTerminal', function (require) {
             throw Error("Not Implemented!");
         },
     });
+
+    return {
+        'storage': AbstractStorage,
+        'terminal': AbstractTerminal,
+    };
 });
