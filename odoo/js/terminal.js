@@ -1,4 +1,4 @@
-// Copyright 2018-2019 Alexandre Díaz <dev@redneboa.es>
+// Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
@@ -6,13 +6,17 @@ odoo.define('terminal.Terminal', function (require) {
     'use strict';
 
     const core = require('web.core');
-    const rpc = require('web.rpc');
-    const session = require('web.session');
     const Class = require('web.Class');
     const AbstractTerminal = require('terminal.AbstractTerminal');
 
     const QWeb = core.qweb;
 
+
+    const TerminalStorage = AbstractTerminal.storage.extend({});
+
+    /**
+     * This class is used to parse terminal command parameters.
+     */
     const ParameterReader = Class.extend({
         INPUT_GROUP_DELIMETERS: ['"', "'"],
 
@@ -22,6 +26,11 @@ odoo.define('terminal.Terminal', function (require) {
             this._regexSanitize = new RegExp("'", 'g');
         },
 
+        /**
+         * Sanitize command parameters to use when invoke commands.
+         * @param {String} strParams
+         * @returns {Object}
+         */
         parse: function (strParams) {
             let scmd = strParams.split(' ');
             const rawParams = scmd.slice(1).join(' ');
@@ -65,11 +74,19 @@ odoo.define('terminal.Terminal', function (require) {
             };
         },
 
+        /**
+         * Replace all quotes to double-quotes.
+         * @param {String} str
+         * @returns {String}
+         */
         _sanitizeString: function (str) {
             return str.replace(this._regexSanitize, '"');
         },
     });
 
+    /**
+     * This class is used to validate command parameters
+     */
     const ParameterChecker = Class.extend({
         _validators: {},
 
@@ -78,6 +95,12 @@ odoo.define('terminal.Terminal', function (require) {
             this._validators.i = this._validateInt;
         },
 
+        /**
+         * Check if the parameter type correspond with the expected type.
+         * @param {Array} args
+         * @param {Array} params
+         * @returns {Boolean}
+         */
         validate: function (args, params) {
             let curParamIndex = 0;
             for (let i=0; i < args.length; ++i) {
@@ -101,9 +124,20 @@ odoo.define('terminal.Terminal', function (require) {
             return !curParamIndex || params.length <= curParamIndex;
         },
 
+        /**
+         * Test if is an string.
+         * @param {String} param
+         * @returns {Boolean}
+         */
         _validateString: function (param) {
             return Number(param) !== parseInt(param, 10);
         },
+
+        /**
+         * Test if is an integer.
+         * @param {String} param
+         * @returns {Boolean}
+         */
         _validateInt: function (param) {
             return Number(param) === parseInt(param, 10);
         },
@@ -121,10 +155,10 @@ odoo.define('terminal.Terminal', function (require) {
         _parameterReader: null,
         _has_exec_init_cmds: false,
 
-        /* INITIALIZE */
         init: function () {
             this._super.apply(this, arguments);
 
+            this._storage = new TerminalStorage(this);
             this._parameterChecker = new ParameterChecker();
             this._parameterReader = new ParameterReader();
 
@@ -137,7 +171,7 @@ odoo.define('terminal.Terminal', function (require) {
                 this._storage.setItem('terminal_screen', this.$term.html());
             }.bind(this), 350);
 
-            /* LISTEN WEBEXTENSION EVENTS */
+            // Listen messages from 'content script'
             window.addEventListener("message", function (ev) {
                 // We only accept messages from ourselves
                 if (event.source !== window) {
@@ -445,29 +479,6 @@ odoo.define('terminal.Terminal', function (require) {
             this._preventLostInputFocus();
         },
 
-        _callAlias: function (alias, params) {
-            const self = this;
-            return rpc.query({
-                method: 'search_read',
-                domain: [['name', '=', alias]],
-                model: 'terminal.alias',
-                fields: ['command'],
-                kwargs: {context: session.user_context},
-            }).then((results) => {
-                if (results.length) {
-                    var cmd = results[0].command;
-                    for (const i in params) {
-                        cmd = cmd.replace('$'+(Number(i)+1), params[i]);
-                    }
-                    self.executeCommand(cmd);
-                } else {
-                    self.print(
-                        _.template("[!] '<%= cmd %>' command not found")(
-                            {cmd:alias}));
-                }
-            });
-        },
-
         _fallbackExecuteCommand: function () {
             const defer = $.Deferred((d) => {
                 d.reject("Invalid command definition!");
@@ -494,11 +505,11 @@ odoo.define('terminal.Terminal', function (require) {
 
         _onClickToggleMaximize: function (ev) {
             const $target = $(ev.currentTarget);
-            const isMaximized = this._storage.getItem('screen_maximized');
+            const isMaximized = this.$term.data('maximized');
             if (isMaximized) {
                 const norm_height = this.documentComputedStyle.getPropertyValue(
                     '--terminal-screen-height');
-                this.$('#terminal_screen').css('height', norm_height);
+                this.$term.css('height', norm_height);
                 $target.css('backgroundColor', '');
             } else {
                 const max_height = this.documentComputedStyle.getPropertyValue(
@@ -506,10 +517,11 @@ odoo.define('terminal.Terminal', function (require) {
                 const btn_bkg_color = this.documentComputedStyle
                     .getPropertyValue(
                         '--terminal-screen-background-button-active');
-                this.$('#terminal_screen').css('height', max_height);
+                this.$term.css('height', max_height);
                 $target.css('backgroundColor', btn_bkg_color);
             }
-            this._storage.setItem('screen_maximized', !isMaximized);
+            this.$term.data('maximized', !isMaximized);
+            this.$term[0].scrollTop = this.$term[0].scrollHeight;
         },
 
         _onInputKeyDown: function (ev) {
@@ -573,5 +585,6 @@ odoo.define('terminal.Terminal', function (require) {
         'terminal': Terminal,
         'parameterReader': ParameterReader,
         'parameterChecker': ParameterChecker,
+        'storage': TerminalStorage,
     };
 });

@@ -1,4 +1,4 @@
-// Copyright 2018-2019 Alexandre Díaz <dev@redneboa.es>
+// Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
@@ -21,6 +21,8 @@ odoo.define('terminal.BackendLoader', function (require) {
             core.bus.on('toggle_terminal', this, () => {
                 this.terminal.do_toggle();
             });
+            // This is used to communicate to the extension that the widget
+            // is initialized successfully.
             window.postMessage({
                 type: "ODOO_TERM_START",
             }, "*");

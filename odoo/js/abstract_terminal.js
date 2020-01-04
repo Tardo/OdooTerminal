@@ -1,4 +1,4 @@
-// Copyright 2019 Alexandre Díaz <dev@redneboa.es>
+// Copyright 2019-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
@@ -13,6 +13,13 @@ odoo.define('terminal.AbstractTerminal', function (require) {
 
 
     const AbstractStorage = Class.extend({
+        _parent: null,
+
+
+        init: function (parent) {
+            this._parent = parent;
+        },
+
         // eslint-disable-next-line
         getItem: function (item) {
             throw Error("Not Implemented!");
@@ -65,10 +72,14 @@ odoo.define('terminal.AbstractTerminal', function (require) {
                 </t>
             </templates>`);
 
-            this._storage = new AbstractStorage(this);
             this._super.apply(this, arguments);
         },
 
+        /**
+         * Sanitize the Odoo error message.
+         * @param {Object} emsg - Odoo error
+         * @returns {String}
+         */
         _getCommandErrorMessage: function (emsg) {
             return emsg || "undefined error";
         },

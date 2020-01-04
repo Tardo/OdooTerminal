@@ -1,10 +1,14 @@
-// Copyright 2019 Alexandre Díaz
+// Copyright 2019-2020 Alexandre Díaz
 
 
+/**
+ * This script is used to collect information about Odoo (if can do it) used
+ * to know if can run the terminal and how do it.
+ */
 (function () {
     "use strict";
 
-    /* Flag to run the script once */
+    // Flag to run the script once
     if (window.hasRun) {
         return;
     }
@@ -18,6 +22,9 @@
     const OdooObj = window.odoo;
     const odooInfo = {};
 
+    /**
+     * Sends the collected information to the 'content script'.
+     */
     function _sendInitializeSignal () {
         // Send odooInfo to content script
         window.postMessage({
@@ -26,6 +33,10 @@
         }, "*");
     }
 
+    /**
+     * Helper function to sanitize the server version.
+     * @param {String} ver - Odoo version
+     */
     function _setServerVersion (ver) {
         odooInfo.serverVersion = ver;
         const foundVer = odooInfo.serverVersion.match(/\d+/);
@@ -40,6 +51,14 @@
         }
     }
 
+    /**
+     * Factory function to create RPC.
+     * @param {String} url
+     * @param {String} fct_name - Function name
+     * @param {Object} params - RPC parameters
+     * @param {Function} onFulfilled
+     * @param {Function} onRejected
+     */
     function _createRpc (url, fct_name, params, onFulfilled, onRejected) {
         if (!('args' in params)) {
             params.args = {};
@@ -57,10 +76,19 @@
         }
     }
 
+    /**
+     * Factory function to create RPC (Service type).
+     * @param {Object} params - RPC parameters
+     * @param {Function} onFulfilled
+     * @param {Function} onRejected
+     */
     function _createServiceRpc (params, onFulfilled, onRejected) {
         _createRpc('/jsonrpc', 'service', params, onFulfilled, onRejected);
     }
 
+    /**
+     * Request to Odoo the version.
+     */
     function _forceOdooServerVersionDetection () {
         _createServiceRpc({
             'service': 'db',

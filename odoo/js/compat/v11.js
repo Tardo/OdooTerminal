@@ -1,14 +1,16 @@
-// Copyright 2019 Alexandre Díaz <dev@redneboa.es>
+// Copyright 2019-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-odoo.define('terminal.AbstractTerminal11', function (require) {
+/** Implements 'interfaces' to work with Odoo 11.0 **/
+odoo.define('terminal.Compat', function (require) {
     'use strict';
 
-    const AbstractTerminal = require('terminal.AbstractTerminal');
     const local_storage = require('web.local_storage');
+    const Terminal = require('terminal.Terminal');
 
-    AbstractTerminal.storage.include({
+
+    Terminal.storage.include({
         getItem: function (item) {
             return JSON.parse(local_storage.getItem(item)) || undefined;
         },
@@ -24,7 +26,7 @@ odoo.define('terminal.AbstractTerminal11', function (require) {
     });
 
 
-    AbstractTerminal.terminal.include({
+    Terminal.terminal.include({
         _getCommandErrorMessage: function (emsg) {
             if (typeof emsg === 'object' &&
                 Object.prototype.hasOwnProperty.call(emsg, 'data')) {
