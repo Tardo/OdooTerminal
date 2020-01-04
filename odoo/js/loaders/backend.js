@@ -33,8 +33,10 @@ odoo.define('terminal.BackendLoader', function (require) {
                 if (controller && controller.widget) {
                     this.terminal.setActiveWidget(
                         controller && controller.widget);
-                } else {
+                } else if (action) {
                     this.terminal.setActiveWidget(action.widget);
+                } else {
+                    this.terminal.setActiveWidget(null);
                 }
                 this.terminal.setActiveAction(action);
             }

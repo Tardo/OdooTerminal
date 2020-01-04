@@ -32,8 +32,9 @@
         if (foundVer && foundVer.length) {
             odooInfo.serverVersionMajor = foundVer[0];
         }
-        const cvers = COMPATIBLE_VERS.filter(
-            (item) => odooInfo.serverVersion.startsWith(item));
+        const cvers = COMPATIBLE_VERS.filter(function (item) {
+            return odooInfo.serverVersion.startsWith(item);
+        });
         if (cvers.length) {
             odooInfo.isCompatible = true;
         }
