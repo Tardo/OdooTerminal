@@ -1,7 +1,7 @@
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)  ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge) ![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)
 
 # Odoo Terminal - WebExtension
-_All the power of json-rpc in a really easy way!_
+_All the power of Odoo json-rpc in a really easy way!_
 
 This web extension adds a terminal-like to control Odoo (11, 12 & 13).
 
@@ -9,8 +9,7 @@ Compatible with Firefox and Chromium but only available in the [Firefox Store](h
 
 ---
 
-Usage
-=====
+# Usage
 
 When you visit a Odoo website, the browser action icon of the extension turn to enabled state. This indicates that the extension is ready to use in the current page.
 
@@ -20,8 +19,7 @@ You can toggle terminal using one of these options:
 * Press CTRL + 1
 * Use extension browser action icon
 
-EXAMPLE COMMANDS
-================
+# Example Commands
 
 | Description | Terminal Command |
 | ----------- | ---------------- |
@@ -33,6 +31,15 @@ EXAMPLE COMMANDS
 | Install module | `install mymodule` |
 
 > Note the usage of quotes when use parameter with spaces.
+
+---
+
+# Extension Permissions
+
+| Permission | Reason |
+| ---------- | ------ |
+| activeTab | Enables support to get information about browser tabs |
+| storage | Enables support to manage stored data in the browser (used for preferences) |
 
 ---
 
@@ -79,7 +86,6 @@ Big Bang!
 # Roadmap
 
 ```
-- Support 'session storage' on frontend
 - Add unittest. Easy? Need mock 99%?
 ```
 
