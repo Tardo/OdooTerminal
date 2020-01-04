@@ -5,7 +5,6 @@
 odoo.define('terminal.FrontendLoader', function (require) {
     'use strict';
 
-    var base = require('web_editor.base');
     const core = require('web.core');
     const Terminal = require('terminal.Terminal').terminal;
 
@@ -14,9 +13,8 @@ odoo.define('terminal.FrontendLoader', function (require) {
     require('terminal.CommonFunctions');
 
 
-    base.ready().then(function () {
+    $(() => {
         const terminal = new Terminal(null, $('body').data());
-        window.odooTerminal = terminal;
         terminal.setElement($('body').find('#terminal'));
         terminal.start();
 
