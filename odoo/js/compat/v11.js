@@ -28,7 +28,7 @@ odoo.define('terminal.AbstractTerminal11', function (require) {
         _getCommandErrorMessage: function (emsg) {
             if (typeof emsg === 'object' &&
                 Object.prototype.hasOwnProperty.call(emsg, 'data')) {
-                return emsg.data.name;
+                return `${emsg.data.name} (${emsg.data.message})`;
             }
             return this._super.apply(this, arguments);
         },

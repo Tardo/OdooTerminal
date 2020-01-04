@@ -1,0 +1,9 @@
+body {
+  padding: 1em;
+}
+
+textarea {
+  height: 200px;
+  white-space: pre;
+  width: 100%;
+}

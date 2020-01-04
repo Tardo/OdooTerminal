@@ -121,7 +121,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
             this.registerCommand('caf', {
                 definition: 'Check model fields access',
                 callback: this._checkFieldAccess,
-                detail: 'Show a list of model fields with access rights',
+                detail: 'Show readable/writeable fields of the selected model',
                 syntaxis:
                     '<STRING: MODEL> "[ARRAY: FIELDS]"',
                 args: 's?s',
@@ -129,12 +129,13 @@ odoo.define('terminal.CommonFunctions', function (require) {
             this.registerCommand('cam', {
                 definition: 'Check model access',
                 callback: this._checkModelAccess,
-                detail: 'Check if can do the selected operation<br>' +
-                        "&lt;OPERATION&gt; Can be 'create', 'read', 'write'" +
-                        " or 'unlink'",
+                detail: 'Show access rights for the selected operation on the' +
+                    ' selected model' +
+                    "<br>&lt;OPERATION&gt; Can be 'create', 'read', 'write'" +
+                    " or 'unlink'",
                 syntaxis:
                     '<STRING: MODEL> <STRING: OPERATION>',
-                args: 'sss',
+                args: 'ss',
             });
         },
 
@@ -323,7 +324,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 args: JSON.parse(args),
                 kwargs: {context: session.user_context},
             }).then((result) => {
-                self.print(result);
+                self.print(JSON.stringify(result, null, 4));
             });
         },
 

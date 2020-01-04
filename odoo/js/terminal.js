@@ -13,7 +13,6 @@ odoo.define('terminal.Terminal', function (require) {
 
     const QWeb = core.qweb;
 
-
     const ParameterReader = Class.extend({
         INPUT_GROUP_DELIMETERS: ['"', "'"],
 
@@ -120,6 +119,7 @@ odoo.define('terminal.Terminal', function (require) {
 
         _parameterChecker: null,
         _parameterReader: null,
+        _has_exec_init_cmds: false,
 
         /* INITIALIZE */
         init: function () {
@@ -128,25 +128,56 @@ odoo.define('terminal.Terminal', function (require) {
             this._parameterChecker = new ParameterChecker();
             this._parameterReader = new ParameterReader();
 
+            this.documentComputedStyle = getComputedStyle(
+                document.documentElement);
+
             $(QWeb.render('terminal')).prependTo("body");
 
             this._lazyStorageTerminalScreen = _.debounce(function () {
                 this._storage.setItem('terminal_screen', this.$term.html());
             }.bind(this), 350);
+
+            /* LISTEN WEBEXTENSION EVENTS */
+            window.addEventListener("message", function (ev) {
+                // We only accept messages from ourselves
+                if (event.source !== window) {
+                    return;
+                }
+                if (!this._has_exec_init_cmds &&
+                        ev.data.type === "ODOO_TERM_EXEC_INIT_CMDS") {
+                    const cmds = _.filter(ev.data.cmds, function (item) {
+                        return item && item[0] !== '/' && item[1] !== '/';
+                    });
+                    for (const cmd of cmds) {
+                        this.eprint(_.template("<%= prompt %> <%= cmd %>")({
+                            prompt: this.PROMPT,
+                            cmd: cmd,
+                        }));
+                        this.executeCommand(cmd);
+                    }
+
+                    this._has_exec_init_cmds = true;
+                }
+            }.bind(this));
         },
 
         start: function () {
             this._super.apply(this, arguments);
 
+            // Custom Events
+            this.$el[0].addEventListener('toggle', this.do_toggle.bind(this));
+
             const isMaximized = this._storage.getItem('screen_maximized');
             if (isMaximized) {
-                document.documentElement.style
-                    .setProperty('--terminal-screen-height', '90vh');
+                const max_height = this.documentComputedStyle.getPropertyValue(
+                    '--terminal-screen-max-height');
+                const btn_bkg_color = this.documentComputedStyle
+                    .getPropertyValue(
+                        '--terminal-screen-background-button-active');
+                this.$('#terminal_screen').css('height', max_height);
                 this.$('.terminal-screen-icon-maximize')
-                    .css('backgroundColor', '#555');
+                    .css('backgroundColor', btn_bkg_color);
             }
-
-            this.$el[0].addEventListener('toggle', this.do_toggle.bind(this));
 
             this.$('.terminal-prompt').val(this.PROMPT);
 
@@ -339,7 +370,7 @@ odoo.define('terminal.Terminal', function (require) {
                     if (i === -1) {
                         return [cpk, rpk];
                     }
-                    return [parseInt(i/cpk, 10), i%rpk];
+                    return [i/cpk, i%rpk];
                 };
 
                 const from_pos = _get_key_pos2d(from);
@@ -371,7 +402,7 @@ odoo.define('terminal.Terminal', function (require) {
                 if (min_score[1] === '' || cmd_score < min_score[0]) {
                     min_score[0] = cmd_score;
                     min_score[1] = cmd;
-                    if (min_score[0] === 0) {
+                    if (min_score[0] === 0.0) {
                         break;
                     }
                 }
@@ -465,13 +496,18 @@ odoo.define('terminal.Terminal', function (require) {
             const $target = $(ev.currentTarget);
             const isMaximized = this._storage.getItem('screen_maximized');
             if (isMaximized) {
-                document.documentElement.style
-                    .setProperty('--terminal-screen-height', '40vh');
+                const norm_height = this.documentComputedStyle.getPropertyValue(
+                    '--terminal-screen-height');
+                this.$('#terminal_screen').css('height', norm_height);
                 $target.css('backgroundColor', '');
             } else {
-                document.documentElement.style
-                    .setProperty('--terminal-screen-height', '90vh');
-                $target.css('backgroundColor', '#555');
+                const max_height = this.documentComputedStyle.getPropertyValue(
+                    '--terminal-screen-max-height');
+                const btn_bkg_color = this.documentComputedStyle
+                    .getPropertyValue(
+                        '--terminal-screen-background-button-active');
+                this.$('#terminal_screen').css('height', max_height);
+                $target.css('backgroundColor', btn_bkg_color);
             }
             this._storage.setItem('screen_maximized', !isMaximized);
         },

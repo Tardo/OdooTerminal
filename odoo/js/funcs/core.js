@@ -20,7 +20,6 @@ odoo.define('terminal.CoreFunctions', function (require) {
                 syntaxis: '[STRING: COMMAND]',
                 args: '?s',
             });
-
             this.registerCommand('clear', {
                 definition: 'Clean terminal section (screen by default)',
                 callback: this._clear,
@@ -28,13 +27,19 @@ odoo.define('terminal.CoreFunctions', function (require) {
                 syntaxis: '[STRING: SECTION]',
                 args: '?s',
             });
-
             this.registerCommand('print', {
                 definition: 'Print a message',
                 callback: this._printEval,
                 detail: 'Eval parameters and print the result.',
-                syntaxis: '<MSG>',
+                syntaxis: '<STRING: MSG>',
                 args: '',
+            });
+            this.registerCommand('load', {
+                definition: 'Load external resource',
+                callback: this._loadResource,
+                detail: 'Load external source (javascript & css)',
+                syntaxis: '<STRING: URL>',
+                args: 's',
             });
         },
 
@@ -106,6 +111,32 @@ odoo.define('terminal.CoreFunctions', function (require) {
                     // Do Nothing
                 } finally {
                     self.print(msg);
+                    d.resolve();
+                }
+            }));
+        },
+
+        _loadResource: function (params) {
+            return $.when($.Deferred((d) => {
+                try {
+                    const inURL = new URL(params[0]);
+                    const pathname = inURL.pathname.toLowerCase();
+                    if (pathname.endsWith('.js')) {
+                        $.getScript(inURL.href);
+                    } else if (pathname.endsWith('.css')) {
+                        $('<link>')
+                            .appendTo('head')
+                            .attr({
+                                type: 'text/css',
+                                rel: 'stylesheet',
+                                href: inURL.href,
+                            });
+                    } else {
+                        d.reject("Invalid file type");
+                    }
+                } catch (err) {
+                    d.reject(err);
+                } finally {
                     d.resolve();
                 }
             }));

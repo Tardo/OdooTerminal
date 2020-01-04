@@ -47,12 +47,16 @@ ADD: Command 'cam': Show access rights on the selected model
 ADD: Command 'caf': Show readable/writeable fields of the selected model
 ADD: Command 'version': Show Odoo version (Only backend)
 ADD: Command 'whoami': Show login of the active user
+ADD: Command 'load': Load external resource (javascript & css)
+ADD: Preferences page (Add-ons > OdooTerminal > Preferences)
 
-FIX: 'metadata' crash on discuss in Odoo 11
+FIX: Terminal command 'metadata' crash on discuss in Odoo 11
+FIX: '_searchSimiliarCommand' accuracy
+FIX: Terminal command 'call' doesn't print results properly
 ```
 
 
-**1.1.0**
+**1.0.1**
 ```
 FIX: Storage compatibility with Odoo 11
 ```
@@ -64,7 +68,7 @@ Big Bang!
 
 ---
 
-More info: [DEV_INFO.md](./DEV_INFO.md)
+More info: [javascript.md](./docs/javascript.md)
 
 ---
 

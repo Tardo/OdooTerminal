@@ -1,5 +1,5 @@
-PUBLIC METHODS (Javascript)
-===========================
+PUBLIC METHODS
+==============
 
 | Command | Description |
 | ------- | ----------- |
@@ -13,8 +13,8 @@ PUBLIC METHODS (Javascript)
 | `do_hide()` | Hide terminal |
 | `do_toggle()` | Toggle visibility |
 
-DEFINE NEW COMMANDS (Javascript)
-================================
+DEFINE NEW COMMANDS
+===================
 Commands works with promises
 
 **Command definition**::
@@ -86,4 +86,4 @@ Commands works with promises
   });
   ```
 
-> Note that all input params are strings. You may use ```JSON.parse``` to transform them if you need a usable Javascript object.
+> Note that all input params are strings or integers. You may use ```JSON.parse``` to transform strings if you need a usable Javascript object.

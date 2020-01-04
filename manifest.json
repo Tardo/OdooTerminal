@@ -6,13 +6,20 @@
   "short_name": "Odoo Terminal",
   "description": "Terminal for Odoo",
 
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "odooterminal@redneboa.es"
+    }
+  },
+
   "icons": {
     "16": "icons/terminal-16.png",
     "32": "icons/terminal-32.png"
   },
 
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
 
   "browser_action": {
@@ -20,7 +27,6 @@
     "default_title": "Odoo Terminal (CTRL + 1)"
   },
 
-  "incognito": "spanning",
   "background": {
     "scripts": ["background.js"]
   },
@@ -34,5 +40,9 @@
 
   "web_accessible_resources": [
     "page_script.js"
-  ]
+  ],
+
+  "options_ui": {
+    "page": "settings/options.html"
+  }
 }

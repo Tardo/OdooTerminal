@@ -16,12 +16,16 @@ odoo.define('terminal.FrontendLoader', function (require) {
 
     base.ready().then(function () {
         const terminal = new Terminal(null, $('body').data());
+        window.odooTerminal = terminal;
         terminal.setElement($('body').find('#terminal'));
         terminal.start();
 
         core.bus.on('toggle_terminal', this, () => {
             terminal.do_toggle();
         });
+        window.postMessage({
+            type: "ODOO_TERM_START",
+        }, "*");
     });
 
 });

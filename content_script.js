@@ -18,17 +18,16 @@
         'serverVersion': null,
         'isCompatible': false,
         'isFrontend': false,
+        'serverVersionMajor': '12',
     };
 
     /* Helper function to inject an script */
-    function _injectPageScript (script, autoremove=true) {
+    function _injectPageScript (script, callback) {
         const script_page = document.createElement('script');
         script_page.setAttribute("type", "text/javascript");
         (document.head || document.documentElement).appendChild(script_page);
-        if (autoremove) {
-            script_page.onload = () => {
-                script_page.parentNode.removeChild(script_page);
-            };
+        if (callback) {
+            script_page.onload = callback;
         }
         script_page.src = BrowserObj.extension.getURL(script);
     }
@@ -48,7 +47,7 @@
             _injectPageCSS(css);
         }
         for (var js of files.js) {
-            _injectPageScript(js, false);
+            _injectPageScript(js);
         }
     }
 
@@ -75,32 +74,42 @@
         if (event.source !== window) {
             return;
         }
-        if (event.data.odooInfo && event.data.type === "ODOO_TERM_INIT") {
+        if (event.data.odooInfo && !event.data.odooInfo.isLoaded &&
+                event.data.type === "ODOO_TERM_INIT") {
             var info = event.data.odooInfo;
             _updateOdooInfo(info);
             if (info.isCompatible) {
                 const to_inject = {
-                    'css': ['module/css/terminal.css'],
+                    'css': ['odoo/css/terminal.css'],
                     'js': [
-                        'module/js/abstract_terminal.js',
-                        'module/js/terminal.js',
-                        'module/js/funcs/core.js',
-                        'module/js/funcs/common.js',
-                        `module/js/compat/v${info.serverVersionMajor}.js`,
+                        'odoo/js/abstract_terminal.js',
+                        'odoo/js/terminal.js',
+                        'odoo/js/funcs/core.js',
+                        'odoo/js/funcs/common.js',
+                        `odoo/js/compat/v${info.serverVersionMajor}.js`,
                     ],
                 };
                 if (info.isFrontend) {
-                    to_inject.js.push('module/js/loaders/frontend.js');
+                    to_inject.js.push('odoo/js/loaders/frontend.js');
                 } else {
                     to_inject.js = [
-                        'module/js/funcs/backend.js',
-                        'module/js/loaders/backend.js',
+                        'odoo/js/funcs/backend.js',
+                        'odoo/js/loaders/backend.js',
                     ].concat(to_inject.js);
                 }
                 _injector(to_inject);
             } else {
                 console.warn("[OdooTerminal] Incompatible server version!");
             }
+        } else if (event.data.type === "ODOO_TERM_START") {
+            // Load Init Commands
+            BrowserObj.storage.sync.get(["init_cmds"], (result) => {
+                const cmds = (result.init_cmds || "").split(/\n\r?/);
+                window.postMessage({
+                    type: "ODOO_TERM_EXEC_INIT_CMDS",
+                    cmds: cmds,
+                }, "*");
+            });
         }
     }, false);
 
@@ -110,7 +119,9 @@
             if (OdooInfoObj.isLoaded) {
                 _sendOdooInfoToBackground();
             } else {
-                _injectPageScript('page_script.js');
+                _injectPageScript('page_script.js', (ev) => {
+                    ev.target.parentNode.removeChild(ev.target);
+                });
             }
         } else if (request.message === 'toggle_terminal') {
             if (OdooInfoObj.isCompatible) {

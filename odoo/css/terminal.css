@@ -2,7 +2,9 @@
   --terminal-input-height: 25px;
   --terminal-screen-width: 70%;
   --terminal-screen-height: 40vh;
+  --terminal-screen-max-height: 90vh;
   --terminal-screen-background-color: black;
+  --terminal-screen-background-button-active: #555;
   --terminal-screen-text-color: lightgray;
   --terminal-screen-font:  "Lucida Console", Monaco, monospace;
   --terminal-title-color: rgb(124, 123, 173);
@@ -17,7 +19,7 @@
   top: -100%;
   transform: translate(-50%, 0);
   width: var(--terminal-screen-width);
-  z-index: 1001;
+  z-index: 1031;
   display: grid; /* Here to force BS4 behavior */
 }
 

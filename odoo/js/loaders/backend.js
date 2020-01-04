@@ -14,12 +14,16 @@ odoo.define('terminal.BackendLoader', function (require) {
         terminal: null,
 
         show_application: function () {
-            this.terminal = new Terminal(this);
+            window.odooTerminal = this.terminal = new Terminal(this);
             this.terminal.setElement(this.$el.parents().find('#terminal'));
             this.terminal.start();
+
             core.bus.on('toggle_terminal', this, () => {
                 this.terminal.do_toggle();
             });
+            window.postMessage({
+                type: "ODOO_TERM_START",
+            }, "*");
             return this._super.apply(this, arguments);
         },
 
