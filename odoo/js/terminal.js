@@ -146,7 +146,7 @@ odoo.define('terminal.Terminal', function (require) {
     const Terminal = AbstractTerminal.terminal.extend({
         events: {
             "keydown #terminal_input": "_onInputKeyDown",
-            "click #terminal_screen": "_preventLostInputFocus",
+            "keydown #terminal_screen": "_preventLostInputFocus",
             "click .o_terminal_cmd": "_onClickTerminalCommand",
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
         },
@@ -308,8 +308,9 @@ odoo.define('terminal.Terminal', function (require) {
                         .then(null, (emsg) => {
                             var errorMessage =
                                 self._getCommandErrorMessage(emsg);
-                            self.eprint(`[!] Error executing '${cmd}': ` +
-                                `${errorMessage}`);
+                            self.eprint(`[!] Error executing '${cmd}':`);
+                            self.print("<span class='error_message'>" +
+                                       `${errorMessage}</span>`);
                             return false;
                         });
                 } else {
@@ -487,8 +488,11 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         /* HANDLE EVENTS */
-        _preventLostInputFocus: function () {
-            this.$input.focus();
+        _preventLostInputFocus: function (ev) {
+            const isCKey = ev && (ev.ctrlKey || ev.altKey);
+            if (!isCKey) {
+                this.$input.focus();
+            }
         },
 
         _onClickTerminalCommand: function (ev) {

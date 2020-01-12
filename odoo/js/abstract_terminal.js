@@ -38,7 +38,7 @@ odoo.define('terminal.AbstractTerminal', function (require) {
 
 
     const AbstractTerminal = Widget.extend({
-        VERSION: '2.0.1',
+        VERSION: '2.2.0',
         PROMPT: '>',
 
         _registeredCmds: {},
@@ -58,7 +58,7 @@ odoo.define('terminal.AbstractTerminal', function (require) {
                 <t t-name='terminal'>
                     <div id='terminal' class='o_terminal'>
                         <div class='col-sm-12 col-lg-12'
-                             id='terminal_screen' readonly='readonly'></div>
+                             id='terminal_screen' tabindex="-1"></div>
                         <div class='d-flex terminal-user-input'>
                             <input class='terminal-prompt' readonly='readonly'/>
                             <input type='edit' id='terminal_input'

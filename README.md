@@ -45,6 +45,18 @@ You can toggle terminal using one of these options:
 
 # Changelog
 
+**2.2.0**
+```
+IMP: Command 'search': Now 'fields' parameter its optional (default value is 'display_name') (#4)
+IMP: Command 'whoami': Now shows more information (#5)
+IMP: Now can copy content from terminal to the clipboard (#6)
+IMP: Terminal CSS
+
+ADD: Command 'lastseen': Show users 'last seen'
+
+FIX: Version number, due to a mistake versioning in the firefox store, the extension version is hard-increased to 2.2.0
+```
+
 **2.0.1**
 ```
 IMP: Start the JSDoc usage
@@ -87,6 +99,8 @@ Big Bang!
 
 ```
 - Add unittest. Easy? Need mock 99%?
+- Create a script for make new releases automatically
+- Copy fish feature to preview last matched command
 ```
 
 ---

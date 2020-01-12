@@ -40,11 +40,12 @@ odoo.define('terminal.CommonFunctions', function (require) {
             this.registerCommand('search', {
                 definition: 'Search model record/s',
                 callback: this._searchModelRecord,
-                detail: 'Launch orm search query.<br>&lt;FIELDS&gt; ' +
-                    'are separated by commas.',
-                syntaxis: '<STRING: MODEL NAME> <STRING: FIELDS> ' +
+                detail: 'Launch orm search query.<br>[FIELDS] ' +
+                    'are separated by commas (without spaces) and by default ' +
+                    "is 'display_name'",
+                syntaxis: '<STRING: MODEL NAME> [STRING: FIELDS] ' +
                     '"[ARRAY: DOMAIN]" [INT: LIMIT]',
-                args: 'ss?s?i',
+                args: 's?s?s?i',
             });
             this.registerCommand('call', {
                 definition: 'Call model method',
@@ -137,6 +138,33 @@ odoo.define('terminal.CommonFunctions', function (require) {
                     '<STRING: MODEL> <STRING: OPERATION>',
                 args: 'ss',
             });
+            this.registerCommand('lastseen', {
+                definition: 'Know user presence',
+                callback: this._lastSeen,
+                detail: 'Show users last seen',
+                syntaxis: '',
+                args: '',
+            });
+        },
+
+        _lastSeen: function () {
+            return rpc.query({
+                method: 'search_read',
+                fields: ['user_id', 'last_presence'],
+                model: 'bus.presence',
+                order: 'last_presence DESC',
+                kwargs: {context: session.user_context},
+            }).then((result) => {
+                let body = "";
+                for (const record of result) {
+                    body +=
+                        `<tr><td>${record.user_id[1]}</td>` +
+                        `<td>${record.user_id[0]}</td>` +
+                        `<td>${record.last_presence}</td></tr>`;
+                }
+
+                this.printTable(['User Name', 'User ID', 'Last Seen'], body);
+            });
         },
 
         _checkModelAccess: function (params) {
@@ -186,6 +214,16 @@ odoo.define('terminal.CommonFunctions', function (require) {
             });
         },
 
+        _WHOAMI_TEMPLATE: "<span style='color: gray;'>Login</span>:" +
+            ` <%= login %>` +
+            "<br><span style='color: gray;'>Partner</span>:" +
+            " <%= partner[1] %> (#<%= partner[0] %>)" +
+            "<br><span style='color: gray;'>Company</span>:" +
+            " <%= company[1] %> (#<%= company[0] %>)" +
+            "<br><span style='color: gray;'>Allowed Companies</span>:" +
+            " <%= companies %>" +
+            "<br><span style='color: gray;'>Groups</span>:" +
+            " <%= groups %>",
         _showWhoAmI: function () {
             const self = this;
             const uid = window.odoo.session_info.uid ||
@@ -193,12 +231,25 @@ odoo.define('terminal.CommonFunctions', function (require) {
             return rpc.query({
                 method: 'search_read',
                 domain: [['id', '=', uid]],
-                fields: ['login'],
+                fields: [
+                    'login',
+                    'partner_id',
+                    'company_id',
+                    'company_ids',
+                    'groups_id',
+                ],
                 model: 'res.users',
                 kwargs: {context: session.user_context},
             }).then((result) => {
                 if (result.length) {
-                    self.print(result[0].login);
+                    const record = result[0];
+                    self.print(_.template(self._WHOAMI_TEMPLATE)({
+                        login: record.login,
+                        partner: record.partner_id,
+                        company: record.company_id,
+                        companies: record.company_ids,
+                        groups: record.groups_id,
+                    }));
                 } else {
                     self.print("[!] Oops! can't get the login :/");
                 }
@@ -217,7 +268,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 this.print(
                     "Debug mode <strong>enabled</strong>. Reloading page...");
                 window.location = $.param.querystring(
-                    window.location.href, 'debug=');
+                    window.location.href, 'debug=1');
             } else if (mode === 2) {
                 this.print(
                     "Debug mode with assets <strong>enabled</strong>. " +
@@ -330,7 +381,10 @@ odoo.define('terminal.CommonFunctions', function (require) {
 
         _searchModelRecord: function (params) {
             const model = params[0];
-            const fields = params[1]==='*'?false:params[1].split(',');
+            let fields = ['display_name'];
+            if (params[1]) {
+                fields = params[1]==='*'?false:params[1].split(',');
+            }
             const domain = params[2] || "[]";
             const limit = Number(params[3]) || false;
             const self = this;

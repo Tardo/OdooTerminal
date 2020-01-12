@@ -5,6 +5,7 @@ PUBLIC METHODS
 | ------- | ----------- |
 | `print(str)` | Print a message |
 | `eprint(str)` | Print a escaped message |
+| `printTable(array, str)` | Print a table |
 | `clean()` | Clean terminal |
 | `cleanInput()` | Clean input |
 | `registerCommand(str, cmdDef)` | Register new command |

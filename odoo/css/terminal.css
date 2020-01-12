@@ -45,8 +45,19 @@
   text-decoration: underline;
 }
 
+.o_terminal div#terminal_screen .error_message {
+  background-color: darkred;
+  border: 1px solid red;
+  padding: 0.3em;
+  border-radius: 3px;
+  margin: 0.3em;
+  display: block;
+}
+
 .o_terminal .terminal-user-input {
   background-color: var(--terminal-screen-background-color);
+  border: 1px dotted #dedede;
+  border-width: 1px 0 0 0;
   color: var(--terminal-screen-text-color);
 
   display: flex; /* Here to force BS4 behavior */
