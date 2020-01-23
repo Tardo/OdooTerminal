@@ -18,6 +18,7 @@
         '11.0', 'saas~11',
         '12.0', 'saas~12',
         '13.0', 'saas~13',
+        '14.0', 'saas~14',
     ];
     const OdooObj = window.odoo;
     const odooInfo = {};
