@@ -9,6 +9,10 @@ Compatible with Firefox and Chromium but only available in the [Firefox Store](h
 
 ---
 
+**This add-on is only for technical purposes, DO NOT use it on remote instances where you don't have authorization!! If you access or alter any data that does not belong to you, you are taking significant legal risks!**
+
+---
+
 # Usage
 
 When you visit a Odoo website, the browser action icon of the extension turn to enabled state. This indicates that the extension is ready to use in the current page.
@@ -44,6 +48,13 @@ You can toggle terminal using one of these options:
 ---
 
 # Changelog
+
+**2.2.1**
+```
+IMP: Command 'settings': Moved to backend
+IMP: Print Objects
+IMP: Print Errors
+```
 
 **2.2.0**
 ```

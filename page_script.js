@@ -64,17 +64,19 @@
         if (!('args' in params)) {
             params.args = {};
         }
-        if ('define' in OdooObj) {
-            OdooObj.define(0, function (require) {
-                var ajax = require('web.ajax');
-                if ('rpc' in ajax) {
-                    ajax.rpc(url, params).then(onFulfilled, onRejected);
-                } else if ('jsonRpc' in ajax) {
-                    ajax.jsonRpc(url, fct_name, params).then(
-                        onFulfilled, onRejected);
-                }
-            });
-        }
+
+        $.ajax(url, {
+            url: url,
+            dataType: 'json',
+            type: 'POST',
+            data: JSON.stringify({
+                jsonrpc: "2.0",
+                method: fct_name,
+                params: params,
+                id: Math.floor(Math.random() * 1000 * 1000 * 1000),
+            }),
+            contentType: 'application/json',
+        }).then(onFulfilled, onRejected);
     }
 
     /**
@@ -94,7 +96,8 @@
         _createServiceRpc({
             'service': 'db',
             'method': 'server_version',
-        }, (version) => {
+        }, (rpc_response) => {
+            const version = rpc_response.result;
             if (!_.isUndefined(version) && typeof version === 'string') {
                 _setServerVersion(version);
             }
@@ -108,7 +111,7 @@
             'isOdoo': true,
         });
 
-        // Module only valid for authenticated users
+        // Extension only valid for authenticated users
         if (Object.prototype.hasOwnProperty.call(OdooObj, 'session_info')) {
             if (OdooObj.session_info.server_version) {
                 _setServerVersion(OdooObj.session_info.server_version);

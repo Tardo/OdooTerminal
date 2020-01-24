@@ -242,10 +242,22 @@ odoo.define('terminal.Terminal', function (require) {
             this._lazyStorageTerminalScreen();
         },
 
-        print: function (msg, enl) {
-            this._printHTML("<span>");
-            this._printHTML(msg);
-            this._printHTML("</span>");
+        _prettyObjectString: function (obj) {
+            return JSON.stringify(obj, null, 4);
+        },
+        print: function (msg, enl, cls) {
+            const msg_type = typeof msg;
+            if (msg_type === 'object') {
+                if (msg instanceof Text) {
+                    this._printHTML($(msg).wrap(
+                        `<span class='${cls || ''}'></span>`));
+                } else {
+                    this._printHTML(`<span class='${cls || ''}'>` +
+                        `${this._prettyObjectString(msg)}</span>`);
+                }
+            } else {
+                this._printHTML(`<span class='${cls || ''}'>${msg}</span>`);
+            }
             if (!enl) {
                 this._printHTML("<br>");
             }
@@ -309,8 +321,7 @@ odoo.define('terminal.Terminal', function (require) {
                             var errorMessage =
                                 self._getCommandErrorMessage(emsg);
                             self.eprint(`[!] Error executing '${cmd}':`);
-                            self.print("<span class='error_message'>" +
-                                       `${errorMessage}</span>`);
+                            self.print(errorMessage, false, 'error_message');
                             return false;
                         });
                 } else {

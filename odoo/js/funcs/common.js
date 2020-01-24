@@ -75,13 +75,6 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 syntaxis: '<STRING: MODULE NAME>',
                 args: 's',
             });
-            this.registerCommand('settings', {
-                definition: 'Open settings page',
-                callback: this._openSettings,
-                detail: 'Open settings page.',
-                syntaxis: '',
-                args: '',
-            });
             this.registerCommand('reload', {
                 definition: 'Reload current page',
                 callback: this._reloadPage,
@@ -375,7 +368,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 args: JSON.parse(args),
                 kwargs: {context: session.user_context},
             }).then((result) => {
-                self.print(JSON.stringify(result, null, 4));
+                self.print(result);
             });
         },
 
@@ -484,18 +477,6 @@ odoo.define('terminal.CommonFunctions', function (require) {
             });
         },
 
-        _openSettings: function () {
-            const self = this;
-            return this.do_action({
-                type: 'ir.actions.act_window',
-                res_model: 'res.config.settings',
-                views: [[false, 'form']],
-                target: 'current',
-            }).then(() => {
-                self.do_hide();
-            });
-        },
-
         _callAction: function (params) {
             let action = params[0];
             try {
@@ -510,8 +491,8 @@ odoo.define('terminal.CommonFunctions', function (require) {
             const url = params[0];
             const data = params[1];
             const self = this;
-            return ajax.post(url, JSON.parse(data)).then((results) => {
-                self.eprint(results);
+            return ajax.post(url, JSON.parse(data)).then((result) => {
+                self.print(result);
             });
         },
     });

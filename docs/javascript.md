@@ -3,7 +3,7 @@ PUBLIC METHODS
 
 | Command | Description |
 | ------- | ----------- |
-| `print(str)` | Print a message |
+| `print(str, bool, str)` | Print a message |
 | `eprint(str)` | Print a escaped message |
 | `printTable(array, str)` | Print a table |
 | `clean()` | Clean terminal |

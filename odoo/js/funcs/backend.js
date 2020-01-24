@@ -43,6 +43,25 @@ odoo.define('terminal.BackendFunctions', function (require) {
                 syntaxis: '',
                 args: '',
             });
+            this.registerCommand('settings', {
+                definition: 'Open settings page',
+                callback: this._openSettings,
+                detail: 'Open settings page.',
+                syntaxis: '',
+                args: '',
+            });
+        },
+
+        _openSettings: function () {
+            const self = this;
+            return this.do_action({
+                type: 'ir.actions.act_window',
+                res_model: 'res.config.settings',
+                views: [[false, 'form']],
+                target: 'current',
+            }).then(() => {
+                self.do_hide();
+            });
         },
 
         _showOdooVersion: function () {
