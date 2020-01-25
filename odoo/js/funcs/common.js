@@ -138,6 +138,52 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 syntaxis: '',
                 args: '',
             });
+            this.registerCommand('searchid', {
+                definition: 'Search model record',
+                callback: this._searchModelRecordId,
+                detail: 'Launch orm search query.<br>[FIELDS] ' +
+                    'are separated by commas (without spaces) and by default ' +
+                    "is 'display_name'",
+                syntaxis: '<STRING: MODEL NAME> <INT: RECORD ID> ' +
+                    '[STRING: FIELDS]',
+                args: 'si?s',
+            });
+        },
+
+        _searchModelRecordId: function (params) {
+            const model = params[0];
+            const recordid = Number(params[1]);
+            let fields = ['display_name'];
+            if (params[2]) {
+                fields = params[2]==='*'?false:params[2].split(',');
+            }
+            const self = this;
+            return rpc.query({
+                method: 'search_read',
+                domain: [['id', '=', recordid]],
+                fields: fields,
+                model: model,
+                kwargs: {context: session.user_context},
+            }).then((result) => {
+                let tbody = '';
+                const columns = ['id'];
+                for (const item of result) {
+                    tbody += '<tr>';
+                    tbody += _.template("<td><span class='o_terminal_click " +
+                        "o_terminal_view' data-resid='<%= id %>' " +
+                        "data-model='<%= model %>'>#<%= id %></span></td>")({
+                        id:item.id,
+                        model:model,
+                    });
+                    delete item.id;
+                    for (const field in item) {
+                        columns.push(field);
+                        tbody += `<td>${item[field]}</td>`;
+                    }
+                    tbody += "</tr>";
+                }
+                self.printTable(_.unique(columns), tbody);
+            });
         },
 
         _lastSeen: function () {
