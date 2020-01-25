@@ -3,13 +3,9 @@
 # Odoo Terminal - WebExtension
 _All the power of Odoo json-rpc in a really easy way!_
 
-This web extension adds a terminal-like to control Odoo (11, 12 & 13).
+This web extension adds a terminal-like to control Odoo (11, 12, 13 & 14).
 
 Compatible with Firefox and Chromium but only available in the [Firefox Store](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/).
-
----
-
-**This add-on is only for technical purposes, DO NOT use it on remote instances where you don't have authorization!! If you access or alter any data that does not belong to you, you are taking significant legal risks!**
 
 ---
 
@@ -34,7 +30,7 @@ You can toggle terminal using one of these options:
 | View selected 'res.partner' record | `view res.partner 4` |
 | Install module | `install mymodule` |
 
-> Note the usage of quotes when use parameter with spaces.
+> Notice the usage of quotes when use parameters with spaces.
 
 ---
 
@@ -54,13 +50,16 @@ You can toggle terminal using one of these options:
 IMP: Command 'settings': Moved to backend
 IMP: Print Objects
 IMP: Print Errors
+
+ADD: Support to Odoo 14.0 (pr #7)
+ADD: Command 'searchid': Works like 'search' but for a specific record id
 ```
 
 **2.2.0**
 ```
-IMP: Command 'search': Now 'fields' parameter its optional (default value is 'display_name') (#4)
-IMP: Command 'whoami': Now shows more information (#5)
-IMP: Now can copy content from terminal to the clipboard (#6)
+IMP: Command 'search': Now 'fields' parameter its optional (default value is 'display_name') (issue #4)
+IMP: Command 'whoami': Now shows more information (issue #5)
+IMP: Now can copy content from terminal to the clipboard (issue #6)
 IMP: Terminal CSS
 
 ADD: Command 'lastseen': Show users 'last seen'
@@ -72,7 +71,7 @@ FIX: Version number, due to a mistake versioning in the firefox store, the exten
 ```
 IMP: Start the JSDoc usage
 
-FIX: Error when clicking on apps button in OE11 (#1)
+FIX: Error when clicking on apps button in OE11 (issue #1)
 FIX: Toggle maximize
 ```
 
@@ -122,7 +121,7 @@ More info: [javascript.md](./docs/javascript.md)
 
 # License
 
-Copyright 2019-2020 Alexandre Díaz
+Copyright 2019-2020 Alexandre Díaz & contributors
 
 AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
