@@ -39,7 +39,9 @@
   ],
 
   "web_accessible_resources": [
-    "page_script.js"
+    "page_script.js",
+    "odoo/css/*",
+    "odoo/js/*"
   ],
 
   "options_ui": {
