@@ -392,8 +392,8 @@ odoo.define('terminal.CommonFunctions', function (require) {
                         model: 'ir.module.module',
                         args: [result[0].id],
                     }).then(() => {
-                        self.print(`'${module}' module successfully
-                            uninstalled`);
+                        self.print(
+                            `'${module}' module successfully uninstalled`);
                     }, () => {
                         self.print(`[!] Can't uninstall '${module}' module`);
                     });
