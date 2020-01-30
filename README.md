@@ -45,11 +45,12 @@ You can toggle terminal using one of these options:
 
 # Changelog
 
-**2.2.1**
+**2.3.0**
 ```
 IMP: Command 'settings': Moved to backend
 IMP: Print Objects
 IMP: Print Errors
+IMP: Input management
 
 ADD: Support to Odoo 14.0 (pr #7)
 ADD: Command 'searchid': Works like 'search' but for a specific record id

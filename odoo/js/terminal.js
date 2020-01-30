@@ -316,20 +316,17 @@ odoo.define('terminal.Terminal', function (require) {
                 scmd.cmd)) {
                 var cmdDef = this._registeredCmds[scmd.cmd];
                 if (this._parameterChecker.validate(cmdDef.args, scmd.params)) {
-                    cmdDef.callback.bind(this)(scmd.params)
+                    return cmdDef.callback.bind(this)(scmd.params)
                         .then(null, (emsg) => {
                             var errorMessage =
                                 self._getCommandErrorMessage(emsg);
                             self.eprint(`[!] Error executing '${cmd}':`);
                             self.print(errorMessage, false, 'error_message');
-                            return false;
                         });
-                } else {
-                    this.print(`<span class='o_terminal_click ` +
-                        `o_terminal_cmd' data-cmd='help ${scmd.cmd}'>[!] ` +
-                        `Invalid command parameters!</span>`);
-                    return false;
                 }
+                this.print(`<span class='o_terminal_click ` +
+                    `o_terminal_cmd' data-cmd='help ${scmd.cmd}'>[!] ` +
+                    `Invalid command parameters!</span>`);
             } else {
                 const similar_cmd = this._searchSimiliarCommand(scmd.cmd);
                 if (similar_cmd) {
@@ -345,7 +342,7 @@ odoo.define('terminal.Terminal', function (require) {
                 }
             }
 
-            return true;
+            return false;
         },
 
         /* VISIBILIY */
@@ -400,7 +397,7 @@ odoo.define('terminal.Terminal', function (require) {
             }
 
             // Only consider words with score lower than this limit
-            const SCORE_LIMIT = 5;
+            const SCORE_LIMIT = 50;
             // Columns per Key and Rows per Key
             const cpk = 10, rpk = 3;
             const _get_key_dist = function (from, to) {
@@ -432,7 +429,8 @@ odoo.define('terminal.Terminal', function (require) {
             const min_score = [0, ''];
             for (const cmd of sortedCmdKeys) {
                 // Penalize word length diff
-                let cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length);
+                let cmd_score = Math.abs(
+                    sanitized_in_cmd.length - cmd.length) * cpk * rpk;
                 // Analize letter key distances
                 for (let i=0; i<sanitized_in_cmd.length; ++i) {
                     if (i < cmd.length) {
@@ -473,6 +471,54 @@ odoo.define('terminal.Terminal', function (require) {
             return matchCmds[this._searchCommandIter++];
         },
 
+        _doSearchPrevHistory: function () {
+            const self = this;
+            if (this._searchCommandQuery) {
+                const orig_iter = self._searchHistoryIter;
+                this._searchHistoryIter = _.findLastIndex(
+                    this._inputHistory, function (item, i) {
+                        return item.indexOf(self._searchCommandQuery) === 0 &&
+                            i <= self._searchHistoryIter - 1;
+                    });
+                if (this._searchHistoryIter === -1) {
+                    this._searchHistoryIter = orig_iter;
+                    return false;
+                }
+                return this._inputHistory[this._searchHistoryIter];
+            }
+            --this._searchHistoryIter;
+            if (this._searchHistoryIter < 0) {
+                this._searchHistoryIter = 0;
+            } else if (this._searchHistoryIter >= this._inputHistory.length) {
+                this._searchHistoryIter = this._inputHistory.length - 1;
+            }
+            return this._inputHistory[this._searchHistoryIter];
+        },
+
+        _doSearchNextHistory: function () {
+            const self = this;
+            if (this._searchCommandQuery) {
+                this._searchHistoryIter = _.findIndex(
+                    this._inputHistory, function (item, i) {
+                        return item.indexOf(self._searchCommandQuery) === 0 &&
+                            i >= self._searchHistoryIter + 1;
+                    });
+                if (this._searchHistoryIter === -1) {
+                    this._searchHistoryIter = this._inputHistory.length;
+                    return false;
+                }
+                return this._inputHistory[this._searchHistoryIter];
+            }
+            ++this._searchHistoryIter;
+            if (this._searchHistoryIter >= this._inputHistory.length) {
+                this._searchCommandQuery = undefined;
+                return false;
+            } else if (this._searchHistoryIter < 0) {
+                this._searchHistoryIter = 0;
+            }
+            return this._inputHistory[this._searchHistoryIter];
+        },
+
         _processInputCommand: function () {
             const cmd = this.$input.val();
             if (cmd) {
@@ -489,6 +535,10 @@ odoo.define('terminal.Terminal', function (require) {
                 this.executeCommand(cmd);
             }
             this._preventLostInputFocus();
+        },
+
+        _updateInput: function (str) {
+            this.$input.val(str);
         },
 
         _fallbackExecuteCommand: function () {
@@ -539,45 +589,68 @@ odoo.define('terminal.Terminal', function (require) {
             this.$term[0].scrollTop = this.$term[0].scrollHeight;
         },
 
-        _onInputKeyDown: function (ev) {
-            if (ev.keyCode === 13) {
-                // Press Enter
-                this._processInputCommand();
+        _onKeyEnter: function () {
+            this._processInputCommand();
+            this._searchHistoryIter = this._inputHistory.length;
+            this._searchCommandQuery = undefined;
+        },
+        _onKeyArrowUp: function () {
+            if (_.isUndefined(this._searchCommandQuery)) {
+                this._searchCommandQuery = this.$input.val();
+            }
+            const found_hist = this._doSearchPrevHistory();
+            if (found_hist) {
+                this._updateInput(found_hist);
+            }
+        },
+        _onKeyArrowDown: function () {
+            if (_.isUndefined(this._searchCommandQuery)) {
+                this._searchCommandQuery = this.$input.val();
+            }
+            const found_hist = this._doSearchNextHistory();
+            if (found_hist) {
+                this._updateInput(found_hist);
+            } else {
+                this._searchCommandQuery = undefined;
+                this.cleanInput();
+            }
+        },
+        _onKeyArrowRight: function () {
+            if (this.$input.val()) {
+                this._searchCommandQuery = this.$input.val();
                 this._searchHistoryIter = this._inputHistory.length;
-            } else if (ev.keyCode === 38) {
-                // Press Up
-                if (this._searchHistoryIter > 0) {
-                    --this._searchHistoryIter;
-                    this.$input.val(
-                        this._inputHistory[this._searchHistoryIter]);
+                this._onKeyArrowUp();
+                this._searchCommandQuery = this.$input.val();
+                this._searchHistoryIter = this._inputHistory.length;
+            }
+        },
+        _onKeyTab: function () {
+            if (this.$input.val()) {
+                if (_.isUndefined(this._searchCommandQuery)) {
+                    this._searchCommandQuery = this.$input.val();
                 }
-            } else if (ev.keyCode === 40) {
-                // Press Down
-                if (this._searchHistoryIter < this._inputHistory.length-1) {
-                    ++this._searchHistoryIter;
-                    this.$input.val(
-                        this._inputHistory[this._searchHistoryIter]);
-                } else {
-                    this._searchHistoryIter = this._inputHistory.length;
-                    this.cleanInput();
+                const found_cmd = this._doSearchCommand();
+                if (found_cmd) {
+                    this._updateInput(found_cmd + ' ');
                 }
             }
+        },
 
-            if (ev.keyCode === 9) {
-                // Press Tab
-                if (this.$input.val()) {
-                    if (!this._searchCommandQuery) {
-                        this._searchCommandQuery = this.$input.val();
-                    }
-                    const found_cmd = this._doSearchCommand();
-                    if (found_cmd) {
-                        this.$input.val(found_cmd + ' ');
-                    }
-                }
+        _onInputKeyDown: function (ev) {
+            if (ev.keyCode === 13) {
+                this._onKeyEnter();
+            } else if (ev.keyCode === 38) {
+                this._onKeyArrowUp();
+            } else if (ev.keyCode === 40) {
+                this._onKeyArrowDown();
+            } else if (ev.keyCode === 39) {
+                this._onKeyArrowRight();
+            } else if (ev.keyCode === 9) {
+                this._onKeyTab();
                 ev.preventDefault();
             } else {
-                this._searchCommandIter = 0;
-                this._searchCommandQuery = false;
+                this._searchCommandIter = this._inputHistory.length;
+                this._searchCommandQuery = undefined;
             }
         },
 

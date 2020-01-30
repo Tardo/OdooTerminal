@@ -38,7 +38,7 @@ odoo.define('terminal.AbstractTerminal', function (require) {
 
 
     const AbstractTerminal = Widget.extend({
-        VERSION: '2.2.1',
+        VERSION: '2.3.0',
         PROMPT: '>',
 
         _registeredCmds: {},
