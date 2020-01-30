@@ -119,7 +119,15 @@
                 if (OdooObj.session_info.is_frontend) {
                     odooInfo.isFrontend = true;
                 }
-                _forceOdooServerVersionDetection();
+
+                try {
+                    OdooObj.define(0, (require) => {
+                        require('web.core');
+                        _forceOdooServerVersionDetection();
+                    });
+                } catch (exception) {
+                    // Do nothing
+                }
                 canInitialize = false;
             }
         }

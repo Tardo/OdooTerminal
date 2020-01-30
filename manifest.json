@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "Odoo Terminal",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "short_name": "Odoo Terminal",
   "description": "Terminal for Odoo",
 
@@ -34,7 +34,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content_script.js"]
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
     }
   ],
 

@@ -19,7 +19,7 @@
   top: -100%;
   transform: translate(-50%, 0);
   width: var(--terminal-screen-width);
-  z-index: 1031;
+  z-index: 1041;
   display: grid; /* Here to force BS4 behavior */
 }
 

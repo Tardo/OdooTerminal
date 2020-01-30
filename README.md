@@ -45,6 +45,11 @@ You can toggle terminal using one of these options:
 
 # Changelog
 
+**2.3.1**
+```
+FIX: Odoo version detection
+```
+
 **2.3.0**
 ```
 IMP: Command 'settings': Moved to backend
