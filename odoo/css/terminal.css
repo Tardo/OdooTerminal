@@ -111,6 +111,10 @@
 .o_terminal .print-table tbody td {
   padding: 0.3em;
 }
+.o_terminal .print-table tbody tr:hover {
+  background-color: lightgray;
+  color: black;
+}
 
 .o_terminal .print-table thead th:last-child,
 .o_terminal .print-table tbody td:last-child {
