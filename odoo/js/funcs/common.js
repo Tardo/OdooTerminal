@@ -157,6 +157,28 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
                 args: '?s?s',
             });
+            this.registerCommand('version', {
+                definition: 'Know Odoo version',
+                callback: this._showOdooVersion,
+                detail: 'Shows Odoo version',
+                syntaxis: '',
+                args: '',
+            });
+        },
+
+        _showOdooVersion: function () {
+            return $.when($.Deferred((d) => {
+                try {
+                    this.print(`${odoo.session_info.server_version_info
+                        .slice(0, 3).join(".")} (${odoo.session_info
+                        .server_version_info.slice(3).join(" ")})`);
+                    d.resolve();
+                } catch (err) {
+                    this.print(window.term_odooVersion);
+                }
+
+                d.resolve();
+            }));
         },
 
         _contextOperation: function (params) {

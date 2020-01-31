@@ -49,6 +49,7 @@ You can toggle terminal using one of these options:
 ```
 IMP: Compatibility load process
 IMP: Terminal CSS
+IMP: Command 'version': Now works on backend & frontend
 
 ADD: Command 'context': 'read', 'write' or 'set' user context
 

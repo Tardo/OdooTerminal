@@ -35,14 +35,6 @@ odoo.define('terminal.BackendFunctions', function (require) {
                 syntaxis: '',
                 args: '',
             });
-            // TODO: move to common
-            this.registerCommand('version', {
-                definition: 'Know Odoo version',
-                callback: this._showOdooVersion,
-                detail: 'Shows Odoo version',
-                syntaxis: '',
-                args: '',
-            });
             this.registerCommand('settings', {
                 definition: 'Open settings page',
                 callback: this._openSettings,
@@ -62,19 +54,6 @@ odoo.define('terminal.BackendFunctions', function (require) {
             }).then(() => {
                 self.do_hide();
             });
-        },
-
-        _showOdooVersion: function () {
-            return $.when($.Deferred((d) => {
-                try {
-                    this.print(`${odoo.session_info.server_version_info
-                        .slice(0, 3).join(".")} (${odoo.session_info
-                        .server_version_info.slice(3).join(" ")})`);
-                    d.resolve();
-                } catch (err) {
-                    d.reject(err.message);
-                }
-            }));
         },
 
         _viewModelRecord: function (params) {
