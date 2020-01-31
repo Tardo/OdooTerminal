@@ -9,7 +9,6 @@ odoo.define('terminal.FrontendLoader', function (require) {
     const Terminal = require('terminal.Terminal').terminal;
 
     // Ensure load resources
-    require('terminal.Compat');
     require('terminal.CoreFunctions');
     require('terminal.CommonFunctions');
 

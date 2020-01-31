@@ -3,7 +3,7 @@
 
 
 /** Implements 'interfaces' to work with Odoo 11.0 **/
-odoo.define('terminal.Compat', function (require) {
+odoo.define('terminal.Compat11', function (require) {
     'use strict';
 
     const local_storage = require('web.local_storage');

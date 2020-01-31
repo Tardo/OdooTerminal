@@ -52,6 +52,8 @@ odoo.define('terminal.AbstractTerminal', function (require) {
 
         _storage: null,
 
+        _has_exec_init_cmds: false,
+
 
         init: function () {
             QWeb.add_template(`<templates>

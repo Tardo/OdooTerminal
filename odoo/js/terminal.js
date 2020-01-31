@@ -153,7 +153,7 @@ odoo.define('terminal.Terminal', function (require) {
 
         _parameterChecker: null,
         _parameterReader: null,
-        _has_exec_init_cmds: false,
+
 
         init: function () {
             this._super.apply(this, arguments);

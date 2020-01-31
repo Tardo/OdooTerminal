@@ -49,6 +49,17 @@
         });
         if (cvers.length) {
             odooInfo.isCompatible = true;
+            window.term_odooVersion = odooInfo.serverVersion;
+            window.term_odooVersionMajor = odooInfo.serverVersionMajor;
+        } else {
+            if (Object.prototype.hasOwnProperty.call(
+                window, 'term_odooVersion')) {
+                delete window.term_odooVersion;
+            }
+            if (Object.prototype.hasOwnProperty.call(
+                window, 'term_odooVersionMajor')) {
+                delete window.term_odooVersionMajor;
+            }
         }
     }
 
@@ -111,7 +122,6 @@
             'isOdoo': true,
         });
 
-        // Extension only valid for authenticated users
         if (Object.prototype.hasOwnProperty.call(OdooObj, 'session_info')) {
             if (OdooObj.session_info.server_version) {
                 _setServerVersion(OdooObj.session_info.server_version);
@@ -127,6 +137,7 @@
                     });
                 } catch (exception) {
                     // Do nothing
+                    // Older versions are not supported
                 }
                 canInitialize = false;
             }

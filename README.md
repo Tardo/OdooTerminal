@@ -45,6 +45,14 @@ You can toggle terminal using one of these options:
 
 # Changelog
 
+**2.4.0**
+```
+IMP: Compatibility load process
+IMP: Terminal CSS
+
+FIX: Minor fixes (strings format, etc...)
+```
+
 **2.3.1**
 ```
 FIX: Odoo version detection

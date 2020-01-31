@@ -3,7 +3,7 @@
 
 
 /** Implements 'interfaces' to work with Odoo 12.0 **/
-odoo.define('terminal.Compat', function (require) {
+odoo.define('terminal.Compat12', function (require) {
     'use strict';
 
     const rpc = require('web.rpc');
@@ -16,7 +16,8 @@ odoo.define('terminal.Compat', function (require) {
         },
 
         setItem: function (item, value) {
-            return this._parent.call('session_storage', 'setItem', item, value);
+            return this._parent.call(
+                'session_storage', 'setItem', item, value);
         },
 
         removeItem: function (item) {
@@ -27,8 +28,12 @@ odoo.define('terminal.Compat', function (require) {
     Terminal.terminal.include({
         _getCommandErrorMessage: function (emsg) {
             if (typeof emsg === 'object' &&
-                Object.prototype.hasOwnProperty.call(emsg, 'data')) {
-                return `${emsg.data.name} (${emsg.data.message})`;
+                Object.prototype.hasOwnProperty.call(emsg, 'message')) {
+                if (typeof emsg.message === 'string') {
+                    return emsg.message;
+                }
+                const msgInfo = emsg.message.data;
+                return `${msgInfo.name} (${msgInfo.message})`;
             }
             return this._super.apply(this, arguments);
         },
