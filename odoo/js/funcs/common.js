@@ -148,6 +148,37 @@ odoo.define('terminal.CommonFunctions', function (require) {
                     '[STRING: FIELDS]',
                 args: 'si?s',
             });
+            this.registerCommand('context', {
+                definition: 'Operations over session context dictionary',
+                callback: this._contextOperation,
+                detail: 'Operations over session context dictionary.' +
+                    "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
+                    "By default is 'read'. ",
+                syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
+                args: '?s?s',
+            });
+        },
+
+        _contextOperation: function (params) {
+            const operation = params[0] || 'read';
+            const values = params[1] || "false";
+
+            const self = this;
+            return $.when($.Deferred((d) => {
+                if (operation === 'read') {
+                    self.print(session.user_context);
+                } else if (operation === 'set') {
+                    session.user_context = JSON.parse(values);
+                    self.print(session.user_context);
+                } else if (operation === 'write') {
+                    Object.assign(session.user_context, JSON.parse(values));
+                    self.print(session.user_context);
+                } else {
+                    d.reject("[!] Invalid operation");
+                }
+
+                d.resolve();
+            }));
         },
 
         _searchModelRecordId: function (params) {

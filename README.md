@@ -50,6 +50,8 @@ You can toggle terminal using one of these options:
 IMP: Compatibility load process
 IMP: Terminal CSS
 
+ADD: Command 'context': 'read', 'write' or 'set' user context
+
 FIX: Minor fixes (strings format, etc...)
 ```
 
