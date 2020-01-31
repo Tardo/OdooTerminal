@@ -15,7 +15,7 @@
   box-shadow: 1px 1px 10px #cecece;
   font-family: var(--terminal-screen-font);
   left: 50%;
-  position: absolute;
+  position: fixed;
   top: -100%;
   transform: translate(-50%, 0);
   width: var(--terminal-screen-width);
