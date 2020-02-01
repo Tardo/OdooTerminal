@@ -93,21 +93,26 @@ odoo.define('terminal.BackendFunctions', function (require) {
             });
         },
 
-        _METADATA_VIEW_TEMPLATE: `<strong>+ ACTIVE VIEW INFO</strong>` +
-            `<br><span style='color: gray;'>XML-ID:</span> <%= id %>` +
-            `<br><span style='color: gray;'>XML-NAME:</span> <%= name %>`,
+        _METADATA_VIEW_TEMPLATE: "<strong>ACTIVE VIEW INFO</strong>" +
+            "<br><span style='color: gray; padding-left: 1.3em;'>" +
+            "XML-ID:</span> <%= id %>" +
+            "<br><span style='color: gray; padding-left: 1.3em;'>" +
+            "XML-NAME:</span> <%= name %>",
 
-        _METADATA_RECORD_TEMPLATE: `<strong>+ CURRENT RECORD INFO</strong>` +
-            `<br><span style='color: gray;'>ID:</span> <%= id %><br>` +
-            `<span style='color: gray;'>Creator:</span>` +
-            `<span class='o_terminal_click o_terminal_cmd'` +
-            `      data-cmd='view res.users <%= uid %>'><%= creator %></span>` +
-            `<br><span style='color: gray;'>Creation Date:</span> <%= date %>` +
-            `<br><span style='color: gray;'>Last Modification By:</span>` +
-            `<span class='o_terminal_click o_terminal_cmd'` +
-            `      data-cmd='view res.users <%= wuid %>'><%= user %></span>` +
-            `<br><span style='color: gray;'>Last Modification Date:</span>` +
-            `<%= wdate %>`,
+        _METADATA_RECORD_TEMPLATE: "<strong>RECORD INFO</strong>" +
+            "<br><span style='color: gray; padding-left: 1.3em;'>ID:" +
+            "</span> <%= id %>" +
+            "<br><span style='color: gray; padding-left: 1.3em;'>" +
+            "Creator:</span> <span class='o_terminal_click o_terminal_cmd'" +
+            "      data-cmd='view res.users <%= uid %>'><%= creator %></span>" +
+            "<br><span style='color: gray; padding-left: 1.3em;'>" +
+            "Creation Date: </span> <%= date %>" +
+            "<br><span style='color: gray; padding-left: 1.3em;'>" +
+            "Last Modification By:</span> " +
+            "<span class='o_terminal_click o_terminal_cmd'" +
+            "      data-cmd='view res.users <%= wuid %>'><%= user %></span>" +
+            "<br><span style='color: gray; padding-left: 1.3em;'>" +
+            "Last Modification Date:</span> <%= wdate %>",
 
         _showMetadata: function () {
             const self = this;
@@ -156,14 +161,12 @@ odoo.define('terminal.BackendFunctions', function (require) {
                                         wdate: metadata.write_date,
                                     }));
                             });
-                    } else {
-                        self.print("No metadata available!");
                     }
                 });
             }
 
             return $.Deferred((d) => {
-                self.print("No metadata available!");
+                self.print("No metadata available! View ID unknown");
                 d.resolve();
             });
         },
