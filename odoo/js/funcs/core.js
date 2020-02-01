@@ -43,23 +43,12 @@ odoo.define('terminal.CoreFunctions', function (require) {
             });
         },
 
-        _printHelp: function (params) {
-            if (!params || params.length === 0) {
-                const sortedCmdKeys = _.keys(this._registeredCmds).sort();
-                for (const cmd of sortedCmdKeys) {
-                    this._printHelpSimple(cmd, this._registeredCmds[cmd]);
-                }
-            } else {
-                const cmd = params[0];
-                if (Object.prototype.hasOwnProperty.call(this._registeredCmds,
-                    cmd)) {
-                    this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
-                } else {
-                    this.print(`[!] '${cmd}' command doesn't exists`);
-                }
-            }
-
-            return $.when();
+        _printWelcomeMessage: function () {
+            this._super.apply(this, arguments);
+            this.print("Type '<i class='o_terminal_click o_terminal_cmd' " +
+                "data-cmd='help'>help</i>' or '<i class='o_terminal_click " +
+                "o_terminal_cmd' data-cmd='help help'>help " +
+                "&lt;command&gt;</i>' to start.");
         },
 
         _printHelpSimple: function (cmd, cmdDef) {
@@ -71,19 +60,32 @@ odoo.define('terminal.CoreFunctions', function (require) {
             }));
         },
 
+        _printHelp: function (params) {
+            const self = this;
+            return $.when($.Deferred((d) => {
+                if (!params || params.length === 0) {
+                    const sortedCmdKeys = _.keys(self._registeredCmds).sort();
+                    for (const cmd of sortedCmdKeys) {
+                        self._printHelpSimple(cmd, self._registeredCmds[cmd]);
+                    }
+                } else {
+                    const cmd = params[0];
+                    if (Object.prototype.hasOwnProperty.call(
+                        self._registeredCmds, cmd)) {
+                        self._printHelpDetailed(cmd, self._registeredCmds[cmd]);
+                    } else {
+                        self.print(`[!] '${cmd}' command doesn't exists`);
+                    }
+                }
+
+                d.resolve();
+            }));
+        },
+
         _printHelpDetailed: function (cmd, cmdDef) {
             this.print(cmdDef.detail);
             this.print(" ");
             this.eprint(`Syntaxis: ${cmd} ${cmdDef.syntaxis}`);
-        },
-
-
-        _printWelcomeMessage: function () {
-            this._super.apply(this, arguments);
-            this.print("Type '<i class='o_terminal_click o_terminal_cmd' " +
-                "data-cmd='help'>help</i>' or '<i class='o_terminal_click " +
-                "o_terminal_cmd' data-cmd='help help'>help " +
-                "&lt;command&gt;</i>' to start.");
         },
 
         _clear: function (params) {

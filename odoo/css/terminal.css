@@ -8,6 +8,7 @@
   --terminal-screen-background-button-active: #555;
   --terminal-screen-text-color: lightgray;
   --terminal-screen-font:  "Lucida Console", Monaco, monospace;
+  --terminal-screen-extra-info-color: darkkhaki;
   --terminal-title-color: rgb(124, 123, 173);
 }
 
@@ -132,13 +133,16 @@
   border-right-width: 0;
 }
 
-.o_terminal .terminal-screen-icon-maximize {
+.o_terminal .terminal-screen-info-zone {
   margin: 1em;
   position: absolute;
   right: 1em;
   top: 0;
 }
-.o_terminal .terminal-screen-icon-maximize i {
+.o_terminal .terminal-screen-info-zone .terminal-screen-running-cmds {
+  color: var(--terminal-screen-extra-info-color);
+}
+.o_terminal .terminal-screen-info-zone .terminal-screen-icon-maximize i {
   color: white;
   padding: 0.6em;
 }

@@ -12,6 +12,9 @@ odoo.define('terminal.CommonFunctions', function (require) {
 
 
     Terminal.include({
+        _longpollingMode: false,
+
+
         init: function () {
             this._super.apply(this, arguments);
 
@@ -164,17 +167,57 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 syntaxis: '',
                 args: '',
             });
+            this.registerCommand('longpolling', {
+                definition: 'Long-Polling operations',
+                callback: this._longpolling,
+                detail: 'Operations over long-polling.' +
+                    "<br>[OPERATION] can be 'verbose', 'off' or empty. " +
+                    "If empty, prints current value.",
+                syntaxis: '[STRING: OPERATION]',
+                args: '?s',
+            });
+        },
+
+        start: function () {
+            this._super.apply(this, arguments);
+
+            this._longpollingMode = this._storage.getItem(
+                'terminal_longpolling_mode');
+        },
+
+        _longpolling: function (params) {
+            const operation = params[0];
+            const self = this;
+            return $.when($.Deferred((d) => {
+                if (typeof operation === 'undefined') {
+                    self.print(self._storage.getItem(
+                        'terminal_longpolling_mode') || 'off');
+                } else if (operation === 'verbose') {
+                    self._storage.setItem(
+                        'terminal_longpolling_mode', 'verbose');
+                    self.print("Now long-polling is in verbose mode.");
+                } else if (operation === 'off') {
+                    self._storage.removeItem(
+                        'terminal_longpolling_mode');
+                    self.print("Now long-polling verbose mode is disabled");
+                } else {
+                    d.reject('Invalid operation');
+                }
+
+                d.resolve();
+            }));
         },
 
         _showOdooVersion: function () {
+            const self = this;
             return $.when($.Deferred((d) => {
                 try {
-                    this.print(`${odoo.session_info.server_version_info
+                    self.print(`${odoo.session_info.server_version_info
                         .slice(0, 3).join(".")} (${odoo.session_info
                         .server_version_info.slice(3).join(" ")})`);
                     d.resolve();
                 } catch (err) {
-                    this.print(window.term_odooVersion);
+                    self.print(window.term_odooVersion);
                 }
 
                 d.resolve();
@@ -196,7 +239,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
                     Object.assign(session.user_context, JSON.parse(values));
                     self.print(session.user_context);
                 } else {
-                    d.reject("[!] Invalid operation");
+                    d.reject("Invalid operation");
                 }
 
                 d.resolve();
@@ -593,6 +636,19 @@ odoo.define('terminal.CommonFunctions', function (require) {
             return ajax.post(url, JSON.parse(data)).then((result) => {
                 self.print(result);
             });
+        },
+
+        //
+        _onBusNotification: function (notifications) {
+            const longpollingMode = this._storage.getItem(
+                'terminal_longpolling_mode');
+            if (longpollingMode !== 'verbose') {
+                return;
+            }
+            for (const notif of notifications) {
+                this.print("- Notification incoming...");
+                this.print(notif);
+            }
         },
     });
 

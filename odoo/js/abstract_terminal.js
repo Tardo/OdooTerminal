@@ -60,7 +60,7 @@ odoo.define('terminal.AbstractTerminal', function (require) {
                 <t t-name='terminal'>
                     <div id='terminal' class='o_terminal'>
                         <div class='col-sm-12 col-lg-12 col-12'
-                             id='terminal_screen' tabindex="-1"></div>
+                             id='terminal_screen' tabindex="-1" />
                         <div class='d-flex terminal-user-input'>
                             <input class='terminal-prompt' readonly='readonly'/>
                             <div class="flex-fill rich-input">
@@ -69,9 +69,14 @@ odoo.define('terminal.AbstractTerminal', function (require) {
                                 <input type='edit' id='terminal_input' />
                             </div>
                         </div>
-                        <div class='btn btn-sm terminal-screen-icon-maximize'
-                             role='button'>
-                            <i class='fa fa-window-maximize'></i>
+                        <div class="terminal-screen-info-zone">
+                            <span class='terminal-screen-running-cmds'
+                                  id='terminal_running_cmd_count' />
+                            <div
+                                class='btn btn-sm terminal-screen-icon-maximize'
+                                role='button'>
+                                <i class='fa fa-window-maximize'></i>
+                            </div>
                         </div>
                     </div>
                 </t>

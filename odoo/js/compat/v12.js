@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-/** Implements 'interfaces' to work with Odoo 12.0 **/
+/** Implementations for Odoo 12.0+ **/
 odoo.define('terminal.Compat12', function (require) {
     'use strict';
 
@@ -10,22 +10,14 @@ odoo.define('terminal.Compat12', function (require) {
     const Terminal = require('terminal.Terminal');
 
 
-    Terminal.storage.include({
-        getItem: function (item) {
-            return this._parent.call('session_storage', 'getItem', item);
-        },
-
-        setItem: function (item, value) {
-            return this._parent.call(
-                'session_storage', 'setItem', item, value);
-        },
-
-        removeItem: function (item) {
-            return this._parent.call('session_storage', 'removeItem', item);
-        },
-    });
-
     Terminal.terminal.include({
+        start: function () {
+            this._super.apply(this, arguments);
+            // Listen long-polling (Used by 'longpolling' command)
+            this.call(
+                'bus_service', 'onNotification', this, this._onBusNotification);
+        },
+
         _getCommandErrorMessage: function (emsg) {
             if (typeof emsg === 'object' &&
                 Object.prototype.hasOwnProperty.call(emsg, 'message')) {

@@ -12,7 +12,38 @@ odoo.define('terminal.Terminal', function (require) {
     const QWeb = core.qweb;
 
 
-    const TerminalStorage = AbstractTerminal.storage.extend({});
+    const TerminalStorage = AbstractTerminal.storage.extend({
+        getItem: function (item) {
+            return JSON.parse(sessionStorage.getItem(item)) || undefined;
+        },
+
+        setItem: function (item, value) {
+            try {
+                return sessionStorage.setItem(item, JSON.stringify(value));
+            } catch (e) {
+                if (e.name !== 'QuotaExceededError') {
+                    throw e;
+                }
+                this._parent._printHTML("<span style='color:navajowhite'>" +
+                "<strong>WARNING:</strong> Clear the " +
+                "<b class='o_terminal_click o_terminal_cmd' " +
+                "data-cmd='clear screen' style='color:orange;'>screen</b> " +
+                "or/and " +
+                "<b class='o_terminal_click o_terminal_cmd' " +
+                "data-cmd='clear history' style='color:orange;'>" +
+                "history</b> " +
+                "to free storage space. Browser <u>Storage Quota Exceeded</u>" +
+                " 😭 </strong><br>",
+                true);
+            }
+
+            return false;
+        },
+
+        removeItem: function (item) {
+            return sessionStorage.removeItem(item) || undefined;
+        },
+    });
 
     /**
      * This class is used to parse terminal command parameters.
@@ -155,6 +186,8 @@ odoo.define('terminal.Terminal', function (require) {
         _parameterChecker: null,
         _parameterReader: null,
 
+        _runningCommandsCount: 0,
+
 
         init: function () {
             this._super.apply(this, arguments);
@@ -219,6 +252,7 @@ odoo.define('terminal.Terminal', function (require) {
             this.$input = this.$('#terminal_input');
             this.$shadowInput = this.$('#terminal_shadow_input');
             this.$term = this.$('#terminal_screen');
+            this.$runningCmdCount = this.$('#terminal_running_cmd_count');
 
             core.bus.on('keydown', this, this._onCoreKeyDown);
             core.bus.on('click', this, this._onCoreClick);
@@ -229,6 +263,10 @@ odoo.define('terminal.Terminal', function (require) {
                 this.print('');
             } else {
                 this._printHTML(cachedScreen);
+                // FIXME: For some reason need ensure scroll position
+                _.defer(function () {
+                    this.$term[0].scrollTop = this.$term[0].scrollHeight;
+                }.bind(this));
             }
             const cachedHistory = this._storage.getItem('terminal_history');
             if (!_.isUndefined(cachedHistory)) {
@@ -238,10 +276,12 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         /* PRINT */
-        _printHTML: function (html) {
+        _printHTML: function (html, nostore) {
             this.$term.append(html);
             this.$term[0].scrollTop = this.$term[0].scrollHeight;
-            this._lazyStorageTerminalScreen();
+            if (!nostore) {
+                this._lazyStorageTerminalScreen();
+            }
         },
 
         _prettyObjectString: function (obj) {
@@ -318,12 +358,14 @@ odoo.define('terminal.Terminal', function (require) {
                 scmd.cmd)) {
                 var cmdDef = this._registeredCmds[scmd.cmd];
                 if (this._parameterChecker.validate(cmdDef.args, scmd.params)) {
+                    this.onStartCommand(scmd.cmd, scmd.params);
                     return cmdDef.callback.bind(this)(scmd.params)
-                        .then(null, (emsg) => {
-                            var errorMessage =
-                                self._getCommandErrorMessage(emsg);
-                            self.eprint(`[!] Error executing '${cmd}':`);
-                            self.print(errorMessage, false, 'error_message');
+                        .then((result) => {
+                            self.onFinishCommand(
+                                scmd.cmd, scmd.params, false, result);
+                        }, (emsg) => {
+                            self.onFinishCommand(
+                                scmd.cmd, scmd.params, true, emsg);
                         });
                 }
                 this.print(`<span class='o_terminal_click ` +
@@ -557,7 +599,34 @@ odoo.define('terminal.Terminal', function (require) {
             return $.when(defer);
         },
 
+        _updateRunningCmdCount: function () {
+            if (this._runningCommandsCount <= 0) {
+                this.$runningCmdCount.fadeOut('fast', function () {
+                    $(this).html('');
+                });
+            } else {
+                this.$runningCmdCount.html(
+                    `Running ${this._runningCommandsCount} command(s)...`
+                ).show();
+            }
+        },
+
         /* HANDLE EVENTS */
+        onStartCommand: function () {
+            ++this._runningCommandsCount;
+            this._updateRunningCmdCount();
+        },
+        onFinishCommand: function (cmd, params, has_errors, result) {
+            --this._runningCommandsCount;
+            this._updateRunningCmdCount();
+            if (has_errors) {
+                var errorMessage =
+                    this._getCommandErrorMessage(result);
+                this.eprint(`[!] Error executing '${cmd}':`);
+                this.print(errorMessage, false, 'error_message');
+            }
+        },
+
         _preventLostInputFocus: function (ev) {
             const isCKey = ev && (ev.ctrlKey || ev.altKey);
             if (!isCKey) {

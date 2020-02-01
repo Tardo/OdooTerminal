@@ -51,8 +51,10 @@ IMP: Compatibility load process
 IMP: Terminal CSS
 IMP: Command 'version': Now works on backend & frontend
 IMP: User input: fish-like command preview feature
+IMP: Minor improvements
 
 ADD: Command 'context': 'read', 'write' or 'set' user context
+ADD: Command 'longpolling': Print notifications
 
 FIX: Minor fixes (strings format, etc...)
 ```

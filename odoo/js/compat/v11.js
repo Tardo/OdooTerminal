@@ -2,31 +2,21 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-/** Implements 'interfaces' to work with Odoo 11.0 **/
+/** Implementations for Odoo 11.0 **/
 odoo.define('terminal.Compat11', function (require) {
     'use strict';
 
-    const local_storage = require('web.local_storage');
     const Terminal = require('terminal.Terminal');
-
-
-    Terminal.storage.include({
-        getItem: function (item) {
-            return JSON.parse(local_storage.getItem(item)) || undefined;
-        },
-
-        setItem: function (item, value) {
-            return local_storage.setItem(item, JSON.stringify(value)) ||
-                undefined;
-        },
-
-        removeItem: function (item) {
-            return local_storage.removeItem(item) || undefined;
-        },
-    });
+    const Bus = require('bus.bus').bus;
 
 
     Terminal.terminal.include({
+        start: function () {
+            this._super.apply(this, arguments);
+            // Listen long-polling (Used by 'longpolling' command)
+            Bus.on("notification", this, this._onBusNotification);
+        },
+
         _getCommandErrorMessage: function (emsg) {
             if (typeof emsg === 'object' &&
                 Object.prototype.hasOwnProperty.call(emsg, 'data')) {
