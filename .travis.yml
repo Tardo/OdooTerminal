@@ -28,6 +28,6 @@ jobs:
     - stage: packaging
       name: "Create zip package"
       before_install:
-      install:
+      install: pip install -r tools/requirements.txt
       script: tools/release.py
       after_success:
