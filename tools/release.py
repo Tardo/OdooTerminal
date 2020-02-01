@@ -18,9 +18,10 @@ import argparse
 import re
 import os
 import zipfile
+import git
 
 
-def update_version(mode=None):
+def update_version(mode, create_commit=False):
     def _file_sub(filepath, cregex, nvalue):
         fin = open(filepath, 'rt')
         data = fin.read()
@@ -55,8 +56,15 @@ def update_version(mode=None):
     # abstract_terminal.js
     _file_sub(
         'odoo/js/abstract_terminal.js',
-        r"VERSION: '\d+\.\d+\.\d+'",
-        "VERSION: '%s'" % extension_ver)
+        r'VERSION: "\d+\.\d+\.\d+"',
+        'VERSION: "%s"' % extension_ver)
+
+    # git release commit
+    print(create_commit)
+    if create_commit:
+        g = git.cmd.Git('.')
+        g.add('.')
+        g.commit('[REL] Version %s' % extension_ver)
 
 
 def create_package():
@@ -86,12 +94,16 @@ if __name__ == '__main__':
     parser.add_argument(
         '-m', '--mode',
         help='Version mode',
-        choices=['major', 'minor', 'patch'],
-        required=False)
+        choices=['major', 'minor', 'patch'])
+    parser.add_argument(
+        '--commit',
+        action='store_true',
+        default=False,
+        help='Version mode')
     args = parser.parse_args()
     if args.mode:
         print('Changing extension version...')
-        update_version(args.mode)
+        update_version(args.mode, args.commit)
     print('Creating extension package...')
     create_package()
     print('All done, bye!')
