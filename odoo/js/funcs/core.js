@@ -62,7 +62,7 @@ odoo.define('terminal.CoreFunctions', function (require) {
 
         _printHelp: function (params) {
             const self = this;
-            return $.when($.Deferred((d) => {
+            return $.Deferred((d) => {
                 if (!params || params.length === 0) {
                     const sortedCmdKeys = _.keys(self._registeredCmds).sort();
                     for (const cmd of sortedCmdKeys) {
@@ -79,7 +79,7 @@ odoo.define('terminal.CoreFunctions', function (require) {
                 }
 
                 d.resolve();
-            }));
+            });
         },
 
         _printHelpDetailed: function (cmd, cmdDef) {
@@ -90,7 +90,7 @@ odoo.define('terminal.CoreFunctions', function (require) {
 
         _clear: function (params) {
             const self = this;
-            const defer_clean = $.Deferred((d) => {
+            return $.Deferred((d) => {
                 if (params.length && params[0] === 'history') {
                     self.cleanInputHistory();
                 } else {
@@ -98,12 +98,11 @@ odoo.define('terminal.CoreFunctions', function (require) {
                 }
                 d.resolve();
             });
-            return $.when(defer_clean);
         },
 
         _printEval: function (params) {
             const self = this;
-            return $.when($.Deferred((d) => {
+            return $.Deferred((d) => {
                 let msg = params.join(' ');
                 try {
                     // Ignore linter warning
@@ -115,11 +114,11 @@ odoo.define('terminal.CoreFunctions', function (require) {
                     self.print(msg);
                     d.resolve();
                 }
-            }));
+            });
         },
 
         _loadResource: function (params) {
-            return $.when($.Deferred((d) => {
+            return $.Deferred((d) => {
                 try {
                     const inURL = new URL(params[0]);
                     const pathname = inURL.pathname.toLowerCase();
@@ -141,7 +140,7 @@ odoo.define('terminal.CoreFunctions', function (require) {
                 } finally {
                     d.resolve();
                 }
-            }));
+            });
         },
     });
 

@@ -88,10 +88,9 @@ odoo.define('terminal.BackendFunctions', function (require) {
                 },
             }).open();
 
-            const defer = $.Deferred((d) => {
+            return $.Deferred((d) => {
                 d.resolve();
             });
-            return $.when(defer);
         },
 
         _METADATA_VIEW_TEMPLATE: `<strong>+ ACTIVE VIEW INFO</strong>` +
@@ -163,11 +162,10 @@ odoo.define('terminal.BackendFunctions', function (require) {
                 });
             }
 
-            var defer = $.Deferred((d) => {
+            return $.Deferred((d) => {
                 self.print("No metadata available!");
                 d.resolve();
             });
-            return $.when(defer);
         },
 
         _onClickTerminalView: function (ev) {

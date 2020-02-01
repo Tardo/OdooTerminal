@@ -188,7 +188,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
         _longpolling: function (params) {
             const operation = params[0];
             const self = this;
-            return $.when($.Deferred((d) => {
+            return $.Deferred((d) => {
                 if (typeof operation === 'undefined') {
                     self.print(self._storage.getItem(
                         'terminal_longpolling_mode') || 'off');
@@ -205,12 +205,12 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 }
 
                 d.resolve();
-            }));
+            });
         },
 
         _showOdooVersion: function () {
             const self = this;
-            return $.when($.Deferred((d) => {
+            return $.Deferred((d) => {
                 try {
                     self.print(`${odoo.session_info.server_version_info
                         .slice(0, 3).join(".")} (${odoo.session_info
@@ -221,7 +221,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 }
 
                 d.resolve();
-            }));
+            });
         },
 
         _contextOperation: function (params) {
@@ -229,7 +229,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
             const values = params[1] || "false";
 
             const self = this;
-            return $.when($.Deferred((d) => {
+            return $.Deferred((d) => {
                 if (operation === 'read') {
                     self.print(session.user_context);
                 } else if (operation === 'set') {
@@ -243,7 +243,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 }
 
                 d.resolve();
-            }));
+            });
         },
 
         _searchModelRecordId: function (params) {
@@ -414,18 +414,20 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 this.print("[!] Invalid debug mode");
             }
 
-            return $.when();
+            return $.Deferred((d) => {
+                d.resolve();
+            });
         },
 
         _reloadPage: function () {
-            return $.when($.Deferred((d) => {
+            return $.Deferred((d) => {
                 try {
                     location.reload();
                     d.resolve();
                 } catch (err) {
                     d.reject(err.message);
                 }
-            }));
+            });
         },
 
         _searchModule: function (module) {
@@ -606,7 +608,7 @@ odoo.define('terminal.CommonFunctions', function (require) {
                 const defer = $.Deferred((d) => {
                     d.reject(err.message);
                 });
-                return $.when(defer);
+                return defer;
             }
             const self = this;
             return rpc.query({
