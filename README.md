@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/Tardo/OdooTerminal.svg?branch=master)](https://travis-ci.com/Tardo/OdooTerminal)
+
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)
@@ -65,6 +67,7 @@ IMP: Minor improvements
 ADD: Command 'context': 'read', 'write' or 'set' user context
 ADD: Command 'longpolling': Print notifications
 ADD: Pre-commit following OCA standards
+ADD: Basic Travis CI configuration
 
 FIX: Minor fixes (strings format, etc...)
 ```
