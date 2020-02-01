@@ -1,148 +1,147 @@
 :root {
-  --terminal-input-height: 25px;
-  --terminal-shadow-input-color: #777;
-  --terminal-screen-width: 70%;
-  --terminal-screen-height: 40vh;
-  --terminal-screen-max-height: 90vh;
-  --terminal-screen-background-color: black;
-  --terminal-screen-background-button-active: #555;
-  --terminal-screen-text-color: lightgray;
-  --terminal-screen-font:  "Lucida Console", Monaco, monospace;
-  --terminal-screen-extra-info-color: darkkhaki;
-  --terminal-title-color: rgb(124, 123, 173);
+    --terminal-input-height: 25px;
+    --terminal-shadow-input-color: #777;
+    --terminal-screen-width: 70%;
+    --terminal-screen-height: 40vh;
+    --terminal-screen-max-height: 90vh;
+    --terminal-screen-background-color: black;
+    --terminal-screen-background-button-active: #555;
+    --terminal-screen-text-color: lightgray;
+    --terminal-screen-font: "Lucida Console", Monaco, monospace;
+    --terminal-screen-extra-info-color: darkkhaki;
+    --terminal-title-color: rgb(124, 123, 173);
 }
 
-
 .o_terminal {
-  box-shadow: 1px 1px 10px #cecece;
-  font-family: var(--terminal-screen-font);
-  left: 50%;
-  position: fixed;
-  top: -100%;
-  transform: translate(-50%, 0);
-  width: var(--terminal-screen-width);
-  z-index: 1041;
-  display: grid; /* Here to force BS4 behavior */
+    box-shadow: 1px 1px 10px #cecece;
+    font-family: var(--terminal-screen-font);
+    left: 50%;
+    position: fixed;
+    top: -100%;
+    transform: translate(-50%, 0);
+    width: var(--terminal-screen-width);
+    z-index: 1041;
+    display: grid; /* Here to force BS4 behavior */
 }
 
 .o_terminal div#terminal_screen {
-  background-color: var(--terminal-screen-background-color);
-  border: 0 solid gray;
-  border-width: 1px 1px 0 1px;
-  caret-color: var(--terminal-screen-text-color);
-  color: var(--terminal-screen-text-color);
-  height: var(--terminal-screen-height);
-  overflow-y: scroll;
-  padding: var(--terminal-screen-height) 0 0 0;
-  resize: none;
-  white-space: pre;
+    background-color: var(--terminal-screen-background-color);
+    border: 0 solid gray;
+    border-width: 1px 1px 0 1px;
+    caret-color: var(--terminal-screen-text-color);
+    color: var(--terminal-screen-text-color);
+    height: var(--terminal-screen-height);
+    overflow-y: scroll;
+    padding: var(--terminal-screen-height) 0 0 0;
+    resize: none;
+    white-space: pre;
 }
 
 .o_terminal div#terminal_screen .o_terminal_title {
-  color: var(--terminal-title-color);
+    color: var(--terminal-title-color);
 }
 
 .o_terminal div#terminal_screen .o_terminal_click:hover {
-  cursor: pointer;
-  text-decoration: underline;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .o_terminal div#terminal_screen .error_message {
-  background-color: darkred;
-  border: 1px solid red;
-  padding: 0.3em;
-  border-radius: 3px;
-  margin: 0.3em;
-  display: block;
+    background-color: darkred;
+    border: 1px solid red;
+    padding: 0.3em;
+    border-radius: 3px;
+    margin: 0.3em;
+    display: block;
 }
 
 .o_terminal .terminal-user-input {
-  background-color: var(--terminal-screen-background-color);
-  border: 1px dotted #dedede;
-  border-width: 1px 0 0 0;
-  color: var(--terminal-screen-text-color);
+    background-color: var(--terminal-screen-background-color);
+    border: 1px dotted #dedede;
+    border-width: 1px 0 0 0;
+    color: var(--terminal-screen-text-color);
 
-  display: flex; /* Here to force BS4 behavior */
+    display: flex; /* Here to force BS4 behavior */
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt {
-  border: 0 solid gray;
-  border-width: 0 0 1px 1px;
-  width: 1.2em;
+    border: 0 solid gray;
+    border-width: 0 0 1px 1px;
+    width: 1.2em;
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt:active,
 .o_terminal .terminal-user-input > .terminal-prompt:focus {
-  outline: hidden;
+    outline: hidden;
 }
 
 .o_terminal .terminal-user-input .rich-input {
-  position: relative;
-  width: 100%; /* Here to 11.0 */
+    position: relative;
+    width: 100%; /* Here to 11.0 */
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input {
-  background-color: transparent;
+    background-color: transparent;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_shadow_input {
-  color: var(--terminal-shadow-input-color);
-  pointer-events: none;
+    color: var(--terminal-shadow-input-color);
+    pointer-events: none;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input,
 .o_terminal .terminal-user-input .rich-input > #terminal_shadow_input {
-  flex: 1 1 auto; /* Here to force BS4 behavior */
-  position: absolute;
-  width: 100%;
+    flex: 1 1 auto; /* Here to force BS4 behavior */
+    position: absolute;
+    width: 100%;
 }
 
 .o_terminal .terminal-user-input input {
-  background-color: var(--terminal-screen-background-color);
-  border: 0 solid gray;
-  border-width: 0 0 1px 0;
-  caret-color: var(--terminal-screen-text-color);
-  color: var(--terminal-screen-text-color);
-  height: var(--terminal-input-height);
+    background-color: var(--terminal-screen-background-color);
+    border: 0 solid gray;
+    border-width: 0 0 1px 0;
+    caret-color: var(--terminal-screen-text-color);
+    color: var(--terminal-screen-text-color);
+    height: var(--terminal-input-height);
 }
 
-.o_terminal .terminal-user-input input[type=edit] {
-  padding: 0;
+.o_terminal .terminal-user-input input[type="edit"] {
+    padding: 0;
 }
 .o_terminal .terminal-user-input input:active,
 .o_terminal .terminal-user-input input:focus {
-  outline: hidden;
+    outline: hidden;
 }
 
 .o_terminal .print-table thead th {
-  border: 1px solid white;
-  border-width: 0 1px 1px 0;
+    border: 1px solid white;
+    border-width: 0 1px 1px 0;
 }
 .o_terminal .print-table tbody td {
-  border: 1px solid white;
-  border-width: 1px 1px 0 0;
+    border: 1px solid white;
+    border-width: 1px 1px 0 0;
 }
 .o_terminal .print-table thead th,
 .o_terminal .print-table tbody td {
-  padding: 0.3em;
+    padding: 0.3em;
 }
 .o_terminal .print-table tbody tr:hover {
-  background-color: lightgray;
-  color: black;
+    background-color: lightgray;
+    color: black;
 }
 
 .o_terminal .print-table thead th:last-child,
 .o_terminal .print-table tbody td:last-child {
-  border-right-width: 0;
+    border-right-width: 0;
 }
 
 .o_terminal .terminal-screen-info-zone {
-  margin: 1em;
-  position: absolute;
-  right: 1em;
-  top: 0;
+    margin: 1em;
+    position: absolute;
+    right: 1em;
+    top: 0;
 }
 .o_terminal .terminal-screen-info-zone .terminal-screen-running-cmds {
-  color: var(--terminal-screen-extra-info-color);
+    color: var(--terminal-screen-extra-info-color);
 }
 .o_terminal .terminal-screen-info-zone .terminal-screen-icon-maximize i {
-  color: white;
-  padding: 0.6em;
+    color: white;
+    padding: 0.6em;
 }

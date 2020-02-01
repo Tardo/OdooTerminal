@@ -1,51 +1,35 @@
 {
-
-  "manifest_version": 2,
-  "name": "Odoo Terminal",
-  "version": "2.4.0",
-  "short_name": "Odoo Terminal",
-  "description": "Terminal for Odoo",
-
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "browser_action": {
+    "default_icon": "icons/terminal-disabled-32.png",
+    "default_title": "Odoo Terminal (CTRL + 1)"
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "{cdfbfc50-7cbf-4044-a6fb-cdef5056605c}"
     }
   },
-
+  "content_scripts": [
+    {
+      "js": ["content_script.js"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_idle"
+    }
+  ],
+  "description": "Terminal for Odoo",
   "icons": {
     "16": "icons/terminal-16.png",
     "32": "icons/terminal-32.png"
   },
-
-  "permissions": [
-    "activeTab",
-    "storage"
-  ],
-
-  "browser_action": {
-    "default_icon": "icons/terminal-disabled-32.png",
-    "default_title": "Odoo Terminal (CTRL + 1)"
-  },
-
-  "background": {
-    "scripts": ["background.js"]
-  },
-
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content_script.js"],
-      "run_at": "document_idle"
-    }
-  ],
-
-  "web_accessible_resources": [
-    "page_script.js",
-    "odoo/css/*",
-    "odoo/js/*"
-  ],
-
+  "manifest_version": 2,
+  "name": "Odoo Terminal",
   "options_ui": {
     "page": "settings/options.html"
-  }
+  },
+  "permissions": ["activeTab", "storage"],
+  "short_name": "Odoo Terminal",
+  "version": "2.4.0",
+  "web_accessible_resources": ["page_script.js", "odoo/css/*", "odoo/js/*"]
 }

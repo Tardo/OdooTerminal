@@ -1,28 +1,28 @@
-odoo.define('terminal.MyFuncs', function (require) {
-    'use strict';
+odoo.define("terminal.MyFuncs", function(require) {
+    "use strict";
 
-    var Terminal = require('terminal.Terminal').terminal;
+    var Terminal = require("terminal.Terminal").terminal;
 
     Terminal.include({
-        init: function () {
+        init: function() {
             this._super.apply(this, arguments);
 
-            this.registerCommand('mycommand', {
-                definition: 'This is my command',
+            this.registerCommand("mycommand", {
+                definition: "This is my command",
                 function: this._myFunc,
-                detail: 'My command explained...',
-                syntaxis: '<STRING: ParamA> <INT: ParamB> [STRING: ParamC]',
-                args: 'si?s',
+                detail: "My command explained...",
+                syntaxis: "<STRING: ParamA> <INT: ParamB> [STRING: ParamC]",
+                args: "si?s",
             });
         },
 
-        _myFunc: function (params) {
+        _myFunc: function(params) {
             var pA = params[0];
             var pB = params[1];
             var pC = params[2] || "DefaultValue";
             var self = this;
 
-            var defer = $.Deferred(function (d) {
+            var defer = $.Deferred(function(d) {
                 self.print("Hello, World!");
                 self.eprint("ParamA (String): " + pA);
                 self.eprint("ParamB (Int): " + pB);
@@ -38,5 +38,4 @@ odoo.define('terminal.MyFuncs', function (require) {
             return $.when(defer);
         },
     });
-
 });

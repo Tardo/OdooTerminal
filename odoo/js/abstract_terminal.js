@@ -1,50 +1,46 @@
 // Copyright 2019-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+odoo.define("terminal.AbstractTerminal", function(require) {
+    "use strict";
 
-odoo.define('terminal.AbstractTerminal', function (require) {
-    'use strict';
-
-    const core = require('web.core');
-    const Widget = require('web.Widget');
-    const Class = require('web.Class');
+    const core = require("web.core");
+    const Widget = require("web.Widget");
+    const Class = require("web.Class");
 
     const QWeb = core.qweb;
-
 
     const AbstractStorage = Class.extend({
         _parent: null,
 
-
-        init: function (parent) {
+        init: function(parent) {
             this._parent = parent;
         },
 
         // eslint-disable-next-line
-        getItem: function (item) {
+        getItem: function(item) {
             throw Error("Not Implemented!");
         },
 
         // eslint-disable-next-line
-        setItem: function (item, value) {
+        setItem: function(item, value) {
             throw Error("Not Implemented!");
         },
 
         // eslint-disable-next-line
-        removeItem: function (item) {
+        removeItem: function(item) {
             throw Error("Not Implemented!");
         },
     });
 
-
     const AbstractTerminal = Widget.extend({
-        VERSION: '2.4.0',
-        PROMPT: '>',
+        VERSION: "2.4.0",
+        PROMPT: ">",
 
         _registeredCmds: {},
         _inputHistory: [],
         _searchCommandIter: 0,
-        _searchCommandQuery: '',
+        _searchCommandQuery: "",
         _searchHistoryIter: 0,
 
         _active_widget: null,
@@ -54,8 +50,7 @@ odoo.define('terminal.AbstractTerminal', function (require) {
 
         _has_exec_init_cmds: false,
 
-
-        init: function () {
+        init: function() {
             QWeb.add_template(`<templates>
                 <t t-name='terminal'>
                     <div id='terminal' class='o_terminal'>
@@ -90,26 +85,26 @@ odoo.define('terminal.AbstractTerminal', function (require) {
          * @param {Object} emsg - Odoo error
          * @returns {String}
          */
-        _getCommandErrorMessage: function (emsg) {
+        _getCommandErrorMessage: function(emsg) {
             return emsg || "undefined error";
         },
 
-        _get_active_view_type_id: function () {
+        _get_active_view_type_id: function() {
             throw Error("Not Implemented!");
         },
 
-        _get_active_view_selected_ids: function () {
+        _get_active_view_selected_ids: function() {
             throw Error("Not Implemented!");
         },
 
         // eslint-disable-next-line
-        _get_metadata: function (ids) {
+        _get_metadata: function(ids) {
             throw Error("Not Implemented!");
         },
     });
 
     return {
-        'storage': AbstractStorage,
-        'terminal': AbstractTerminal,
+        storage: AbstractStorage,
+        terminal: AbstractTerminal,
     };
 });

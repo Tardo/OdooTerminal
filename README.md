@@ -1,34 +1,42 @@
-![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)  ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge) ![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)
+![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
+![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)
+![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)
 
 # Odoo Terminal - WebExtension
+
 _All the power of Odoo json-rpc in a really easy way!_
 
 This web extension adds a terminal-like to control Odoo (11, 12, 13 & 14).
 
-Compatible with Firefox and Chromium but only available in the [Firefox Store](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/).
+Compatible with Firefox and Chromium but only available in the
+[Firefox Store](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/).
 
 ---
 
 # Usage
 
-When you visit a Odoo website, the browser action icon of the extension turn to enabled state. This indicates that the extension is ready to use in the current page.
+When you visit a Odoo website, the browser action icon of the extension turn to
+enabled state. This indicates that the extension is ready to use in the current
+page.
 
-Few commands aren't available on the frontend, use command 'help' to know the available commands.
+Few commands aren't available on the frontend, use command 'help' to know the
+available commands.
 
 You can toggle terminal using one of these options:
-* Press CTRL + 1
-* Use extension browser action icon
+
+- Press CTRL + 1
+- Use extension browser action icon
 
 # Example Commands
 
-| Description | Terminal Command |
-| ----------- | ---------------- |
-| Create 'res.partner' record | `create res.partner "{'name': 'The One'}"` |
-| Search 'res.partner' records | `search res.partner name,email "[['id', '>', 5]]"` |
-| Search all fields of selected 'res.partner' records | `search res.partner * "[['id', '>', 5]]"` |
-| View 'res.partner' records | `view res.partner` |
-| View selected 'res.partner' record | `view res.partner 4` |
-| Install module | `install mymodule` |
+| Description                                         | Terminal Command                                   |
+| --------------------------------------------------- | -------------------------------------------------- |
+| Create 'res.partner' record                         | `create res.partner "{'name': 'The One'}"`         |
+| Search 'res.partner' records                        | `search res.partner name,email "[['id', '>', 5]]"` |
+| Search all fields of selected 'res.partner' records | `search res.partner * "[['id', '>', 5]]"`          |
+| View 'res.partner' records                          | `view res.partner`                                 |
+| View selected 'res.partner' record                  | `view res.partner 4`                               |
+| Install module                                      | `install mymodule`                                 |
 
 > Notice the usage of quotes when use parameters with spaces.
 
@@ -36,16 +44,17 @@ You can toggle terminal using one of these options:
 
 # Extension Permissions
 
-| Permission | Reason |
-| ---------- | ------ |
-| activeTab | Enables support to get information about browser tabs |
-| storage | Enables support to manage stored data in the browser (used for preferences) |
+| Permission | Reason                                                                      |
+| ---------- | --------------------------------------------------------------------------- |
+| activeTab  | Enables support to get information about browser tabs                       |
+| storage    | Enables support to manage stored data in the browser (used for preferences) |
 
 ---
 
 # Changelog
 
-**2.4.0**
+**3.0.0**
+
 ```
 IMP: Compatibility load process
 IMP: Terminal CSS
@@ -55,16 +64,19 @@ IMP: Minor improvements
 
 ADD: Command 'context': 'read', 'write' or 'set' user context
 ADD: Command 'longpolling': Print notifications
+ADD: Pre-commit following OCA standards
 
 FIX: Minor fixes (strings format, etc...)
 ```
 
 **2.3.1**
+
 ```
 FIX: Odoo version detection
 ```
 
 **2.3.0**
+
 ```
 IMP: Command 'settings': Moved to backend
 IMP: Print Objects
@@ -76,6 +88,7 @@ ADD: Command 'searchid': Works like 'search' but for a specific record id
 ```
 
 **2.2.0**
+
 ```
 IMP: Command 'search': Now 'fields' parameter its optional (default value is 'display_name') (issue #4)
 IMP: Command 'whoami': Now shows more information (issue #5)
@@ -88,6 +101,7 @@ FIX: Version number, due to a mistake versioning in the firefox store, the exten
 ```
 
 **2.0.1**
+
 ```
 IMP: Start the JSDoc usage
 
@@ -96,6 +110,7 @@ FIX: Toggle maximize
 ```
 
 **2.0.0**
+
 ```
 IMP: Code refactor
 IMP: Now works on frontend
@@ -114,11 +129,13 @@ FIX: Terminal command 'call' doesn't print results properly
 ```
 
 **1.0.1**
+
 ```
 FIX: Storage compatibility with Odoo 11
 ```
 
 **1.0.0**
+
 ```
 Big Bang!
 ```
@@ -129,7 +146,6 @@ Big Bang!
 
 ```
 - Add unittest. Easy? Need mock 99%?
-- Create a script for make new releases automatically
 ```
 
 ---

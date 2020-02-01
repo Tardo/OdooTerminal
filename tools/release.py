@@ -22,16 +22,16 @@ import zipfile
 
 def update_version(mode=None):
     def _file_sub(filepath, cregex, nvalue):
-        fin = open(filepath, "rt")
+        fin = open(filepath, 'rt')
         data = fin.read()
         fin.close()
-        fout = open(filepath, "wt")
+        fout = open(filepath, 'wt')
         data = re.sub(cregex, nvalue, data)
         fout.write(data)
         fout.close()
 
     # Get Extension Version
-    fin = open("manifest.json", "rt")
+    fin = open('manifest.json', 'rt')
     data = fin.read()
     fin.close()
     extension_ver = re.search(r'"version": "(\d+\.\d+\.\d+)"', data).group(1)
@@ -49,12 +49,12 @@ def update_version(mode=None):
 
     # manifest.json
     _file_sub(
-        "manifest.json",
+        'manifest.json',
         r'"version": "\d+\.\d+\.\d+"',
         '"version": "%s"' % extension_ver)
     # abstract_terminal.js
     _file_sub(
-        "odoo/js/abstract_terminal.js",
+        'odoo/js/abstract_terminal.js',
         r"VERSION: '\d+\.\d+\.\d+'",
         "VERSION: '%s'" % extension_ver)
 
@@ -67,14 +67,14 @@ def create_package():
             for file in files:
                 zipf.write(os.path.join(root, file))
 
-    zipdir("icons/")
-    zipdir("settings/")
-    zipdir("odoo/")
-    zipf.write("background.js")
-    zipf.write("content_script.js")
-    zipf.write("manifest.json")
-    zipf.write("page_script.js")
-    zipf.write("README.md")
+    zipdir('icons/')
+    zipdir('settings/')
+    zipdir('odoo/')
+    zipf.write('background.js')
+    zipf.write('content_script.js')
+    zipf.write('manifest.json')
+    zipf.write('page_script.js')
+    zipf.write('README.md')
 
     zipf.close()
 
@@ -85,13 +85,13 @@ if __name__ == '__main__':
         add_help=True)
     parser.add_argument(
         '-m', '--mode',
-        help="Version mode",
-        choices=["major", "minor", "patch"],
+        help='Version mode',
+        choices=['major', 'minor', 'patch'],
         required=False)
     args = parser.parse_args()
     if args.mode:
-        print("Changing extension version...")
+        print('Changing extension version...')
         update_version(args.mode)
-    print("Creating extension package...")
+    print('Creating extension package...')
     create_package()
-    print("All done, bye!")
+    print('All done, bye!')

@@ -1,90 +1,90 @@
-PUBLIC METHODS
-==============
+# PUBLIC METHODS
 
-| Command | Description |
-| ------- | ----------- |
-| `print(str, bool, str)` | Print a message |
-| `eprint(str)` | Print a escaped message |
-| `printTable(array, str)` | Print a table |
-| `clean()` | Clean terminal |
-| `cleanInput()` | Clean input |
-| `registerCommand(str, cmdDef)` | Register new command |
-| `executeCommand(str)` | Execute a command |
-| `do_show()` | Show terminal |
-| `do_hide()` | Hide terminal |
-| `do_toggle()` | Toggle visibility |
+| Command                        | Description             |
+| ------------------------------ | ----------------------- |
+| `print(str, bool, str)`        | Print a message         |
+| `eprint(str)`                  | Print a escaped message |
+| `printTable(array, str)`       | Print a table           |
+| `clean()`                      | Clean terminal          |
+| `cleanInput()`                 | Clean input             |
+| `registerCommand(str, cmdDef)` | Register new command    |
+| `executeCommand(str)`          | Execute a command       |
+| `do_show()`                    | Show terminal           |
+| `do_hide()`                    | Hide terminal           |
+| `do_toggle()`                  | Toggle visibility       |
 
-DEFINE NEW COMMANDS
-===================
+# DEFINE NEW COMMANDS
+
 Commands works with promises
 
 **Command definition**::
 
-  ```
-  {
-    definition: 'string',
-    callback: function,
-    detail: 'string',
-    syntaxis: 'string',
-    args: 'string',
-  }
-  ```
+```
+{
+  definition: 'string',
+  callback: function,
+  detail: 'string',
+  syntaxis: 'string',
+  args: 'string',
+}
+```
 
-* definition: Quick definition.
-* callback: Callback function.
-* detail: Command explained.
-* syntaxis: Command Parameters (For Humans)
-  * <> Required
-  * [] Optional
-* args: Command Paramerters Types
-  * 's' String
-  * 'i' Integer
-  * '?' Indicates that next parameter is optional
+- definition: Quick definition.
+- callback: Callback function.
+- detail: Command explained.
+- syntaxis: Command Parameters (For Humans)
+  - <> Required
+  - [] Optional
+- args: Command Paramerters Types
+  - 's' String
+  - 'i' Integer
+  - '?' Indicates that next parameter is optional
 
 **Basic Example**::
-  ```javascript
-  odoo.define('terminal.MyFuncs', function(require) {
-    'use strict';
 
-    var Terminal = require('terminal.Terminal').terminal;
+```javascript
+odoo.define("terminal.MyFuncs", function(require) {
+  "use strict";
 
-    Terminal.include({
-      init: function() {
-        this._super.apply(this, arguments);
+  var Terminal = require("terminal.Terminal").terminal;
 
-        this.registerCommand('mycommand', {
-          definition: 'This is my command',
-          function: this._myFunc,
-          detail: 'My command explained...',
-          syntaxis: '<STRING: ParamA> <INT: ParamB> [STRING: ParamC]',
-          args: 'si?s',
-        });
-      },
+  Terminal.include({
+    init: function() {
+      this._super.apply(this, arguments);
 
-      _myFunc: function(params) {
-        var pA = params[0];
-        var pB = params[1];
-        var pC = params[2] || "DefaultValue";
-        var self = this;
+      this.registerCommand("mycommand", {
+        definition: "This is my command",
+        function: this._myFunc,
+        detail: "My command explained...",
+        syntaxis: "<STRING: ParamA> <INT: ParamB> [STRING: ParamC]",
+        args: "si?s",
+      });
+    },
 
-        var defer = $.Deferred(function(d){
-          self.print("Hello, World!");
-          self.eprint("ParamA (String): " + pA);
-          self.eprint("ParamB (Int): " + pB);
-          self.eprint("ParamC (Optional String): " + pC);
+    _myFunc: function(params) {
+      var pA = params[0];
+      var pB = params[1];
+      var pC = params[2] || "DefaultValue";
+      var self = this;
 
-          if (Number(pA) === pB) {
-            d.resolve();
-          } else {
-            d.reject("Oops! error");
-          }
-        });
+      var defer = $.Deferred(function(d) {
+        self.print("Hello, World!");
+        self.eprint("ParamA (String): " + pA);
+        self.eprint("ParamB (Int): " + pB);
+        self.eprint("ParamC (Optional String): " + pC);
 
-        return $.when(defer);
-      },
-    });
+        if (Number(pA) === pB) {
+          d.resolve();
+        } else {
+          d.reject("Oops! error");
+        }
+      });
 
+      return $.when(defer);
+    },
   });
-  ```
+});
+```
 
-> Note that all input params are strings or integers. You may use ```JSON.parse``` to transform strings if you need a usable Javascript object.
+> Note that all input params are strings or integers. You may use `JSON.parse`
+> to transform strings if you need a usable Javascript object.
