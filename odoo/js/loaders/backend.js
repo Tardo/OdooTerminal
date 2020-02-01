@@ -14,7 +14,7 @@ odoo.define('terminal.BackendLoader', function (require) {
         terminal: null,
 
         show_application: function () {
-            window.odooTerminal = this.terminal = new Terminal(this);
+            this.terminal = new Terminal(this);
             this.terminal.setElement(this.$el.parents().find('#terminal'));
             this.terminal.start();
 

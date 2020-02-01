@@ -50,6 +50,7 @@ You can toggle terminal using one of these options:
 IMP: Compatibility load process
 IMP: Terminal CSS
 IMP: Command 'version': Now works on backend & frontend
+IMP: User input: fish-like command preview feature
 
 ADD: Command 'context': 'read', 'write' or 'set' user context
 
@@ -127,7 +128,6 @@ Big Bang!
 ```
 - Add unittest. Easy? Need mock 99%?
 - Create a script for make new releases automatically
-- Copy fish feature to preview last matched command
 ```
 
 ---

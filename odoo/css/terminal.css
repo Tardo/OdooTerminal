@@ -1,5 +1,6 @@
 :root {
   --terminal-input-height: 25px;
+  --terminal-shadow-input-color: #777;
   --terminal-screen-width: 70%;
   --terminal-screen-height: 40vh;
   --terminal-screen-max-height: 90vh;
@@ -63,10 +64,6 @@
   display: flex; /* Here to force BS4 behavior */
 }
 
-.o_terminal .terminal-user-input > #terminal_input {
-  flex: 1 1 auto; /* Here to force BS4 behavior */
-}
-
 .o_terminal .terminal-user-input > .terminal-prompt {
   border: 0 solid gray;
   border-width: 0 0 1px 1px;
@@ -78,7 +75,25 @@
   outline: hidden;
 }
 
-.o_terminal .terminal-user-input > input {
+.o_terminal .terminal-user-input .rich-input {
+  position: relative;
+  width: 100%; /* Here to 11.0 */
+}
+.o_terminal .terminal-user-input .rich-input > #terminal_input {
+  background-color: transparent;
+}
+.o_terminal .terminal-user-input .rich-input > #terminal_shadow_input {
+  color: var(--terminal-shadow-input-color);
+  pointer-events: none;
+}
+.o_terminal .terminal-user-input .rich-input > #terminal_input,
+.o_terminal .terminal-user-input .rich-input > #terminal_shadow_input {
+  flex: 1 1 auto; /* Here to force BS4 behavior */
+  position: absolute;
+  width: 100%;
+}
+
+.o_terminal .terminal-user-input input {
   background-color: var(--terminal-screen-background-color);
   border: 0 solid gray;
   border-width: 0 0 1px 0;
@@ -87,15 +102,11 @@
   height: var(--terminal-input-height);
 }
 
-.o_terminal .terminal-user-input > input[type=button],
-.o_terminal .terminal-user-input > input[type=button]:hover {
-  background-color: lightgray;
-}
-.o_terminal .terminal-user-input > input[type=edit] {
+.o_terminal .terminal-user-input input[type=edit] {
   padding: 0;
 }
-.o_terminal .terminal-user-input > input:active,
-.o_terminal .terminal-user-input > input:focus {
+.o_terminal .terminal-user-input input:active,
+.o_terminal .terminal-user-input input:focus {
   outline: hidden;
 }
 

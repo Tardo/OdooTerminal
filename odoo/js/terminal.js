@@ -145,6 +145,7 @@ odoo.define('terminal.Terminal', function (require) {
 
     const Terminal = AbstractTerminal.terminal.extend({
         events: {
+            "keyup #terminal_input": "_onInputKeyUp",
             "keydown #terminal_input": "_onInputKeyDown",
             "keydown #terminal_screen": "_preventLostInputFocus",
             "click .o_terminal_cmd": "_onClickTerminalCommand",
@@ -216,6 +217,7 @@ odoo.define('terminal.Terminal', function (require) {
             this.$('.terminal-prompt').val(this.PROMPT);
 
             this.$input = this.$('#terminal_input');
+            this.$shadowInput = this.$('#terminal_shadow_input');
             this.$term = this.$('#terminal_screen');
 
             core.bus.on('keydown', this, this._onCoreKeyDown);
@@ -379,6 +381,10 @@ odoo.define('terminal.Terminal', function (require) {
                 "Terminal v<%= ver %></strong>")({ver:this.VERSION}));
         },
 
+        _cleanShadowInput: function () {
+            this.$shadowInput.val('');
+        },
+
         // Key Distance Comparison (Simple mode)
         // Comparison by distance between keys.
         //
@@ -540,6 +546,9 @@ odoo.define('terminal.Terminal', function (require) {
         _updateInput: function (str) {
             this.$input.val(str);
         },
+        _updateShadowInput: function (str) {
+            this.$shadowInput.val(str);
+        },
 
         _fallbackExecuteCommand: function () {
             const defer = $.Deferred((d) => {
@@ -637,6 +646,13 @@ odoo.define('terminal.Terminal', function (require) {
         },
 
         _onInputKeyDown: function (ev) {
+            if (ev.keyCode === 9) {
+                // Press Tab
+                ev.preventDefault();
+            }
+        },
+        _onInputKeyUp: function (ev) {
+            this._cleanShadowInput();
             if (ev.keyCode === 13) {
                 this._onKeyEnter();
             } else if (ev.keyCode === 38) {
@@ -647,8 +663,20 @@ odoo.define('terminal.Terminal', function (require) {
                 this._onKeyArrowRight();
             } else if (ev.keyCode === 9) {
                 this._onKeyTab();
-                ev.preventDefault();
             } else {
+                // Fish-like feature
+                if (this.$input.val()) {
+                    this._searchCommandQuery = this.$input.val();
+                    this._searchHistoryIter = this._inputHistory.length;
+                    const self = this;
+                    $.Deferred((d) => {
+                        const found_hist = self._doSearchPrevHistory();
+                        self._updateShadowInput(found_hist || '');
+                        d.resolve();
+                    });
+                }
+
+                this._searchHistoryIter = this._inputHistory.length;
                 this._searchCommandIter = this._inputHistory.length;
                 this._searchCommandQuery = undefined;
             }
