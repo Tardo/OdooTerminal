@@ -60,11 +60,10 @@ def update_version(mode, create_commit=False):
         'VERSION: "%s"' % extension_ver)
 
     # git release commit
-    print(create_commit)
     if create_commit:
-        g = git.cmd.Git('.')
-        g.add('.')
-        g.commit('[REL] Version %s' % extension_ver)
+        repo = git.Repo()
+        repo.git.add(u=True)
+        repo.index.commit('[REL] Version %s' % extension_ver)
 
 
 def create_package():

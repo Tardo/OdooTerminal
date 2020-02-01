@@ -55,6 +55,12 @@ You can toggle terminal using one of these options:
 
 # Changelog
 
+**3.0.1**
+
+```
+FIX: tools/release.py
+```
+
 **3.0.0**
 
 ```
