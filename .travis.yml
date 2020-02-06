@@ -3,6 +3,8 @@ cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/.cache/pre-commit
+services:
+  - xvfb
 
 python:
   - "3.6"
@@ -11,23 +13,29 @@ addons:
   apt:
     packages:
       - expect-dev # provides unbuffer utility
+      - chromium-browser
+      - chromium-chromedriver
+  chrome: stable
 
 stages:
   - linting
-  - packaging
+  - selenium
 
 jobs:
   include:
     - stage: linting
-      name: "pre-commit"
-      before_install:
+      name: "pre-commit (eslint, web-ext, prettier, etc...)"
       install: pip install pre-commit
+      before_script: npm install web-ext -g
       script:
-        pre-commit run --all --show-diff-on-failure --verbose --color always
-      after_success:
-    - stage: packaging
-      name: "Create zip package"
-      before_install:
-      install: pip install -r tools/requirements.txt
-      script: tools/release.py
-      after_success:
+        - pre-commit run --all --show-diff-on-failure --verbose --color always
+    - stage: selenium
+      name: "Selenium Chromium/Chrome"
+      install:
+        - pip install -r tests/requirements.txt
+        - pip install -r tools/requirements.txt
+      before_script:
+        - export DISPLAY=:99.0
+      script:
+        - tools/release.py
+        - python tests/test_selenium.py
