@@ -55,6 +55,15 @@ You can toggle terminal using one of these options:
 
 # Changelog
 
+**3.1.0**
+
+```
+IMP: Odoo mode detection
+IMP: Pre-commit (web-ext)
+
+ADD: Basic Selenium tests
+```
+
 **3.0.1**
 
 ```
@@ -154,7 +163,7 @@ Big Bang!
 # Roadmap
 
 ```
-- Add unittest. Easy? Need mock 99%?
+- Improve unittest
 ```
 
 ---
