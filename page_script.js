@@ -53,6 +53,7 @@
         const cvers = COMPATIBLE_VERS.filter(function(item) {
             return odooInfo.serverVersion.startsWith(item);
         });
+        console.log(odooInfo.serverVersion);
         if (cvers.length) {
             odooInfo.isCompatible = true;
             window.term_odooVersion = odooInfo.serverVersion;
@@ -115,18 +116,40 @@
      * Request to Odoo the version.
      */
     function _forceOdooServerVersionDetection() {
-        _createServiceRpc(
-            {
-                service: "db",
-                method: "server_version",
-            },
-            rpc_response => {
-                const version = rpc_response.result;
-                if (!_.isUndefined(version) && typeof version === "string") {
-                    _setServerVersion(version);
-                }
-                _sendInitializeSignal();
-            }
+        try {
+            OdooObj.define(0, require => {
+                require("web.core");
+                _createServiceRpc(
+                    {
+                        service: "db",
+                        method: "server_version",
+                    },
+                    rpc_response => {
+                        const version = rpc_response.result;
+                        if (
+                            !_.isUndefined(version) &&
+                            typeof version === "string"
+                        ) {
+                            _setServerVersion(version);
+                        }
+                        _sendInitializeSignal();
+                    }
+                );
+            });
+        } catch (exception) {
+            // Do nothing
+            // Older versions are not supported
+        }
+    }
+
+    /**
+     * Heuristic method to determine backend mode
+     *
+     * @returns {Boolean}
+     */
+    function _forceIsOdooBackendDetection() {
+        return _.isNull(
+            document.querySelector("head script[src*='assets_frontend']")
         );
     }
 
@@ -138,23 +161,19 @@
 
         if (Object.prototype.hasOwnProperty.call(OdooObj, "session_info")) {
             if (OdooObj.session_info.server_version) {
+                console.log(odooInfo.serverVersion);
                 _setServerVersion(OdooObj.session_info.server_version);
             } else {
                 if (OdooObj.session_info.is_frontend) {
                     odooInfo.isFrontend = true;
                 }
 
-                try {
-                    OdooObj.define(0, require => {
-                        require("web.core");
-                        _forceOdooServerVersionDetection();
-                    });
-                } catch (exception) {
-                    // Do nothing
-                    // Older versions are not supported
-                }
+                _forceOdooServerVersionDetection();
                 canInitialize = false;
             }
+        } else {
+            odooInfo.isFrontend = !_forceIsOdooBackendDetection();
+            _forceOdooServerVersionDetection();
         }
     }
     if (canInitialize) {

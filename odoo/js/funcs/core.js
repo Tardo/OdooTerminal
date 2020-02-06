@@ -28,7 +28,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
             });
             this.registerCommand("print", {
                 definition: "Print a message",
-                callback: this._printEval,
+                callback: this._printText,
                 detail: "Eval parameters and print the result.",
                 syntaxis: "<STRING: MSG>",
                 args: "",
@@ -109,20 +109,11 @@ odoo.define("terminal.CoreFunctions", function(require) {
             });
         },
 
-        _printEval: function(params) {
+        _printText: function(params) {
             const self = this;
             return $.Deferred(d => {
-                let msg = params.join(" ");
-                try {
-                    // Ignore linter warning
-                    // eslint-disable-next-line
-                    msg = eval(msg);
-                } catch (err) {
-                    // Do Nothing
-                } finally {
-                    self.print(msg);
-                    d.resolve();
-                }
+                self.print(params.join(" "));
+                d.resolve();
             });
         },
 
