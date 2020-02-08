@@ -53,7 +53,6 @@
         const cvers = COMPATIBLE_VERS.filter(function(item) {
             return odooInfo.serverVersion.startsWith(item);
         });
-        console.log(odooInfo.serverVersion);
         if (cvers.length) {
             odooInfo.isCompatible = true;
             window.term_odooVersion = odooInfo.serverVersion;
@@ -161,7 +160,6 @@
 
         if (Object.prototype.hasOwnProperty.call(OdooObj, "session_info")) {
             if (OdooObj.session_info.server_version) {
-                console.log(odooInfo.serverVersion);
                 _setServerVersion(OdooObj.session_info.server_version);
             } else {
                 if (OdooObj.session_info.is_frontend) {
