@@ -1,2 +1,9 @@
+# Distribution extension package
 OdooTerminal.zip
+
+# Test logs
 *.log
+
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]

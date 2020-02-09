@@ -53,6 +53,74 @@ You can toggle terminal using one of these options:
 
 ---
 
+# Pre-commit
+
+If you want collaborate, you need this to make travis happy.
+
+#### Installation
+
+```
+pip install pre-commit
+pre-commit install -a
+```
+
+#### Usage
+
+After install, when you do a commit all linters, prettiers, etc.. will run
+automatically ;)
+
+If one step fails the commit will be cancelled, try do it again (surely
+pre-commit was changed some files, no problem, it's his job, add them again).
+The only step thats require manual action if fails (very rare to happen) is the
+last ('web-ext').
+
+---
+
+# Testing
+
+This tests only checks that the extension is loaded successfully on all
+compatible Odoo versions.
+
+#### Installation
+
+_For environments without a real X11 server see 'xvfb' (X11 Virtual
+FrameBuffer)_
+
+- **Common**
+
+```
+apt-get install python python-pip
+pip install selenium
+```
+
+- Chromium
+
+```
+apt-get install chromium chromium-chromedriver
+```
+
+- Chrome
+
+\*\* Install chrome browser in your system: https://www.google.com/chrome/
+
+```
+apt-get install chromium-chromedriver
+```
+
+- Firefox (Not used already!)
+
+```
+apt-get install firefox geckodriver
+```
+
+#### Usage
+
+```
+python tests
+```
+
+---
+
 # Changelog
 
 **3.1.0**
@@ -163,7 +231,7 @@ Big Bang!
 # Roadmap
 
 ```
-- Improve unittest
+- Improve unittest (tests for commmands)
 ```
 
 ---
