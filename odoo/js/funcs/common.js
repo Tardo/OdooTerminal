@@ -181,6 +181,28 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis: "[STRING: OPERATION]",
                 args: "?s",
             });
+            this.registerCommand("login", {
+                definition: "Login as...",
+                callback: this._loginAs,
+                detail:
+                    "Login as selected user." +
+                    "<br>&lt;LOGIN&gt; Can be optionally preceded by the '-'" +
+                    "character and it will be used for password too",
+                syntaxis:
+                    "<STRING: DATABASE> <STRING: LOGIN> [STRING: PASSWORD]",
+                args: "ss?s",
+            });
+            this.registerCommand("uhg", {
+                definition: "Check if user is in the selected groups",
+                callback: this._userHasGroups,
+                detail:
+                    "Check if user is in the selected groups." +
+                    "<br>&lt;GROUPS&gt; A list of groups separated by " +
+                    "commas, a group can be optionally preceded by '!' to " +
+                    "say 'is not in group'",
+                syntaxis: "<STRING: GROUPS>",
+                args: "s",
+            });
         },
 
         start: function() {
@@ -189,6 +211,37 @@ odoo.define("terminal.CommonFunctions", function(require) {
             this._longpollingMode = this._storage.getItem(
                 "terminal_longpolling_mode"
             );
+        },
+
+        _userHasGroups: function(params) {
+            const groups = params[0];
+            const self = this;
+            return rpc
+                .query({
+                    method: "user_has_groups",
+                    model: "res.users",
+                    args: [groups],
+                    kwargs: {context: session.user_context},
+                })
+                .then(result => {
+                    self.print(result);
+                });
+        },
+
+        _loginAs: function(params) {
+            const db = params[0];
+            var login = params[1];
+            var passwd = params[2] || false;
+            var self = this;
+            if (login[0] === "-" && !passwd) {
+                login = login.substr(1);
+                passwd = login;
+            }
+            return session
+                ._session_authenticate(db, login, passwd)
+                .then(function() {
+                    self.print(`Successfully logged as '${login}'`);
+                });
         },
 
         _longpolling: function(params) {

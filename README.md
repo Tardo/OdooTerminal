@@ -123,6 +123,16 @@ python tests
 
 # Changelog
 
+**3.2.0**
+
+```
+IMP: Selenium tests
+IMP: Catch errors
+
+ADD: Command 'login': Login as selected user
+ADD: Command 'uhg': Check if user is in the selected groups
+```
+
 **3.1.0**
 
 ```

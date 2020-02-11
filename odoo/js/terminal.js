@@ -395,26 +395,36 @@ odoo.define("terminal.Terminal", function(require) {
                 var cmdDef = this._registeredCmds[scmd.cmd];
                 if (this._parameterChecker.validate(cmdDef.args, scmd.params)) {
                     this.onStartCommand(scmd.cmd, scmd.params);
-                    return cmdDef.callback
-                        .bind(this)(scmd.params)
-                        .then(
-                            result => {
-                                self.onFinishCommand(
-                                    scmd.cmd,
-                                    scmd.params,
-                                    false,
-                                    result
-                                );
-                            },
-                            emsg => {
-                                self.onFinishCommand(
-                                    scmd.cmd,
-                                    scmd.params,
-                                    true,
-                                    emsg
-                                );
-                            }
+                    try {
+                        return cmdDef.callback
+                            .bind(this)(scmd.params)
+                            .then(
+                                result => {
+                                    self.onFinishCommand(
+                                        scmd.cmd,
+                                        scmd.params,
+                                        false,
+                                        result
+                                    );
+                                },
+                                emsg => {
+                                    self.onFinishCommand(
+                                        scmd.cmd,
+                                        scmd.params,
+                                        true,
+                                        emsg
+                                    );
+                                }
+                            );
+                    } catch (err) {
+                        self.onFinishCommand(
+                            scmd.cmd,
+                            scmd.params,
+                            true,
+                            err.message
                         );
+                    }
+                    return false;
                 }
                 this.print(
                     `<span class='o_terminal_click ` +
