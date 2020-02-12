@@ -186,6 +186,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 callback: this._loginAs,
                 detail:
                     "Login as selected user." +
+                    "<br>&lt;DATABASE&gt; Can be '*' to use current database" +
                     "<br>&lt;LOGIN&gt; Can be optionally preceded by the '-'" +
                     "character and it will be used for password too",
                 syntaxis:
@@ -204,6 +205,13 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis: "<STRING: GROUPS>",
                 args: "s",
             });
+            this.registerCommand("dblist", {
+                definition: "Show database names",
+                callback: this._showDBList,
+                detail: "Show database names",
+                syntaxis: "",
+                args: "",
+            });
         },
 
         start: function() {
@@ -212,6 +220,29 @@ odoo.define("terminal.CommonFunctions", function(require) {
             this._longpollingMode = this._storage.getItem(
                 "terminal_longpolling_mode"
             );
+        },
+
+        _showDBList: function() {
+            const self = this;
+            return ajax
+                .rpc("/jsonrpc", {
+                    service: "db",
+                    method: "list",
+                    args: {},
+                })
+                .then(databases => {
+                    if (!databases) {
+                        self.print("[!] Can't get database names");
+                        return;
+                    }
+                    for (const dbname of databases) {
+                        if (dbname === session.db) {
+                            self._printHTML(`<strong>${dbname}</strong>`);
+                        } else {
+                            self.print(dbname);
+                        }
+                    }
+                });
         },
 
         _userHasGroups: function(params) {
@@ -230,13 +261,16 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _loginAs: function(params) {
-            const db = params[0];
-            var login = params[1];
-            var passwd = params[2] || false;
-            var self = this;
+            let db = params[0];
+            let login = params[1];
+            let passwd = params[2] || false;
+            const self = this;
             if (login[0] === "-" && !passwd) {
                 login = login.substr(1);
                 passwd = login;
+            }
+            if (db === "*") {
+                db = session.db;
             }
             return session
                 ._session_authenticate(db, login, passwd)

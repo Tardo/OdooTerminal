@@ -131,6 +131,7 @@ IMP: Catch errors
 
 ADD: Command 'login': Login as selected user
 ADD: Command 'uhg': Check if user is in the selected groups
+ADD: Command 'dblist': List database names
 ```
 
 **3.1.0**

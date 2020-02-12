@@ -748,7 +748,7 @@ odoo.define("terminal.Terminal", function(require) {
             --this._runningCommandsCount;
             this._updateRunningCmdCount();
             if (has_errors) {
-                var errorMessage = this._getCommandErrorMessage(result);
+                const errorMessage = this._getCommandErrorMessage(result);
                 this.eprint(`[!] Error executing '${cmd}':`);
                 this.print(errorMessage, false, "error_message");
             }

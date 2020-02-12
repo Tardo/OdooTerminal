@@ -4,7 +4,7 @@
 odoo.define("terminal.CoreFunctions", function(require) {
     "use strict";
 
-    var Terminal = require("terminal.Terminal").terminal;
+    const Terminal = require("terminal.Terminal").terminal;
 
     Terminal.include({
         init: function() {
