@@ -191,6 +191,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis:
                     "<STRING: DATABASE> <STRING: LOGIN> [STRING: PASSWORD]",
                 args: "ss?s",
+                secured: true,
             });
             this.registerCommand("uhg", {
                 definition: "Check if user is in the selected groups",

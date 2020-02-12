@@ -239,7 +239,7 @@ odoo.define("terminal.Terminal", function(require) {
                                     cmd: cmd,
                                 })
                             );
-                            this.executeCommand(cmd);
+                            this._processCommandJob(cmd);
                         }
 
                         this._has_exec_init_cmds = true;
@@ -378,79 +378,47 @@ odoo.define("terminal.Terminal", function(require) {
                         "This command hasn't a properly detailed information",
                     syntaxis: "Unknown",
                     args: "",
+                    secured: false,
                 },
                 cmdDef
             );
         },
 
-        executeCommand: function(cmd) {
-            const self = this;
-            const scmd = this._parameterReader.parse(cmd);
-            if (
-                Object.prototype.hasOwnProperty.call(
-                    this._registeredCmds,
-                    scmd.cmd
-                )
-            ) {
-                var cmdDef = this._registeredCmds[scmd.cmd];
-                if (this._parameterChecker.validate(cmdDef.args, scmd.params)) {
-                    this.onStartCommand(scmd.cmd, scmd.params);
-                    try {
-                        return cmdDef.callback
-                            .bind(this)(scmd.params)
-                            .then(
-                                result => {
-                                    self.onFinishCommand(
-                                        scmd.cmd,
-                                        scmd.params,
-                                        false,
-                                        result
-                                    );
-                                },
-                                emsg => {
-                                    self.onFinishCommand(
-                                        scmd.cmd,
-                                        scmd.params,
-                                        true,
-                                        emsg
-                                    );
-                                }
-                            );
-                    } catch (err) {
-                        self.onFinishCommand(
-                            scmd.cmd,
-                            scmd.params,
-                            true,
-                            err.message
-                        );
-                    }
-                    return false;
-                }
-                this.print(
-                    `<span class='o_terminal_click ` +
-                        `o_terminal_cmd' data-cmd='help ${scmd.cmd}'>[!] ` +
-                        `Invalid command parameters!</span>`
-                );
-            } else {
-                const similar_cmd = this._searchSimiliarCommand(scmd.cmd);
-                if (similar_cmd) {
-                    this.print(
-                        _.template(
-                            "Unknown command. Did you mean " +
-                                "'<strong class='o_terminal_click " +
-                                "o_terminal_cmd' data-cmd='<%= cmd %> <%= params %>'>" +
-                                "<%= cmd %></strong>'?"
-                        )({
-                            cmd: similar_cmd,
-                            params: scmd.rawParams,
+        executeCommand: function(cmd, store = true) {
+            if (cmd) {
+                const scmd = this._parameterReader.parse(cmd);
+                const cmdDef = this._registeredCmds[scmd.cmd];
+                if (cmdDef && cmdDef.secured) {
+                    this.eprint(
+                        _.template("<%= prompt %> <%= cmd %> *****")({
+                            prompt: this.PROMPT,
+                            cmd: scmd.cmd,
                         })
                     );
                 } else {
-                    this.eprint("Unknown command.");
-                }
-            }
+                    this.eprint(
+                        _.template("<%= prompt %> <%= cmd %>")({
+                            prompt: this.PROMPT,
+                            cmd: cmd,
+                        })
+                    );
 
-            return false;
+                    if (store) {
+                        this.$input.append(
+                            _.template("<option><%= cmd %></option>")({
+                                cmd: cmd,
+                            })
+                        );
+                        this._inputHistory.push(cmd);
+                        this._storage.setItem(
+                            "terminal_history",
+                            this._inputHistory
+                        );
+                    }
+                }
+                this.cleanInput();
+                this._processCommandJob(scmd);
+            }
         },
 
         /* VISIBILIY */
@@ -676,25 +644,73 @@ odoo.define("terminal.Terminal", function(require) {
             return this._inputHistory[this._searchHistoryIter];
         },
 
-        _processInputCommand: function() {
-            const cmd = this.$input.val();
-            if (cmd) {
-                const self = this;
-                self.$input.append(
-                    _.template("<option><%= cmd %></option>")({cmd: cmd})
+        _processCommandJob: function(scmd) {
+            const self = this;
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    this._registeredCmds,
+                    scmd.cmd
+                )
+            ) {
+                const cmdDef = this._registeredCmds[scmd.cmd];
+                if (this._parameterChecker.validate(cmdDef.args, scmd.params)) {
+                    this.onStartCommand(scmd.cmd, scmd.params);
+                    try {
+                        return cmdDef.callback
+                            .bind(this)(scmd.params)
+                            .then(
+                                result => {
+                                    self.onFinishCommand(
+                                        scmd.cmd,
+                                        scmd.params,
+                                        false,
+                                        result
+                                    );
+                                },
+                                emsg => {
+                                    self.onFinishCommand(
+                                        scmd.cmd,
+                                        scmd.params,
+                                        true,
+                                        emsg
+                                    );
+                                }
+                            );
+                    } catch (err) {
+                        self.onFinishCommand(
+                            scmd.cmd,
+                            scmd.params,
+                            true,
+                            err.message
+                        );
+                    }
+                    return false;
+                }
+                this.print(
+                    `<span class='o_terminal_click ` +
+                        `o_terminal_cmd' data-cmd='help ${scmd.cmd}'>[!] ` +
+                        `Invalid command parameters!</span>`
                 );
-                self.eprint(
-                    _.template("<%= prompt %> <%= cmd %>")({
-                        prompt: this.PROMPT,
-                        cmd: cmd,
-                    })
-                );
-                this._inputHistory.push(cmd);
-                this._storage.setItem("terminal_history", this._inputHistory);
-                this.cleanInput();
-                this.executeCommand(cmd);
+            } else {
+                const similar_cmd = this._searchSimiliarCommand(scmd.cmd);
+                if (similar_cmd) {
+                    this.print(
+                        _.template(
+                            "Unknown command. Did you mean " +
+                                "'<strong class='o_terminal_click " +
+                                "o_terminal_cmd' data-cmd='<%= cmd %> <%= params %>'>" +
+                                "<%= cmd %></strong>'?"
+                        )({
+                            cmd: similar_cmd,
+                            params: scmd.rawParams,
+                        })
+                    );
+                } else {
+                    this.eprint("Unknown command.");
+                }
             }
-            this._preventLostInputFocus();
+
+            return false;
         },
 
         _updateInput: function(str) {
@@ -756,7 +772,7 @@ odoo.define("terminal.Terminal", function(require) {
                         cmd: cmd,
                     })
                 );
-                this.executeCommand(cmd);
+                this._processCommandJob(cmd);
             }
         },
 
@@ -784,9 +800,10 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         _onKeyEnter: function() {
-            this._processInputCommand();
+            this.executeCommand(this.$input.val());
             this._searchHistoryIter = this._inputHistory.length;
             this._searchCommandQuery = undefined;
+            this._preventLostInputFocus();
         },
         _onKeyArrowUp: function() {
             if (_.isUndefined(this._searchCommandQuery)) {

@@ -21,11 +21,12 @@ Commands works with promises
 
 ```
 {
-  definition: 'string',
+  definition: string,
   callback: function,
-  detail: 'string',
-  syntaxis: 'string',
-  args: 'string',
+  detail: string,
+  syntaxis: string,
+  args: string,
+  secured: boolean,
 }
 ```
 
@@ -39,6 +40,7 @@ Commands works with promises
   - 's' String
   - 'i' Integer
   - '?' Indicates that next parameter is optional
+- secured: Hide command from screen & history
 
 **Basic Example**::
 

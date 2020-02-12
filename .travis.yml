@@ -40,4 +40,4 @@ jobs:
         - export DISPLAY=:99.0
       script:
         - tools/release.py
-        - python tests
+        - python -m tests tests/test_chrome.py
