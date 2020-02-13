@@ -61,7 +61,7 @@ If you want collaborate, you need this to make travis happy.
 
 ```
 pip install pre-commit
-pre-commit install -a
+pre-commit run -a
 ```
 
 #### Usage
@@ -96,7 +96,7 @@ pip install selenium
 - Chromium
 
 ```
-apt-get install chromium chromium-chromedriver
+apt-get install chromium-browser chromium-chromedriver
 ```
 
 - Chrome
@@ -128,6 +128,7 @@ python tests
 ```
 IMP: Selenium tests
 IMP: Catch errors
+IMP: Code refactor
 
 ADD: Command 'login': Login as selected user
 ADD: Command 'uhg': Check if user is in the selected groups

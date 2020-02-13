@@ -20,20 +20,6 @@ odoo.define("terminal.Compat12", function(require) {
             );
         },
 
-        _getCommandErrorMessage: function(emsg) {
-            if (
-                typeof emsg === "object" &&
-                Object.prototype.hasOwnProperty.call(emsg, "message")
-            ) {
-                if (typeof emsg.message === "string") {
-                    return emsg.message;
-                }
-                const msgInfo = emsg.message.data;
-                return `${msgInfo.name} (${msgInfo.message})`;
-            }
-            return this._super.apply(this, arguments);
-        },
-
         _get_active_view_type_id: function() {
             for (const index in this._active_action._views) {
                 if (

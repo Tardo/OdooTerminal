@@ -13,8 +13,6 @@ odoo.define("terminal.BackendLoader", function(require) {
 
         show_application: function() {
             this.terminal = new Terminal(this);
-            this.terminal.setElement(this.$el.parents().find("#terminal"));
-            this.terminal.start();
 
             core.bus.on("toggle_terminal", this, () => {
                 this.terminal.do_toggle();

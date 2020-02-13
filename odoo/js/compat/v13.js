@@ -13,15 +13,7 @@ odoo.define("terminal.Compat13", function(require) {
             if (this._active_action.view_id) {
                 return this._active_action.view_id[0];
             }
-            for (const index in this._active_action._views) {
-                if (
-                    this._active_action._views[index][1] ===
-                    this._active_widget.viewType
-                ) {
-                    return this._active_action._views[index][0];
-                }
-            }
-            return false;
+            return this._super.apply(this, arguments);
         },
     });
 });

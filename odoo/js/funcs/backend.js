@@ -43,21 +43,19 @@ odoo.define("terminal.BackendFunctions", function(require) {
         },
 
         _openSettings: function() {
-            const self = this;
             return this.do_action({
                 type: "ir.actions.act_window",
                 res_model: "res.config.settings",
                 views: [[false, "form"]],
                 target: "current",
             }).then(() => {
-                self.do_hide();
+                this.do_hide();
             });
         },
 
         _viewModelRecord: function(params) {
             const model = params[0];
             const resId = Number(params[1]) || false;
-            const self = this;
             if (resId) {
                 return this.do_action({
                     type: "ir.actions.act_window",
@@ -67,7 +65,7 @@ odoo.define("terminal.BackendFunctions", function(require) {
                     views: [[false, "form"]],
                     target: "new",
                 }).then(() => {
-                    self.do_hide();
+                    this.do_hide();
                 });
             }
             new dialogs.SelectCreateDialog(this, {
@@ -75,7 +73,7 @@ odoo.define("terminal.BackendFunctions", function(require) {
                 title: "Select a record",
                 disable_multiple_selection: true,
                 on_selected: records => {
-                    self.do_action({
+                    this.do_action({
                         type: "ir.actions.act_window",
                         name: "View Record",
                         res_model: model,
@@ -115,7 +113,6 @@ odoo.define("terminal.BackendFunctions", function(require) {
             "Last Modification Date:</span> <%= wdate %>",
 
         _showMetadata: function() {
-            const self = this;
             const view_id = this._get_active_view_type_id();
             if (view_id) {
                 return rpc
@@ -129,15 +126,15 @@ odoo.define("terminal.BackendFunctions", function(require) {
                     })
                     .then(results => {
                         const view = results[0];
-                        self.print(
-                            _.template(self._METADATA_VIEW_TEMPLATE)({
+                        this.print(
+                            _.template(this._METADATA_VIEW_TEMPLATE)({
                                 id: view.xml_id,
                                 name: view.name,
                             })
                         );
-                        const controllerSelectedIds = self._get_active_view_selected_ids();
+                        const controllerSelectedIds = this._get_active_view_selected_ids();
                         if (controllerSelectedIds.length) {
-                            self._get_metadata(controllerSelectedIds).then(
+                            this._get_metadata(controllerSelectedIds).then(
                                 result => {
                                     const metadata = result[0];
                                     metadata.creator = field_utils.format.many2one(
@@ -159,9 +156,9 @@ odoo.define("terminal.BackendFunctions", function(require) {
                                         modificationDate
                                     );
 
-                                    self.print(
+                                    this.print(
                                         _.template(
-                                            self._METADATA_RECORD_TEMPLATE
+                                            this._METADATA_RECORD_TEMPLATE
                                         )({
                                             id: metadata.id,
                                             uid: metadata.create_uid[0],
@@ -179,7 +176,7 @@ odoo.define("terminal.BackendFunctions", function(require) {
             }
 
             return $.Deferred(d => {
-                self.print("No metadata available! View ID unknown");
+                this.print("No metadata available! View ID unknown");
                 d.resolve();
             });
         },

@@ -66,24 +66,23 @@ odoo.define("terminal.CoreFunctions", function(require) {
         },
 
         _printHelp: function(params) {
-            const self = this;
             return $.Deferred(d => {
                 if (!params || params.length === 0) {
-                    const sortedCmdKeys = _.keys(self._registeredCmds).sort();
+                    const sortedCmdKeys = _.keys(this._registeredCmds).sort();
                     for (const cmd of sortedCmdKeys) {
-                        self._printHelpSimple(cmd, self._registeredCmds[cmd]);
+                        this._printHelpSimple(cmd, this._registeredCmds[cmd]);
                     }
                 } else {
                     const cmd = params[0];
                     if (
                         Object.prototype.hasOwnProperty.call(
-                            self._registeredCmds,
+                            this._registeredCmds,
                             cmd
                         )
                     ) {
-                        self._printHelpDetailed(cmd, self._registeredCmds[cmd]);
+                        this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
                     } else {
-                        self.print(`[!] '${cmd}' command doesn't exists`);
+                        this.printError(`'${cmd}' command doesn't exists`);
                     }
                 }
 
@@ -98,21 +97,19 @@ odoo.define("terminal.CoreFunctions", function(require) {
         },
 
         _clear: function(params) {
-            const self = this;
             return $.Deferred(d => {
                 if (params.length && params[0] === "history") {
-                    self.cleanInputHistory();
+                    this.cleanInputHistory();
                 } else {
-                    self.clean();
+                    this.clean();
                 }
                 d.resolve();
             });
         },
 
         _printText: function(params) {
-            const self = this;
             return $.Deferred(d => {
-                self.print(params.join(" "));
+                this.print(params.join(" "));
                 d.resolve();
             });
         },

@@ -13,9 +13,9 @@ class SeleniumTestCase(unittest.TestCase):
 
     _ODOO_SERVERS = {
         'ce': {
-            '11': 'https://runbot.odoo-community.org/runbot/113/11.0',
-            '12': 'https://runbot.odoo-community.org/runbot/113/12.0',
-            '13': 'https://runbot.odoo-community.org/runbot/113/13.0',
+            '11': 'https://runbot.odoo-community.org/runbot/186/11.0',
+            '12': 'https://runbot.odoo-community.org/runbot/186/12.0',
+            '13': 'https://runbot.odoo-community.org/runbot/186/13.0',
         },
         'ee': {
             '11': 'http://runbot.odoo.com/runbot/quick_connect/33836',

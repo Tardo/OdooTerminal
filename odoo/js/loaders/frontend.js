@@ -4,6 +4,7 @@
 odoo.define("terminal.FrontendLoader", function(require) {
     "use strict";
 
+    require("web.dom_ready");
     const core = require("web.core");
     const Terminal = require("terminal.Terminal").terminal;
 
@@ -13,8 +14,6 @@ odoo.define("terminal.FrontendLoader", function(require) {
 
     $(() => {
         const terminal = new Terminal(null, $("body").data());
-        terminal.setElement($("body").find("#terminal"));
-        terminal.start();
 
         core.bus.on("toggle_terminal", this, () => {
             terminal.do_toggle();

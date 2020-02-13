@@ -1,6 +1,13 @@
 // Copyright 2019-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+/**
+ * This file is 'only' for better readability of the source.
+ * Here are 'declared' the methods that are not compatible on all Odoo versions
+ * or classes that can be implemented in various ways...
+ * For exmaple, Storage can be implemented to use localStorage instead of
+ * sessionStorage.
+ */
 odoo.define("terminal.AbstractTerminal", function(require) {
     "use strict";
 
@@ -13,20 +20,33 @@ odoo.define("terminal.AbstractTerminal", function(require) {
     const AbstractStorage = Class.extend({
         _parent: null,
 
+        /**
+         * @param {Widget} parent - Odoo Widget
+         */
         init: function(parent) {
             this._parent = parent;
         },
 
+        /**
+         * @param {String} item
+         */
         // eslint-disable-next-line
         getItem: function(item) {
             throw Error("Not Implemented!");
         },
 
+        /**
+         * @param {String} item
+         * @param {Object} value
+         */
         // eslint-disable-next-line
         setItem: function(item, value) {
             throw Error("Not Implemented!");
         },
 
+        /**
+         * @params {String} item
+         */
         // eslint-disable-next-line
         removeItem: function(item) {
             throw Error("Not Implemented!");
@@ -80,15 +100,6 @@ odoo.define("terminal.AbstractTerminal", function(require) {
             this._super.apply(this, arguments);
         },
 
-        /**
-         * Sanitize the Odoo error message.
-         * @param {Object} emsg - Odoo error
-         * @returns {String}
-         */
-        _getCommandErrorMessage: function(emsg) {
-            return emsg || "undefined error";
-        },
-
         _get_active_view_type_id: function() {
             throw Error("Not Implemented!");
         },
@@ -97,6 +108,9 @@ odoo.define("terminal.AbstractTerminal", function(require) {
             throw Error("Not Implemented!");
         },
 
+        /**
+         * @param {Array} ids - Array of integers
+         */
         // eslint-disable-next-line
         _get_metadata: function(ids) {
             throw Error("Not Implemented!");

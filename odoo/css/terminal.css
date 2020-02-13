@@ -54,6 +54,13 @@
     margin: 0.3em;
     display: block;
 }
+.o_terminal div#terminal_screen .error_message h4 {
+    margin: 0;
+    color: var(--terminal-screen-text-color);
+}
+.o_terminal div#terminal_screen .error_message ul {
+    margin-bottom: 0;
+}
 
 .o_terminal .terminal-user-input {
     background-color: var(--terminal-screen-background-color);

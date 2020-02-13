@@ -223,7 +223,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _showDBList: function() {
-            const self = this;
             return ajax
                 .rpc("/jsonrpc", {
                     service: "db",
@@ -232,14 +231,14 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 })
                 .then(databases => {
                     if (!databases) {
-                        self.print("[!] Can't get database names");
+                        this.printError("Can't get database names");
                         return;
                     }
                     for (const dbname of databases) {
                         if (dbname === session.db) {
-                            self._printHTML(`<strong>${dbname}</strong>`);
+                            this.print(`<strong>${dbname}</strong>`);
                         } else {
-                            self.print(dbname);
+                            this.print(dbname);
                         }
                     }
                 });
@@ -247,7 +246,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
 
         _userHasGroups: function(params) {
             const groups = params[0];
-            const self = this;
             return rpc
                 .query({
                     method: "user_has_groups",
@@ -256,7 +254,11 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: session.user_context},
                 })
                 .then(result => {
-                    self.print(result);
+                    if (result) {
+                        this.print("Nice! groups are truly evaluated");
+                    } else {
+                        this.print("Groups are negatively evaluated");
+                    }
                 });
         },
 
@@ -264,41 +266,47 @@ odoo.define("terminal.CommonFunctions", function(require) {
             let db = params[0];
             let login = params[1];
             let passwd = params[2] || false;
-            const self = this;
             if (login[0] === "-" && !passwd) {
                 login = login.substr(1);
                 passwd = login;
             }
             if (db === "*") {
+                if (!session.db) {
+                    this.printError(
+                        "Unknown active database. Try using " +
+                            "'<span class='o_terminal_click o_terminal_cmd' " +
+                            "data-cmd='dblist'>dblist</span>' command."
+                    );
+                    return $.Deferred(d => {
+                        d.resolve();
+                    });
+                }
                 db = session.db;
             }
-            return session
-                ._session_authenticate(db, login, passwd)
-                .then(function() {
-                    self.print(`Successfully logged as '${login}'`);
-                });
+            return session._session_authenticate(db, login, passwd).then(() => {
+                this.print(`Successfully logged as '${login}'`);
+            });
         },
 
         _longpolling: function(params) {
             const operation = params[0];
-            const self = this;
             return $.Deferred(d => {
                 if (typeof operation === "undefined") {
-                    self.print(
-                        self._storage.getItem("terminal_longpolling_mode") ||
+                    this.print(
+                        this._storage.getItem("terminal_longpolling_mode") ||
                             "off"
                     );
                 } else if (operation === "verbose") {
-                    self._storage.setItem(
+                    this._storage.setItem(
                         "terminal_longpolling_mode",
                         "verbose"
                     );
-                    self.print("Now long-polling is in verbose mode.");
+                    this.print("Now long-polling is in verbose mode.");
                 } else if (operation === "off") {
-                    self._storage.removeItem("terminal_longpolling_mode");
-                    self.print("Now long-polling verbose mode is disabled");
+                    this._storage.removeItem("terminal_longpolling_mode");
+                    this.print("Now long-polling verbose mode is disabled");
                 } else {
-                    d.reject("Invalid operation");
+                    this.printError("Invalid Operation.");
                 }
 
                 d.resolve();
@@ -306,10 +314,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _showOdooVersion: function() {
-            const self = this;
             return $.Deferred(d => {
                 try {
-                    self.print(
+                    this.print(
                         `${odoo.session_info.server_version_info
                             .slice(0, 3)
                             .join(
@@ -320,7 +327,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     );
                     d.resolve();
                 } catch (err) {
-                    self.print(window.term_odooVersion);
+                    this.print(window.term_odooVersion);
                 }
 
                 d.resolve();
@@ -331,18 +338,17 @@ odoo.define("terminal.CommonFunctions", function(require) {
             const operation = params[0] || "read";
             const values = params[1] || "false";
 
-            const self = this;
             return $.Deferred(d => {
                 if (operation === "read") {
-                    self.print(session.user_context);
+                    this.print(session.user_context);
                 } else if (operation === "set") {
                     session.user_context = JSON.parse(values);
-                    self.print(session.user_context);
+                    this.print(session.user_context);
                 } else if (operation === "write") {
                     Object.assign(session.user_context, JSON.parse(values));
-                    self.print(session.user_context);
+                    this.print(session.user_context);
                 } else {
-                    d.reject("Invalid operation");
+                    this.printError("Invalid operation");
                 }
 
                 d.resolve();
@@ -356,7 +362,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (params[2]) {
                 fields = params[2] === "*" ? false : params[2].split(",");
             }
-            const self = this;
+
             return rpc
                 .query({
                     method: "search_read",
@@ -385,7 +391,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         }
                         tbody += "</tr>";
                     }
-                    self.printTable(_.unique(columns), tbody);
+                    this.printTable(_.unique(columns), tbody);
                 });
         },
 
@@ -482,7 +488,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
             "<br><span style='color: gray;'>Groups</span>:" +
             " <%= groups %>",
         _showWhoAmI: function() {
-            const self = this;
             const uid =
                 window.odoo.session_info.uid ||
                 window.odoo.session_info.user_id;
@@ -503,8 +508,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 .then(result => {
                     if (result.length) {
                         const record = result[0];
-                        self.print(
-                            _.template(self._WHOAMI_TEMPLATE)({
+                        this.print(
+                            _.template(this._WHOAMI_TEMPLATE)({
                                 login: record.login,
                                 partner: record.partner_id,
                                 company: record.company_id,
@@ -513,7 +518,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             })
                         );
                     } else {
-                        self.print("[!] Oops! can't get the login :/");
+                        this.printError("Oops! can't get the login :/");
                     }
                 });
         },
@@ -545,7 +550,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "debug=assets"
                 );
             } else {
-                this.print("[!] Invalid debug mode");
+                this.printError("Invalid debug mode");
             }
 
             return $.Deferred(d => {
@@ -576,7 +581,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
 
         _upgradeModule: function(params) {
             const module = params[0];
-            const self = this;
             return this._searchModule(module).then(result => {
                 if (result.length) {
                     rpc.query({
@@ -585,23 +589,22 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         args: [result[0].id],
                     }).then(
                         () => {
-                            self.print(
+                            this.print(
                                 `'${module}' module successfully upgraded`
                             );
                         },
                         () => {
-                            self.print(`[!] Can't upgrade '${module}' module`);
+                            this.printError(`Can't upgrade '${module}' module`);
                         }
                     );
                 } else {
-                    self.print(`[!] '${module}' module doesn't exists`);
+                    this.printError(`'${module}' module doesn't exists`);
                 }
             });
         },
 
         _installModule: function(params) {
             const module = params[0];
-            const self = this;
             return this._searchModule(module).then(result => {
                 if (result.length) {
                     rpc.query({
@@ -610,23 +613,22 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         args: [result[0].id],
                     }).then(
                         () => {
-                            self.print(
+                            this.print(
                                 `'${module}' module successfully installed`
                             );
                         },
                         () => {
-                            self.print(`[!] Can't install '${module}' module`);
+                            this.printError(`Can't install '${module}' module`);
                         }
                     );
                 } else {
-                    self.print(`[!] '${module}' module doesn't exists`);
+                    this.printError(`'${module}' module doesn't exists`);
                 }
             });
         },
 
         _uninstallModule: function(params) {
             const module = params[0];
-            const self = this;
             return this._searchModule(module).then(result => {
                 if (result.length) {
                     rpc.query({
@@ -635,18 +637,18 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         args: [result[0].id],
                     }).then(
                         () => {
-                            self.print(
+                            this.print(
                                 `'${module}' module successfully uninstalled`
                             );
                         },
                         () => {
-                            self.print(
-                                `[!] Can't uninstall '${module}' module`
+                            this.printError(
+                                `Can't uninstall '${module}' module`
                             );
                         }
                     );
                 } else {
-                    self.print(`[!] '${module}' module doesn't exists`);
+                    this.printError(`'${module}' module doesn't exists`);
                 }
             });
         },
@@ -655,7 +657,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
             const model = params[0];
             const method = params[1];
             const args = params[2] || "[]";
-            const self = this;
             return rpc
                 .query({
                     method: method,
@@ -664,7 +665,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: session.user_context},
                 })
                 .then(result => {
-                    self.print(result);
+                    this.print(result);
                 });
         },
 
@@ -676,7 +677,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
             }
             const domain = params[2] || "[]";
             const limit = Number(params[3]) || false;
-            const self = this;
             return rpc
                 .query({
                     method: "search_read",
@@ -706,13 +706,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         }
                         tbody += "</tr>";
                     }
-                    self.printTable(_.unique(columns), tbody);
+                    this.printTable(_.unique(columns), tbody);
                 });
         },
 
         _createModelRecord: function(params) {
             const model = params[0];
-            const self = this;
             if (params.length === 1) {
                 return this.do_action({
                     type: "ir.actions.act_window",
@@ -720,7 +719,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     views: [[false, "form"]],
                     target: "current",
                 }).then(() => {
-                    self.do_hide();
+                    this.do_hide();
                 });
             }
             const values = params[1];
@@ -732,7 +731,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: session.user_context},
                 })
                 .then(result => {
-                    self.print(
+                    this.print(
                         _.template(
                             "<%= model %> record created " +
                                 "successfully: <span class='o_terminal_click " +
@@ -749,7 +748,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
         _unlinkModelRecord: function(params) {
             const model = params[0];
             const record_id = parseInt(params[1], 10);
-            const self = this;
             return rpc
                 .query({
                     method: "unlink",
@@ -758,7 +756,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: session.user_context},
                 })
                 .then(() => {
-                    self.print(`${model} record deleted successfully`);
+                    this.print(`${model} record deleted successfully`);
                 });
         },
 
@@ -774,7 +772,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
                 return defer;
             }
-            const self = this;
             return rpc
                 .query({
                     method: "write",
@@ -783,7 +780,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: session.user_context},
                 })
                 .then(() => {
-                    self.print(`${model} record updated successfully`);
+                    this.print(`${model} record updated successfully`);
                 });
         },
 
@@ -800,9 +797,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
         _postData: function(params) {
             const url = params[0];
             const data = params[1];
-            const self = this;
             return ajax.post(url, JSON.parse(data)).then(result => {
-                self.print(result);
+                this.print(result);
             });
         },
 

@@ -34,9 +34,8 @@ class ChromeTestCase(SeleniumTestCase):
         self._execute_test_ee(self._ODOO_SERVERS['ee']['12'])
 
     # Test Odoo 13.0
-    # Odoo 13 CE is down
-    # def testOdoo13CE(self):
-    #     self._execute_test(self._ODOO_SERVERS['ce']['13'])
+    def test_Odoo13CE(self):
+        self._execute_test_ce(self._ODOO_SERVERS['ce']['13'])
 
     def test_Odoo13EE(self):
         self._execute_test_ee(self._ODOO_SERVERS['ee']['13'])
