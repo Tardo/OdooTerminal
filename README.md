@@ -133,6 +133,8 @@ IMP: Code refactor
 ADD: Command 'login': Login as selected user
 ADD: Command 'uhg': Check if user is in the selected groups
 ADD: Command 'dblist': List database names
+
+FIX: Odoo mode detection
 ```
 
 **3.1.0**

@@ -13,9 +13,10 @@ class SeleniumTestCase(unittest.TestCase):
 
     _ODOO_SERVERS = {
         'ce': {
-            '11': 'https://runbot.odoo-community.org/runbot/186/11.0',
-            '12': 'https://runbot.odoo-community.org/runbot/186/12.0',
-            '13': 'https://runbot.odoo-community.org/runbot/186/13.0',
+            '11': 'http://runbot.odoo.com/runbot/quick_connect/33835',
+            '12': 'http://runbot.odoo.com/runbot/quick_connect/47160',
+            '13': 'http://runbot.odoo.com/runbot/quick_connect/72616',
+            '14': 'http://runbot.odoo.com/runbot/quick_connect/1',
         },
         'ee': {
             '11': 'http://runbot.odoo.com/runbot/quick_connect/33836',
@@ -61,7 +62,7 @@ class SeleniumTestCase(unittest.TestCase):
     def _do_user_actions(self, delay, wait_cmd):
         elem = self._waitForElement('terminal', delay)
         self.assertTrue(elem)
-        self.browser.execute_script("document.getElementById('terminal')"
+        self.browser.execute_script("document.querySelector('.o_terminal')"
                                     + ".dispatchEvent(new Event('toggle'));")
         self._waitForElement(
             "#terminal[style='top 0px;']", 3, by=By.CSS_SELECTOR)
@@ -109,7 +110,7 @@ class SeleniumTestCase(unittest.TestCase):
             by=By.CSS_SELECTOR)
         elem.click()
         elem = self._waitForElement(
-            'body:not(.o_home_menu_background)',
+            'body:not(.o_home_menu_background):not(.o_app_switcher_background)',
             self._WAIT_SECS*2,
             by=By.CSS_SELECTOR)
         self.assertTrue(elem)

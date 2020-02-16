@@ -159,11 +159,13 @@
         });
 
         if (Object.prototype.hasOwnProperty.call(OdooObj, "session_info")) {
+            odooInfo.isFrontend = OdooObj.session_info.is_frontend;
             if (OdooObj.session_info.server_version) {
                 _setServerVersion(OdooObj.session_info.server_version);
             } else {
-                if (OdooObj.session_info.is_frontend) {
-                    odooInfo.isFrontend = true;
+                if (!odooInfo.isFrontend) {
+                    // Ensure that is not front-end (portal)
+                    odooInfo.isFrontend = !_forceIsOdooBackendDetection();
                 }
 
                 _forceOdooServerVersionDetection();
@@ -172,6 +174,7 @@
         } else {
             odooInfo.isFrontend = !_forceIsOdooBackendDetection();
             _forceOdooServerVersionDetection();
+            canInitialize = false;
         }
     }
     if (canInitialize) {

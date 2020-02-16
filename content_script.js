@@ -88,6 +88,48 @@
         _sendOdooInfoToBackground();
     }
 
+    /**
+     * Get necessary resources to initialize the terminal
+     * @param {OdooInfo} info
+     * @returns {Array}
+     */
+    function _getTerminalResources(info) {
+        // Common resources
+        const to_inject = {
+            css: ["odoo/css/terminal.css"],
+            js: [
+                "odoo/js/abstract_terminal.js",
+                "odoo/js/terminal.js",
+                "odoo/js/funcs/core.js",
+                "odoo/js/funcs/common.js",
+            ],
+        };
+        // Compatibility resources
+        // 11 - v11
+        // 12 - v12
+        // 13+ - v12 + v13
+        const odooVersion = Number(info.serverVersionMajor);
+        if (odooVersion === 11) {
+            to_inject.js.push("odoo/js/compat/v11.js");
+        }
+        if (odooVersion >= 12) {
+            to_inject.js.push("odoo/js/compat/v12.js");
+        }
+        if (odooVersion >= 13) {
+            to_inject.js.push("odoo/js/compat/v13.js");
+        }
+        // Backend/Frontend resources
+        if (info.isFrontend) {
+            to_inject.js.push("odoo/js/loaders/frontend.js");
+        } else {
+            to_inject.js = [
+                "odoo/js/funcs/backend.js",
+                "odoo/js/loaders/backend.js",
+            ].concat(to_inject.js);
+        }
+        return to_inject;
+    }
+
     // Listen messages from page script
     window.addEventListener(
         "message",
@@ -104,42 +146,8 @@
                 var info = event.data.odooInfo;
                 _updateOdooInfo(info);
                 if (info.isCompatible) {
-                    // Common resources
-                    const to_inject = {
-                        css: ["odoo/css/terminal.css"],
-                        js: [
-                            "odoo/js/abstract_terminal.js",
-                            "odoo/js/terminal.js",
-                            "odoo/js/funcs/core.js",
-                            "odoo/js/funcs/common.js",
-                        ],
-                    };
-                    // Compatibility resources
-                    // 11 - v11
-                    // 12 - v12
-                    // 13+ - v12 + v13
-                    const odooVersion = Number(info.serverVersionMajor);
-                    if (odooVersion === 11) {
-                        to_inject.js.push("odoo/js/compat/v11.js");
-                    }
-                    if (odooVersion >= 12) {
-                        to_inject.js.push("odoo/js/compat/v12.js");
-                    }
-                    if (odooVersion >= 13) {
-                        to_inject.js.push("odoo/js/compat/v13.js");
-                    }
-                    // Backend/Frontend resources
-                    if (info.isFrontend) {
-                        to_inject.js.push("odoo/js/loaders/frontend.js");
-                    } else {
-                        to_inject.js = [
-                            "odoo/js/funcs/backend.js",
-                            "odoo/js/loaders/backend.js",
-                        ].concat(to_inject.js);
-                    }
-
-                    _injector(to_inject);
-                } else {
+                    _injector(_getTerminalResources(info));
+                } else if (info.isOdoo) {
                     console.warn("[OdooTerminal] Incompatible server version!");
                 }
             } else if (event.data.type === "ODOO_TERM_START") {
