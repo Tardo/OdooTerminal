@@ -22,7 +22,7 @@ import zipfile
 import git
 
 
-def update_version(mode, create_commit=False):
+def update_version(mode, create_tag=False):
     def _file_sub(filepath, cregex, nvalue):
         fin = open(filepath, 'rt')
         data = fin.read()
@@ -61,10 +61,13 @@ def update_version(mode, create_commit=False):
         'VERSION: "%s"' % extension_ver)
 
     # git release commit
-    if create_commit:
+    if create_tag:
         repo = git.Repo()
         repo.git.add(u=True)
-        repo.index.commit('[REL] Version %s' % extension_ver)
+        #repo.index.commit('[REL] Version %s' % extension_ver)
+        new_tag = repo.create_tag(extension_ver,
+                                  message="Automatic tag '%s'" % extension_ver)
+        repo.remotes.origin.push(new_tag)
 
 
 def create_package():
@@ -96,14 +99,14 @@ if __name__ == '__main__':
         help='Version mode',
         choices=['major', 'minor', 'patch'])
     parser.add_argument(
-        '--commit',
+        '--tag',
         action='store_true',
         default=False,
-        help='Version mode')
+        help='Create release tag')
     args = parser.parse_args()
     if args.mode:
         print('Changing extension version...')
-        update_version(args.mode, args.commit)
+        update_version(args.mode, args.tag)
     print('Creating extension package...')
     create_package()
     print('All done, bye!')
