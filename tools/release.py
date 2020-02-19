@@ -64,8 +64,9 @@ def update_version(mode, create_tag=False):
     if create_tag:
         repo = git.Repo()
         repo.git.add(u=True)
-        #repo.index.commit('[REL] Version %s' % extension_ver)
-        new_tag = repo.create_tag(extension_ver,
+        repo.index.commit('[REL] Version %s' % extension_ver)
+        repo.remotes.origin.push('master')
+        new_tag = repo.create_tag('v%s' % extension_ver,
                                   message="Automatic tag '%s'" % extension_ver)
         repo.remotes.origin.push(new_tag)
 
@@ -99,14 +100,14 @@ if __name__ == '__main__':
         help='Version mode',
         choices=['major', 'minor', 'patch'])
     parser.add_argument(
-        '--tag',
+        '--git',
         action='store_true',
         default=False,
-        help='Create release tag')
+        help='Create commit and tag')
     args = parser.parse_args()
     if args.mode:
         print('Changing extension version...')
-        update_version(args.mode, args.tag)
+        update_version(args.mode, args.git)
     print('Creating extension package...')
     create_package()
     print('All done, bye!')
