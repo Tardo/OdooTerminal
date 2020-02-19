@@ -41,6 +41,8 @@ class ChromeTestCase(SeleniumTestCase):
         self._execute_test_ee(self._ODOO_SERVERS['ee']['13'])
 
     # Test Odoo 14.0 (master)
-    # Odoo 14 CE not exists already
+    def test_Odoo14CE(self):
+        self._execute_test_ce(self._ODOO_SERVERS['ce']['14'])
+
     def test_Odoo14EE(self):
         self._execute_test_ee(self._ODOO_SERVERS['ee']['14'])

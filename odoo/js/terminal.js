@@ -217,8 +217,11 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         _injectTerminal: function() {
-            const $term = $("body").find("#terminal");
-            if (!$term.length) {
+            const $terms = $("body").find(".o_terminal");
+            if ($terms.length > 1) {
+                const toRemove = $terms.filter(":not(:first-child)");
+                toRemove.remove();
+            } else if (!$terms.length) {
                 $(QWeb.render("terminal")).prependTo("body");
                 this.setElement($("body").find("#terminal"));
                 this.start();
@@ -247,35 +250,9 @@ odoo.define("terminal.Terminal", function(require) {
 
             core.bus.on("keydown", this, this._onCoreKeyDown);
             core.bus.on("click", this, this._onCoreClick);
-            // Listen messages from 'content script'
-            window.addEventListener(
-                "message",
-                function(ev) {
-                    // We only accept messages from ourselves
-                    if (event.source !== window) {
-                        return;
-                    }
-                    if (
-                        !this._has_exec_init_cmds &&
-                        ev.data.type === "ODOO_TERM_EXEC_INIT_CMDS"
-                    ) {
-                        const cmds = _.filter(ev.data.cmds, function(item) {
-                            return item && item[0] !== "/" && item[1] !== "/";
-                        });
-                        for (const cmd of cmds) {
-                            this.eprint(
-                                _.template("<%= prompt %> <%= cmd %>")({
-                                    prompt: this.PROMPT,
-                                    cmd: cmd,
-                                })
-                            );
-                            this.executeCommand(cmd);
-                        }
-
-                        this._has_exec_init_cmds = true;
-                    }
-                }.bind(this)
-            );
+            // NOTE: Listen messages from 'content script'
+            window.addEventListener("message", this._onWindowMessage, true);
+            // NOTE-END
 
             this._injectTerminal();
             this._initGuard();
@@ -333,6 +310,7 @@ odoo.define("terminal.Terminal", function(require) {
             if (typeof this.observer !== "undefined") {
                 this.observer.disconnect();
             }
+            window.removeEventListener("message", this._onWindowMessage, true);
             core.bus.off("keydown", this, this._onCoreKeyDown);
             core.bus.off("click", this, this._onCoreClick);
             this._super.apply(this, arguments);
@@ -502,15 +480,6 @@ odoo.define("terminal.Terminal", function(require) {
             } else {
                 this.do_show();
             }
-        },
-
-        /* GENERAL */
-        setActiveWidget: function(widget) {
-            this._active_widget = widget;
-        },
-
-        setActiveAction: function(action) {
-            this._active_action = action;
         },
 
         /* PRIVATE METHODS*/
@@ -822,7 +791,6 @@ odoo.define("terminal.Terminal", function(require) {
             --this._runningCommandsCount;
             this._updateRunningCmdCount();
             if (has_errors) {
-                console.log(result);
                 const errorMessage = this._getCommandErrorMessage(result);
                 this.printError(`Error executing '${cmd}':`);
                 this.printError(errorMessage, true);
@@ -963,6 +931,34 @@ odoo.define("terminal.Terminal", function(require) {
                 this.do_toggle();
             }
         },
+
+        // NOTE: This method is only used for extension purposes
+        _onWindowMessage: function(ev) {
+            // We only accept messages from ourselves
+            if (event.source !== window) {
+                return;
+            }
+            if (
+                !this._has_exec_init_cmds &&
+                ev.data.type === "ODOO_TERM_EXEC_INIT_CMDS"
+            ) {
+                const cmds = _.filter(ev.data.cmds, function(item) {
+                    return item && item[0] !== "/" && item[1] !== "/";
+                });
+                for (const cmd of cmds) {
+                    this.eprint(
+                        _.template("<%= prompt %> <%= cmd %>")({
+                            prompt: this.PROMPT,
+                            cmd: cmd,
+                        })
+                    );
+                    this.executeCommand(cmd);
+                }
+
+                this._has_exec_init_cmds = true;
+            }
+        },
+        // NOTE-END
     });
 
     return {

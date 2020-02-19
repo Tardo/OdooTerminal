@@ -1,8 +1,11 @@
 # Copyright 2020 Alexandre Díaz
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 import sys
+import subprocess
 import unittest
 
+
+subprocess.call(['python', 'tools/release.py'])
 sys.path.append('.')
 
 loader = unittest.TestLoader()

@@ -64,6 +64,7 @@ rules:
   no-empty-pattern: error
   no-empty: warn
   no-eq-null: error
+  no-eval: error
   no-ex-assign: error
   no-extend-native: warn
   no-extra-bind: warn
