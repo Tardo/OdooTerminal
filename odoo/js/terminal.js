@@ -254,7 +254,6 @@ odoo.define("terminal.Terminal", function(require) {
             window.addEventListener("message", this._onWindowMessage, true);
             // NOTE-END
 
-            console.log("INITIALIZAR");
             this._injectTerminal();
             this._initGuard();
         },
@@ -481,15 +480,6 @@ odoo.define("terminal.Terminal", function(require) {
             } else {
                 this.do_show();
             }
-        },
-
-        /* GENERAL */
-        setActiveWidget: function(widget) {
-            this._active_widget = widget;
-        },
-
-        setActiveAction: function(action) {
-            this._active_action = action;
         },
 
         /* PRIVATE METHODS*/
@@ -801,7 +791,6 @@ odoo.define("terminal.Terminal", function(require) {
             --this._runningCommandsCount;
             this._updateRunningCmdCount();
             if (has_errors) {
-                console.log(result);
                 const errorMessage = this._getCommandErrorMessage(result);
                 this.printError(`Error executing '${cmd}':`);
                 this.printError(errorMessage, true);

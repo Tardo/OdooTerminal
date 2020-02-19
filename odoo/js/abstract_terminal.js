@@ -99,22 +99,6 @@ odoo.define("terminal.AbstractTerminal", function(require) {
 
             this._super.apply(this, arguments);
         },
-
-        _get_active_view_type_id: function() {
-            throw Error("Not Implemented!");
-        },
-
-        _get_active_view_selected_ids: function() {
-            throw Error("Not Implemented!");
-        },
-
-        /**
-         * @param {Array} ids - Array of integers
-         */
-        // eslint-disable-next-line
-        _get_metadata: function(ids) {
-            throw Error("Not Implemented!");
-        },
     });
 
     return {

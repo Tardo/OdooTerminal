@@ -4,6 +4,7 @@
 odoo.define("terminal.CommonFunctions", function(require) {
     "use strict";
 
+    const tour = require("web_tour.tour");
     const rpc = require("web.rpc");
     const ajax = require("web.ajax");
     const session = require("web.session");
@@ -212,6 +213,26 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis: "",
                 args: "",
             });
+            this.registerCommand("jstest", {
+                definition: "Launch JS Tests",
+                callback: this._jsTest,
+                detail:
+                    "Runs js tests in desktop or mobile mode for the selected module." +
+                    "<br>&lt;MODULE&gt; Module name" +
+                    "<br>&lt;MODE&gt; Can be 'desktop' or 'mobile' (By default is 'desktop')",
+                syntaxis: "<STRING: MODULE> <STRING: MODE>",
+                args: "?s?s",
+            });
+            this.registerCommand("tour", {
+                definition: "Launch Tour",
+                callback: this._runTour,
+                detail:
+                    "Runs the selected tour" +
+                    "<br>[OPERATION] Can be 'run' or 'list'" +
+                    "<br>&lt;TOUR NAME&gt; Tour Name",
+                syntaxis: "[STRING: OPERATION] <STRING: TOUR NAME>",
+                args: "s?s",
+            });
         },
 
         start: function() {
@@ -220,6 +241,52 @@ odoo.define("terminal.CommonFunctions", function(require) {
             this._longpollingMode = this._storage.getItem(
                 "terminal_longpolling_mode"
             );
+        },
+
+        _runTour: function(params) {
+            const oper = params[0];
+            const tourName = params[1];
+
+            return $.Deferred(d => {
+                const tourNames = Object.keys(tour.tours);
+                if (oper === "list") {
+                    if (tourNames.length) {
+                        for (const itour of tourNames) {
+                            this.print(`- ${itour}`);
+                        }
+                    } else {
+                        this.print("The tours list is empty");
+                    }
+                } else if (oper === "run") {
+                    if (tourName) {
+                        this.print("Running tour...");
+                        odoo.__DEBUG__.services["web_tour.tour"].run(tourName);
+                    } else {
+                        this.printError("No tour has been indicated to run");
+                    }
+                } else {
+                    this.printError("Invalid Operation! (Use 'run' or 'list')");
+                }
+                d.resolve();
+            });
+        },
+
+        _jsTest: function(params) {
+            let mod = params[0] || "";
+            const mode = params[1];
+            if (mod === "*") {
+                mod = "";
+            }
+            let url = `/web/tests?module=${mod}`;
+            if (mode === "mobile") {
+                url = `/web/tests/mobile?module=${mod}`;
+            }
+            return this.do_action({
+                name: "JS Tests",
+                target: "new",
+                type: "ir.actions.act_url",
+                url: url,
+            });
         },
 
         _showDBList: function() {

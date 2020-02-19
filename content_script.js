@@ -106,17 +106,13 @@
         };
         // Compatibility resources
         // 11 - v11
-        // 12 - v12
-        // 13+ - v12 + v13
+        // 12+ - v12
         const odooVersion = Number(info.serverVersionMajor);
         if (odooVersion === 11) {
-            to_inject.js.push("odoo/js/compat/v11.js");
+            to_inject.js.push("odoo/js/compat/v11/common.js");
         }
         if (odooVersion >= 12) {
-            to_inject.js.push("odoo/js/compat/v12.js");
-        }
-        if (odooVersion >= 13) {
-            to_inject.js.push("odoo/js/compat/v13.js");
+            to_inject.js.push("odoo/js/compat/v12/common.js");
         }
         // Backend/Frontend resources
         if (info.isFrontend) {

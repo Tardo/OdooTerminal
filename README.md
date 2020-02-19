@@ -123,7 +123,7 @@ python tests
 
 # Changelog
 
-**3.2.0**
+**4.0.0**
 
 ```
 IMP: Selenium tests
@@ -133,8 +133,12 @@ IMP: Code refactor
 ADD: Command 'login': Login as selected user
 ADD: Command 'uhg': Check if user is in the selected groups
 ADD: Command 'dblist': List database names
+ADD: Command 'jstest': Launch JS Tests
+ADD: Command 'tour': Launch Tour
 
 FIX: Odoo mode detection
+
+DEL: metadata command (redundant with Odoo DebugManager + not fully functional + adds more complexity for only one command)
 ```
 
 **3.1.0**
