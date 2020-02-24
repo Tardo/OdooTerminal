@@ -57,8 +57,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 definition: "Call model method",
                 callback: this._cmdCallModelMethod,
                 detail: "Call model method.",
-                syntaxis: '<STRING: MODEL> <STRING: METHOD> "[ARRAY: ARGS]"',
-                args: "ss?s",
+                syntaxis:
+                    '<STRING: MODEL> <STRING: METHOD> "[ARRAY: ARGS]" ' +
+                    '"[DICT: KWARGS]"',
+                args: "ss?s?s",
             });
             this.registerCommand("upgrade", {
                 definition: "Upgrade a module",
@@ -749,12 +751,16 @@ odoo.define("terminal.CommonFunctions", function(require) {
             const model = params[0];
             const method = params[1];
             const args = params[2] || "[]";
+            const kwargs = params[3] ? JSON.parse(params[3]) : {};
+            if (typeof kwargs.context === "undefined") {
+                kwargs.context = session.user_context;
+            }
             return rpc
                 .query({
                     method: method,
                     model: model,
                     args: JSON.parse(args),
-                    kwargs: {context: session.user_context},
+                    kwargs: kwargs,
                 })
                 .then(result => {
                     this.print(result);

@@ -131,6 +131,7 @@ IMP: Print Array
 IMP: Command 'longpolling': Rewrite implementation
 IMP: Refactor Code (Methods names, Compat)
 IMP: Command 'whoami': Show res.user info
+IMP: Command 'call': Add KWARGS argument (pr #9)
 
 FIX: Terminal command 'jstest' doesn't works in portal (frontend)
 FIX: Print error information
