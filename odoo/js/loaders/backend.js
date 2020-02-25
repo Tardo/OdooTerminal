@@ -15,19 +15,24 @@ odoo.define("terminal.BackendLoader", function(require) {
 
     // Detached initialization to ensure that the terminal loads on all
     // possible conditions
-    $(function() {
-        const terminal = new Terminal(WebClientObj);
-        core.bus.on("toggle_terminal", this, () => {
-            terminal.do_toggle();
-        });
+    $(() => {
+        try {
+            const terminal = new Terminal(WebClientObj);
+            core.bus.on("toggle_terminal", this, () => {
+                terminal.do_toggle();
+            });
 
-        // This is used to communicate to the extension that the widget
-        // is initialized successfully.
-        window.postMessage(
-            {
-                type: "ODOO_TERM_START",
-            },
-            "*"
-        );
+            // This is used to communicate to the extension that the widget
+            // is initialized successfully.
+            window.postMessage(
+                {
+                    type: "ODOO_TERM_START",
+                },
+                "*"
+            );
+        } catch (e) {
+            console.error(e);
+            console.warn("[OdooTerminal] Can't initialize the terminal!");
+        }
     });
 });

@@ -123,6 +123,16 @@ python tests
 
 # Changelog
 
+**4.1.0**
+
+```
+IMP: Safer loaders
+IMP: Print Array
+
+FIX: Terminal command 'jstest' doesn't works in portal (frontend)
+FIX: Print error information
+```
+
 **4.0.0**
 
 ```

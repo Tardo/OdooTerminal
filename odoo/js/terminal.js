@@ -333,16 +333,27 @@ odoo.define("terminal.Terminal", function(require) {
             if (msg_type === "object") {
                 if (msg instanceof Text) {
                     this._printHTML(
-                        $(msg).wrap(`<span class='${cls || ""}'></span>`)
+                        $(msg).wrap(
+                            `<span class='line-text ${cls || ""}'></span>`
+                        )
                     );
+                } else if (msg instanceof Array) {
+                    for (const imsg of msg) {
+                        this._printHTML(
+                            `<span class='line-array ${cls ||
+                                ""}'>${imsg}</span><br>`
+                        );
+                    }
                 } else {
                     this._printHTML(
-                        `<span class='${cls || ""}'>` +
+                        `<span class='line-object ${cls || ""}'>` +
                             `${this._prettyObjectString(msg)}</span>`
                     );
                 }
             } else {
-                this._printHTML(`<span class='${cls || ""}'>${msg}</span>`);
+                this._printHTML(
+                    `<span class='line-text ${cls || ""}'>${msg}</span>`
+                );
             }
             if (!enl) {
                 this._printHTML("<br>");
@@ -358,16 +369,20 @@ odoo.define("terminal.Terminal", function(require) {
                 this.print(`[!] ${error}`);
                 return;
             }
-            if (typeof error === "object" && "exception_type" in error) {
+            if (
+                typeof error === "object" &&
+                "data" in error &&
+                "exception_type" in error.data
+            ) {
                 // It's an Odoo error report
                 this.print(
-                    `<div><h4>${error.name}</h4>
-<span>${error.message}</span>
+                    `<div><h4>${error.data.name}</h4>
+<span>${error.data.message}</span>
 <ul>
-<li><b>Exception Type:</b> ${error.exception_type}</li>
-<li><b>Context:</b> ${JSON.stringify(error.context)}</li>
-<li><b>Arguments:</b> ${JSON.stringify(error.arguments)}</li>
-<li><b>Debug:</b><br>${error.debug}</li>
+<li><b>Exception Type:</b> ${error.data.exception_type}</li>
+<li><b>Context:</b> ${JSON.stringify(error.data.context)}</li>
+<li><b>Arguments:</b> ${JSON.stringify(error.data.arguments)}</li>
+<li><b>Debug:</b><br>${error.data.debug}</li>
 </ul></div>`,
                     false,
                     "error_message"
@@ -769,19 +784,6 @@ odoo.define("terminal.Terminal", function(require) {
             }
         },
 
-        _getCommandErrorMessage: function(emsg) {
-            if (
-                typeof emsg === "object" &&
-                Object.prototype.hasOwnProperty.call(emsg, "message")
-            ) {
-                if (typeof emsg.message === "string") {
-                    return emsg.message;
-                }
-                return emsg.message.data;
-            }
-            return emsg || "Undefined Error";
-        },
-
         /* HANDLE EVENTS */
         onStartCommand: function() {
             ++this._runningCommandsCount;
@@ -791,9 +793,8 @@ odoo.define("terminal.Terminal", function(require) {
             --this._runningCommandsCount;
             this._updateRunningCmdCount();
             if (has_errors) {
-                const errorMessage = this._getCommandErrorMessage(result);
                 this.printError(`Error executing '${cmd}':`);
-                this.printError(errorMessage, true);
+                this.printError(result, true);
             }
         },
 

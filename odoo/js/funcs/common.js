@@ -251,9 +251,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 const tourNames = Object.keys(tour.tours);
                 if (oper === "list") {
                     if (tourNames.length) {
-                        for (const itour of tourNames) {
-                            this.print(`- ${itour}`);
-                        }
+                        this.print(tourNames);
                     } else {
                         this.print("The tours list is empty");
                     }
@@ -281,11 +279,11 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (mode === "mobile") {
                 url = `/web/tests/mobile?module=${mod}`;
             }
-            return this.do_action({
-                name: "JS Tests",
-                target: "new",
-                type: "ir.actions.act_url",
-                url: url,
+
+            window.location = url;
+
+            return $.Deferred(d => {
+                d.resolve();
             });
         },
 
@@ -301,13 +299,13 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         this.printError("Can't get database names");
                         return;
                     }
-                    for (const dbname of databases) {
-                        if (dbname === session.db) {
-                            this.print(`<strong>${dbname}</strong>`);
-                        } else {
-                            this.print(dbname);
+                    for (const i in databases) {
+                        if (databases[i] === session.db) {
+                            databases[i] = `<strong>${databases[i]}</strong>`;
+                            break;
                         }
                     }
+                    this.print(databases);
                 });
         },
 

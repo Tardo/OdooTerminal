@@ -13,18 +13,23 @@ odoo.define("terminal.FrontendLoader", function(require) {
     require("terminal.CommonFunctions");
 
     $(() => {
-        const terminal = new Terminal(null, $("body").data());
+        try {
+            const terminal = new Terminal(null, $("body").data());
 
-        core.bus.on("toggle_terminal", this, () => {
-            terminal.do_toggle();
-        });
-        // This is used to communicate to the extension that the widget
-        // is initialized successfully.
-        window.postMessage(
-            {
-                type: "ODOO_TERM_START",
-            },
-            "*"
-        );
+            core.bus.on("toggle_terminal", this, () => {
+                terminal.do_toggle();
+            });
+            // This is used to communicate to the extension that the widget
+            // is initialized successfully.
+            window.postMessage(
+                {
+                    type: "ODOO_TERM_START",
+                },
+                "*"
+            );
+        } catch (e) {
+            console.error(e);
+            console.warn("[OdooTerminal] Can't initialize the terminal!");
+        }
     });
 });

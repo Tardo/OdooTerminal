@@ -61,6 +61,12 @@
 .o_terminal div#terminal_screen .error_message ul {
     margin-bottom: 0;
 }
+.o_terminal div#terminal_screen .line-array {
+    margin-left: 1em;
+}
+.o_terminal div#terminal_screen .line-array:before {
+    content: "- ";
+}
 
 .o_terminal .terminal-user-input {
     background-color: var(--terminal-screen-background-color);

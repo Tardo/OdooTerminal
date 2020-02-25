@@ -6,6 +6,7 @@ odoo.define("terminal.Compat11Common", function(require) {
     "use strict";
 
     const Terminal = require("terminal.Terminal");
+    // FIXME: Only available in backend
     const Bus = require("bus.bus").bus;
 
     Terminal.terminal.include({
@@ -13,16 +14,6 @@ odoo.define("terminal.Compat11Common", function(require) {
             this._super.apply(this, arguments);
             // Listen long-polling (Used by 'longpolling' command)
             Bus.on("notification", this, this._onBusNotification);
-        },
-
-        _getCommandErrorMessage: function(emsg) {
-            if (
-                typeof emsg === "object" &&
-                Object.prototype.hasOwnProperty.call(emsg, "data")
-            ) {
-                return `${emsg.data.name} (${emsg.data.message})`;
-            }
-            return this._super.apply(this, arguments);
         },
     });
 });
