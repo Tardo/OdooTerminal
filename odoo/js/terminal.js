@@ -54,6 +54,33 @@ odoo.define("terminal.Terminal", function(require) {
         },
     });
 
+    const TerminalLongPolling = AbstractTerminal.longpolling.extend({
+        setVerbose: function(status) {
+            if (status) {
+                this._parent._storage.setItem(
+                    "terminal_longpolling_mode",
+                    "verbose"
+                );
+            } else {
+                this._parent._storage.removeItem("terminal_longpolling_mode");
+            }
+        },
+
+        isVerbose: function() {
+            return this._parent._storage.getItem("terminal_longpolling_mode");
+        },
+
+        //
+        _onBusNotification: function(notifications) {
+            if (this.isVerbose()) {
+                this._parent.trigger_up(
+                    "longpolling_notification",
+                    notifications
+                );
+            }
+        },
+    });
+
     /**
      * This class is used to parse terminal command parameters.
      */
@@ -193,6 +220,7 @@ odoo.define("terminal.Terminal", function(require) {
     });
 
     const Terminal = AbstractTerminal.terminal.extend({
+        custom_events: {},
         events: {
             "keyup #terminal_input": "_onInputKeyUp",
             "keydown #terminal_input": "_onInputKeyDown",
@@ -208,11 +236,11 @@ odoo.define("terminal.Terminal", function(require) {
         _errorCount: 0,
 
         _initGuard: function() {
-            if (typeof this.observer === "undefined") {
-                this.observer = new MutationObserver(
+            if (typeof this._observer === "undefined") {
+                this._observer = new MutationObserver(
                     this._injectTerminal.bind(this)
                 );
-                this.observer.observe(document.body, {childList: true});
+                this._observer.observe(document.body, {childList: true});
             }
         },
 
@@ -232,6 +260,7 @@ odoo.define("terminal.Terminal", function(require) {
             this._super.apply(this, arguments);
 
             this._storage = new TerminalStorage(this);
+            this._longpolling = new TerminalLongPolling(this);
             this._parameterChecker = new ParameterChecker();
             this._parameterReader = new ParameterReader();
 
@@ -307,8 +336,8 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         destroy: function() {
-            if (typeof this.observer !== "undefined") {
-                this.observer.disconnect();
+            if (typeof this._observer !== "undefined") {
+                this._observer.disconnect();
             }
             window.removeEventListener("message", this._onWindowMessage, true);
             core.bus.off("keydown", this, this._onCoreKeyDown);
@@ -347,7 +376,7 @@ odoo.define("terminal.Terminal", function(require) {
                 } else {
                     this._printHTML(
                         `<span class='line-object ${cls || ""}'>` +
-                            `${this._prettyObjectString(msg)}</span>`
+                            `${this._prettyObjectString(msg)}</span><br>`
                     );
                 }
             } else {
@@ -376,13 +405,13 @@ odoo.define("terminal.Terminal", function(require) {
             ) {
                 // It's an Odoo error report
                 this.print(
-                    `<div><h4>${error.data.name}</h4>
-<span>${error.data.message}</span>
+                    `<div><h4>${this._encodeHTML(error.data.name)}</h4>
+<span>${this._encodeHTML(error.data.message)}</span>
 <ul>
 <li><b>Exception Type:</b> ${error.data.exception_type}</li>
 <li><b>Context:</b> ${JSON.stringify(error.data.context)}</li>
 <li><b>Arguments:</b> ${JSON.stringify(error.data.arguments)}</li>
-<li><b>Debug:</b><br>${error.data.debug}</li>
+<li><b>Debug:</b><br>${this._encodeHTML(error.data.debug)}</li>
 </ul></div>`,
                     false,
                     "error_message"
@@ -498,6 +527,13 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         /* PRIVATE METHODS*/
+        _encodeHTML: function(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/"/g, "&quot;");
+        },
+
         _printWelcomeMessage: function() {
             this.print(
                 _.template(
@@ -967,5 +1003,6 @@ odoo.define("terminal.Terminal", function(require) {
         parameterReader: ParameterReader,
         parameterChecker: ParameterChecker,
         storage: TerminalStorage,
+        longpolling: TerminalLongPolling,
     };
 });

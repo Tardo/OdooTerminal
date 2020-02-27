@@ -123,11 +123,14 @@ python tests
 
 # Changelog
 
-**4.1.0**
+**5.0.0**
 
 ```
 IMP: Safer loaders
 IMP: Print Array
+IMP: Command 'longpolling': Rewrite implementation
+IMP: Refactor Code (Methods names, Compat)
+IMP: Command 'whoami': Show res.user info
 
 FIX: Terminal command 'jstest' doesn't works in portal (frontend)
 FIX: Print error information

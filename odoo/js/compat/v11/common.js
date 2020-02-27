@@ -5,15 +5,29 @@
 odoo.define("terminal.Compat11Common", function(require) {
     "use strict";
 
-    const Terminal = require("terminal.Terminal");
-    // FIXME: Only available in backend
+    const AbstractTerminal = require("terminal.AbstractTerminal");
     const Bus = require("bus.bus").bus;
 
-    Terminal.terminal.include({
+    AbstractTerminal.longpolling.include({
         start: function() {
             this._super.apply(this, arguments);
-            // Listen long-polling (Used by 'longpolling' command)
             Bus.on("notification", this, this._onBusNotification);
+        },
+
+        addChannel: function(name) {
+            return Bus.add_channel(name);
+        },
+
+        deleteChannel: function(name) {
+            return Bus.delete_channel(name);
+        },
+
+        startPoll: function() {
+            return Bus.start_polling();
+        },
+
+        stopPoll: function() {
+            return Bus.stop_polling();
         },
     });
 });

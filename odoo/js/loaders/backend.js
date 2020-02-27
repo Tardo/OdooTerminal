@@ -14,8 +14,11 @@ odoo.define("terminal.BackendLoader", function(require) {
     require("terminal.BackendFunctions");
 
     // Detached initialization to ensure that the terminal loads on all
-    // possible conditions
+    // possible conditions. This is necessary because the extension run
+    // at 'document idle', and script could be injected after the
+    // Odoo 'web client' initialization script.
     $(() => {
+        // A generic try-catch to avoid stops scripts execution.
         try {
             const terminal = new Terminal(WebClientObj);
             core.bus.on("toggle_terminal", this, () => {

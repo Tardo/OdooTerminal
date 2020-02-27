@@ -37,6 +37,10 @@
     white-space: pre;
 }
 
+.o_terminal div#terminal_screen hr {
+    border-color: gray;
+}
+
 .o_terminal div#terminal_screen .o_terminal_title {
     color: var(--terminal-title-color);
 }

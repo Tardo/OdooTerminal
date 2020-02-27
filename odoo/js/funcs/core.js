@@ -12,7 +12,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
 
             this.registerCommand("help", {
                 definition: "Print this help or command detailed info",
-                callback: this._printHelp,
+                callback: this._cmdPrintHelp,
                 detail:
                     "Show commands and a quick definition.<br/>- " +
                     "<> ~> Required Parameter<br/>- [] ~> Optional Parameter",
@@ -21,21 +21,21 @@ odoo.define("terminal.CoreFunctions", function(require) {
             });
             this.registerCommand("clear", {
                 definition: "Clean terminal section (screen by default)",
-                callback: this._clear,
+                callback: this._cmdClear,
                 detail: "Available sections: screen (default), history.",
                 syntaxis: "[STRING: SECTION]",
                 args: "?s",
             });
             this.registerCommand("print", {
                 definition: "Print a message",
-                callback: this._printText,
+                callback: this._cmdPrintText,
                 detail: "Eval parameters and print the result.",
                 syntaxis: "<STRING: MSG>",
                 args: "",
             });
             this.registerCommand("load", {
                 definition: "Load external resource",
-                callback: this._loadResource,
+                callback: this._cmdLoadResource,
                 detail: "Load external source (javascript & css)",
                 syntaxis: "<STRING: URL>",
                 args: "s",
@@ -65,7 +65,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
             );
         },
 
-        _printHelp: function(params) {
+        _cmdPrintHelp: function(params) {
             return $.Deferred(d => {
                 if (!params || params.length === 0) {
                     const sortedCmdKeys = _.keys(this._registeredCmds).sort();
@@ -96,7 +96,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
             this.eprint(`Syntaxis: ${cmd} ${cmdDef.syntaxis}`);
         },
 
-        _clear: function(params) {
+        _cmdClear: function(params) {
             return $.Deferred(d => {
                 if (params.length && params[0] === "history") {
                     this.cleanInputHistory();
@@ -107,14 +107,14 @@ odoo.define("terminal.CoreFunctions", function(require) {
             });
         },
 
-        _printText: function(params) {
+        _cmdPrintText: function(params) {
             return $.Deferred(d => {
                 this.print(params.join(" "));
                 d.resolve();
             });
         },
 
-        _loadResource: function(params) {
+        _cmdLoadResource: function(params) {
             return $.Deferred(d => {
                 try {
                     const inURL = new URL(params[0]);

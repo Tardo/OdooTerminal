@@ -17,7 +17,7 @@ odoo.define("terminal.BackendFunctions", function(require) {
 
             this.registerCommand("view", {
                 definition: "View model record/s",
-                callback: this._viewModelRecord,
+                callback: this._cmdViewModelRecord,
                 detail:
                     "Open model record in form view or records in list view.",
                 syntaxis: "<STRING: MODEL NAME> [INT: RECORD ID]",
@@ -25,14 +25,14 @@ odoo.define("terminal.BackendFunctions", function(require) {
             });
             this.registerCommand("settings", {
                 definition: "Open settings page",
-                callback: this._openSettings,
+                callback: this._cmdOpenSettings,
                 detail: "Open settings page.",
                 syntaxis: "",
                 args: "",
             });
         },
 
-        _openSettings: function() {
+        _cmdOpenSettings: function() {
             return this.do_action({
                 type: "ir.actions.act_window",
                 res_model: "res.config.settings",
@@ -43,7 +43,7 @@ odoo.define("terminal.BackendFunctions", function(require) {
             });
         },
 
-        _viewModelRecord: function(params) {
+        _cmdViewModelRecord: function(params) {
             const model = params[0];
             const resId = Number(params[1]) || false;
             if (resId) {
@@ -79,6 +79,7 @@ odoo.define("terminal.BackendFunctions", function(require) {
             });
         },
 
+        //
         _onClickTerminalView: function(ev) {
             if (
                 Object.prototype.hasOwnProperty.call(
