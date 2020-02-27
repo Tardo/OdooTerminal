@@ -738,7 +738,7 @@ odoo.define("terminal.Terminal", function(require) {
                     this.onStartCommand(scmd.cmd, scmd.params);
                     try {
                         return cmdDef.callback
-                            .bind(this)(scmd.params)
+                            .bind(this)(...scmd.params)
                             .then(
                                 result => {
                                     this.onFinishCommand(

@@ -129,7 +129,7 @@ python tests
 IMP: Safer loaders
 IMP: Print Array
 IMP: Command 'longpolling': Rewrite implementation
-IMP: Refactor Code (Methods names, Compat)
+IMP: Refactor Code (Methods names, Compat, Spread Operator)
 IMP: Command 'whoami': Show res.user info
 IMP: Command 'call': Add KWARGS argument (pr #9)
 

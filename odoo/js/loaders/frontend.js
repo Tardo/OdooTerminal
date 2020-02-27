@@ -13,7 +13,7 @@ odoo.define("terminal.FrontendLoader", function(require) {
     require("terminal.CommonFunctions");
 
     $(() => {
-        // A generic try-catch to avoid stops scripts execution.
+        // A generic try-catch to avoid stop scripts execution.
         try {
             const terminal = new Terminal(null, $("body").data());
 

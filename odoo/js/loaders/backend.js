@@ -18,7 +18,7 @@ odoo.define("terminal.BackendLoader", function(require) {
     // at 'document idle', and script could be injected after the
     // Odoo 'web client' initialization script.
     $(() => {
-        // A generic try-catch to avoid stops scripts execution.
+        // A generic try-catch to avoid stop scripts execution.
         try {
             const terminal = new Terminal(WebClientObj);
             core.bus.on("toggle_terminal", this, () => {

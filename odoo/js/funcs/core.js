@@ -65,25 +65,22 @@ odoo.define("terminal.CoreFunctions", function(require) {
             );
         },
 
-        _cmdPrintHelp: function(params) {
+        _cmdPrintHelp: function(cmd) {
             return $.Deferred(d => {
-                if (!params || params.length === 0) {
+                if (typeof cmd === "undefined") {
                     const sortedCmdKeys = _.keys(this._registeredCmds).sort();
-                    for (const cmd of sortedCmdKeys) {
-                        this._printHelpSimple(cmd, this._registeredCmds[cmd]);
+                    for (const _cmd of sortedCmdKeys) {
+                        this._printHelpSimple(_cmd, this._registeredCmds[_cmd]);
                     }
+                } else if (
+                    Object.prototype.hasOwnProperty.call(
+                        this._registeredCmds,
+                        cmd
+                    )
+                ) {
+                    this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
                 } else {
-                    const cmd = params[0];
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            this._registeredCmds,
-                            cmd
-                        )
-                    ) {
-                        this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
-                    } else {
-                        this.printError(`'${cmd}' command doesn't exists`);
-                    }
+                    this.printError(`'${cmd}' command doesn't exists`);
                 }
 
                 d.resolve();
@@ -96,9 +93,9 @@ odoo.define("terminal.CoreFunctions", function(require) {
             this.eprint(`Syntaxis: ${cmd} ${cmdDef.syntaxis}`);
         },
 
-        _cmdClear: function(params) {
+        _cmdClear: function(section) {
             return $.Deferred(d => {
-                if (params.length && params[0] === "history") {
+                if (section === "history") {
                     this.cleanInputHistory();
                 } else {
                     this.clean();
@@ -107,17 +104,17 @@ odoo.define("terminal.CoreFunctions", function(require) {
             });
         },
 
-        _cmdPrintText: function(params) {
+        _cmdPrintText: function(...text) {
             return $.Deferred(d => {
-                this.print(params.join(" "));
+                this.print(text.join(" "));
                 d.resolve();
             });
         },
 
-        _cmdLoadResource: function(params) {
+        _cmdLoadResource: function(url) {
             return $.Deferred(d => {
                 try {
-                    const inURL = new URL(params[0]);
+                    const inURL = new URL(url);
                     const pathname = inURL.pathname.toLowerCase();
                     if (pathname.endsWith(".js")) {
                         $.getScript(inURL.href);

@@ -43,9 +43,8 @@ odoo.define("terminal.BackendFunctions", function(require) {
             });
         },
 
-        _cmdViewModelRecord: function(params) {
-            const model = params[0];
-            const resId = Number(params[1]) || false;
+        _cmdViewModelRecord: function(model, id) {
+            const resId = Number(id) || false;
             if (resId) {
                 return this.do_action({
                     type: "ir.actions.act_window",

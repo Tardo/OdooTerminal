@@ -200,7 +200,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "Login as selected user." +
                     "<br>&lt;DATABASE&gt; Can be '*' to use current database" +
                     "<br>&lt;LOGIN&gt; Can be optionally preceded by the '-'" +
-                    "character and it will be used for password too",
+                    " character and it will be used for password too",
                 syntaxis:
                     "<STRING: DATABASE> <STRING: LOGIN> [STRING: PASSWORD]",
                 args: "ss?s",
@@ -250,10 +250,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             this._super.apply(this, arguments);
         },
 
-        _cmdRunTour: function(params) {
-            const oper = params[0];
-            const tourName = params[1];
-
+        _cmdRunTour: function(oper, tourName) {
             return $.Deferred(d => {
                 const tourNames = Object.keys(tour.tours);
                 if (oper === "list") {
@@ -276,10 +273,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _cmdJSTest: function(params) {
-            let mod = params[0] || "";
-            const mode = params[1];
-            if (mod === "*") {
+        _cmdJSTest: function(module_name, mode) {
+            let mod = module_name || "";
+            if (module_name === "*") {
                 mod = "";
             }
             let url = `/web/tests?module=${mod}`;
@@ -316,8 +312,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdUserHasGroups: function(params) {
-            const groups = params[0];
+        _cmdUserHasGroups: function(groups) {
             return rpc
                 .query({
                     method: "user_has_groups",
@@ -334,10 +329,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdLoginAs: function(params) {
-            let db = params[0];
-            let login = params[1];
-            let passwd = params[2] || false;
+        _cmdLoginAs: function(database, login_name, pass) {
+            let db = database;
+            let login = login_name;
+            let passwd = pass || false;
             if (login[0] === "-" && !passwd) {
                 login = login.substr(1);
                 passwd = login;
@@ -360,8 +355,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _cmdLongpolling: function(params) {
-            const operation = params[0];
+        _cmdLongpolling: function(operation, name) {
             return $.Deferred(d => {
                 if (typeof operation === "undefined") {
                     this.print(this._longpolling.isVerbose() || "off");
@@ -372,7 +366,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     this._longpolling.setVerbose(false);
                     this.print("Now long-polling verbose mode is disabled");
                 } else if (operation === "add_channel") {
-                    const name = params[1];
                     if (typeof name === "undefined") {
                         this.printError("Invalid channel name.");
                     } else {
@@ -380,7 +373,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         this.print(`Joined the '${name}' channel.`);
                     }
                 } else if (operation === "del_channel") {
-                    const name = params[1];
                     if (typeof name === "undefined") {
                         this.printError("Invalid channel name.");
                     } else {
@@ -422,10 +414,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _cmdContextOperation: function(params) {
-            const operation = params[0] || "read";
-            const values = params[1] || "false";
-
+        _cmdContextOperation: function(operation = "read", values = "false") {
             return $.Deferred(d => {
                 if (operation === "read") {
                     this.print(session.user_context);
@@ -443,12 +432,11 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _cmdSearchModelRecordId: function(params) {
-            const model = params[0];
-            const recordid = Number(params[1]);
+        _cmdSearchModelRecordId: function(model, id, field_names) {
+            const recordid = Number(id);
             let fields = ["display_name"];
-            if (params[2]) {
-                fields = params[2] === "*" ? false : params[2].split(",");
+            if (field_names) {
+                fields = field_names === "*" ? false : field_names.split(",");
             }
 
             return rpc
@@ -508,9 +496,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdCheckModelAccess: function(params) {
-            const model = params[0];
-            const operation = params[1];
+        _cmdCheckModelAccess: function(model, operation) {
             return rpc
                 .query({
                     method: "check_access_rights",
@@ -527,9 +513,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdCheckFieldAccess: function(params) {
-            const model = params[0];
-            const fields = params[1] || "false";
+        _cmdCheckFieldAccess: function(model, fields = "false") {
             return rpc
                 .query({
                     method: "fields_get",
@@ -573,9 +557,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
             " <%= partner[1] %> (#<%= partner[0] %>)" +
             "<br><span style='color: gray;'>Company</span>:" +
             " <%= company[1] %> (#<%= company[0] %>)" +
-            "<br><span style='color: gray;'>Allowed Companies</span>:" +
+            "<br><span style='color: gray;'>In Companies (ids)</span>:" +
             " <%= companies %>" +
-            "<br><span style='color: gray;'>Groups</span>:" +
+            "<br><span style='color: gray;'>In Groups (ids)</span>:" +
             " <%= groups %>",
         _cmdShowWhoAmI: function() {
             const uid =
@@ -617,8 +601,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdSetDebugMode: function(params) {
-            const mode = Number(params[0]);
+        _cmdSetDebugMode: function(mode_num) {
+            const mode = Number(mode_num);
             if (mode === 0) {
                 this.print(
                     "Debug mode <strong>disabled</strong>. Reloading page..."
@@ -663,19 +647,18 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _searchModule: function(module) {
+        _searchModule: function(module_name) {
             return rpc.query({
                 method: "search_read",
-                domain: [["name", "=", module]],
+                domain: [["name", "=", module_name]],
                 fields: ["name"],
                 model: "ir.module.module",
                 kwargs: {context: session.user_context},
             });
         },
 
-        _cmdUpgradeModule: function(params) {
-            const module = params[0];
-            return this._searchModule(module).then(result => {
+        _cmdUpgradeModule: function(module_name) {
+            return this._searchModule(module_name).then(result => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_upgrade",
@@ -684,22 +667,23 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     }).then(
                         () => {
                             this.print(
-                                `'${module}' module successfully upgraded`
+                                `'${module_name}' module successfully upgraded`
                             );
                         },
                         () => {
-                            this.printError(`Can't upgrade '${module}' module`);
+                            this.printError(
+                                `Can't upgrade '${module_name}' module`
+                            );
                         }
                     );
                 } else {
-                    this.printError(`'${module}' module doesn't exists`);
+                    this.printError(`'${module_name}' module doesn't exists`);
                 }
             });
         },
 
-        _cmdInstallModule: function(params) {
-            const module = params[0];
-            return this._searchModule(module).then(result => {
+        _cmdInstallModule: function(module_name) {
+            return this._searchModule(module_name).then(result => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_install",
@@ -708,22 +692,23 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     }).then(
                         () => {
                             this.print(
-                                `'${module}' module successfully installed`
+                                `'${module_name}' module successfully installed`
                             );
                         },
                         () => {
-                            this.printError(`Can't install '${module}' module`);
+                            this.printError(
+                                `Can't install '${module_name}' module`
+                            );
                         }
                     );
                 } else {
-                    this.printError(`'${module}' module doesn't exists`);
+                    this.printError(`'${module_name}' module doesn't exists`);
                 }
             });
         },
 
-        _cmdUninstallModule: function(params) {
-            const module = params[0];
-            return this._searchModule(module).then(result => {
+        _cmdUninstallModule: function(module_name) {
+            return this._searchModule(module_name).then(result => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_uninstall",
@@ -732,56 +717,60 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     }).then(
                         () => {
                             this.print(
-                                `'${module}' module successfully uninstalled`
+                                `'${module_name}' module successfully uninstalled`
                             );
                         },
                         () => {
                             this.printError(
-                                `Can't uninstall '${module}' module`
+                                `Can't uninstall '${module_name}' module`
                             );
                         }
                     );
                 } else {
-                    this.printError(`'${module}' module doesn't exists`);
+                    this.printError(`'${module_name}' module doesn't exists`);
                 }
             });
         },
 
-        _cmdCallModelMethod: function(params) {
-            const model = params[0];
-            const method = params[1];
-            const args = params[2] || "[]";
-            const kwargs = params[3] ? JSON.parse(params[3]) : {};
-            if (typeof kwargs.context === "undefined") {
-                kwargs.context = session.user_context;
+        _cmdCallModelMethod: function(
+            model,
+            method,
+            args = "[]",
+            kwargs = "{}"
+        ) {
+            const pkwargs = JSON.parse(kwargs);
+            if (typeof pkwargs.context === "undefined") {
+                pkwargs.context = session.user_context;
             }
             return rpc
                 .query({
                     method: method,
                     model: model,
                     args: JSON.parse(args),
-                    kwargs: kwargs,
+                    kwargs: pkwargs,
                 })
                 .then(result => {
                     this.print(result);
                 });
         },
 
-        _cmdSearchModelRecord: function(params) {
-            const model = params[0];
+        _cmdSearchModelRecord: function(
+            model,
+            field_names,
+            domain = "[]",
+            limit
+        ) {
             let fields = ["display_name"];
-            if (params[1]) {
-                fields = params[1] === "*" ? false : params[1].split(",");
+            if (field_names) {
+                fields = field_names === "*" ? false : field_names.split(",");
             }
-            const domain = params[2] || "[]";
-            const limit = Number(params[3]) || false;
             return rpc
                 .query({
                     method: "search_read",
                     domain: JSON.parse(domain),
                     fields: fields,
                     model: model,
-                    limit: limit,
+                    limit: Number(limit) || false,
                     kwargs: {context: session.user_context},
                 })
                 .then(result => {
@@ -808,9 +797,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdCreateModelRecord: function(params) {
-            const model = params[0];
-            if (params.length === 1) {
+        _cmdCreateModelRecord: function(model, values) {
+            if (typeof values === "undefined") {
                 return this.do_action({
                     type: "ir.actions.act_window",
                     res_model: model,
@@ -820,7 +808,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     this.do_hide();
                 });
             }
-            const values = params[1];
             return rpc
                 .query({
                     method: "create",
@@ -843,14 +830,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdUnlinkModelRecord: function(params) {
-            const model = params[0];
-            const record_id = parseInt(params[1], 10);
+        _cmdUnlinkModelRecord: function(model, id) {
             return rpc
                 .query({
                     method: "unlink",
                     model: model,
-                    args: [record_id],
+                    args: [Number(id)],
                     kwargs: {context: session.user_context},
                 })
                 .then(() => {
@@ -858,23 +843,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdWriteModelRecord: function(params) {
-            const model = params[0];
-            const record_id = parseInt(params[1], 10);
-            let values = params[2];
-            try {
-                values = JSON.parse(values);
-            } catch (err) {
-                const defer = $.Deferred(d => {
-                    d.reject(err.message);
-                });
-                return defer;
-            }
+        _cmdWriteModelRecord: function(model, id, values) {
             return rpc
                 .query({
                     method: "write",
                     model: model,
-                    args: [record_id, values],
+                    args: [Number(id), JSON.parse(values)],
                     kwargs: {context: session.user_context},
                 })
                 .then(() => {
@@ -882,19 +856,17 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
-        _cmdCallAction: function(params) {
-            let action = params[0];
+        _cmdCallAction: function(action) {
+            let paction = action;
             try {
-                action = JSON.parse(action);
+                paction = JSON.parse(action);
             } catch (err) {
                 // Do Nothing
             }
-            return this.do_action(action);
+            return this.do_action(paction);
         },
 
-        _cmdPostData: function(params) {
-            const url = params[0];
-            const data = params[1];
+        _cmdPostData: function(url, data) {
             return ajax.post(url, JSON.parse(data)).then(result => {
                 this.print(result);
             });
@@ -902,7 +874,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
 
         //
         _onBusNotification: function(notifications) {
-            console.log(Object.values(notifications.data));
             for (const notif of Object.values(notifications.data)) {
                 this.print(
                     "<strong>[<i class='fa fa-envelope-o'></i>] New Longpolling Notification:</stron>"
