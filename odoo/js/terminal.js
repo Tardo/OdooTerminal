@@ -10,15 +10,6 @@ odoo.define("terminal.Terminal", function(require) {
 
     const QWeb = core.qweb;
 
-    const KeyCodes = {
-        TAB: 9,
-        ENTER: 13,
-        ARROW_UP: 38,
-        ARROW_RIGHT: 39,
-        ARROW_DOWN: 40,
-        NUM1: 49,
-    };
-
     const TerminalStorage = AbstractTerminal.storage.extend({
         getItem: function(item) {
             return JSON.parse(sessionStorage.getItem(item)) || undefined;
@@ -229,6 +220,10 @@ odoo.define("terminal.Terminal", function(require) {
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
         },
 
+        SCREEN_HEIGHT: "40vh",
+        SCREEN_MAX_HEIGHT: "90vh",
+        BTN_BCKG_COLOR_ACTIVE: "#555",
+
         _parameterChecker: null,
         _parameterReader: null,
 
@@ -264,10 +259,6 @@ odoo.define("terminal.Terminal", function(require) {
             this._parameterChecker = new ParameterChecker();
             this._parameterReader = new ParameterReader();
 
-            this.documentComputedStyle = getComputedStyle(
-                document.documentElement
-            );
-
             this._rawTerminal = QWeb.render("terminal");
 
             this._lazyStorageTerminalScreen = _.debounce(
@@ -293,21 +284,6 @@ odoo.define("terminal.Terminal", function(require) {
             // Custom Events
             this.$el[0].addEventListener("toggle", this.do_toggle.bind(this));
 
-            const isMaximized = this._storage.getItem("screen_maximized");
-            if (isMaximized) {
-                const max_height = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-max-height"
-                );
-                const btn_bkg_color = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-background-button-active"
-                );
-                this.$("#terminal_screen").css("height", max_height);
-                this.$(".terminal-screen-icon-maximize").css(
-                    "backgroundColor",
-                    btn_bkg_color
-                );
-            }
-
             this.$(".terminal-prompt").val(this.PROMPT);
 
             this.$input = this.$("#terminal_input");
@@ -332,6 +308,17 @@ odoo.define("terminal.Terminal", function(require) {
             if (!_.isUndefined(cachedHistory)) {
                 this._inputHistory = cachedHistory;
                 this._searchHistoryIter = this._inputHistory.length;
+            }
+
+            const isMaximized = this._storage.getItem("screen_maximized");
+            if (isMaximized) {
+                this.$term.css("height", this.SCREEN_MAX_HEIGHT);
+                this.$(".terminal-screen-icon-maximize").css(
+                    "backgroundColor",
+                    this.BTN_BCKG_COLOR_ACTIVE
+                );
+            } else {
+                this.$term.css("height", this.SCREEN_HEIGHT);
             }
         },
 
@@ -851,24 +838,15 @@ odoo.define("terminal.Terminal", function(require) {
 
         _onClickToggleMaximize: function(ev) {
             const $target = $(ev.currentTarget);
-            const isMaximized = this.$term.data("maximized");
+            const isMaximized = this._storage.getItem("screen_maximized");
             if (isMaximized) {
-                const norm_height = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-height"
-                );
-                this.$term.css("height", norm_height);
+                this.$term.css("height", this.SCREEN_HEIGHT);
                 $target.css("backgroundColor", "");
             } else {
-                const max_height = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-max-height"
-                );
-                const btn_bkg_color = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-background-button-active"
-                );
-                this.$term.css("height", max_height);
-                $target.css("backgroundColor", btn_bkg_color);
+                this.$term.css("height", this.SCREEN_MAX_HEIGHT);
+                $target.css("backgroundColor", this.BTN_BCKG_COLOR_ACTIVE);
             }
-            this.$term.data("maximized", !isMaximized);
+            this._storage.setItem("screen_maximized", !isMaximized);
             this.$term[0].scrollTop = this.$term[0].scrollHeight;
         },
 
@@ -927,15 +905,15 @@ odoo.define("terminal.Terminal", function(require) {
         },
         _onInputKeyUp: function(ev) {
             this._cleanShadowInput();
-            if (ev.keyCode === KeyCodes.ENTER) {
+            if (ev.keyCode === $.ui.keyCode.ENTER) {
                 this._onKeyEnter();
-            } else if (ev.keyCode === KeyCodes.ARROW_UP) {
+            } else if (ev.keyCode === $.ui.keyCode.UP) {
                 this._onKeyArrowUp();
-            } else if (ev.keyCode === KeyCodes.ARROW_DOWN) {
+            } else if (ev.keyCode === $.ui.keyCode.DOWN) {
                 this._onKeyArrowDown();
-            } else if (ev.keyCode === KeyCodes.ARROW_RIGHT) {
+            } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
                 this._onKeyArrowRight();
-            } else if (ev.keyCode === KeyCodes.TAB) {
+            } else if (ev.keyCode === $.ui.keyCode.TAB) {
                 this._onKeyTab();
             } else {
                 // Fish-like feature
@@ -962,7 +940,7 @@ odoo.define("terminal.Terminal", function(require) {
             }
         },
         _onCoreKeyDown: function(ev) {
-            if (ev.ctrlKey && ev.keyCode === KeyCodes.NUM1) {
+            if (ev.ctrlKey && ev.key === "1") {
                 // Press Ctrl + 1
                 ev.preventDefault();
                 this.do_toggle();
