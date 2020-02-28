@@ -123,6 +123,21 @@ python tests
 
 # Changelog
 
+**5.0.0**
+
+```
+IMP: Safer loaders
+IMP: Print Array
+IMP: Command 'longpolling': Rewrite implementation
+IMP: Refactor Code (Methods names, Compat, Spread Operator)
+IMP: Command 'whoami': Show res.user info
+IMP: Command 'call': Add KWARGS argument (pr #9)
+IMP: Maximize button: Save value in session storage
+
+FIX: Terminal command 'jstest' doesn't works in portal (frontend)
+FIX: Print error information
+```
+
 **4.0.0**
 
 ```

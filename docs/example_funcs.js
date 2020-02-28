@@ -9,17 +9,14 @@ odoo.define("terminal.MyFuncs", function(require) {
 
             this.registerCommand("mycommand", {
                 definition: "This is my command",
-                function: this._myFunc,
+                function: this._cmdMyFunc,
                 detail: "My command explained...",
                 syntaxis: "<STRING: ParamA> <INT: ParamB> [STRING: ParamC]",
                 args: "si?s",
             });
         },
 
-        _myFunc: function(params) {
-            var pA = params[0];
-            var pB = params[1];
-            var pC = params[2] || "DefaultValue";
+        _cmdMyFunc: function(pA, pB, pC = "DefaultValue") {
             var self = this;
 
             var defer = $.Deferred(function(d) {

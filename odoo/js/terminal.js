@@ -10,15 +10,6 @@ odoo.define("terminal.Terminal", function(require) {
 
     const QWeb = core.qweb;
 
-    const KeyCodes = {
-        TAB: 9,
-        ENTER: 13,
-        ARROW_UP: 38,
-        ARROW_RIGHT: 39,
-        ARROW_DOWN: 40,
-        NUM1: 49,
-    };
-
     const TerminalStorage = AbstractTerminal.storage.extend({
         getItem: function(item) {
             return JSON.parse(sessionStorage.getItem(item)) || undefined;
@@ -51,6 +42,33 @@ odoo.define("terminal.Terminal", function(require) {
 
         removeItem: function(item) {
             return sessionStorage.removeItem(item) || undefined;
+        },
+    });
+
+    const TerminalLongPolling = AbstractTerminal.longpolling.extend({
+        setVerbose: function(status) {
+            if (status) {
+                this._parent._storage.setItem(
+                    "terminal_longpolling_mode",
+                    "verbose"
+                );
+            } else {
+                this._parent._storage.removeItem("terminal_longpolling_mode");
+            }
+        },
+
+        isVerbose: function() {
+            return this._parent._storage.getItem("terminal_longpolling_mode");
+        },
+
+        //
+        _onBusNotification: function(notifications) {
+            if (this.isVerbose()) {
+                this._parent.trigger_up(
+                    "longpolling_notification",
+                    notifications
+                );
+            }
         },
     });
 
@@ -193,6 +211,7 @@ odoo.define("terminal.Terminal", function(require) {
     });
 
     const Terminal = AbstractTerminal.terminal.extend({
+        custom_events: {},
         events: {
             "keyup #terminal_input": "_onInputKeyUp",
             "keydown #terminal_input": "_onInputKeyDown",
@@ -201,6 +220,10 @@ odoo.define("terminal.Terminal", function(require) {
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
         },
 
+        SCREEN_HEIGHT: "40vh",
+        SCREEN_MAX_HEIGHT: "90vh",
+        BTN_BCKG_COLOR_ACTIVE: "#555",
+
         _parameterChecker: null,
         _parameterReader: null,
 
@@ -208,11 +231,11 @@ odoo.define("terminal.Terminal", function(require) {
         _errorCount: 0,
 
         _initGuard: function() {
-            if (typeof this.observer === "undefined") {
-                this.observer = new MutationObserver(
+            if (typeof this._observer === "undefined") {
+                this._observer = new MutationObserver(
                     this._injectTerminal.bind(this)
                 );
-                this.observer.observe(document.body, {childList: true});
+                this._observer.observe(document.body, {childList: true});
             }
         },
 
@@ -232,12 +255,9 @@ odoo.define("terminal.Terminal", function(require) {
             this._super.apply(this, arguments);
 
             this._storage = new TerminalStorage(this);
+            this._longpolling = new TerminalLongPolling(this);
             this._parameterChecker = new ParameterChecker();
             this._parameterReader = new ParameterReader();
-
-            this.documentComputedStyle = getComputedStyle(
-                document.documentElement
-            );
 
             this._rawTerminal = QWeb.render("terminal");
 
@@ -264,21 +284,6 @@ odoo.define("terminal.Terminal", function(require) {
             // Custom Events
             this.$el[0].addEventListener("toggle", this.do_toggle.bind(this));
 
-            const isMaximized = this._storage.getItem("screen_maximized");
-            if (isMaximized) {
-                const max_height = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-max-height"
-                );
-                const btn_bkg_color = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-background-button-active"
-                );
-                this.$("#terminal_screen").css("height", max_height);
-                this.$(".terminal-screen-icon-maximize").css(
-                    "backgroundColor",
-                    btn_bkg_color
-                );
-            }
-
             this.$(".terminal-prompt").val(this.PROMPT);
 
             this.$input = this.$("#terminal_input");
@@ -304,11 +309,22 @@ odoo.define("terminal.Terminal", function(require) {
                 this._inputHistory = cachedHistory;
                 this._searchHistoryIter = this._inputHistory.length;
             }
+
+            const isMaximized = this._storage.getItem("screen_maximized");
+            if (isMaximized) {
+                this.$term.css("height", this.SCREEN_MAX_HEIGHT);
+                this.$(".terminal-screen-icon-maximize").css(
+                    "backgroundColor",
+                    this.BTN_BCKG_COLOR_ACTIVE
+                );
+            } else {
+                this.$term.css("height", this.SCREEN_HEIGHT);
+            }
         },
 
         destroy: function() {
-            if (typeof this.observer !== "undefined") {
-                this.observer.disconnect();
+            if (typeof this._observer !== "undefined") {
+                this._observer.disconnect();
             }
             window.removeEventListener("message", this._onWindowMessage, true);
             core.bus.off("keydown", this, this._onCoreKeyDown);
@@ -333,16 +349,27 @@ odoo.define("terminal.Terminal", function(require) {
             if (msg_type === "object") {
                 if (msg instanceof Text) {
                     this._printHTML(
-                        $(msg).wrap(`<span class='${cls || ""}'></span>`)
+                        $(msg).wrap(
+                            `<span class='line-text ${cls || ""}'></span>`
+                        )
                     );
+                } else if (msg instanceof Array) {
+                    for (const imsg of msg) {
+                        this._printHTML(
+                            `<span class='line-array ${cls ||
+                                ""}'>${imsg}</span><br>`
+                        );
+                    }
                 } else {
                     this._printHTML(
-                        `<span class='${cls || ""}'>` +
-                            `${this._prettyObjectString(msg)}</span>`
+                        `<span class='line-object ${cls || ""}'>` +
+                            `${this._prettyObjectString(msg)}</span><br>`
                     );
                 }
             } else {
-                this._printHTML(`<span class='${cls || ""}'>${msg}</span>`);
+                this._printHTML(
+                    `<span class='line-text ${cls || ""}'>${msg}</span>`
+                );
             }
             if (!enl) {
                 this._printHTML("<br>");
@@ -358,16 +385,20 @@ odoo.define("terminal.Terminal", function(require) {
                 this.print(`[!] ${error}`);
                 return;
             }
-            if (typeof error === "object" && "exception_type" in error) {
+            if (
+                typeof error === "object" &&
+                "data" in error &&
+                "exception_type" in error.data
+            ) {
                 // It's an Odoo error report
                 this.print(
-                    `<div><h4>${error.name}</h4>
-<span>${error.message}</span>
+                    `<div><h4>${this._encodeHTML(error.data.name)}</h4>
+<span>${this._encodeHTML(error.data.message)}</span>
 <ul>
-<li><b>Exception Type:</b> ${error.exception_type}</li>
-<li><b>Context:</b> ${JSON.stringify(error.context)}</li>
-<li><b>Arguments:</b> ${JSON.stringify(error.arguments)}</li>
-<li><b>Debug:</b><br>${error.debug}</li>
+<li><b>Exception Type:</b> ${error.data.exception_type}</li>
+<li><b>Context:</b> ${JSON.stringify(error.data.context)}</li>
+<li><b>Arguments:</b> ${JSON.stringify(error.data.arguments)}</li>
+<li><b>Debug:</b><br>${this._encodeHTML(error.data.debug)}</li>
 </ul></div>`,
                     false,
                     "error_message"
@@ -483,6 +514,13 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         /* PRIVATE METHODS*/
+        _encodeHTML: function(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/"/g, "&quot;");
+        },
+
         _printWelcomeMessage: function() {
             this.print(
                 _.template(
@@ -687,7 +725,7 @@ odoo.define("terminal.Terminal", function(require) {
                     this.onStartCommand(scmd.cmd, scmd.params);
                     try {
                         return cmdDef.callback
-                            .bind(this)(scmd.params)
+                            .bind(this)(...scmd.params)
                             .then(
                                 result => {
                                     this.onFinishCommand(
@@ -769,19 +807,6 @@ odoo.define("terminal.Terminal", function(require) {
             }
         },
 
-        _getCommandErrorMessage: function(emsg) {
-            if (
-                typeof emsg === "object" &&
-                Object.prototype.hasOwnProperty.call(emsg, "message")
-            ) {
-                if (typeof emsg.message === "string") {
-                    return emsg.message;
-                }
-                return emsg.message.data;
-            }
-            return emsg || "Undefined Error";
-        },
-
         /* HANDLE EVENTS */
         onStartCommand: function() {
             ++this._runningCommandsCount;
@@ -791,9 +816,8 @@ odoo.define("terminal.Terminal", function(require) {
             --this._runningCommandsCount;
             this._updateRunningCmdCount();
             if (has_errors) {
-                const errorMessage = this._getCommandErrorMessage(result);
                 this.printError(`Error executing '${cmd}':`);
-                this.printError(errorMessage, true);
+                this.printError(result, true);
             }
         },
 
@@ -814,24 +838,15 @@ odoo.define("terminal.Terminal", function(require) {
 
         _onClickToggleMaximize: function(ev) {
             const $target = $(ev.currentTarget);
-            const isMaximized = this.$term.data("maximized");
+            const isMaximized = this._storage.getItem("screen_maximized");
             if (isMaximized) {
-                const norm_height = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-height"
-                );
-                this.$term.css("height", norm_height);
+                this.$term.css("height", this.SCREEN_HEIGHT);
                 $target.css("backgroundColor", "");
             } else {
-                const max_height = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-max-height"
-                );
-                const btn_bkg_color = this.documentComputedStyle.getPropertyValue(
-                    "--terminal-screen-background-button-active"
-                );
-                this.$term.css("height", max_height);
-                $target.css("backgroundColor", btn_bkg_color);
+                this.$term.css("height", this.SCREEN_MAX_HEIGHT);
+                $target.css("backgroundColor", this.BTN_BCKG_COLOR_ACTIVE);
             }
-            this.$term.data("maximized", !isMaximized);
+            this._storage.setItem("screen_maximized", !isMaximized);
             this.$term[0].scrollTop = this.$term[0].scrollHeight;
         },
 
@@ -890,15 +905,15 @@ odoo.define("terminal.Terminal", function(require) {
         },
         _onInputKeyUp: function(ev) {
             this._cleanShadowInput();
-            if (ev.keyCode === KeyCodes.ENTER) {
+            if (ev.keyCode === $.ui.keyCode.ENTER) {
                 this._onKeyEnter();
-            } else if (ev.keyCode === KeyCodes.ARROW_UP) {
+            } else if (ev.keyCode === $.ui.keyCode.UP) {
                 this._onKeyArrowUp();
-            } else if (ev.keyCode === KeyCodes.ARROW_DOWN) {
+            } else if (ev.keyCode === $.ui.keyCode.DOWN) {
                 this._onKeyArrowDown();
-            } else if (ev.keyCode === KeyCodes.ARROW_RIGHT) {
+            } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
                 this._onKeyArrowRight();
-            } else if (ev.keyCode === KeyCodes.TAB) {
+            } else if (ev.keyCode === $.ui.keyCode.TAB) {
                 this._onKeyTab();
             } else {
                 // Fish-like feature
@@ -925,7 +940,7 @@ odoo.define("terminal.Terminal", function(require) {
             }
         },
         _onCoreKeyDown: function(ev) {
-            if (ev.ctrlKey && ev.keyCode === KeyCodes.NUM1) {
+            if (ev.ctrlKey && ev.key === "1") {
                 // Press Ctrl + 1
                 ev.preventDefault();
                 this.do_toggle();
@@ -966,5 +981,6 @@ odoo.define("terminal.Terminal", function(require) {
         parameterReader: ParameterReader,
         parameterChecker: ParameterChecker,
         storage: TerminalStorage,
+        longpolling: TerminalLongPolling,
     };
 });

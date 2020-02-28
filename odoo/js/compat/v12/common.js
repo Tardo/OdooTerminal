@@ -5,18 +5,32 @@
 odoo.define("terminal.Compat12Common", function(require) {
     "use strict";
 
-    const Terminal = require("terminal.Terminal");
+    const AbstractTerminal = require("terminal.AbstractTerminal");
 
-    Terminal.terminal.include({
-        start: function() {
+    AbstractTerminal.longpolling.include({
+        _busServ: function(method, ...params) {
+            return this._parent.call("bus_service", method, ...params);
+        },
+
+        init: function() {
             this._super.apply(this, arguments);
-            // Listen long-polling (Used by 'longpolling' command)
-            this.call(
-                "bus_service",
-                "onNotification",
-                this,
-                this._onBusNotification
-            );
+            this._busServ("onNotification", this, this._onBusNotification);
+        },
+
+        addChannel: function(name) {
+            return this._busServ("addChannel", name);
+        },
+
+        deleteChannel: function(name) {
+            return this._busServ("deleteChannel", name);
+        },
+
+        startPoll: function() {
+            return this._busServ("startPolling");
+        },
+
+        stopPoll: function() {
+            return this._busServ("stopPolling");
         },
     });
 });

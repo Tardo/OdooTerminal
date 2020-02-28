@@ -2,10 +2,7 @@
     --terminal-input-height: 25px;
     --terminal-shadow-input-color: #777;
     --terminal-screen-width: 70%;
-    --terminal-screen-height: 40vh;
-    --terminal-screen-max-height: 90vh;
     --terminal-screen-background-color: black;
-    --terminal-screen-background-button-active: #555;
     --terminal-screen-text-color: lightgray;
     --terminal-screen-font: "Lucida Console", Monaco, monospace;
     --terminal-screen-extra-info-color: darkkhaki;
@@ -30,11 +27,14 @@
     border-width: 1px 1px 0 1px;
     caret-color: var(--terminal-screen-text-color);
     color: var(--terminal-screen-text-color);
-    height: var(--terminal-screen-height);
     overflow-y: scroll;
-    padding: var(--terminal-screen-height) 0 0 0;
+    padding: 0;
     resize: none;
     white-space: pre;
+}
+
+.o_terminal div#terminal_screen hr {
+    border-color: gray;
 }
 
 .o_terminal div#terminal_screen .o_terminal_title {
@@ -60,6 +60,12 @@
 }
 .o_terminal div#terminal_screen .error_message ul {
     margin-bottom: 0;
+}
+.o_terminal div#terminal_screen .line-array {
+    margin-left: 1em;
+}
+.o_terminal div#terminal_screen .line-array:before {
+    content: "- ";
 }
 
 .o_terminal .terminal-user-input {
