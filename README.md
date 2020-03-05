@@ -123,6 +123,12 @@ python tests
 
 # Changelog
 
+**5.1.0**
+
+```
+IMP: Added some sugar (async/await usage)
+```
+
 **5.0.0**
 
 ```

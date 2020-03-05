@@ -65,26 +65,23 @@ odoo.define("terminal.CoreFunctions", function(require) {
             );
         },
 
-        _cmdPrintHelp: function(cmd) {
-            return $.Deferred(d => {
-                if (typeof cmd === "undefined") {
-                    const sortedCmdKeys = _.keys(this._registeredCmds).sort();
-                    for (const _cmd of sortedCmdKeys) {
-                        this._printHelpSimple(_cmd, this._registeredCmds[_cmd]);
-                    }
-                } else if (
-                    Object.prototype.hasOwnProperty.call(
-                        this._registeredCmds,
-                        cmd
-                    )
-                ) {
-                    this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
-                } else {
-                    this.printError(`'${cmd}' command doesn't exists`);
+        _cmdPrintHelp: async function(cmd) {
+            if (typeof cmd === "undefined") {
+                const sortedCmdKeys = _.keys(this._registeredCmds).sort();
+                for (const _cmd of sortedCmdKeys) {
+                    this._printHelpSimple(_cmd, this._registeredCmds[_cmd]);
                 }
-
-                d.resolve();
-            });
+            } else if (
+                Object.prototype.hasOwnProperty.call(
+                    this._registeredCmds,
+                    cmd
+                )
+            ) {
+                this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
+            } else {
+                this.printError(`'${cmd}' command doesn't exists`);
+            }
+            return true;
         },
 
         _printHelpDetailed: function(cmd, cmdDef) {
@@ -93,48 +90,37 @@ odoo.define("terminal.CoreFunctions", function(require) {
             this.eprint(`Syntaxis: ${cmd} ${cmdDef.syntaxis}`);
         },
 
-        _cmdClear: function(section) {
-            return $.Deferred(d => {
-                if (section === "history") {
-                    this.cleanInputHistory();
-                } else {
-                    this.clean();
-                }
-                d.resolve();
-            });
+        _cmdClear: async function(section) {
+            if (section === "history") {
+                this.cleanInputHistory();
+            } else {
+                this.clean();
+            }
+            return true;
         },
 
-        _cmdPrintText: function(...text) {
-            return $.Deferred(d => {
-                this.print(text.join(" "));
-                d.resolve();
-            });
+        _cmdPrintText: async function(...text) {
+            this.print(text.join(" "));
+            return true;
         },
 
-        _cmdLoadResource: function(url) {
-            return $.Deferred(d => {
-                try {
-                    const inURL = new URL(url);
-                    const pathname = inURL.pathname.toLowerCase();
-                    if (pathname.endsWith(".js")) {
-                        $.getScript(inURL.href);
-                    } else if (pathname.endsWith(".css")) {
-                        $("<link>")
-                            .appendTo("head")
-                            .attr({
-                                type: "text/css",
-                                rel: "stylesheet",
-                                href: inURL.href,
-                            });
-                    } else {
-                        d.reject("Invalid file type");
-                    }
-                } catch (err) {
-                    d.reject(err);
-                } finally {
-                    d.resolve();
-                }
-            });
+        _cmdLoadResource: async function(url) {
+            const inURL = new URL(url);
+            const pathname = inURL.pathname.toLowerCase();
+            if (pathname.endsWith(".js")) {
+                await $.getScript(inURL.href);
+            } else if (pathname.endsWith(".css")) {
+                $("<link>")
+                    .appendTo("head")
+                    .attr({
+                        type: "text/css",
+                        rel: "stylesheet",
+                        href: inURL.href,
+                    });
+            } else {
+                this.printError("Invalid file type");
+            }
+            return true;
         },
     });
 });

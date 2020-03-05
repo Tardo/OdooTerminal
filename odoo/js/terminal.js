@@ -713,51 +713,46 @@ odoo.define("terminal.Terminal", function(require) {
             return this._inputHistory[this._searchHistoryIter];
         },
 
-        _processCommandJob: function(scmd) {
+        _processCommandJob: async function(scmd) {
             if (
                 Object.prototype.hasOwnProperty.call(
                     this._registeredCmds,
                     scmd.cmd
                 )
             ) {
-                const cmdDef = this._registeredCmds[scmd.cmd];
-                if (this._parameterChecker.validate(cmdDef.args, scmd.params)) {
-                    this.onStartCommand(scmd.cmd, scmd.params);
-                    try {
-                        return cmdDef.callback
-                            .bind(this)(...scmd.params)
-                            .then(
-                                result => {
-                                    this.onFinishCommand(
-                                        scmd.cmd,
-                                        scmd.params,
-                                        false,
-                                        result
-                                    );
-                                },
-                                emsg => {
-                                    this.onFinishCommand(
-                                        scmd.cmd,
-                                        scmd.params,
-                                        true,
-                                        emsg
-                                    );
-                                }
-                            );
-                    } catch (err) {
-                        this.onFinishCommand(
-                            scmd.cmd,
-                            scmd.params,
-                            true,
-                            err.message
-                        );
-                    }
-                    return false;
+
+                this.onStartCommand(scmd.cmd, scmd.params);
+                let result = "";
+                let isFailed = false;
+                try {
+                    result = await cmdDef.callback.bind(this)(...scmd.params);
+                } catch (err) {
+                    isFailed = true;
+                    result =
+                        (err && err.message) ||
+                        "[!] Oops! Unknown error! (no detailed error message given :/)";
+                } finally {
+                    this.onFinishCommand(
+                        scmd.cmd,
+                        scmd.params,
+                        isFailed,
+                        result
+                    );
                 }
-                this.printError(
-                    `<span class='o_terminal_click ` +
-                        `o_terminal_cmd' data-cmd='help ${scmd.cmd}'>` +
-                        `Invalid command parameters!</span>`
+                return false;
+            }
+            const similar_cmd = this._searchSimiliarCommand(scmd.cmd);
+            if (similar_cmd) {
+                this.print(
+                    _.template(
+                        "Unknown command. Did you mean " +
+                            "'<strong class='o_terminal_click " +
+                            "o_terminal_cmd' data-cmd='<%= cmd %> <%= params %>'>" +
+                            "<%= cmd %></strong>'?"
+                    )({
+                        cmd: similar_cmd,
+                        params: scmd.rawParams,
+                    })
                 );
             } else {
                 const similar_cmd = this._searchSimiliarCommand(scmd.cmd);
@@ -788,11 +783,8 @@ odoo.define("terminal.Terminal", function(require) {
             this.$shadowInput.val(str);
         },
 
-        _fallbackExecuteCommand: function() {
-            const defer = $.Deferred(d => {
-                d.reject("Invalid command definition!");
-            });
-            return $.when(defer);
+        _fallbackExecuteCommand: async function() {
+            throw new Error("Invalid command definition!");
         },
 
         _updateRunningCmdCount: function() {
@@ -920,10 +912,10 @@ odoo.define("terminal.Terminal", function(require) {
                 if (this.$input.val()) {
                     this._searchCommandQuery = this.$input.val();
                     this._searchHistoryIter = this._inputHistory.length;
-                    $.Deferred(d => {
+                    new Promise(resolve => {
                         const found_hist = this._doSearchPrevHistory();
                         this._updateShadowInput(found_hist || "");
-                        d.resolve();
+                        resolve();
                     });
                 }
 
