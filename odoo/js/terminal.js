@@ -76,68 +76,90 @@ odoo.define("terminal.Terminal", function(require) {
      * This class is used to parse terminal command parameters.
      */
     const ParameterReader = Class.extend({
-        INPUT_GROUP_DELIMETERS: ['"', "'"],
-
+        _validators: {},
+        _formatters: {},
         _regexSanitize: null,
+        _regexParams: null,
 
         init: function() {
+            this._validators = {
+                s: this._validateString,
+                i: this._validateInt,
+            };
+            this._formatters = {
+                s: this._formatString,
+                i: this._formatInt,
+            };
             this._regexSanitize = new RegExp("'", "g");
+            this._regexParams = new RegExp(
+                /(["'])((?:(?=(\\?))\2.)*?)\1|[^\s]+/,
+                "g"
+            );
         },
 
         /**
          * Sanitize command parameters to use when invoke commands.
-         * @param {String} strParams
+         * @param {String} cmdRaw
+         * @param {Object} cmdDef
          * @returns {Object}
          */
-        parse: function(strParams) {
-            let scmd = strParams.split(" ");
-            const rawParams = scmd.slice(1).join(" ");
-            scmd = _.filter(scmd, function(item) {
-                return item;
+        parse: function(cmdRaw, cmdDef) {
+            const match = this._regexParams[Symbol.matchAll](cmdRaw);
+            let scmd = Array.from(match, x => x[0]);
+            const cmd = scmd[0];
+            scmd = scmd.slice(1);
+            const rawParams = scmd.join(" ");
+            let params = _.map(scmd, item => {
+                let nvalue = item;
+                if (item[0] === '"' || item[0] === "'") {
+                    nvalue = item.substr(1, item.length - 2);
+                }
+                return this._sanitizeString(nvalue);
             });
 
-            const c_group = [false, false];
-            let mdeli = "";
-            const params = [];
-            for (const i in scmd) {
-                const startChar = scmd[i].charAt(0);
-                const endChar = scmd[i].charAt(scmd[i].length - 1);
-                if (
-                    c_group[0] === false &&
-                    this.INPUT_GROUP_DELIMETERS.indexOf(startChar) !== -1
-                ) {
-                    c_group[0] = i;
-                    mdeli = startChar;
-                }
-                if (c_group[0] !== false && endChar === mdeli) {
-                    c_group[1] = i;
-                }
-
-                if (c_group[0] !== false && c_group[1] !== false) {
-                    scmd[c_group[0]] = scmd[c_group[0]].slice(1);
-                    scmd[c_group[1]] = scmd[c_group[1]].slice(
-                        0,
-                        scmd[c_group[1]].length - 1
-                    );
-                    params.push(
-                        this._sanitizeString(
-                            _.clone(scmd)
-                                .splice(c_group[0], c_group[1] - c_group[0] + 1)
-                                .join(" ")
-                        )
-                    );
-                    c_group[0] = false;
-                    c_group[1] = false;
-                } else if (c_group[0] === false && c_group[1] === false) {
-                    params.push(this._sanitizeString(scmd[i]));
-                }
-            }
+            params = this.validateAndFormat(cmdDef.args, params);
 
             return {
-                cmd: params[0],
+                cmd: cmd,
                 rawParams: rawParams,
-                params: params.slice(1),
+                params: params,
             };
+        },
+
+        /**
+         * Check if the parameter type correspond with the expected type.
+         * @param {Array} args
+         * @param {Array} params
+         * @returns {Boolean}
+         */
+        validateAndFormat: function(args, params) {
+            if (!args || !args.length) {
+                return params;
+            }
+            const formattedParams = [];
+            for (let i = 0; i < args.length; ++i) {
+                let carg = args[i];
+                let optional = false;
+                if (carg === "?") {
+                    optional = true;
+                    carg = args[++i];
+                }
+
+                const curParamIndex = formattedParams.length;
+                const isInvalidNO = !optional && curParamIndex >= params.length;
+                const isInvalidO =
+                    curParamIndex < params.length &&
+                    !this._validators[carg](params[curParamIndex]);
+                if (isInvalidNO || isInvalidO) {
+                    throw new Error("Invalid command parameters");
+                }
+
+                formattedParams.push(
+                    this._formatters[carg](params[curParamIndex])
+                );
+            }
+
+            return formattedParams;
         },
 
         /**
@@ -147,48 +169,6 @@ odoo.define("terminal.Terminal", function(require) {
          */
         _sanitizeString: function(str) {
             return str.replace(this._regexSanitize, '"');
-        },
-    });
-
-    /**
-     * This class is used to validate command parameters
-     */
-    const ParameterChecker = Class.extend({
-        _validators: {},
-
-        init: function() {
-            this._validators.s = this._validateString;
-            this._validators.i = this._validateInt;
-        },
-
-        /**
-         * Check if the parameter type correspond with the expected type.
-         * @param {Array} args
-         * @param {Array} params
-         * @returns {Boolean}
-         */
-        validate: function(args, params) {
-            let curParamIndex = 0;
-            for (let i = 0; i < args.length; ++i) {
-                let carg = args[i];
-                let optional = false;
-                if (carg === "?") {
-                    optional = true;
-                    carg = args[++i];
-                }
-
-                const isInvalidNO = !optional && curParamIndex >= params.length;
-                const isInvalidO =
-                    curParamIndex < params.length &&
-                    !this._validators[carg](params[curParamIndex]);
-                if (isInvalidNO || isInvalidO) {
-                    return false;
-                }
-
-                ++curParamIndex;
-            }
-
-            return !curParamIndex || params.length <= curParamIndex;
         },
 
         /**
@@ -208,6 +188,24 @@ odoo.define("terminal.Terminal", function(require) {
         _validateInt: function(param) {
             return Number(param) === parseInt(param, 10);
         },
+
+        /**
+         * Format value to string
+         * @param {String} param
+         * @returns {String}
+         */
+        _formatString: function(param) {
+            return param;
+        },
+
+        /**
+         * Format value to integer
+         * @param {String} param
+         * @returns {Number}
+         */
+        _formatInt: function(param) {
+            return (param && Number(param)) || false;
+        },
     });
 
     const Terminal = AbstractTerminal.terminal.extend({
@@ -224,7 +222,6 @@ odoo.define("terminal.Terminal", function(require) {
         SCREEN_MAX_HEIGHT: "90vh",
         BTN_BCKG_COLOR_ACTIVE: "#555",
 
-        _parameterChecker: null,
         _parameterReader: null,
 
         _runningCommandsCount: 0,
@@ -256,7 +253,6 @@ odoo.define("terminal.Terminal", function(require) {
 
             this._storage = new TerminalStorage(this);
             this._longpolling = new TerminalLongPolling(this);
-            this._parameterChecker = new ParameterChecker();
             this._parameterReader = new ParameterReader();
 
             this._rawTerminal = QWeb.render("terminal");
@@ -457,42 +453,52 @@ odoo.define("terminal.Terminal", function(require) {
             );
         },
 
-        executeCommand: function(cmd, store = true) {
-            if (cmd) {
-                const scmd = this._parameterReader.parse(cmd);
-                const cmdDef = this._registeredCmds[scmd.cmd];
-                if (cmdDef && cmdDef.secured) {
-                    this.eprint(
-                        _.template("<%= prompt %> <%= cmd %> *****")({
-                            prompt: this.PROMPT,
-                            cmd: scmd.cmd,
-                        })
-                    );
-                } else {
-                    this.eprint(
-                        _.template("<%= prompt %> <%= cmd %>")({
-                            prompt: this.PROMPT,
+        executeCommand: function(cmdRaw, store = true) {
+            const cmd = cmdRaw || "";
+            const cmdDef = this._getCmdDef(cmd);
+            let scmd = {};
+            try {
+                scmd = this._parameterReader.parse(cmd, cmdDef);
+            } catch (err) {
+                this.printError(
+                    `<span class='o_terminal_click ` +
+                        `o_terminal_cmd' data-cmd='help ${scmd.cmd}'>` +
+                        `${err.message}!</span>`
+                );
+                this.cleanInput();
+                return false;
+            }
+            if (cmdDef && cmdDef.secured) {
+                this.eprint(
+                    _.template("<%= prompt %> <%= cmd %> *****")({
+                        prompt: this.PROMPT,
+                        cmd: scmd.cmd,
+                    })
+                );
+            } else {
+                this.eprint(
+                    _.template("<%= prompt %> <%= cmd %>")({
+                        prompt: this.PROMPT,
+                        cmd: cmd,
+                    })
+                );
+
+                if (store) {
+                    this.$input.append(
+                        _.template("<option><%= cmd %></option>")({
                             cmd: cmd,
                         })
                     );
-
-                    if (store) {
-                        this.$input.append(
-                            _.template("<option><%= cmd %></option>")({
-                                cmd: cmd,
-                            })
-                        );
-                        this._inputHistory.push(cmd);
-                        this._storage.setItem(
-                            "terminal_history",
-                            this._inputHistory
-                        );
-                        this._searchHistoryIter = this._inputHistory.length;
-                    }
+                    this._inputHistory.push(cmd);
+                    this._storage.setItem(
+                        "terminal_history",
+                        this._inputHistory
+                    );
+                    this._searchHistoryIter = this._inputHistory.length;
                 }
-                this.cleanInput();
-                this._processCommandJob(scmd);
             }
+            this.cleanInput();
+            this._processCommandJob(scmd, cmdDef);
         },
 
         /* VISIBILIY */
@@ -514,6 +520,10 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         /* PRIVATE METHODS*/
+        _getCmdDef: function(cmdRaw) {
+            return this._registeredCmds[cmdRaw.split(" ")[0]];
+        },
+
         _encodeHTML: function(text) {
             return text
                 .replace(/&/g, "&amp;")
@@ -713,14 +723,13 @@ odoo.define("terminal.Terminal", function(require) {
             return this._inputHistory[this._searchHistoryIter];
         },
 
-        _processCommandJob: async function(scmd) {
+        _processCommandJob: async function(scmd, cmdDef) {
             if (
                 Object.prototype.hasOwnProperty.call(
                     this._registeredCmds,
                     scmd.cmd
                 )
             ) {
-
                 this.onStartCommand(scmd.cmd, scmd.params);
                 let result = "";
                 let isFailed = false;
@@ -755,22 +764,7 @@ odoo.define("terminal.Terminal", function(require) {
                     })
                 );
             } else {
-                const similar_cmd = this._searchSimiliarCommand(scmd.cmd);
-                if (similar_cmd) {
-                    this.print(
-                        _.template(
-                            "Unknown command. Did you mean " +
-                                "'<strong class='o_terminal_click " +
-                                "o_terminal_cmd' data-cmd='<%= cmd %> <%= params %>'>" +
-                                "<%= cmd %></strong>'?"
-                        )({
-                            cmd: similar_cmd,
-                            params: scmd.rawParams,
-                        })
-                    );
-                } else {
-                    this.eprint("Unknown command.");
-                }
+                this.eprint("Unknown command.");
             }
 
             return false;
@@ -971,7 +965,6 @@ odoo.define("terminal.Terminal", function(require) {
     return {
         terminal: Terminal,
         parameterReader: ParameterReader,
-        parameterChecker: ParameterChecker,
         storage: TerminalStorage,
         longpolling: TerminalLongPolling,
     };

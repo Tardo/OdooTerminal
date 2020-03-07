@@ -285,12 +285,11 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _cmdShowDBList: async function() {
-            const databases = await ajax
-                .rpc("/jsonrpc", {
-                    service: "db",
-                    method: "list",
-                    args: {},
-                });
+            const databases = await ajax.rpc("/jsonrpc", {
+                service: "db",
+                method: "list",
+                args: {},
+            });
             if (!databases) {
                 this.printError("Can't get database names");
                 return;
@@ -306,13 +305,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _cmdUserHasGroups: async function(groups) {
-            const result = await rpc
-                .query({
-                    method: "user_has_groups",
-                    model: "res.users",
-                    args: [groups],
-                    kwargs: {context: session.user_context},
-                });
+            const result = await rpc.query({
+                method: "user_has_groups",
+                model: "res.users",
+                args: [groups],
+                kwargs: {context: session.user_context},
+            });
             if (result) {
                 this.print("Nice! groups are truly evaluated");
             } else {
@@ -397,7 +395,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
             return true;
         },
 
-        _cmdContextOperation: async function(operation = "read", values = "false") {
+        _cmdContextOperation: async function(
+            operation = "read",
+            values = "false"
+        ) {
             if (operation === "read") {
                 this.print(session.user_context);
             } else if (operation === "set") {
@@ -413,19 +414,17 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _cmdSearchModelRecordId: async function(model, id, field_names) {
-            const recordid = Number(id);
             let fields = ["display_name"];
             if (field_names) {
                 fields = field_names === "*" ? false : field_names.split(",");
             }
-            const result = await rpc
-                .query({
-                    method: "search_read",
-                    domain: [["id", "=", recordid]],
-                    fields: fields,
-                    model: model,
-                    kwargs: {context: session.user_context},
-                });
+            const result = await rpc.query({
+                method: "search_read",
+                domain: [["id", "=", id]],
+                fields: fields,
+                model: model,
+                kwargs: {context: session.user_context},
+            });
             let tbody = "";
             const columns = ["id"];
             for (const item of result) {
@@ -450,14 +449,13 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _cmdLastSeen: async function() {
-            const result = await rpc
-                .query({
-                    method: "search_read",
-                    fields: ["user_id", "last_presence"],
-                    model: "bus.presence",
-                    order: "last_presence DESC",
-                    kwargs: {context: session.user_context},
-                });
+            const result = await rpc.query({
+                method: "search_read",
+                fields: ["user_id", "last_presence"],
+                model: "bus.presence",
+                order: "last_presence DESC",
+                kwargs: {context: session.user_context},
+            });
             let body = "";
             for (const record of result) {
                 body +=
@@ -465,21 +463,17 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     `<td>${record.user_id[0]}</td>` +
                     `<td>${record.last_presence}</td></tr>`;
             }
-            this.printTable(
-                ["User Name", "User ID", "Last Seen"],
-                body
-            );
+            this.printTable(["User Name", "User ID", "Last Seen"], body);
             return true;
         },
 
         _cmdCheckModelAccess: async function(model, operation) {
-            const result = await rpc
-                .query({
-                    method: "check_access_rights",
-                    model: model,
-                    args: [operation, false],
-                    kwargs: {context: session.user_context},
-                });
+            const result = await rpc.query({
+                method: "check_access_rights",
+                model: model,
+                args: [operation, false],
+                kwargs: {context: session.user_context},
+            });
             if (result) {
                 this.print(`Nice! you can '${operation}' on ${model}`);
             } else {
@@ -489,13 +483,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _cmdCheckFieldAccess: async function(model, fields = "false") {
-            const result = await rpc
-                .query({
-                    method: "fields_get",
-                    model: model,
-                    args: [JSON.parse(fields)],
-                    kwargs: {context: session.user_context},
-                });
+            const result = await rpc.query({
+                method: "fields_get",
+                model: model,
+                args: [JSON.parse(fields)],
+                kwargs: {context: session.user_context},
+            });
             const keys = Object.keys(result);
             const fieldParams = [
                 "type",
@@ -538,22 +531,21 @@ odoo.define("terminal.CommonFunctions", function(require) {
             const uid =
                 window.odoo.session_info.uid ||
                 window.odoo.session_info.user_id;
-            const result = await rpc
-                .query({
-                    method: "search_read",
-                    domain: [["id", "=", uid]],
-                    fields: [
-                        "id",
-                        "display_name",
-                        "login",
-                        "partner_id",
-                        "company_id",
-                        "company_ids",
-                        "groups_id",
-                    ],
-                    model: "res.users",
-                    kwargs: {context: session.user_context},
-                });
+            const result = await rpc.query({
+                method: "search_read",
+                domain: [["id", "=", uid]],
+                fields: [
+                    "id",
+                    "display_name",
+                    "login",
+                    "partner_id",
+                    "company_id",
+                    "company_ids",
+                    "groups_id",
+                ],
+                model: "res.users",
+                kwargs: {context: session.user_context},
+            });
             if (result.length) {
                 const record = result[0];
                 this.print(
@@ -573,8 +565,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             return true;
         },
 
-        _cmdSetDebugMode: async function(mode_num) {
-            const mode = Number(mode_num);
+        _cmdSetDebugMode: async function(mode) {
             if (mode === 0) {
                 this.print(
                     "Debug mode <strong>disabled</strong>. Reloading page..."
@@ -705,13 +696,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (typeof pkwargs.context === "undefined") {
                 pkwargs.context = session.user_context;
             }
-            const result = await rpc
-                .query({
-                    method: method,
-                    model: model,
-                    args: JSON.parse(args),
-                    kwargs: pkwargs,
-                });
+            const result = await rpc.query({
+                method: method,
+                model: model,
+                args: JSON.parse(args),
+                kwargs: pkwargs,
+            });
             this.print(result);
         },
 
@@ -725,15 +715,14 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (field_names) {
                 fields = field_names === "*" ? false : field_names.split(",");
             }
-            const result = await rpc
-                .query({
-                    method: "search_read",
-                    domain: JSON.parse(domain),
-                    fields: fields,
-                    model: model,
-                    limit: Number(limit) || false,
-                    kwargs: {context: session.user_context},
-                });
+            const result = await rpc.query({
+                method: "search_read",
+                domain: JSON.parse(domain),
+                fields: fields,
+                model: model,
+                limit: limit,
+                kwargs: {context: session.user_context},
+            });
             let tbody = "";
             const columns = ["id"];
             for (const item of result) {
@@ -768,13 +757,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     this.do_hide();
                 });
             }
-            const result = await rpc
-                .query({
-                    method: "create",
-                    model: model,
-                    args: [JSON.parse(values)],
-                    kwargs: {context: session.user_context},
-                });
+            const result = await rpc.query({
+                method: "create",
+                model: model,
+                args: [JSON.parse(values)],
+                kwargs: {context: session.user_context},
+            });
             this.print(
                 _.template(
                     "<%= model %> record created " +
@@ -790,25 +778,23 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _cmdUnlinkModelRecord: async function(model, id) {
-            await rpc
-                .query({
-                    method: "unlink",
-                    model: model,
-                    args: [Number(id)],
-                    kwargs: {context: session.user_context},
-                });
+            await rpc.query({
+                method: "unlink",
+                model: model,
+                args: [id],
+                kwargs: {context: session.user_context},
+            });
             this.print(`${model} record deleted successfully`);
             return true;
         },
 
         _cmdWriteModelRecord: async function(model, id, values) {
-            await rpc
-                .query({
-                    method: "write",
-                    model: model,
-                    args: [Number(id), JSON.parse(values)],
-                    kwargs: {context: session.user_context},
-                });
+            await rpc.query({
+                method: "write",
+                model: model,
+                args: [id, JSON.parse(values)],
+                kwargs: {context: session.user_context},
+            });
             this.print(`${model} record updated successfully`);
             return true;
         },

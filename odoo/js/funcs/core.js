@@ -72,10 +72,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                     this._printHelpSimple(_cmd, this._registeredCmds[_cmd]);
                 }
             } else if (
-                Object.prototype.hasOwnProperty.call(
-                    this._registeredCmds,
-                    cmd
-                )
+                Object.prototype.hasOwnProperty.call(this._registeredCmds, cmd)
             ) {
                 this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
             } else {

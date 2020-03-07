@@ -59,12 +59,18 @@ If you want collaborate, you need this to make travis happy.
 
 #### Installation
 
+`pre-commit` command need be run inside of the project folder.
+
 ```
 pip install pre-commit
-pre-commit run -a
+pre-commit install -f
 ```
 
 #### Usage
+
+```
+pre-commit run -a
+```
 
 After install, when you do a commit all linters, prettiers, etc.. will run
 automatically ;)
@@ -127,6 +133,7 @@ python tests
 
 ```
 IMP: Added some sugar (async/await usage)
+IMP: ParameterReader
 ```
 
 **5.0.0**

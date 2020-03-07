@@ -44,17 +44,15 @@ odoo.define("terminal.BackendFunctions", function(require) {
         },
 
         _cmdViewModelRecord: async function(model, id) {
-            const resId = Number(id) || false;
-            if (resId) {
+            if (id) {
                 await this.do_action({
                     type: "ir.actions.act_window",
                     name: "View Record",
                     res_model: model,
-                    res_id: resId,
+                    res_id: id,
                     views: [[false, "form"]],
                     target: "new",
                 });
-                console.log("sdsd");
                 this.do_hide();
             } else {
                 new dialogs.SelectCreateDialog(this, {

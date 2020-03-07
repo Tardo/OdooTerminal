@@ -24,8 +24,12 @@ odoo.define("terminal.MyFuncs", function(require) {
             self.eprint("ParamB (Int): " + pB);
             self.eprint("ParamC (Optional String): " + pC);
 
-            if (Number(pA) !== pB) {
-                this.printError("Oops! error");
+            if (pB instanceof Number) {
+                this.print("pB is a Number!");
+            }
+
+            if (pA !== pC) {
+                this.printError("Invalid! pA need be the same as pC");
             }
 
             return true;
