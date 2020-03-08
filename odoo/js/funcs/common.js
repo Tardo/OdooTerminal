@@ -427,7 +427,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
             let tbody = "";
             const columns = ["id"];
-            for (const item of result) {
+            const l = result.length;
+            for (let x = 0; x < l; ++x) {
+                const item = result[x];
                 tbody += "<tr>";
                 tbody += _.template(
                     "<td><span class='o_terminal_click " +
@@ -457,7 +459,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 kwargs: {context: session.user_context},
             });
             let body = "";
-            for (const record of result) {
+            const l = result.length;
+            for (let x = 0; x < l; ++x) {
+                const record = result[x];
                 body +=
                     `<tr><td>${record.user_id[1]}</td>` +
                     `<td>${record.user_id[0]}</td>` +
@@ -500,12 +504,15 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 "depends",
             ];
             let body = "";
-            for (const field of keys) {
+            const l = keys.length;
+            for (let x = 0; x < l; ++x) {
+                const field = keys[x];
                 body += "<tr>";
                 body += `<td>${field}</td>`;
                 const fieldDef = result[field];
-                for (const param of fieldParams) {
-                    body += `<td>${fieldDef[param]}</td>`;
+                const l2 = fieldParams.length;
+                for (let x2 = 0; x2 < l2; ++x2) {
+                    body += `<td>${fieldDef[fieldParams[x2]]}</td>`;
                 }
                 body += "</tr>";
             }
@@ -725,7 +732,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
             let tbody = "";
             const columns = ["id"];
-            for (const item of result) {
+            const l = result.length;
+            for (let x = 0; x < l; ++x) {
+                const item = result[x];
                 tbody += "<tr>";
                 tbody += _.template(
                     "<td><span class='o_terminal_click " +
@@ -818,7 +827,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
 
         //
         _onBusNotification: function(notifications) {
-            for (const notif of Object.values(notifications.data)) {
+            const NotifDatas = Object.values(notifications.data);
+            const l = NotifDatas.length;
+            for (let x = 0; x < l; ++x) {
+                const notif = NotifDatas[x];
                 this.print(
                     "<strong>[<i class='fa fa-envelope-o'></i>] New Longpolling Notification:</stron>"
                 );

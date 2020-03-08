@@ -68,7 +68,9 @@ odoo.define("terminal.CoreFunctions", function(require) {
         _cmdPrintHelp: async function(cmd) {
             if (typeof cmd === "undefined") {
                 const sortedCmdKeys = _.keys(this._registeredCmds).sort();
-                for (const _cmd of sortedCmdKeys) {
+                const l = sortedCmdKeys.length;
+                for (let x = 0; x < l; ++x) {
+                    const _cmd = sortedCmdKeys[x];
                     this._printHelpSimple(_cmd, this._registeredCmds[_cmd]);
                 }
             } else if (
