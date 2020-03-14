@@ -139,6 +139,8 @@ python -m tests tests/test_chrome.py
 IMP: Added some sugar (async/await usage)
 IMP: ParameterReader
 IMP: Performance
+
+FIX: Only consider the major version part to check the compatibility
 ```
 
 **5.0.0**
