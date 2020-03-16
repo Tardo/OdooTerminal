@@ -58,11 +58,13 @@
      * @param {Object} files - Files by type to inject
      */
     function _injector(files) {
-        for (var css of files.css) {
-            _injectPageCSS(css);
+        let l = files.css.length;
+        for (let x = 0; x < l; ++x) {
+            _injectPageCSS(files.css[x]);
         }
-        for (var js of files.js) {
-            _injectPageScript(js);
+        l = files.js.length;
+        for (let x = 0; x < l; ++x) {
+            _injectPageScript(files.js[x]);
         }
     }
 

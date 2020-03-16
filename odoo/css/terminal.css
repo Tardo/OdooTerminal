@@ -53,14 +53,28 @@
     border-radius: 3px;
     margin: 0.3em;
     display: block;
+    overflow: auto;
+}
+.o_terminal div#terminal_screen .error_message > div {
+    white-space: normal;
+}
+.o_terminal div#terminal_screen .error_message > div > ul {
+    list-style-type: disclosure-closed;
+    margin-bottom: 0;
+    margin-top: 1.3em;
+    padding-left: 2em;
+}
+.o_terminal div#terminal_screen .error_message > div > ul > li {
+    margin-bottom: 3px;
+}
+.o_terminal div#terminal_screen .error_message li[name="debug"] .card-body {
+    white-space: pre;
 }
 .o_terminal div#terminal_screen .error_message h4 {
-    margin: 0;
     color: var(--terminal-screen-text-color);
+    margin: 0;
 }
-.o_terminal div#terminal_screen .error_message ul {
-    margin-bottom: 0;
-}
+
 .o_terminal div#terminal_screen .line-array {
     margin-left: 1em;
 }

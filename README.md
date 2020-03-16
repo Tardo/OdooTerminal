@@ -53,21 +53,31 @@ You can toggle terminal using one of these options:
 
 ---
 
-# Pre-commit
+# Contributing
+
+## Pre-commit
 
 If you want collaborate, you need this to make travis happy.
 
 #### Installation
 
+`pre-commit` command need be run inside of the project folder.
+
 ```
 pip install pre-commit
-pre-commit run -a
+pre-commit install -f
 ```
 
 #### Usage
 
 After install, when you do a commit all linters, prettiers, etc.. will run
 automatically ;)
+
+But, if you want you can run it manually:
+
+```
+pre-commit run -a
+```
 
 If one step fails the commit will be cancelled, try do it again (surely
 pre-commit was changed some files, no problem, it's his job, add them again).
@@ -76,7 +86,7 @@ last ('web-ext').
 
 ---
 
-# Testing
+## Testing
 
 This tests only checks that the extension is loaded successfully on all
 compatible Odoo versions.
@@ -116,12 +126,22 @@ apt-get install firefox geckodriver
 #### Usage
 
 ```
-python tests
+python -m tests tests/test_chrome.py
 ```
 
 ---
 
 # Changelog
+
+**5.1.0**
+
+```
+IMP: Added some sugar (async/await usage)
+IMP: ParameterReader
+IMP: Performance
+
+FIX: Only consider the major version part to check the compatibility
+```
 
 **5.0.0**
 

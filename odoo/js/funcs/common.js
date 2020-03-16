@@ -250,30 +250,28 @@ odoo.define("terminal.CommonFunctions", function(require) {
             this._super.apply(this, arguments);
         },
 
-        _cmdRunTour: function(oper, tourName) {
-            return $.Deferred(d => {
-                const tourNames = Object.keys(tour.tours);
-                if (oper === "list") {
-                    if (tourNames.length) {
-                        this.print(tourNames);
-                    } else {
-                        this.print("The tours list is empty");
-                    }
-                } else if (oper === "run") {
-                    if (tourName) {
-                        this.print("Running tour...");
-                        odoo.__DEBUG__.services["web_tour.tour"].run(tourName);
-                    } else {
-                        this.printError("No tour has been indicated to run");
-                    }
+        _cmdRunTour: async function(oper, tourName) {
+            const tourNames = Object.keys(tour.tours);
+            if (oper === "list") {
+                if (tourNames.length) {
+                    this.print(tourNames);
                 } else {
-                    this.printError("Invalid Operation! (Use 'run' or 'list')");
+                    this.print("The tours list is empty");
                 }
-                d.resolve();
-            });
+            } else if (oper === "run") {
+                if (tourName) {
+                    this.print("Running tour...");
+                    odoo.__DEBUG__.services["web_tour.tour"].run(tourName);
+                } else {
+                    this.printError("No tour has been indicated to run");
+                }
+            } else {
+                this.printError("Invalid Operation! (Use 'run' or 'list')");
+            }
+            return true;
         },
 
-        _cmdJSTest: function(module_name, mode) {
+        _cmdJSTest: async function(module_name, mode) {
             let mod = module_name || "";
             if (module_name === "*") {
                 mod = "";
@@ -282,54 +280,46 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (mode === "mobile") {
                 url = `/web/tests/mobile?module=${mod}`;
             }
-
             window.location = url;
+            return true;
+        },
 
-            return $.Deferred(d => {
-                d.resolve();
+        _cmdShowDBList: async function() {
+            const databases = await ajax.rpc("/jsonrpc", {
+                service: "db",
+                method: "list",
+                args: {},
             });
+            if (!databases) {
+                this.printError("Can't get database names");
+                return;
+            }
+            for (const i in databases) {
+                if (databases[i] === session.db) {
+                    databases[i] = `<strong>${databases[i]}</strong>`;
+                    break;
+                }
+            }
+            this.print(databases);
+            return true;
         },
 
-        _cmdShowDBList: function() {
-            return ajax
-                .rpc("/jsonrpc", {
-                    service: "db",
-                    method: "list",
-                    args: {},
-                })
-                .then(databases => {
-                    if (!databases) {
-                        this.printError("Can't get database names");
-                        return;
-                    }
-                    for (const i in databases) {
-                        if (databases[i] === session.db) {
-                            databases[i] = `<strong>${databases[i]}</strong>`;
-                            break;
-                        }
-                    }
-                    this.print(databases);
-                });
+        _cmdUserHasGroups: async function(groups) {
+            const result = await rpc.query({
+                method: "user_has_groups",
+                model: "res.users",
+                args: [groups],
+                kwargs: {context: session.user_context},
+            });
+            if (result) {
+                this.print("Nice! groups are truly evaluated");
+            } else {
+                this.print("Groups are negatively evaluated");
+            }
+            return true;
         },
 
-        _cmdUserHasGroups: function(groups) {
-            return rpc
-                .query({
-                    method: "user_has_groups",
-                    model: "res.users",
-                    args: [groups],
-                    kwargs: {context: session.user_context},
-                })
-                .then(result => {
-                    if (result) {
-                        this.print("Nice! groups are truly evaluated");
-                    } else {
-                        this.print("Groups are negatively evaluated");
-                    }
-                });
-        },
-
-        _cmdLoginAs: function(database, login_name, pass) {
+        _cmdLoginAs: async function(database, login_name, pass) {
             let db = database;
             let login = login_name;
             let passwd = pass || false;
@@ -344,208 +334,191 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             "'<span class='o_terminal_click o_terminal_cmd' " +
                             "data-cmd='dblist'>dblist</span>' command."
                     );
-                    return $.Deferred(d => {
-                        d.resolve();
-                    });
+                    return true;
                 }
                 db = session.db;
             }
-            return session._session_authenticate(db, login, passwd).then(() => {
-                this.print(`Successfully logged as '${login}'`);
-            });
+            await session._session_authenticate(db, login, passwd);
+            this.print(`Successfully logged as '${login}'`);
+            return true;
         },
 
-        _cmdLongpolling: function(operation, name) {
-            return $.Deferred(d => {
-                if (typeof operation === "undefined") {
-                    this.print(this._longpolling.isVerbose() || "off");
-                } else if (operation === "verbose") {
-                    this._longpolling.setVerbose(true);
-                    this.print("Now long-polling is in verbose mode.");
-                } else if (operation === "off") {
-                    this._longpolling.setVerbose(false);
-                    this.print("Now long-polling verbose mode is disabled");
-                } else if (operation === "add_channel") {
-                    if (typeof name === "undefined") {
-                        this.printError("Invalid channel name.");
-                    } else {
-                        this.print(this._longpolling.addChannel(name));
-                        this.print(`Joined the '${name}' channel.`);
-                    }
-                } else if (operation === "del_channel") {
-                    if (typeof name === "undefined") {
-                        this.printError("Invalid channel name.");
-                    } else {
-                        this._longpolling.deleteChannel(name);
-                        this.print(`Leave the '${name}' channel.`);
-                    }
-                } else if (operation === "start") {
-                    this._longpolling.startPoll();
-                    this.print("Longpolling started");
-                } else if (operation === "stop") {
-                    this._longpolling.stopPoll();
-                    this.print("Longpolling stopped");
+        _cmdLongpolling: async function(operation, name) {
+            if (typeof operation === "undefined") {
+                this.print(this._longpolling.isVerbose() || "off");
+            } else if (operation === "verbose") {
+                this._longpolling.setVerbose(true);
+                this.print("Now long-polling is in verbose mode.");
+            } else if (operation === "off") {
+                this._longpolling.setVerbose(false);
+                this.print("Now long-polling verbose mode is disabled");
+            } else if (operation === "add_channel") {
+                if (typeof name === "undefined") {
+                    this.printError("Invalid channel name.");
                 } else {
-                    this.printError("Invalid Operation.");
+                    this.print(this._longpolling.addChannel(name));
+                    this.print(`Joined the '${name}' channel.`);
                 }
-
-                d.resolve();
-            });
-        },
-
-        _cmdShowOdooVersion: function() {
-            return $.Deferred(d => {
-                try {
-                    this.print(
-                        `${odoo.session_info.server_version_info
-                            .slice(0, 3)
-                            .join(
-                                "."
-                            )} (${odoo.session_info.server_version_info
-                            .slice(3)
-                            .join(" ")})`
-                    );
-                    d.resolve();
-                } catch (err) {
-                    this.print(window.term_odooVersion);
-                }
-
-                d.resolve();
-            });
-        },
-
-        _cmdContextOperation: function(operation = "read", values = "false") {
-            return $.Deferred(d => {
-                if (operation === "read") {
-                    this.print(session.user_context);
-                } else if (operation === "set") {
-                    session.user_context = JSON.parse(values);
-                    this.print(session.user_context);
-                } else if (operation === "write") {
-                    Object.assign(session.user_context, JSON.parse(values));
-                    this.print(session.user_context);
+            } else if (operation === "del_channel") {
+                if (typeof name === "undefined") {
+                    this.printError("Invalid channel name.");
                 } else {
-                    this.printError("Invalid operation");
+                    this._longpolling.deleteChannel(name);
+                    this.print(`Leave the '${name}' channel.`);
                 }
-
-                d.resolve();
-            });
+            } else if (operation === "start") {
+                this._longpolling.startPoll();
+                this.print("Longpolling started");
+            } else if (operation === "stop") {
+                this._longpolling.stopPoll();
+                this.print("Longpolling stopped");
+            } else {
+                this.printError("Invalid Operation.");
+            }
+            return true;
         },
 
-        _cmdSearchModelRecordId: function(model, id, field_names) {
-            const recordid = Number(id);
+        _cmdShowOdooVersion: async function() {
+            try {
+                this.print(
+                    `${odoo.session_info.server_version_info
+                        .slice(0, 3)
+                        .join(
+                            "."
+                        )} (${odoo.session_info.server_version_info
+                        .slice(3)
+                        .join(" ")})`
+                );
+            } catch (err) {
+                this.print(window.term_odooVersion);
+            }
+            return true;
+        },
+
+        _cmdContextOperation: async function(
+            operation = "read",
+            values = "false"
+        ) {
+            if (operation === "read") {
+                this.print(session.user_context);
+            } else if (operation === "set") {
+                session.user_context = JSON.parse(values);
+                this.print(session.user_context);
+            } else if (operation === "write") {
+                Object.assign(session.user_context, JSON.parse(values));
+                this.print(session.user_context);
+            } else {
+                this.printError("Invalid operation");
+            }
+            return true;
+        },
+
+        _cmdSearchModelRecordId: async function(model, id, field_names) {
             let fields = ["display_name"];
             if (field_names) {
                 fields = field_names === "*" ? false : field_names.split(",");
             }
-
-            return rpc
-                .query({
-                    method: "search_read",
-                    domain: [["id", "=", recordid]],
-                    fields: fields,
+            const result = await rpc.query({
+                method: "search_read",
+                domain: [["id", "=", id]],
+                fields: fields,
+                model: model,
+                kwargs: {context: session.user_context},
+            });
+            let tbody = "";
+            const columns = ["id"];
+            const l = result.length;
+            for (let x = 0; x < l; ++x) {
+                const item = result[x];
+                tbody += "<tr>";
+                tbody += _.template(
+                    "<td><span class='o_terminal_click " +
+                        "o_terminal_view' data-resid='<%= id %>' " +
+                        "data-model='<%= model %>'>#<%= id %></span></td>"
+                )({
+                    id: item.id,
                     model: model,
-                    kwargs: {context: session.user_context},
-                })
-                .then(result => {
-                    let tbody = "";
-                    const columns = ["id"];
-                    for (const item of result) {
-                        tbody += "<tr>";
-                        tbody += _.template(
-                            "<td><span class='o_terminal_click " +
-                                "o_terminal_view' data-resid='<%= id %>' " +
-                                "data-model='<%= model %>'>#<%= id %></span></td>"
-                        )({
-                            id: item.id,
-                            model: model,
-                        });
-                        delete item.id;
-                        for (const field in item) {
-                            columns.push(field);
-                            tbody += `<td>${item[field]}</td>`;
-                        }
-                        tbody += "</tr>";
-                    }
-                    this.printTable(_.unique(columns), tbody);
                 });
+                delete item.id;
+                for (const field in item) {
+                    columns.push(field);
+                    tbody += `<td>${item[field]}</td>`;
+                }
+                tbody += "</tr>";
+            }
+            this.printTable(_.unique(columns), tbody);
+            return true;
         },
 
-        _cmdLastSeen: function() {
-            return rpc
-                .query({
-                    method: "search_read",
-                    fields: ["user_id", "last_presence"],
-                    model: "bus.presence",
-                    order: "last_presence DESC",
-                    kwargs: {context: session.user_context},
-                })
-                .then(result => {
-                    let body = "";
-                    for (const record of result) {
-                        body +=
-                            `<tr><td>${record.user_id[1]}</td>` +
-                            `<td>${record.user_id[0]}</td>` +
-                            `<td>${record.last_presence}</td></tr>`;
-                    }
-
-                    this.printTable(
-                        ["User Name", "User ID", "Last Seen"],
-                        body
-                    );
-                });
+        _cmdLastSeen: async function() {
+            const result = await rpc.query({
+                method: "search_read",
+                fields: ["user_id", "last_presence"],
+                model: "bus.presence",
+                order: "last_presence DESC",
+                kwargs: {context: session.user_context},
+            });
+            let body = "";
+            const l = result.length;
+            for (let x = 0; x < l; ++x) {
+                const record = result[x];
+                body +=
+                    `<tr><td>${record.user_id[1]}</td>` +
+                    `<td>${record.user_id[0]}</td>` +
+                    `<td>${record.last_presence}</td></tr>`;
+            }
+            this.printTable(["User Name", "User ID", "Last Seen"], body);
+            return true;
         },
 
-        _cmdCheckModelAccess: function(model, operation) {
-            return rpc
-                .query({
-                    method: "check_access_rights",
-                    model: model,
-                    args: [operation, false],
-                    kwargs: {context: session.user_context},
-                })
-                .then(result => {
-                    if (result) {
-                        this.print(`Nice! you can '${operation}' on ${model}`);
-                    } else {
-                        this.print(`You can't '${operation}' on ${model}`);
-                    }
-                });
+        _cmdCheckModelAccess: async function(model, operation) {
+            const result = await rpc.query({
+                method: "check_access_rights",
+                model: model,
+                args: [operation, false],
+                kwargs: {context: session.user_context},
+            });
+            if (result) {
+                this.print(`Nice! you can '${operation}' on ${model}`);
+            } else {
+                this.print(`You can't '${operation}' on ${model}`);
+            }
+            return true;
         },
 
-        _cmdCheckFieldAccess: function(model, fields = "false") {
-            return rpc
-                .query({
-                    method: "fields_get",
-                    model: model,
-                    args: [JSON.parse(fields)],
-                    kwargs: {context: session.user_context},
-                })
-                .then(result => {
-                    const keys = Object.keys(result);
-                    const fieldParams = [
-                        "type",
-                        "string",
-                        "relation",
-                        "required",
-                        "readonly",
-                        "searchable",
-                        "depends",
-                    ];
-
-                    let body = "";
-                    for (const field of keys) {
-                        body += "<tr>";
-                        body += `<td>${field}</td>`;
-                        const fieldDef = result[field];
-                        for (const param of fieldParams) {
-                            body += `<td>${fieldDef[param]}</td>`;
-                        }
-                        body += "</tr>";
-                    }
-                    fieldParams.unshift("field");
-                    this.printTable(fieldParams, body);
-                });
+        _cmdCheckFieldAccess: async function(model, fields = "false") {
+            const result = await rpc.query({
+                method: "fields_get",
+                model: model,
+                args: [JSON.parse(fields)],
+                kwargs: {context: session.user_context},
+            });
+            const keys = Object.keys(result);
+            const fieldParams = [
+                "type",
+                "string",
+                "relation",
+                "required",
+                "readonly",
+                "searchable",
+                "depends",
+            ];
+            let body = "";
+            const l = keys.length;
+            for (let x = 0; x < l; ++x) {
+                const field = keys[x];
+                body += "<tr>";
+                body += `<td>${field}</td>`;
+                const fieldDef = result[field];
+                const l2 = fieldParams.length;
+                for (let x2 = 0; x2 < l2; ++x2) {
+                    body += `<td>${fieldDef[fieldParams[x2]]}</td>`;
+                }
+                body += "</tr>";
+            }
+            fieldParams.unshift("field");
+            this.printTable(fieldParams, body);
+            return true;
         },
 
         _WHOAMI_TEMPLATE:
@@ -561,48 +534,45 @@ odoo.define("terminal.CommonFunctions", function(require) {
             " <%= companies %>" +
             "<br><span style='color: gray;'>In Groups (ids)</span>:" +
             " <%= groups %>",
-        _cmdShowWhoAmI: function() {
+        _cmdShowWhoAmI: async function() {
             const uid =
                 window.odoo.session_info.uid ||
                 window.odoo.session_info.user_id;
-            return rpc
-                .query({
-                    method: "search_read",
-                    domain: [["id", "=", uid]],
-                    fields: [
-                        "id",
-                        "display_name",
-                        "login",
-                        "partner_id",
-                        "company_id",
-                        "company_ids",
-                        "groups_id",
-                    ],
-                    model: "res.users",
-                    kwargs: {context: session.user_context},
-                })
-                .then(result => {
-                    if (result.length) {
-                        const record = result[0];
-                        this.print(
-                            _.template(this._WHOAMI_TEMPLATE)({
-                                login: record.login,
-                                display_name: record.display_name,
-                                user_id: record.id,
-                                partner: record.partner_id,
-                                company: record.company_id,
-                                companies: record.company_ids,
-                                groups: record.groups_id,
-                            })
-                        );
-                    } else {
-                        this.printError("Oops! can't get the login :/");
-                    }
-                });
+            const result = await rpc.query({
+                method: "search_read",
+                domain: [["id", "=", uid]],
+                fields: [
+                    "id",
+                    "display_name",
+                    "login",
+                    "partner_id",
+                    "company_id",
+                    "company_ids",
+                    "groups_id",
+                ],
+                model: "res.users",
+                kwargs: {context: session.user_context},
+            });
+            if (result.length) {
+                const record = result[0];
+                this.print(
+                    _.template(this._WHOAMI_TEMPLATE)({
+                        login: record.login,
+                        display_name: record.display_name,
+                        user_id: record.id,
+                        partner: record.partner_id,
+                        company: record.company_id,
+                        companies: record.company_ids,
+                        groups: record.groups_id,
+                    })
+                );
+            } else {
+                this.printError("Oops! can't get the login :/");
+            }
+            return true;
         },
 
-        _cmdSetDebugMode: function(mode_num) {
-            const mode = Number(mode_num);
+        _cmdSetDebugMode: async function(mode) {
             if (mode === 0) {
                 this.print(
                     "Debug mode <strong>disabled</strong>. Reloading page..."
@@ -630,21 +600,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
             } else {
                 this.printError("Invalid debug mode");
             }
-
-            return $.Deferred(d => {
-                d.resolve();
-            });
+            return true;
         },
 
-        _cmdReloadPage: function() {
-            return $.Deferred(d => {
-                try {
-                    location.reload();
-                    d.resolve();
-                } catch (err) {
-                    d.reject(err.message);
-                }
-            });
+        _cmdReloadPage: async function() {
+            location.reload();
+            return true;
         },
 
         _searchModule: function(module_name) {
@@ -657,82 +618,82 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _cmdUpgradeModule: function(module_name) {
-            return this._searchModule(module_name).then(result => {
-                if (result.length) {
-                    rpc.query({
-                        method: "button_immediate_upgrade",
-                        model: "ir.module.module",
-                        args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.print(
-                                `'${module_name}' module successfully upgraded`
-                            );
-                        },
-                        () => {
-                            this.printError(
-                                `Can't upgrade '${module_name}' module`
-                            );
-                        }
-                    );
-                } else {
-                    this.printError(`'${module_name}' module doesn't exists`);
-                }
-            });
+        _cmdUpgradeModule: async function(module_name) {
+            const result = await this._searchModule(module_name);
+            if (result.length) {
+                rpc.query({
+                    method: "button_immediate_upgrade",
+                    model: "ir.module.module",
+                    args: [result[0].id],
+                }).then(
+                    () => {
+                        this.print(
+                            `'${module_name}' module successfully upgraded`
+                        );
+                    },
+                    () => {
+                        this.printError(
+                            `Can't upgrade '${module_name}' module`
+                        );
+                    }
+                );
+            } else {
+                this.printError(`'${module_name}' module doesn't exists`);
+            }
+            return true;
         },
 
-        _cmdInstallModule: function(module_name) {
-            return this._searchModule(module_name).then(result => {
-                if (result.length) {
-                    rpc.query({
-                        method: "button_immediate_install",
-                        model: "ir.module.module",
-                        args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.print(
-                                `'${module_name}' module successfully installed`
-                            );
-                        },
-                        () => {
-                            this.printError(
-                                `Can't install '${module_name}' module`
-                            );
-                        }
-                    );
-                } else {
-                    this.printError(`'${module_name}' module doesn't exists`);
-                }
-            });
+        _cmdInstallModule: async function(module_name) {
+            const result = await this._searchModule(module_name);
+            if (result.length) {
+                rpc.query({
+                    method: "button_immediate_install",
+                    model: "ir.module.module",
+                    args: [result[0].id],
+                }).then(
+                    () => {
+                        this.print(
+                            `'${module_name}' module successfully installed`
+                        );
+                    },
+                    () => {
+                        this.printError(
+                            `Can't install '${module_name}' module`
+                        );
+                    }
+                );
+            } else {
+                this.printError(`'${module_name}' module doesn't exists`);
+            }
+            return true;
         },
 
-        _cmdUninstallModule: function(module_name) {
-            return this._searchModule(module_name).then(result => {
-                if (result.length) {
-                    rpc.query({
-                        method: "button_immediate_uninstall",
-                        model: "ir.module.module",
-                        args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.print(
-                                `'${module_name}' module successfully uninstalled`
-                            );
-                        },
-                        () => {
-                            this.printError(
-                                `Can't uninstall '${module_name}' module`
-                            );
-                        }
-                    );
-                } else {
-                    this.printError(`'${module_name}' module doesn't exists`);
-                }
-            });
+        _cmdUninstallModule: async function(module_name) {
+            const result = await this._searchModule(module_name);
+            if (result.length) {
+                rpc.query({
+                    method: "button_immediate_uninstall",
+                    model: "ir.module.module",
+                    args: [result[0].id],
+                }).then(
+                    () => {
+                        this.print(
+                            `'${module_name}' module successfully uninstalled`
+                        );
+                    },
+                    () => {
+                        this.printError(
+                            `Can't uninstall '${module_name}' module`
+                        );
+                    }
+                );
+            } else {
+                this.printError(`'${module_name}' module doesn't exists`);
+            }
+            return true;
         },
 
-        _cmdCallModelMethod: function(
+        _cmdCallModelMethod: async function(
             model,
             method,
             args = "[]",
@@ -742,19 +703,16 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (typeof pkwargs.context === "undefined") {
                 pkwargs.context = session.user_context;
             }
-            return rpc
-                .query({
-                    method: method,
-                    model: model,
-                    args: JSON.parse(args),
-                    kwargs: pkwargs,
-                })
-                .then(result => {
-                    this.print(result);
-                });
+            const result = await rpc.query({
+                method: method,
+                model: model,
+                args: JSON.parse(args),
+                kwargs: pkwargs,
+            });
+            this.print(result);
         },
 
-        _cmdSearchModelRecord: function(
+        _cmdSearchModelRecord: async function(
             model,
             field_names,
             domain = "[]",
@@ -764,40 +722,40 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (field_names) {
                 fields = field_names === "*" ? false : field_names.split(",");
             }
-            return rpc
-                .query({
-                    method: "search_read",
-                    domain: JSON.parse(domain),
-                    fields: fields,
+            const result = await rpc.query({
+                method: "search_read",
+                domain: JSON.parse(domain),
+                fields: fields,
+                model: model,
+                limit: limit,
+                kwargs: {context: session.user_context},
+            });
+            let tbody = "";
+            const columns = ["id"];
+            const l = result.length;
+            for (let x = 0; x < l; ++x) {
+                const item = result[x];
+                tbody += "<tr>";
+                tbody += _.template(
+                    "<td><span class='o_terminal_click " +
+                        "o_terminal_view' data-resid='<%= id %>' " +
+                        "data-model='<%= model %>'>#<%= id %></span></td>"
+                )({
+                    id: item.id,
                     model: model,
-                    limit: Number(limit) || false,
-                    kwargs: {context: session.user_context},
-                })
-                .then(result => {
-                    let tbody = "";
-                    const columns = ["id"];
-                    for (const item of result) {
-                        tbody += "<tr>";
-                        tbody += _.template(
-                            "<td><span class='o_terminal_click " +
-                                "o_terminal_view' data-resid='<%= id %>' " +
-                                "data-model='<%= model %>'>#<%= id %></span></td>"
-                        )({
-                            id: item.id,
-                            model: model,
-                        });
-                        delete item.id;
-                        for (const field in item) {
-                            columns.push(field);
-                            tbody += `<td>${item[field]}</td>`;
-                        }
-                        tbody += "</tr>";
-                    }
-                    this.printTable(_.unique(columns), tbody);
                 });
+                delete item.id;
+                for (const field in item) {
+                    columns.push(field);
+                    tbody += `<td>${item[field]}</td>`;
+                }
+                tbody += "</tr>";
+            }
+            this.printTable(_.unique(columns), tbody);
+            return true;
         },
 
-        _cmdCreateModelRecord: function(model, values) {
+        _cmdCreateModelRecord: async function(model, values) {
             if (typeof values === "undefined") {
                 return this.do_action({
                     type: "ir.actions.act_window",
@@ -808,73 +766,71 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     this.do_hide();
                 });
             }
-            return rpc
-                .query({
-                    method: "create",
+            const result = await rpc.query({
+                method: "create",
+                model: model,
+                args: [JSON.parse(values)],
+                kwargs: {context: session.user_context},
+            });
+            this.print(
+                _.template(
+                    "<%= model %> record created " +
+                        "successfully: <span class='o_terminal_click " +
+                        "o_terminal_view' data-resid='<%= new_id %>' " +
+                        "data-model='<%= model %>'><%= new_id %></span>"
+                )({
                     model: model,
-                    args: [JSON.parse(values)],
-                    kwargs: {context: session.user_context},
+                    new_id: result,
                 })
-                .then(result => {
-                    this.print(
-                        _.template(
-                            "<%= model %> record created " +
-                                "successfully: <span class='o_terminal_click " +
-                                "o_terminal_view' data-resid='<%= new_id %>' " +
-                                "data-model='<%= model %>'><%= new_id %></span>"
-                        )({
-                            model: model,
-                            new_id: result,
-                        })
-                    );
-                });
+            );
+            return true;
         },
 
-        _cmdUnlinkModelRecord: function(model, id) {
-            return rpc
-                .query({
-                    method: "unlink",
-                    model: model,
-                    args: [Number(id)],
-                    kwargs: {context: session.user_context},
-                })
-                .then(() => {
-                    this.print(`${model} record deleted successfully`);
-                });
+        _cmdUnlinkModelRecord: async function(model, id) {
+            await rpc.query({
+                method: "unlink",
+                model: model,
+                args: [id],
+                kwargs: {context: session.user_context},
+            });
+            this.print(`${model} record deleted successfully`);
+            return true;
         },
 
-        _cmdWriteModelRecord: function(model, id, values) {
-            return rpc
-                .query({
-                    method: "write",
-                    model: model,
-                    args: [Number(id), JSON.parse(values)],
-                    kwargs: {context: session.user_context},
-                })
-                .then(() => {
-                    this.print(`${model} record updated successfully`);
-                });
+        _cmdWriteModelRecord: async function(model, id, values) {
+            await rpc.query({
+                method: "write",
+                model: model,
+                args: [id, JSON.parse(values)],
+                kwargs: {context: session.user_context},
+            });
+            this.print(`${model} record updated successfully`);
+            return true;
         },
 
-        _cmdCallAction: function(action) {
+        _cmdCallAction: async function(action) {
             let paction = action;
             try {
                 paction = JSON.parse(action);
             } catch (err) {
                 // Do Nothing
             }
-            return this.do_action(paction);
+            await this.do_action(paction);
+            return true;
         },
 
-        _cmdPostData: function(url, data) {
-            return ajax.post(url, JSON.parse(data)).then(result => {
-                this.print(result);
-            });
+        _cmdPostData: async function(url, data) {
+            const result = await ajax.post(url, JSON.parse(data));
+            this.print(result);
+            return true;
         },
 
         //
         _onBusNotification: function(notifications) {
-            for (const notif of Object.values(notifications.data)) {
+            const NotifDatas = Object.values(notifications.data);
+            const l = NotifDatas.length;
+            for (let x = 0; x < l; ++x) {
+                const notif = NotifDatas[x];
                 this.print(
                     "<strong>[<i class='fa fa-envelope-o'></i>] New Longpolling Notification:</stron>"
                 );

@@ -16,23 +16,23 @@ odoo.define("terminal.MyFuncs", function(require) {
             });
         },
 
-        _cmdMyFunc: function(pA, pB, pC = "DefaultValue") {
+        _cmdMyFunc: async function(pA, pB, pC = "DefaultValue") {
             var self = this;
 
-            var defer = $.Deferred(function(d) {
-                self.print("Hello, World!");
-                self.eprint("ParamA (String): " + pA);
-                self.eprint("ParamB (Int): " + pB);
-                self.eprint("ParamC (Optional String): " + pC);
+            self.print("Hello, World!");
+            self.eprint("ParamA (String): " + pA);
+            self.eprint("ParamB (Int): " + pB);
+            self.eprint("ParamC (Optional String): " + pC);
 
-                if (Number(pA) === pB) {
-                    d.resolve();
-                } else {
-                    d.reject("Oops! error");
-                }
-            });
+            if (pB instanceof Number) {
+                this.print("pB is a Number!");
+            }
 
-            return $.when(defer);
+            if (pA !== pC) {
+                this.printError("Invalid! pA need be the same as pC");
+            }
+
+            return true;
         },
     });
 });

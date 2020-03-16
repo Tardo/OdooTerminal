@@ -1,7 +1,6 @@
 env:
   browser: true
 
-# See https://github.com/OCA/odoo-community.org/issues/37#issuecomment-470686449
 parserOptions:
   ecmaVersion: 2017
 
@@ -15,6 +14,8 @@ globals:
   odoo: readonly
   openerp: off
   Promise: readonly
+  Symbol: readonly
+  BigInt: readonly
 
 # Styling is handled by Prettier, so we only need to enable AST rules;
 # see https://github.com/OCA/maintainer-quality-tools/pull/618#issuecomment-558576890
@@ -97,7 +98,7 @@ rules:
   no-new-require: warn
   no-new-symbol: warn
   no-new-wrappers: warn
-  no-new: warn
+  no-new: off
   no-obj-calls: warn
   no-octal-escape: warn
   no-octal: warn
@@ -142,6 +143,9 @@ rules:
   no-useless-rename: warn
   no-void: warn
   no-with: warn
+  no-console:
+    - error
+    - allow: ["warn", "error"]
   operator-assignment: [error, always]
   prefer-const: warn
   radix: warn

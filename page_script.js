@@ -14,13 +14,13 @@
     window.hasRun = true;
 
     const COMPATIBLE_VERS = [
-        "11.0",
+        "11.",
         "saas~11",
-        "12.0",
+        "12.",
         "saas~12",
-        "13.0",
+        "13.",
         "saas~13",
-        "14.0",
+        "14.",
         "saas~14",
     ];
     const OdooObj = window.odoo;

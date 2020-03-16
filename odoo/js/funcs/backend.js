@@ -32,50 +32,47 @@ odoo.define("terminal.BackendFunctions", function(require) {
             });
         },
 
-        _cmdOpenSettings: function() {
-            return this.do_action({
+        _cmdOpenSettings: async function() {
+            await this.do_action({
                 type: "ir.actions.act_window",
                 res_model: "res.config.settings",
                 views: [[false, "form"]],
                 target: "current",
-            }).then(() => {
-                this.do_hide();
             });
+            this.do_hide();
+            return true;
         },
 
-        _cmdViewModelRecord: function(model, id) {
-            const resId = Number(id) || false;
-            if (resId) {
-                return this.do_action({
+        _cmdViewModelRecord: async function(model, id) {
+            if (id) {
+                await this.do_action({
                     type: "ir.actions.act_window",
                     name: "View Record",
                     res_model: model,
-                    res_id: resId,
+                    res_id: id,
                     views: [[false, "form"]],
                     target: "new",
-                }).then(() => {
-                    this.do_hide();
                 });
+                this.do_hide();
+            } else {
+                new dialogs.SelectCreateDialog(this, {
+                    res_model: model,
+                    title: "Select a record",
+                    disable_multiple_selection: true,
+                    on_selected: records => {
+                        this.do_action({
+                            type: "ir.actions.act_window",
+                            name: "View Record",
+                            res_model: model,
+                            res_id: records[0].id,
+                            views: [[false, "form"]],
+                            target: "new",
+                        });
+                    },
+                }).open();
             }
-            new dialogs.SelectCreateDialog(this, {
-                res_model: model,
-                title: "Select a record",
-                disable_multiple_selection: true,
-                on_selected: records => {
-                    this.do_action({
-                        type: "ir.actions.act_window",
-                        name: "View Record",
-                        res_model: model,
-                        res_id: records[0].id,
-                        views: [[false, "form"]],
-                        target: "new",
-                    });
-                },
-            }).open();
 
-            return $.Deferred(d => {
-                d.resolve();
-            });
+            return true;
         },
 
         //

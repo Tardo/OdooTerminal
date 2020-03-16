@@ -23,7 +23,6 @@ jobs:
     - stage: linting
       name: "pre-commit (eslint, web-ext, prettier, etc...)"
       install: pip install pre-commit
-      before_script: npm install web-ext -g
       script:
         - pre-commit run --all --show-diff-on-failure --verbose --color always
     - stage: selenium
