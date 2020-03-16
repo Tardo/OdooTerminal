@@ -386,14 +386,45 @@ odoo.define("terminal.Terminal", function(require) {
                 "exception_type" in error.data
             ) {
                 // It's an Odoo error report
+                const error_id = new Date().getTime();
                 this.print(
                     `<div><h4>${this._encodeHTML(error.data.name)}</h4>
 <span>${this._encodeHTML(error.data.message)}</span>
 <ul>
-<li><b>Exception Type:</b> ${error.data.exception_type}</li>
-<li><b>Context:</b> ${JSON.stringify(error.data.context)}</li>
-<li><b>Arguments:</b> ${JSON.stringify(error.data.arguments)}</li>
-<li><b>Debug:</b><br>${this._encodeHTML(error.data.debug)}</li>
+<li name="exception_type">
+    <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapseExceptionType${error_id}" role="button" aria-expanded="false" aria-controls="collapseExceptionType${error_id}">
+        Exception Type
+    </a>
+    <div class="collapse" id="collapseExceptionType${error_id}">
+        <div class="card card-body">${error.data.exception_type}</div>
+    </div>
+</li>
+<li name="context">
+    <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapseContext${error_id}" role="button" aria-expanded="false" aria-controls="collapseContext${error_id}">
+        Context
+    </a>
+    <div class="collapse" id="collapseContext${error_id}">
+        <div class="card card-body">${JSON.stringify(error.data.context)}</div>
+    </div>
+</li>
+<li name="args">
+    <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapseArguments${error_id}" role="button" aria-expanded="false" aria-controls="collapseArguments${error_id}">
+        Arguments
+    </a>
+    <div class="collapse" id="collapseArguments${error_id}">
+        <div class="card card-body">${JSON.stringify(
+            error.data.arguments
+        )}</div>
+    </div>
+</li>
+<li name="debug">
+    <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapseDebug${error_id}" role="button" aria-expanded="false" aria-controls="collapseDebug${error_id}">
+        Debug
+    </a>
+    <div class="collapse" id="collapseDebug${error_id}">
+        <div class="card card-body">${this._encodeHTML(error.data.debug)}</div>
+    </div>
+</li>
 </ul></div>`,
                     false,
                     "error_message"
