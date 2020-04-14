@@ -54,11 +54,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
 
         _printHelpSimple: function(cmd, cmdDef) {
             this.print(
-                _.template(
-                    "<strong class='o_terminal_click " +
-                        "o_terminal_cmd' data-cmd='help <%= cmd %>'><%= cmd %>" +
-                        "</strong> - <i><%= def %></i>"
-                )({
+                this._templates.render("HELP_CMD", {
                     cmd: cmd,
                     def: cmdDef.definition,
                 })

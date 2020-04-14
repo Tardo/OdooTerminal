@@ -431,11 +431,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             for (let x = 0; x < l; ++x) {
                 const item = result[x];
                 tbody += "<tr>";
-                tbody += _.template(
-                    "<td><span class='o_terminal_click " +
-                        "o_terminal_view' data-resid='<%= id %>' " +
-                        "data-model='<%= model %>'>#<%= id %></span></td>"
-                )({
+                tbody += this._templates.render("TABLE_BODY_CMD", {
                     id: item.id,
                     model: model,
                 });
@@ -521,19 +517,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
             return true;
         },
 
-        _WHOAMI_TEMPLATE:
-            "<span style='color: gray;'>Login</span>:" +
-            ` <%= login %>` +
-            "<br><span style='color: gray;'>User</span>:" +
-            " <%= display_name %> (#<%= user_id %>)" +
-            "<br><span style='color: gray;'>Partner</span>:" +
-            " <%= partner[1] %> (#<%= partner[0] %>)" +
-            "<br><span style='color: gray;'>Company</span>:" +
-            " <%= company[1] %> (#<%= company[0] %>)" +
-            "<br><span style='color: gray;'>In Companies (ids)</span>:" +
-            " <%= companies %>" +
-            "<br><span style='color: gray;'>In Groups (ids)</span>:" +
-            " <%= groups %>",
         _cmdShowWhoAmI: async function() {
             const uid =
                 window.odoo.session_info.uid ||
@@ -556,7 +539,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (result.length) {
                 const record = result[0];
                 this.print(
-                    _.template(this._WHOAMI_TEMPLATE)({
+                    this._templates.render("WHOAMI", {
                         login: record.login,
                         display_name: record.display_name,
                         user_id: record.id,
@@ -736,11 +719,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             for (let x = 0; x < l; ++x) {
                 const item = result[x];
                 tbody += "<tr>";
-                tbody += _.template(
-                    "<td><span class='o_terminal_click " +
-                        "o_terminal_view' data-resid='<%= id %>' " +
-                        "data-model='<%= model %>'>#<%= id %></span></td>"
-                )({
+                tbody += this._templates.render("TABLE_SEARCH_ID", {
                     id: item.id,
                     model: model,
                 });
@@ -773,12 +752,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 kwargs: {context: session.user_context},
             });
             this.print(
-                _.template(
-                    "<%= model %> record created " +
-                        "successfully: <span class='o_terminal_click " +
-                        "o_terminal_view' data-resid='<%= new_id %>' " +
-                        "data-model='<%= model %>'><%= new_id %></span>"
-                )({
+                this._templates.render("RECORD_CREATED", {
                     model: model,
                     new_id: result,
                 })
