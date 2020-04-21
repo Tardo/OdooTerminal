@@ -30,6 +30,8 @@
     overflow-y: scroll;
     padding: 0;
     resize: none;
+    scrollbar-color: var(--terminal-screen-text-color)
+        var(--terminal-screen-background-color);
     white-space: pre;
 }
 

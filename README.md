@@ -137,6 +137,9 @@ python -m tests tests/test_chrome.py
 
 ```
 IMP: Refactor code (TemplateManager)
+IMP: User input
+
+ADD: Command 'json': Sends POST application/json requests
 
 FIX: Store wrong inputs again!
 ```

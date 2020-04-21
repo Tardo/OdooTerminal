@@ -229,6 +229,7 @@ odoo.define("terminal.Terminal", function(require) {
 
         _initGuard: function() {
             if (typeof this._observer === "undefined") {
+                // FIXME: Obversers !== Performance :(
                 this._observer = new MutationObserver(
                     this._injectTerminal.bind(this)
                 );
