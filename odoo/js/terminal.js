@@ -449,6 +449,9 @@ odoo.define("terminal.Terminal", function(require) {
             const cmd = cmdRaw || "";
             const cmdSplit = cmdRaw.split(" ");
             const cmdName = cmdSplit[0];
+            if (!cmdName) {
+                return false;
+            }
             const cmdDef = this._registeredCmds[cmdName];
 
             // Stop execution if the command doesn't exists
@@ -642,19 +645,28 @@ odoo.define("terminal.Terminal", function(require) {
             const l = sortedCmdKeys.length;
             for (let x = 0; x < l; ++x) {
                 const cmd = sortedCmdKeys[x];
-                // Penalize word length diff
-                let cmd_score =
-                    Math.abs(sanitized_in_cmd.length - cmd.length) * cpk * rpk;
-                // Analize letter key distances
-                for (let i = 0; i < sanitized_in_cmd.length; ++i) {
-                    if (i < cmd.length) {
-                        cmd_score += _get_key_dist(
-                            sanitized_in_cmd.charAt(i),
-                            cmd.charAt(i)
-                        );
-                    } else {
-                        break;
+                // Analize typo's
+                const search_index = sanitized_in_cmd.search(cmd);
+                let cmd_score = 0;
+                if (search_index === -1) {
+                    // Penalize word length diff
+                    cmd_score =
+                        Math.abs(sanitized_in_cmd.length - cmd.length) *
+                        cpk *
+                        rpk;
+                    // Analize letter key distances
+                    for (let i = 0; i < sanitized_in_cmd.length; ++i) {
+                        if (i < cmd.length) {
+                            cmd_score += _get_key_dist(
+                                sanitized_in_cmd.charAt(i),
+                                cmd.charAt(i)
+                            );
+                        } else {
+                            break;
+                        }
                     }
+                } else {
+                    cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length);
                 }
 
                 // Search lower score
@@ -776,6 +788,7 @@ odoo.define("terminal.Terminal", function(require) {
         },
         _updateShadowInput: function(str) {
             this.$shadowInput.val(str);
+            this.$shadowInput.scrollLeft(this.$input.scrollLeft());
         },
 
         _fallbackExecuteCommand: async function() {
@@ -915,7 +928,9 @@ odoo.define("terminal.Terminal", function(require) {
                 }
 
                 this._searchHistoryIter = this._inputHistory.length;
-                this._searchCommandIter = this._registeredCmds.length;
+                this._searchCommandIter = Object.keys(
+                    this._registeredCmds
+                ).length;
                 this._searchCommandQuery = undefined;
             }
         },
