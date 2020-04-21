@@ -239,15 +239,32 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 callback: this._cmdRunTour,
                 detail:
                     "Runs the selected tour" +
-                    "<br>[OPERATION] Can be 'run' or 'list'" +
-                    "<br>&lt;TOUR NAME&gt; Tour Name",
-                syntaxis: "[STRING: OPERATION] <STRING: TOUR NAME>",
+                    "<br>&lt;OPERATION&gt; Can be 'run' or 'list'" +
+                    "<br>[TOUR NAME] Tour Name",
+                syntaxis: "<STRING: OPERATION> [STRING: TOUR NAME]",
                 args: "s?s",
+            });
+            this.registerCommand("json", {
+                definition: "Send POST JSON",
+                callback: this._cmdPostJSONData,
+                detail: "Sends HTTP POST 'application/json' request",
+                syntaxis: '<STRING: CONTROLLER URL> "<DICT: DATA>"',
+                args: "ss",
             });
         },
 
         start: function() {
             this._super.apply(this, arguments);
+        },
+
+        _cmdPostJSONData: async function(url, data) {
+            const result = await $.ajax(url, {
+                data: data,
+                contentType: "application/json",
+                type: "POST",
+            });
+            this.print(result);
+            return true;
         },
 
         _cmdRunTour: async function(oper, tourName) {

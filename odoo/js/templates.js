@@ -3,7 +3,6 @@
 
 /**
  * This file is 'only' for better readability of the source.
- * Here are 'declared' the templates.
  */
 odoo.define("terminal.TemplateManager", function(require) {
     "use strict";
