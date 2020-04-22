@@ -525,7 +525,11 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 const fieldDef = result[field];
                 const l2 = fieldParams.length;
                 for (let x2 = 0; x2 < l2; ++x2) {
-                    body += `<td>${fieldDef[fieldParams[x2]]}</td>`;
+                    let value = fieldDef[fieldParams[x2]];
+                    if (_.isUndefined(value) || _.isNull(undefined)) {
+                        value = "";
+                    }
+                    body += `<td>${value}</td>`;
                 }
                 body += "</tr>";
             }
