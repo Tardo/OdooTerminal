@@ -133,6 +133,17 @@ python -m tests tests/test_chrome.py
 
 # Changelog
 
+**5.2.0**
+
+```
+IMP: Refactor code (TemplateManager)
+IMP: User input
+
+ADD: Command 'json': Sends POST application/json requests
+
+FIX: Store wrong inputs again!
+```
+
 **5.1.0**
 
 ```

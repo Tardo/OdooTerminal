@@ -229,6 +229,7 @@ odoo.define("terminal.Terminal", function(require) {
 
         _initGuard: function() {
             if (typeof this._observer === "undefined") {
+                // FIXME: Obversers !== Performance :(
                 this._observer = new MutationObserver(
                     this._injectTerminal.bind(this)
                 );
@@ -388,44 +389,15 @@ odoo.define("terminal.Terminal", function(require) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
                 this.print(
-                    `<div><h4>${this._encodeHTML(error.data.name)}</h4>
-<span>${this._encodeHTML(error.data.message)}</span>
-<ul>
-<li name="exception_type">
-    <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapseExceptionType${error_id}" role="button" aria-expanded="false" aria-controls="collapseExceptionType${error_id}">
-        Exception Type
-    </a>
-    <div class="collapse" id="collapseExceptionType${error_id}">
-        <div class="card card-body">${error.data.exception_type}</div>
-    </div>
-</li>
-<li name="context">
-    <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapseContext${error_id}" role="button" aria-expanded="false" aria-controls="collapseContext${error_id}">
-        Context
-    </a>
-    <div class="collapse" id="collapseContext${error_id}">
-        <div class="card card-body">${JSON.stringify(error.data.context)}</div>
-    </div>
-</li>
-<li name="args">
-    <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapseArguments${error_id}" role="button" aria-expanded="false" aria-controls="collapseArguments${error_id}">
-        Arguments
-    </a>
-    <div class="collapse" id="collapseArguments${error_id}">
-        <div class="card card-body">${JSON.stringify(
-            error.data.arguments
-        )}</div>
-    </div>
-</li>
-<li name="debug">
-    <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapseDebug${error_id}" role="button" aria-expanded="false" aria-controls="collapseDebug${error_id}">
-        Debug
-    </a>
-    <div class="collapse" id="collapseDebug${error_id}">
-        <div class="card card-body">${this._encodeHTML(error.data.debug)}</div>
-    </div>
-</li>
-</ul></div>`,
+                    this._templates.render("ERROR_MESSAGE", {
+                        error_name: this._encodeHTML(error.data.name),
+                        error_message: this._encodeHTML(error.data.message),
+                        error_id: error_id,
+                        exception_type: error.data.exception_type,
+                        context: JSON.stringify(error.data.context),
+                        args: JSON.stringify(error.data.arguments),
+                        debug: this._encodeHTML(error.data.debug),
+                    }),
                     false,
                     "error_message"
                 );
@@ -437,16 +409,7 @@ odoo.define("terminal.Terminal", function(require) {
 
         printTable: function(columns, tbody) {
             this.print(
-                _.template(`<table class="print-table">
-                <thead>
-                    <tr>
-                        <th><%= thead %></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%= tbody %>
-                </tbody>
-            </table>`)({
+                this._templates.render("TABLE", {
                     thead: columns.join("</th><th>"),
                     tbody: tbody,
                 })
@@ -487,18 +450,17 @@ odoo.define("terminal.Terminal", function(require) {
             const cmd = cmdRaw || "";
             const cmdSplit = cmdRaw.split(" ");
             const cmdName = cmdSplit[0];
+            if (!cmdName) {
+                return false;
+            }
             const cmdDef = this._registeredCmds[cmdName];
 
+            // Stop execution if the command doesn't exists
             if (!cmdDef) {
                 const similar_cmd = this._searchSimiliarCommand(cmdName);
                 if (similar_cmd) {
                     this.print(
-                        _.template(
-                            "Unknown command. Did you mean " +
-                                "'<strong class='o_terminal_click " +
-                                "o_terminal_cmd' data-cmd='<%= cmd %> <%= params %>'>" +
-                                "<%= cmd %></strong>'?"
-                        )({
+                        this._templates.render("UNKNOWN_COMMAND", {
                             cmd: similar_cmd,
                             params: cmdSplit.slice(1),
                         })
@@ -506,7 +468,9 @@ odoo.define("terminal.Terminal", function(require) {
                 } else {
                     this.eprint("Unknown command.");
                 }
-                this._storeUserInput(cmd);
+                if (store) {
+                    this._storeUserInput(cmd);
+                }
                 this.cleanInput();
                 return false;
             }
@@ -515,33 +479,35 @@ odoo.define("terminal.Terminal", function(require) {
             try {
                 scmd = this._parameterReader.parse(cmd, cmdDef);
             } catch (err) {
-                this.printError(
-                    `<span class='o_terminal_click ` +
-                        `o_terminal_cmd' data-cmd='help ${scmd.cmd}'>` +
-                        `${err.message}!</span>`
-                );
-                this.cleanInput();
-                return false;
-            }
-            if (cmdDef.secured) {
                 this.eprint(
-                    _.template("<%= prompt %> <%= cmd %> *****")({
-                        prompt: this.PROMPT,
-                        cmd: scmd.cmd,
-                    })
-                );
-            } else {
-                this.eprint(
-                    _.template("<%= prompt %> <%= cmd %>")({
+                    this._templates.render("PROMPT_CMD", {
                         prompt: this.PROMPT,
                         cmd: cmd,
                     })
                 );
-
+                this.printError(
+                    `<span class='o_terminal_click ` +
+                        `o_terminal_cmd' data-cmd='help ${cmdName}'>` +
+                        `${err.message}!</span>`
+                );
                 if (store) {
                     this._storeUserInput(cmd);
                 }
+                this.cleanInput();
+                return false;
             }
+            let template = "PROMPT_CMD";
+            if (cmdDef.secured) {
+                template = "PROMPT_CMD_HIDDEN_ARGS";
+            } else if (store) {
+                this._storeUserInput(cmd);
+            }
+            this.eprint(
+                this._templates.render(template, {
+                    prompt: this.PROMPT,
+                    cmd: cmdRaw,
+                })
+            );
             this.cleanInput();
             this._processCommandJob(scmd, cmdDef);
         },
@@ -571,7 +537,7 @@ odoo.define("terminal.Terminal", function(require) {
         /* PRIVATE METHODS*/
         _storeUserInput: function(strInput) {
             this.$input.append(
-                _.template("<option><%= cmd %></option>")({
+                this._templates.render("HISTORY_CMD", {
                     cmd: strInput,
                 })
             );
@@ -592,12 +558,7 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         _printWelcomeMessage: function() {
-            this.print(
-                _.template(
-                    "<strong class='o_terminal_title'>Odoo " +
-                        "Terminal v<%= ver %></strong>"
-                )({ver: this.VERSION})
-            );
+            this.print(this._templates.render("WELCOME", {ver: this.VERSION}));
         },
 
         _cleanShadowInput: function() {
@@ -685,19 +646,28 @@ odoo.define("terminal.Terminal", function(require) {
             const l = sortedCmdKeys.length;
             for (let x = 0; x < l; ++x) {
                 const cmd = sortedCmdKeys[x];
-                // Penalize word length diff
-                let cmd_score =
-                    Math.abs(sanitized_in_cmd.length - cmd.length) * cpk * rpk;
-                // Analize letter key distances
-                for (let i = 0; i < sanitized_in_cmd.length; ++i) {
-                    if (i < cmd.length) {
-                        cmd_score += _get_key_dist(
-                            sanitized_in_cmd.charAt(i),
-                            cmd.charAt(i)
-                        );
-                    } else {
-                        break;
+                // Analize typo's
+                const search_index = sanitized_in_cmd.search(cmd);
+                let cmd_score = 0;
+                if (search_index === -1) {
+                    // Penalize word length diff
+                    cmd_score =
+                        Math.abs(sanitized_in_cmd.length - cmd.length) *
+                        cpk *
+                        rpk;
+                    // Analize letter key distances
+                    for (let i = 0; i < sanitized_in_cmd.length; ++i) {
+                        if (i < cmd.length) {
+                            cmd_score += _get_key_dist(
+                                sanitized_in_cmd.charAt(i),
+                                cmd.charAt(i)
+                            );
+                        } else {
+                            break;
+                        }
                     }
+                } else {
+                    cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length);
                 }
 
                 // Search lower score
@@ -819,6 +789,7 @@ odoo.define("terminal.Terminal", function(require) {
         },
         _updateShadowInput: function(str) {
             this.$shadowInput.val(str);
+            this.$shadowInput.scrollLeft(this.$input.scrollLeft());
         },
 
         _fallbackExecuteCommand: async function() {
@@ -958,7 +929,9 @@ odoo.define("terminal.Terminal", function(require) {
                 }
 
                 this._searchHistoryIter = this._inputHistory.length;
-                this._searchCommandIter = this._registeredCmds.length;
+                this._searchCommandIter = Object.keys(
+                    this._registeredCmds
+                ).length;
                 this._searchCommandQuery = undefined;
             }
         },
@@ -994,7 +967,7 @@ odoo.define("terminal.Terminal", function(require) {
                 for (let x = 0; x < l; ++x) {
                     const cmd = cmds[x];
                     this.eprint(
-                        _.template("<%= prompt %> <%= cmd %>")({
+                        this._templates.render("PROMPT_CMD", {
                             prompt: this.PROMPT,
                             cmd: cmd,
                         })

@@ -102,6 +102,7 @@
             js: [
                 "odoo/js/abstract_terminal.js",
                 "odoo/js/terminal.js",
+                "odoo/js/templates.js",
                 "odoo/js/funcs/core.js",
                 "odoo/js/funcs/common.js",
             ],
