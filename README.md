@@ -29,7 +29,7 @@ You can toggle terminal using one of these options:
 - Press CTRL + 1
 - Use extension browser action icon
 
-# Example Commands
+## Example Commands
 
 | Description                                         | Terminal Command                                   |
 | --------------------------------------------------- | -------------------------------------------------- |
@@ -41,6 +41,14 @@ You can toggle terminal using one of these options:
 | Install module                                      | `install mymodule`                                 |
 
 > Notice the usage of quotes when use parameters with spaces.
+
+
+- This extension have a "preferences" page where you can add commands to run on
+  every session. This is useful for example to load a remote script to extend
+  the 'terminal' features.
+- This extension uses an internal context to extend the 'user context'. This
+  'terminal context' has by default the key 'active_test' = false (see issue #14
+  to get more information) and only affects to terminal operations.
 
 ---
 
@@ -136,7 +144,7 @@ python -m tests tests/test_chrome.py
 **5.3.0**
 
 ```
-ADD: Command 'depends': Know module dependencies
+ADD: Command 'depends': Know modules that depends on the given module
 
 FIX: Extension Preferences (issue #14)
 FIX: Click view record shortcut (issue #13)
