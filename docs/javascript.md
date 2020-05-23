@@ -27,6 +27,7 @@ Commands works with promises
   syntaxis: string,
   args: string,
   secured: boolean,
+  aliases: array,
 }
 ```
 
@@ -41,6 +42,7 @@ Commands works with promises
   - 'i' Integer
   - '?' Indicates that next parameter is optional
 - secured: Hide command from screen & history
+- aliases: Used to given deprecated names of the module
 
 **Basic Example**::
 

@@ -29,10 +29,6 @@ You can toggle terminal using one of these options:
 - Press CTRL + 1
 - Use extension browser action icon
 
-This extension have a "preferences" page where you can add commands to run on
-every session. This is useful for example to load a remote script to extend the
-'terminal' features.
-
 ## Example Commands
 
 | Description                                         | Terminal Command                                   |
@@ -47,12 +43,14 @@ every session. This is useful for example to load a remote script to extend the
 
 > Notice the usage of quotes when use parameters with spaces.
 
+## Notes
+
 - This extension have a "preferences" page where you can add commands to run on
   every session. This is useful for example to load a remote script to extend
   the 'terminal' features.
 - This extension uses an internal context to extend the 'user context'. This
   'terminal context' has by default the key 'active_test' = false (see issue #14
-  to get more information) and only affects to terminal operations.
+  to get more information). This context only affects to terminal operations.
 
 ---
 
@@ -148,6 +146,12 @@ python -m tests tests/test_chrome.py
 **5.3.0**
 
 ```
+UPD: Renamed 'searchid' command to 'read' (Now 'searchid' is deprecated)
+
+IMP: Aliases for terminal commands
+IMP: Command Parser 'args' simplified
+IMP: Code refactor
+
 ADD: Command 'depends': Know modules that depends on the given module
 ADD: Command 'term_context': 'read', 'write' or 'set' terminal context (issue #14)
 

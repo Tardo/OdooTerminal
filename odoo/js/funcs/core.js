@@ -85,7 +85,17 @@ odoo.define("terminal.CoreFunctions", function(require) {
             ) {
                 this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
             } else {
-                this.printError(`'${cmd}' command doesn't exists`);
+                const [ncmd, cmdDef] = this._searchCommandDefByAlias(cmd);
+                if (cmdDef) {
+                    this.print(
+                        this._templates.render("DEPRECATED_COMMAND", {
+                            cmd: ncmd,
+                        })
+                    );
+                    this._printHelpDetailed(ncmd, this._registeredCmds[ncmd]);
+                } else {
+                    this.printError(`'${cmd}' command doesn't exists`);
+                }
             }
             return true;
         },

@@ -51,7 +51,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis:
                     "<STRING: MODEL NAME> [STRING: FIELDS] " +
                     '"[ARRAY: DOMAIN]" [INT: LIMIT]',
-                args: "s?s?s?i",
+                args: "s?ssi",
             });
             this.registerCommand("call", {
                 definition: "Call model method",
@@ -147,7 +147,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis: "",
                 args: "",
             });
-            this.registerCommand("searchid", {
+            this.registerCommand("read", {
                 definition: "Search model record",
                 callback: this._cmdSearchModelRecordId,
                 detail:
@@ -158,6 +158,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "<STRING: MODEL NAME> <INT: RECORD ID> " +
                     "[STRING: FIELDS]",
                 args: "si?s",
+                // Depecrated Names
+                aliases: ["searchid"],
             });
             this.registerCommand("context", {
                 definition: "Operations over session context dictionary",

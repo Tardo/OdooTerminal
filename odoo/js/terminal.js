@@ -446,6 +446,7 @@ odoo.define("terminal.Terminal", function(require) {
                     syntaxis: "Unknown",
                     args: "",
                     secured: false,
+                    aliases: [],
                 },
                 cmdDef
             );
@@ -458,26 +459,29 @@ odoo.define("terminal.Terminal", function(require) {
             if (!cmdName) {
                 return false;
             }
-            const cmdDef = this._registeredCmds[cmdName];
+            let cmdDef = this._registeredCmds[cmdName];
 
             // Stop execution if the command doesn't exists
             if (!cmdDef) {
-                const similar_cmd = this._searchSimiliarCommand(cmdName);
-                if (similar_cmd) {
-                    this.print(
-                        this._templates.render("UNKNOWN_COMMAND", {
-                            cmd: similar_cmd,
-                            params: cmdSplit.slice(1),
-                        })
-                    );
-                } else {
-                    this.eprint("Unknown command.");
+                [, cmdDef] = this._searchCommandDefByAlias(cmdName);
+                if (!cmdDef) {
+                    const similar_cmd = this._searchSimiliarCommand(cmdName);
+                    if (similar_cmd) {
+                        this.print(
+                            this._templates.render("UNKNOWN_COMMAND", {
+                                cmd: similar_cmd,
+                                params: cmdSplit.slice(1),
+                            })
+                        );
+                    } else {
+                        this.eprint("Unknown command.");
+                    }
+                    if (store) {
+                        this._storeUserInput(cmd);
+                    }
+                    this.cleanInput();
+                    return false;
                 }
-                if (store) {
-                    this._storeUserInput(cmd);
-                }
-                this.cleanInput();
-                return false;
             }
 
             let scmd = {};
@@ -571,6 +575,17 @@ odoo.define("terminal.Terminal", function(require) {
 
         _cleanShadowInput: function() {
             this.$shadowInput.val("");
+        },
+
+        _searchCommandDefByAlias: function(cmd) {
+            const cmdKeys = _.keys(this._registeredCmds);
+            for (const cmdName of cmdKeys) {
+                const cmdDef = this._registeredCmds[cmdName];
+                if (cmdDef.aliases.indexOf(cmd) !== -1) {
+                    return [cmdName, cmdDef];
+                }
+            }
+            return [false, false];
         },
 
         // Key Distance Comparison (Simple mode)
@@ -764,31 +779,20 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         _processCommandJob: async function(scmd, cmdDef) {
-            if (
-                Object.prototype.hasOwnProperty.call(
-                    this._registeredCmds,
-                    scmd.cmd
-                )
-            ) {
-                this.onStartCommand(scmd.cmd, scmd.params);
-                let result = "";
-                let isFailed = false;
-                try {
-                    result = await cmdDef.callback.bind(this)(...scmd.params);
-                } catch (err) {
-                    isFailed = true;
-                    result =
-                        (err && err.message) ||
-                        "[!] Oops! Unknown error! (no detailed error message given :/)";
-                } finally {
-                    this.onFinishCommand(
-                        scmd.cmd,
-                        scmd.params,
-                        isFailed,
-                        result
-                    );
-                }
+            this.onStartCommand(scmd.cmd, scmd.params);
+            let result = "";
+            let isFailed = false;
+            try {
+                result = await cmdDef.callback.bind(this)(...scmd.params);
+            } catch (err) {
+                isFailed = true;
+                result =
+                    (err && err.message) ||
+                    "[!] Oops! Unknown error! (no detailed error message given :/)";
+            } finally {
+                this.onFinishCommand(scmd.cmd, scmd.params, isFailed, result);
             }
+
             return true;
         },
 
