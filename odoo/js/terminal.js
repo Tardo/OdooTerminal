@@ -268,7 +268,7 @@ odoo.define("terminal.Terminal", function(require) {
             core.bus.on("keydown", this, this._onCoreKeyDown);
             core.bus.on("click", this, this._onCoreClick);
             // NOTE: Listen messages from 'content script'
-            window.addEventListener("message", this._onWindowMessage, true);
+            window.addEventListener("message", this._onWindowMessage.bind(this), true);
             // NOTE-END
 
             this._injectTerminal();
@@ -963,18 +963,8 @@ odoo.define("terminal.Terminal", function(require) {
                 const cmds = _.filter(ev.data.cmds, function(item) {
                     return item && item[0] !== "/" && item[1] !== "/";
                 });
-                const l = cmds.length;
-                for (let x = 0; x < l; ++x) {
-                    const cmd = cmds[x];
-                    this.eprint(
-                        this._templates.render("PROMPT_CMD", {
-                            prompt: this.PROMPT,
-                            cmd: cmd,
-                        })
-                    );
-                    this.executeCommand(cmd);
-                }
-
+                const cmdsLen = cmds.length;
+                for (let x = 0; x < cmdsLen; this.executeCommand(cmds[x++], false));
                 this._has_exec_init_cmds = true;
             }
         },
