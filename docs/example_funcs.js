@@ -12,17 +12,18 @@ odoo.define("terminal.MyFuncs", function(require) {
                 function: this._cmdMyFunc,
                 detail: "My command explained...",
                 syntaxis: "<STRING: ParamA> <INT: ParamB> [STRING: ParamC]",
-                args: "si?s",
+                args: "si?si",
             });
         },
 
-        _cmdMyFunc: async function(pA, pB, pC = "DefaultValue") {
+        _cmdMyFunc: async function(pA, pB, pC = "DefaultValue", pD = -1) {
             var self = this;
 
             self.print("Hello, World!");
             self.eprint("ParamA (String): " + pA);
             self.eprint("ParamB (Int): " + pB);
             self.eprint("ParamC (Optional String): " + pC);
+            self.eprint("ParamD (Optional Int): " + pD);
 
             if (pB instanceof Number) {
                 this.print("pB is a Number!");

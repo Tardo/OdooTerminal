@@ -40,9 +40,9 @@ Commands works with promises
 - args: Command Paramerters Types
   - 's' String
   - 'i' Integer
-  - '?' Indicates that next parameter is optional
+  - '?' Indicates that next parameters are optional
 - secured: Hide command from screen & history
-- aliases: Used to given deprecated names of the module
+- aliases: Used to set deprecated names of the module
 
 **Basic Example**::
 

@@ -138,16 +138,17 @@ odoo.define("terminal.Terminal", function(require) {
                 return params;
             }
             const formattedParams = [];
+            let optionalMode = false;
             for (let i = 0; i < args.length; ++i) {
                 let carg = args[i];
-                let optional = false;
                 if (carg === "?") {
-                    optional = true;
+                    optionalMode = true;
                     carg = args[++i];
                 }
 
                 const curParamIndex = formattedParams.length;
-                const isInvalidNO = !optional && curParamIndex >= params.length;
+                const isInvalidNO =
+                    !optionalMode && curParamIndex >= params.length;
                 const isInvalidO =
                     curParamIndex < params.length &&
                     !this._validators[carg](params[curParamIndex]);

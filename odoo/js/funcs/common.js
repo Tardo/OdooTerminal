@@ -60,7 +60,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis:
                     '<STRING: MODEL> <STRING: METHOD> "[ARRAY: ARGS]" ' +
                     '"[DICT: KWARGS]"',
-                args: "ss?s?s",
+                args: "ss?ss",
             });
             this.registerCommand("upgrade", {
                 definition: "Upgrade a module",
@@ -169,7 +169,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
                     "By default is 'read'. ",
                 syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
-                args: "?s?s",
+                args: "?ss",
             });
             this.registerCommand("version", {
                 definition: "Know Odoo version",
@@ -193,7 +193,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "<br> - start > Start client longpolling service" +
                     "<br> - stop > Stop client longpolling service",
                 syntaxis: "[STRING: OPERATION] [STRING: PARAM1]",
-                args: "?s?s",
+                args: "?ss",
             });
             this.registerCommand("login", {
                 definition: "Login as...",
@@ -234,7 +234,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "<br>&lt;MODULE&gt; Module name" +
                     "<br>&lt;MODE&gt; Can be 'desktop' or 'mobile' (By default is 'desktop')",
                 syntaxis: "<STRING: MODULE> <STRING: MODE>",
-                args: "?s?s",
+                args: "?ss",
             });
             this.registerCommand("tour", {
                 definition: "Launch Tour",

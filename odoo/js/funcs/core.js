@@ -49,7 +49,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                     "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
                     "By default is 'read'. ",
                 syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
-                args: "?s?s",
+                args: "?ss",
             });
         },
 
