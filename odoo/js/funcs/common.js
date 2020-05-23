@@ -111,8 +111,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
             this.registerCommand("post", {
                 definition: "Send POST request",
                 callback: this._cmdPostData,
-                detail: "Send POST request to selected controller url",
-                syntaxis: '<STRING: CONTROLLER URL> "<DICT: DATA>"',
+                detail: "Send POST request to selected endpoint",
+                syntaxis: '<STRING: ENDPOINT> "<DICT: DATA>"',
                 args: "ss",
             });
             this.registerCommand("whoami", {
@@ -250,7 +250,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 definition: "Send POST JSON",
                 callback: this._cmdPostJSONData,
                 detail: "Sends HTTP POST 'application/json' request",
-                syntaxis: '<STRING: CONTROLLER URL> "<DICT: DATA>"',
+                syntaxis: '<STRING: ENDPOINT> "<DICT: DATA>"',
                 args: "ss",
             });
             this.registerCommand("depends", {
