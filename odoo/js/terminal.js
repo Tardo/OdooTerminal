@@ -564,10 +564,11 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         _encodeHTML: function(text) {
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/"/g, "&quot;");
+            // See https://en.wikipedia.org/wiki/List_of_Unicode_characters
+            return text.replace(
+                /[\u00A0-\u9999\u003C-\u003E\u0022-\u002F]/gim,
+                i => `&#${i.charCodeAt(0)};`
+            );
         },
 
         _printWelcomeMessage: function() {
