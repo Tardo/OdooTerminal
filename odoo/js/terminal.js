@@ -5,6 +5,7 @@ odoo.define("terminal.Terminal", function(require) {
     "use strict";
 
     const core = require("web.core");
+    const session = require("web.session");
     const Class = require("web.Class");
     const AbstractTerminal = require("terminal.AbstractTerminal");
 
@@ -539,6 +540,9 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         /* PRIVATE METHODS*/
+        _getContext: function() {
+            return _.extend({}, session.user_context, this._user_context);
+        },
         _storeUserInput: function(strInput) {
             this.$input.append(
                 this._templates.render("HISTORY_CMD", {

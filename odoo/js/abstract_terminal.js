@@ -133,6 +133,7 @@ odoo.define("terminal.AbstractTerminal", function(require) {
         _longpolling: null,
 
         _has_exec_init_cmds: false,
+        _user_context: {active_test: false},
 
         init: function() {
             this._templates = new TemplateManager();

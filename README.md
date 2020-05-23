@@ -29,6 +29,10 @@ You can toggle terminal using one of these options:
 - Press CTRL + 1
 - Use extension browser action icon
 
+This extension have a "preferences" page where you can add commands to run on
+every session. This is useful for example to load a remote script to extend the
+'terminal' features.
+
 ## Example Commands
 
 | Description                                         | Terminal Command                                   |
@@ -36,8 +40,9 @@ You can toggle terminal using one of these options:
 | Create 'res.partner' record                         | `create res.partner "{'name': 'The One'}"`         |
 | Search 'res.partner' records                        | `search res.partner name,email "[['id', '>', 5]]"` |
 | Search all fields of selected 'res.partner' records | `search res.partner * "[['id', '>', 5]]"`          |
-| View 'res.partner' records                          | `view res.partner`                                 |
-| View selected 'res.partner' record                  | `view res.partner 4`                               |
+| Search all fields of selected 'res.partner' record  | `searchid res.partner 5 *`                         |
+| View 'res.partner' records _(only backend)_         | `view res.partner`                                 |
+| View selected 'res.partner' record _(only backend)_ | `view res.partner 4`                               |
 | Install module                                      | `install mymodule`                                 |
 
 > Notice the usage of quotes when use parameters with spaces.
@@ -144,8 +149,9 @@ python -m tests tests/test_chrome.py
 
 ```
 ADD: Command 'depends': Know modules that depends on the given module
+ADD: Command 'term_context': 'read', 'write' or 'set' terminal context (issue #14)
 
-FIX: Extension Preferences (issue #14)
+FIX: Extension Preferences
 FIX: Click view record shortcut (issue #13)
 ```
 

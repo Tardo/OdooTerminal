@@ -270,7 +270,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 method: "onchange_module",
                 model: "res.config.settings",
                 args: [false, false, module_name],
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             if ("warning" in result) {
                 const depend_names = result.warning.message
@@ -354,7 +354,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 method: "user_has_groups",
                 model: "res.users",
                 args: [groups],
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             if (result) {
                 this.print("Nice! groups are truly evaluated");
@@ -468,7 +468,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 domain: [["id", "=", id]],
                 fields: fields,
                 model: model,
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             let tbody = "";
             const columns = ["id"];
@@ -497,7 +497,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 fields: ["user_id", "last_presence"],
                 model: "bus.presence",
                 order: "last_presence DESC",
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             let body = "";
             const l = result.length;
@@ -517,7 +517,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 method: "check_access_rights",
                 model: model,
                 args: [operation, false],
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             if (result) {
                 this.print(`Nice! you can '${operation}' on ${model}`);
@@ -532,7 +532,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 method: "fields_get",
                 model: model,
                 args: [JSON.parse(fields)],
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             const keys = Object.keys(result);
             const fieldParams = [
@@ -583,7 +583,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "groups_id",
                 ],
                 model: "res.users",
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             if (result.length) {
                 const record = result[0];
@@ -646,7 +646,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 domain: [["name", "=", module_name]],
                 fields: ["name"],
                 model: "ir.module.module",
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
         },
 
@@ -733,7 +733,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
         ) {
             const pkwargs = JSON.parse(kwargs);
             if (typeof pkwargs.context === "undefined") {
-                pkwargs.context = session.user_context;
+                pkwargs.context = this._getContext();
             }
             const result = await rpc.query({
                 method: method,
@@ -760,7 +760,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 fields: fields,
                 model: model,
                 limit: limit,
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             let tbody = "";
             const columns = ["id"];
@@ -798,7 +798,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 method: "create",
                 model: model,
                 args: [JSON.parse(values)],
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             this.print(
                 this._templates.render("RECORD_CREATED", {
@@ -814,7 +814,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 method: "unlink",
                 model: model,
                 args: [id],
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             this.print(`${model} record deleted successfully`);
             return true;
@@ -825,7 +825,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 method: "write",
                 model: model,
                 args: [id, JSON.parse(values)],
-                kwargs: {context: session.user_context},
+                kwargs: {context: this._getContext()},
             });
             this.print(`${model} record updated successfully`);
             return true;

@@ -40,6 +40,17 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: "<STRING: URL>",
                 args: "s",
             });
+            this.registerCommand("term_context", {
+                definition: "Operations over terminal context dictionary",
+                callback: this._cmdTerminalContextOperation,
+                detail:
+                    "Operations over terminal context dictionary. " +
+                    "This context only affects to the terminal operations." +
+                    "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
+                    "By default is 'read'. ",
+                syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
+                args: "?s?s",
+            });
         },
 
         _printWelcomeMessage: function() {
@@ -114,6 +125,24 @@ odoo.define("terminal.CoreFunctions", function(require) {
                     });
             } else {
                 this.printError("Invalid file type");
+            }
+            return true;
+        },
+
+        _cmdTerminalContextOperation: async function(
+            operation = "read",
+            values = "false"
+        ) {
+            if (operation === "read") {
+                this.print(this._user_context);
+            } else if (operation === "set") {
+                this._user_context = JSON.parse(values);
+                this.print(this._user_context);
+            } else if (operation === "write") {
+                Object.assign(this._user_context, JSON.parse(values));
+                this.print(this._user_context);
+            } else {
+                this.printError("Invalid operation");
             }
             return true;
         },
