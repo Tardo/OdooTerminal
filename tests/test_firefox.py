@@ -1,16 +1,16 @@
 # Copyright 2020 Alexandre Díaz
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+import pathlib
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 from tests.common import SeleniumTestCase
 
 
-class ChromeTestCase(SeleniumTestCase):
-
+class FirefoxTestCase(SeleniumTestCase):
     def setUp(self):
-        options = webdriver.ChromeOptions()
-        options.add_extension('./OdooTerminal.zip')
-        self.browser = webdriver.Chrome(ChromeDriverManager(log_level=0).install(), options=options)
+        profile = webdriver.FirefoxProfile()
+        self.browser = webdriver.Firefox(firefox_profile=profile, executable_path=GeckoDriverManager(log_level=0).install())
+        self.browser.install_addon(str(pathlib.Path('./OdooTerminal.zip').absolute()), temporary=True)
         super().setUp()
 
     # Test No Terminal
