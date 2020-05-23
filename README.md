@@ -42,7 +42,6 @@ You can toggle terminal using one of these options:
 
 > Notice the usage of quotes when use parameters with spaces.
 
-
 - This extension have a "preferences" page where you can add commands to run on
   every session. This is useful for example to load a remote script to extend
   the 'terminal' features.

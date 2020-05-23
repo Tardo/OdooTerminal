@@ -272,11 +272,15 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 args: [false, false, module_name],
                 kwargs: {context: session.user_context},
             });
-            if ('warning' in result) {
-                const depend_names = result.warning.message.substr(result.warning.message.search("\n")+1).split("\n");
+            if ("warning" in result) {
+                const depend_names = result.warning.message
+                    .substr(result.warning.message.search("\n") + 1)
+                    .split("\n");
                 this.print(depend_names);
             } else {
-                this.printError("The module doesn't exists or isn't installed/activated");
+                this.printError(
+                    "The module doesn't exists or isn't installed/activated"
+                );
             }
             return true;
         },
