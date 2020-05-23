@@ -133,6 +133,15 @@ python -m tests tests/test_chrome.py
 
 # Changelog
 
+**5.3.0**
+
+```
+ADD: Command 'depends': Know module dependencies
+
+FIX: Extension Preferences (issue #14)
+FIX: Click view record shortcut (issue #13)
+```
+
 **5.2.0**
 
 ```

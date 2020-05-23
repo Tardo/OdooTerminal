@@ -251,10 +251,34 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis: '<STRING: CONTROLLER URL> "<DICT: DATA>"',
                 args: "ss",
             });
+            this.registerCommand("depends", {
+                definition: "Know modules that depends on the given module",
+                callback: this._cmdModuleDepends,
+                detail:
+                    "Show a list of the modules that depends on the given module",
+                syntaxis: "<STRING: MODULE NAME>",
+                args: "s",
+            });
         },
 
         start: function() {
             this._super.apply(this, arguments);
+        },
+
+        _cmdModuleDepends: async function(module_name) {
+            const result = await rpc.query({
+                method: "onchange_module",
+                model: "res.config.settings",
+                args: [false, false, module_name],
+                kwargs: {context: session.user_context},
+            });
+            if ('warning' in result) {
+                const depend_names = result.warning.message.substr(result.warning.message.search("\n")+1).split("\n");
+                this.print(depend_names);
+            } else {
+                this.printError("The module doesn't exists or isn't installed/activated");
+            }
+            return true;
         },
 
         _cmdPostJSONData: async function(url, data) {
