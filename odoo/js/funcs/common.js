@@ -297,18 +297,18 @@ odoo.define("terminal.CommonFunctions", function(require) {
             return true;
         },
 
-        _cmdRunTour: async function(oper, tourName) {
-            const tourNames = Object.keys(tour.tours);
+        _cmdRunTour: async function(oper, tour_name) {
+            const tour_names = Object.keys(tour.tours);
             if (oper === "list") {
-                if (tourNames.length) {
-                    this.print(tourNames);
+                if (tour_names.length) {
+                    this.print(tour_names);
                 } else {
                     this.print("The tours list is empty");
                 }
             } else if (oper === "run") {
-                if (tourName) {
+                if (tour_name) {
                     this.print("Running tour...");
-                    odoo.__DEBUG__.services["web_tour.tour"].run(tourName);
+                    odoo.__DEBUG__.services["web_tour.tour"].run(tour_name);
                 } else {
                     this.printError("No tour has been indicated to run");
                 }

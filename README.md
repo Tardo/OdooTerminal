@@ -65,6 +65,20 @@ You can toggle terminal using one of these options:
 
 # Contributing
 
+## Fast Guidelines
+
+- Naming Convention:
+  - Classes: Pascal Case
+  - Member Variables: Camel Case
+  - Methods: Camel Case
+  - Variables: Snake Case
+  - 'Constants': Screaming Snake Case
+  - Follow 'Private Variables' Python convention
+    (https://docs.python.org/3/tutorial/classes.html#tut-private)
+- Indentation Style: K&R - 1TBS Variant
+  (https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS))
+- JavaScript Specification: ES2017
+
 ## Pre-commit
 
 If you want collaborate, you need this to make travis happy.

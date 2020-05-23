@@ -71,6 +71,10 @@
 .o_terminal div#terminal_screen .error_message > div > ul > li {
     margin-bottom: 3px;
 }
+.o_terminal div#terminal_screen .error_message .card-body {
+    color: black;
+    border-radius: 0;
+}
 .o_terminal div#terminal_screen .error_message li[name="debug"] .card-body {
     white-space: pre;
 }

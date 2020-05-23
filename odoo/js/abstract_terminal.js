@@ -126,14 +126,11 @@ odoo.define("terminal.AbstractTerminal", function(require) {
         _searchCommandQuery: "",
         _searchHistoryIter: 0,
 
-        _active_widget: null,
-        _active_action: null,
-
         _storage: null,
         _longpolling: null,
 
-        _has_exec_init_cmds: false,
-        _user_context: {active_test: false},
+        _hasExecInitCmds: false,
+        _userContext: {active_test: false},
 
         init: function() {
             this._templates = new TemplateManager();

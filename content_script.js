@@ -15,9 +15,9 @@
     window.hasRun = true;
 
     // This is for cross-browser compatibility
-    const BrowserObj = typeof chrome === "undefined" ? browser : chrome;
+    const gBrowserObj = typeof chrome === "undefined" ? browser : chrome;
     // Default collected information
-    const OdooInfoObj = {
+    const gOdooInfoObj = {
         isOdoo: false,
         isLoaded: false,
         serverVersion: null,
@@ -38,7 +38,7 @@
         if (callback) {
             script_page.onload = callback;
         }
-        script_page.src = BrowserObj.extension.getURL(script);
+        script_page.src = gBrowserObj.extension.getURL(script);
     }
 
     /**
@@ -50,7 +50,7 @@
         link_page.setAttribute("rel", "stylesheet");
         link_page.setAttribute("type", "text/css");
         (document.head || document.documentElement).appendChild(link_page);
-        link_page.href = BrowserObj.extension.getURL(css);
+        link_page.href = gBrowserObj.extension.getURL(css);
     }
 
     /**
@@ -58,12 +58,12 @@
      * @param {Object} files - Files by type to inject
      */
     function _injector(files) {
-        let l = files.css.length;
-        for (let x = 0; x < l; ++x) {
+        let files_len = files.css.length;
+        for (let x = 0; x < files_len; ++x) {
             _injectPageCSS(files.css[x]);
         }
-        l = files.js.length;
-        for (let x = 0; x < l; ++x) {
+        files_len = files.js.length;
+        for (let x = 0; x < files_len; ++x) {
             _injectPageScript(files.js[x]);
         }
     }
@@ -72,21 +72,21 @@
      * Send Odoo Info to background.
      */
     function _sendOdooInfoToBackground() {
-        BrowserObj.runtime.sendMessage({
+        gBrowserObj.runtime.sendMessage({
             message: "update_terminal_badge_info",
-            odooInfo: OdooInfoObj,
+            odooInfo: gOdooInfoObj,
         });
     }
 
     /**
      * Update Odoo Info.
-     * @param {Object} odooInfo - The collected information
+     * @param {Object} odoo_info - The collected information
      */
-    function _updateOdooInfo(odooInfo) {
-        if (typeof odooInfo !== "object") {
+    function _updateOdooInfo(odoo_info) {
+        if (typeof odoo_info !== "object") {
             return;
         }
-        Object.assign(OdooInfoObj, odooInfo, {isLoaded: true});
+        Object.assign(gOdooInfoObj, odoo_info, {isLoaded: true});
         _sendOdooInfoToBackground();
     }
 
@@ -110,11 +110,11 @@
         // Compatibility resources
         // 11 - v11
         // 12+ - v12
-        const odooVersion = Number(info.serverVersionMajor);
-        if (odooVersion === 11) {
+        const odoo_version = Number(info.serverVersionMajor);
+        if (odoo_version === 11) {
             to_inject.js.push("odoo/js/compat/v11/common.js");
         }
-        if (odooVersion >= 12) {
+        if (odoo_version >= 12) {
             to_inject.js.push("odoo/js/compat/v12/common.js");
         }
         // Backend/Frontend resources
@@ -151,7 +151,7 @@
                 }
             } else if (event.data.type === "ODOO_TERM_START") {
                 // Load Init Commands
-                BrowserObj.storage.sync.get(["init_cmds"], result => {
+                gBrowserObj.storage.sync.get(["init_cmds"], result => {
                     const cmds = (result.init_cmds || "").split(/\n\r?/);
                     window.postMessage(
                         {
@@ -167,9 +167,9 @@
     );
 
     // Listen messages from background
-    BrowserObj.runtime.onMessage.addListener(request => {
+    gBrowserObj.runtime.onMessage.addListener(request => {
         if (request.message === "update_odoo_terminal_info") {
-            if (OdooInfoObj.isLoaded) {
+            if (gOdooInfoObj.isLoaded) {
                 _sendOdooInfoToBackground();
             } else {
                 _injectPageScript("page_script.js", ev => {
@@ -177,7 +177,7 @@
                 });
             }
         } else if (request.message === "toggle_terminal") {
-            if (OdooInfoObj.isCompatible) {
+            if (gOdooInfoObj.isCompatible) {
                 document
                     .getElementById("terminal")
                     .dispatchEvent(new Event("toggle"));

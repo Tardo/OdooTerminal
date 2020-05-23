@@ -16,21 +16,26 @@ odoo.define("terminal.MyFuncs", function(require) {
             });
         },
 
-        _cmdMyFunc: async function(pA, pB, pC = "DefaultValue", pD = -1) {
+        _cmdMyFunc: async function(
+            param_a,
+            param_b,
+            param_c = "DefaultValue",
+            param_d = -1
+        ) {
             var self = this;
 
             self.print("Hello, World!");
-            self.eprint("ParamA (String): " + pA);
-            self.eprint("ParamB (Int): " + pB);
-            self.eprint("ParamC (Optional String): " + pC);
-            self.eprint("ParamD (Optional Int): " + pD);
+            self.eprint("ParamA (String): " + param_a);
+            self.eprint("ParamB (Int): " + param_b);
+            self.eprint("ParamC (Optional String): " + param_c);
+            self.eprint("ParamD (Optional Int): " + param_d);
 
-            if (pB instanceof Number) {
-                this.print("pB is a Number!");
+            if (param_b instanceof Number) {
+                this.print("ParamB is a Number!");
             }
 
-            if (pA !== pC) {
-                this.printError("Invalid! pA need be the same as pC");
+            if (param_a !== param_c) {
+                this.printError("Invalid! ParamA need be the same as ParamC");
             }
 
             return true;
