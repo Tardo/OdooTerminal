@@ -525,14 +525,14 @@ odoo.define("terminal.Terminal", function(require) {
         /* VISIBILIY */
         do_show: function() {
             if (!this._isTerminalVisible()) {
-                this.$el.animate({top: "0"});
+                this.$el.addClass("terminal-transition-topdown");
                 this.$input.focus();
             }
         },
 
         do_hide: function() {
             if (this._isTerminalVisible()) {
-                this.$el.animate({top: "-100%"});
+                this.$el.removeClass("terminal-transition-topdown");
             }
         },
 
@@ -560,7 +560,7 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         _isTerminalVisible: function() {
-            return this.$el.css("top") === "0px";
+            return parseInt(this.$el.css("top"), 10) >= 0;
         },
 
         _encodeHTML: function(text) {
