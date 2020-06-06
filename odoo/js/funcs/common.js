@@ -261,10 +261,28 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis: "<STRING: MODULE NAME>",
                 args: "s",
             });
+            this.registerCommand("ual", {
+                definition: "Update apps list",
+                callback: this._cmdUpdateAppList,
+                detail: "Update apps list",
+                syntaxis: "",
+                args: "",
+            });
         },
 
-        start: function() {
-            this._super.apply(this, arguments);
+        _cmdUpdateAppList: async function() {
+            const result = await rpc.query({
+                method: "update_list",
+                model: "ir.module.module",
+                args: [false],
+            });
+            if (result) {
+                this.print("The apps list has been successfully updated");
+            } else {
+                this.printError("Can't update the apps list!");
+                return false;
+            }
+            return true;
         },
 
         _cmdModuleDepends: async function(module_name) {
@@ -274,15 +292,13 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 args: [false, false, module_name],
                 kwargs: {context: this._getContext()},
             });
-            if ("warning" in result) {
+            if (result) {
                 const depend_names = result.warning.message
                     .substr(result.warning.message.search("\n") + 1)
                     .split("\n");
                 this.print(depend_names);
             } else {
-                this.printError(
-                    "The module doesn't exists or isn't installed/activated"
-                );
+                this.printError("The module isn't installed");
             }
             return true;
         },

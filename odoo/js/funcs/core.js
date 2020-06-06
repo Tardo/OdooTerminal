@@ -40,7 +40,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: "<STRING: URL>",
                 args: "s",
             });
-            this.registerCommand("term_context", {
+            this.registerCommand("context_term", {
                 definition: "Operations over terminal context dictionary",
                 callback: this._cmdTerminalContextOperation,
                 detail:

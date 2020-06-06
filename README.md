@@ -167,7 +167,8 @@ IMP: Command Parser 'args' simplified
 IMP: Code refactor
 
 ADD: Command 'depends': Know modules that depends on the given module
-ADD: Command 'term_context': 'read', 'write' or 'set' terminal context (issue #14)
+ADD: Command 'context_term': 'read', 'write' or 'set' terminal context (issue #14)
+ADD: Command 'ual': Update apps list
 
 FIX: Extension Preferences
 FIX: Click view record shortcut (issue #13)
@@ -337,6 +338,7 @@ Big Bang!
 
 ```
 - Improve unittest (tests for commmands)
+- Solve some boostrap "glitches" printing error section in 11.0 (Because Terminal uses BS4 and 11.0 BS3)
 ```
 
 ---
