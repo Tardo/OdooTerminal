@@ -479,7 +479,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
         _cmdSearchModelRecordId: async function(model, id, field_names) {
             let fields = ["display_name"];
             if (field_names) {
-                fields = field_names === "*" ? false : field_names.split(",");
+                fields =
+                    field_names === "*"
+                        ? false
+                        : this._parameterReader.splitAndTrim(field_names, ",");
             }
             const result = await rpc.query({
                 method: "search_read",
@@ -770,7 +773,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
         ) {
             let fields = ["display_name"];
             if (field_names) {
-                fields = field_names === "*" ? false : field_names.split(",");
+                fields =
+                    field_names === "*"
+                        ? false
+                        : this._parameterReader.splitAndTrim(field_names, ",");
             }
             const result = await rpc.query({
                 method: "search_read",

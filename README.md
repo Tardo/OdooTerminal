@@ -36,7 +36,7 @@ You can toggle terminal using one of these options:
 | Create 'res.partner' record                         | `create res.partner "{'name': 'The One'}"`         |
 | Search 'res.partner' records                        | `search res.partner name,email "[['id', '>', 5]]"` |
 | Search all fields of selected 'res.partner' records | `search res.partner * "[['id', '>', 5]]"`          |
-| Search all fields of selected 'res.partner' record  | `searchid res.partner 5 *`                         |
+| Search all fields of selected 'res.partner' record  | `read res.partner 5 *`                             |
 | View 'res.partner' records _(only backend)_         | `view res.partner`                                 |
 | View selected 'res.partner' record _(only backend)_ | `view res.partner 4`                               |
 | Install module                                      | `install mymodule`                                 |
@@ -120,37 +120,32 @@ compatible Odoo versions.
 _For environments without a real X11 server see 'xvfb' (X11 Virtual
 FrameBuffer)_
 
-- **Common**
-
 ```
 apt-get install python python-pip
-pip install selenium
-```
-
-- Chromium
-
-```
-apt-get install chromium-browser chromium-chromedriver
-```
-
-- Chrome
-
-\*\* Install chrome browser in your system: https://www.google.com/chrome/
-
-```
-apt-get install chromium-chromedriver
-```
-
-- Firefox (Not used already!)
-
-```
-apt-get install firefox geckodriver
+pip install -r tests/requirements.txt
+pip install -r tools/requirements.txt
 ```
 
 #### Usage
 
+- All (Automated packaging)
+
 ```
-python -m tests tests/test_chrome.py
+python -m tests
+```
+
+- Chrome
+
+```
+python tools/release.py
+python -m unittest tests.test_chrome
+```
+
+- Firefox
+
+```
+python tools/release.py
+python -m unittest tests.test_firefox
 ```
 
 ---
@@ -165,6 +160,7 @@ UPD: Renamed 'searchid' command to 'read' (Now 'searchid' is deprecated)
 IMP: Aliases for terminal commands
 IMP: Command Parser 'args' simplified
 IMP: Code refactor
+IMP: Tests
 
 ADD: Command 'depends': Know modules that depends on the given module
 ADD: Command 'context_term': 'read', 'write' or 'set' terminal context (issue #14)

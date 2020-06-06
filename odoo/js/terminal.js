@@ -99,6 +99,16 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         /**
+         * Split and trim values
+         * @param {String} text
+         * @param {String} separator
+         * @returns {Array}
+         */
+        splitAndTrim: function(text, separator) {
+            return _.map(text.split(separator), item => item.trim());
+        },
+
+        /**
          * Sanitize command parameters to use when invoke commands.
          * @param {String} cmd_raw
          * @param {Object} cmd_def
@@ -216,6 +226,7 @@ odoo.define("terminal.Terminal", function(require) {
             "keyup #terminal_input": "_onInputKeyUp",
             "keydown #terminal_input": "_onInputKeyDown",
             "keydown #terminal_screen": "_preventLostInputFocus",
+            "input #terminal_input": "_onInput",
             "click .o_terminal_cmd": "_onClickTerminalCommand",
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
         },
@@ -913,6 +924,20 @@ odoo.define("terminal.Terminal", function(require) {
             }
         },
 
+        _onInput: function() {
+            // Fish-like feature
+            this._cleanShadowInput();
+            if (this.$input.val()) {
+                this._searchCommandQuery = this.$input.val();
+                this._searchHistoryIter = this._inputHistory.length;
+                new Promise(resolve => {
+                    resolve(this._doSearchPrevHistory());
+                }).then(found_hist => {
+                    this._updateShadowInput(found_hist || "");
+                });
+            }
+        },
+
         _onInputKeyDown: function(ev) {
             if (ev.keyCode === 9) {
                 // Press Tab
@@ -920,7 +945,6 @@ odoo.define("terminal.Terminal", function(require) {
             }
         },
         _onInputKeyUp: function(ev) {
-            this._cleanShadowInput();
             if (ev.keyCode === $.ui.keyCode.ENTER) {
                 this._onKeyEnter();
             } else if (ev.keyCode === $.ui.keyCode.UP) {
@@ -932,17 +956,6 @@ odoo.define("terminal.Terminal", function(require) {
             } else if (ev.keyCode === $.ui.keyCode.TAB) {
                 this._onKeyTab();
             } else {
-                // Fish-like feature
-                if (this.$input.val()) {
-                    this._searchCommandQuery = this.$input.val();
-                    this._searchHistoryIter = this._inputHistory.length;
-                    new Promise(resolve => {
-                        resolve(this._doSearchPrevHistory());
-                    }).then(found_hist => {
-                        this._updateShadowInput(found_hist || "");
-                    });
-                }
-
                 this._searchHistoryIter = this._inputHistory.length;
                 this._searchCommandIter = Object.keys(
                     this._registeredCmds
