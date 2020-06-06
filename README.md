@@ -165,6 +165,7 @@ IMP: Tests
 ADD: Command 'depends': Know modules that depends on the given module
 ADD: Command 'context_term': 'read', 'write' or 'set' terminal context (issue #14)
 ADD: Command 'ual': Update apps list
+ADD: Command 'logout': Session log out
 
 FIX: Extension Preferences
 FIX: Click view record shortcut (issue #13)

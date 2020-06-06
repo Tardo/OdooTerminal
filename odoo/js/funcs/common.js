@@ -268,6 +268,13 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 syntaxis: "",
                 args: "",
             });
+            this.registerCommand("logout", {
+                definition: "Log out",
+                callback: this._cmdLogOut,
+                detail: "Session log out",
+                syntaxis: "",
+                args: "",
+            });
         },
 
         _cmdUpdateAppList: async function() {
@@ -277,7 +284,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 args: [false],
             });
             if (result) {
-                this.print("The apps list has been successfully updated");
+                this.print("The apps list has been updated successfully");
             } else {
                 this.printError("Can't update the apps list!");
                 return false;
@@ -403,6 +410,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
             }
             await session._session_authenticate(db, login, passwd);
             this.print(`Successfully logged as '${login}'`);
+            return true;
+        },
+
+        _cmdLogOut: async function() {
+            await session.session_logout();
+            this.print("Logged out");
             return true;
         },
 
