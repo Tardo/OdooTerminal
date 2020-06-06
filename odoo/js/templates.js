@@ -102,6 +102,7 @@ odoo.define("terminal.TemplateManager", function(require) {
             WELCOME: `<strong class='o_terminal_title'>Odoo Terminal v<%= ver %></strong>`,
             HELP_CMD: `<strong class='o_terminal_click o_terminal_cmd' data-cmd='help <%= cmd %>'><%= cmd %></strong> - <i><%= def %></i>`,
             RECORD_CREATED: `<%= model %> record created successfully: <span class='o_terminal_click o_terminal_view' data-resid='<%= new_id %>' data-model='<%= model %>'><%= new_id %></span>`,
+            DEPRECATED_COMMAND: `** This command is deprecated, please use '<%= cmd %>' instead.`,
         },
 
         render: function(templateid, values) {

@@ -23,18 +23,18 @@
         "14.",
         "saas~14",
     ];
-    const OdooObj = window.odoo;
-    const odooInfo = {};
+    const gOdooObj = window.odoo;
+    const gOdooInfo = {};
 
     /**
      * Sends the collected information to the 'content script'.
      */
     function _sendInitializeSignal() {
-        // Send odooInfo to content script
+        // Send gOdooInfo to content script
         window.postMessage(
             {
                 type: "ODOO_TERM_INIT",
-                odooInfo: odooInfo,
+                odooInfo: gOdooInfo,
             },
             "*"
         );
@@ -45,18 +45,18 @@
      * @param {String} ver - Odoo version
      */
     function _setServerVersion(ver) {
-        odooInfo.serverVersion = ver;
-        const foundVer = odooInfo.serverVersion.match(/\d+/);
+        gOdooInfo.serverVersion = ver;
+        const foundVer = gOdooInfo.serverVersion.match(/\d+/);
         if (foundVer && foundVer.length) {
-            odooInfo.serverVersionMajor = foundVer[0];
+            gOdooInfo.serverVersionMajor = foundVer[0];
         }
         const cvers = COMPATIBLE_VERS.filter(function(item) {
-            return odooInfo.serverVersion.startsWith(item);
+            return gOdooInfo.serverVersion.startsWith(item);
         });
         if (cvers.length) {
-            odooInfo.isCompatible = true;
-            window.term_odooVersion = odooInfo.serverVersion;
-            window.term_odooVersionMajor = odooInfo.serverVersionMajor;
+            gOdooInfo.isCompatible = true;
+            window.term_odooVersion = gOdooInfo.serverVersion;
+            window.term_odooVersionMajor = gOdooInfo.serverVersionMajor;
         } else {
             if (
                 Object.prototype.hasOwnProperty.call(window, "term_odooVersion")
@@ -79,10 +79,10 @@
      * @param {String} url
      * @param {String} fct_name - Function name
      * @param {Object} params - RPC parameters
-     * @param {Function} onFulfilled
-     * @param {Function} onRejected
+     * @param {Function} on_fulfilled
+     * @param {Function} on_rejected
      */
-    function _createRpc(url, fct_name, params, onFulfilled, onRejected) {
+    function _createRpc(url, fct_name, params, on_fulfilled, on_rejected) {
         if (!("args" in params)) {
             params.args = {};
         }
@@ -98,17 +98,17 @@
                 id: Math.floor(Math.random() * 1000 * 1000 * 1000),
             }),
             contentType: "application/json",
-        }).then(onFulfilled, onRejected);
+        }).then(on_fulfilled, on_rejected);
     }
 
     /**
      * Factory function to create RPC (Service type).
      * @param {Object} params - RPC parameters
-     * @param {Function} onFulfilled
-     * @param {Function} onRejected
+     * @param {Function} on_fulfilled
+     * @param {Function} on_rejected
      */
-    function _createServiceRpc(params, onFulfilled, onRejected) {
-        _createRpc("/jsonrpc", "service", params, onFulfilled, onRejected);
+    function _createServiceRpc(params, on_fulfilled, on_rejected) {
+        _createRpc("/jsonrpc", "service", params, on_fulfilled, on_rejected);
     }
 
     /**
@@ -116,7 +116,7 @@
      */
     function _forceOdooServerVersionDetection() {
         try {
-            OdooObj.define(0, require => {
+            gOdooObj.define(0, require => {
                 require("web.core");
                 _createServiceRpc(
                     {
@@ -152,32 +152,32 @@
         );
     }
 
-    let canInitialize = true;
-    if (typeof OdooObj !== "undefined") {
-        Object.assign(odooInfo, {
+    let gCanInitialize = true;
+    if (typeof gOdooObj !== "undefined") {
+        Object.assign(gOdooInfo, {
             isOdoo: true,
         });
 
-        if (Object.prototype.hasOwnProperty.call(OdooObj, "session_info")) {
-            odooInfo.isFrontend = OdooObj.session_info.is_frontend;
-            if (OdooObj.session_info.server_version) {
-                _setServerVersion(OdooObj.session_info.server_version);
+        if (Object.prototype.hasOwnProperty.call(gOdooObj, "session_info")) {
+            gOdooInfo.isFrontend = gOdooObj.session_info.is_frontend;
+            if (gOdooObj.session_info.server_version) {
+                _setServerVersion(gOdooObj.session_info.server_version);
             } else {
-                if (!odooInfo.isFrontend) {
+                if (!gOdooInfo.isFrontend) {
                     // Ensure that is not front-end (portal)
-                    odooInfo.isFrontend = !_forceIsOdooBackendDetection();
+                    gOdooInfo.isFrontend = !_forceIsOdooBackendDetection();
                 }
 
                 _forceOdooServerVersionDetection();
-                canInitialize = false;
+                gCanInitialize = false;
             }
         } else {
-            odooInfo.isFrontend = !_forceIsOdooBackendDetection();
+            gOdooInfo.isFrontend = !_forceIsOdooBackendDetection();
             _forceOdooServerVersionDetection();
-            canInitialize = false;
+            gCanInitialize = false;
         }
     }
-    if (canInitialize) {
+    if (gCanInitialize) {
         _sendInitializeSignal();
     }
 })();

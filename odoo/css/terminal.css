@@ -19,6 +19,8 @@
     width: var(--terminal-screen-width);
     z-index: 1041;
     display: grid; /* Here to force BS4 behavior */
+    transition: 200ms;
+    transition-timing-function: ease-out;
 }
 
 .o_terminal div#terminal_screen {
@@ -68,6 +70,10 @@
 }
 .o_terminal div#terminal_screen .error_message > div > ul > li {
     margin-bottom: 3px;
+}
+.o_terminal div#terminal_screen .error_message .card-body {
+    color: black;
+    border-radius: 0;
 }
 .o_terminal div#terminal_screen .error_message li[name="debug"] .card-body {
     white-space: pre;
@@ -173,4 +179,11 @@
 .o_terminal .terminal-screen-info-zone .terminal-screen-icon-maximize i {
     color: white;
     padding: 0.6em;
+}
+
+/* TRANSITIONS */
+.terminal-transition-topdown {
+    top: 0;
+    transition: 700ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }

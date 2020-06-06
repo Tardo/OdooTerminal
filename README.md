@@ -29,18 +29,28 @@ You can toggle terminal using one of these options:
 - Press CTRL + 1
 - Use extension browser action icon
 
-# Example Commands
+## Example Commands
 
 | Description                                         | Terminal Command                                   |
 | --------------------------------------------------- | -------------------------------------------------- |
 | Create 'res.partner' record                         | `create res.partner "{'name': 'The One'}"`         |
 | Search 'res.partner' records                        | `search res.partner name,email "[['id', '>', 5]]"` |
 | Search all fields of selected 'res.partner' records | `search res.partner * "[['id', '>', 5]]"`          |
-| View 'res.partner' records                          | `view res.partner`                                 |
-| View selected 'res.partner' record                  | `view res.partner 4`                               |
+| Search all fields of selected 'res.partner' record  | `read res.partner 5 *`                             |
+| View 'res.partner' records _(only backend)_         | `view res.partner`                                 |
+| View selected 'res.partner' record _(only backend)_ | `view res.partner 4`                               |
 | Install module                                      | `install mymodule`                                 |
 
 > Notice the usage of quotes when use parameters with spaces.
+
+## Notes
+
+- This extension have a "preferences" page where you can add commands to run on
+  every session. This is useful for example to load a remote script to extend
+  the 'terminal' features.
+- This extension uses an internal context to extend the 'user context'. This
+  'terminal context' has by default the key 'active_test' = false (see issue #14
+  to get more information). This context only affects to terminal operations.
 
 ---
 
@@ -54,6 +64,20 @@ You can toggle terminal using one of these options:
 ---
 
 # Contributing
+
+## Fast Guidelines
+
+- Naming Convention:
+  - Classes: Pascal Case
+  - Member Variables: Camel Case
+  - Methods: Camel Case
+  - Variables: Snake Case
+  - 'Constants': Screaming Snake Case
+  - Follow 'Private Variables' Python convention
+    (https://docs.python.org/3/tutorial/classes.html#tut-private)
+- Indentation Style: K&R - 1TBS Variant
+  (https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS))
+- JavaScript Specification: ES2017
 
 ## Pre-commit
 
@@ -96,42 +120,56 @@ compatible Odoo versions.
 _For environments without a real X11 server see 'xvfb' (X11 Virtual
 FrameBuffer)_
 
-- **Common**
-
 ```
 apt-get install python python-pip
-pip install selenium
-```
-
-- Chromium
-
-```
-apt-get install chromium-browser chromium-chromedriver
-```
-
-- Chrome
-
-\*\* Install chrome browser in your system: https://www.google.com/chrome/
-
-```
-apt-get install chromium-chromedriver
-```
-
-- Firefox (Not used already!)
-
-```
-apt-get install firefox geckodriver
+pip install -r tests/requirements.txt
+pip install -r tools/requirements.txt
 ```
 
 #### Usage
 
+- All (Automated packaging)
+
 ```
-python -m tests tests/test_chrome.py
+python -m tests
+```
+
+- Chrome
+
+```
+python tools/release.py
+python -m unittest tests.test_chrome
+```
+
+- Firefox
+
+```
+python tools/release.py
+python -m unittest tests.test_firefox
 ```
 
 ---
 
 # Changelog
+
+**5.3.0**
+
+```
+UPD: Renamed 'searchid' command to 'read' (Now 'searchid' is deprecated)
+
+IMP: Aliases for terminal commands
+IMP: Command Parser 'args' simplified
+IMP: Code refactor
+IMP: Tests
+
+ADD: Command 'depends': Know modules that depends on the given module
+ADD: Command 'context_term': 'read', 'write' or 'set' terminal context (issue #14)
+ADD: Command 'ual': Update apps list
+ADD: Command 'logout': Session log out
+
+FIX: Extension Preferences
+FIX: Click view record shortcut (issue #13)
+```
 
 **5.2.0**
 
@@ -297,6 +335,7 @@ Big Bang!
 
 ```
 - Improve unittest (tests for commmands)
+- Solve some boostrap "glitches" printing error section in 11.0 (Because Terminal uses BS4 and 11.0 BS3)
 ```
 
 ---

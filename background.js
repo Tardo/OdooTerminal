@@ -13,14 +13,14 @@
     "use strict";
 
     // This is for cross-browser compatibility
-    const BrowserObj = typeof chrome === "undefined" ? browser : chrome;
+    const gBrowserObj = typeof chrome === "undefined" ? browser : chrome;
 
     /**
      * Handle click event.
      * @param {Object} tab - The active tab
      */
     function onClickBrowserAction(tab) {
-        BrowserObj.tabs.sendMessage(tab.id, {
+        gBrowserObj.tabs.sendMessage(tab.id, {
             message: "toggle_terminal",
         });
     }
@@ -30,16 +30,16 @@
      * information of the page to the 'content script'
      */
     function refreshOdooInfo() {
-        BrowserObj.browserAction.setIcon({
+        gBrowserObj.browserAction.setIcon({
             path: "icons/terminal-disabled-32.png",
         });
-        BrowserObj.browserAction.setBadgeText({text: ""});
+        gBrowserObj.browserAction.setBadgeText({text: ""});
 
         // Query for active tab
-        BrowserObj.tabs.query({active: true, currentWindow: true}, tabs => {
+        gBrowserObj.tabs.query({active: true, currentWindow: true}, tabs => {
             if (tabs.length) {
                 // Request Odoo Info
-                BrowserObj.tabs.sendMessage(tabs[0].id, {
+                gBrowserObj.tabs.sendMessage(tabs[0].id, {
                     message: "update_odoo_terminal_info",
                 });
             }
@@ -48,23 +48,23 @@
 
     /**
      * Update action browser icon.
-     * @param {Object} odooInfo - Collected information
+     * @param {Object} odoo_info - Collected information
      */
-    function _updateBadgeInfo(odooInfo) {
+    function _updateBadgeInfo(odoo_info) {
         let path = "icons/terminal-disabled-32.png";
-        if (odooInfo.isCompatible) {
+        if (odoo_info.isCompatible) {
             path = "icons/terminal-32.png";
         }
-        BrowserObj.browserAction.setIcon({path: path});
+        gBrowserObj.browserAction.setIcon({path: path});
     }
 
     // Listen 'content script' reply with the collected information
-    BrowserObj.runtime.onMessage.addListener(request => {
+    gBrowserObj.runtime.onMessage.addListener(request => {
         if (request.message === "update_terminal_badge_info") {
             _updateBadgeInfo(request.odooInfo);
         }
     });
 
-    BrowserObj.tabs.onUpdated.addListener(refreshOdooInfo);
-    BrowserObj.browserAction.onClicked.addListener(onClickBrowserAction);
+    gBrowserObj.tabs.onUpdated.addListener(refreshOdooInfo);
+    gBrowserObj.browserAction.onClicked.addListener(onClickBrowserAction);
 })();

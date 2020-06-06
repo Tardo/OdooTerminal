@@ -4,17 +4,17 @@
 (function() {
     "use strict";
 
-    const BrowserObj = typeof chrome === "undefined" ? browser : chrome;
+    const gBrowserObj = typeof chrome === "undefined" ? browser : chrome;
 
     function _saveOptions(e) {
         e.preventDefault();
-        BrowserObj.storage.sync.set({
+        gBrowserObj.storage.sync.set({
             init_cmds: document.querySelector("#init_cmds").value,
         });
     }
 
     function _onDOMLoaded() {
-        BrowserObj.storage.sync.get(["init_cmds"], result => {
+        gBrowserObj.storage.sync.get(["init_cmds"], result => {
             document.querySelector("#init_cmds").value = result.init_cmds || "";
         });
 

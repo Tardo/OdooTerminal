@@ -40,6 +40,17 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: "<STRING: URL>",
                 args: "s",
             });
+            this.registerCommand("context_term", {
+                definition: "Operations over terminal context dictionary",
+                callback: this._cmdTerminalContextOperation,
+                detail:
+                    "Operations over terminal context dictionary. " +
+                    "This context only affects to the terminal operations." +
+                    "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
+                    "By default is 'read'. ",
+                syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
+                args: "?ss",
+            });
         },
 
         _printWelcomeMessage: function() {
@@ -52,21 +63,21 @@ odoo.define("terminal.CoreFunctions", function(require) {
             );
         },
 
-        _printHelpSimple: function(cmd, cmdDef) {
+        _printHelpSimple: function(cmd, cmd_def) {
             this.print(
                 this._templates.render("HELP_CMD", {
                     cmd: cmd,
-                    def: cmdDef.definition,
+                    def: cmd_def.definition,
                 })
             );
         },
 
         _cmdPrintHelp: async function(cmd) {
             if (typeof cmd === "undefined") {
-                const sortedCmdKeys = _.keys(this._registeredCmds).sort();
-                const l = sortedCmdKeys.length;
-                for (let x = 0; x < l; ++x) {
-                    const _cmd = sortedCmdKeys[x];
+                const sorted_cmd_keys = _.keys(this._registeredCmds).sort();
+                const sorted_keys_len = sorted_cmd_keys.length;
+                for (let x = 0; x < sorted_keys_len; ++x) {
+                    const _cmd = sorted_cmd_keys[x];
                     this._printHelpSimple(_cmd, this._registeredCmds[_cmd]);
                 }
             } else if (
@@ -74,15 +85,25 @@ odoo.define("terminal.CoreFunctions", function(require) {
             ) {
                 this._printHelpDetailed(cmd, this._registeredCmds[cmd]);
             } else {
-                this.printError(`'${cmd}' command doesn't exists`);
+                const [ncmd, cmd_def] = this._searchCommandDefByAlias(cmd);
+                if (cmd_def) {
+                    this.print(
+                        this._templates.render("DEPRECATED_COMMAND", {
+                            cmd: ncmd,
+                        })
+                    );
+                    this._printHelpDetailed(ncmd, this._registeredCmds[ncmd]);
+                } else {
+                    this.printError(`'${cmd}' command doesn't exists`);
+                }
             }
             return true;
         },
 
-        _printHelpDetailed: function(cmd, cmdDef) {
-            this.print(cmdDef.detail);
+        _printHelpDetailed: function(cmd, cmd_def) {
+            this.print(cmd_def.detail);
             this.print(" ");
-            this.eprint(`Syntaxis: ${cmd} ${cmdDef.syntaxis}`);
+            this.eprint(`Syntaxis: ${cmd} ${cmd_def.syntaxis}`);
         },
 
         _cmdClear: async function(section) {
@@ -114,6 +135,24 @@ odoo.define("terminal.CoreFunctions", function(require) {
                     });
             } else {
                 this.printError("Invalid file type");
+            }
+            return true;
+        },
+
+        _cmdTerminalContextOperation: async function(
+            operation = "read",
+            values = "false"
+        ) {
+            if (operation === "read") {
+                this.print(this._userContext);
+            } else if (operation === "set") {
+                this._userContext = JSON.parse(values);
+                this.print(this._userContext);
+            } else if (operation === "write") {
+                Object.assign(this._userContext, JSON.parse(values));
+                this.print(this._userContext);
+            } else {
+                this.printError("Invalid operation");
             }
             return true;
         },

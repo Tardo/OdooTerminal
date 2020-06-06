@@ -7,7 +7,7 @@ services:
   - xvfb
 
 python:
-  - "3.6"
+  - "3.8"
 
 addons:
   apt:
@@ -15,27 +15,38 @@ addons:
       - expect-dev # provides unbuffer utility
 
 stages:
-  - linting
-  - selenium
+  - pre-commit
+  - selenium-chrome
+  - selenium-firefox
 
 jobs:
   include:
-    - stage: linting
-      name: "pre-commit (eslint, web-ext, prettier, etc...)"
+    - stage: pre-commit
+      name: "eslint, web-ext, prettier, etc..."
       install: pip install pre-commit
       script:
         - pre-commit run --all --show-diff-on-failure --verbose --color always
     - stage: selenium
-      name: "Selenium Chrome"
+      name: "Chrome"
       addons:
-        apt:
-          packages:
-            - chromium-chromedriver
         chrome: stable
       install:
-        - pip install selenium
+        - pip install -r tests/requirements.txt
         - pip install -r tools/requirements.txt
       before_script:
         - export DISPLAY=:99.0
+        - python3 tools/release.py
       script:
-        - python -m tests tests/test_chrome.py
+        - python3 -m unittest tests.test_chrome
+    - stage: selenium
+      name: "Firefox"
+      addons:
+        firefox: latest
+      install:
+        - pip install -r tests/requirements.txt
+        - pip install -r tools/requirements.txt
+      before_script:
+        - export DISPLAY=:99.0
+        - python3 tools/release.py
+      script:
+        - python3 -m unittest tests.test_firefox

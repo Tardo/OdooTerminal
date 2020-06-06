@@ -5,7 +5,7 @@ import subprocess
 import unittest
 
 
-subprocess.call(['python', 'tools/release.py'])
+subprocess.call(['python3', 'tools/release.py'])
 sys.path.append('.')
 
 loader = unittest.TestLoader()
