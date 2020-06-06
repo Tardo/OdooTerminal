@@ -418,6 +418,27 @@ odoo.define("terminal.Terminal", function(require) {
                     "error_message"
                 );
                 ++this._errorCount;
+            } else if (
+                typeof error === "object" &&
+                "data" in error &&
+                "type" in error.data
+            ) {
+                // It's an Odoo error report
+                const error_id = new Date().getTime();
+                this.print(
+                    this._templates.render("ERROR_MESSAGE", {
+                        error_name: this._encodeHTML(error.data.objects[1]),
+                        error_message: this._encodeHTML(error.message),
+                        error_id: error_id,
+                        exception_type: error.data.type,
+                        context: "",
+                        args: "",
+                        debug: this._encodeHTML(error.data.debug),
+                    }),
+                    false,
+                    "error_message"
+                );
+                ++this._errorCount;
             } else {
                 this.print(error, false, "error_message");
             }
@@ -440,6 +461,7 @@ odoo.define("terminal.Terminal", function(require) {
 
         cleanInput: function() {
             this.$input.val("");
+            this._cleanShadowInput();
         },
 
         cleanInputHistory: function() {
