@@ -3,6 +3,7 @@ cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/.cache/pre-commit
+    - $HOME/.wdm
 services:
   - xvfb
 
@@ -16,8 +17,7 @@ addons:
 
 stages:
   - pre-commit
-  - selenium-chrome
-  - selenium-firefox
+  - selenium
 
 jobs:
   include:

@@ -84,10 +84,10 @@ odoo.define("terminal.BackendFunctions", function(require) {
                 ) &&
                 Object.prototype.hasOwnProperty.call(ev.target.dataset, "model")
             ) {
-                this._cmdViewModelRecord([
+                this._cmdViewModelRecord(
                     ev.target.dataset.model,
-                    ev.target.dataset.resid,
-                ]);
+                    Number(ev.target.dataset.resid)
+                );
             }
         },
     });

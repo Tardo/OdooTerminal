@@ -152,6 +152,12 @@ python -m unittest tests.test_firefox
 
 # Changelog
 
+**5.3.1**
+
+```
+FIX: Click view record shortcut (issue #13) [fix 5.3.0 broken]
+```
+
 **5.3.0**
 
 ```
