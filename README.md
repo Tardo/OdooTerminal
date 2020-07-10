@@ -152,6 +152,13 @@ python -m unittest tests.test_firefox
 
 # Changelog
 
+**5.3.2**
+
+```
+IMP: Chromium based browsers action icon
+IMP: Terminal CSS
+```
+
 **5.3.1**
 
 ```

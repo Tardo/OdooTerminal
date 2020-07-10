@@ -105,11 +105,6 @@
     width: 1.2em;
 }
 
-.o_terminal .terminal-user-input > .terminal-prompt:active,
-.o_terminal .terminal-user-input > .terminal-prompt:focus {
-    outline: hidden;
-}
-
 .o_terminal .terminal-user-input .rich-input {
     position: relative;
     width: 100%; /* Here to 11.0 */
@@ -142,7 +137,7 @@
 }
 .o_terminal .terminal-user-input input:active,
 .o_terminal .terminal-user-input input:focus {
-    outline: hidden;
+    outline: none;
 }
 
 .o_terminal .print-table thead th {

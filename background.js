@@ -66,5 +66,6 @@
     });
 
     gBrowserObj.tabs.onUpdated.addListener(refreshOdooInfo);
+    gBrowserObj.tabs.onActivated.addListener(refreshOdooInfo);
     gBrowserObj.browserAction.onClicked.addListener(onClickBrowserAction);
 })();
