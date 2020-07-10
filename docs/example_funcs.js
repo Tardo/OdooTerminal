@@ -1,9 +1,12 @@
 odoo.define("terminal.MyFuncs", function(require) {
     "use strict";
 
-    var Terminal = require("terminal.Terminal").terminal;
+    const Terminal = require("terminal.Terminal").terminal;
 
     Terminal.include({
+        /**
+         * @override
+         */
         init: function() {
             this._super.apply(this, arguments);
 
@@ -16,6 +19,14 @@ odoo.define("terminal.MyFuncs", function(require) {
             });
         },
 
+        /**
+         * NOTE: 'async' usage will break inheritance chain!!
+         *
+         * @param {String} param_a
+         * @param {Int} param_b
+         * @param {String} param_c
+         * @param {Int} param_d
+         */
         _cmdMyFunc: async function(
             param_a,
             param_b,

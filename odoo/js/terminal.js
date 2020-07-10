@@ -240,9 +240,11 @@ odoo.define("terminal.Terminal", function(require) {
         _runningCommandsCount: 0,
         _errorCount: 0,
 
+        /**
+         * This is necessary to prevent terminal issues in Odoo EE
+         */
         _initGuard: function() {
             if (typeof this._observer === "undefined") {
-                // FIXME: Obversers !== Performance :(
                 this._observer = new MutationObserver(
                     this._injectTerminal.bind(this)
                 );
@@ -253,8 +255,8 @@ odoo.define("terminal.Terminal", function(require) {
         _injectTerminal: function() {
             const $terms = $("body").find(".o_terminal");
             if ($terms.length > 1) {
-                const to_remove = $terms.filter(":not(:first-child)");
-                to_remove.remove();
+                // Remove extra terminals
+                $terms.filter(":not(:first-child)").remove();
             } else if (!$terms.length) {
                 $(QWeb.render("terminal")).prependTo("body");
                 this.setElement($("body").find("#terminal"));
@@ -556,16 +558,12 @@ odoo.define("terminal.Terminal", function(require) {
 
         /* VISIBILIY */
         do_show: function() {
-            if (!this._isTerminalVisible()) {
-                this.$el.addClass("terminal-transition-topdown");
-                this.$input.focus();
-            }
+            this.$el.addClass("terminal-transition-topdown");
+            this.$input.focus();
         },
 
         do_hide: function() {
-            if (this._isTerminalVisible()) {
-                this.$el.removeClass("terminal-transition-topdown");
-            }
+            this.$el.removeClass("terminal-transition-topdown");
         },
 
         do_toggle: function() {
@@ -988,7 +986,11 @@ odoo.define("terminal.Terminal", function(require) {
 
         _onCoreClick: function(ev) {
             // Auto-Hide
-            if (this.$el && !this.$el[0].contains(ev.target)) {
+            if (
+                this.$el &&
+                !this.$el[0].contains(ev.target) &&
+                this._isTerminalVisible()
+            ) {
                 this.do_hide();
             }
         },
