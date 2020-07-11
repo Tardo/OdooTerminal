@@ -1,17 +1,31 @@
 [![Build Status](https://travis-ci.com/Tardo/OdooTerminal.svg?branch=master)](https://travis-ci.com/Tardo/OdooTerminal)
+![Odoo Ver](https://img.shields.io/badge/Odoo-11.0-yellowgreen)
+![Odoo Ver](https://img.shields.io/badge/Odoo-12.0-green)
+![Odoo Ver](https://img.shields.io/badge/Odoo-13.0-green)
+![Odoo Ver](https://img.shields.io/badge/Odoo-14.0-green)
 
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)
+![Mozilla Add-on](https://img.shields.io/amo/rating/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)
 
-# Odoo Terminal - WebExtension
+![Chrome Add-on](https://img.shields.io/chrome-web-store/v/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+![Chrome Add-on](https://img.shields.io/chrome-web-store/users/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+![Chrome Add-on](https://img.shields.io/chrome-web-store/rating/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+
+<h1 align="center">
+  <img src="/icons/terminal-48.png" />
+  <div>Odoo Terminal - WebExtension</div>
+</h1>
 
 _All the power of Odoo json-rpc in a really easy way!_
 
 This web extension adds a terminal-like to control Odoo (11, 12, 13 & 14).
 
-Compatible with Firefox and Chromium but only available in the
-[Firefox Store](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/).
+**Downloads**
+
+[<img src="https://www.mozilla.org/media/protocol/img/logos/firefox/browser/logo-lg.3d9087ac44e8.png" width="64">](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/)
+[<img src="https://www.google.com/chrome/static/images/chrome-logo.svg" width="64">](https://chrome.google.com/webstore/detail/odoo-terminal/fdidojpjkbpfplcdmeaaehnjfkgpbhad)
 
 ---
 
@@ -157,6 +171,7 @@ python -m unittest tests.test_firefox
 ```
 IMP: Chromium based browsers action icon
 IMP: Terminal CSS
+IMP: Minor changes
 ```
 
 **5.3.1**
