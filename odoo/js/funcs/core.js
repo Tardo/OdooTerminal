@@ -72,7 +72,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
             );
         },
 
-        _cmdPrintHelp: async function(cmd) {
+        _cmdPrintHelp: function(cmd) {
             if (typeof cmd === "undefined") {
                 const sorted_cmd_keys = _.keys(this._registeredCmds).sort();
                 const sorted_keys_len = sorted_cmd_keys.length;
@@ -97,7 +97,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                     this.printError(`'${cmd}' command doesn't exists`);
                 }
             }
-            return true;
+            return Promise.resolve();
         },
 
         _printHelpDetailed: function(cmd, cmd_def) {
@@ -106,25 +106,25 @@ odoo.define("terminal.CoreFunctions", function(require) {
             this.eprint(`Syntaxis: ${cmd} ${cmd_def.syntaxis}`);
         },
 
-        _cmdClear: async function(section) {
+        _cmdClear: function(section) {
             if (section === "history") {
                 this.cleanInputHistory();
             } else {
                 this.clean();
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdPrintText: async function(...text) {
+        _cmdPrintText: function(...text) {
             this.print(text.join(" "));
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdLoadResource: async function(url) {
+        _cmdLoadResource: function(url) {
             const inURL = new URL(url);
             const pathname = inURL.pathname.toLowerCase();
             if (pathname.endsWith(".js")) {
-                await $.getScript(inURL.href);
+                return $.getScript(inURL.href);
             } else if (pathname.endsWith(".css")) {
                 $("<link>")
                     .appendTo("head")
@@ -136,10 +136,10 @@ odoo.define("terminal.CoreFunctions", function(require) {
             } else {
                 this.printError("Invalid file type");
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdTerminalContextOperation: async function(
+        _cmdTerminalContextOperation: function(
             operation = "read",
             values = "false"
         ) {
@@ -154,7 +154,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
             } else {
                 this.printError("Invalid operation");
             }
-            return true;
+            return Promise.resolve();
         },
     });
 });

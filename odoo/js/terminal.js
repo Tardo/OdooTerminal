@@ -441,6 +441,27 @@ odoo.define("terminal.Terminal", function(require) {
                     "error_message"
                 );
                 ++this._errorCount;
+            } else if (
+                typeof error === "object" &&
+                "status" in error &&
+                error.status !== "200"
+            ) {
+                // It's an Odoo error report
+                const error_id = new Date().getTime();
+                this.print(
+                    this._templates.render("ERROR_MESSAGE", {
+                        error_name: this._encodeHTML(error.statusText),
+                        error_message: this._encodeHTML(error.statusText),
+                        error_id: error_id,
+                        exception_type: "Invalid HTTP Request",
+                        context: "",
+                        args: "",
+                        debug: this._encodeHTML(error.responseText),
+                    }),
+                    false,
+                    "error_message"
+                );
+                ++this._errorCount;
             } else {
                 this.print(error, false, "error_message");
             }
@@ -808,22 +829,28 @@ odoo.define("terminal.Terminal", function(require) {
             return this._inputHistory[this._searchHistoryIter];
         },
 
-        _processCommandJob: async function(scmd, cmd_def) {
-            this.onStartCommand(scmd.cmd, scmd.params);
-            let result = "";
-            let is_failed = false;
-            try {
-                result = await cmd_def.callback.bind(this)(...scmd.params);
-            } catch (err) {
-                is_failed = true;
-                result =
-                    err ||
-                    "[!] Oops! Unknown error! (no detailed error message given :/)";
-            } finally {
-                this.onFinishCommand(scmd.cmd, scmd.params, is_failed, result);
-            }
-
-            return true;
+        _processCommandJob: function(scmd, cmd_def) {
+            return new Promise(async resolve => {
+                this.onStartCommand(scmd.cmd, scmd.params);
+                let result = "";
+                let is_failed = false;
+                try {
+                    result = await cmd_def.callback.bind(this)(...scmd.params);
+                } catch (err) {
+                    is_failed = true;
+                    result =
+                        err ||
+                        "[!] Oops! Unknown error! (no detailed error message given :/)";
+                } finally {
+                    this.onFinishCommand(
+                        scmd.cmd,
+                        scmd.params,
+                        is_failed,
+                        result
+                    );
+                }
+                resolve();
+            });
         },
 
         _updateInput: function(str) {
@@ -834,8 +861,8 @@ odoo.define("terminal.Terminal", function(require) {
             this.$shadowInput.scrollLeft(this.$input.scrollLeft());
         },
 
-        _fallbackExecuteCommand: async function() {
-            throw new Error("Invalid command definition!");
+        _fallbackExecuteCommand: function() {
+            return Promise.reject("Invalid command definition!");
         },
 
         _updateRunningCmdCount: function() {

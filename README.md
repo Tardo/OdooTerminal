@@ -14,7 +14,7 @@
 ![Chrome Add-on](https://img.shields.io/chrome-web-store/rating/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
 
 <h1 align="center">
-  <img src="/icons/terminal-48.png" />
+  <img src="icons/terminal-48.png" />
   <div>Odoo Terminal - WebExtension</div>
 </h1>
 
@@ -166,12 +166,17 @@ python -m unittest tests.test_firefox
 
 # Changelog
 
-**5.3.2**
+**5.4.0**
 
 ```
 IMP: Chromium based browsers action icon
 IMP: Terminal CSS
 IMP: Minor changes
+
+ADD: Command 'alias': Make your own command aliases
+
+FIX: async/await: Use a workaround to not break inheritance chain
+
 ```
 
 **5.3.1**

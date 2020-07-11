@@ -277,50 +277,55 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _cmdUpdateAppList: async function() {
-            const result = await rpc.query({
-                method: "update_list",
-                model: "ir.module.module",
-                args: [false],
-            });
-            if (result) {
-                this.print("The apps list has been updated successfully");
-            } else {
-                this.printError("Can't update the apps list!");
-                return false;
-            }
-            return true;
+        _cmdUpdateAppList: function() {
+            return rpc
+                .query({
+                    method: "update_list",
+                    model: "ir.module.module",
+                    args: [false],
+                })
+                .then(result => {
+                    if (result) {
+                        this.print(
+                            "The apps list has been updated successfully"
+                        );
+                    } else {
+                        this.printError("Can't update the apps list!");
+                    }
+                });
         },
 
-        _cmdModuleDepends: async function(module_name) {
-            const result = await rpc.query({
-                method: "onchange_module",
-                model: "res.config.settings",
-                args: [false, false, module_name],
-                kwargs: {context: this._getContext()},
-            });
-            if (result) {
-                const depend_names = result.warning.message
-                    .substr(result.warning.message.search("\n") + 1)
-                    .split("\n");
-                this.print(depend_names);
-            } else {
-                this.printError("The module isn't installed");
-            }
-            return true;
+        _cmdModuleDepends: function(module_name) {
+            return rpc
+                .query({
+                    method: "onchange_module",
+                    model: "res.config.settings",
+                    args: [false, false, module_name],
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    if (result) {
+                        const depend_names = result.warning.message
+                            .substr(result.warning.message.search("\n") + 1)
+                            .split("\n");
+                        this.print(depend_names);
+                    } else {
+                        this.printError("The module isn't installed");
+                    }
+                });
         },
 
-        _cmdPostJSONData: async function(url, data) {
-            const result = await $.ajax(url, {
+        _cmdPostJSONData: function(url, data) {
+            return $.ajax(url, {
                 data: data,
                 contentType: "application/json",
                 type: "POST",
+            }).then(result => {
+                this.print(result);
             });
-            this.print(result);
-            return true;
         },
 
-        _cmdRunTour: async function(oper, tour_name) {
+        _cmdRunTour: function(oper, tour_name) {
             const tour_names = Object.keys(tour.tours);
             if (oper === "list") {
                 if (tour_names.length) {
@@ -338,10 +343,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
             } else {
                 this.printError("Invalid Operation! (Use 'run' or 'list')");
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdJSTest: async function(module_name, mode) {
+        _cmdJSTest: function(module_name, mode) {
             let mod = module_name || "";
             if (module_name === "*") {
                 mod = "";
@@ -351,45 +356,49 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 url = `/web/tests/mobile?module=${mod}`;
             }
             window.location = url;
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdShowDBList: async function() {
-            const databases = await ajax.rpc("/jsonrpc", {
-                service: "db",
-                method: "list",
-                args: {},
-            });
-            if (!databases) {
-                this.printError("Can't get database names");
-                return;
-            }
-            for (const i in databases) {
-                if (databases[i] === session.db) {
-                    databases[i] = `<strong>${databases[i]}</strong>`;
-                    break;
-                }
-            }
-            this.print(databases);
-            return true;
+        _cmdShowDBList: function() {
+            return ajax
+                .rpc("/jsonrpc", {
+                    service: "db",
+                    method: "list",
+                    args: {},
+                })
+                .then(databases => {
+                    if (!databases) {
+                        this.printError("Can't get database names");
+                        return;
+                    }
+                    for (const i in databases) {
+                        if (databases[i] === session.db) {
+                            databases[i] = `<strong>${databases[i]}</strong>`;
+                            break;
+                        }
+                    }
+                    this.print(databases);
+                });
         },
 
-        _cmdUserHasGroups: async function(groups) {
-            const result = await rpc.query({
-                method: "user_has_groups",
-                model: "res.users",
-                args: [groups],
-                kwargs: {context: this._getContext()},
-            });
-            if (result) {
-                this.print("Nice! groups are truly evaluated");
-            } else {
-                this.print("Groups are negatively evaluated");
-            }
-            return true;
+        _cmdUserHasGroups: function(groups) {
+            return rpc
+                .query({
+                    method: "user_has_groups",
+                    model: "res.users",
+                    args: [groups],
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    if (result) {
+                        this.print("Nice! groups are truly evaluated");
+                    } else {
+                        this.print("Groups are negatively evaluated");
+                    }
+                });
         },
 
-        _cmdLoginAs: async function(database, login_name, pass) {
+        _cmdLoginAs: function(database, login_name, pass) {
             let db = database;
             let login = login_name;
             let passwd = pass || false;
@@ -404,22 +413,22 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             "'<span class='o_terminal_click o_terminal_cmd' " +
                             "data-cmd='dblist'>dblist</span>' command."
                     );
-                    return true;
+                    return Promise.resolve();
                 }
                 db = session.db;
             }
-            await session._session_authenticate(db, login, passwd);
-            this.print(`Successfully logged as '${login}'`);
-            return true;
+            return session._session_authenticate(db, login, passwd).then(() => {
+                this.print(`Successfully logged as '${login}'`);
+            });
         },
 
-        _cmdLogOut: async function() {
-            await session.session_logout();
-            this.print("Logged out");
-            return true;
+        _cmdLogOut: function() {
+            return session.session_logout().then(() => {
+                this.print("Logged out");
+            });
         },
 
-        _cmdLongpolling: async function(operation, name) {
+        _cmdLongpolling: function(operation, name) {
             if (typeof operation === "undefined") {
                 this.print(this._longpolling.isVerbose() || "off");
             } else if (operation === "verbose") {
@@ -451,10 +460,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
             } else {
                 this.printError("Invalid Operation.");
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdShowOdooVersion: async function() {
+        _cmdShowOdooVersion: function() {
             try {
                 this.print(
                     `${odoo.session_info.server_version_info
@@ -468,13 +477,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
             } catch (err) {
                 this.print(window.term_odooVersion);
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdContextOperation: async function(
-            operation = "read",
-            values = "false"
-        ) {
+        _cmdContextOperation: function(operation = "read", values = "false") {
             if (operation === "read") {
                 this.print(session.user_context);
             } else if (operation === "set") {
@@ -486,10 +492,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
             } else {
                 this.printError("Invalid operation");
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdSearchModelRecordId: async function(model, id, field_names) {
+        _cmdSearchModelRecordId: function(model, id, field_names) {
             let fields = ["display_name"];
             if (field_names) {
                 fields =
@@ -497,148 +503,161 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         ? false
                         : this._parameterReader.splitAndTrim(field_names, ",");
             }
-            const result = await rpc.query({
-                method: "search_read",
-                domain: [["id", "=", id]],
-                fields: fields,
-                model: model,
-                kwargs: {context: this._getContext()},
-            });
-            let tbody = "";
-            const columns = ["id"];
-            const l = result.length;
-            for (let x = 0; x < l; ++x) {
-                const item = result[x];
-                tbody += "<tr>";
-                tbody += this._templates.render("TABLE_BODY_CMD", {
-                    id: item.id,
+            return rpc
+                .query({
+                    method: "search_read",
+                    domain: [["id", "=", id]],
+                    fields: fields,
                     model: model,
-                });
-                delete item.id;
-                for (const field in item) {
-                    columns.push(field);
-                    tbody += `<td>${item[field]}</td>`;
-                }
-                tbody += "</tr>";
-            }
-            this.printTable(_.unique(columns), tbody);
-            return true;
-        },
-
-        _cmdLastSeen: async function() {
-            const result = await rpc.query({
-                method: "search_read",
-                fields: ["user_id", "last_presence"],
-                model: "bus.presence",
-                order: "last_presence DESC",
-                kwargs: {context: this._getContext()},
-            });
-            let body = "";
-            const l = result.length;
-            for (let x = 0; x < l; ++x) {
-                const record = result[x];
-                body +=
-                    `<tr><td>${record.user_id[1]}</td>` +
-                    `<td>${record.user_id[0]}</td>` +
-                    `<td>${record.last_presence}</td></tr>`;
-            }
-            this.printTable(["User Name", "User ID", "Last Seen"], body);
-            return true;
-        },
-
-        _cmdCheckModelAccess: async function(model, operation) {
-            const result = await rpc.query({
-                method: "check_access_rights",
-                model: model,
-                args: [operation, false],
-                kwargs: {context: this._getContext()},
-            });
-            if (result) {
-                this.print(`Nice! you can '${operation}' on ${model}`);
-            } else {
-                this.print(`You can't '${operation}' on ${model}`);
-            }
-            return true;
-        },
-
-        _cmdCheckFieldAccess: async function(model, fields = "false") {
-            const result = await rpc.query({
-                method: "fields_get",
-                model: model,
-                args: [JSON.parse(fields)],
-                kwargs: {context: this._getContext()},
-            });
-            const keys = Object.keys(result);
-            const fieldParams = [
-                "type",
-                "string",
-                "relation",
-                "required",
-                "readonly",
-                "searchable",
-                "depends",
-            ];
-            let body = "";
-            const l = keys.length;
-            for (let x = 0; x < l; ++x) {
-                const field = keys[x];
-                body += "<tr>";
-                body += `<td>${field}</td>`;
-                const fieldDef = result[field];
-                const l2 = fieldParams.length;
-                for (let x2 = 0; x2 < l2; ++x2) {
-                    let value = fieldDef[fieldParams[x2]];
-                    if (_.isUndefined(value) || _.isNull(undefined)) {
-                        value = "";
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    let tbody = "";
+                    const columns = ["id"];
+                    const l = result.length;
+                    for (let x = 0; x < l; ++x) {
+                        const item = result[x];
+                        tbody += "<tr>";
+                        tbody += this._templates.render("TABLE_BODY_CMD", {
+                            id: item.id,
+                            model: model,
+                        });
+                        delete item.id;
+                        for (const field in item) {
+                            columns.push(field);
+                            tbody += `<td>${item[field]}</td>`;
+                        }
+                        tbody += "</tr>";
                     }
-                    body += `<td>${value}</td>`;
-                }
-                body += "</tr>";
-            }
-            fieldParams.unshift("field");
-            this.printTable(fieldParams, body);
-            return true;
+                    this.printTable(_.unique(columns), tbody);
+                });
         },
 
-        _cmdShowWhoAmI: async function() {
+        _cmdLastSeen: function() {
+            return rpc
+                .query({
+                    method: "search_read",
+                    fields: ["user_id", "last_presence"],
+                    model: "bus.presence",
+                    order: "last_presence DESC",
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    let body = "";
+                    const l = result.length;
+                    for (let x = 0; x < l; ++x) {
+                        const record = result[x];
+                        body +=
+                            `<tr><td>${record.user_id[1]}</td>` +
+                            `<td>${record.user_id[0]}</td>` +
+                            `<td>${record.last_presence}</td></tr>`;
+                    }
+                    this.printTable(
+                        ["User Name", "User ID", "Last Seen"],
+                        body
+                    );
+                });
+        },
+
+        _cmdCheckModelAccess: function(model, operation) {
+            return rpc
+                .query({
+                    method: "check_access_rights",
+                    model: model,
+                    args: [operation, false],
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    if (result) {
+                        this.print(`Nice! you can '${operation}' on ${model}`);
+                    } else {
+                        this.print(`You can't '${operation}' on ${model}`);
+                    }
+                });
+        },
+
+        _cmdCheckFieldAccess: function(model, fields = "false") {
+            return rpc
+                .query({
+                    method: "fields_get",
+                    model: model,
+                    args: [JSON.parse(fields)],
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    const keys = Object.keys(result);
+                    const fieldParams = [
+                        "type",
+                        "string",
+                        "relation",
+                        "required",
+                        "readonly",
+                        "searchable",
+                        "depends",
+                    ];
+                    let body = "";
+                    const l = keys.length;
+                    for (let x = 0; x < l; ++x) {
+                        const field = keys[x];
+                        body += "<tr>";
+                        body += `<td>${field}</td>`;
+                        const fieldDef = result[field];
+                        const l2 = fieldParams.length;
+                        for (let x2 = 0; x2 < l2; ++x2) {
+                            let value = fieldDef[fieldParams[x2]];
+                            if (_.isUndefined(value) || _.isNull(undefined)) {
+                                value = "";
+                            }
+                            body += `<td>${value}</td>`;
+                        }
+                        body += "</tr>";
+                    }
+                    fieldParams.unshift("field");
+                    this.printTable(fieldParams, body);
+                });
+        },
+
+        _cmdShowWhoAmI: function() {
             const uid =
                 window.odoo.session_info.uid ||
                 window.odoo.session_info.user_id;
-            const result = await rpc.query({
-                method: "search_read",
-                domain: [["id", "=", uid]],
-                fields: [
-                    "id",
-                    "display_name",
-                    "login",
-                    "partner_id",
-                    "company_id",
-                    "company_ids",
-                    "groups_id",
-                ],
-                model: "res.users",
-                kwargs: {context: this._getContext()},
-            });
-            if (result.length) {
-                const record = result[0];
-                this.print(
-                    this._templates.render("WHOAMI", {
-                        login: record.login,
-                        display_name: record.display_name,
-                        user_id: record.id,
-                        partner: record.partner_id,
-                        company: record.company_id,
-                        companies: record.company_ids,
-                        groups: record.groups_id,
-                    })
-                );
-            } else {
-                this.printError("Oops! can't get the login :/");
-            }
-            return true;
+            return rpc
+                .query({
+                    method: "search_read",
+                    domain: [["id", "=", uid]],
+                    fields: [
+                        "id",
+                        "display_name",
+                        "login",
+                        "partner_id",
+                        "company_id",
+                        "company_ids",
+                        "groups_id",
+                    ],
+                    model: "res.users",
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    if (result.length) {
+                        const record = result[0];
+                        this.print(
+                            this._templates.render("WHOAMI", {
+                                login: record.login,
+                                display_name: record.display_name,
+                                user_id: record.id,
+                                partner: record.partner_id,
+                                company: record.company_id,
+                                companies: record.company_ids,
+                                groups: record.groups_id,
+                            })
+                        );
+                    } else {
+                        this.printError("Oops! can't get the login :/");
+                    }
+                });
         },
 
-        _cmdSetDebugMode: async function(mode) {
+        _cmdSetDebugMode: function(mode) {
             if (mode === 0) {
                 this.print(
                     "Debug mode <strong>disabled</strong>. Reloading page..."
@@ -666,12 +685,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
             } else {
                 this.printError("Invalid debug mode");
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdReloadPage: async function() {
+        _cmdReloadPage: function() {
             location.reload();
-            return true;
+            return Promise.resolve();
         },
 
         _searchModule: function(module_name) {
@@ -684,82 +703,82 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _cmdUpgradeModule: async function(module_name) {
-            const result = await this._searchModule(module_name);
-            if (result.length) {
-                rpc.query({
-                    method: "button_immediate_upgrade",
-                    model: "ir.module.module",
-                    args: [result[0].id],
-                }).then(
-                    () => {
-                        this.print(
-                            `'${module_name}' module successfully upgraded`
-                        );
-                    },
-                    () => {
-                        this.printError(
-                            `Can't upgrade '${module_name}' module`
-                        );
-                    }
-                );
-            } else {
-                this.printError(`'${module_name}' module doesn't exists`);
-            }
-            return true;
+        _cmdUpgradeModule: function(module_name) {
+            return this._searchModule(module_name).then(result => {
+                if (result.length) {
+                    rpc.query({
+                        method: "button_immediate_upgrade",
+                        model: "ir.module.module",
+                        args: [result[0].id],
+                    }).then(
+                        () => {
+                            this.print(
+                                `'${module_name}' module successfully upgraded`
+                            );
+                        },
+                        () => {
+                            this.printError(
+                                `Can't upgrade '${module_name}' module`
+                            );
+                        }
+                    );
+                } else {
+                    this.printError(`'${module_name}' module doesn't exists`);
+                }
+            });
         },
 
-        _cmdInstallModule: async function(module_name) {
-            const result = await this._searchModule(module_name);
-            if (result.length) {
-                rpc.query({
-                    method: "button_immediate_install",
-                    model: "ir.module.module",
-                    args: [result[0].id],
-                }).then(
-                    () => {
-                        this.print(
-                            `'${module_name}' module successfully installed`
-                        );
-                    },
-                    () => {
-                        this.printError(
-                            `Can't install '${module_name}' module`
-                        );
-                    }
-                );
-            } else {
-                this.printError(`'${module_name}' module doesn't exists`);
-            }
-            return true;
+        _cmdInstallModule: function(module_name) {
+            return this._searchModule(module_name).then(result => {
+                if (result.length) {
+                    rpc.query({
+                        method: "button_immediate_install",
+                        model: "ir.module.module",
+                        args: [result[0].id],
+                    }).then(
+                        () => {
+                            this.print(
+                                `'${module_name}' module successfully installed`
+                            );
+                        },
+                        () => {
+                            this.printError(
+                                `Can't install '${module_name}' module`
+                            );
+                        }
+                    );
+                } else {
+                    this.printError(`'${module_name}' module doesn't exists`);
+                }
+            });
         },
 
-        _cmdUninstallModule: async function(module_name) {
-            const result = await this._searchModule(module_name);
-            if (result.length) {
-                rpc.query({
-                    method: "button_immediate_uninstall",
-                    model: "ir.module.module",
-                    args: [result[0].id],
-                }).then(
-                    () => {
-                        this.print(
-                            `'${module_name}' module successfully uninstalled`
-                        );
-                    },
-                    () => {
-                        this.printError(
-                            `Can't uninstall '${module_name}' module`
-                        );
-                    }
-                );
-            } else {
-                this.printError(`'${module_name}' module doesn't exists`);
-            }
-            return true;
+        _cmdUninstallModule: function(module_name) {
+            return this._searchModule(module_name).then(result => {
+                if (result.length) {
+                    rpc.query({
+                        method: "button_immediate_uninstall",
+                        model: "ir.module.module",
+                        args: [result[0].id],
+                    }).then(
+                        () => {
+                            this.print(
+                                `'${module_name}' module successfully uninstalled`
+                            );
+                        },
+                        () => {
+                            this.printError(
+                                `Can't uninstall '${module_name}' module`
+                            );
+                        }
+                    );
+                } else {
+                    this.printError(`'${module_name}' module doesn't exists`);
+                }
+            });
         },
 
-        _cmdCallModelMethod: async function(
+        _cmdCallModelMethod: function(
             model,
             method,
             args = "[]",
@@ -769,16 +788,19 @@ odoo.define("terminal.CommonFunctions", function(require) {
             if (typeof pkwargs.context === "undefined") {
                 pkwargs.context = this._getContext();
             }
-            const result = await rpc.query({
-                method: method,
-                model: model,
-                args: JSON.parse(args),
-                kwargs: pkwargs,
-            });
-            this.print(result);
+            return rpc
+                .query({
+                    method: method,
+                    model: model,
+                    args: JSON.parse(args),
+                    kwargs: pkwargs,
+                })
+                .then(result => {
+                    this.print(result);
+                });
         },
 
-        _cmdSearchModelRecord: async function(
+        _cmdSearchModelRecord: function(
             model,
             field_names,
             domain = "[]",
@@ -791,36 +813,38 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         ? false
                         : this._parameterReader.splitAndTrim(field_names, ",");
             }
-            const result = await rpc.query({
-                method: "search_read",
-                domain: JSON.parse(domain),
-                fields: fields,
-                model: model,
-                limit: limit,
-                kwargs: {context: this._getContext()},
-            });
-            let tbody = "";
-            const columns = ["id"];
-            const l = result.length;
-            for (let x = 0; x < l; ++x) {
-                const item = result[x];
-                tbody += "<tr>";
-                tbody += this._templates.render("TABLE_SEARCH_ID", {
-                    id: item.id,
+            return rpc
+                .query({
+                    method: "search_read",
+                    domain: JSON.parse(domain),
+                    fields: fields,
                     model: model,
+                    limit: limit,
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    let tbody = "";
+                    const columns = ["id"];
+                    const l = result.length;
+                    for (let x = 0; x < l; ++x) {
+                        const item = result[x];
+                        tbody += "<tr>";
+                        tbody += this._templates.render("TABLE_SEARCH_ID", {
+                            id: item.id,
+                            model: model,
+                        });
+                        delete item.id;
+                        for (const field in item) {
+                            columns.push(field);
+                            tbody += `<td>${item[field]}</td>`;
+                        }
+                        tbody += "</tr>";
+                    }
+                    this.printTable(_.unique(columns), tbody);
                 });
-                delete item.id;
-                for (const field in item) {
-                    columns.push(field);
-                    tbody += `<td>${item[field]}</td>`;
-                }
-                tbody += "</tr>";
-            }
-            this.printTable(_.unique(columns), tbody);
-            return true;
         },
 
-        _cmdCreateModelRecord: async function(model, values) {
+        _cmdCreateModelRecord: function(model, values) {
             if (typeof values === "undefined") {
                 return this.do_action({
                     type: "ir.actions.act_window",
@@ -831,58 +855,63 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     this.do_hide();
                 });
             }
-            const result = await rpc.query({
-                method: "create",
-                model: model,
-                args: [JSON.parse(values)],
-                kwargs: {context: this._getContext()},
-            });
-            this.print(
-                this._templates.render("RECORD_CREATED", {
+            return rpc
+                .query({
+                    method: "create",
                     model: model,
-                    new_id: result,
+                    args: [JSON.parse(values)],
+                    kwargs: {context: this._getContext()},
                 })
-            );
-            return true;
+                .then(result => {
+                    this.print(
+                        this._templates.render("RECORD_CREATED", {
+                            model: model,
+                            new_id: result,
+                        })
+                    );
+                });
         },
 
-        _cmdUnlinkModelRecord: async function(model, id) {
-            await rpc.query({
-                method: "unlink",
-                model: model,
-                args: [id],
-                kwargs: {context: this._getContext()},
-            });
-            this.print(`${model} record deleted successfully`);
-            return true;
+        _cmdUnlinkModelRecord: function(model, id) {
+            return rpc
+                .query({
+                    method: "unlink",
+                    model: model,
+                    args: [id],
+                    kwargs: {context: this._getContext()},
+                })
+                .then(() => {
+                    this.print(`${model} record deleted successfully`);
+                });
         },
 
-        _cmdWriteModelRecord: async function(model, id, values) {
-            await rpc.query({
-                method: "write",
-                model: model,
-                args: [id, JSON.parse(values)],
-                kwargs: {context: this._getContext()},
-            });
-            this.print(`${model} record updated successfully`);
-            return true;
+        _cmdWriteModelRecord: function(model, id, values) {
+            return rpc
+                .query({
+                    method: "write",
+                    model: model,
+                    args: [id, JSON.parse(values)],
+                    kwargs: {context: this._getContext()},
+                })
+                .then(() => {
+                    this.print(`${model} record updated successfully`);
+                });
         },
 
-        _cmdCallAction: async function(action) {
+        _cmdCallAction: function(action) {
             let paction = action;
             try {
                 paction = JSON.parse(action);
             } catch (err) {
                 // Do Nothing
             }
-            await this.do_action(paction);
-            return true;
+            return this.do_action(paction);
         },
 
-        _cmdPostData: async function(url, data) {
-            const result = await ajax.post(url, JSON.parse(data));
-            this.print(result);
-            return true;
+        _cmdPostData: function(url, data) {
+            return ajax.post(url, JSON.parse(data)).then(result => {
+                this.print(result);
+            });
         },
 
         //

@@ -20,8 +20,8 @@ odoo.define("terminal.TemplateManager", function(require) {
                 "<div class='d-flex terminal-user-input'>" +
                 "<input class='terminal-prompt' readonly='readonly'/>" +
                 "<div class='flex-fill rich-input'>" +
-                "<input type='edit' id='terminal_shadow_input' readonly='readonly'/>" +
-                "<input type='edit' id='terminal_input' />" +
+                "<input type='edit' id='terminal_shadow_input' autocomplete='off' readonly='readonly'/>" +
+                "<input type='edit' id='terminal_input' autocomplete='off' />" +
                 "</div>" +
                 "</div>" +
                 "<div class='terminal-screen-info-zone'>" +

@@ -15,7 +15,7 @@
 
 # DEFINE NEW COMMANDS
 
-Commands works with promises
+Commands uses promises
 
 **Command definition**::
 
