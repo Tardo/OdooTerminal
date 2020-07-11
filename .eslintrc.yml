@@ -2,7 +2,7 @@ env:
   browser: true
 
 parserOptions:
-  ecmaVersion: 2017
+  ecmaVersion: 2020
 
 # Globals available in Odoo that shouldn't produce errorings
 globals:

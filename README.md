@@ -91,7 +91,7 @@ You can toggle terminal using one of these options:
     (https://docs.python.org/3/tutorial/classes.html#tut-private)
 - Indentation Style: K&R - 1TBS Variant
   (https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS))
-- JavaScript Specification: ES2017
+- ECMAScript: 2020
 
 ## Pre-commit
 
