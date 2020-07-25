@@ -158,8 +158,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "<STRING: MODEL NAME> <INT: RECORD ID> " +
                     "[STRING: FIELDS]",
                 args: "si?s",
-                // Depecrated Names
-                aliases: ["searchid"],
             });
             this.registerCommand("context", {
                 definition: "Operations over session context dictionary",
@@ -231,7 +229,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 callback: this._cmdJSTest,
                 detail:
                     "Runs js tests in desktop or mobile mode for the selected module." +
-                    "<br>&lt;MODULE&gt; Module name" +
+                    "<br>&lt;MODULE&gt; Module technical name" +
                     "<br>&lt;MODE&gt; Can be 'desktop' or 'mobile' (By default is 'desktop')",
                 syntaxis: "<STRING: MODULE> <STRING: MODE>",
                 args: "?ss",
@@ -240,11 +238,10 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 definition: "Launch Tour",
                 callback: this._cmdRunTour,
                 detail:
-                    "Runs the selected tour" +
-                    "<br>&lt;OPERATION&gt; Can be 'run' or 'list'" +
+                    "Runs the selected tour. If no tour given, prints all available tours." +
                     "<br>[TOUR NAME] Tour Name",
-                syntaxis: "<STRING: OPERATION> [STRING: TOUR NAME]",
-                args: "s?s",
+                syntaxis: "[STRING: TOUR NAME]",
+                args: "?s",
             });
             this.registerCommand("json", {
                 definition: "Send POST JSON",
@@ -325,23 +322,19 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
-        _cmdRunTour: function(oper, tour_name) {
+        _cmdRunTour: function(tour_name) {
             const tour_names = Object.keys(tour.tours);
-            if (oper === "list") {
-                if (tour_names.length) {
-                    this.print(tour_names);
+            if (tour_name) {
+                if (tour_names.indexOf(tour_name) === -1) {
+                    this.printError("The given tour doesn't exists!");
                 } else {
-                    this.print("The tours list is empty");
-                }
-            } else if (oper === "run") {
-                if (tour_name) {
-                    this.print("Running tour...");
                     odoo.__DEBUG__.services["web_tour.tour"].run(tour_name);
-                } else {
-                    this.printError("No tour has been indicated to run");
+                    this.print("Running tour...");
                 }
+            } else if (tour_names.length) {
+                this.print(tour_names);
             } else {
-                this.printError("Invalid Operation! (Use 'run' or 'list')");
+                this.print("The tour list is empty");
             }
             return Promise.resolve();
         },

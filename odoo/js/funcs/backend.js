@@ -26,18 +26,23 @@ odoo.define("terminal.BackendFunctions", function(require) {
             this.registerCommand("settings", {
                 definition: "Open settings page",
                 callback: this._cmdOpenSettings,
-                detail: "Open settings page.",
-                syntaxis: "",
-                args: "",
+                detail:
+                    "Open settings page." +
+                    "<br>[MODULE NAME] The module technical name (default is 'general_settings')",
+                syntaxis: "[STRING: MODULE NAME]",
+                args: "?s",
             });
         },
 
-        _cmdOpenSettings: function() {
+        _cmdOpenSettings: function(module = "general_settings") {
             return this.do_action({
+                name: "Settings",
                 type: "ir.actions.act_window",
                 res_model: "res.config.settings",
+                view_mode: "form",
                 views: [[false, "form"]],
-                target: "current",
+                target: "inline",
+                context: {module: module},
             }).then(() => this.do_hide());
         },
 

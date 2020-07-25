@@ -173,8 +173,11 @@ python -m unittest tests.test_firefox
 IMP: Chromium based browsers action icon
 IMP: Terminal CSS
 IMP: Minor changes
+IMP: User input
+IMP: Command 'settings': Now can select the target module
 
 ADD: Command 'alias': Make your own command aliases
+ADD: Command 'quit': Hide the terminal
 
 FIX: async/await: Use a workaround to not break inheritance chain
 
@@ -195,6 +198,7 @@ IMP: Aliases for terminal commands
 IMP: Command Parser 'args' simplified
 IMP: Code refactor
 IMP: Tests
+IMP: Command 'tour': Removed operation parameter (list, run)
 
 ADD: Command 'depends': Know modules that depends on the given module
 ADD: Command 'context_term': 'read', 'write' or 'set' terminal context (issue #14)
@@ -203,6 +207,8 @@ ADD: Command 'logout': Session log out
 
 FIX: Extension Preferences
 FIX: Click view record shortcut (issue #13)
+
+DEL: Deprecated code
 ```
 
 **5.2.0**

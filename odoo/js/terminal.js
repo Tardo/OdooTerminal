@@ -86,11 +86,6 @@ odoo.define("terminal.Terminal", function(require) {
      * This class is used to parse terminal command parameters.
      */
     const ParameterReader = Class.extend({
-        _validators: {},
-        _formatters: {},
-        _regexSanitize: null,
-        _regexParams: null,
-
         init: function() {
             this._validators = {
                 s: this._validateString,
@@ -105,7 +100,7 @@ odoo.define("terminal.Terminal", function(require) {
                 /(["'])((?:(?=(\\?))\2.)*?)\1|[^\s]+/,
                 "g"
             );
-            this._regexArgs = new RegExp("[?*]");
+            this._regexArgs = new RegExp(/[?*]/);
         },
 
         /**
@@ -215,7 +210,8 @@ odoo.define("terminal.Terminal", function(require) {
          * @returns {Int}
          */
         _getNumRequiredArgs: function(args) {
-            return args.match(this._regexArgs).index;
+            const match = args.match(this._regexArgs);
+            return match ? match.index : args.length;
         },
 
         /**
@@ -275,12 +271,6 @@ odoo.define("terminal.Terminal", function(require) {
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
         },
 
-        SCREEN_HEIGHT: "40vh",
-        SCREEN_MAX_HEIGHT: "90vh",
-        BTN_BCKG_COLOR_ACTIVE: "#555",
-
-        _parameterReader: null,
-
         _runningCommandsCount: 0,
         _errorCount: 0,
 
@@ -315,15 +305,15 @@ odoo.define("terminal.Terminal", function(require) {
             this._storageLocal = new TerminalStorageLocal(this);
             this._longpolling = new TerminalLongPolling(this);
             this._parameterReader = new ParameterReader();
-
             this._rawTerminal = QWeb.render("terminal");
-
             this._lazyStorageTerminalScreen = _.debounce(
                 function() {
                     this._storage.setItem("terminal_screen", this.$term.html());
                 }.bind(this),
                 350
             );
+            this._runningCommandsCount = 0;
+            this._errorCount = 0;
 
             core.bus.on("keydown", this, this._onCoreKeyDown);
             core.bus.on("click", this, this._onCoreClick);
@@ -370,13 +360,10 @@ odoo.define("terminal.Terminal", function(require) {
 
             const isMaximized = this._storage.getItem("screen_maximized");
             if (isMaximized) {
-                this.$term.css("height", this.SCREEN_MAX_HEIGHT);
-                this.$(".terminal-screen-icon-maximize").css(
-                    "backgroundColor",
-                    this.BTN_BCKG_COLOR_ACTIVE
-                );
-            } else {
-                this.$term.css("height", this.SCREEN_HEIGHT);
+                this.$el.addClass("term-maximized");
+                this.$(".terminal-screen-icon-maximize")
+                    .removeClass("btn-dark")
+                    .addClass("btn-light");
             }
         },
 
@@ -931,6 +918,7 @@ odoo.define("terminal.Terminal", function(require) {
 
         _updateInput: function(str) {
             this.$input.val(str);
+            this._cleanShadowInput();
         },
         _updateShadowInput: function(str) {
             this.$shadowInput.val(str);
@@ -994,14 +982,15 @@ odoo.define("terminal.Terminal", function(require) {
             const $target = $(ev.currentTarget);
             const is_maximized = this._storage.getItem("screen_maximized");
             if (is_maximized) {
-                this.$term.css("height", this.SCREEN_HEIGHT);
-                $target.css("backgroundColor", "");
+                this.$el.removeClass("term-maximized");
+                $target.removeClass("btn-light").addClass("btn-dark");
             } else {
-                this.$term.css("height", this.SCREEN_MAX_HEIGHT);
-                $target.css("backgroundColor", this.BTN_BCKG_COLOR_ACTIVE);
+                this.$el.addClass("term-maximized");
+                $target.removeClass("btn-dark").addClass("btn-light");
             }
             this._storage.setItem("screen_maximized", !is_maximized);
             this.$term[0].scrollTop = this.$term[0].scrollHeight;
+            this._preventLostInputFocus();
         },
 
         _onKeyEnter: function() {
@@ -1030,8 +1019,11 @@ odoo.define("terminal.Terminal", function(require) {
                 this.cleanInput();
             }
         },
-        _onKeyArrowRight: function() {
-            if (this.$input.val()) {
+        _onKeyArrowRight: function(ev) {
+            if (
+                this.$input.val() &&
+                ev.target.selectionStart === this.$input.val().length
+            ) {
                 this._searchCommandQuery = this.$input.val();
                 this._searchHistoryIter = this._inputHistory.length;
                 this._onKeyArrowUp();
@@ -1073,15 +1065,15 @@ odoo.define("terminal.Terminal", function(require) {
         },
         _onInputKeyUp: function(ev) {
             if (ev.keyCode === $.ui.keyCode.ENTER) {
-                this._onKeyEnter();
+                this._onKeyEnter(ev);
             } else if (ev.keyCode === $.ui.keyCode.UP) {
-                this._onKeyArrowUp();
+                this._onKeyArrowUp(ev);
             } else if (ev.keyCode === $.ui.keyCode.DOWN) {
-                this._onKeyArrowDown();
+                this._onKeyArrowDown(ev);
             } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
-                this._onKeyArrowRight();
+                this._onKeyArrowRight(ev);
             } else if (ev.keyCode === $.ui.keyCode.TAB) {
-                this._onKeyTab();
+                this._onKeyTab(ev);
             } else {
                 this._searchHistoryIter = this._inputHistory.length;
                 this._searchCommandIter = Object.keys(

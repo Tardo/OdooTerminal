@@ -65,6 +65,11 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: "[STRING: ALIAS] [STRING: DEFINITION]",
                 args: "?s*",
             });
+            this.registerCommand("quit", {
+                definition: "Close terminal",
+                callback: this._cmdQuit,
+                detail: "Close the terminal. ",
+            });
         },
 
         _printWelcomeMessage: function() {
@@ -193,6 +198,11 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 }
                 this._storageLocal.setItem("terminal_aliases", aliases);
             }
+            return Promise.resolve();
+        },
+
+        _cmdQuit: function() {
+            this.do_hide();
             return Promise.resolve();
         },
     });
