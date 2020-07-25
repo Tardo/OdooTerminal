@@ -13,17 +13,17 @@ class SeleniumTestCase(unittest.TestCase):
 
     _ODOO_SERVERS = {
         'ce': {
-            '11': 'http://runbot.odoo.com/runbot/quick_connect/33835',
-            '12': 'http://runbot.odoo.com/runbot/quick_connect/47160',
-            '13': 'http://runbot.odoo.com/runbot/quick_connect/72616',
-            '14': 'http://runbot.odoo.com/runbot/quick_connect/1',
+            '11': 'https://runbot.odoo-community.org/runbot/162/11.0',
+            '12': 'https://runbot.odoo-community.org/runbot/162/12.0',
+            '13': 'https://runbot.odoo-community.org/runbot/162/13.0',
+            #'14': 'http://runbot.odoo.com/runbot/quick_connect/1',
         },
-        'ee': {
-            '11': 'http://runbot.odoo.com/runbot/quick_connect/33836',
-            '12': 'http://runbot.odoo.com/runbot/quick_connect/47161',
-            '13': 'http://runbot.odoo.com/runbot/quick_connect/72617',
-            '14': 'http://runbot.odoo.com/runbot/quick_connect/9471',
-        }
+        # 'ee': {
+        #     '11': 'http://runbot.odoo.com/runbot/quick_connect/33836',
+        #     '12': 'http://runbot.odoo.com/runbot/quick_connect/47161',
+        #     '13': 'http://runbot.odoo.com/runbot/quick_connect/72617',
+        #     '14': 'http://runbot.odoo.com/runbot/quick_connect/9471',
+        # }
     }
     _WAIT_SECS = 5
 
@@ -51,7 +51,8 @@ class SeleniumTestCase(unittest.TestCase):
             .click()
         elem = self._waitForElement(
             'p.alert-danger', self._WAIT_SECS, by=By.CSS_SELECTOR)
-        self.assertFalse(elem, 'Ooops! Invalid login :/')
+        if elem and not 'Only employee can access this database' in elem.text:
+            raise Exception('Ooops! Invalid login :/')
 
     def _send_terminal_command(self, cmd):
         elem = self.browser.find_element_by_css_selector(
