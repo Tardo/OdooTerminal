@@ -54,6 +54,7 @@ You can toggle terminal using one of these options:
 | View 'res.partner' records _(only backend)_         | `view res.partner`                                 |
 | View selected 'res.partner' record _(only backend)_ | `view res.partner 4`                               |
 | Install module                                      | `install mymodule`                                 |
+| Create alias                                        | `alias myalias print My name is $1`                |
 
 > Notice the usage of quotes when use parameters with spaces.
 
@@ -166,7 +167,7 @@ python -m unittest tests.test_firefox
 
 # Changelog
 
-**5.4.0**
+**6.0.0**
 
 ```
 IMP: Chromium based browsers action icon

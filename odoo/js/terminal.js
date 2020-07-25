@@ -11,7 +11,7 @@ odoo.define("terminal.Terminal", function(require) {
 
     const QWeb = core.qweb;
 
-    const TerminalStorage = AbstractTerminal.storage.extend({
+    const TerminalStorageSession = AbstractTerminal.storage.extend({
         getItem: function(item) {
             return JSON.parse(sessionStorage.getItem(item)) || undefined;
         },
@@ -19,23 +19,10 @@ odoo.define("terminal.Terminal", function(require) {
         setItem: function(item, value) {
             try {
                 return sessionStorage.setItem(item, JSON.stringify(value));
-            } catch (e) {
-                if (e.name !== "QuotaExceededError") {
-                    throw e;
+            } catch (err) {
+                if (!this._checkError(err)) {
+                    throw err;
                 }
-                this._parent._printHTML(
-                    "<span style='color:navajowhite'>" +
-                        "<strong>WARNING:</strong> Clear the " +
-                        "<b class='o_terminal_click o_terminal_cmd' " +
-                        "data-cmd='clear screen' style='color:orange;'>screen</b> " +
-                        "or/and " +
-                        "<b class='o_terminal_click o_terminal_cmd' " +
-                        "data-cmd='clear history' style='color:orange;'>" +
-                        "history</b> " +
-                        "to free storage space. Browser <u>Storage Quota Exceeded</u>" +
-                        " 😭 </strong><br>",
-                    true
-                );
             }
 
             return false;
@@ -43,6 +30,28 @@ odoo.define("terminal.Terminal", function(require) {
 
         removeItem: function(item) {
             return sessionStorage.removeItem(item) || undefined;
+        },
+    });
+
+    const TerminalStorageLocal = AbstractTerminal.storage.extend({
+        getItem: function(item) {
+            return JSON.parse(localStorage.getItem(item)) || undefined;
+        },
+
+        setItem: function(item, value) {
+            try {
+                return localStorage.setItem(item, JSON.stringify(value));
+            } catch (err) {
+                if (!this._checkError(err)) {
+                    throw err;
+                }
+            }
+
+            return false;
+        },
+
+        removeItem: function(item) {
+            return localStorage.removeItem(item) || undefined;
         },
     });
 
@@ -96,6 +105,7 @@ odoo.define("terminal.Terminal", function(require) {
                 /(["'])((?:(?=(\\?))\2.)*?)\1|[^\s]+/,
                 "g"
             );
+            this._regexArgs = new RegExp("[?*]");
         },
 
         /**
@@ -144,34 +154,68 @@ odoo.define("terminal.Terminal", function(require) {
          * @returns {Boolean}
          */
         validateAndFormat: function(args, params) {
-            if (!args || !args.length) {
+            if (!args.length) {
                 return params;
             }
             const formatted_params = [];
-            let optional_mode = false;
-            for (let i = 0; i < args.length; ++i) {
+            let checkedCount = 0;
+            for (
+                let i = 0;
+                i < args.length && checkedCount < params.length;
+                ++i
+            ) {
                 let carg = args[i];
+                // Determine argument type
                 if (carg === "?") {
-                    optional_mode = true;
                     carg = args[++i];
+                } else if (carg === "*") {
+                    for (; checkedCount < params.length; ++checkedCount) {
+                        formatted_params.push(
+                            this._formatters.s(params[checkedCount])
+                        );
+                    }
+                    break;
                 }
-
-                const curParamIndex = formatted_params.length;
-                const isInvalidNO =
-                    !optional_mode && curParamIndex >= params.length;
-                const isInvalidO =
-                    curParamIndex < params.length &&
-                    !this._validators[carg](params[curParamIndex]);
-                if (isInvalidNO || isInvalidO) {
-                    throw new Error("Invalid command parameters");
+                // Parameter validation & formatting
+                const param = params[checkedCount];
+                if (!this._validators[carg](param)) {
+                    break;
                 }
+                formatted_params.push(this._formatters[carg](param));
+                ++checkedCount;
+            }
 
-                formatted_params.push(
-                    this._formatters[carg](params[curParamIndex])
-                );
+            if (
+                checkedCount !== params.length ||
+                checkedCount < this._getNumRequiredArgs(args)
+            ) {
+                throw new Error("Invalid command parameters");
             }
 
             return formatted_params;
+        },
+
+        /**
+         * Convert array of command params to 'raw' string params
+         * @param {Array} params
+         * @returns {String}
+         */
+        stringify: function(params) {
+            return _.map(params, function(item) {
+                if (item.indexOf(" ") === -1) {
+                    return item;
+                }
+                return `"${item}"`;
+            }).join(" ");
+        },
+
+        /**
+         * Get the number of required arguments
+         * @param {String} args
+         * @returns {Int}
+         */
+        _getNumRequiredArgs: function(args) {
+            return args.match(this._regexArgs).index;
         },
 
         /**
@@ -267,7 +311,8 @@ odoo.define("terminal.Terminal", function(require) {
         init: function() {
             this._super.apply(this, arguments);
 
-            this._storage = new TerminalStorage(this);
+            this._storage = new TerminalStorageSession(this);
+            this._storageLocal = new TerminalStorageLocal(this);
             this._longpolling = new TerminalLongPolling(this);
             this._parameterReader = new ParameterReader();
 
@@ -492,6 +537,12 @@ odoo.define("terminal.Terminal", function(require) {
             this._storage.removeItem("terminal_screen");
         },
 
+        getAliasCommand: function(cmd_name) {
+            const aliases =
+                this._storageLocal.getItem("terminal_aliases") || {};
+            return aliases[cmd_name];
+        },
+
         registerCommand: function(cmd, cmd_def) {
             this._registeredCmds[cmd] = _.extend(
                 {
@@ -515,32 +566,18 @@ odoo.define("terminal.Terminal", function(require) {
             if (!cmd_name) {
                 return false;
             }
+
             let cmd_def = this._registeredCmds[cmd_name];
+            let scmd = {};
 
             // Stop execution if the command doesn't exists
             if (!cmd_def) {
                 [, cmd_def] = this._searchCommandDefByAlias(cmd_name);
                 if (!cmd_def) {
-                    const similar_cmd = this._searchSimiliarCommand(cmd_name);
-                    if (similar_cmd) {
-                        this.print(
-                            this._templates.render("UNKNOWN_COMMAND", {
-                                cmd: similar_cmd,
-                                params: cmd_split.slice(1),
-                            })
-                        );
-                    } else {
-                        this.eprint("Unknown command.");
-                    }
-                    if (store) {
-                        this._storeUserInput(cmd);
-                    }
-                    this.cleanInput();
-                    return false;
+                    return this._alternativeExecuteCommand(cmd_raw, store);
                 }
             }
 
-            let scmd = {};
             try {
                 scmd = this._parameterReader.parse(cmd, cmd_def);
             } catch (err) {
@@ -575,6 +612,7 @@ odoo.define("terminal.Terminal", function(require) {
             );
             this.cleanInput();
             this._processCommandJob(scmd, cmd_def);
+            return true;
         },
 
         /* VISIBILIY */
@@ -596,6 +634,44 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         /* PRIVATE METHODS*/
+        _alternativeExecuteCommand: function(cmd_raw, store = true) {
+            const cmd = cmd_raw || "";
+            const cmd_split = cmd_raw.split(" ");
+            const cmd_name = cmd_split[0];
+            // Try alias
+            let alias_cmd = this.getAliasCommand(cmd_name);
+            if (alias_cmd) {
+                const scmd = this._parameterReader.parse(cmd, {args: "*"});
+                for (const index in scmd.params) {
+                    const re = new RegExp(`\\$${Number(index) + 1}`, "g");
+                    alias_cmd = alias_cmd.replace(re, scmd.params[index]);
+                }
+                if (store) {
+                    this._storeUserInput(cmd);
+                }
+                this.executeCommand(alias_cmd, false);
+                return true;
+            }
+
+            // Search similar commands
+            const similar_cmd = this._searchSimiliarCommand(cmd_name);
+            if (similar_cmd) {
+                this.print(
+                    this._templates.render("UNKNOWN_COMMAND", {
+                        cmd: similar_cmd,
+                        params: cmd_split.slice(1),
+                    })
+                );
+            } else {
+                this.eprint("Unknown command.");
+            }
+            if (store) {
+                this._storeUserInput(cmd);
+            }
+            this.cleanInput();
+            return false;
+        },
+
         _getContext: function() {
             return _.extend({}, session.user_context, this._userContext);
         },
@@ -887,7 +963,11 @@ odoo.define("terminal.Terminal", function(require) {
             this._updateRunningCmdCount();
             if (has_errors) {
                 this.printError(`Error executing '${cmd}':`);
-                if (!("data" in result) && "message" in result) {
+                if (
+                    typeof result === "object" &&
+                    !("data" in result) &&
+                    "message" in result
+                ) {
                     this.printError(result.message, true);
                 } else {
                     this.printError(result, true);
@@ -1057,7 +1137,8 @@ odoo.define("terminal.Terminal", function(require) {
     return {
         terminal: Terminal,
         parameterReader: ParameterReader,
-        storage: TerminalStorage,
+        storageSession: TerminalStorageSession,
+        storageLocal: TerminalStorageLocal,
         longpolling: TerminalLongPolling,
     };
 });

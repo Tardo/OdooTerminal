@@ -41,6 +41,7 @@ Commands uses promises
   - 's' String
   - 'i' Integer
   - '?' Indicates that next parameters are optional
+  - '\*' All the rest (unknown) of params are formatted as string
 - secured: Hide command from screen & history
 - aliases: Used to set deprecated names of the module
 
