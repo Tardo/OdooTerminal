@@ -47,11 +47,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 detail:
                     "Launch orm search query.<br>[FIELDS] " +
                     "are separated by commas (without spaces) and by default " +
-                    "is 'display_name'",
+                    "is 'display_name'" +
+                    "<br>[LIMIT] can be zero (no limit)",
                 syntaxis:
                     "<STRING: MODEL NAME> [STRING: FIELDS] " +
-                    '"[ARRAY: DOMAIN]" [INT: LIMIT]',
-                args: "s?ssi",
+                    '"[ARRAY: DOMAIN]" [INT: LIMIT] [INT: OFFSET]',
+                args: "s?ssii",
             });
             this.registerCommand("call", {
                 definition: "Call model method",
@@ -797,7 +798,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
             model,
             field_names,
             domain = "[]",
-            limit
+            limit,
+            offset
         ) {
             let fields = ["display_name"];
             if (field_names) {
@@ -813,6 +815,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     fields: fields,
                     model: model,
                     limit: limit,
+                    offset: offset,
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {

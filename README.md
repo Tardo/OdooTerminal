@@ -175,12 +175,15 @@ IMP: Terminal CSS
 IMP: Minor changes
 IMP: User input
 IMP: Command 'settings': Now can select the target module
+IMP: Command 'tour': Removed the "oper" parameter
+IMP: Command 'search': Added the 'offset' parameter
 
 ADD: Command 'alias': Make your own command aliases
 ADD: Command 'quit': Hide the terminal
 
 FIX: async/await: Use a workaround to not break inheritance chain
 
+DEL: Deprecated code
 ```
 
 **5.3.1**
@@ -207,8 +210,6 @@ ADD: Command 'logout': Session log out
 
 FIX: Extension Preferences
 FIX: Click view record shortcut (issue #13)
-
-DEL: Deprecated code
 ```
 
 **5.2.0**
