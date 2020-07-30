@@ -2,33 +2,47 @@
     --terminal-input-height: 25px;
     --terminal-shadow-input-color: #777;
     --terminal-screen-width: 70%;
+    --terminal-screen-width-maximized: 100%;
     --terminal-screen-background-color: black;
     --terminal-screen-text-color: lightgray;
     --terminal-screen-font: "Lucida Console", Monaco, monospace;
     --terminal-screen-extra-info-color: darkkhaki;
+    --terminal-screen-height: 40vh;
+    --terminal-screen-height-maximized: 100vh;
     --terminal-title-color: rgb(124, 123, 173);
 }
 
 .o_terminal {
     box-shadow: 1px 1px 10px #cecece;
+    border: 0 solid gray;
+    border-width: 1px 1px 0 1px;
     font-family: var(--terminal-screen-font);
     left: 50%;
     position: fixed;
-    top: -100%;
+    top: -110%;
     transform: translate(-50%, 0);
     width: var(--terminal-screen-width);
     z-index: 1041;
     display: grid; /* Here to force BS4 behavior */
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
     transition: 200ms;
     transition-timing-function: ease-out;
+    height: var(--terminal-screen-height);
+}
+
+.o_terminal.term-maximized {
+    width: var(--terminal-screen-width-maximized);
+    height: var(--terminal-screen-height-maximized);
+    border-width: 0;
 }
 
 .o_terminal div#terminal_screen {
     background-color: var(--terminal-screen-background-color);
-    border: 0 solid gray;
-    border-width: 1px 1px 0 1px;
     caret-color: var(--terminal-screen-text-color);
     color: var(--terminal-screen-text-color);
+    height: 100%;
+    opacity: 0.93;
     overflow-y: scroll;
     padding: 0;
     resize: none;
@@ -92,7 +106,7 @@
 
 .o_terminal .terminal-user-input {
     background-color: var(--terminal-screen-background-color);
-    border: 1px dotted #dedede;
+    border: 1px dotted #5a5a5a;
     border-width: 1px 0 0 0;
     color: var(--terminal-screen-text-color);
 
@@ -100,14 +114,7 @@
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt {
-    border: 0 solid gray;
-    border-width: 0 0 1px 1px;
     width: 1.2em;
-}
-
-.o_terminal .terminal-user-input > .terminal-prompt:active,
-.o_terminal .terminal-user-input > .terminal-prompt:focus {
-    outline: hidden;
 }
 
 .o_terminal .terminal-user-input .rich-input {
@@ -130,8 +137,7 @@
 
 .o_terminal .terminal-user-input input {
     background-color: var(--terminal-screen-background-color);
-    border: 0 solid gray;
-    border-width: 0 0 1px 0;
+    border: 0;
     caret-color: var(--terminal-screen-text-color);
     color: var(--terminal-screen-text-color);
     height: var(--terminal-input-height);
@@ -142,7 +148,7 @@
 }
 .o_terminal .terminal-user-input input:active,
 .o_terminal .terminal-user-input input:focus {
-    outline: hidden;
+    outline: none;
 }
 
 .o_terminal .print-table thead th {
@@ -175,10 +181,6 @@
 }
 .o_terminal .terminal-screen-info-zone .terminal-screen-running-cmds {
     color: var(--terminal-screen-extra-info-color);
-}
-.o_terminal .terminal-screen-info-zone .terminal-screen-icon-maximize i {
-    color: white;
-    padding: 0.6em;
 }
 
 /* TRANSITIONS */

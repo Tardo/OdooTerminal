@@ -51,6 +51,25 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
                 args: "?ss",
             });
+            this.registerCommand("alias", {
+                definition: "Create aliases",
+                callback: this._cmdAlias,
+                detail:
+                    "Define aliases to run commands easy. " +
+                    "<br><b>WARNING:</b> This command uses 'local storage' " +
+                    "to persist the data even if you close the browser. " +
+                    "This data can be easy accessed by other computer users. " +
+                    "Don't use sensible data if you are using a shared " +
+                    "computer." +
+                    "<br><br>Can use positional parameters ($1,$2,$3,$N...)",
+                syntaxis: "[STRING: ALIAS] [STRING: DEFINITION]",
+                args: "?s*",
+            });
+            this.registerCommand("quit", {
+                definition: "Close terminal",
+                callback: this._cmdQuit,
+                detail: "Close the terminal. ",
+            });
         },
 
         _printWelcomeMessage: function() {
@@ -72,7 +91,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
             );
         },
 
-        _cmdPrintHelp: async function(cmd) {
+        _cmdPrintHelp: function(cmd) {
             if (typeof cmd === "undefined") {
                 const sorted_cmd_keys = _.keys(this._registeredCmds).sort();
                 const sorted_keys_len = sorted_cmd_keys.length;
@@ -97,7 +116,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                     this.printError(`'${cmd}' command doesn't exists`);
                 }
             }
-            return true;
+            return Promise.resolve();
         },
 
         _printHelpDetailed: function(cmd, cmd_def) {
@@ -106,25 +125,25 @@ odoo.define("terminal.CoreFunctions", function(require) {
             this.eprint(`Syntaxis: ${cmd} ${cmd_def.syntaxis}`);
         },
 
-        _cmdClear: async function(section) {
+        _cmdClear: function(section) {
             if (section === "history") {
                 this.cleanInputHistory();
             } else {
                 this.clean();
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdPrintText: async function(...text) {
+        _cmdPrintText: function(...text) {
             this.print(text.join(" "));
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdLoadResource: async function(url) {
+        _cmdLoadResource: function(url) {
             const inURL = new URL(url);
             const pathname = inURL.pathname.toLowerCase();
             if (pathname.endsWith(".js")) {
-                await $.getScript(inURL.href);
+                return $.getScript(inURL.href);
             } else if (pathname.endsWith(".css")) {
                 $("<link>")
                     .appendTo("head")
@@ -136,10 +155,10 @@ odoo.define("terminal.CoreFunctions", function(require) {
             } else {
                 this.printError("Invalid file type");
             }
-            return true;
+            return Promise.resolve();
         },
 
-        _cmdTerminalContextOperation: async function(
+        _cmdTerminalContextOperation: function(
             operation = "read",
             values = "false"
         ) {
@@ -154,7 +173,37 @@ odoo.define("terminal.CoreFunctions", function(require) {
             } else {
                 this.printError("Invalid operation");
             }
-            return true;
+            return Promise.resolve();
+        },
+
+        _cmdAlias: function(name = false, ...defcall) {
+            const aliases =
+                this._storageLocal.getItem("terminal_aliases") || {};
+            if (!name) {
+                const alias_names = Object.keys(aliases);
+                if (alias_names.length) {
+                    this.print(alias_names);
+                } else {
+                    this.print("No aliases defined.");
+                }
+            } else if (name in this._registeredCmds) {
+                this.printError("Invalid alias name");
+            } else {
+                if (_.some(defcall)) {
+                    aliases[name] = this._parameterReader.stringify(defcall);
+                    this.print("Alias created successfully");
+                } else {
+                    delete aliases[name];
+                    this.print("Alias removed successfully");
+                }
+                this._storageLocal.setItem("terminal_aliases", aliases);
+            }
+            return Promise.resolve();
+        },
+
+        _cmdQuit: function() {
+            this.do_hide();
+            return Promise.resolve();
         },
     });
 });

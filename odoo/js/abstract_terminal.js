@@ -52,6 +52,32 @@ odoo.define("terminal.AbstractTerminal", function(require) {
         removeItem: function(item) {
             throw Error("Not Implemented!");
         },
+
+        /**
+         * Print a friendly error message
+         *
+         * @param {Exception} err
+         * @returns {Boolean}
+         */
+        _checkError: function(err) {
+            if (err.name !== "QuotaExceededError") {
+                return false;
+            }
+            this._parent._printHTML(
+                "<span style='color:navajowhite'>" +
+                    "<strong>WARNING:</strong> Clear the " +
+                    "<b class='o_terminal_click o_terminal_cmd' " +
+                    "data-cmd='clear screen' style='color:orange;'>screen</b> " +
+                    "or/and " +
+                    "<b class='o_terminal_click o_terminal_cmd' " +
+                    "data-cmd='clear history' style='color:orange;'>" +
+                    "history</b> " +
+                    "to free storage space. Browser <u>Storage Quota Exceeded</u>" +
+                    " 😭 </strong><br>",
+                true
+            );
+            return true;
+        },
     });
 
     const AbstractLongPolling = Class.extend({

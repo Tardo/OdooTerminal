@@ -1,17 +1,31 @@
 [![Build Status](https://travis-ci.com/Tardo/OdooTerminal.svg?branch=master)](https://travis-ci.com/Tardo/OdooTerminal)
+![Odoo Ver](https://img.shields.io/badge/Odoo-11.0-yellowgreen)
+![Odoo Ver](https://img.shields.io/badge/Odoo-12.0-green)
+![Odoo Ver](https://img.shields.io/badge/Odoo-13.0-green)
+![Odoo Ver](https://img.shields.io/badge/Odoo-14.0-green)
 
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)
+![Mozilla Add-on](https://img.shields.io/amo/rating/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)
 
-# Odoo Terminal - WebExtension
+![Chrome Add-on](https://img.shields.io/chrome-web-store/v/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+![Chrome Add-on](https://img.shields.io/chrome-web-store/users/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+![Chrome Add-on](https://img.shields.io/chrome-web-store/rating/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+
+<h1 align="center">
+  <img src="icons/terminal-48.png" />
+  <div>Odoo Terminal - WebExtension</div>
+</h1>
 
 _All the power of Odoo json-rpc in a really easy way!_
 
 This web extension adds a terminal-like to control Odoo (11, 12, 13 & 14).
 
-Compatible with Firefox and Chromium but only available in the
-[Firefox Store](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/).
+**Downloads**
+
+[<img src="https://www.mozilla.org/media/protocol/img/logos/firefox/browser/logo-lg.3d9087ac44e8.png" width="64">](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/)
+[<img src="https://www.google.com/chrome/static/images/chrome-logo.svg" width="64">](https://chrome.google.com/webstore/detail/odoo-terminal/fdidojpjkbpfplcdmeaaehnjfkgpbhad)
 
 ---
 
@@ -40,6 +54,7 @@ You can toggle terminal using one of these options:
 | View 'res.partner' records _(only backend)_         | `view res.partner`                                 |
 | View selected 'res.partner' record _(only backend)_ | `view res.partner 4`                               |
 | Install module                                      | `install mymodule`                                 |
+| Create alias                                        | `alias myalias print My name is $1`                |
 
 > Notice the usage of quotes when use parameters with spaces.
 
@@ -77,7 +92,7 @@ You can toggle terminal using one of these options:
     (https://docs.python.org/3/tutorial/classes.html#tut-private)
 - Indentation Style: K&R - 1TBS Variant
   (https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS))
-- JavaScript Specification: ES2017
+- ECMAScript: 2020
 
 ## Pre-commit
 
@@ -152,6 +167,25 @@ python -m unittest tests.test_firefox
 
 # Changelog
 
+**6.0.0**
+
+```
+IMP: Chromium based browsers action icon
+IMP: Terminal CSS
+IMP: Minor changes
+IMP: User input
+IMP: Command 'settings': Now can select the target module
+IMP: Command 'tour': Removed the "oper" parameter
+IMP: Command 'search': Added the 'offset' parameter
+
+ADD: Command 'alias': Make your own command aliases
+ADD: Command 'quit': Hide the terminal
+
+FIX: async/await: Use a workaround to not break inheritance chain
+
+DEL: Deprecated code
+```
+
 **5.3.1**
 
 ```
@@ -167,6 +201,7 @@ IMP: Aliases for terminal commands
 IMP: Command Parser 'args' simplified
 IMP: Code refactor
 IMP: Tests
+IMP: Command 'tour': Removed operation parameter (list, run)
 
 ADD: Command 'depends': Know modules that depends on the given module
 ADD: Command 'context_term': 'read', 'write' or 'set' terminal context (issue #14)

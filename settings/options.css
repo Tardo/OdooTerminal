@@ -8,3 +8,12 @@ textarea {
     white-space: pre;
     width: 100%;
 }
+
+.btn_zone {
+    margin-top: 1em;
+    text-align: right;
+}
+
+.btn_zone > button {
+    padding: 0.5em;
+}

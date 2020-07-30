@@ -15,7 +15,7 @@
 
 # DEFINE NEW COMMANDS
 
-Commands works with promises
+Commands uses promises
 
 **Command definition**::
 
@@ -41,6 +41,7 @@ Commands works with promises
   - 's' String
   - 'i' Integer
   - '?' Indicates that next parameters are optional
+  - '\*' All the rest (unknown) of params are formatted as string
 - secured: Hide command from screen & history
 - aliases: Used to set deprecated names of the module
 

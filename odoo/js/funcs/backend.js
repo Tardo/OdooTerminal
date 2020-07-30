@@ -26,53 +26,54 @@ odoo.define("terminal.BackendFunctions", function(require) {
             this.registerCommand("settings", {
                 definition: "Open settings page",
                 callback: this._cmdOpenSettings,
-                detail: "Open settings page.",
-                syntaxis: "",
-                args: "",
+                detail:
+                    "Open settings page." +
+                    "<br>[MODULE NAME] The module technical name (default is 'general_settings')",
+                syntaxis: "[STRING: MODULE NAME]",
+                args: "?s",
             });
         },
 
-        _cmdOpenSettings: async function() {
-            await this.do_action({
+        _cmdOpenSettings: function(module = "general_settings") {
+            return this.do_action({
+                name: "Settings",
                 type: "ir.actions.act_window",
                 res_model: "res.config.settings",
+                view_mode: "form",
                 views: [[false, "form"]],
-                target: "current",
-            });
-            this.do_hide();
-            return true;
+                target: "inline",
+                context: {module: module},
+            }).then(() => this.do_hide());
         },
 
-        _cmdViewModelRecord: async function(model, id) {
+        _cmdViewModelRecord: function(model, id) {
             if (id) {
-                await this.do_action({
+                return this.do_action({
                     type: "ir.actions.act_window",
                     name: "View Record",
                     res_model: model,
                     res_id: id,
                     views: [[false, "form"]],
                     target: "new",
-                });
-                this.do_hide();
-            } else {
-                new dialogs.SelectCreateDialog(this, {
-                    res_model: model,
-                    title: "Select a record",
-                    disable_multiple_selection: true,
-                    on_selected: records => {
-                        this.do_action({
-                            type: "ir.actions.act_window",
-                            name: "View Record",
-                            res_model: model,
-                            res_id: records[0].id,
-                            views: [[false, "form"]],
-                            target: "new",
-                        });
-                    },
-                }).open();
+                }).then(() => this.do_hide());
             }
+            new dialogs.SelectCreateDialog(this, {
+                res_model: model,
+                title: "Select a record",
+                disable_multiple_selection: true,
+                on_selected: records => {
+                    this.do_action({
+                        type: "ir.actions.act_window",
+                        name: "View Record",
+                        res_model: model,
+                        res_id: records[0].id,
+                        views: [[false, "form"]],
+                        target: "new",
+                    });
+                },
+            }).open();
 
-            return true;
+            return Promise.resolve();
         },
 
         //
