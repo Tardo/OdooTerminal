@@ -48,7 +48,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 detail:
                     "Launch orm search query.<br>[FIELDS] " +
                     "are separated by commas (without spaces) and by default " +
-                    "is 'display_name'" +
+                    "is 'display_name'. Can use '*' to show all fields of the model" +
                     "<br>[LIMIT] can be zero (no limit)" +
                     "<br>[ORDER] A list of orders separated by comma (Example: 'age DESC, email')",
                 syntaxis:
@@ -304,13 +304,13 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
-                    if (result) {
+                    if (_.isEmpty(result)) {
+                        this.printError("The module isn't installed");
+                    } else {
                         const depend_names = result.warning.message
                             .substr(result.warning.message.search("\n") + 1)
                             .split("\n");
                         this.print(depend_names);
-                    } else {
-                        this.printError("The module isn't installed");
                     }
                 });
         },
@@ -813,8 +813,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
         /**
          * Odoo js framework works with a custom object for sort. This
          * method converts string to this object.
+         *
          * @param {String} orderBy
-         * @returns {List[String]}
+         * @returns {Array}
          */
         _deserializeSort: function(orderBy) {
             const res = [];
