@@ -1,4 +1,4 @@
-// Copyright 2018-2019 Alexandre Díaz <dev@redneboa.es>
+// Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 odoo.define("terminal.CommonFunctions", function(require) {
@@ -870,8 +870,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 .then(result => {
                     let tbody = "";
                     const columns = ["id"];
-                    const l = result.length;
-                    for (let x = 0; x < l; ++x) {
+                    const len = result.length;
+                    for (let x = 0; x < len; ++x) {
                         const item = result[x];
                         tbody += "<tr>";
                         tbody += this._templates.render("TABLE_SEARCH_ID", {
@@ -886,6 +886,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         tbody += "</tr>";
                     }
                     this.printTable(_.unique(columns), tbody);
+                    this.print(`Records count: ${len}`);
                 });
         },
 
