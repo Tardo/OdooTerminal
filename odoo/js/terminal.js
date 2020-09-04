@@ -303,7 +303,12 @@ odoo.define("terminal.Terminal", function(require) {
 
             this._storage = new TerminalStorageSession(this);
             this._storageLocal = new TerminalStorageLocal(this);
-            this._longpolling = new TerminalLongPolling(this);
+            try {
+                this._longpolling = new TerminalLongPolling(this);
+            } catch (err) {
+                // This happens if 'bus' module is not installed
+                this._longpolling = false;
+            }
             this._parameterReader = new ParameterReader();
             this._rawTerminal = QWeb.render("terminal");
             this._lazyStorageTerminalScreen = _.debounce(

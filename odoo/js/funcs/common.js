@@ -422,7 +422,31 @@ odoo.define("terminal.CommonFunctions", function(require) {
             });
         },
 
+        _longPollingAddChannel: function(name) {
+            if (typeof name === "undefined") {
+                this.printError("Invalid channel name.");
+            } else {
+                this.print(this._longpolling.addChannel(name));
+                this.print(`Joined the '${name}' channel.`);
+            }
+        },
+
+        _longPollingDelChannel: function(name) {
+            if (typeof name === "undefined") {
+                this.printError("Invalid channel name.");
+            } else {
+                this._longpolling.deleteChannel(name);
+                this.print(`Leave the '${name}' channel.`);
+            }
+        },
+
         _cmdLongpolling: function(operation, name) {
+            if (!this._longpolling) {
+                return Promise.reject(
+                    "Can't use longpolling, 'bus' module is not installed"
+                );
+            }
+
             if (typeof operation === "undefined") {
                 this.print(this._longpolling.isVerbose() || "off");
             } else if (operation === "verbose") {
@@ -432,19 +456,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 this._longpolling.setVerbose(false);
                 this.print("Now long-polling verbose mode is disabled");
             } else if (operation === "add_channel") {
-                if (typeof name === "undefined") {
-                    this.printError("Invalid channel name.");
-                } else {
-                    this.print(this._longpolling.addChannel(name));
-                    this.print(`Joined the '${name}' channel.`);
-                }
+                this._longPollingAddChannel(name);
             } else if (operation === "del_channel") {
-                if (typeof name === "undefined") {
-                    this.printError("Invalid channel name.");
-                } else {
-                    this._longpolling.deleteChannel(name);
-                    this.print(`Leave the '${name}' channel.`);
-                }
+                this._longPollingDelChannel(name);
             } else if (operation === "start") {
                 this._longpolling.startPoll();
                 this.print("Longpolling started");
