@@ -1102,7 +1102,10 @@ odoo.define("terminal.Terminal", function(require) {
             }
         },
         _onCoreKeyDown: function(ev) {
-            if (ev.ctrlKey && ev.key === "1") {
+            if (ev.keyCode === 27) {
+                // Press Escape
+                this.do_hide();
+            } else if (ev.ctrlKey && ev.key === "1") {
                 // Press Ctrl + 1
                 ev.preventDefault();
                 this.do_toggle();
