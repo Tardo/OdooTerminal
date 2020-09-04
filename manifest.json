@@ -32,6 +32,6 @@
   },
   "permissions": ["activeTab", "storage"],
   "short_name": "Odoo Terminal",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "web_accessible_resources": ["page_script.js", "odoo/css/*", "odoo/js/*"]
 }
