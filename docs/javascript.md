@@ -28,6 +28,7 @@ Commands uses promises
   args: string,
   secured: boolean,
   aliases: array,
+  sanitized: boolean,
 }
 ```
 
@@ -42,8 +43,9 @@ Commands uses promises
   - 'i' Integer
   - '?' Indicates that next parameters are optional
   - '\*' All the rest (unknown) of params are formatted as string
-- secured: Hide command from screen & history
+- secured: Hide command from screen & history (default is false)
 - aliases: Used to set deprecated names of the module
+- sanitized: Truncate single quotes (default is true)
 
 **Basic Example**::
 

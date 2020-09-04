@@ -32,6 +32,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 detail: "Eval parameters and print the result.",
                 syntaxis: "<STRING: MSG>",
                 args: "",
+                sanitized: false,
             });
             this.registerCommand("load", {
                 definition: "Load external resource",
@@ -64,6 +65,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                     "<br><br>Can use positional parameters ($1,$2,$3,$N...)",
                 syntaxis: "[STRING: ALIAS] [STRING: DEFINITION]",
                 args: "?s*",
+                sanitized: false,
             });
             this.registerCommand("quit", {
                 definition: "Close terminal",
@@ -135,7 +137,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
         },
 
         _cmdPrintText: function(...text) {
-            this.print(text.join(" "));
+            this.print(this._parameterReader.stringify(text));
             return Promise.resolve();
         },
 

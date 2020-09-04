@@ -130,7 +130,9 @@ odoo.define("terminal.Terminal", function(require) {
                 if (item[0] === '"' || item[0] === "'") {
                     nvalue = item.substr(1, item.length - 2);
                 }
-                return this._sanitizeString(nvalue);
+                return cmd_def.sanitized
+                    ? this._sanitizeString(nvalue)
+                    : nvalue;
             });
 
             params = this.validateAndFormat(cmd_def.args, params);
@@ -546,6 +548,7 @@ odoo.define("terminal.Terminal", function(require) {
                     args: "",
                     secured: false,
                     aliases: [],
+                    sanitized: true,
                 },
                 cmd_def
             );
