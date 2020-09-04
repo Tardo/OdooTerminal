@@ -167,6 +167,19 @@ python -m unittest tests.test_firefox
 
 # Changelog
 
+**6.1.0**
+
+```
+IMP: Commands 'print' & 'alias': New command definition attribute 'sanitized' to don't truncate the single quotes
+IMP: Command 'search': Added the 'order' parameter and better description
+IMP: Handle keyboard 'Escape' key to hide the terminal
+
+FIX: Command 'longpolling': Don't break extension execution if 'bus' module hasn't been installed (issue #18)
+FIX: Command 'lastseen': Don't run if 'bus' module hasn't been installed
+FIX: Command 'ual': Now works on all supported Odoo versions
+FIX: Command 'depends': Now works well if the module is not installed
+```
+
 **6.0.0**
 
 ```
