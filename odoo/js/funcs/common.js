@@ -49,11 +49,13 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "Launch orm search query.<br>[FIELDS] " +
                     "are separated by commas (without spaces) and by default " +
                     "is 'display_name'" +
-                    "<br>[LIMIT] can be zero (no limit)",
+                    "<br>[LIMIT] can be zero (no limit)" +
+                    "<br>[ORDER] A list of orders separated by comma (Example: 'age DESC, email')",
                 syntaxis:
                     "<STRING: MODEL NAME> [STRING: FIELDS] " +
-                    '"[ARRAY: DOMAIN]" [INT: LIMIT] [INT: OFFSET]',
-                args: "s?ssii",
+                    '"[ARRAY: DOMAIN]" [INT: LIMIT] [INT: OFFSET] ' +
+                    '"[STRING: ORDER]"',
+                args: "s?ssiis",
             });
             this.registerCommand("call", {
                 definition: "Call model method",
@@ -808,12 +810,37 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 });
         },
 
+        /**
+         * Odoo js framework works with a custom object for sort. This
+         * method converts string to this object.
+         * @param {String} orderBy
+         * @returns {List[String]}
+         */
+        _deserializeSort: function(orderBy) {
+            const res = [];
+            if (!orderBy) {
+                return res;
+            }
+            const orders = this._parameterReader.splitAndTrim(orderBy, ",");
+            for (const order of orders) {
+                const order_s = order.split(" ");
+                res.push({
+                    name: order_s[0],
+                    asc:
+                        order_s.length < 2 ||
+                        order_s[1].toLowerCase() === "asc",
+                });
+            }
+            return res;
+        },
+
         _cmdSearchModelRecord: function(
             model,
             field_names,
             domain = "[]",
             limit,
-            offset
+            offset,
+            order
         ) {
             let fields = ["display_name"];
             if (field_names) {
@@ -822,6 +849,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         ? false
                         : this._parameterReader.splitAndTrim(field_names, ",");
             }
+
             return rpc
                 .query({
                     method: "search_read",
@@ -830,6 +858,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     model: model,
                     limit: limit,
                     offset: offset,
+                    orderBy: this._deserializeSort(order),
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
