@@ -18,6 +18,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
         init: function() {
             this._super.apply(this, arguments);
 
+            // Someone said 'registerCommand' ?¿?? O_o
             this.registerCommand("create", {
                 definition: "Create new record",
                 callback: this._cmdCreateModelRecord,
@@ -280,7 +281,6 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 .query({
                     method: "update_list",
                     model: "ir.module.module",
-                    args: [false],
                 })
                 .then(result => {
                     if (result) {
