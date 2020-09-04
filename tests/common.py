@@ -27,8 +27,9 @@ class SeleniumTestCase(unittest.TestCase):
     }
     _WAIT_SECS = 5
 
-    def setUp(self):
-        self.addCleanup(self.browser.quit)
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.quit
 
     def _relative_get(self, url):
         self.browser.get(urllib.parse.urljoin(self.base_url, url))
@@ -71,6 +72,12 @@ class SeleniumTestCase(unittest.TestCase):
         elem = self._waitForElement(
             "strong[data-cmd='help %s']" % wait_cmd, 3, By.CSS_SELECTOR)
         self.assertTrue(elem)
+
+    def _execute_test_empty(self):
+        self.browser.get('http://www.duckduckgo.com')
+        self.assertIn('DuckDuckGo', self.browser.title)
+        elem = self._waitForElement('terminal', 3)
+        self.assertFalse(elem)
 
     def _execute_test_ce(self, serv_url):
         self.browser.get(serv_url)
