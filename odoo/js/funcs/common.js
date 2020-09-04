@@ -544,18 +544,23 @@ odoo.define("terminal.CommonFunctions", function(require) {
         },
 
         _cmdLastSeen: function() {
+            if (!this._longpolling) {
+                return Promise.reject(
+                    "Can't use lastseen, 'bus' module is not installed"
+                );
+            }
             return rpc
                 .query({
                     method: "search_read",
                     fields: ["user_id", "last_presence"],
                     model: "bus.presence",
-                    order: "last_presence DESC",
+                    orderBy: [{name: "last_presence", asc: false}],
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
                     let body = "";
-                    const l = result.length;
-                    for (let x = 0; x < l; ++x) {
+                    const len = result.length;
+                    for (let x = 0; x < len; ++x) {
                         const record = result[x];
                         body +=
                             `<tr><td>${record.user_id[1]}</td>` +
