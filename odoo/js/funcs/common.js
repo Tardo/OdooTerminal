@@ -30,17 +30,18 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 definition: "Unlink record",
                 callback: this._cmdUnlinkModelRecord,
                 detail: "Delete a record.",
-                syntaxis: "<STRING: MODEL NAME> <INT: RECORD ID>",
-                args: "si",
+                syntaxis:
+                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs>",
+                args: "sli",
             });
             this.registerCommand("write", {
                 definition: "Update record values",
                 callback: this._cmdWriteModelRecord,
                 detail: "Update record values.",
                 syntaxis:
-                    "<STRING: MODEL NAME> <INT: RECORD ID> " +
+                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     '"<DICT: NEW VALUES>"',
-                args: "sis",
+                args: "slis",
             });
             this.registerCommand("search", {
                 definition: "Search model record/s",
@@ -159,9 +160,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "are separated by commas (without spaces) and by default " +
                     "is 'display_name'",
                 syntaxis:
-                    "<STRING: MODEL NAME> <INT: RECORD ID> " +
+                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     "[STRING: FIELDS]",
-                args: "si?s",
+                args: "sli?s",
             });
             this.registerCommand("context", {
                 definition: "Operations over session context dictionary",
@@ -516,7 +517,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             return rpc
                 .query({
                     method: "search_read",
-                    domain: [["id", "=", id]],
+                    domain: [["id", "in", id]],
                     fields: fields,
                     model: model,
                     kwargs: {context: this._getContext()},

@@ -50,13 +50,15 @@ You can toggle terminal using one of these options:
 | Create 'res.partner' record                         | `create res.partner "{'name': 'The One'}"`         |
 | Search 'res.partner' records                        | `search res.partner name,email "[['id', '>', 5]]"` |
 | Search all fields of selected 'res.partner' records | `search res.partner * "[['id', '>', 5]]"`          |
-| Search all fields of selected 'res.partner' record  | `read res.partner 5 *`                             |
+| Read all fields of selected 'res.partner' record    | `read res.partner 5 *`                             |
+| Read all fields of various 'res.partner' records    | `read res.partner 5,15,8 *`                        |
 | View 'res.partner' records _(only backend)_         | `view res.partner`                                 |
 | View selected 'res.partner' record _(only backend)_ | `view res.partner 4`                               |
 | Install module                                      | `install mymodule`                                 |
 | Create alias                                        | `alias myalias print My name is $1`                |
 
-> Notice the usage of quotes when use parameters with spaces.
+> Notice the usage of quotes when use parameters with spaces. Notice that a list
+> is an string of values separated by commas. Example: "5, 15, 8"
 
 ## Notes
 
@@ -166,6 +168,15 @@ python -m unittest tests.test_firefox
 ---
 
 # Changelog
+
+**6.2.0**
+
+```
+IMP: New parameter modifier 'l': Allow input list of values (a list is a string of values separted by commas. Example: "1, 3, 5") (issue #19)
+  - Command 'unlink': Now supports passing it a list of ids
+  - Command 'write': Now supports passing it a list of ids
+  - Command 'read': Now supports passing it a list of ids
+```
 
 **6.1.0**
 

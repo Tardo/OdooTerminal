@@ -100,7 +100,7 @@ odoo.define("terminal.Terminal", function(require) {
                 /(["'])((?:(?=(\\?))\2.)*?)\1|[^\s]+/,
                 "g"
             );
-            this._regexArgs = new RegExp(/[?*]/);
+            this._regexArgs = new RegExp(/[l?*]/);
         },
 
         /**
@@ -161,10 +161,14 @@ odoo.define("terminal.Terminal", function(require) {
                 i < args.length && checkedCount < params.length;
                 ++i
             ) {
+                let list_mode = false;
                 let carg = args[i];
-                // Determine argument type
+                // Determine argument type (modifiers)
                 if (carg === "?") {
                     carg = args[++i];
+                } else if (carg === "l") {
+                    carg = args[++i];
+                    list_mode = true;
                 } else if (carg === "*") {
                     for (; checkedCount < params.length; ++checkedCount) {
                         formatted_params.push(
@@ -175,10 +179,10 @@ odoo.define("terminal.Terminal", function(require) {
                 }
                 // Parameter validation & formatting
                 const param = params[checkedCount];
-                if (!this._validators[carg](param)) {
+                if (!this._validators[carg](param, list_mode)) {
                     break;
                 }
-                formatted_params.push(this._formatters[carg](param));
+                formatted_params.push(this._formatters[carg](param, list_mode));
                 ++checkedCount;
             }
 
@@ -228,37 +232,71 @@ odoo.define("terminal.Terminal", function(require) {
         /**
          * Test if is an string.
          * @param {String} param
+         * @param {Boolean} list_mode
          * @returns {Boolean}
          */
-        _validateString: function(param) {
+        _validateString: function(param, list_mode = false) {
+            if (list_mode) {
+                const param_split = param.split(",");
+                let is_valid = true;
+                for (const ps of param_split) {
+                    const param_sa = ps.trim();
+                    if (Number(param_sa) === parseInt(param_sa, 10)) {
+                        is_valid = false;
+                        break;
+                    }
+                }
+                return is_valid;
+            }
             return Number(param) !== parseInt(param, 10);
         },
 
         /**
          * Test if is an integer.
          * @param {String} param
+         * @param {Boolean} list_mode
          * @returns {Boolean}
          */
-        _validateInt: function(param) {
+        _validateInt: function(param, list_mode = false) {
+            if (list_mode) {
+                const param_split = param.split(",");
+                let is_valid = true;
+                for (const ps of param_split) {
+                    const param_sa = ps.trim();
+                    if (Number(param_sa) !== parseInt(param_sa, 10)) {
+                        is_valid = false;
+                        break;
+                    }
+                }
+                return is_valid;
+            }
             return Number(param) === parseInt(param, 10);
         },
 
         /**
          * Format value to string
          * @param {String} param
+         * @param {Boolean} list_mode
          * @returns {String}
          */
-        _formatString: function(param) {
+        _formatString: function(param, list_mode = false) {
+            if (list_mode) {
+                return _.map(param.split(","), item => item.trim());
+            }
             return param;
         },
 
         /**
          * Format value to integer
          * @param {String} param
+         * @param {Boolean} list_mode
          * @returns {Number}
          */
-        _formatInt: function(param) {
-            return (param && Number(param)) || false;
+        _formatInt: function(param, list_mode = false) {
+            if (list_mode) {
+                return _.map(param.split(","), item => Number(item.trim()));
+            }
+            return Number(param);
         },
     });
 
