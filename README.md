@@ -176,6 +176,7 @@ IMP: New parameter modifier 'l': Allow input list of values (a list is a string 
   - Command 'unlink': Now supports passing it a list of ids
   - Command 'write': Now supports passing it a list of ids
   - Command 'read': Now supports passing it a list of ids
+IMP: Disable auto-hide in "fullscreen" mode
 ```
 
 **6.1.0**

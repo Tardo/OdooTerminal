@@ -1134,7 +1134,8 @@ odoo.define("terminal.Terminal", function(require) {
             if (
                 this.$el &&
                 !this.$el[0].contains(ev.target) &&
-                this._isTerminalVisible()
+                this._isTerminalVisible() &&
+                !this._storage.getItem("screen_maximized")
             ) {
                 this.do_hide();
             }
