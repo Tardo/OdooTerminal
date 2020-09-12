@@ -81,6 +81,16 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 args: "*",
                 sanitized: false,
             });
+            this.registerCommand("chrono", {
+                definition: "Print the time expended executing a command",
+                callback: this._cmdChrono,
+                detail:
+                    "Print the elapsed time in seconds to execute a command. " +
+                    "<br/>Notice that this time includes the time to print the result!",
+                syntaxis: "<STRING: COMMAND>",
+                args: "*",
+                sanitized: false,
+            });
         },
 
         _printWelcomeMessage: function() {
@@ -218,28 +228,50 @@ odoo.define("terminal.CoreFunctions", function(require) {
             return Promise.resolve();
         },
 
+        _validateCommand: function(defcall) {
+            if (!_.some(defcall)) {
+                return [false, false];
+            }
+            const cmd = this._parameterReader.stringify(defcall);
+            const cmd_split = cmd.split(" ");
+            const cmd_name = cmd_split[0];
+            if (!cmd_name) {
+                return [cmd, false];
+            }
+            return [cmd, cmd_name];
+        },
+
         _cmdExport: function(...defcall) {
             return new Promise(async (resolve, reject) => {
-                if (!_.some(defcall)) {
-                    reject("Need a command to execute!");
-                }
-                const cmd = this._parameterReader.stringify(defcall);
-                const cmd_split = cmd.split(" ");
-                const cmd_name = cmd_split[0];
+                const [cmd, cmd_name] = this._validateCommand(defcall);
                 if (!cmd_name) {
                     reject("Need a valid command to execute!");
                     return;
                 }
                 const cmd_def = this._registeredCmds[cmd_name];
-                if (!cmd_def) {
-                    reject("Invalid command");
-                }
                 const scmd = this._parameterReader.parse(cmd, cmd_def);
                 const varname = _.uniqueId("term");
                 window[varname] = await this._processCommandJob(scmd, cmd_def);
                 this.print(
                     `Command result exported! now you can use '${varname}' variable in the browser console`
                 );
+                resolve();
+            });
+        },
+
+        _cmdChrono: function(...defcall) {
+            return new Promise(async (resolve, reject) => {
+                const [cmd, cmd_name] = this._validateCommand(defcall);
+                if (!cmd_name) {
+                    reject("Need a valid command to execute!");
+                    return;
+                }
+                const cmd_def = this._registeredCmds[cmd_name];
+                const scmd = this._parameterReader.parse(cmd, cmd_def);
+                const start_time = new Date();
+                await this._processCommandJob(scmd, cmd_def);
+                const time_elapsed_secs = (new Date() - start_time) / 1000.0;
+                this.print(`Time elapsed: '${time_elapsed_secs}' seconds`);
                 resolve();
             });
         },

@@ -11,6 +11,7 @@ IMP: Disable auto-hide in "fullscreen" mode
 IMP: Reorganize project docs
 
 ADD: Command 'exportvar': Export command result to a browser console variable
+ADD: Command 'chrono': Print the time expended executing a command
 ```
 
 **6.1.0**
