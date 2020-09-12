@@ -91,6 +91,14 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 args: "*",
                 sanitized: false,
             });
+            this.registerCommand("repeat", {
+                definition: "Repeat a command N times",
+                callback: this._cmdRepeat,
+                detail: "Repeat a command N times.",
+                syntaxis: "<INT: Times> <STRING: COMMAND>",
+                args: "i*",
+                sanitized: false,
+            });
         },
 
         _printWelcomeMessage: function() {
@@ -272,6 +280,22 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 await this._processCommandJob(scmd, cmd_def);
                 const time_elapsed_secs = (new Date() - start_time) / 1000.0;
                 this.print(`Time elapsed: '${time_elapsed_secs}' seconds`);
+                resolve();
+            });
+        },
+
+        _cmdRepeat: function(times, ...defcall) {
+            return new Promise(async (resolve, reject) => {
+                const [cmd, cmd_name] = this._validateCommand(defcall);
+                if (!cmd_name) {
+                    reject("Need a valid command to execute!");
+                    return;
+                }
+                const cmd_def = this._registeredCmds[cmd_name];
+                const scmd = this._parameterReader.parse(cmd, cmd_def);
+                for (let i = 0; i < times; ++i) {
+                    await this._processCommandJob(scmd, cmd_def);
+                }
                 resolve();
             });
         },

@@ -12,6 +12,7 @@ IMP: Reorganize project docs
 
 ADD: Command 'exportvar': Export command result to a browser console variable
 ADD: Command 'chrono': Print the time expended executing a command
+ADD: Command 'repeat': Repeat a command N times
 ```
 
 **6.1.0**
