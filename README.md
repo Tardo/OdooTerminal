@@ -71,6 +71,29 @@ You can toggle terminal using one of these options:
 
 ---
 
+## Advance Usage
+
+You can use "parameter generator" to create values.
+
+| Generator  | Arguments | Description                                                           |
+| ---------- | --------- | --------------------------------------------------------------------- |
+| \$STR      | min,max   | Generates a random string with a length between the given min and max |
+| \$INT      | min,max   | Generates a random int between the given min and max                  |
+| \$DATE     | min,max   | Generates a random date between the given min and max                 |
+| \$DATETIME | min,max   | Generates a random date time between the given min and max            |
+| \$NOW      |           | Gets the current date                                                 |
+| \$NOWTIME  |           | Gets the current date time                                            |
+
+The anatomy of a generator is: `$type[min,max]`
+
+For example:
+
+- create a new record with a random string:
+  `create res.partner "{'name': '$STR[4,30]'}"`
+- print the current date time: `print $NOWTIME`
+
+> Notice that 'date' min and max are the milliseconds since 1970/01/01
+
 # Extension Permissions
 
 | Permission | Reason                                                                      |

@@ -13,6 +13,7 @@ IMP: Reorganize project docs
 ADD: Command 'exportvar': Export command result to a browser console variable
 ADD: Command 'chrono': Print the time expended executing a command
 ADD: Command 'repeat': Repeat a command N times
+ADD: 'ParameterGenerator' component: Generate values for terminal command parameters
 ```
 
 **6.1.0**

@@ -66,6 +66,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: "[STRING: ALIAS] [STRING: DEFINITION]",
                 args: "?s*",
                 sanitized: false,
+                generators: false,
             });
             this.registerCommand("quit", {
                 definition: "Close terminal",
@@ -80,6 +81,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
+                generators: false,
             });
             this.registerCommand("chrono", {
                 definition: "Print the time expended executing a command",
@@ -90,6 +92,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
+                generators: false,
             });
             this.registerCommand("repeat", {
                 definition: "Repeat a command N times",
@@ -98,6 +101,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 syntaxis: "<INT: Times> <STRING: COMMAND>",
                 args: "i*",
                 sanitized: false,
+                generators: false,
             });
         },
 

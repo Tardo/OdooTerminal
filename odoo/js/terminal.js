@@ -6,6 +6,7 @@ odoo.define("terminal.Terminal", function(require) {
 
     const core = require("web.core");
     const session = require("web.session");
+    const time = require("web.time");
     const Class = require("web.Class");
     const AbstractTerminal = require("terminal.AbstractTerminal");
 
@@ -300,6 +301,83 @@ odoo.define("terminal.Terminal", function(require) {
         },
     });
 
+    /**
+     * This class is used to generate values for terminal command parameters.
+     */
+    const ParameterGenerator = Class.extend({
+        init: function() {
+            this._generators = {
+                INT: this._generateInt.bind(this),
+                STR: this._generateString.bind(this),
+                DATE: this._generateDate.bind(this),
+                NOW: this._getDate,
+                DATETIME: this._generateDateTime.bind(this),
+                NOWTIME: this._getDateTime,
+            };
+            this._regexParamGenerator = new RegExp(
+                /(\$(\w+)(?:\[(\d+),(\d+)\])*)/,
+                "g"
+            );
+            this._characters =
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
+            this._charactersLength = this._characters.length;
+        },
+
+        _generateInt: function(min, max) {
+            const min_s = Number(min);
+            const max_s = Number(max);
+            return Math.floor(Math.random() * (max_s - min_s + 1) + min_s);
+        },
+
+        _generateString: function(min, max) {
+            const rlen = this._generateInt(min, max);
+            let result = "";
+            for (let i = 0; i < rlen; ++i) {
+                result += this._characters.charAt(
+                    Math.floor(Math.random() * this._charactersLength)
+                );
+            }
+            return result;
+        },
+
+        _generateDate: function(min, max) {
+            const rdate = this._generateInt(min, max);
+            return moment(new Date(rdate)).format(time.getLangDateFormat());
+        },
+
+        _generateDateTime: function(min, max) {
+            const rdate = this._generateInt(min, max);
+            return moment(new Date(rdate)).format(time.getLangDatetimeFormat());
+        },
+
+        _getDate: function() {
+            return moment().format(time.getLangDateFormat());
+        },
+
+        _getDateTime: function() {
+            return moment().format(time.getLangDatetimeFormat());
+        },
+
+        parse: function(params) {
+            const parsed_params = [];
+            for (let param of params) {
+                const matches = String(param).matchAll(
+                    this._regexParamGenerator
+                );
+                for (const match of matches) {
+                    if (match[2] in this._generators) {
+                        param = param.replace(
+                            match[0],
+                            this._generators[match[2]](...match.splice(3))
+                        );
+                    }
+                }
+                parsed_params.push(param);
+            }
+            return parsed_params;
+        },
+    });
+
     const Terminal = AbstractTerminal.terminal.extend({
         custom_events: {},
         events: {
@@ -350,6 +428,7 @@ odoo.define("terminal.Terminal", function(require) {
                 this._longpolling = false;
             }
             this._parameterReader = new ParameterReader();
+            this._parameterGenerator = new ParameterGenerator();
             this._rawTerminal = QWeb.render("terminal");
             this._lazyStorageTerminalScreen = _.debounce(
                 function() {
@@ -587,6 +666,7 @@ odoo.define("terminal.Terminal", function(require) {
                     secured: false,
                     aliases: [],
                     sanitized: true,
+                    generators: true,
                 },
                 cmd_def
             );
@@ -944,7 +1024,11 @@ odoo.define("terminal.Terminal", function(require) {
                 let result = "";
                 let is_failed = false;
                 try {
-                    result = await cmd_def.callback.bind(this)(...scmd.params);
+                    let params = scmd.params;
+                    if (cmd_def.generators) {
+                        params = this._parameterGenerator.parse(scmd.params);
+                    }
+                    result = await cmd_def.callback.bind(this)(...params);
                 } catch (err) {
                     is_failed = true;
                     result =
