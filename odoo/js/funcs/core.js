@@ -70,7 +70,16 @@ odoo.define("terminal.CoreFunctions", function(require) {
             this.registerCommand("quit", {
                 definition: "Close terminal",
                 callback: this._cmdQuit,
-                detail: "Close the terminal. ",
+                detail: "Close the terminal.",
+            });
+            this.registerCommand("exportvar", {
+                definition:
+                    "Export command result to a browser console variable",
+                callback: this._cmdExport,
+                detail: "Export command result to a browser console variable.",
+                syntaxis: "<STRING: COMMAND>",
+                args: "*",
+                sanitized: false,
             });
         },
 
@@ -137,8 +146,9 @@ odoo.define("terminal.CoreFunctions", function(require) {
         },
 
         _cmdPrintText: function(...text) {
-            this.print(this._parameterReader.stringify(text));
-            return Promise.resolve();
+            const to_print = this._parameterReader.stringify(text);
+            this.print(to_print);
+            return Promise.resolve(to_print);
         },
 
         _cmdLoadResource: function(url) {
@@ -206,6 +216,32 @@ odoo.define("terminal.CoreFunctions", function(require) {
         _cmdQuit: function() {
             this.do_hide();
             return Promise.resolve();
+        },
+
+        _cmdExport: function(...defcall) {
+            return new Promise(async (resolve, reject) => {
+                if (!_.some(defcall)) {
+                    reject("Need a command to execute!");
+                }
+                const cmd = this._parameterReader.stringify(defcall);
+                const cmd_split = cmd.split(" ");
+                const cmd_name = cmd_split[0];
+                if (!cmd_name) {
+                    reject("Need a valid command to execute!");
+                    return;
+                }
+                const cmd_def = this._registeredCmds[cmd_name];
+                if (!cmd_def) {
+                    reject("Invalid command");
+                }
+                const scmd = this._parameterReader.parse(cmd, cmd_def);
+                const varname = _.uniqueId("term");
+                window[varname] = await this._processCommandJob(scmd, cmd_def);
+                this.print(
+                    `Command result exported! now you can use '${varname}' variable in the browser console`
+                );
+                resolve();
+            });
         },
     });
 });

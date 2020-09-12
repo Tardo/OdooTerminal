@@ -293,6 +293,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     } else {
                         this.printError("Can't update the apps list!");
                     }
+                    return result;
                 });
         },
 
@@ -313,6 +314,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             .split("\n");
                         this.print(depend_names);
                     }
+                    return result;
                 });
         },
 
@@ -323,6 +325,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 type: "POST",
             }).then(result => {
                 this.print(result);
+                return result;
             });
         },
 
@@ -375,6 +378,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         }
                     }
                     this.print(databases);
+                    return databases;
                 });
         },
 
@@ -392,6 +396,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     } else {
                         this.print("Groups are negatively evaluated");
                     }
+                    return result;
                 });
         },
 
@@ -414,14 +419,18 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 }
                 db = session.db;
             }
-            return session._session_authenticate(db, login, passwd).then(() => {
-                this.print(`Successfully logged as '${login}'`);
-            });
+            return session
+                ._session_authenticate(db, login, passwd)
+                .then(result => {
+                    this.print(`Successfully logged as '${login}'`);
+                    return result;
+                });
         },
 
         _cmdLogOut: function() {
-            return session.session_logout().then(() => {
+            return session.session_logout().then(result => {
                 this.print("Logged out");
+                return result;
             });
         },
 
@@ -541,6 +550,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         tbody += "</tr>";
                     }
                     this.printTable(_.unique(columns), tbody);
+                    return result;
                 });
         },
 
@@ -572,6 +582,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         ["User Name", "User ID", "Last Seen"],
                         body
                     );
+                    return result;
                 });
         },
 
@@ -589,6 +600,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     } else {
                         this.print(`You can't '${operation}' on ${model}`);
                     }
+                    return result;
                 });
         },
 
@@ -630,6 +642,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     }
                     fieldParams.unshift("field");
                     this.printTable(fieldParams, body);
+                    return result;
                 });
         },
 
@@ -670,6 +683,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     } else {
                         this.printError("Oops! can't get the login :/");
                     }
+                    return result;
                 });
         },
 
@@ -813,6 +827,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 })
                 .then(result => {
                     this.print(result);
+                    return result;
                 });
         },
 
@@ -888,6 +903,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     }
                     this.printTable(_.unique(columns), tbody);
                     this.print(`Records count: ${len}`);
+                    return result;
                 });
         },
 
@@ -916,6 +932,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             new_id: result,
                         })
                     );
+                    return result;
                 });
         },
 
@@ -927,8 +944,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     args: [id],
                     kwargs: {context: this._getContext()},
                 })
-                .then(() => {
+                .then(result => {
                     this.print(`${model} record deleted successfully`);
+                    return result;
                 });
         },
 
@@ -940,8 +958,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     args: [id, JSON.parse(values)],
                     kwargs: {context: this._getContext()},
                 })
-                .then(() => {
+                .then(result => {
                     this.print(`${model} record updated successfully`);
+                    return result;
                 });
         },
 

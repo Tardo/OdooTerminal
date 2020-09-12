@@ -432,7 +432,7 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         _prettyObjectString: function(obj) {
-            return JSON.stringify(obj, null, 4);
+            return this._encodeHTML(JSON.stringify(obj, null, 4));
         },
         print: function(msg, enl, cls) {
             const msg_type = typeof msg;
@@ -958,7 +958,7 @@ odoo.define("terminal.Terminal", function(require) {
                         result
                     );
                 }
-                resolve();
+                resolve(result);
             });
         },
 
