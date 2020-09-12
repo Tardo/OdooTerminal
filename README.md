@@ -94,6 +94,8 @@ For example:
 
 > Notice that 'date' min and max are the milliseconds since 1970/01/01
 
+---
+
 # Extension Permissions
 
 | Permission | Reason                                                                      |
@@ -103,8 +105,15 @@ For example:
 
 ---
 
-- Contributing: [contributing.md](./docs/contributing.md)
-- Changelog: [CHANGELOG.md](CHANGELOG.md)
+# Contributing
+
+- [contributing.md](./docs/contributing.md)
+
+---
+
+# Changelog
+
+- [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
