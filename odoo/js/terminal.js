@@ -1042,7 +1042,7 @@ odoo.define("terminal.Terminal", function(require) {
                         result
                     );
                 }
-                resolve(result);
+                return resolve(result);
             });
         },
 
