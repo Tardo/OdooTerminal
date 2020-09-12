@@ -74,10 +74,10 @@ odoo.define("terminal.MyFuncs", function(require) {
                 const other_result = await Promise.resolve(param_b);
 
                 if (result !== other_result) {
-                    reject("Something is wrong!");
+                    return reject("Something is wrong!");
                 }
 
-                resolve();
+                return resolve();
             });
         },
     });

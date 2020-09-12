@@ -6,6 +6,7 @@ odoo.define("terminal.Terminal", function(require) {
 
     const core = require("web.core");
     const session = require("web.session");
+    const time = require("web.time");
     const Class = require("web.Class");
     const AbstractTerminal = require("terminal.AbstractTerminal");
 
@@ -100,7 +101,7 @@ odoo.define("terminal.Terminal", function(require) {
                 /(["'])((?:(?=(\\?))\2.)*?)\1|[^\s]+/,
                 "g"
             );
-            this._regexArgs = new RegExp(/[?*]/);
+            this._regexArgs = new RegExp(/[l?*]/);
         },
 
         /**
@@ -161,10 +162,14 @@ odoo.define("terminal.Terminal", function(require) {
                 i < args.length && checkedCount < params.length;
                 ++i
             ) {
+                let list_mode = false;
                 let carg = args[i];
-                // Determine argument type
+                // Determine argument type (modifiers)
                 if (carg === "?") {
                     carg = args[++i];
+                } else if (carg === "l") {
+                    carg = args[++i];
+                    list_mode = true;
                 } else if (carg === "*") {
                     for (; checkedCount < params.length; ++checkedCount) {
                         formatted_params.push(
@@ -175,10 +180,10 @@ odoo.define("terminal.Terminal", function(require) {
                 }
                 // Parameter validation & formatting
                 const param = params[checkedCount];
-                if (!this._validators[carg](param)) {
+                if (!this._validators[carg](param, list_mode)) {
                     break;
                 }
-                formatted_params.push(this._formatters[carg](param));
+                formatted_params.push(this._formatters[carg](param, list_mode));
                 ++checkedCount;
             }
 
@@ -228,37 +233,148 @@ odoo.define("terminal.Terminal", function(require) {
         /**
          * Test if is an string.
          * @param {String} param
+         * @param {Boolean} list_mode
          * @returns {Boolean}
          */
-        _validateString: function(param) {
+        _validateString: function(param, list_mode = false) {
+            if (list_mode) {
+                const param_split = param.split(",");
+                let is_valid = true;
+                for (const ps of param_split) {
+                    const param_sa = ps.trim();
+                    if (Number(param_sa) === parseInt(param_sa, 10)) {
+                        is_valid = false;
+                        break;
+                    }
+                }
+                return is_valid;
+            }
             return Number(param) !== parseInt(param, 10);
         },
 
         /**
          * Test if is an integer.
          * @param {String} param
+         * @param {Boolean} list_mode
          * @returns {Boolean}
          */
-        _validateInt: function(param) {
+        _validateInt: function(param, list_mode = false) {
+            if (list_mode) {
+                const param_split = param.split(",");
+                let is_valid = true;
+                for (const ps of param_split) {
+                    const param_sa = ps.trim();
+                    if (Number(param_sa) !== parseInt(param_sa, 10)) {
+                        is_valid = false;
+                        break;
+                    }
+                }
+                return is_valid;
+            }
             return Number(param) === parseInt(param, 10);
         },
 
         /**
          * Format value to string
          * @param {String} param
+         * @param {Boolean} list_mode
          * @returns {String}
          */
-        _formatString: function(param) {
+        _formatString: function(param, list_mode = false) {
+            if (list_mode) {
+                return _.map(param.split(","), item => item.trim());
+            }
             return param;
         },
 
         /**
          * Format value to integer
          * @param {String} param
+         * @param {Boolean} list_mode
          * @returns {Number}
          */
-        _formatInt: function(param) {
-            return (param && Number(param)) || false;
+        _formatInt: function(param, list_mode = false) {
+            if (list_mode) {
+                return _.map(param.split(","), item => Number(item.trim()));
+            }
+            return Number(param);
+        },
+    });
+
+    /**
+     * This class is used to generate values for terminal command parameters.
+     */
+    const ParameterGenerator = Class.extend({
+        init: function() {
+            this._generators = {
+                INT: this._generateInt.bind(this),
+                STR: this._generateString.bind(this),
+                DATE: this._generateDate.bind(this),
+                NOW: this._getDate,
+                DATETIME: this._generateDateTime.bind(this),
+                NOWTIME: this._getDateTime,
+            };
+            this._regexParamGenerator = new RegExp(
+                /(\$(\w+)(?:\[(\d+),(\d+)\])*)/,
+                "g"
+            );
+            this._characters =
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
+            this._charactersLength = this._characters.length;
+        },
+
+        _generateInt: function(min, max) {
+            const min_s = Number(min);
+            const max_s = Number(max);
+            return Math.floor(Math.random() * (max_s - min_s + 1) + min_s);
+        },
+
+        _generateString: function(min, max) {
+            const rlen = this._generateInt(min, max);
+            let result = "";
+            for (let i = 0; i < rlen; ++i) {
+                result += this._characters.charAt(
+                    Math.floor(Math.random() * this._charactersLength)
+                );
+            }
+            return result;
+        },
+
+        _generateDate: function(min, max) {
+            const rdate = this._generateInt(min, max);
+            return moment(new Date(rdate)).format(time.getLangDateFormat());
+        },
+
+        _generateDateTime: function(min, max) {
+            const rdate = this._generateInt(min, max);
+            return moment(new Date(rdate)).format(time.getLangDatetimeFormat());
+        },
+
+        _getDate: function() {
+            return moment().format(time.getLangDateFormat());
+        },
+
+        _getDateTime: function() {
+            return moment().format(time.getLangDatetimeFormat());
+        },
+
+        parse: function(params) {
+            const parsed_params = [];
+            for (let param of params) {
+                const matches = String(param).matchAll(
+                    this._regexParamGenerator
+                );
+                for (const match of matches) {
+                    if (match[2] in this._generators) {
+                        param = param.replace(
+                            match[0],
+                            this._generators[match[2]](...match.splice(3))
+                        );
+                    }
+                }
+                parsed_params.push(param);
+            }
+            return parsed_params;
         },
     });
 
@@ -312,6 +428,7 @@ odoo.define("terminal.Terminal", function(require) {
                 this._longpolling = false;
             }
             this._parameterReader = new ParameterReader();
+            this._parameterGenerator = new ParameterGenerator();
             this._rawTerminal = QWeb.render("terminal");
             this._lazyStorageTerminalScreen = _.debounce(
                 function() {
@@ -394,7 +511,7 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         _prettyObjectString: function(obj) {
-            return JSON.stringify(obj, null, 4);
+            return this._encodeHTML(JSON.stringify(obj, null, 4));
         },
         print: function(msg, enl, cls) {
             const msg_type = typeof msg;
@@ -549,6 +666,7 @@ odoo.define("terminal.Terminal", function(require) {
                     secured: false,
                     aliases: [],
                     sanitized: true,
+                    generators: true,
                 },
                 cmd_def
             );
@@ -906,7 +1024,11 @@ odoo.define("terminal.Terminal", function(require) {
                 let result = "";
                 let is_failed = false;
                 try {
-                    result = await cmd_def.callback.bind(this)(...scmd.params);
+                    let params = scmd.params;
+                    if (cmd_def.generators) {
+                        params = this._parameterGenerator.parse(scmd.params);
+                    }
+                    result = await cmd_def.callback.bind(this)(...params);
                 } catch (err) {
                     is_failed = true;
                     result =
@@ -920,7 +1042,7 @@ odoo.define("terminal.Terminal", function(require) {
                         result
                     );
                 }
-                resolve();
+                return resolve(result);
             });
         },
 
@@ -1096,7 +1218,8 @@ odoo.define("terminal.Terminal", function(require) {
             if (
                 this.$el &&
                 !this.$el[0].contains(ev.target) &&
-                this._isTerminalVisible()
+                this._isTerminalVisible() &&
+                !this._storage.getItem("screen_maximized")
             ) {
                 this.do_hide();
             }

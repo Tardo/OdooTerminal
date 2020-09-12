@@ -30,17 +30,18 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 definition: "Unlink record",
                 callback: this._cmdUnlinkModelRecord,
                 detail: "Delete a record.",
-                syntaxis: "<STRING: MODEL NAME> <INT: RECORD ID>",
-                args: "si",
+                syntaxis:
+                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs>",
+                args: "sli",
             });
             this.registerCommand("write", {
                 definition: "Update record values",
                 callback: this._cmdWriteModelRecord,
                 detail: "Update record values.",
                 syntaxis:
-                    "<STRING: MODEL NAME> <INT: RECORD ID> " +
+                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     '"<DICT: NEW VALUES>"',
-                args: "sis",
+                args: "slis",
             });
             this.registerCommand("search", {
                 definition: "Search model record/s",
@@ -159,9 +160,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "are separated by commas (without spaces) and by default " +
                     "is 'display_name'",
                 syntaxis:
-                    "<STRING: MODEL NAME> <INT: RECORD ID> " +
+                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     "[STRING: FIELDS]",
-                args: "si?s",
+                args: "sli?s",
             });
             this.registerCommand("context", {
                 definition: "Operations over session context dictionary",
@@ -292,6 +293,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     } else {
                         this.printError("Can't update the apps list!");
                     }
+                    return result;
                 });
         },
 
@@ -312,6 +314,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             .split("\n");
                         this.print(depend_names);
                     }
+                    return result;
                 });
         },
 
@@ -322,6 +325,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 type: "POST",
             }).then(result => {
                 this.print(result);
+                return result;
             });
         },
 
@@ -374,6 +378,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         }
                     }
                     this.print(databases);
+                    return databases;
                 });
         },
 
@@ -391,6 +396,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     } else {
                         this.print("Groups are negatively evaluated");
                     }
+                    return result;
                 });
         },
 
@@ -413,14 +419,18 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 }
                 db = session.db;
             }
-            return session._session_authenticate(db, login, passwd).then(() => {
-                this.print(`Successfully logged as '${login}'`);
-            });
+            return session
+                ._session_authenticate(db, login, passwd)
+                .then(result => {
+                    this.print(`Successfully logged as '${login}'`);
+                    return result;
+                });
         },
 
         _cmdLogOut: function() {
-            return session.session_logout().then(() => {
+            return session.session_logout().then(result => {
                 this.print("Logged out");
+                return result;
             });
         },
 
@@ -516,7 +526,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             return rpc
                 .query({
                     method: "search_read",
-                    domain: [["id", "=", id]],
+                    domain: [["id", "in", id]],
                     fields: fields,
                     model: model,
                     kwargs: {context: this._getContext()},
@@ -540,6 +550,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         tbody += "</tr>";
                     }
                     this.printTable(_.unique(columns), tbody);
+                    return result;
                 });
         },
 
@@ -571,6 +582,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         ["User Name", "User ID", "Last Seen"],
                         body
                     );
+                    return result;
                 });
         },
 
@@ -588,6 +600,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     } else {
                         this.print(`You can't '${operation}' on ${model}`);
                     }
+                    return result;
                 });
         },
 
@@ -629,6 +642,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     }
                     fieldParams.unshift("field");
                     this.printTable(fieldParams, body);
+                    return result;
                 });
         },
 
@@ -669,6 +683,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     } else {
                         this.printError("Oops! can't get the login :/");
                     }
+                    return result;
                 });
         },
 
@@ -812,6 +827,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 })
                 .then(result => {
                     this.print(result);
+                    return result;
                 });
         },
 
@@ -887,6 +903,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     }
                     this.printTable(_.unique(columns), tbody);
                     this.print(`Records count: ${len}`);
+                    return result;
                 });
         },
 
@@ -915,6 +932,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             new_id: result,
                         })
                     );
+                    return result;
                 });
         },
 
@@ -926,8 +944,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     args: [id],
                     kwargs: {context: this._getContext()},
                 })
-                .then(() => {
+                .then(result => {
                     this.print(`${model} record deleted successfully`);
+                    return result;
                 });
         },
 
@@ -939,8 +958,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     args: [id, JSON.parse(values)],
                     kwargs: {context: this._getContext()},
                 })
-                .then(() => {
+                .then(result => {
                     this.print(`${model} record updated successfully`);
+                    return result;
                 });
         },
 
