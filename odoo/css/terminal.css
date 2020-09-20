@@ -178,6 +178,7 @@
     position: absolute;
     right: 1em;
     top: 0;
+    z-index: 10;
 }
 .o_terminal .terminal-screen-info-zone .terminal-screen-running-cmds {
     color: var(--terminal-screen-extra-info-color);

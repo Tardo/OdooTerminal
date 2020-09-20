@@ -1,10 +1,10 @@
 // Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.CoreFunctions", function(require) {
+odoo.define("terminal.functions.Core", function(require) {
     "use strict";
 
-    const Terminal = require("terminal.Terminal").terminal;
+    const Terminal = require("terminal.Terminal");
 
     Terminal.include({
         init: function() {
@@ -88,7 +88,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 callback: this._cmdChrono,
                 detail:
                     "Print the elapsed time in seconds to execute a command. " +
-                    "<br/>Notice that this time includes the time to print the result!",
+                    "<br/>Notice that this time includes the time to format the result!",
                 syntaxis: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
@@ -107,7 +107,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
 
         _printWelcomeMessage: function() {
             this._super.apply(this, arguments);
-            this.print(
+            this.screen.print(
                 "Type '<i class='o_terminal_click o_terminal_cmd' " +
                     "data-cmd='help'>help</i>' or '<i class='o_terminal_click " +
                     "o_terminal_cmd' data-cmd='help help'>help " +
@@ -116,7 +116,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
         },
 
         _printHelpSimple: function(cmd, cmd_def) {
-            this.print(
+            this.screen.print(
                 this._templates.render("HELP_CMD", {
                     cmd: cmd,
                     def: cmd_def.definition,
@@ -153,23 +153,23 @@ odoo.define("terminal.CoreFunctions", function(require) {
         },
 
         _printHelpDetailed: function(cmd, cmd_def) {
-            this.print(cmd_def.detail);
-            this.print(" ");
-            this.eprint(`Syntaxis: ${cmd} ${cmd_def.syntaxis}`);
+            this.screen.print(cmd_def.detail);
+            this.screen.print(" ");
+            this.screen.eprint(`Syntaxis: ${cmd} ${cmd_def.syntaxis}`);
         },
 
         _cmdClear: function(section) {
             if (section === "history") {
                 this.cleanInputHistory();
             } else {
-                this.clean();
+                this.screen.clean();
             }
             return Promise.resolve();
         },
 
         _cmdPrintText: function(...text) {
             const to_print = this._parameterReader.stringify(text);
-            this.print(to_print);
+            this.screen.print(to_print);
             return Promise.resolve(to_print);
         },
 
@@ -187,7 +187,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                         href: inURL.href,
                     });
             } else {
-                this.printError("Invalid file type");
+                this.screen.printError("Invalid file type");
             }
             return Promise.resolve();
         },
@@ -197,15 +197,15 @@ odoo.define("terminal.CoreFunctions", function(require) {
             values = "false"
         ) {
             if (operation === "read") {
-                this.print(this._userContext);
+                this.screen.print(this._userContext);
             } else if (operation === "set") {
                 this._userContext = JSON.parse(values);
-                this.print(this._userContext);
+                this.screen.print(this._userContext);
             } else if (operation === "write") {
                 Object.assign(this._userContext, JSON.parse(values));
-                this.print(this._userContext);
+                this.screen.print(this._userContext);
             } else {
-                this.printError("Invalid operation");
+                this.screen.printError("Invalid operation");
             }
             return Promise.resolve();
         },
@@ -216,21 +216,23 @@ odoo.define("terminal.CoreFunctions", function(require) {
             if (!name) {
                 const alias_names = Object.keys(aliases);
                 if (alias_names.length) {
-                    this.print(alias_names);
+                    this.screen.print(alias_names);
                 } else {
-                    this.print("No aliases defined.");
+                    this.screen.print("No aliases defined.");
                 }
             } else if (name in this._registeredCmds) {
-                this.printError("Invalid alias name");
+                this.screen.printError("Invalid alias name");
             } else {
                 if (_.some(defcall)) {
                     aliases[name] = this._parameterReader.stringify(defcall);
-                    this.print("Alias created successfully");
+                    this.screen.print("Alias created successfully");
                 } else {
                     delete aliases[name];
-                    this.print("Alias removed successfully");
+                    this.screen.print("Alias removed successfully");
                 }
-                this._storageLocal.setItem("terminal_aliases", aliases);
+                this._storageLocal.setItem("terminal_aliases", aliases, err =>
+                    this.screen.printHTML(err)
+                );
             }
             return Promise.resolve();
         },
@@ -263,7 +265,7 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 const scmd = this._parameterReader.parse(cmd, cmd_def);
                 const varname = _.uniqueId("term");
                 window[varname] = await this._processCommandJob(scmd, cmd_def);
-                this.print(
+                this.screen.print(
                     `Command result exported! now you can use '${varname}' variable in the browser console`
                 );
                 return resolve();
@@ -281,7 +283,9 @@ odoo.define("terminal.CoreFunctions", function(require) {
                 const start_time = new Date();
                 await this._processCommandJob(scmd, cmd_def);
                 const time_elapsed_secs = (new Date() - start_time) / 1000.0;
-                this.print(`Time elapsed: '${time_elapsed_secs}' seconds`);
+                this.screen.print(
+                    `Time elapsed: '${time_elapsed_secs}' seconds`
+                );
                 return resolve();
             });
         },
@@ -293,8 +297,8 @@ odoo.define("terminal.CoreFunctions", function(require) {
                     return reject("Need a valid command to execute!");
                 }
                 const cmd_def = this._registeredCmds[cmd_name];
-                const scmd = this._parameterReader.parse(cmd, cmd_def);
                 for (let i = 0; i < times; ++i) {
+                    const scmd = this._parameterReader.parse(cmd, cmd_def);
                     await this._processCommandJob(scmd, cmd_def);
                 }
                 return resolve();

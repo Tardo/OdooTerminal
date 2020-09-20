@@ -2,12 +2,12 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 /** Implementations for Odoo 12.0+ **/
-odoo.define("terminal.Compat12Common", function(require) {
+odoo.define("terminal.core.compat.12.Common", function(require) {
     "use strict";
 
-    const AbstractTerminal = require("terminal.AbstractTerminal");
+    const AbstractLongpolling = require("terminal.core.abstract.Longpolling");
 
-    AbstractTerminal.longpolling.include({
+    AbstractLongpolling.include({
         _busServ: function(method, ...params) {
             return this._parent.call("bus_service", method, ...params);
         },

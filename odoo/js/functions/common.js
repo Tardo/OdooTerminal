@@ -1,14 +1,14 @@
 // Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.CommonFunctions", function(require) {
+odoo.define("terminal.functions.Common", function(require) {
     "use strict";
 
     const tour = require("web_tour.tour");
     const rpc = require("web.rpc");
     const ajax = require("web.ajax");
     const session = require("web.session");
-    const Terminal = require("terminal.Terminal").terminal;
+    const Terminal = require("terminal.Terminal");
 
     Terminal.include({
         custom_events: _.extend({}, Terminal.prototype.custom_events, {
@@ -287,11 +287,11 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 })
                 .then(result => {
                     if (result) {
-                        this.print(
+                        this.screen.print(
                             "The apps list has been updated successfully"
                         );
                     } else {
-                        this.printError("Can't update the apps list!");
+                        this.screen.printError("Can't update the apps list!");
                     }
                     return result;
                 });
@@ -307,12 +307,12 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 })
                 .then(result => {
                     if (_.isEmpty(result)) {
-                        this.printError("The module isn't installed");
+                        this.screen.printError("The module isn't installed");
                     } else {
                         const depend_names = result.warning.message
                             .substr(result.warning.message.search("\n") + 1)
                             .split("\n");
-                        this.print(depend_names);
+                        this.screen.print(depend_names);
                     }
                     return result;
                 });
@@ -324,7 +324,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 contentType: "application/json",
                 type: "POST",
             }).then(result => {
-                this.print(result);
+                this.screen.print(result);
                 return result;
             });
         },
@@ -333,15 +333,15 @@ odoo.define("terminal.CommonFunctions", function(require) {
             const tour_names = Object.keys(tour.tours);
             if (tour_name) {
                 if (tour_names.indexOf(tour_name) === -1) {
-                    this.printError("The given tour doesn't exists!");
+                    this.screen.printError("The given tour doesn't exists!");
                 } else {
                     odoo.__DEBUG__.services["web_tour.tour"].run(tour_name);
                     this.print("Running tour...");
                 }
             } else if (tour_names.length) {
-                this.print(tour_names);
+                this.screen.print(tour_names);
             } else {
-                this.print("The tour list is empty");
+                this.screen.print("The tour list is empty");
             }
             return Promise.resolve();
         },
@@ -368,7 +368,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 })
                 .then(databases => {
                     if (!databases) {
-                        this.printError("Can't get database names");
+                        this.screen.printError("Can't get database names");
                         return;
                     }
                     for (const i in databases) {
@@ -377,7 +377,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             break;
                         }
                     }
-                    this.print(databases);
+                    this.screen.print(databases);
                     return databases;
                 });
         },
@@ -392,9 +392,9 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 })
                 .then(result => {
                     if (result) {
-                        this.print("Nice! groups are truly evaluated");
+                        this.screen.print("Nice! groups are truly evaluated");
                     } else {
-                        this.print("Groups are negatively evaluated");
+                        this.screen.print("Groups are negatively evaluated");
                     }
                     return result;
                 });
@@ -410,7 +410,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
             }
             if (db === "*") {
                 if (!session.db) {
-                    this.printError(
+                    this.screen.printError(
                         "Unknown active database. Try using " +
                             "'<span class='o_terminal_click o_terminal_cmd' " +
                             "data-cmd='dblist'>dblist</span>' command."
@@ -422,33 +422,33 @@ odoo.define("terminal.CommonFunctions", function(require) {
             return session
                 ._session_authenticate(db, login, passwd)
                 .then(result => {
-                    this.print(`Successfully logged as '${login}'`);
+                    this.screen.print(`Successfully logged as '${login}'`);
                     return result;
                 });
         },
 
         _cmdLogOut: function() {
             return session.session_logout().then(result => {
-                this.print("Logged out");
+                this.screen.print("Logged out");
                 return result;
             });
         },
 
         _longPollingAddChannel: function(name) {
             if (typeof name === "undefined") {
-                this.printError("Invalid channel name.");
+                this.screen.printError("Invalid channel name.");
             } else {
-                this.print(this._longpolling.addChannel(name));
-                this.print(`Joined the '${name}' channel.`);
+                this.screen.print(this._longpolling.addChannel(name));
+                this.screen.print(`Joined the '${name}' channel.`);
             }
         },
 
         _longPollingDelChannel: function(name) {
             if (typeof name === "undefined") {
-                this.printError("Invalid channel name.");
+                this.screen.printError("Invalid channel name.");
             } else {
                 this._longpolling.deleteChannel(name);
-                this.print(`Leave the '${name}' channel.`);
+                this.screen.print(`Leave the '${name}' channel.`);
             }
         },
 
@@ -460,32 +460,32 @@ odoo.define("terminal.CommonFunctions", function(require) {
             }
 
             if (typeof operation === "undefined") {
-                this.print(this._longpolling.isVerbose() || "off");
+                this.screen.print(this._longpolling.isVerbose() || "off");
             } else if (operation === "verbose") {
                 this._longpolling.setVerbose(true);
-                this.print("Now long-polling is in verbose mode.");
+                this.screen.print("Now long-polling is in verbose mode.");
             } else if (operation === "off") {
                 this._longpolling.setVerbose(false);
-                this.print("Now long-polling verbose mode is disabled");
+                this.screen.print("Now long-polling verbose mode is disabled");
             } else if (operation === "add_channel") {
                 this._longPollingAddChannel(name);
             } else if (operation === "del_channel") {
                 this._longPollingDelChannel(name);
             } else if (operation === "start") {
                 this._longpolling.startPoll();
-                this.print("Longpolling started");
+                this.screen.print("Longpolling started");
             } else if (operation === "stop") {
                 this._longpolling.stopPoll();
-                this.print("Longpolling stopped");
+                this.screen.print("Longpolling stopped");
             } else {
-                this.printError("Invalid Operation.");
+                this.screen.printError("Invalid Operation.");
             }
             return Promise.resolve();
         },
 
         _cmdShowOdooVersion: function() {
             try {
-                this.print(
+                this.screen.print(
                     `${odoo.session_info.server_version_info
                         .slice(0, 3)
                         .join(
@@ -495,22 +495,22 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         .join(" ")})`
                 );
             } catch (err) {
-                this.print(window.term_odooVersion);
+                this.screen.print(window.term_odooVersion);
             }
             return Promise.resolve();
         },
 
         _cmdContextOperation: function(operation = "read", values = "false") {
             if (operation === "read") {
-                this.print(session.user_context);
+                this.screen.print(session.user_context);
             } else if (operation === "set") {
                 session.user_context = JSON.parse(values);
-                this.print(session.user_context);
+                this.screen.print(session.user_context);
             } else if (operation === "write") {
                 Object.assign(session.user_context, JSON.parse(values));
-                this.print(session.user_context);
+                this.screen.print(session.user_context);
             } else {
-                this.printError("Invalid operation");
+                this.screen.printError("Invalid operation");
             }
             return Promise.resolve();
         },
@@ -549,7 +549,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         }
                         tbody += "</tr>";
                     }
-                    this.printTable(_.unique(columns), tbody);
+                    this.screen.printTable(_.unique(columns), tbody);
                     return result;
                 });
         },
@@ -578,7 +578,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             `<td>${record.user_id[0]}</td>` +
                             `<td>${record.last_presence}</td></tr>`;
                     }
-                    this.printTable(
+                    this.screen.printTable(
                         ["User Name", "User ID", "Last Seen"],
                         body
                     );
@@ -596,9 +596,13 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 })
                 .then(result => {
                     if (result) {
-                        this.print(`Nice! you can '${operation}' on ${model}`);
+                        this.screen.print(
+                            `You have access rights for '${operation}' on ${model}`
+                        );
                     } else {
-                        this.print(`You can't '${operation}' on ${model}`);
+                        this.screen.print(
+                            `You can't '${operation}' on ${model}`
+                        );
                     }
                     return result;
                 });
@@ -641,7 +645,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         body += "</tr>";
                     }
                     fieldParams.unshift("field");
-                    this.printTable(fieldParams, body);
+                    this.screen.printTable(fieldParams, body);
                     return result;
                 });
         },
@@ -669,7 +673,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                 .then(result => {
                     if (result.length) {
                         const record = result[0];
-                        this.print(
+                        this.screen.print(
                             this._templates.render("WHOAMI", {
                                 login: record.login,
                                 display_name: record.display_name,
@@ -681,7 +685,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                             })
                         );
                     } else {
-                        this.printError("Oops! can't get the login :/");
+                        this.screen.printError("Oops! can't get the login :/");
                     }
                     return result;
                 });
@@ -689,14 +693,14 @@ odoo.define("terminal.CommonFunctions", function(require) {
 
         _cmdSetDebugMode: function(mode) {
             if (mode === 0) {
-                this.print(
+                this.screen.print(
                     "Debug mode <strong>disabled</strong>. Reloading page..."
                 );
                 const qs = $.deparam.querystring();
                 delete qs.debug;
                 window.location.search = "?" + $.param(qs);
             } else if (mode === 1) {
-                this.print(
+                this.screen.print(
                     "Debug mode <strong>enabled</strong>. Reloading page..."
                 );
                 window.location = $.param.querystring(
@@ -704,7 +708,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "debug=1"
                 );
             } else if (mode === 2) {
-                this.print(
+                this.screen.print(
                     "Debug mode with assets <strong>enabled</strong>. " +
                         "Reloading page..."
                 );
@@ -713,7 +717,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     "debug=assets"
                 );
             } else {
-                this.printError("Invalid debug mode");
+                this.screen.printError("Invalid debug mode");
             }
             return Promise.resolve();
         },
@@ -742,18 +746,20 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         args: [result[0].id],
                     }).then(
                         () => {
-                            this.print(
+                            this.screen.print(
                                 `'${module_name}' module successfully upgraded`
                             );
                         },
                         () => {
-                            this.printError(
+                            this.screen.printError(
                                 `Can't upgrade '${module_name}' module`
                             );
                         }
                     );
                 } else {
-                    this.printError(`'${module_name}' module doesn't exists`);
+                    this.screen.printError(
+                        `'${module_name}' module doesn't exists`
+                    );
                 }
             });
         },
@@ -767,18 +773,20 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         args: [result[0].id],
                     }).then(
                         () => {
-                            this.print(
+                            this.screen.print(
                                 `'${module_name}' module successfully installed`
                             );
                         },
                         () => {
-                            this.printError(
+                            this.screen.printError(
                                 `Can't install '${module_name}' module`
                             );
                         }
                     );
                 } else {
-                    this.printError(`'${module_name}' module doesn't exists`);
+                    this.screen.printError(
+                        `'${module_name}' module doesn't exists`
+                    );
                 }
             });
         },
@@ -792,18 +800,20 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         args: [result[0].id],
                     }).then(
                         () => {
-                            this.print(
+                            this.screen.print(
                                 `'${module_name}' module successfully uninstalled`
                             );
                         },
                         () => {
-                            this.printError(
+                            this.screen.printError(
                                 `Can't uninstall '${module_name}' module`
                             );
                         }
                     );
                 } else {
-                    this.printError(`'${module_name}' module doesn't exists`);
+                    this.screen.printError(
+                        `'${module_name}' module doesn't exists`
+                    );
                 }
             });
         },
@@ -826,7 +836,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: pkwargs,
                 })
                 .then(result => {
-                    this.print(result);
+                    this.screen.print(result);
                     return result;
                 });
         },
@@ -901,8 +911,8 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         }
                         tbody += "</tr>";
                     }
-                    this.printTable(_.unique(columns), tbody);
-                    this.print(`Records count: ${len}`);
+                    this.screen.printTable(_.unique(columns), tbody);
+                    this.screen.print(`Records count: ${len}`);
                     return result;
                 });
         },
@@ -926,7 +936,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
-                    this.print(
+                    this.screen.print(
                         this._templates.render("RECORD_CREATED", {
                             model: model,
                             new_id: result,
@@ -945,7 +955,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
-                    this.print(`${model} record deleted successfully`);
+                    this.screen.print(`${model} record deleted successfully`);
                     return result;
                 });
         },
@@ -959,7 +969,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
-                    this.print(`${model} record updated successfully`);
+                    this.screen.print(`${model} record updated successfully`);
                     return result;
                 });
         },
@@ -976,7 +986,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
 
         _cmdPostData: function(url, data) {
             return ajax.post(url, JSON.parse(data)).then(result => {
-                this.print(result);
+                this.screen.print(result);
             });
         },
 
@@ -986,11 +996,11 @@ odoo.define("terminal.CommonFunctions", function(require) {
             const l = NotifDatas.length;
             for (let x = 0; x < l; ++x) {
                 const notif = NotifDatas[x];
-                this.print(
+                this.screen.print(
                     "<strong>[<i class='fa fa-envelope-o'></i>] New Longpolling Notification:</stron>"
                 );
                 if (notif[0] !== "not") {
-                    this.print(
+                    this.screen.print(
                         [
                             `From: ${notif[0][0]}`,
                             `Channel: ${notif[0][1]}`,
@@ -999,7 +1009,7 @@ odoo.define("terminal.CommonFunctions", function(require) {
                         true
                     );
                 }
-                this.print(notif[1], false);
+                this.screen.print(notif[1], false);
             }
         },
     });

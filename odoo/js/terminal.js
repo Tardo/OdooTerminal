@@ -6,388 +6,35 @@ odoo.define("terminal.Terminal", function(require) {
 
     const core = require("web.core");
     const session = require("web.session");
-    const time = require("web.time");
-    const Class = require("web.Class");
-    const AbstractTerminal = require("terminal.AbstractTerminal");
+    const Widget = require("web.Widget");
+    const Screen = require("terminal.core.Screen");
+    const Longpolling = require("terminal.core.Longpolling");
+    const ParameterReader = require("terminal.core.ParameterReader");
+    const TemplateManager = require("terminal.core.TemplateManager");
+    const Storage = require("terminal.core.Storage");
 
     const QWeb = core.qweb;
 
-    const TerminalStorageSession = AbstractTerminal.storage.extend({
-        getItem: function(item) {
-            return JSON.parse(sessionStorage.getItem(item)) || undefined;
-        },
+    const Terminal = Widget.extend({
+        VERSION: "6.2.0",
 
-        setItem: function(item, value) {
-            try {
-                return sessionStorage.setItem(item, JSON.stringify(value));
-            } catch (err) {
-                if (!this._checkError(err)) {
-                    throw err;
-                }
-            }
-
-            return false;
-        },
-
-        removeItem: function(item) {
-            return sessionStorage.removeItem(item) || undefined;
-        },
-    });
-
-    const TerminalStorageLocal = AbstractTerminal.storage.extend({
-        getItem: function(item) {
-            return JSON.parse(localStorage.getItem(item)) || undefined;
-        },
-
-        setItem: function(item, value) {
-            try {
-                return localStorage.setItem(item, JSON.stringify(value));
-            } catch (err) {
-                if (!this._checkError(err)) {
-                    throw err;
-                }
-            }
-
-            return false;
-        },
-
-        removeItem: function(item) {
-            return localStorage.removeItem(item) || undefined;
-        },
-    });
-
-    const TerminalLongPolling = AbstractTerminal.longpolling.extend({
-        setVerbose: function(status) {
-            if (status) {
-                this._parent._storage.setItem(
-                    "terminal_longpolling_mode",
-                    "verbose"
-                );
-            } else {
-                this._parent._storage.removeItem("terminal_longpolling_mode");
-            }
-        },
-
-        isVerbose: function() {
-            return this._parent._storage.getItem("terminal_longpolling_mode");
-        },
-
-        //
-        _onBusNotification: function(notifications) {
-            if (this.isVerbose()) {
-                this._parent.trigger_up(
-                    "longpolling_notification",
-                    notifications
-                );
-            }
-        },
-    });
-
-    /**
-     * This class is used to parse terminal command parameters.
-     */
-    const ParameterReader = Class.extend({
-        init: function() {
-            this._validators = {
-                s: this._validateString,
-                i: this._validateInt,
-            };
-            this._formatters = {
-                s: this._formatString,
-                i: this._formatInt,
-            };
-            this._regexSanitize = new RegExp("'", "g");
-            this._regexParams = new RegExp(
-                /(["'])((?:(?=(\\?))\2.)*?)\1|[^\s]+/,
-                "g"
-            );
-            this._regexArgs = new RegExp(/[l?*]/);
-        },
-
-        /**
-         * Split and trim values
-         * @param {String} text
-         * @param {String} separator
-         * @returns {Array}
-         */
-        splitAndTrim: function(text, separator) {
-            return _.map(text.split(separator), item => item.trim());
-        },
-
-        /**
-         * Sanitize command parameters to use when invoke commands.
-         * @param {String} cmd_raw
-         * @param {Object} cmd_def
-         * @returns {Object}
-         */
-        parse: function(cmd_raw, cmd_def) {
-            const match = this._regexParams[Symbol.matchAll](cmd_raw);
-            let scmd = Array.from(match, x => x[0]);
-            const cmd = scmd[0];
-            scmd = scmd.slice(1);
-            const rawParams = scmd.join(" ");
-            let params = _.map(scmd, item => {
-                let nvalue = item;
-                if (item[0] === '"' || item[0] === "'") {
-                    nvalue = item.substr(1, item.length - 2);
-                }
-                return cmd_def.sanitized
-                    ? this._sanitizeString(nvalue)
-                    : nvalue;
-            });
-
-            params = this.validateAndFormat(cmd_def.args, params);
-
-            return {
-                cmd: cmd,
-                rawParams: rawParams,
-                params: params,
-            };
-        },
-
-        /**
-         * Check if the parameter type correspond with the expected type.
-         * @param {Array} args
-         * @param {Array} params
-         * @returns {Boolean}
-         */
-        validateAndFormat: function(args, params) {
-            if (!args.length) {
-                return params;
-            }
-            const formatted_params = [];
-            let checkedCount = 0;
-            for (
-                let i = 0;
-                i < args.length && checkedCount < params.length;
-                ++i
-            ) {
-                let list_mode = false;
-                let carg = args[i];
-                // Determine argument type (modifiers)
-                if (carg === "?") {
-                    carg = args[++i];
-                } else if (carg === "l") {
-                    carg = args[++i];
-                    list_mode = true;
-                } else if (carg === "*") {
-                    for (; checkedCount < params.length; ++checkedCount) {
-                        formatted_params.push(
-                            this._formatters.s(params[checkedCount])
-                        );
-                    }
-                    break;
-                }
-                // Parameter validation & formatting
-                const param = params[checkedCount];
-                if (!this._validators[carg](param, list_mode)) {
-                    break;
-                }
-                formatted_params.push(this._formatters[carg](param, list_mode));
-                ++checkedCount;
-            }
-
-            if (
-                checkedCount !== params.length ||
-                checkedCount < this._getNumRequiredArgs(args)
-            ) {
-                throw new Error("Invalid command parameters");
-            }
-
-            return formatted_params;
-        },
-
-        /**
-         * Convert array of command params to 'raw' string params
-         * @param {Array} params
-         * @returns {String}
-         */
-        stringify: function(params) {
-            return _.map(params, function(item) {
-                if (item.indexOf(" ") === -1) {
-                    return item;
-                }
-                return `"${item}"`;
-            }).join(" ");
-        },
-
-        /**
-         * Get the number of required arguments
-         * @param {String} args
-         * @returns {Int}
-         */
-        _getNumRequiredArgs: function(args) {
-            const match = args.match(this._regexArgs);
-            return match ? match.index : args.length;
-        },
-
-        /**
-         * Replace all quotes to double-quotes.
-         * @param {String} str
-         * @returns {String}
-         */
-        _sanitizeString: function(str) {
-            return str.replace(this._regexSanitize, '"');
-        },
-
-        /**
-         * Test if is an string.
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {Boolean}
-         */
-        _validateString: function(param, list_mode = false) {
-            if (list_mode) {
-                const param_split = param.split(",");
-                let is_valid = true;
-                for (const ps of param_split) {
-                    const param_sa = ps.trim();
-                    if (Number(param_sa) === parseInt(param_sa, 10)) {
-                        is_valid = false;
-                        break;
-                    }
-                }
-                return is_valid;
-            }
-            return Number(param) !== parseInt(param, 10);
-        },
-
-        /**
-         * Test if is an integer.
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {Boolean}
-         */
-        _validateInt: function(param, list_mode = false) {
-            if (list_mode) {
-                const param_split = param.split(",");
-                let is_valid = true;
-                for (const ps of param_split) {
-                    const param_sa = ps.trim();
-                    if (Number(param_sa) !== parseInt(param_sa, 10)) {
-                        is_valid = false;
-                        break;
-                    }
-                }
-                return is_valid;
-            }
-            return Number(param) === parseInt(param, 10);
-        },
-
-        /**
-         * Format value to string
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {String}
-         */
-        _formatString: function(param, list_mode = false) {
-            if (list_mode) {
-                return _.map(param.split(","), item => item.trim());
-            }
-            return param;
-        },
-
-        /**
-         * Format value to integer
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {Number}
-         */
-        _formatInt: function(param, list_mode = false) {
-            if (list_mode) {
-                return _.map(param.split(","), item => Number(item.trim()));
-            }
-            return Number(param);
-        },
-    });
-
-    /**
-     * This class is used to generate values for terminal command parameters.
-     */
-    const ParameterGenerator = Class.extend({
-        init: function() {
-            this._generators = {
-                INT: this._generateInt.bind(this),
-                STR: this._generateString.bind(this),
-                DATE: this._generateDate.bind(this),
-                NOW: this._getDate,
-                DATETIME: this._generateDateTime.bind(this),
-                NOWTIME: this._getDateTime,
-            };
-            this._regexParamGenerator = new RegExp(
-                /(\$(\w+)(?:\[(\d+),(\d+)\])*)/,
-                "g"
-            );
-            this._characters =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
-            this._charactersLength = this._characters.length;
-        },
-
-        _generateInt: function(min, max) {
-            const min_s = Number(min);
-            const max_s = Number(max);
-            return Math.floor(Math.random() * (max_s - min_s + 1) + min_s);
-        },
-
-        _generateString: function(min, max) {
-            const rlen = this._generateInt(min, max);
-            let result = "";
-            for (let i = 0; i < rlen; ++i) {
-                result += this._characters.charAt(
-                    Math.floor(Math.random() * this._charactersLength)
-                );
-            }
-            return result;
-        },
-
-        _generateDate: function(min, max) {
-            const rdate = this._generateInt(min, max);
-            return moment(new Date(rdate)).format(time.getLangDateFormat());
-        },
-
-        _generateDateTime: function(min, max) {
-            const rdate = this._generateInt(min, max);
-            return moment(new Date(rdate)).format(time.getLangDatetimeFormat());
-        },
-
-        _getDate: function() {
-            return moment().format(time.getLangDateFormat());
-        },
-
-        _getDateTime: function() {
-            return moment().format(time.getLangDatetimeFormat());
-        },
-
-        parse: function(params) {
-            const parsed_params = [];
-            for (let param of params) {
-                const matches = String(param).matchAll(
-                    this._regexParamGenerator
-                );
-                for (const match of matches) {
-                    if (match[2] in this._generators) {
-                        param = param.replace(
-                            match[0],
-                            this._generators[match[2]](...match.splice(3))
-                        );
-                    }
-                }
-                parsed_params.push(param);
-            }
-            return parsed_params;
-        },
-    });
-
-    const Terminal = AbstractTerminal.terminal.extend({
         custom_events: {},
         events: {
-            "keyup #terminal_input": "_onInputKeyUp",
-            "keydown #terminal_input": "_onInputKeyDown",
-            "keydown #terminal_screen": "_preventLostInputFocus",
-            "input #terminal_input": "_onInput",
             "click .o_terminal_cmd": "_onClickTerminalCommand",
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
         },
+
+        _registeredCmds: {},
+        _inputHistory: [],
+        _searchCommandIter: 0,
+        _searchCommandQuery: "",
+        _searchHistoryIter: 0,
+
+        _storage: null,
+        _longpolling: null,
+
+        _hasExecInitCmds: false,
+        _userContext: {active_test: false},
 
         _runningCommandsCount: 0,
         _errorCount: 0,
@@ -410,7 +57,7 @@ odoo.define("terminal.Terminal", function(require) {
                 // Remove extra terminals
                 $terms.filter(":not(:first-child)").remove();
             } else if (!$terms.length) {
-                $(QWeb.render("terminal")).prependTo("body");
+                $(this._rawTerminalTemplate).prependTo("body");
                 this.setElement($("body").find("#terminal"));
                 this.start();
             }
@@ -418,24 +65,31 @@ odoo.define("terminal.Terminal", function(require) {
 
         init: function() {
             this._super.apply(this, arguments);
-
-            this._storage = new TerminalStorageSession(this);
-            this._storageLocal = new TerminalStorageLocal(this);
+            this._createTerminal();
+            this._storage = new Storage.StorageSession();
+            this._storageLocal = new Storage.StorageLocal();
             try {
-                this._longpolling = new TerminalLongPolling(this);
+                this._longpolling = new Longpolling(this);
             } catch (err) {
                 // This happens if 'bus' module is not installed
                 this._longpolling = false;
             }
-            this._parameterReader = new ParameterReader();
-            this._parameterGenerator = new ParameterGenerator();
-            this._rawTerminal = QWeb.render("terminal");
-            this._lazyStorageTerminalScreen = _.debounce(
-                function() {
-                    this._storage.setItem("terminal_screen", this.$term.html());
+            this._templates = new TemplateManager();
+            this.screen = new Screen({
+                onSaveScreen: function(content) {
+                    _.debounce(
+                        this._storage.setItem("terminal_screen", content, err =>
+                            this.screen.printHTML(err)
+                        ),
+                        350
+                    );
                 }.bind(this),
-                350
-            );
+                onCleanScreen: () =>
+                    this._storage.removeItem("terminal_screen"),
+                onInputKeyUp: this._onInputKeyUp.bind(this),
+                onInput: this._onInput.bind(this),
+            });
+            this._parameterReader = new ParameterReader();
             this._runningCommandsCount = 0;
             this._errorCount = 0;
 
@@ -456,25 +110,19 @@ odoo.define("terminal.Terminal", function(require) {
         start: function() {
             this._super.apply(this, arguments);
 
+            this.screen.start(this.$el);
+
             // Custom Events
             this.$el[0].addEventListener("toggle", this.do_toggle.bind(this));
-
-            this.$(".terminal-prompt").val(this.PROMPT);
-
-            this.$input = this.$("#terminal_input");
-            this.$shadowInput = this.$("#terminal_shadow_input");
-            this.$term = this.$("#terminal_screen");
             this.$runningCmdCount = this.$("#terminal_running_cmd_count");
 
             const cachedScreen = this._storage.getItem("terminal_screen");
             if (_.isUndefined(cachedScreen)) {
                 this._printWelcomeMessage();
-                this.print("");
+                this.screen.print("");
             } else {
-                this._printHTML(cachedScreen);
-                requestAnimationFrame(() => {
-                    this.$term[0].scrollTop = this.$term[0].scrollHeight;
-                });
+                this.screen.printHTML(cachedScreen);
+                requestAnimationFrame(() => this.screen.scrollDown());
             }
             const cachedHistory = this._storage.getItem("terminal_history");
             if (!_.isUndefined(cachedHistory)) {
@@ -501,148 +149,7 @@ odoo.define("terminal.Terminal", function(require) {
             this._super.apply(this, arguments);
         },
 
-        /* PRINT */
-        _printHTML: function(html, nostore) {
-            this.$term.append(html);
-            this.$term[0].scrollTop = this.$term[0].scrollHeight;
-            if (!nostore) {
-                this._lazyStorageTerminalScreen();
-            }
-        },
-
-        _prettyObjectString: function(obj) {
-            return this._encodeHTML(JSON.stringify(obj, null, 4));
-        },
-        print: function(msg, enl, cls) {
-            const msg_type = typeof msg;
-            if (msg_type === "object") {
-                if (msg instanceof Text) {
-                    this._printHTML(
-                        $(msg).wrap(
-                            `<span class='line-text ${cls || ""}'></span>`
-                        )
-                    );
-                } else if (msg instanceof Array) {
-                    const l = msg.length;
-                    let html_to_print = "";
-                    for (let x = 0; x < l; ++x) {
-                        html_to_print += `<span class='line-array ${cls ||
-                            ""}'>${msg[x]}</span><br>`;
-                    }
-                    this._printHTML(html_to_print);
-                } else {
-                    this._printHTML(
-                        `<span class='line-object ${cls || ""}'>` +
-                            `${this._prettyObjectString(msg)}</span><br>`
-                    );
-                }
-            } else {
-                this._printHTML(
-                    `<span class='line-text ${cls || ""}'>${msg}</span>`
-                );
-            }
-            if (!enl) {
-                this._printHTML("<br>");
-            }
-        },
-
-        eprint: function(msg, enl) {
-            this.print(document.createTextNode(msg), enl);
-        },
-
-        printError: function(error, internal = false) {
-            if (!internal) {
-                this.print(`[!] ${error}`);
-                return;
-            }
-            if (
-                typeof error === "object" &&
-                "data" in error &&
-                "exception_type" in error.data
-            ) {
-                // It's an Odoo error report
-                const error_id = new Date().getTime();
-                this.print(
-                    this._templates.render("ERROR_MESSAGE", {
-                        error_name: this._encodeHTML(error.data.name),
-                        error_message: this._encodeHTML(error.data.message),
-                        error_id: error_id,
-                        exception_type: error.data.exception_type,
-                        context: JSON.stringify(error.data.context),
-                        args: JSON.stringify(error.data.arguments),
-                        debug: this._encodeHTML(error.data.debug),
-                    }),
-                    false,
-                    "error_message"
-                );
-                ++this._errorCount;
-            } else if (
-                typeof error === "object" &&
-                "data" in error &&
-                "type" in error.data
-            ) {
-                // It's an Odoo error report
-                const error_id = new Date().getTime();
-                this.print(
-                    this._templates.render("ERROR_MESSAGE", {
-                        error_name: this._encodeHTML(error.data.objects[1]),
-                        error_message: this._encodeHTML(error.message),
-                        error_id: error_id,
-                        exception_type: error.data.type,
-                        context: "",
-                        args: "",
-                        debug: this._encodeHTML(error.data.debug),
-                    }),
-                    false,
-                    "error_message"
-                );
-                ++this._errorCount;
-            } else if (
-                typeof error === "object" &&
-                "status" in error &&
-                error.status !== "200"
-            ) {
-                // It's an Odoo error report
-                const error_id = new Date().getTime();
-                this.print(
-                    this._templates.render("ERROR_MESSAGE", {
-                        error_name: this._encodeHTML(error.statusText),
-                        error_message: this._encodeHTML(error.statusText),
-                        error_id: error_id,
-                        exception_type: "Invalid HTTP Request",
-                        context: "",
-                        args: "",
-                        debug: this._encodeHTML(error.responseText),
-                    }),
-                    false,
-                    "error_message"
-                );
-                ++this._errorCount;
-            } else {
-                this.print(error, false, "error_message");
-            }
-        },
-
-        printTable: function(columns, tbody) {
-            this.print(
-                this._templates.render("TABLE", {
-                    thead: columns.join("</th><th>"),
-                    tbody: tbody,
-                })
-            );
-        },
-
         /* BASIC FUNCTIONS */
-        clean: function() {
-            this.$term.html("");
-            this._storage.removeItem("terminal_screen");
-        },
-
-        cleanInput: function() {
-            this.$input.val("");
-            this._cleanShadowInput();
-        },
-
         cleanInputHistory: function() {
             this._inputHistory = [];
             this._storage.removeItem("terminal_screen");
@@ -694,13 +201,8 @@ odoo.define("terminal.Terminal", function(require) {
             try {
                 scmd = this._parameterReader.parse(cmd, cmd_def);
             } catch (err) {
-                this.eprint(
-                    this._templates.render("PROMPT_CMD", {
-                        prompt: this.PROMPT,
-                        cmd: cmd,
-                    })
-                );
-                this.printError(
+                this.screen.printCommand(cmd);
+                this.screen.printError(
                     `<span class='o_terminal_click ` +
                         `o_terminal_cmd' data-cmd='help ${cmd_name}'>` +
                         `${err.message}!</span>`
@@ -708,22 +210,14 @@ odoo.define("terminal.Terminal", function(require) {
                 if (store) {
                     this._storeUserInput(cmd);
                 }
-                this.cleanInput();
+                this.screen.cleanInput();
                 return false;
             }
-            let template = "PROMPT_CMD";
-            if (cmd_def.secured) {
-                template = "PROMPT_CMD_HIDDEN_ARGS";
-            } else if (store) {
+            if (!cmd_def.secured) {
                 this._storeUserInput(cmd);
             }
-            this.eprint(
-                this._templates.render(template, {
-                    prompt: this.PROMPT,
-                    cmd: cmd_raw,
-                })
-            );
-            this.cleanInput();
+            this.screen.printCommand(cmd_raw, cmd_def.secured);
+            this.screen.cleanInput();
             this._processCommandJob(scmd, cmd_def);
             return true;
         },
@@ -731,7 +225,7 @@ odoo.define("terminal.Terminal", function(require) {
         /* VISIBILIY */
         do_show: function() {
             this.$el.addClass("terminal-transition-topdown");
-            this.$input.focus();
+            this.screen.focus();
         },
 
         do_hide: function() {
@@ -747,6 +241,24 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         /* PRIVATE METHODS*/
+        _createTerminal: function() {
+            QWeb.add_template(
+                "<templates>" +
+                    "<t t-name='terminal'>" +
+                    "<div id='terminal' class='o_terminal'>" +
+                    "<div class='terminal-screen-info-zone'>" +
+                    "<span class='terminal-screen-running-cmds' id='terminal_running_cmd_count' />" +
+                    "<div class='btn btn-sm btn-dark terminal-screen-icon-maximize p-2' role='button'>" +
+                    "<i class='fa fa-window-maximize'></i>" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>" +
+                    "</t>" +
+                    "</templates>"
+            );
+            this._rawTerminalTemplate = QWeb.render("terminal");
+        },
+
         _alternativeExecuteCommand: function(cmd_raw, store = true) {
             const cmd = cmd_raw || "";
             const cmd_split = cmd_raw.split(" ");
@@ -769,33 +281,31 @@ odoo.define("terminal.Terminal", function(require) {
             // Search similar commands
             const similar_cmd = this._searchSimiliarCommand(cmd_name);
             if (similar_cmd) {
-                this.print(
+                this.screen.print(
                     this._templates.render("UNKNOWN_COMMAND", {
                         cmd: similar_cmd,
                         params: cmd_split.slice(1),
                     })
                 );
             } else {
-                this.eprint("Unknown command.");
+                this.screen.eprint("Unknown command.");
             }
             if (store) {
                 this._storeUserInput(cmd);
             }
-            this.cleanInput();
+            this.screen.cleanInput();
             return false;
         },
 
         _getContext: function() {
             return _.extend({}, session.user_context, this._userContext);
         },
+
         _storeUserInput: function(strInput) {
-            this.$input.append(
-                this._templates.render("HISTORY_CMD", {
-                    cmd: strInput,
-                })
-            );
             this._inputHistory.push(strInput);
-            this._storage.setItem("terminal_history", this._inputHistory);
+            this._storage.setItem("terminal_history", this._inputHistory, err =>
+                this.screen.printHTML(err)
+            );
             this._searchHistoryIter = this._inputHistory.length;
         },
 
@@ -803,20 +313,10 @@ odoo.define("terminal.Terminal", function(require) {
             return parseInt(this.$el.css("top"), 10) >= 0;
         },
 
-        _encodeHTML: function(text) {
-            // See https://en.wikipedia.org/wiki/List_of_Unicode_characters
-            return text.replace(
-                /[\u00A0-\u9999\u003C-\u003E\u0022-\u002F]/gim,
-                i => `&#${i.charCodeAt(0)};`
-            );
-        },
-
         _printWelcomeMessage: function() {
-            this.print(this._templates.render("WELCOME", {ver: this.VERSION}));
-        },
-
-        _cleanShadowInput: function() {
-            this.$shadowInput.val("");
+            this.screen.print(
+                this._templates.render("WELCOME", {ver: this.VERSION})
+            );
         },
 
         _searchCommandDefByAlias: function(cmd) {
@@ -1024,11 +524,7 @@ odoo.define("terminal.Terminal", function(require) {
                 let result = "";
                 let is_failed = false;
                 try {
-                    let params = scmd.params;
-                    if (cmd_def.generators) {
-                        params = this._parameterGenerator.parse(scmd.params);
-                    }
-                    result = await cmd_def.callback.bind(this)(...params);
+                    result = await cmd_def.callback.bind(this)(...scmd.params);
                 } catch (err) {
                     is_failed = true;
                     result =
@@ -1044,15 +540,6 @@ odoo.define("terminal.Terminal", function(require) {
                 }
                 return resolve(result);
             });
-        },
-
-        _updateInput: function(str) {
-            this.$input.val(str);
-            this._cleanShadowInput();
-        },
-        _updateShadowInput: function(str) {
-            this.$shadowInput.val(str);
-            this.$shadowInput.scrollLeft(this.$input.scrollLeft());
         },
 
         _fallbackExecuteCommand: function() {
@@ -1080,23 +567,16 @@ odoo.define("terminal.Terminal", function(require) {
             --this._runningCommandsCount;
             this._updateRunningCmdCount();
             if (has_errors) {
-                this.printError(`Error executing '${cmd}':`);
+                this.screen.printError(`Error executing '${cmd}':`);
                 if (
                     typeof result === "object" &&
                     !("data" in result) &&
                     "message" in result
                 ) {
-                    this.printError(result.message, true);
+                    this.screen.printError(result.message, true);
                 } else {
-                    this.printError(result, true);
+                    this.screen.printError(result, true);
                 }
-            }
-        },
-
-        _preventLostInputFocus: function(ev) {
-            const isCKey = ev && (ev.ctrlKey || ev.altKey);
-            if (!isCKey) {
-                this.$input.focus();
             }
         },
 
@@ -1118,81 +598,77 @@ odoo.define("terminal.Terminal", function(require) {
                 this.$el.addClass("term-maximized");
                 $target.removeClass("btn-dark").addClass("btn-light");
             }
-            this._storage.setItem("screen_maximized", !is_maximized);
-            this.$term[0].scrollTop = this.$term[0].scrollHeight;
-            this._preventLostInputFocus();
+            this._storage.setItem("screen_maximized", !is_maximized, err =>
+                this.screen.printHTML(err)
+            );
+            this.screen.scrollDown();
+            this.screen.preventLostInputFocus();
         },
 
         _onKeyEnter: function() {
-            this.executeCommand(this.$input.val());
+            this.executeCommand(this.screen.getUserInput());
             this._searchCommandQuery = undefined;
-            this._preventLostInputFocus();
+            this.screen.preventLostInputFocus();
         },
         _onKeyArrowUp: function() {
             if (_.isUndefined(this._searchCommandQuery)) {
-                this._searchCommandQuery = this.$input.val();
+                this._searchCommandQuery = this.screen.getUserInput();
             }
             const found_hist = this._doSearchPrevHistory();
             if (found_hist) {
-                this._updateInput(found_hist);
+                this.screen.updateInput(found_hist);
             }
         },
         _onKeyArrowDown: function() {
             if (_.isUndefined(this._searchCommandQuery)) {
-                this._searchCommandQuery = this.$input.val();
+                this._searchCommandQuery = this.screen.getUserInput();
             }
             const found_hist = this._doSearchNextHistory();
             if (found_hist) {
-                this._updateInput(found_hist);
+                this.screen.updateInput(found_hist);
             } else {
                 this._searchCommandQuery = undefined;
-                this.cleanInput();
+                this.screen.cleanInput();
             }
         },
         _onKeyArrowRight: function(ev) {
             if (
-                this.$input.val() &&
-                ev.target.selectionStart === this.$input.val().length
+                this.screen.getUserInput() &&
+                ev.target.selectionStart === this.screen.getUserInput().length
             ) {
-                this._searchCommandQuery = this.$input.val();
+                this._searchCommandQuery = this.screen.getUserInput();
                 this._searchHistoryIter = this._inputHistory.length;
                 this._onKeyArrowUp();
-                this._searchCommandQuery = this.$input.val();
+                this._searchCommandQuery = this.screen.getUserInput();
                 this._searchHistoryIter = this._inputHistory.length;
             }
         },
         _onKeyTab: function() {
-            if (this.$input.val()) {
+            if (this.screen.getUserInput()) {
                 if (_.isUndefined(this._searchCommandQuery)) {
-                    this._searchCommandQuery = this.$input.val();
+                    this._searchCommandQuery = this.screen.getUserInput();
                 }
                 const found_cmd = this._doSearchCommand();
                 if (found_cmd) {
-                    this._updateInput(found_cmd + " ");
+                    this.screen.updateInput(found_cmd + " ");
                 }
             }
         },
 
         _onInput: function() {
             // Fish-like feature
-            this._cleanShadowInput();
-            if (this.$input.val()) {
-                this._searchCommandQuery = this.$input.val();
+            this.screen.cleanShadowInput();
+            if (this.screen.getUserInput()) {
+                this._searchCommandQuery = this.screen.getUserInput();
                 this._searchHistoryIter = this._inputHistory.length;
                 new Promise(resolve => {
                     resolve(this._doSearchPrevHistory());
                 }).then(found_hist => {
-                    this._updateShadowInput(found_hist || "");
+                    this.screen.updateShadowInput(found_hist || "");
                 });
             }
         },
 
-        _onInputKeyDown: function(ev) {
-            if (ev.keyCode === 9) {
-                // Press Tab
-                ev.preventDefault();
-            }
-        },
         _onInputKeyUp: function(ev) {
             if (ev.keyCode === $.ui.keyCode.ENTER) {
                 this._onKeyEnter(ev);
@@ -1260,11 +736,5 @@ odoo.define("terminal.Terminal", function(require) {
         // NOTE-END
     });
 
-    return {
-        terminal: Terminal,
-        parameterReader: ParameterReader,
-        storageSession: TerminalStorageSession,
-        storageLocal: TerminalStorageLocal,
-        longpolling: TerminalLongPolling,
-    };
+    return Terminal;
 });

@@ -4,35 +4,13 @@
 /**
  * This file is 'only' for better readability of the source.
  */
-odoo.define("terminal.TemplateManager", function(require) {
+odoo.define("terminal.core.TemplateManager", function(require) {
     "use strict";
 
     const Class = require("web.Class");
 
     const TemplateManager = Class.extend({
         TEMPLATES: {
-            /* ABASTRACT TERMINAL */
-            MAIN:
-                "<templates>" +
-                "<t t-name='terminal'>" +
-                "<div id='terminal' class='o_terminal'>" +
-                "<div class='col-sm-12 col-lg-12 col-12' id='terminal_screen' tabindex='-1' />" +
-                "<div class='d-flex terminal-user-input'>" +
-                "<input class='terminal-prompt' readonly='readonly'/>" +
-                "<div class='flex-fill rich-input'>" +
-                "<input type='edit' id='terminal_shadow_input' autocomplete='off' readonly='readonly'/>" +
-                "<input type='edit' id='terminal_input' autocomplete='off' />" +
-                "</div>" +
-                "</div>" +
-                "<div class='terminal-screen-info-zone'>" +
-                "<span class='terminal-screen-running-cmds' id='terminal_running_cmd_count' />" +
-                "<div class='btn btn-sm btn-dark terminal-screen-icon-maximize p-2' role='button'>" +
-                "<i class='fa fa-window-maximize'></i>" +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-                "</t>" +
-                "</templates>",
             /* TERMINAL */
             ERROR_MESSAGE:
                 "<div>" +
@@ -98,7 +76,6 @@ odoo.define("terminal.TemplateManager", function(require) {
             UNKNOWN_COMMAND: `Unknown command. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='<%= cmd %> <%= params %>'><%= cmd %></strong>'?`,
             PROMPT_CMD_HIDDEN_ARGS: `<%= prompt %> <%= cmd.split(" ")[0] %> *****`,
             PROMPT_CMD: `<%= prompt %> <%= cmd %>`,
-            HISTORY_CMD: `<option><%= cmd %></option>`,
             WELCOME: `<strong class='o_terminal_title'>Odoo Terminal v<%= ver %></strong>`,
             HELP_CMD: `<strong class='o_terminal_click o_terminal_cmd' data-cmd='help <%= cmd %>'><%= cmd %></strong> - <i><%= def %></i>`,
             RECORD_CREATED: `<%= model %> record created successfully: <span class='o_terminal_click o_terminal_view' data-resid='<%= new_id %>' data-model='<%= model %>'><%= new_id %></span>`,

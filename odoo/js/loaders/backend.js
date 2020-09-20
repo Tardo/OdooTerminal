@@ -1,17 +1,17 @@
 // Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.BackendLoader", function(require) {
+odoo.define("terminal.loaders.Backend", function(require) {
     "use strict";
 
     const core = require("web.core");
-    const Terminal = require("terminal.Terminal").terminal;
+    const Terminal = require("terminal.Terminal");
     const WebClientObj = require("web.web_client");
 
     // Ensure load resources
-    require("terminal.CoreFunctions");
-    require("terminal.CommonFunctions");
-    require("terminal.BackendFunctions");
+    require("terminal.functions.Core");
+    require("terminal.functions.Common");
+    require("terminal.functions.Backend");
 
     // Detached initialization to ensure that the terminal loads on all
     // possible conditions. This is necessary because the extension run

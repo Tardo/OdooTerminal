@@ -1,11 +1,11 @@
 // Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.BackendFunctions", function(require) {
+odoo.define("terminal.functions.Backend", function(require) {
     "use strict";
 
     const dialogs = require("web.view_dialogs");
-    const Terminal = require("terminal.Terminal").terminal;
+    const Terminal = require("terminal.Terminal");
 
     Terminal.include({
         events: _.extend({}, Terminal.prototype.events, {
