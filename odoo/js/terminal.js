@@ -199,6 +199,7 @@ odoo.define("terminal.Terminal", function(require) {
             }
 
             try {
+                this._parameterReader.resetStores();
                 scmd = this._parameterReader.parse(cmd, cmd_def);
             } catch (err) {
                 this.screen.printCommand(cmd);

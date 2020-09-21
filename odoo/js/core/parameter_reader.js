@@ -140,6 +140,13 @@ odoo.define("terminal.core.ParameterReader", function(require) {
         },
 
         /**
+         * Free internal stores
+         */
+        resetStores: function() {
+            this._parameterGenerator.resetStores();
+        },
+
+        /**
          * Get the number of required arguments
          * @param {String} args
          * @returns {Int}
