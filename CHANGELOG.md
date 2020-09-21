@@ -1,5 +1,35 @@
 # Changelog
 
+**7.0.0**
+
+```
+IMP: Restructured project
+IMP: Refactor source
+IMP: Parameter generator: Now doesn't need set the 'max' value
+IMP: Command 'view': Now can select a view ref
+IMP: Commands 'search' and 'read': Doesn't delete the 'id' attribute
+
+ADD: New parameter generators:
+  - Generator '$INTSEQ'
+  - Generator '$INTITER'
+  - Generator '$TZDATE'
+  - Generator '$TIME'
+  - Generator '$TZTIME'
+  - Generator '$TZDATETIME'
+  - Generator '$NOWDATE'
+  - Generator '$TZNOWDATE'
+  - Generator '$TZNOWTIME'
+  - Generator '$TZNOW'
+  - Generator '$EMAIL'
+  - Generator '$URL'
+ADD: Command 'fuzz': Open the selected view of the model and try to create a new record with random values (This is the first basic attempt for this feature)
+
+FIX: Behaviour of some parameter generators was changed:
+  - Generator '$DATE'
+  - Generator '$DATETIME'
+  - Generator '$NOW'
+```
+
 **6.2.0**
 
 ```
