@@ -56,7 +56,7 @@ def update_version(mode, create_tag=False):
         '"version": "%s"' % extension_ver)
     # abstract_terminal.js
     _file_sub(
-        'odoo/js/abstract_terminal.js',
+        'odoo/js/terminal.js',
         r'VERSION: "\d+\.\d+\.\d+"',
         'VERSION: "%s"' % extension_ver)
 
