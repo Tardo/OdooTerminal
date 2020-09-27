@@ -16,7 +16,7 @@ odoo.define("terminal.Terminal", function(require) {
     const QWeb = core.qweb;
 
     const Terminal = Widget.extend({
-        VERSION: "6.2.0",
+        VERSION: "7.0.0",
 
         custom_events: {},
         events: {
