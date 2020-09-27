@@ -18,7 +18,7 @@ odoo.define("terminal.loaders.Frontend", function(require) {
             const terminal = new Terminal(null, $("body").data());
 
             core.bus.on("toggle_terminal", this, () => {
-                terminal.do_toggle();
+                terminal.doToggle();
             });
             // This is used to communicate to the extension that the widget
             // is initialized successfully.

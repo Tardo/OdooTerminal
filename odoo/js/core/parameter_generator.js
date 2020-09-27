@@ -13,13 +13,38 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
     const ParameterGenerator = Class.extend({
         _rndLetter: {
             [Symbol.iterator]: function*() {
-                const characters =
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
-                const charactersLength = characters.length;
+                const characters = "bcdfghjklmnpqrstvwxyz ";
+                const vocals = "aeiou";
+                const characters_length = characters.length;
+                const vocals_length = vocals.length;
+                let cur_char = "";
+                let last_char = "";
+                let count = 0;
+                let cc_count = 0;
+
+                const isVocal = letter => vocals.indexOf(letter) !== -1;
+
                 for (;;) {
-                    yield characters.charAt(
-                        Math.floor(Math.random() * charactersLength)
-                    );
+                    if (cc_count < 2 && (!last_char || isVocal(last_char))) {
+                        cur_char = characters.charAt(
+                            Math.floor(Math.random() * characters_length)
+                        );
+                        ++cc_count;
+                    } else {
+                        cur_char = vocals.charAt(
+                            Math.floor(Math.random() * vocals_length)
+                        );
+                        cc_count = 0;
+                    }
+
+                    if (count === 0 || last_char === " ") {
+                        cur_char = cur_char.toUpperCase();
+                    }
+                    if (cur_char !== last_char) {
+                        last_char = cur_char;
+                        ++count;
+                        yield cur_char;
+                    }
                 }
             },
         },
@@ -29,23 +54,24 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
 
         init: function() {
             this._generators = {
-                EMAIL: this._generateEmail.bind(this),
-                INT: this._generateInt.bind(this),
-                INTSEQ: this._generateIntSeq.bind(this),
+                INT: this.generateInt.bind(this),
+                INTSEQ: this.generateIntSeq.bind(this),
                 INTITER: this._doIntIter.bind(this),
-                STR: this._generateString.bind(this),
-                DATE: this._generateDate.bind(this),
-                TZDATE: this._generateTzDate.bind(this),
-                TIME: this._generateTime.bind(this),
-                TZTIME: this._generateTzTime.bind(this),
-                DATETIME: this._generateDateTime.bind(this),
-                TZDATETIME: this._generateTzDateTime.bind(this),
-                NOW: this._getDateTime,
-                TZNOW: this._getTzDateTime,
-                NOWTIME: this._getTime,
-                TZNOWTIME: this._getTzTime,
-                NOWDATE: this._getDate,
-                TZNOWDATE: this._getTzDate,
+                STR: this.generateString.bind(this),
+                DATE: this.generateDate.bind(this),
+                TZDATE: this.generateTzDate.bind(this),
+                TIME: this.generateTime.bind(this),
+                TZTIME: this.generateTzTime.bind(this),
+                DATETIME: this.generateDateTime.bind(this),
+                TZDATETIME: this.generateTzDateTime.bind(this),
+                NOW: this.getDateTime,
+                TZNOW: this.getTzDateTime,
+                NOWTIME: this.getTime,
+                TZNOWTIME: this.getTzTime,
+                NOWDATE: this.getDate,
+                TZNOWDATE: this.getTzDate,
+                EMAIL: this.generateEmail.bind(this),
+                URL: this.generateUrl.bind(this),
             };
             this._regexParamGenerator = new RegExp(
                 /(\$(\w+)(?:\[(\d+)(?:,(\d+))?\])*)/,
@@ -84,21 +110,31 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             this._intIterStoreIndex = 0;
         },
 
-        _generateEmail: function(min, max) {
-            if (!min) {
+        generateEmail: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
-            const email_name = this._generateString(min, max);
-            const email_domain_a = this._generateString(min, max);
-            const email_domain_b = this._generateString(2, 3);
-            return `${email_name}@${email_domain_a}.${email_domain_b}`.replaceAll(
-                " ",
-                ""
-            );
+            const email_name = this.generateString(min, max);
+            const email_domain_a = this.generateString(min, max);
+            const email_domain_b = this.generateString(2, 3);
+            return `${email_name}@${email_domain_a}.${email_domain_b}`
+                .replaceAll(" ", "")
+                .toLowerCase();
         },
 
-        _generateInt: function(min, max) {
-            if (!min) {
+        generateUrl: function(min, max) {
+            if (typeof min === "undefined") {
+                return false;
+            }
+            const url = this.generateString(min, max);
+            const ext = this.generateString(2, 3);
+            return `https://www.${url}.${ext}`
+                .replaceAll(" ", "")
+                .toLowerCase();
+        },
+
+        generateInt: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
             const min_s = _.isUndefined(max) ? 0 : Number(min);
@@ -106,8 +142,8 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return Math.floor(Math.random() * (max_s - min_s + 1) + min_s);
         },
 
-        _generateIntSeq: function(min, max) {
-            if (!min) {
+        generateIntSeq: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
             const min_s = _.isUndefined(max) ? 0 : Number(min);
@@ -132,11 +168,11 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return (int_iter_store.value += Number(step));
         },
 
-        _generateString: function(min, max) {
-            if (!min) {
+        generateString: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
-            const rlen = this._generateInt(min, max);
+            const rlen = this.generateInt(min, max);
             let result = "";
             let count = 0;
             for (const letter of this._rndLetter) {
@@ -149,75 +185,75 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return result;
         },
 
-        _generateTzDate: function(min, max) {
-            if (!min) {
+        generateTzDate: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
-            const rdate = this._generateInt(min, max);
+            const rdate = this.generateInt(min, max);
             return moment(new Date(rdate)).format(time.getLangDateFormat());
         },
 
-        _generateDate: function(min, max) {
-            if (!min) {
+        generateDate: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
-            const rdate = this._generateInt(min, max);
+            const rdate = this.generateInt(min, max);
             return time.date_to_str(new Date(rdate));
         },
 
-        _generateTzTime: function(min, max) {
-            if (!min) {
+        generateTzTime: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
-            const rdate = this._generateInt(min, max);
+            const rdate = this.generateInt(min, max);
             return moment(new Date(rdate)).format(time.getLangTimeFormat());
         },
 
-        _generateTime: function(min, max) {
-            if (!min) {
+        generateTime: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
-            const rdate = this._generateInt(min, max);
+            const rdate = this.generateInt(min, max);
             return time.time_to_str(new Date(rdate));
         },
 
-        _generateTzDateTime: function(min, max) {
-            if (!min) {
+        generateTzDateTime: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
-            const rdate = this._generateInt(min, max);
+            const rdate = this.generateInt(min, max);
             return moment(new Date(rdate)).format(time.getLangDatetimeFormat());
         },
 
-        _generateDateTime: function(min, max) {
-            if (!min) {
+        generateDateTime: function(min, max) {
+            if (typeof min === "undefined") {
                 return false;
             }
-            const rdate = this._generateInt(min, max);
+            const rdate = this.generateInt(min, max);
             return time.datetime_to_str(new Date(rdate));
         },
 
-        _getTzDate: function() {
+        getTzDate: function() {
             return moment().format(time.getLangDateFormat());
         },
 
-        _getDate: function() {
+        getDate: function() {
             return time.date_to_str(new Date());
         },
 
-        _getTzTime: function() {
+        getTzTime: function() {
             return moment().format(time.getLangTimeFormat());
         },
 
-        _getTime: function() {
+        getTime: function() {
             return time.time_to_str(new Date());
         },
 
-        _getTzDateTime: function() {
+        getTzDateTime: function() {
             return moment().format(time.getLangDatetimeFormat());
         },
 
-        _getDateTime: function() {
+        getDateTime: function() {
             return time.datetime_to_str(new Date());
         },
     });

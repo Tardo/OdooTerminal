@@ -130,6 +130,7 @@
         } else {
             to_inject.js = [
                 "odoo/js/functions/backend.js",
+                "odoo/js/functions/fuzz.js",
                 "odoo/js/loaders/backend.js",
             ].concat(to_inject.js);
         }

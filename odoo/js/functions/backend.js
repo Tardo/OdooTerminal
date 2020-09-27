@@ -20,8 +20,9 @@ odoo.define("terminal.functions.Backend", function(require) {
                 callback: this._cmdViewModelRecord,
                 detail:
                     "Open model record in form view or records in list view.",
-                syntaxis: "<STRING: MODEL NAME> [INT: RECORD ID]",
-                args: "s?i",
+                syntaxis:
+                    "<STRING: MODEL NAME> [INT: RECORD ID] [STRING: VIEW REF]",
+                args: "s?is",
             });
             this.registerCommand("settings", {
                 definition: "Open settings page",
@@ -43,10 +44,13 @@ odoo.define("terminal.functions.Backend", function(require) {
                 views: [[false, "form"]],
                 target: "inline",
                 context: {module: module},
-            }).then(() => this.do_hide());
+            }).then(() => this.doHide());
         },
 
-        _cmdViewModelRecord: function(model, id) {
+        _cmdViewModelRecord: function(model, id, view_ref = false) {
+            const context = _.extend({}, this._getContext(), {
+                form_view_ref: view_ref,
+            });
             if (id) {
                 return this.do_action({
                     type: "ir.actions.act_window",
@@ -55,7 +59,8 @@ odoo.define("terminal.functions.Backend", function(require) {
                     res_id: id,
                     views: [[false, "form"]],
                     target: "new",
-                }).then(() => this.do_hide());
+                    context: context,
+                }).then(() => this.doHide());
             }
             new dialogs.SelectCreateDialog(this, {
                 res_model: model,
@@ -69,6 +74,7 @@ odoo.define("terminal.functions.Backend", function(require) {
                         res_id: records[0].id,
                         views: [[false, "form"]],
                         target: "new",
+                        context: context,
                     });
                 },
             }).open();

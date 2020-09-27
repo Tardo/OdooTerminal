@@ -238,7 +238,7 @@ odoo.define("terminal.functions.Core", function(require) {
         },
 
         _cmdQuit: function() {
-            this.do_hide();
+            this.doHide();
             return Promise.resolve();
         },
 

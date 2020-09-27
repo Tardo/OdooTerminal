@@ -12,6 +12,7 @@ odoo.define("terminal.loaders.Backend", function(require) {
     require("terminal.functions.Core");
     require("terminal.functions.Common");
     require("terminal.functions.Backend");
+    require("terminal.functions.Fuzz");
 
     // Detached initialization to ensure that the terminal loads on all
     // possible conditions. This is necessary because the extension run
@@ -22,7 +23,7 @@ odoo.define("terminal.loaders.Backend", function(require) {
         try {
             const terminal = new Terminal(WebClientObj);
             core.bus.on("toggle_terminal", this, () => {
-                terminal.do_toggle();
+                terminal.doToggle();
             });
 
             // This is used to communicate to the extension that the widget

@@ -113,7 +113,7 @@ odoo.define("terminal.Terminal", function(require) {
             this.screen.start(this.$el);
 
             // Custom Events
-            this.$el[0].addEventListener("toggle", this.do_toggle.bind(this));
+            this.$el[0].addEventListener("toggle", this.doToggle.bind(this));
             this.$runningCmdCount = this.$("#terminal_running_cmd_count");
 
             const cachedScreen = this._storage.getItem("terminal_screen");
@@ -224,20 +224,20 @@ odoo.define("terminal.Terminal", function(require) {
         },
 
         /* VISIBILIY */
-        do_show: function() {
+        doShow: function() {
             this.$el.addClass("terminal-transition-topdown");
             this.screen.focus();
         },
 
-        do_hide: function() {
+        doHide: function() {
             this.$el.removeClass("terminal-transition-topdown");
         },
 
-        do_toggle: function() {
+        doToggle: function() {
             if (this._isTerminalVisible()) {
-                this.do_hide();
+                this.doHide();
             } else {
-                this.do_show();
+                this.doShow();
             }
         },
 
@@ -698,17 +698,17 @@ odoo.define("terminal.Terminal", function(require) {
                 this._isTerminalVisible() &&
                 !this._storage.getItem("screen_maximized")
             ) {
-                this.do_hide();
+                this.doHide();
             }
         },
         _onCoreKeyDown: function(ev) {
             if (ev.keyCode === 27) {
                 // Press Escape
-                this.do_hide();
+                this.doHide();
             } else if (ev.ctrlKey && ev.key === "1") {
                 // Press Ctrl + 1
                 ev.preventDefault();
-                this.do_toggle();
+                this.doToggle();
             }
         },
 

@@ -542,8 +542,10 @@ odoo.define("terminal.functions.Common", function(require) {
                             id: item.id,
                             model: model,
                         });
-                        delete item.id;
                         for (const field in item) {
+                            if (field === "id") {
+                                continue;
+                            }
                             columns.push(field);
                             tbody += `<td>${item[field]}</td>`;
                         }
@@ -904,8 +906,10 @@ odoo.define("terminal.functions.Common", function(require) {
                             id: item.id,
                             model: model,
                         });
-                        delete item.id;
                         for (const field in item) {
+                            if (field === "id") {
+                                continue;
+                            }
                             columns.push(field);
                             tbody += `<td>${item[field]}</td>`;
                         }
@@ -925,7 +929,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     views: [[false, "form"]],
                     target: "current",
                 }).then(() => {
-                    this.do_hide();
+                    this.doHide();
                 });
             }
             return rpc
