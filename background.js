@@ -16,19 +16,6 @@
     const gBrowserObj = typeof chrome === "undefined" ? browser : chrome;
 
     /**
-     * Handle uninstalled event.
-     * @param {Object} info
-     */
-    function onUninstalled(info) {
-        if (info.name !== "Odoo Terminal") {
-            return;
-        }
-        sessionStorage.removeItem("terminal_history");
-        sessionStorage.removeItem("terminal_screen");
-        localStorage.removeItem("terminal_aliases");
-    }
-
-    /**
      * Handle click event.
      * @param {Object} tab - The active tab
      */
@@ -81,5 +68,4 @@
     gBrowserObj.tabs.onUpdated.addListener(refreshOdooInfo);
     gBrowserObj.tabs.onActivated.addListener(refreshOdooInfo);
     gBrowserObj.browserAction.onClicked.addListener(onClickBrowserAction);
-    gBrowserObj.management.onUninstalled.addListener(onUninstalled);
 })();

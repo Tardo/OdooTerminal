@@ -100,11 +100,18 @@
         const to_inject = {
             css: ["odoo/css/terminal.css"],
             js: [
-                "odoo/js/abstract_terminal.js",
+                "odoo/js/core/utils.js",
+                "odoo/js/core/abstract/longpolling.js",
+                "odoo/js/core/abstract/screen.js",
+                "odoo/js/core/storage.js",
+                "odoo/js/core/template_manager.js",
+                "odoo/js/core/screen.js",
+                "odoo/js/core/longpolling.js",
+                "odoo/js/core/parameter_reader.js",
+                "odoo/js/core/parameter_generator.js",
                 "odoo/js/terminal.js",
-                "odoo/js/templates.js",
-                "odoo/js/funcs/core.js",
-                "odoo/js/funcs/common.js",
+                "odoo/js/functions/core.js",
+                "odoo/js/functions/common.js",
             ],
         };
         // Compatibility resources
@@ -112,17 +119,18 @@
         // 12+ - v12
         const odoo_version = Number(info.serverVersionMajor);
         if (odoo_version === 11) {
-            to_inject.js.push("odoo/js/compat/v11/common.js");
+            to_inject.js.push("odoo/js/core/compat/v11/common.js");
         }
         if (odoo_version >= 12) {
-            to_inject.js.push("odoo/js/compat/v12/common.js");
+            to_inject.js.push("odoo/js/core/compat/v12/common.js");
         }
         // Backend/Frontend resources
         if (info.isFrontend) {
             to_inject.js.push("odoo/js/loaders/frontend.js");
         } else {
             to_inject.js = [
-                "odoo/js/funcs/backend.js",
+                "odoo/js/functions/backend.js",
+                "odoo/js/functions/fuzz.js",
                 "odoo/js/loaders/backend.js",
             ].concat(to_inject.js);
         }

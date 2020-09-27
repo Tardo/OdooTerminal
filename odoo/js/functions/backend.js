@@ -1,11 +1,11 @@
 // Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.BackendFunctions", function(require) {
+odoo.define("terminal.functions.Backend", function(require) {
     "use strict";
 
     const dialogs = require("web.view_dialogs");
-    const Terminal = require("terminal.Terminal").terminal;
+    const Terminal = require("terminal.Terminal");
 
     Terminal.include({
         events: _.extend({}, Terminal.prototype.events, {
@@ -20,8 +20,9 @@ odoo.define("terminal.BackendFunctions", function(require) {
                 callback: this._cmdViewModelRecord,
                 detail:
                     "Open model record in form view or records in list view.",
-                syntaxis: "<STRING: MODEL NAME> [INT: RECORD ID]",
-                args: "s?i",
+                syntaxis:
+                    "<STRING: MODEL NAME> [INT: RECORD ID] [STRING: VIEW REF]",
+                args: "s?is",
             });
             this.registerCommand("settings", {
                 definition: "Open settings page",
@@ -43,10 +44,13 @@ odoo.define("terminal.BackendFunctions", function(require) {
                 views: [[false, "form"]],
                 target: "inline",
                 context: {module: module},
-            }).then(() => this.do_hide());
+            }).then(() => this.doHide());
         },
 
-        _cmdViewModelRecord: function(model, id) {
+        _cmdViewModelRecord: function(model, id, view_ref = false) {
+            const context = _.extend({}, this._getContext(), {
+                form_view_ref: view_ref,
+            });
             if (id) {
                 return this.do_action({
                     type: "ir.actions.act_window",
@@ -55,7 +59,8 @@ odoo.define("terminal.BackendFunctions", function(require) {
                     res_id: id,
                     views: [[false, "form"]],
                     target: "new",
-                }).then(() => this.do_hide());
+                    context: context,
+                }).then(() => this.doHide());
             }
             new dialogs.SelectCreateDialog(this, {
                 res_model: model,
@@ -69,6 +74,7 @@ odoo.define("terminal.BackendFunctions", function(require) {
                         res_id: records[0].id,
                         views: [[false, "form"]],
                         target: "new",
+                        context: context,
                     });
                 },
             }).open();

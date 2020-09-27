@@ -15,8 +15,12 @@
   <img src="icons/terminal-48.png" />
   <div>Odoo Terminal - WebExtension</div>
 </h1>
-
-_All the power of Odoo json-rpc in a really easy way!_
+<p align="center">
+The BFG10k for Odoo developers
+</p>
+<p align="center">
+All the power of Odoo json-rpc in a really easy way!
+</p>
 
 This web extension adds a terminal-like to control Odoo (11, 12, 13 & 14).
 
@@ -75,22 +79,34 @@ You can toggle terminal using one of these options:
 
 You can use "parameter generator" to create values.
 
-| Generator  | Arguments | Description                                                           |
-| ---------- | --------- | --------------------------------------------------------------------- |
-| \$STR      | min,max   | Generates a random string with a length between the given min and max |
-| \$INT      | min,max   | Generates a random int between the given min and max                  |
-| \$DATE     | min,max   | Generates a random date between the given min and max                 |
-| \$DATETIME | min,max   | Generates a random date time between the given min and max            |
-| \$NOW      |           | Gets the current date                                                 |
-| \$NOWTIME  |           | Gets the current date time                                            |
+| Generator    | Arguments | Default   | Description                                                                   |
+| ------------ | --------- | --------- | ----------------------------------------------------------------------------- |
+| \$STR        | min,max   | max = min | Generates a random string with a length between the given min and max         |
+| \$INT        | min,max   | max = min | Generates a random int between the given min and max                          |
+| \$INTSEQ     | min,max   | max = min | Generates a list of int's starting from min to max                            |
+| \$INTITER    | min,step  | step = 1  | Generates a consecutive int starting from min (useful with 'repeat' command)  |
+| \$DATE       | min,max   | max = min | Generates a random date between the given min and max                         |
+| \$TZDATE     | min,max   | max = min | Generates a random date between the given min and max (time zone format)      |
+| \$TIME       | min,max   | max = min | Generates a random time between the given min and max                         |
+| \$TZTIME     | min,max   | max = min | Generates a random time between the given min and max (time zone format)      |
+| \$DATETIME   | min,max   | max = min | Generates a random date time between the given min and max                    |
+| \$TZDATETIME | min,max   | max = min | Generates a random date time between the given min and max (time zone format) |
+| \$EMAIL      | min,max   | max = min | Generates a random email                                                      |
+| \$URL        | min,max   | max = min | Generates a random url                                                        |
+| \$NOWDATE    |           |           | Gets the current date                                                         |
+| \$TZNOWDATE  |           |           | Gets the current date (time zone format)                                      |
+| \$NOWTIME    |           |           | Gets the current time                                                         |
+| \$TZNOWTIME  |           |           | Gets the current time (time zone format)                                      |
+| \$NOW        |           |           | Gets the current date time                                                    |
+| \$TZNOW      |           |           | Gets the current date time (time zone format)                                 |
 
-The anatomy of a generator is: `$type[min,max]`
+The anatomy of a generator is: `$type[min,max]`, `$type[min]` or `$type`
 
 For example:
 
 - create a new record with a random string:
   `create res.partner "{'name': '$STR[4,30]'}"`
-- print the current date time: `print $NOWTIME`
+- print the current time: `print $NOWTIME`
 
 > Notice that 'date' min and max are the milliseconds since 1970/01/01
 

@@ -30,10 +30,11 @@ repos:
       - id: mixed-line-ending
         args: ["--fix=lf"]
       - id: trailing-whitespace
-  - repo: https://github.com/Tardo/pre-commit-hooks
-    rev: v1.0.2
-    hooks:
-      - id: web-ext
-        verbose: true
-        args:
-          - lint
+  # Disabled due travis errors
+  # - repo: https://github.com/Tardo/pre-commit-hooks
+  #   rev: v1.0.2
+  #   hooks:
+  #     - id: web-ext
+  #       verbose: true
+  #       args:
+  #         - lint
