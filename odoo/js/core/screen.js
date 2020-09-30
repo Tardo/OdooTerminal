@@ -17,6 +17,7 @@ odoo.define("terminal.core.Screen", function(require) {
         init: function() {
             this._super.apply(this, arguments);
             this._templates = new TemplateManager();
+            this._linesCounter = 0;
         },
 
         start: function() {
@@ -92,34 +93,27 @@ odoo.define("terminal.core.Screen", function(require) {
 
         print: function(msg, enl, cls) {
             const msg_type = typeof msg;
+            const scls = enl ? cls || "" : `line-br ${cls}`;
             if (msg_type === "object") {
                 if (msg instanceof Text) {
                     this.printHTML(
-                        $(msg).wrap(
-                            `<span class='line-text ${cls || ""}'></span>`
-                        )
+                        $(msg).wrap(`<span class='line-text ${scls}'></span>`)
                     );
                 } else if (msg instanceof Array) {
                     const l = msg.length;
                     let html_to_print = "";
                     for (let x = 0; x < l; ++x) {
-                        html_to_print += `<span class='line-array ${cls ||
-                            ""}'>${msg[x]}</span><br>`;
+                        html_to_print += `<span class='line-array ${scls}'>${msg[x]}</span>`;
                     }
                     this.printHTML(html_to_print);
                 } else {
                     this.printHTML(
-                        `<span class='line-object ${cls || ""}'>` +
-                            `${this._prettyObjectString(msg)}</span><br>`
+                        `<span class='line-object ${scls}'>` +
+                            `${this._prettyObjectString(msg)}</span>`
                     );
                 }
             } else {
-                this.printHTML(
-                    `<span class='line-text ${cls || ""}'>${msg}</span>`
-                );
-            }
-            if (!enl) {
-                this.printHTML("<br>");
+                this.printHTML(`<span class='line-text ${scls}'>${msg}</span>`);
             }
         },
 

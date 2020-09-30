@@ -4,6 +4,7 @@
 
 ```
 IMP: Command 'caf': Sorted by field name
+IMP: Screen: Use less nodes
 ```
 
 **7.0.0**
