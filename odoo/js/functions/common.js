@@ -619,7 +619,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
-                    const keys = Object.keys(result);
+                    const keys = Object.keys(result).sort();
                     const fieldParams = [
                         "type",
                         "string",
@@ -630,8 +630,8 @@ odoo.define("terminal.functions.Common", function(require) {
                         "depends",
                     ];
                     let body = "";
-                    const l = keys.length;
-                    for (let x = 0; x < l; ++x) {
+                    const len = keys.length;
+                    for (let x = 0; x < len; ++x) {
                         const field = keys[x];
                         body += "<tr>";
                         body += `<td>${field}</td>`;

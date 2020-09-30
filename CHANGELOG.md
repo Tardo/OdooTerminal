@@ -1,5 +1,11 @@
 # Changelog
 
+**7.1.0**
+
+```
+IMP: Command 'caf': Sorted by field name
+```
+
 **7.0.0**
 
 ```
