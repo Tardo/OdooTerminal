@@ -22,7 +22,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
             };
             this._regexSanitize = new RegExp("'", "g");
             this._regexParams = new RegExp(
-                /(["'])((?:(?=(\\?))\2.)*?)\1|[^\s]+/,
+                /(["'])(?:(?=(\\?))\2.)*?\1|[^\s]+/,
                 "g"
             );
             this._regexArgs = new RegExp(/[l?*]/);
@@ -56,9 +56,10 @@ odoo.define("terminal.core.ParameterReader", function(require) {
                 if (item[0] === '"' || item[0] === "'") {
                     nvalue = item.substr(1, item.length - 2);
                 }
-                return cmd_def.sanitized
+                return (cmd_def.sanitized
                     ? this._sanitizeString(nvalue)
-                    : nvalue;
+                    : nvalue
+                ).replaceAll("\\", "");
             });
 
             if (cmd_def.generators) {
