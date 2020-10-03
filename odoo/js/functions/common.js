@@ -277,6 +277,29 @@ odoo.define("terminal.functions.Common", function(require) {
                 syntaxis: "",
                 args: "",
             });
+            this.registerCommand("count", {
+                definition:
+                    "Gets number of records from the given model in the selected domain",
+                callback: this._cmdCount,
+                detail:
+                    "Gets number of records from the given model in the selected domain",
+                syntaxis: '<STRING MODEL> "[ARRAY: DOMAIN]"',
+                args: "s?s",
+            });
+        },
+
+        _cmdCount: function(model, domain = "[]") {
+            return rpc
+                .query({
+                    method: "search_count",
+                    model: model,
+                    args: [JSON.parse(domain)],
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    this.screen.print(`Result: ${result}`);
+                    return result;
+                });
         },
 
         _cmdUpdateAppList: function() {
@@ -336,7 +359,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     this.screen.printError("The given tour doesn't exists!");
                 } else {
                     odoo.__DEBUG__.services["web_tour.tour"].run(tour_name);
-                    this.print("Running tour...");
+                    this.screen.print("Running tour...");
                 }
             } else if (tour_names.length) {
                 this.screen.print(tour_names);

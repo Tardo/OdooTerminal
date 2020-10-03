@@ -68,10 +68,13 @@ You can toggle terminal using one of these options:
 
 - This extension have a "preferences" page where you can add commands to run on
   every session. This is useful for example to load a remote script to extend
-  the 'terminal' features.
+  the 'terminal' features or declare custom aliases.
 - This extension uses an internal context to extend the 'user context'. This
   'terminal context' has by default the key 'active_test' = false (see issue #14
   to get more information). This context only affects to terminal operations.
+- The maximum buffered screen lines is set to 750. So, you can't see more than
+  749 records in the same query. This is necessary to avoid have a lot of
+  nodes... One of the problems of use HTML elements to render the output :/
 
 ---
 

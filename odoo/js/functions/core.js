@@ -103,6 +103,16 @@ odoo.define("terminal.functions.Core", function(require) {
                 sanitized: false,
                 generators: false,
             });
+            this.registerCommand("mute", {
+                definition: "Only prints errors",
+                callback: this._cmdMute,
+                detail:
+                    "Print to screen is a really slow task, you can improve performance if only prints errors.",
+                syntaxis: "<STRING: COMMAND>",
+                args: "*",
+                sanitized: false,
+                generators: false,
+            });
         },
 
         _printWelcomeMessage: function() {
@@ -139,14 +149,14 @@ odoo.define("terminal.functions.Core", function(require) {
             } else {
                 const [ncmd, cmd_def] = this._searchCommandDefByAlias(cmd);
                 if (cmd_def) {
-                    this.print(
+                    this.screen.print(
                         this._templates.render("DEPRECATED_COMMAND", {
                             cmd: ncmd,
                         })
                     );
                     this._printHelpDetailed(ncmd, this._registeredCmds[ncmd]);
                 } else {
-                    this.printError(`'${cmd}' command doesn't exists`);
+                    this.screen.printError(`'${cmd}' command doesn't exists`);
                 }
             }
             return Promise.resolve();
@@ -291,17 +301,52 @@ odoo.define("terminal.functions.Core", function(require) {
         },
 
         _cmdRepeat: function(times, ...defcall) {
-            return new Promise(async (resolve, reject) => {
-                const [cmd, cmd_name] = this._validateCommand(defcall);
-                if (!cmd_name) {
-                    return reject("Need a valid command to execute!");
-                }
-                const cmd_def = this._registeredCmds[cmd_name];
-                for (let i = 0; i < times; ++i) {
+            if (times < 0) {
+                return Promise.reject("'Times' parameter must be positive");
+            }
+            const [cmd, cmd_name] = this._validateCommand(defcall);
+            if (!cmd_name) {
+                return Promise.reject("Need a valid command to execute!");
+            }
+            const cmd_def = this._registeredCmds[cmd_name];
+            setTimeout(() => {
+                const do_repeat = rtimes => {
+                    if (!rtimes) {
+                        this.screen.print(
+                            `<i>** Repeat finsihed: command called ${times} times</i>`
+                        );
+                        return true;
+                    }
                     const scmd = this._parameterReader.parse(cmd, cmd_def);
-                    await this._processCommandJob(scmd, cmd_def);
-                }
-                return resolve();
+                    this._processCommandJob(scmd, cmd_def).finally(() =>
+                        do_repeat(rtimes - 1)
+                    );
+                    return true;
+                };
+                do_repeat(times);
+            }, 0);
+
+            return Promise.resolve();
+        },
+
+        _cmdMute: function(...defcall) {
+            const [cmd, cmd_name] = this._validateCommand(defcall);
+            if (!cmd_name) {
+                return Promise.reject("Need a valid command to execute!");
+            }
+
+            // Monkey-Patch screen print
+            const orig_print_ref = this.screen.print;
+            this.screen.print = () => {
+                // Do nothing.
+            };
+
+            const cmd_def = this._registeredCmds[cmd_name];
+            const scmd = this._parameterReader.parse(cmd, cmd_def);
+            return this._processCommandJob(scmd, cmd_def).finally(() => {
+                // Revert monkey-patch
+                this.screen.print = orig_print_ref;
+                return true;
             });
         },
     });

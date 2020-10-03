@@ -5,6 +5,12 @@
 ```
 IMP: Command 'caf': Sorted by field name
 IMP: Screen: Use less nodes
+IMP: Screen: Auto vacuum (No more than 750 lines)
+IMP: Command 'repeat': Try to be nice with the main thread
+
+ADD: Command 'mute': Runs the command only printing errors. (Useful with the 'repeat' command)
+
+FIX: Changed some calls using the old 'print' call.
 ```
 
 **7.0.0**

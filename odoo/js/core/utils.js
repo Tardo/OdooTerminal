@@ -11,7 +11,28 @@ odoo.define("terminal.core.Utils", function() {
             i => `&#${i.charCodeAt(0)};`
         );
 
+    // See https://stackoverflow.com/a/7616484
+    const genHash = text => {
+        let hash = 0;
+        const len = text.length;
+        for (let i = 0; i < len; ++i) {
+            hash = (hash << 5) - hash + text.charCodeAt(i);
+            // Convert to 32bit integer
+            hash |= 0;
+        }
+        return hash;
+    };
+
+    const hex2rgb = hex => {
+        const r = (hex >> 24) & 0xff;
+        const g = (hex >> 16) & 0xff;
+        const b = (hex >> 8) & 0xff;
+        return [r, g, b];
+    };
+
     return {
         encodeHTML: encodeHTML,
+        genHash: genHash,
+        hex2rgb: hex2rgb,
     };
 });

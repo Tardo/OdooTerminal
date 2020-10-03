@@ -101,10 +101,6 @@
     content: "\A";
     white-space: pre;
 }
-.o_terminal div#terminal_screen .line-br::before {
-    content: "\A";
-    white-space: pre;
-}
 
 .o_terminal div#terminal_screen .line-array {
     margin-left: 1em;
