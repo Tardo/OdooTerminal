@@ -5,6 +5,7 @@ odoo.define("terminal.functions.Core", function(require) {
     "use strict";
 
     const Terminal = require("terminal.Terminal");
+    const Utils = require("terminal.core.Utils");
 
     Terminal.include({
         init: function() {
@@ -74,9 +75,19 @@ odoo.define("terminal.functions.Core", function(require) {
             });
             this.registerCommand("exportvar", {
                 definition:
-                    "Export command result to a browser console variable",
+                    "Exports the command result to a browser console variable",
                 callback: this._cmdExport,
-                detail: "Export command result to a browser console variable.",
+                detail:
+                    "Exports the command result to a browser console variable.",
+                syntaxis: "<STRING: COMMAND>",
+                args: "*",
+                sanitized: false,
+                generators: false,
+            });
+            this.registerCommand("exportfile", {
+                definition: "Exports the command result to a text/json file",
+                callback: this._cmdExportFile,
+                detail: "Exports the command result to a text/json file.",
                 syntaxis: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
@@ -276,6 +287,25 @@ odoo.define("terminal.functions.Core", function(require) {
                 window[varname] = await this._processCommandJob(scmd, cmd_def);
                 this.screen.print(
                     `Command result exported! now you can use '${varname}' variable in the browser console`
+                );
+                return resolve();
+            });
+        },
+
+        _cmdExportFile: function(...defcall) {
+            return new Promise(async (resolve, reject) => {
+                const [cmd, cmd_name] = this._validateCommand(defcall);
+                if (!cmd_name) {
+                    return reject("Need a valid command to execute!");
+                }
+                const cmd_def = this._registeredCmds[cmd_name];
+                const scmd = this._parameterReader.parse(cmd, cmd_def);
+                const filename = `${cmd_name}_${new Date().getTime()}.json`;
+                const result = await this._processCommandJob(scmd, cmd_def);
+                Utils.save2File(
+                    filename,
+                    "text/json",
+                    JSON.stringify(result, null, 4)
                 );
                 return resolve();
             });

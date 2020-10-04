@@ -41,10 +41,27 @@ odoo.define("terminal.core.Utils", function() {
         return parsed_text;
     };
 
+    const save2File = (filename, type, data) => {
+        const blob = new Blob([data], {type: type});
+        if (window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveBlob(blob, filename);
+        } else {
+            const elem = window.document.createElement("a");
+            const objURL = window.URL.createObjectURL(blob);
+            elem.href = objURL;
+            elem.download = filename;
+            document.body.appendChild(elem);
+            elem.click();
+            document.body.removeChild(elem);
+            URL.revokeObjectURL(objURL);
+        }
+    };
+
     return {
         encodeHTML: encodeHTML,
         genHash: genHash,
         hex2rgb: hex2rgb,
         unescapeSlashes: unescapeSlashes,
+        save2File: save2File,
     };
 });

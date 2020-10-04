@@ -7,13 +7,17 @@ IMP: Command 'caf': Sorted by field name
 IMP: Screen: Use less nodes
 IMP: Screen: Auto vacuum (No more than 750 lines)
 IMP: Command 'repeat': Try to be nice with the main thread
+IMP: Command 'fuzz': Support one2many fields and other improvements
+IMP: ParameterReader: Now can use slashes to avoid double quotes grouping (Example: "This \"is\" an example")
 
 ADD: Command 'mute': Runs the command only printing errors. (Useful with the 'repeat' command)
 ADD: Command 'count': Get the number of records
+ADD: Command 'exportfile': Exports the command result to a text file
 ADD: New parameter generator: $FLOAT
 ADD: Prompt changes the color per host (locahost doesn't have any color)
 
 FIX: Changed some calls using the old 'print' call.
+FIX: Command 'caf': Now can use 'fields' parameter
 ```
 
 **7.0.0**
