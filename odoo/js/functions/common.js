@@ -633,12 +633,19 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdCheckFieldAccess: function(model, fields = "false") {
+        _cmdCheckFieldAccess: function(model, field_names = false) {
+            let fields = false;
+            if (field_names) {
+                fields =
+                    field_names === "*"
+                        ? false
+                        : this._parameterReader.splitAndTrim(field_names, ",");
+            }
             return rpc
                 .query({
                     method: "fields_get",
                     model: model,
-                    args: [JSON.parse(fields)],
+                    args: [fields],
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {

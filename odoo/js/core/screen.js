@@ -96,7 +96,10 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         print: function(msg, enl, cls) {
-            const scls = enl ? cls || "" : `line-br ${cls}`;
+            let scls = cls || "";
+            if (!enl) {
+                scls = `line-br ${scls}`;
+            }
             this.printHTML(this._getTerminalLine(msg, scls));
         },
 
@@ -214,7 +217,9 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         _vacuum: function() {
-            const $lines = this.$screen.find("> span");
+            const $lines = this.$screen.find(
+                "> span .print-table tr, > span:has(.print-table tbody:empty), > span:not(:has(.print-table))"
+            );
             const diff = $lines.length - this._max_lines;
             if (diff > 0) {
                 $lines.slice(0, diff).remove();

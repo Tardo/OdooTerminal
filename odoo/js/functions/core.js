@@ -32,7 +32,6 @@ odoo.define("terminal.functions.Core", function(require) {
                 detail: "Eval parameters and print the result.",
                 syntaxis: "<STRING: MSG>",
                 args: "",
-                sanitized: false,
             });
             this.registerCommand("load", {
                 definition: "Load external resource",

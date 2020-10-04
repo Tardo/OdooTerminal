@@ -30,9 +30,21 @@ odoo.define("terminal.core.Utils", function() {
         return [r, g, b];
     };
 
+    // See https://stackoverflow.com/a/48855846
+    const unescapeSlashes = text => {
+        let parsed_text = text.replace(/(^|[^\\])(\\\\)*\\$/, "$&\\");
+        try {
+            parsed_text = JSON.parse(`"${parsed_text}"`);
+        } catch (e) {
+            return text;
+        }
+        return parsed_text;
+    };
+
     return {
         encodeHTML: encodeHTML,
         genHash: genHash,
         hex2rgb: hex2rgb,
+        unescapeSlashes: unescapeSlashes,
     };
 });

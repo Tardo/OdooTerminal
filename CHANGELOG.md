@@ -9,6 +9,9 @@ IMP: Screen: Auto vacuum (No more than 750 lines)
 IMP: Command 'repeat': Try to be nice with the main thread
 
 ADD: Command 'mute': Runs the command only printing errors. (Useful with the 'repeat' command)
+ADD: Command 'count': Get the number of records
+ADD: New parameter generator: $FLOAT
+ADD: Prompt changes the color per host (locahost doesn't have any color)
 
 FIX: Changed some calls using the old 'print' call.
 ```
