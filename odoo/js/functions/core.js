@@ -277,14 +277,12 @@ odoo.define("terminal.functions.Core", function(require) {
 
         _cmdExport: function(...defcall) {
             return new Promise(async (resolve, reject) => {
-                const [cmd, cmd_name] = this._validateCommand(defcall);
+                const cmd_name = this._validateCommand(defcall)[1];
                 if (!cmd_name) {
                     return reject("Need a valid command to execute!");
                 }
-                const cmd_def = this._registeredCmds[cmd_name];
-                const scmd = this._parameterReader.parse(cmd, cmd_def);
                 const varname = _.uniqueId("term");
-                window[varname] = await this._processCommandJob(scmd, cmd_def);
+                window[varname] = await this._cmdMute(...defcall);
                 this.screen.print(
                     `Command result exported! now you can use '${varname}' variable in the browser console`
                 );
@@ -294,18 +292,19 @@ odoo.define("terminal.functions.Core", function(require) {
 
         _cmdExportFile: function(...defcall) {
             return new Promise(async (resolve, reject) => {
-                const [cmd, cmd_name] = this._validateCommand(defcall);
+                const cmd_name = this._validateCommand(defcall)[1];
                 if (!cmd_name) {
                     return reject("Need a valid command to execute!");
                 }
-                const cmd_def = this._registeredCmds[cmd_name];
-                const scmd = this._parameterReader.parse(cmd, cmd_def);
                 const filename = `${cmd_name}_${new Date().getTime()}.json`;
-                const result = await this._processCommandJob(scmd, cmd_def);
+                const result = await this._cmdMute(...defcall);
                 Utils.save2File(
                     filename,
                     "text/json",
                     JSON.stringify(result, null, 4)
+                );
+                this.screen.print(
+                    `Command result exported to '${filename}' file`
                 );
                 return resolve();
             });
@@ -366,15 +365,21 @@ odoo.define("terminal.functions.Core", function(require) {
 
             // Monkey-Patch screen print
             const orig_print_ref = this.screen.print;
-            this.screen.print = () => {
-                // Do nothing.
-            };
+            if (!this._mute_mode) {
+                this._mute_mode = true;
+                this.screen.print = () => {
+                    // Do nothing.
+                };
+            }
 
             const cmd_def = this._registeredCmds[cmd_name];
             const scmd = this._parameterReader.parse(cmd, cmd_def);
             return this._processCommandJob(scmd, cmd_def).finally(() => {
                 // Revert monkey-patch
-                this.screen.print = orig_print_ref;
+                if (this._mute_mode) {
+                    this.screen.print = orig_print_ref;
+                    this._mute_mode = false;
+                }
                 return true;
             });
         },

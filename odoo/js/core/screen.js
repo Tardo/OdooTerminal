@@ -14,6 +14,8 @@ odoo.define("terminal.core.Screen", function(require) {
     const Screen = AbstractScreen.extend({
         PROMPT: ">",
 
+        _line_selector:
+            "> span .print-table tr, > span:has(.print-table tbody:empty), > span:not(:has(.print-table))",
         _max_lines: 750,
 
         init: function() {
@@ -195,6 +197,29 @@ odoo.define("terminal.core.Screen", function(require) {
             );
         },
 
+        printRecords: function(model, records) {
+            let tbody = "";
+            const columns = ["id"];
+            const len = records.length;
+            for (let x = 0; x < len; ++x) {
+                const item = records[x];
+                tbody += "<tr>";
+                tbody += this._templates.render("TABLE_SEARCH_ID", {
+                    id: item.id,
+                    model: model,
+                });
+                for (const field in item) {
+                    if (field === "id") {
+                        continue;
+                    }
+                    columns.push(field);
+                    tbody += `<td>${item[field]}</td>`;
+                }
+                tbody += "</tr>";
+            }
+            this.printTable(_.unique(columns), tbody);
+        },
+
         /* PRIVATE */
         _getTerminalLine: function(msg, cls) {
             const msg_type = typeof msg;
@@ -220,9 +245,7 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         _vacuum: function() {
-            const $lines = this.$screen.find(
-                "> span .print-table tr, > span:has(.print-table tbody:empty), > span:not(:has(.print-table))"
-            );
+            const $lines = this.$screen.find(this._line_selector);
             const diff = $lines.length - this._max_lines;
             if (diff > 0) {
                 $lines.slice(0, diff).remove();

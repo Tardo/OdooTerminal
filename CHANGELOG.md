@@ -9,6 +9,8 @@ IMP: Screen: Auto vacuum (No more than 750 lines)
 IMP: Command 'repeat': Try to be nice with the main thread
 IMP: Command 'fuzz': Support one2many fields and other improvements
 IMP: ParameterReader: Now can use slashes to avoid double quotes grouping (Example: "This \"is\" an example")
+IMP: Handle big results: split current query to not block/crash the browser
+IMP: Now can set default values for positional replacements (Example: $1[defaul text value] or $1[42])
 
 ADD: Command 'mute': Runs the command only printing errors. (Useful with the 'repeat' command)
 ADD: Command 'count': Get the number of records
