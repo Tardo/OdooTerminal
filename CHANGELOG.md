@@ -16,8 +16,9 @@ ADD: Command 'exportfile': Exports the command result to a text file
 ADD: New parameter generator: $FLOAT
 ADD: Prompt changes the color per host (locahost doesn't have any color)
 
-FIX: Changed some calls using the old 'print' call.
+FIX: Changed some calls using the old 'print' call
 FIX: Command 'caf': Now can use 'fields' parameter
+FIX: Shadow Input: Correct sync. with input scroll left
 ```
 
 **7.0.0**

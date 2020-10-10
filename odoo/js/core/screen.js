@@ -67,7 +67,10 @@ odoo.define("terminal.core.Screen", function(require) {
 
         updateShadowInput: function(str) {
             this.$shadowInput.val(str);
-            this.$shadowInput.scrollLeft(this.$input.scrollLeft());
+            // Deferred to ensure that has updated values
+            _.defer(() =>
+                this.$shadowInput.scrollLeft(this.$input.scrollLeft())
+            );
         },
 
         preventLostInputFocus: function(ev) {
