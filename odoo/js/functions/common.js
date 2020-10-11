@@ -277,6 +277,29 @@ odoo.define("terminal.functions.Common", function(require) {
                 syntaxis: "",
                 args: "",
             });
+            this.registerCommand("count", {
+                definition:
+                    "Gets number of records from the given model in the selected domain",
+                callback: this._cmdCount,
+                detail:
+                    "Gets number of records from the given model in the selected domain",
+                syntaxis: '<STRING MODEL> "[ARRAY: DOMAIN]"',
+                args: "s?s",
+            });
+        },
+
+        _cmdCount: function(model, domain = "[]") {
+            return rpc
+                .query({
+                    method: "search_count",
+                    model: model,
+                    args: [JSON.parse(domain)],
+                    kwargs: {context: this._getContext()},
+                })
+                .then(result => {
+                    this.screen.print(`Result: ${result}`);
+                    return result;
+                });
         },
 
         _cmdUpdateAppList: function() {
@@ -336,7 +359,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     this.screen.printError("The given tour doesn't exists!");
                 } else {
                     odoo.__DEBUG__.services["web_tour.tour"].run(tour_name);
-                    this.print("Running tour...");
+                    this.screen.print("Running tour...");
                 }
             } else if (tour_names.length) {
                 this.screen.print(tour_names);
@@ -532,26 +555,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
-                    let tbody = "";
-                    const columns = ["id"];
-                    const l = result.length;
-                    for (let x = 0; x < l; ++x) {
-                        const item = result[x];
-                        tbody += "<tr>";
-                        tbody += this._templates.render("TABLE_BODY_CMD", {
-                            id: item.id,
-                            model: model,
-                        });
-                        for (const field in item) {
-                            if (field === "id") {
-                                continue;
-                            }
-                            columns.push(field);
-                            tbody += `<td>${item[field]}</td>`;
-                        }
-                        tbody += "</tr>";
-                    }
-                    this.screen.printTable(_.unique(columns), tbody);
+                    this.screen.printRecords(model, result);
                     return result;
                 });
         },
@@ -610,16 +614,23 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdCheckFieldAccess: function(model, fields = "false") {
+        _cmdCheckFieldAccess: function(model, field_names = false) {
+            let fields = false;
+            if (field_names) {
+                fields =
+                    field_names === "*"
+                        ? false
+                        : this._parameterReader.splitAndTrim(field_names, ",");
+            }
             return rpc
                 .query({
                     method: "fields_get",
                     model: model,
-                    args: [JSON.parse(fields)],
+                    args: [fields],
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
-                    const keys = Object.keys(result);
+                    const keys = Object.keys(result).sort();
                     const fieldParams = [
                         "type",
                         "string",
@@ -630,8 +641,8 @@ odoo.define("terminal.functions.Common", function(require) {
                         "depends",
                     ];
                     let body = "";
-                    const l = keys.length;
-                    for (let x = 0; x < l; ++x) {
+                    const len = keys.length;
+                    for (let x = 0; x < len; ++x) {
                         const field = keys[x];
                         body += "<tr>";
                         body += `<td>${field}</td>`;
@@ -876,12 +887,34 @@ odoo.define("terminal.functions.Common", function(require) {
             offset,
             order
         ) {
+            const lines_total = this.screen._max_lines - 3;
             let fields = ["display_name"];
             if (field_names) {
                 fields =
                     field_names === "*"
                         ? false
                         : this._parameterReader.splitAndTrim(field_names, ",");
+            }
+
+            // Workaround: '--more' is a special model name to handle print the rest of the previous call result
+            if (model === "--more") {
+                const buff = this._buffer[this.__meta.name];
+                if (!buff || !buff.data.length) {
+                    this.screen.printError(
+                        "There are no more results to print"
+                    );
+                    return Promise.resolve();
+                }
+                const sresult = buff.data.slice(0, lines_total);
+                buff.data = buff.data.slice(lines_total);
+                this.screen.printRecords(buff.model, sresult);
+                if (buff.data.length) {
+                    this.screen.print(
+                        `There are still results to print (${buff.data.length}). Continue using '<strong class='o_terminal_click o_terminal_cmd' data-cmd='search --more'>--more</strong>'...`
+                    );
+                }
+                this.screen.print(`Records count: ${sresult.length}`);
+                return Promise.resolve(sresult);
             }
 
             return rpc
@@ -896,27 +929,25 @@ odoo.define("terminal.functions.Common", function(require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then(result => {
-                    let tbody = "";
-                    const columns = ["id"];
-                    const len = result.length;
-                    for (let x = 0; x < len; ++x) {
-                        const item = result[x];
-                        tbody += "<tr>";
-                        tbody += this._templates.render("TABLE_SEARCH_ID", {
-                            id: item.id,
+                    const need_truncate =
+                        !this._mute_mode && result.length > lines_total;
+                    let sresult = result;
+                    if (need_truncate) {
+                        this._buffer[this.__meta.name] = {
                             model: model,
-                        });
-                        for (const field in item) {
-                            if (field === "id") {
-                                continue;
-                            }
-                            columns.push(field);
-                            tbody += `<td>${item[field]}</td>`;
-                        }
-                        tbody += "</tr>";
+                            data: sresult.slice(lines_total),
+                        };
+                        sresult = sresult.slice(0, lines_total);
                     }
-                    this.screen.printTable(_.unique(columns), tbody);
-                    this.screen.print(`Records count: ${len}`);
+                    this.screen.printRecords(model, sresult);
+                    if (need_truncate) {
+                        this.screen.printError(
+                            `<strong class='text-warning'>Result truncated!</strong> The query is too big to be displayed entirely. Use '<strong class='o_terminal_click o_terminal_cmd' data-cmd='search --more'>search --more</strong>' to print the rest of the results (${
+                                this._buffer[this.__meta.name].data.length
+                            })...`
+                        );
+                    }
+                    this.screen.print(`Records count: ${sresult.length}`);
                     return result;
                 });
         },

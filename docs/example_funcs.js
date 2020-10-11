@@ -43,18 +43,20 @@ odoo.define("terminal.MyFuncs", function(require) {
             param_c = "DefaultValue",
             param_d = -1
         ) {
-            this.print("Hello, World!");
-            this.eprint("ParamA (String): " + param_a);
-            this.eprint("ParamB (Int): " + param_b);
-            this.eprint("ParamC (Optional String): " + param_c);
-            this.eprint("ParamD (Optional Int): " + param_d);
+            this.screen.print("Hello, World!");
+            this.screen.eprint("ParamA (String): " + param_a);
+            this.screen.eprint("ParamB (Int): " + param_b);
+            this.screen.eprint("ParamC (Optional String): " + param_c);
+            this.screen.eprint("ParamD (Optional Int): " + param_d);
 
             if (param_b instanceof Number) {
-                this.print("ParamB is a Number!");
+                this.screen.print("ParamB is a Number!");
             }
 
             if (param_a !== param_c) {
-                this.printError("Invalid! ParamA need be the same as ParamC");
+                this.screen.printError(
+                    "Invalid! ParamA need be the same as ParamC"
+                );
             }
 
             return Promise.resolve();

@@ -5,6 +5,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
     "use strict";
 
     const ParameterGenerator = require("terminal.core.ParameterGenerator");
+    const Utils = require("terminal.core.Utils");
     const Class = require("web.Class");
 
     /**
@@ -22,7 +23,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
             };
             this._regexSanitize = new RegExp("'", "g");
             this._regexParams = new RegExp(
-                /(["'])((?:(?=(\\?))\2.)*?)\1|[^\s]+/,
+                /(["'])(?:(?=(\\?))\2.)*?\1|[^\s]+/,
                 "g"
             );
             this._regexArgs = new RegExp(/[l?*]/);
@@ -57,7 +58,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
                     nvalue = item.substr(1, item.length - 2);
                 }
                 return cmd_def.sanitized
-                    ? this._sanitizeString(nvalue)
+                    ? this._sanitizeString(Utils.unescapeSlashes(nvalue))
                     : nvalue;
             });
 

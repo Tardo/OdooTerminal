@@ -5,6 +5,7 @@ odoo.define("terminal.functions.Core", function(require) {
     "use strict";
 
     const Terminal = require("terminal.Terminal");
+    const Utils = require("terminal.core.Utils");
 
     Terminal.include({
         init: function() {
@@ -32,7 +33,6 @@ odoo.define("terminal.functions.Core", function(require) {
                 detail: "Eval parameters and print the result.",
                 syntaxis: "<STRING: MSG>",
                 args: "",
-                sanitized: false,
             });
             this.registerCommand("load", {
                 definition: "Load external resource",
@@ -75,9 +75,19 @@ odoo.define("terminal.functions.Core", function(require) {
             });
             this.registerCommand("exportvar", {
                 definition:
-                    "Export command result to a browser console variable",
+                    "Exports the command result to a browser console variable",
                 callback: this._cmdExport,
-                detail: "Export command result to a browser console variable.",
+                detail:
+                    "Exports the command result to a browser console variable.",
+                syntaxis: "<STRING: COMMAND>",
+                args: "*",
+                sanitized: false,
+                generators: false,
+            });
+            this.registerCommand("exportfile", {
+                definition: "Exports the command result to a text/json file",
+                callback: this._cmdExportFile,
+                detail: "Exports the command result to a text/json file.",
                 syntaxis: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
@@ -100,6 +110,16 @@ odoo.define("terminal.functions.Core", function(require) {
                 detail: "Repeat a command N times.",
                 syntaxis: "<INT: Times> <STRING: COMMAND>",
                 args: "i*",
+                sanitized: false,
+                generators: false,
+            });
+            this.registerCommand("mute", {
+                definition: "Only prints errors",
+                callback: this._cmdMute,
+                detail:
+                    "Print to screen is a really slow task, you can improve performance if only prints errors.",
+                syntaxis: "<STRING: COMMAND>",
+                args: "*",
                 sanitized: false,
                 generators: false,
             });
@@ -139,14 +159,14 @@ odoo.define("terminal.functions.Core", function(require) {
             } else {
                 const [ncmd, cmd_def] = this._searchCommandDefByAlias(cmd);
                 if (cmd_def) {
-                    this.print(
+                    this.screen.print(
                         this._templates.render("DEPRECATED_COMMAND", {
                             cmd: ncmd,
                         })
                     );
                     this._printHelpDetailed(ncmd, this._registeredCmds[ncmd]);
                 } else {
-                    this.printError(`'${cmd}' command doesn't exists`);
+                    this.screen.printError(`'${cmd}' command doesn't exists`);
                 }
             }
             return Promise.resolve();
@@ -257,16 +277,34 @@ odoo.define("terminal.functions.Core", function(require) {
 
         _cmdExport: function(...defcall) {
             return new Promise(async (resolve, reject) => {
-                const [cmd, cmd_name] = this._validateCommand(defcall);
+                const cmd_name = this._validateCommand(defcall)[1];
                 if (!cmd_name) {
                     return reject("Need a valid command to execute!");
                 }
-                const cmd_def = this._registeredCmds[cmd_name];
-                const scmd = this._parameterReader.parse(cmd, cmd_def);
                 const varname = _.uniqueId("term");
-                window[varname] = await this._processCommandJob(scmd, cmd_def);
+                window[varname] = await this._cmdMute(...defcall);
                 this.screen.print(
                     `Command result exported! now you can use '${varname}' variable in the browser console`
+                );
+                return resolve();
+            });
+        },
+
+        _cmdExportFile: function(...defcall) {
+            return new Promise(async (resolve, reject) => {
+                const cmd_name = this._validateCommand(defcall)[1];
+                if (!cmd_name) {
+                    return reject("Need a valid command to execute!");
+                }
+                const filename = `${cmd_name}_${new Date().getTime()}.json`;
+                const result = await this._cmdMute(...defcall);
+                Utils.save2File(
+                    filename,
+                    "text/json",
+                    JSON.stringify(result, null, 4)
+                );
+                this.screen.print(
+                    `Command result exported to '${filename}' file`
                 );
                 return resolve();
             });
@@ -291,17 +329,58 @@ odoo.define("terminal.functions.Core", function(require) {
         },
 
         _cmdRepeat: function(times, ...defcall) {
-            return new Promise(async (resolve, reject) => {
-                const [cmd, cmd_name] = this._validateCommand(defcall);
-                if (!cmd_name) {
-                    return reject("Need a valid command to execute!");
-                }
-                const cmd_def = this._registeredCmds[cmd_name];
-                for (let i = 0; i < times; ++i) {
+            if (times < 0) {
+                return Promise.reject("'Times' parameter must be positive");
+            }
+            const [cmd, cmd_name] = this._validateCommand(defcall);
+            if (!cmd_name) {
+                return Promise.reject("Need a valid command to execute!");
+            }
+            const cmd_def = this._registeredCmds[cmd_name];
+            setTimeout(() => {
+                const do_repeat = rtimes => {
+                    if (!rtimes) {
+                        this.screen.print(
+                            `<i>** Repeat finsihed: command called ${times} times</i>`
+                        );
+                        return true;
+                    }
                     const scmd = this._parameterReader.parse(cmd, cmd_def);
-                    await this._processCommandJob(scmd, cmd_def);
+                    this._processCommandJob(scmd, cmd_def).finally(() =>
+                        do_repeat(rtimes - 1)
+                    );
+                    return true;
+                };
+                do_repeat(times);
+            }, 0);
+
+            return Promise.resolve();
+        },
+
+        _cmdMute: function(...defcall) {
+            const [cmd, cmd_name] = this._validateCommand(defcall);
+            if (!cmd_name) {
+                return Promise.reject("Need a valid command to execute!");
+            }
+
+            // Monkey-Patch screen print
+            const orig_print_ref = this.screen.print;
+            if (!this._mute_mode) {
+                this._mute_mode = true;
+                this.screen.print = () => {
+                    // Do nothing.
+                };
+            }
+
+            const cmd_def = this._registeredCmds[cmd_name];
+            const scmd = this._parameterReader.parse(cmd, cmd_def);
+            return this._processCommandJob(scmd, cmd_def).finally(() => {
+                // Revert monkey-patch
+                if (this._mute_mode) {
+                    this.screen.print = orig_print_ref;
+                    this._mute_mode = false;
                 }
-                return resolve();
+                return true;
             });
         },
     });

@@ -65,6 +65,7 @@ odoo.define("terminal.Terminal", function(require) {
 
         init: function() {
             this._super.apply(this, arguments);
+            this._buffer = {};
             this._createTerminal();
             this._storage = new Storage.StorageSession();
             this._storageLocal = new Storage.StorageLocal();
@@ -269,9 +270,18 @@ odoo.define("terminal.Terminal", function(require) {
             if (alias_cmd) {
                 const scmd = this._parameterReader.parse(cmd, {args: "*"});
                 for (const index in scmd.params) {
-                    const re = new RegExp(`\\$${Number(index) + 1}`, "g");
-                    alias_cmd = alias_cmd.replace(re, scmd.params[index]);
+                    const re = new RegExp(
+                        `\\$${Number(index) + 1}(?:\\[[^\\]]+\\])?`,
+                        "g"
+                    );
+                    alias_cmd = alias_cmd.replaceAll(re, scmd.params[index]);
                 }
+                alias_cmd = alias_cmd.replaceAll(
+                    /\$\d+(?:\[([^\]]+)\])?/g,
+                    (match, group) => {
+                        return group || "";
+                    }
+                );
                 if (store) {
                     this._storeUserInput(cmd);
                 }
@@ -525,7 +535,13 @@ odoo.define("terminal.Terminal", function(require) {
                 let result = "";
                 let is_failed = false;
                 try {
+                    this.__meta = {
+                        name: scmd.cmd,
+                        rawParams: scmd.rawParams,
+                        def: cmd_def,
+                    };
                     result = await cmd_def.callback.bind(this)(...scmd.params);
+                    delete this.__meta;
                 } catch (err) {
                     is_failed = true;
                     result =

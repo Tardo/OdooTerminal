@@ -54,6 +54,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
 
         init: function() {
             this._generators = {
+                FLOAT: this.generateFloat.bind(this),
                 INT: this.generateInt.bind(this),
                 INTSEQ: this.generateIntSeq.bind(this),
                 INTITER: this._doIntIter.bind(this),
@@ -131,6 +132,17 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return `https://www.${url}.${ext}`
                 .replaceAll(" ", "")
                 .toLowerCase();
+        },
+
+        generateFloat: function(min, max) {
+            if (typeof min === "undefined") {
+                return false;
+            }
+            const min_s = _.isUndefined(max) ? 0 : Number(min);
+            const max_s = _.isUndefined(max) ? Number(min) : Number(max);
+            return Number(
+                (Math.random() * (max_s - min_s + 1.0) + min_s).toFixed(2)
+            );
         },
 
         generateInt: function(min, max) {

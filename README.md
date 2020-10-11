@@ -68,20 +68,26 @@ You can toggle terminal using one of these options:
 
 - This extension have a "preferences" page where you can add commands to run on
   every session. This is useful for example to load a remote script to extend
-  the 'terminal' features.
+  the 'terminal' features or declare custom aliases.
 - This extension uses an internal context to extend the 'user context'. This
   'terminal context' has by default the key 'active_test' = false (see issue #14
   to get more information). This context only affects to terminal operations.
+- The maximum buffered screen lines is set to 750. So, you can't see more than
+  749 records in the same query. This is necessary to avoid have a lot of
+  nodes... One of the problems of use HTML elements to render the output :/
 
 ---
 
 ## Advance Usage
+
+#### + Parameter Generators
 
 You can use "parameter generator" to create values.
 
 | Generator    | Arguments | Default   | Description                                                                   |
 | ------------ | --------- | --------- | ----------------------------------------------------------------------------- |
 | \$STR        | min,max   | max = min | Generates a random string with a length between the given min and max         |
+| \$FLOAT      | min,max   | max = min | Generates a random float between the given min and max                        |
 | \$INT        | min,max   | max = min | Generates a random int between the given min and max                          |
 | \$INTSEQ     | min,max   | max = min | Generates a list of int's starting from min to max                            |
 | \$INTITER    | min,step  | step = 1  | Generates a consecutive int starting from min (useful with 'repeat' command)  |
@@ -100,7 +106,7 @@ You can use "parameter generator" to create values.
 | \$NOW        |           |           | Gets the current date time                                                    |
 | \$TZNOW      |           |           | Gets the current date time (time zone format)                                 |
 
-The anatomy of a generator is: `$type[min,max]`, `$type[min]` or `$type`
+The anatomy of a generator is: `$type[min,max]`, `$type[max]` or `$type`
 
 For example:
 
@@ -109,6 +115,22 @@ For example:
 - print the current time: `print $NOWTIME`
 
 > Notice that 'date' min and max are the milliseconds since 1970/01/01
+
+#### + Positional replacements for aliases
+
+You can define aliases to call commands with predefined values. This command can
+use positional replacements.
+
+The anatomy of a positional replacement is: `$num[default_value]` or `$num`
+
+For example:
+
+- First positional replacement (without default value = empty):
+  `alias my_alias print Hello, $1`
+- Fist position replacement with default value 'world':
+  `alias my_alias print Hello, $1[world]`
+- A somewhat more complex:
+  `alias search_mod search ir.module.module display_name "[['name', '=', '$1'], ['state', '=', '$2[installed]']]"`
 
 ---
 

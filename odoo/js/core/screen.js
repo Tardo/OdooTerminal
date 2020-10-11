@@ -6,7 +6,7 @@ odoo.define("terminal.core.Screen", function(require) {
 
     const AbstractScreen = require("terminal.core.abstract.Screen");
     const TemplateManager = require("terminal.core.TemplateManager");
-    const encodeHTML = require("terminal.core.Utils").encodeHTML;
+    const utils = require("terminal.core.Utils");
 
     /**
      * This class is used to manage 'terminal screen'
@@ -14,9 +14,15 @@ odoo.define("terminal.core.Screen", function(require) {
     const Screen = AbstractScreen.extend({
         PROMPT: ">",
 
+        _line_selector:
+            "> span .print-table tr, > span:has(.print-table tbody:empty), > span:not(:has(.print-table))",
+        _max_lines: 750,
+
         init: function() {
             this._super.apply(this, arguments);
             this._templates = new TemplateManager();
+            this._linesCounter = 0;
+            this._lazyVacuum = _.debounce(() => this._vacuum(), 350);
         },
 
         start: function() {
@@ -63,7 +69,10 @@ odoo.define("terminal.core.Screen", function(require) {
 
         updateShadowInput: function(str) {
             this.$shadowInput.val(str);
-            this.$shadowInput.scrollLeft(this.$input.scrollLeft());
+            // Deferred to ensure that has updated values
+            _.defer(() =>
+                this.$shadowInput.scrollLeft(this.$input.scrollLeft())
+            );
         },
 
         preventLostInputFocus: function(ev) {
@@ -84,6 +93,7 @@ odoo.define("terminal.core.Screen", function(require) {
         /* PRINT */
         printHTML: function(html, nostore) {
             this.$screen.append(html);
+            this._lazyVacuum();
             this.scrollDown();
             if (!nostore && "onSaveScreen" in this._options) {
                 this._options.onSaveScreen(this.getContent());
@@ -91,40 +101,15 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         print: function(msg, enl, cls) {
-            const msg_type = typeof msg;
-            if (msg_type === "object") {
-                if (msg instanceof Text) {
-                    this.printHTML(
-                        $(msg).wrap(
-                            `<span class='line-text ${cls || ""}'></span>`
-                        )
-                    );
-                } else if (msg instanceof Array) {
-                    const l = msg.length;
-                    let html_to_print = "";
-                    for (let x = 0; x < l; ++x) {
-                        html_to_print += `<span class='line-array ${cls ||
-                            ""}'>${msg[x]}</span><br>`;
-                    }
-                    this.printHTML(html_to_print);
-                } else {
-                    this.printHTML(
-                        `<span class='line-object ${cls || ""}'>` +
-                            `${this._prettyObjectString(msg)}</span><br>`
-                    );
-                }
-            } else {
-                this.printHTML(
-                    `<span class='line-text ${cls || ""}'>${msg}</span>`
-                );
-            }
+            let scls = cls || "";
             if (!enl) {
-                this.printHTML("<br>");
+                scls = `line-br ${scls}`;
             }
+            this.printHTML(this._getTerminalLine(msg, scls));
         },
 
         eprint: function(msg, enl) {
-            this.print(document.createTextNode(msg), enl);
+            this.print(utils.encodeHTML(msg), enl);
         },
 
         printCommand: function(cmd, secured = false) {
@@ -141,9 +126,12 @@ odoo.define("terminal.core.Screen", function(require) {
 
         printError: function(error, internal = false) {
             if (!internal) {
-                this.print(`[!] ${error}`);
+                this.printHTML(
+                    this._getTerminalLine(`[!] ${error}`, "line-br")
+                );
                 return;
             }
+            let error_msg = error;
             if (
                 typeof error === "object" &&
                 "data" in error &&
@@ -151,19 +139,15 @@ odoo.define("terminal.core.Screen", function(require) {
             ) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
-                this.print(
-                    this._templates.render("ERROR_MESSAGE", {
-                        error_name: encodeHTML(error.data.name),
-                        error_message: encodeHTML(error.data.message),
-                        error_id: error_id,
-                        exception_type: error.data.exception_type,
-                        context: JSON.stringify(error.data.context),
-                        args: JSON.stringify(error.data.arguments),
-                        debug: encodeHTML(error.data.debug),
-                    }),
-                    false,
-                    "error_message"
-                );
+                error_msg = this._templates.render("ERROR_MESSAGE", {
+                    error_name: utils.encodeHTML(error.data.name),
+                    error_message: utils.encodeHTML(error.data.message),
+                    error_id: error_id,
+                    exception_type: error.data.exception_type,
+                    context: JSON.stringify(error.data.context),
+                    args: JSON.stringify(error.data.arguments),
+                    debug: utils.encodeHTML(error.data.debug),
+                });
                 ++this._errorCount;
             } else if (
                 typeof error === "object" &&
@@ -172,19 +156,15 @@ odoo.define("terminal.core.Screen", function(require) {
             ) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
-                this.print(
-                    this._templates.render("ERROR_MESSAGE", {
-                        error_name: encodeHTML(error.data.objects[1]),
-                        error_message: encodeHTML(error.message),
-                        error_id: error_id,
-                        exception_type: error.data.type,
-                        context: "",
-                        args: "",
-                        debug: encodeHTML(error.data.debug),
-                    }),
-                    false,
-                    "error_message"
-                );
+                error_msg = this._templates.render("ERROR_MESSAGE", {
+                    error_name: utils.encodeHTML(error.data.objects[1]),
+                    error_message: utils.encodeHTML(error.message),
+                    error_id: error_id,
+                    exception_type: error.data.type,
+                    context: "",
+                    args: "",
+                    debug: utils.encodeHTML(error.data.debug),
+                });
                 ++this._errorCount;
             } else if (
                 typeof error === "object" &&
@@ -193,23 +173,19 @@ odoo.define("terminal.core.Screen", function(require) {
             ) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
-                this.print(
-                    this._templates.render("ERROR_MESSAGE", {
-                        error_name: encodeHTML(error.statusText),
-                        error_message: encodeHTML(error.statusText),
-                        error_id: error_id,
-                        exception_type: "Invalid HTTP Request",
-                        context: "",
-                        args: "",
-                        debug: encodeHTML(error.responseText),
-                    }),
-                    false,
-                    "error_message"
-                );
+                error_msg = this._templates.render("ERROR_MESSAGE", {
+                    error_name: utils.encodeHTML(error.statusText),
+                    error_message: utils.encodeHTML(error.statusText),
+                    error_id: error_id,
+                    exception_type: "Invalid HTTP Request",
+                    context: "",
+                    args: "",
+                    debug: utils.encodeHTML(error.responseText),
+                });
                 ++this._errorCount;
-            } else {
-                this.print(error, false, "error_message");
             }
+
+            this.printHTML(this._getTerminalLine(error_msg, "error_message"));
         },
 
         printTable: function(columns, tbody) {
@@ -221,9 +197,63 @@ odoo.define("terminal.core.Screen", function(require) {
             );
         },
 
+        printRecords: function(model, records) {
+            let tbody = "";
+            const columns = ["id"];
+            const len = records.length;
+            for (let x = 0; x < len; ++x) {
+                const item = records[x];
+                tbody += "<tr>";
+                tbody += this._templates.render("TABLE_SEARCH_ID", {
+                    id: item.id,
+                    model: model,
+                });
+                for (const field in item) {
+                    if (field === "id") {
+                        continue;
+                    }
+                    columns.push(field);
+                    tbody += `<td>${item[field]}</td>`;
+                }
+                tbody += "</tr>";
+            }
+            this.printTable(_.unique(columns), tbody);
+        },
+
         /* PRIVATE */
+        _getTerminalLine: function(msg, cls) {
+            const msg_type = typeof msg;
+            if (msg_type === "object") {
+                if (msg instanceof Text) {
+                    return `<span class='line-text ${cls}'>${msg}</span>`;
+                } else if (msg instanceof Array) {
+                    const l = msg.length;
+                    let html_to_print = "";
+                    for (let x = 0; x < l; ++x) {
+                        html_to_print += `<span class='line-array ${cls}'>${this._getTerminalLine(
+                            msg[x]
+                        )}</span>`;
+                    }
+                    return html_to_print;
+                }
+                return (
+                    `<span class='line-object ${cls}'>` +
+                    `${this._prettyObjectString(msg)}</span>`
+                );
+            }
+            return `<span class='line-text ${cls}'>${msg}</span>`;
+        },
+
+        _vacuum: function() {
+            const $lines = this.$screen.find(this._line_selector);
+            const diff = $lines.length - this._max_lines;
+            if (diff > 0) {
+                $lines.slice(0, diff).remove();
+            }
+        },
+
         _prettyObjectString: function(obj) {
-            return encodeHTML(JSON.stringify(obj, null, 4));
+            return utils.encodeHTML(JSON.stringify(obj, null, 4));
         },
 
         _createScreen: function() {
@@ -252,6 +282,26 @@ odoo.define("terminal.core.Screen", function(require) {
             this.$input.on("keyup", this._options.onInputKeyUp);
             this.$input.on("keydown", this._onInputKeyDown.bind(this));
             this.$input.on("input", this._options.onInput);
+            // Custom color indicator per host
+            const host = window.location.host;
+            if (
+                !host.startsWith("localhost") &&
+                !host.startsWith("127.0.0.1")
+            ) {
+                const [r, g, b] = utils.hex2rgb(
+                    utils.genHash(window.location.host)
+                );
+                this.$prompt.css("background-color", `rgb(${r},${g},${b})`);
+                const gv =
+                    1 -
+                    (0.2126 * (r / 255) +
+                        0.7152 * (g / 255) +
+                        0.0722 * (b / 255));
+                this.$prompt.css({
+                    background_color: `rgb(${r},${g},${b})`,
+                    color: gv < 0.5 ? "#000" : "#fff",
+                });
+            }
         },
 
         /* EVENTS */
