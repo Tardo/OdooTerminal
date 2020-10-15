@@ -1046,6 +1046,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 }
                 this.screen.print(notif[1], false);
             }
+            this.screen.flush();
         },
     });
 });

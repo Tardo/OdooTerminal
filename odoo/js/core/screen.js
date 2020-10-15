@@ -14,15 +14,15 @@ odoo.define("terminal.core.Screen", function(require) {
     const Screen = AbstractScreen.extend({
         PROMPT: ">",
 
-        _line_selector:
-            "> span .print-table tr, > span:has(.print-table tbody:empty), > span:not(:has(.print-table))",
+        _line_selector: ":scope > span .print-table tr, :scope > span",
         _max_lines: 750,
 
         init: function() {
             this._super.apply(this, arguments);
             this._templates = new TemplateManager();
             this._linesCounter = 0;
-            this._lazyVacuum = _.debounce(() => this._vacuum(), 350);
+            this._lazyVacuum = _.debounce(() => this._vacuum(), 650);
+            this._buff = [];
         },
 
         start: function() {
@@ -91,13 +91,21 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         /* PRINT */
-        printHTML: function(html, nostore) {
-            this.$screen.append(html);
+        flush: function() {
+            this.$screen.append(this._buff);
+            this._buff = [];
             this._lazyVacuum();
             this.scrollDown();
-            if (!nostore && "onSaveScreen" in this._options) {
+            if ("onSaveScreen" in this._options) {
                 this._options.onSaveScreen(this.getContent());
             }
+        },
+
+        printHTML: function(html) {
+            if (this._buff.length >= this._max_lines) {
+                this._buff.shift();
+            }
+            this._buff.push(html);
         },
 
         print: function(msg, enl, cls) {
@@ -245,10 +253,21 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         _vacuum: function() {
-            const $lines = this.$screen.find(this._line_selector);
+            const $lines = Array.from(
+                this.$screen[0].querySelectorAll(this._line_selector)
+            );
             const diff = $lines.length - this._max_lines;
             if (diff > 0) {
-                $lines.slice(0, diff).remove();
+                const nodes = $lines.slice(0, diff);
+                do {
+                    const node = nodes.pop();
+                    const can_be_deleted =
+                        node.querySelector(".print-table tbody:empty") ||
+                        !node.querySelector(".print-table");
+                    if (can_be_deleted) {
+                        node.remove();
+                    }
+                } while (nodes.length);
             }
         },
 

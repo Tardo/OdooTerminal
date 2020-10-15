@@ -64,7 +64,10 @@ odoo.define("terminal.MyFuncs", function(require) {
 
         /**
          * Async/await workaround example
-         * This is necessary to don't brake the inheritance chain
+         * This is necessary to don't brake the inheritance chain.
+         * This results in two promises, one awaitable and other
+         * wrapping them. So for this reason you must use 'return' to
+         * finalize the awaitable promise and propagate the results.
          *
          * @param {Int} param_a
          * @param {Int} param_b

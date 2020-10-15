@@ -63,8 +63,12 @@ odoo.define("terminal.core.abstract.Screen", function(require) {
         },
 
         /* PRINT */
+        flush: function() {
+            throw Error("Not Implemented!");
+        },
+
         // eslint-disable-next-line
-        printHTML: function(html, nostore) {
+        printHTML: function(html) {
             throw Error("Not Implemented!");
         },
 

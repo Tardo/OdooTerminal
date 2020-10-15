@@ -343,6 +343,7 @@ odoo.define("terminal.functions.Core", function(require) {
                         this.screen.print(
                             `<i>** Repeat finsihed: command called ${times} times</i>`
                         );
+                        this.screen.flush();
                         return true;
                     }
                     const scmd = this._parameterReader.parse(cmd, cmd_def);

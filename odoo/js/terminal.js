@@ -36,7 +36,7 @@ odoo.define("terminal.Terminal", function(require) {
         _hasExecInitCmds: false,
         _userContext: {active_test: false},
 
-        _runningCommandsCount: 0,
+        _commandTimeout: 30000,
         _errorCount: 0,
 
         /**
@@ -91,7 +91,7 @@ odoo.define("terminal.Terminal", function(require) {
                 onInput: this._onInput.bind(this),
             });
             this._parameterReader = new ParameterReader();
-            this._runningCommandsCount = 0;
+            this._jobs = [];
             this._errorCount = 0;
 
             core.bus.on("keydown", this, this._onCoreKeyDown);
@@ -138,6 +138,7 @@ odoo.define("terminal.Terminal", function(require) {
                     .removeClass("btn-dark")
                     .addClass("btn-light");
             }
+            this.screen.flush();
         },
 
         destroy: function() {
@@ -213,6 +214,7 @@ odoo.define("terminal.Terminal", function(require) {
                     this._storeUserInput(cmd);
                 }
                 this.screen.cleanInput();
+                this.screen.flush();
                 return false;
             }
             if (!cmd_def.secured) {
@@ -220,6 +222,7 @@ odoo.define("terminal.Terminal", function(require) {
             }
             this.screen.printCommand(cmd_raw, cmd_def.secured);
             this.screen.cleanInput();
+            this.screen.flush();
             this._processCommandJob(scmd, cmd_def);
             return true;
         },
@@ -305,6 +308,7 @@ odoo.define("terminal.Terminal", function(require) {
                 this._storeUserInput(cmd);
             }
             this.screen.cleanInput();
+            this.screen.flush();
             return false;
         },
 
@@ -314,8 +318,13 @@ odoo.define("terminal.Terminal", function(require) {
 
         _storeUserInput: function(strInput) {
             this._inputHistory.push(strInput);
-            this._storage.setItem("terminal_history", this._inputHistory, err =>
-                this.screen.printHTML(err)
+            this._storage.setItem(
+                "terminal_history",
+                this._inputHistory,
+                err => {
+                    this.screen.printError(err, true);
+                    this.screen.flush();
+                }
             );
             this._searchHistoryIter = this._inputHistory.length;
         },
@@ -531,7 +540,7 @@ odoo.define("terminal.Terminal", function(require) {
 
         _processCommandJob: function(scmd, cmd_def) {
             return new Promise(async resolve => {
-                this.onStartCommand(scmd.cmd, scmd.params);
+                const job_index = this.onStartCommand(scmd, cmd_def);
                 let result = "";
                 let is_failed = false;
                 try {
@@ -539,8 +548,9 @@ odoo.define("terminal.Terminal", function(require) {
                         name: scmd.cmd,
                         rawParams: scmd.rawParams,
                         def: cmd_def,
+                        jobIndex: job_index,
                     };
-                    result = await cmd_def.callback.bind(this)(...scmd.params);
+                    result = await cmd_def.callback.apply(this, scmd.params);
                     delete this.__meta;
                 } catch (err) {
                     is_failed = true;
@@ -548,12 +558,8 @@ odoo.define("terminal.Terminal", function(require) {
                         err ||
                         "[!] Oops! Unknown error! (no detailed error message given :/)";
                 } finally {
-                    this.onFinishCommand(
-                        scmd.cmd,
-                        scmd.params,
-                        is_failed,
-                        result
-                    );
+                    this.onFinishCommand(job_index, is_failed, result);
+                    this.screen.flush();
                 }
                 return resolve(result);
             });
@@ -563,28 +569,52 @@ odoo.define("terminal.Terminal", function(require) {
             return Promise.reject("Invalid command definition!");
         },
 
-        _updateRunningCmdCount: function() {
-            if (this._runningCommandsCount <= 0) {
+        _updateJobsInfo: function() {
+            const count = this._jobs.filter(Object).length;
+            if (count) {
+                const count_unhealthy = this._jobs.filter(item => !item.healthy)
+                    .length;
+                let str_info = `Running ${count} command(s)`;
+                if (count_unhealthy) {
+                    str_info += ` (${count_unhealthy} unhealthy)`;
+                }
+                str_info += "...";
+                this.$runningCmdCount.html(str_info).show();
+            } else {
                 this.$runningCmdCount.fadeOut("fast", function() {
                     $(this).html("");
                 });
-            } else {
-                this.$runningCmdCount
-                    .html(`Running ${this._runningCommandsCount} command(s)...`)
-                    .show();
             }
         },
 
         /* HANDLE EVENTS */
-        onStartCommand: function() {
-            ++this._runningCommandsCount;
-            this._updateRunningCmdCount();
+        onStartCommand: function(scmd) {
+            const job_info = {
+                scmd: scmd,
+                healthy: true,
+            };
+            // Add new job on a empty space or new one
+            let index = _.findIndex(this._jobs, item => {
+                return typeof item === "undefined";
+            });
+            if (index === -1) {
+                index = this._jobs.push(job_info) - 1;
+            } else {
+                this._jobs[index] = job_info;
+            }
+            job_info.timeout = setTimeout(() => {
+                this.onTimeoutCommand(index);
+            }, this._commandTimeout);
+            this._updateJobsInfo();
+            return index;
         },
-        onFinishCommand: function(cmd, params, has_errors, result) {
-            --this._runningCommandsCount;
-            this._updateRunningCmdCount();
+        onFinishCommand: function(job_index, has_errors, result) {
+            const job_info = this._jobs[job_index];
+            clearTimeout(job_info.timeout);
             if (has_errors) {
-                this.screen.printError(`Error executing '${cmd}':`);
+                this.screen.printError(
+                    `Error executing '${job_info.scmd.cmd}':`
+                );
                 if (
                     typeof result === "object" &&
                     !("data" in result) &&
@@ -595,6 +625,12 @@ odoo.define("terminal.Terminal", function(require) {
                     this.screen.printError(result, true);
                 }
             }
+            delete this._jobs[job_index];
+            this._updateJobsInfo();
+        },
+        onTimeoutCommand: function(job_index) {
+            this._jobs[job_index].healthy = false;
+            this._updateJobsInfo();
         },
 
         _onClickTerminalCommand: function(ev) {
