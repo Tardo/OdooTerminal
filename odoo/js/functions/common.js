@@ -757,18 +757,22 @@ odoo.define("terminal.functions.Common", function(require) {
                         method: "button_immediate_upgrade",
                         model: "ir.module.module",
                         args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.screen.print(
-                                `'${module_name}' module successfully upgraded`
-                            );
-                        },
-                        () => {
-                            this.screen.printError(
-                                `Can't upgrade '${module_name}' module`
-                            );
-                        }
-                    );
+                    })
+                        .then(
+                            () => {
+                                this.screen.print(
+                                    `'${module_name}' module successfully upgraded`
+                                );
+                            },
+                            () => {
+                                this.screen.printError(
+                                    `Can't upgrade '${module_name}' module`
+                                );
+                            }
+                        )
+                        .finally(() => {
+                            this.screen.flush();
+                        });
                 } else {
                     this.screen.printError(
                         `'${module_name}' module doesn't exists`
@@ -784,18 +788,22 @@ odoo.define("terminal.functions.Common", function(require) {
                         method: "button_immediate_install",
                         model: "ir.module.module",
                         args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.screen.print(
-                                `'${module_name}' module successfully installed`
-                            );
-                        },
-                        () => {
-                            this.screen.printError(
-                                `Can't install '${module_name}' module`
-                            );
-                        }
-                    );
+                    })
+                        .then(
+                            () => {
+                                this.screen.print(
+                                    `'${module_name}' module successfully installed`
+                                );
+                            },
+                            () => {
+                                this.screen.printError(
+                                    `Can't install '${module_name}' module`
+                                );
+                            }
+                        )
+                        .finally(() => {
+                            this.screen.flush();
+                        });
                 } else {
                     this.screen.printError(
                         `'${module_name}' module doesn't exists`
@@ -811,18 +819,22 @@ odoo.define("terminal.functions.Common", function(require) {
                         method: "button_immediate_uninstall",
                         model: "ir.module.module",
                         args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.screen.print(
-                                `'${module_name}' module successfully uninstalled`
-                            );
-                        },
-                        () => {
-                            this.screen.printError(
-                                `Can't uninstall '${module_name}' module`
-                            );
-                        }
-                    );
+                    })
+                        .then(
+                            () => {
+                                this.screen.print(
+                                    `'${module_name}' module successfully uninstalled`
+                                );
+                            },
+                            () => {
+                                this.screen.printError(
+                                    `Can't uninstall '${module_name}' module`
+                                );
+                            }
+                        )
+                        .finally(() => {
+                            this.screen.flush();
+                        });
                 } else {
                     this.screen.printError(
                         `'${module_name}' module doesn't exists`
@@ -851,6 +863,9 @@ odoo.define("terminal.functions.Common", function(require) {
                 .then(result => {
                     this.screen.print(result);
                     return result;
+                })
+                .finally(() => {
+                    this.screen.flush();
                 });
         },
 
