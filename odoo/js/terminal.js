@@ -272,12 +272,15 @@ odoo.define("terminal.Terminal", function(require) {
             let alias_cmd = this.getAliasCommand(cmd_name);
             if (alias_cmd) {
                 const scmd = this._parameterReader.parse(cmd, {args: "*"});
-                for (const index in scmd.params) {
+                const params_len = scmd.params.length;
+                let index = 0;
+                while (index < params_len) {
                     const re = new RegExp(
                         `\\$${Number(index) + 1}(?:\\[[^\\]]+\\])?`,
                         "g"
                     );
                     alias_cmd = alias_cmd.replaceAll(re, scmd.params[index]);
+                    ++index;
                 }
                 alias_cmd = alias_cmd.replaceAll(
                     /\$\d+(?:\[([^\]]+)\])?/g,
@@ -346,11 +349,15 @@ odoo.define("terminal.Terminal", function(require) {
 
         _searchCommandDefByAlias: function(cmd) {
             const cmd_keys = _.keys(this._registeredCmds);
-            for (const cmd_name of cmd_keys) {
+            const cmd_keys_len = cmd_keys.length;
+            let index = 0;
+            while (index < cmd_keys_len) {
+                const cmd_name = cmd_keys[index];
                 const cmd_def = this._registeredCmds[cmd_name];
                 if (cmd_def.aliases.indexOf(cmd) !== -1) {
                     return [cmd_name, cmd_def];
                 }
+                ++index;
             }
             return [false, false];
         },

@@ -217,12 +217,18 @@ odoo.define("terminal.core.Screen", function(require) {
                     id: item.id,
                     model: model,
                 });
-                for (const field in item) {
+                const keys = Object.keys(item);
+                const keys_len = keys.length;
+                let index = 0;
+                while (index < keys_len) {
+                    const field = keys[index];
                     if (field === "id") {
+                        ++index;
                         continue;
                     }
                     columns.push(field);
                     tbody += `<td>${item[field]}</td>`;
+                    ++index;
                 }
                 tbody += "</tr>";
             }

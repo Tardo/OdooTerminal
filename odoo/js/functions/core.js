@@ -342,33 +342,30 @@ odoo.define("terminal.functions.Core", function(require) {
         },
 
         _cmdRepeat: function(times, ...defcall) {
-            if (times < 0) {
-                return Promise.reject("'Times' parameter must be positive");
-            }
-            const [cmd, cmd_name] = this._validateCommand(defcall);
-            if (!cmd_name) {
-                return Promise.reject("Need a valid command to execute!");
-            }
-            const cmd_def = this._registeredCmds[cmd_name];
-            setTimeout(() => {
+            return new Promise((resolve, reject) => {
+                if (times < 0) {
+                    return reject("'Times' parameter must be positive");
+                }
+                const [cmd, cmd_name] = this._validateCommand(defcall);
+                if (!cmd_name) {
+                    return reject("Need a valid command to execute!");
+                }
+                const cmd_def = this._registeredCmds[cmd_name];
                 const do_repeat = rtimes => {
                     if (!rtimes) {
                         this.screen.print(
                             `<i>** Repeat finsihed: command called ${times} times</i>`
                         );
                         // This.screen.flush();
-                        return true;
+                        return resolve();
                     }
                     const scmd = this._parameterReader.parse(cmd, cmd_def);
                     this._processCommandJob(scmd, cmd_def).finally(() =>
                         do_repeat(rtimes - 1)
                     );
-                    return true;
                 };
                 do_repeat(times);
-            }, 0);
-
-            return Promise.resolve();
+            });
         },
 
         _cmdMute: function(...defcall) {

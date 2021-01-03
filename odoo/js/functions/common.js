@@ -390,15 +390,22 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: {},
                 })
                 .then(databases => {
-                    if (!databases) {
+                    const databases_len = databases.length;
+                    if (!databases_len) {
                         this.screen.printError("Can't get database names");
                         return;
                     }
-                    for (const i in databases) {
-                        if (databases[i] === session.db) {
-                            databases[i] = `<strong>${databases[i]}</strong>`;
+                    // Search active database
+                    let index = 0;
+                    while (index < databases_len) {
+                        const database = databases[index];
+                        if (database === session.db) {
+                            databases[
+                                index
+                            ] = `<strong>${database}</strong> (Active Database)`;
                             break;
                         }
+                        ++index;
                     }
                     this.screen.print(databases);
                     return databases;
@@ -879,14 +886,17 @@ odoo.define("terminal.functions.Common", function(require) {
                 return res;
             }
             const orders = this._parameterReader.splitAndTrim(orderBy, ",");
-            for (const order of orders) {
-                const order_s = order.split(" ");
+            const orders_len = orders.length;
+            let index = 0;
+            while (index < orders_len) {
+                const order_s = orders[index].split(" ");
                 res.push({
                     name: order_s[0],
                     asc:
                         order_s.length < 2 ||
                         order_s[1].toLowerCase() === "asc",
                 });
+                ++index;
             }
             return res;
         },

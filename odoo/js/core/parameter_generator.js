@@ -83,11 +83,17 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
         parse: function(params) {
             const parsed_params = [];
             this._resetStoreIndexes();
-            for (let param of params) {
-                const matches = String(param).matchAll(
-                    this._regexParamGenerator
-                );
-                for (const match of matches) {
+            const params_len = params.length;
+            let index = 0;
+            while (index < params_len) {
+                let param = params[index];
+                const matches = [
+                    ...String(param).matchAll(this._regexParamGenerator),
+                ];
+                const matches_len = matches.length;
+                let index_b = 0;
+                while (index_b < matches_len) {
+                    const match = matches[index_b];
                     if (match[2] in this._generators) {
                         const gen_val = this._generators[match[2]](
                             ...match.splice(3)
@@ -96,8 +102,10 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
                             param = param.replace(match[0], gen_val);
                         }
                     }
+                    ++index_b;
                 }
                 parsed_params.push(param);
+                ++index;
             }
             return parsed_params;
         },
@@ -186,13 +194,10 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             }
             const rlen = this.generateInt(min, max);
             let result = "";
-            let count = 0;
-            for (const letter of this._rndLetter) {
-                if (count === rlen) {
-                    break;
-                }
-                result += letter;
-                ++count;
+            let index = 0;
+            while (index < rlen) {
+                result += this._rndLetter[index];
+                ++index;
             }
             return result;
         },

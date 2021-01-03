@@ -176,12 +176,16 @@ odoo.define("terminal.core.ParameterReader", function(require) {
             if (list_mode) {
                 const param_split = param.split(",");
                 let is_valid = true;
-                for (const ps of param_split) {
+                const param_split_len = param_split.length;
+                let index = 0;
+                while (index < param_split_len) {
+                    const ps = param_split[index];
                     const param_sa = ps.trim();
                     if (Number(param_sa) === parseInt(param_sa, 10)) {
                         is_valid = false;
                         break;
                     }
+                    ++index;
                 }
                 return is_valid;
             }
@@ -198,12 +202,16 @@ odoo.define("terminal.core.ParameterReader", function(require) {
             if (list_mode) {
                 const param_split = param.split(",");
                 let is_valid = true;
-                for (const ps of param_split) {
+                const param_split_len = param_split.length;
+                let index = 0;
+                while (index < param_split_len) {
+                    const ps = param_split[index];
                     const param_sa = ps.trim();
                     if (Number(param_sa) !== parseInt(param_sa, 10)) {
                         is_valid = false;
                         break;
                     }
+                    ++index;
                 }
                 return is_valid;
             }

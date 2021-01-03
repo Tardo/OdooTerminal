@@ -109,13 +109,18 @@ odoo.define("terminal.functions.Fuzz", function(require) {
 
         _generateOne2ManyValue: function(field) {
             const keys = Object.keys(field.values);
-            if (!keys.length) {
+            const keys_len = keys.length;
+            if (!keys_len) {
                 return false;
             }
             const record = {};
-            for (const key of keys) {
+
+            let index = 0;
+            while (index < keys_len) {
+                const key = keys[index];
                 const extra_field = field.values[key];
                 record[key] = this.process(extra_field);
+                ++index;
             }
             return {
                 operation: "CREATE",
@@ -201,7 +206,10 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                         return fields.indexOf(item?.attrs.name) !== -1;
                     });
                 }
-                for (const field_view_def of fields_view) {
+                const fields_view_len = fields_view.length;
+                let index = 0;
+                while (index < fields_view_len) {
+                    const field_view_def = fields_view[index];
                     const field_name = field_view_def.attrs.name;
                     if (fields_ignored.indexOf(field_name) !== -1) {
                         this._term.screen.eprint(
@@ -244,6 +252,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                             return reject(err);
                         }
                     }
+                    ++index;
                 }
                 return resolve([processed, ignored]);
             });
@@ -251,13 +260,18 @@ odoo.define("terminal.functions.Fuzz", function(require) {
 
         _convertData2State: function(data) {
             const res = {};
-            for (const key in data) {
+            const keys = Object.keys(data);
+            const keys_len = keys.length;
+            let index = 0;
+            while (index < keys_len) {
+                const key = keys[index];
                 const value = data[key];
                 if (typeof value === "object" && !moment.isMoment(value)) {
                     res[key] = value.data?.id;
                 } else {
                     res[key] = value;
                 }
+                ++index;
             }
             return res;
         },
@@ -360,19 +374,27 @@ odoo.define("terminal.functions.Fuzz", function(require) {
         _getArchFields: function(arch) {
             let fields = [];
             const childrens = arch?.children || [];
-            for (const children of childrens) {
+            const childrens_len = childrens.length;
+            let index = 0;
+            while (index < childrens_len) {
+                const children = childrens[index];
                 if (children.tag === "field") {
                     fields.push(children);
                 } else if (_.some(children.children)) {
                     fields = _.union(fields, this._getArchFields(children));
                 }
+                ++index;
             }
             return fields;
         },
 
         _getChangesValues: function(changes) {
             const values = {};
-            for (const field_name in changes) {
+            const keys = Object.keys(changes);
+            const keys_len = keys.length;
+            let index = 0;
+            while (index < keys_len) {
+                const field_name = keys[index];
                 const change = changes[field_name];
                 if (typeof change === "object" && "operation" in change) {
                     if (change.operation === "ADD") {
@@ -385,6 +407,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                 } else {
                     values[field_name] = change;
                 }
+                ++index;
             }
             return values;
         },
@@ -425,7 +448,9 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                     const o2m_fields = this._getArchFields(
                         field_info.views[field_info.mode]?.arch
                     );
-                    for (const index in o2m_fields) {
+                    const o2m_fields_len = o2m_fields.length;
+                    let index = 0;
+                    while (index < o2m_fields_len) {
                         const field = o2m_fields[index];
                         const field_view_name = field.attrs.name;
                         const field_view_def =
@@ -499,6 +524,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                                 changes
                             );
                         }
+                        ++index;
                     }
                 }
                 // Do not apply changes if doesn't exists changes to apply
@@ -534,8 +560,12 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                     if (!field.required) {
                         gen_field_def.values.push(false);
                     }
-                    for (const option of field.selection) {
+                    const selection_len = field.selection.length;
+                    let index = 0;
+                    while (index < selection_len) {
+                        const option = field.selection[index];
                         gen_field_def.values.push(option[0]);
+                        ++index;
                     }
                 }
 
@@ -545,9 +575,16 @@ odoo.define("terminal.functions.Fuzz", function(require) {
 
         _processFieldChanges: function(field_name, datas, state_data) {
             const fields_changed = [];
-            for (const data of datas) {
+            const datas_len = datas.length;
+            let index = 0;
+            while (index < datas_len) {
+                const data = datas[index];
                 if (data.name === field_name) {
-                    for (const rf_name in data.recordData) {
+                    const keys = Object.keys(data.recordData);
+                    const keys_len = keys.length;
+                    let index_b = 0;
+                    while (index_b < keys_len) {
+                        const rf_name = keys[index_b];
                         if (
                             !_.isEqual(
                                 data.recordData[rf_name],
@@ -556,9 +593,11 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                         ) {
                             fields_changed.push(rf_name);
                         }
+                        ++index_b;
                     }
                     break;
                 }
+                ++index;
             }
             return fields_changed;
         },
