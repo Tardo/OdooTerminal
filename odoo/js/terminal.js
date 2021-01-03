@@ -138,7 +138,7 @@ odoo.define("terminal.Terminal", function(require) {
                     .removeClass("btn-dark")
                     .addClass("btn-light");
             }
-            this.screen.flush();
+            // This.screen.flush();
         },
 
         destroy: function() {
@@ -214,7 +214,7 @@ odoo.define("terminal.Terminal", function(require) {
                     this._storeUserInput(cmd);
                 }
                 this.screen.cleanInput();
-                this.screen.flush();
+                // This.screen.flush();
                 return false;
             }
             if (!cmd_def.secured) {
@@ -222,7 +222,7 @@ odoo.define("terminal.Terminal", function(require) {
             }
             this.screen.printCommand(cmd_raw, cmd_def.secured);
             this.screen.cleanInput();
-            this.screen.flush();
+            // This.screen.flush();
             this._processCommandJob(scmd, cmd_def);
             return true;
         },
@@ -308,12 +308,17 @@ odoo.define("terminal.Terminal", function(require) {
                 this._storeUserInput(cmd);
             }
             this.screen.cleanInput();
-            this.screen.flush();
+            // This.screen.flush();
             return false;
         },
 
-        _getContext: function() {
-            return _.extend({}, session.user_context, this._userContext);
+        _getContext: function(extra_context) {
+            return _.extend(
+                {},
+                session.user_context,
+                this._userContext,
+                extra_context
+            );
         },
 
         _storeUserInput: function(strInput) {
@@ -559,7 +564,7 @@ odoo.define("terminal.Terminal", function(require) {
                         "[!] Oops! Unknown error! (no detailed error message given :/)";
                 } finally {
                     this.onFinishCommand(job_index, is_failed, result);
-                    this.screen.flush();
+                    // This.screen.flush();
                 }
                 return resolve(result);
             });

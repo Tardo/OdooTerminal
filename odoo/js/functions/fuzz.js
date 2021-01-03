@@ -36,6 +36,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                 many2many: this._generateMany2ManyValue.bind(this),
                 boolean: this._generateBooleanValue.bind(this),
                 monetary: this._generateFloatValue.bind(this),
+                html: this._generateHTML.bind(this),
 
                 phone: this._generatePhoneValue.bind(this),
                 email: this._generateEmailValue.bind(this),
@@ -68,6 +69,10 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                 this._minStr,
                 this._maxStr * 10
             );
+        },
+
+        _generateHTML: function() {
+            return `<p>${this._generateTextValue()}</p>`;
         },
 
         _generateFloatValue: function() {
@@ -169,7 +174,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
         },
     });
 
-    const FuzzDialogForm = Class.extend({
+    const FuzzForm = Class.extend({
         init: function(term) {
             this._term = term;
             this._fieldValueGenerator = new FieldValueGenerator();
@@ -179,18 +184,23 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             this._fieldValueGenerator.destroy();
         },
 
-        processFormFields: function(controller) {
-            return new Promise(async resolve => {
+        processFormFields: function(controller, fields, o2m_num_records = 1) {
+            return new Promise(async (resolve, reject) => {
                 const controller_state = controller.widget.renderer.state;
-                const fields = controller_state.fields;
+                const controller_fields = controller_state.fields;
                 const fields_info =
                     controller_state.fieldsInfo[controller_state.viewType];
                 const processed = {};
                 const ignored = [];
                 let fields_ignored = [];
-                const fields_view = this._getArchFields(
+                let fields_view = this._getArchFields(
                     controller.widget.renderer.arch
                 );
+                if (!_.isEmpty(fields)) {
+                    fields_view = _.filter(fields_view, item => {
+                        return fields.indexOf(item?.attrs.name) !== -1;
+                    });
+                }
                 for (const field_view_def of fields_view) {
                     const field_name = field_view_def.attrs.name;
                     if (fields_ignored.indexOf(field_name) !== -1) {
@@ -201,7 +211,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                         continue;
                     }
                     const field_info = fields_info[field_name];
-                    const field = fields[field_name];
+                    const field = controller_fields[field_name];
                     const is_invisible = utils.toBoolElse(
                         field_info.modifiersValue?.invisible
                     );
@@ -212,26 +222,26 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                     if (!is_invisible && !is_readonly) {
                         // Create more than one 'one2many' record
                         const num_records =
-                            field.type === "one2many"
-                                ? this._fieldValueGenerator._parameterGenerator.generateInt(
-                                      7
-                                  )
-                                : 1;
+                            field.type === "one2many" ? o2m_num_records : 1;
                         this._O2MRequiredStore = {};
-                        for (let i = 0; i < num_records; ++i) {
-                            const [
-                                field_def,
-                                affected_fields,
-                            ] = await this._fillField(
-                                controller,
-                                field,
-                                field_info
-                            );
-                            processed[field_name] = field_def;
-                            fields_ignored = _.union(
-                                fields_ignored,
-                                affected_fields
-                            );
+                        try {
+                            for (let i = 0; i < num_records; ++i) {
+                                const [
+                                    field_def,
+                                    affected_fields,
+                                ] = await this._fillField(
+                                    controller,
+                                    field,
+                                    field_info
+                                );
+                                processed[field_name] = field_def;
+                                fields_ignored = _.union(
+                                    fields_ignored,
+                                    affected_fields
+                                );
+                            }
+                        } catch (err) {
+                            return reject(err);
                         }
                     }
                 }
@@ -349,7 +359,8 @@ odoo.define("terminal.functions.Fuzz", function(require) {
 
         _getArchFields: function(arch) {
             let fields = [];
-            for (const children of arch.children) {
+            const childrens = arch?.children || [];
+            for (const children of childrens) {
                 if (children.tag === "field") {
                     fields.push(children);
                 } else if (_.some(children.children)) {
@@ -403,6 +414,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
         },
 
         _generateChangesFieldO2M: async function(field_info, widget) {
+            // eslint-disable-next-line
             return new Promise(async resolve => {
                 const changes = {};
                 changes[field_info.name] = {
@@ -486,9 +498,6 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                                 field_view,
                                 changes
                             );
-                        } else {
-                            changes[field_info.name].data = [];
-                            break;
                         }
                     }
                 }
@@ -522,6 +531,9 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                     });
                 } else if (field.selection) {
                     gen_field_def.values = [];
+                    if (!field.required) {
+                        gen_field_def.values.push(false);
+                    }
                     for (const option of field.selection) {
                         gen_field_def.values.push(option[0]);
                     }
@@ -560,67 +572,117 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                 definition: "Run a 'Fuzz Test'",
                 callback: this._cmdFuzz,
                 detail: "Runs a 'Fuzz Test' over the selected model and view",
-                syntaxis: "<STRING: MODEL NAME> [STRING: VIEW REF]",
-                args: "s?s",
+                syntaxis:
+                    "<STRING: MODEL NAME> [LIST: FIELDS] [STRING: VIEW REF]",
+                args: "s?lss",
             });
+            this.registerCommand("fuzz_active", {
+                definition: "Run a 'Fuzz Test' in the active form view",
+                callback: this._cmdFuzzActive,
+                detail: "Runs a 'Fuzz Test' over the active form view",
+                syntaxis: "[LIST: FIELDS] [INT: O2M RECORDS COUNT]",
+                args: "ls?i",
+            });
+        },
+
+        _cmdFuzzActive: function(fields, o2m_num_records) {
+            const current_state = this.getParent()._current_state;
+            if (!current_state) {
+                return Promise.reject("Can't detect the active state!");
+            }
+            const current_action = _.find(
+                this.getParent().action_manager.actions,
+                {
+                    id: Number(current_state.action),
+                }
+            );
+            if (!current_action) {
+                return Promise.reject("Can't found the active action!");
+            }
+            const form_controller = this._getController(
+                current_action.controllerID
+            );
+            return this._runFuzz(form_controller, fields, o2m_num_records);
         },
 
         _cmdFuzz: function(model, view_ref = false) {
             return new Promise(async (resolve, reject) => {
-                this.screen.eprint(`Opening selected ${model} form...`);
-                const context = _.extend({}, this._getContext(), {
-                    form_view_ref: view_ref,
-                });
-                const action = await this.do_action({
-                    type: "ir.actions.act_window",
-                    name: "View Record",
-                    res_model: model,
-                    res_id: false,
-                    views: [[false, "form"]],
-                    target: "new",
-                    context: context,
-                });
-                this.screen.eprint("Writing random values...");
-                const form_controller = this._getController(
-                    action.controllerID
-                );
-                const fuzz_dialog_form = new FuzzDialogForm(this);
-                const [
-                    processed_fields,
-                    ignored_fields,
-                ] = await fuzz_dialog_form.processFormFields(form_controller);
-                const required_count = _.size(
-                    _.filter(processed_fields, field => field.required)
-                );
-                this.screen.eprint(
-                    ` - Founded ${_.size(
-                        processed_fields
-                    )} visible fields (${required_count} required)`
-                );
-                this.screen.eprint(
-                    ` - Ignored ${_.size(
-                        ignored_fields
-                    )} fields affected by an 'onchange'`
-                );
-                this.screen.eprint("Saving changes...");
-                form_controller.widget
-                    .saveRecord()
-                    .then(() => {
-                        const record = form_controller.widget.model.get(
-                            form_controller.widget.handle
-                        );
-                        this.screen.eprint(
-                            `Fuzz test finished successfully: ${record.res_id}`
-                        );
-                        if (!form_controller.dialog.isDestroyed()) {
-                            form_controller.dialog.close();
-                        }
-                        this.doShow();
-                        return resolve(record.res_id);
-                    })
-                    .fail(err => {
-                        return reject(err);
+                try {
+                    this.screen.eprint(`Opening selected ${model} form...`);
+                    const context = this._getContext({
+                        form_view_ref: view_ref,
                     });
+                    const action = await this.do_action({
+                        type: "ir.actions.act_window",
+                        name: "View Record",
+                        res_model: model,
+                        res_id: false,
+                        views: [[false, "form"]],
+                        target: "new",
+                        context: context,
+                    });
+                    const form_controller = this._getController(
+                        action.controllerID
+                    );
+                    await this._runFuzz(form_controller, 4);
+                    this.screen.eprint("Saving changes...");
+                    form_controller.widget
+                        .saveRecord()
+                        .then(() => {
+                            const record = form_controller.widget.model.get(
+                                form_controller.widget.handle
+                            );
+                            this.screen.eprint(
+                                `Fuzz test finished successfully: ${record.res_id}`
+                            );
+                            if (!form_controller.dialog.isDestroyed()) {
+                                form_controller.dialog.close();
+                            }
+                            this.doShow();
+                            return resolve(record.res_id);
+                        })
+                        .catch(err => {
+                            return reject(err);
+                        });
+                } catch (err) {
+                    return reject(err);
+                }
+
+                return resolve();
+            });
+        },
+
+        _runFuzz: function(form_controller, fields, o2m_num_records) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    this.screen.eprint("Writing random values...");
+                    const fuzz_form = new FuzzForm(this);
+                    const [
+                        processed_fields,
+                        ignored_fields,
+                    ] = await fuzz_form.processFormFields(
+                        form_controller,
+                        fields,
+                        o2m_num_records
+                    );
+                    const required_count = _.size(
+                        _.filter(processed_fields, field => field.required)
+                    );
+                    this.screen.eprint(
+                        ` - Founded ${_.size(
+                            processed_fields
+                        )} visible fields (${required_count} required)`
+                    );
+                    this.screen.eprint(
+                        ` - Ignored ${_.size(
+                            ignored_fields
+                        )} fields affected by an 'onchange'`
+                    );
+                } catch (err) {
+                    return reject();
+                }
+
+                return resolve();
             });
         },
 

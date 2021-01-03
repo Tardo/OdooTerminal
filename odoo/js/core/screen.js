@@ -106,6 +106,7 @@ odoo.define("terminal.core.Screen", function(require) {
                 this._buff.shift();
             }
             this._buff.push(html);
+            window.requestAnimationFrame(this.flush.bind(this));
         },
 
         print: function(msg, enl, cls) {

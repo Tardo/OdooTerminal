@@ -48,7 +48,7 @@ odoo.define("terminal.functions.Backend", function(require) {
         },
 
         _cmdViewModelRecord: function(model, id, view_ref = false) {
-            const context = _.extend({}, this._getContext(), {
+            const context = this._getContext({
                 form_view_ref: view_ref,
             });
             if (id) {

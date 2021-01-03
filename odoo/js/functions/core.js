@@ -277,53 +277,66 @@ odoo.define("terminal.functions.Core", function(require) {
 
         _cmdExport: function(...defcall) {
             return new Promise(async (resolve, reject) => {
-                const cmd_name = this._validateCommand(defcall)[1];
-                if (!cmd_name) {
-                    return reject("Need a valid command to execute!");
+                try {
+                    const cmd_name = this._validateCommand(defcall)[1];
+                    if (!cmd_name) {
+                        return reject("Need a valid command to execute!");
+                    }
+                    const varname = _.uniqueId("term");
+                    window[varname] = await this._cmdMute(...defcall);
+                    this.screen.print(
+                        `Command result exported! now you can use '${varname}' variable in the browser console`
+                    );
+                } catch (err) {
+                    return reject(err);
                 }
-                const varname = _.uniqueId("term");
-                window[varname] = await this._cmdMute(...defcall);
-                this.screen.print(
-                    `Command result exported! now you can use '${varname}' variable in the browser console`
-                );
                 return resolve();
             });
         },
 
         _cmdExportFile: function(...defcall) {
             return new Promise(async (resolve, reject) => {
-                const cmd_name = this._validateCommand(defcall)[1];
-                if (!cmd_name) {
-                    return reject("Need a valid command to execute!");
+                try {
+                    const cmd_name = this._validateCommand(defcall)[1];
+                    if (!cmd_name) {
+                        return reject("Need a valid command to execute!");
+                    }
+                    const filename = `${cmd_name}_${new Date().getTime()}.json`;
+                    const result = await this._cmdMute(...defcall);
+                    Utils.save2File(
+                        filename,
+                        "text/json",
+                        JSON.stringify(result, null, 4)
+                    );
+                    this.screen.print(
+                        `Command result exported to '${filename}' file`
+                    );
+                } catch (err) {
+                    return reject(err);
                 }
-                const filename = `${cmd_name}_${new Date().getTime()}.json`;
-                const result = await this._cmdMute(...defcall);
-                Utils.save2File(
-                    filename,
-                    "text/json",
-                    JSON.stringify(result, null, 4)
-                );
-                this.screen.print(
-                    `Command result exported to '${filename}' file`
-                );
                 return resolve();
             });
         },
 
         _cmdChrono: function(...defcall) {
             return new Promise(async (resolve, reject) => {
-                const [cmd, cmd_name] = this._validateCommand(defcall);
-                if (!cmd_name) {
-                    return reject("Need a valid command to execute!");
+                try {
+                    const [cmd, cmd_name] = this._validateCommand(defcall);
+                    if (!cmd_name) {
+                        return reject("Need a valid command to execute!");
+                    }
+                    const cmd_def = this._registeredCmds[cmd_name];
+                    const scmd = this._parameterReader.parse(cmd, cmd_def);
+                    const start_time = new Date();
+                    await this._processCommandJob(scmd, cmd_def);
+                    const time_elapsed_secs =
+                        (new Date() - start_time) / 1000.0;
+                    this.screen.print(
+                        `Time elapsed: '${time_elapsed_secs}' seconds`
+                    );
+                } catch (err) {
+                    return reject(err);
                 }
-                const cmd_def = this._registeredCmds[cmd_name];
-                const scmd = this._parameterReader.parse(cmd, cmd_def);
-                const start_time = new Date();
-                await this._processCommandJob(scmd, cmd_def);
-                const time_elapsed_secs = (new Date() - start_time) / 1000.0;
-                this.screen.print(
-                    `Time elapsed: '${time_elapsed_secs}' seconds`
-                );
                 return resolve();
             });
         },
@@ -343,7 +356,7 @@ odoo.define("terminal.functions.Core", function(require) {
                         this.screen.print(
                             `<i>** Repeat finsihed: command called ${times} times</i>`
                         );
-                        this.screen.flush();
+                        // This.screen.flush();
                         return true;
                     }
                     const scmd = this._parameterReader.parse(cmd, cmd_def);
