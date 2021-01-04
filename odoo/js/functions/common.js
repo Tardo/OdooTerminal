@@ -776,9 +776,6 @@ odoo.define("terminal.functions.Common", function(require) {
                             );
                         }
                     );
-                    // .finally(() => {
-                    //     this.screen.flush();
-                    // });
                 } else {
                     this.screen.printError(
                         `'${module_name}' module doesn't exists`
@@ -806,9 +803,6 @@ odoo.define("terminal.functions.Common", function(require) {
                             );
                         }
                     );
-                    // .finally(() => {
-                    //     this.screen.flush();
-                    // });
                 } else {
                     this.screen.printError(
                         `'${module_name}' module doesn't exists`
@@ -836,9 +830,6 @@ odoo.define("terminal.functions.Common", function(require) {
                             );
                         }
                     );
-                    // .finally(() => {
-                    //     this.screen.flush();
-                    // });
                 } else {
                     this.screen.printError(
                         `'${module_name}' module doesn't exists`
@@ -868,9 +859,6 @@ odoo.define("terminal.functions.Common", function(require) {
                     this.screen.print(result);
                     return result;
                 });
-            // .finally(() => {
-            //     this.screen.flush();
-            // });
         },
 
         /**
@@ -1068,7 +1056,6 @@ odoo.define("terminal.functions.Common", function(require) {
                 }
                 this.screen.print(notif[1], false);
             }
-            // This.screen.flush();
         },
     });
 });

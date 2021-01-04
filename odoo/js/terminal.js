@@ -138,7 +138,6 @@ odoo.define("terminal.Terminal", function(require) {
                     .removeClass("btn-dark")
                     .addClass("btn-light");
             }
-            // This.screen.flush();
         },
 
         destroy: function() {
@@ -214,7 +213,6 @@ odoo.define("terminal.Terminal", function(require) {
                     this._storeUserInput(cmd);
                 }
                 this.screen.cleanInput();
-                // This.screen.flush();
                 return false;
             }
             if (!cmd_def.secured) {
@@ -222,7 +220,6 @@ odoo.define("terminal.Terminal", function(require) {
             }
             this.screen.printCommand(cmd_raw, cmd_def.secured);
             this.screen.cleanInput();
-            // This.screen.flush();
             this._processCommandJob(scmd, cmd_def);
             return true;
         },
@@ -311,7 +308,6 @@ odoo.define("terminal.Terminal", function(require) {
                 this._storeUserInput(cmd);
             }
             this.screen.cleanInput();
-            // This.screen.flush();
             return false;
         },
 
@@ -326,13 +322,8 @@ odoo.define("terminal.Terminal", function(require) {
 
         _storeUserInput: function(strInput) {
             this._inputHistory.push(strInput);
-            this._storage.setItem(
-                "terminal_history",
-                this._inputHistory,
-                err => {
-                    this.screen.printError(err, true);
-                    this.screen.flush();
-                }
+            this._storage.setItem("terminal_history", this._inputHistory, err =>
+                this.screen.printError(err, true)
             );
             this._searchHistoryIter = this._inputHistory.length;
         },
@@ -571,7 +562,6 @@ odoo.define("terminal.Terminal", function(require) {
                         "[!] Oops! Unknown error! (no detailed error message given :/)";
                 } finally {
                     this.onFinishCommand(job_index, is_failed, result);
-                    // This.screen.flush();
                 }
                 return resolve(result);
             });

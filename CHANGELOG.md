@@ -1,5 +1,15 @@
 # Changelog
 
+**7.2.0**
+
+```
+IMP: Print to screen performance
+IMP: Fuzz feature
+IMP: Loops performance
+
+ADD: Command 'fuzz_active': Fill fields on the active form
+```
+
 **7.1.0**
 
 ```
