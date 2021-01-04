@@ -92,7 +92,12 @@ odoo.define("terminal.core.Screen", function(require) {
 
         /* PRINT */
         flush: function() {
-            this.$screen.append(this._buff);
+            this._rafID = null;
+            if (this._buff.length > this._max_lines) {
+                this.$screen[0].innerHTML = this._buff.join("");
+            } else {
+                this.$screen[0].innerHTML += this._buff.join("");
+            }
             this._buff = [];
             this._lazyVacuum();
             this.scrollDown();
@@ -102,11 +107,11 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         printHTML: function(html) {
-            if (this._buff.length >= this._max_lines) {
-                this._buff.shift();
-            }
             this._buff.push(html);
-            window.requestAnimationFrame(this.flush.bind(this));
+            if (this._rafID) {
+                window.cancelAnimationFrame(this._rafID);
+            }
+            this._rafID = window.requestAnimationFrame(this.flush.bind(this));
         },
 
         print: function(msg, enl, cls) {
