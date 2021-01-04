@@ -59,7 +59,6 @@ odoo.define("terminal.Terminal", function (require) {
             } else if (!$terms.length) {
                 $(this._rawTerminalTemplate).prependTo("body");
                 this.setElement($("body").find("#terminal"));
-                this.start();
             }
         },
 
@@ -108,6 +107,8 @@ odoo.define("terminal.Terminal", function (require) {
 
             this._injectTerminal();
             this._initGuard();
+
+            this._isLoaded = false;
         },
 
         start: function () {
@@ -140,6 +141,8 @@ odoo.define("terminal.Terminal", function (require) {
                     .removeClass("btn-dark")
                     .addClass("btn-light");
             }
+
+            this._isLoaded = true;
         },
 
         destroy: function () {
@@ -228,6 +231,10 @@ odoo.define("terminal.Terminal", function (require) {
 
         /* VISIBILIY */
         doShow: function () {
+            // Only start the terminal if needed
+            if (!this._isLoaded) {
+                this.start();
+            }
             this.$el.addClass("terminal-transition-topdown");
             this.screen.focus();
         },
