@@ -1,7 +1,7 @@
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.Screen", function(require) {
+odoo.define("terminal.core.Screen", function (require) {
     "use strict";
 
     const AbstractScreen = require("terminal.core.abstract.Screen");
@@ -17,7 +17,7 @@ odoo.define("terminal.core.Screen", function(require) {
         _line_selector: ":scope > span .print-table tr, :scope > span",
         _max_lines: 750,
 
-        init: function() {
+        init: function () {
             this._super.apply(this, arguments);
             this._templates = new TemplateManager();
             this._linesCounter = 0;
@@ -25,49 +25,49 @@ odoo.define("terminal.core.Screen", function(require) {
             this._buff = [];
         },
 
-        start: function() {
+        start: function () {
             this._super.apply(this, arguments);
             this._createScreen();
             this._createUserInput();
         },
 
-        destroy: function() {
+        destroy: function () {
             this.$screen.off("keydown");
             this.$input.off("keyup");
             this.$input.off("keydown");
             this.$input.off("input");
         },
 
-        getContent: function() {
+        getContent: function () {
             return this.$screen.html();
         },
 
-        scrollDown: function() {
+        scrollDown: function () {
             this.$screen[0].scrollTop = this.$screen[0].scrollHeight;
         },
 
-        clean: function() {
+        clean: function () {
             this.$screen.html("");
             if ("onCleanScreen" in this._options) {
                 this._options.onCleanScreen(this.getContent());
             }
         },
 
-        cleanInput: function() {
+        cleanInput: function () {
             this.$input.val("");
             this.cleanShadowInput();
         },
 
-        cleanShadowInput: function() {
+        cleanShadowInput: function () {
             this.$shadowInput.val("");
         },
 
-        updateInput: function(str) {
+        updateInput: function (str) {
             this.$input.val(str);
             this.cleanShadowInput();
         },
 
-        updateShadowInput: function(str) {
+        updateShadowInput: function (str) {
             this.$shadowInput.val(str);
             // Deferred to ensure that has updated values
             _.defer(() =>
@@ -75,28 +75,31 @@ odoo.define("terminal.core.Screen", function(require) {
             );
         },
 
-        preventLostInputFocus: function(ev) {
+        preventLostInputFocus: function (ev) {
             const isCKey = ev && (ev.ctrlKey || ev.altKey);
             if (!isCKey) {
                 this.focus();
             }
         },
 
-        focus: function() {
+        focus: function () {
             this.$input.focus();
         },
 
-        getUserInput: function() {
+        getUserInput: function () {
             return this.$input.val();
         },
 
         /* PRINT */
-        flush: function() {
+        flush: function () {
             this._rafID = null;
             if (this._buff.length > this._max_lines) {
                 this.$screen[0].innerHTML = this._buff.join("");
             } else {
-                this.$screen[0].innerHTML += this._buff.join("");
+                this.$screen[0].insertAdjacentHTML(
+                    "beforeend",
+                    this._buff.join("")
+                );
             }
             this._buff = [];
             this._lazyVacuum();
@@ -106,7 +109,7 @@ odoo.define("terminal.core.Screen", function(require) {
             }
         },
 
-        printHTML: function(html) {
+        printHTML: function (html) {
             this._buff.push(html);
             if (this._rafID) {
                 window.cancelAnimationFrame(this._rafID);
@@ -114,7 +117,7 @@ odoo.define("terminal.core.Screen", function(require) {
             this._rafID = window.requestAnimationFrame(this.flush.bind(this));
         },
 
-        print: function(msg, enl, cls) {
+        print: function (msg, enl, cls) {
             let scls = cls || "";
             if (!enl) {
                 scls = `line-br ${scls}`;
@@ -122,11 +125,11 @@ odoo.define("terminal.core.Screen", function(require) {
             this.printHTML(this._getTerminalLine(msg, scls));
         },
 
-        eprint: function(msg, enl) {
+        eprint: function (msg, enl) {
             this.print(utils.encodeHTML(msg), enl);
         },
 
-        printCommand: function(cmd, secured = false) {
+        printCommand: function (cmd, secured = false) {
             this.eprint(
                 this._templates.render(
                     secured ? "PROMPT_CMD_HIDDEN_ARGS" : "PROMPT_CMD",
@@ -138,7 +141,7 @@ odoo.define("terminal.core.Screen", function(require) {
             );
         },
 
-        printError: function(error, internal = false) {
+        printError: function (error, internal = false) {
             if (!internal) {
                 this.printHTML(
                     this._getTerminalLine(`[!] ${error}`, "line-br")
@@ -202,7 +205,7 @@ odoo.define("terminal.core.Screen", function(require) {
             this.printHTML(this._getTerminalLine(error_msg, "error_message"));
         },
 
-        printTable: function(columns, tbody) {
+        printTable: function (columns, tbody) {
             this.print(
                 this._templates.render("TABLE", {
                     thead: columns.join("</th><th>"),
@@ -211,7 +214,7 @@ odoo.define("terminal.core.Screen", function(require) {
             );
         },
 
-        printRecords: function(model, records) {
+        printRecords: function (model, records) {
             let tbody = "";
             const columns = ["id"];
             const len = records.length;
@@ -241,7 +244,7 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         /* PRIVATE */
-        _getTerminalLine: function(msg, cls) {
+        _getTerminalLine: function (msg, cls) {
             const msg_type = typeof msg;
             if (msg_type === "object") {
                 if (msg instanceof Text) {
@@ -264,7 +267,7 @@ odoo.define("terminal.core.Screen", function(require) {
             return `<span class='line-text ${cls}'>${msg}</span>`;
         },
 
-        _vacuum: function() {
+        _vacuum: function () {
             const $lines = Array.from(
                 this.$screen[0].querySelectorAll(this._line_selector)
             );
@@ -283,11 +286,11 @@ odoo.define("terminal.core.Screen", function(require) {
             }
         },
 
-        _prettyObjectString: function(obj) {
+        _prettyObjectString: function (obj) {
             return utils.encodeHTML(JSON.stringify(obj, null, 4));
         },
 
-        _createScreen: function() {
+        _createScreen: function () {
             this.$screen = $(
                 "<div class='col-sm-12 col-lg-12 col-12' id='terminal_screen' tabindex='-1' />"
             );
@@ -295,7 +298,7 @@ odoo.define("terminal.core.Screen", function(require) {
             this.$screen.on("keydown", this.preventLostInputFocus.bind(this));
         },
 
-        _createUserInput: function() {
+        _createUserInput: function () {
             const to_inject = $(
                 "<div class='d-flex terminal-user-input'>" +
                     "<input class='terminal-prompt' readonly='readonly'/>" +
@@ -336,7 +339,7 @@ odoo.define("terminal.core.Screen", function(require) {
         },
 
         /* EVENTS */
-        _onInputKeyDown: function(ev) {
+        _onInputKeyDown: function (ev) {
             if (ev.keyCode === 9) {
                 // Press Tab
                 ev.preventDefault();

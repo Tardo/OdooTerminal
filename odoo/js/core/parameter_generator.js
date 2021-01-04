@@ -1,7 +1,7 @@
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.ParameterGenerator", function(require) {
+odoo.define("terminal.core.ParameterGenerator", function (require) {
     "use strict";
 
     const time = require("web.time");
@@ -12,7 +12,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
      */
     const ParameterGenerator = Class.extend({
         _rndLetter: {
-            [Symbol.iterator]: function*() {
+            [Symbol.iterator]: function* () {
                 const characters = "bcdfghjklmnpqrstvwxyz ";
                 const vocals = "aeiou";
                 const characters_length = characters.length;
@@ -22,7 +22,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
                 let count = 0;
                 let cc_count = 0;
 
-                const isVocal = letter => vocals.indexOf(letter) !== -1;
+                const isVocal = (letter) => vocals.indexOf(letter) !== -1;
 
                 for (;;) {
                     if (cc_count < 2 && (!last_char || isVocal(last_char))) {
@@ -52,7 +52,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
         _intIterStore: [],
         _intIterStoreIndex: 0,
 
-        init: function() {
+        init: function () {
             this._generators = {
                 FLOAT: this.generateFloat.bind(this),
                 INT: this.generateInt.bind(this),
@@ -80,7 +80,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             );
         },
 
-        parse: function(params) {
+        parse: function (params) {
             const parsed_params = [];
             this._resetStoreIndexes();
             const params_len = params.length;
@@ -110,16 +110,16 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return parsed_params;
         },
 
-        resetStores: function() {
+        resetStores: function () {
             this._intIterStore = [];
             this._resetStoreIndexes();
         },
 
-        _resetStoreIndexes: function() {
+        _resetStoreIndexes: function () {
             this._intIterStoreIndex = 0;
         },
 
-        generateEmail: function(min, max) {
+        generateEmail: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -131,7 +131,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
                 .toLowerCase();
         },
 
-        generateUrl: function(min, max) {
+        generateUrl: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -142,7 +142,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
                 .toLowerCase();
         },
 
-        generateFloat: function(min, max) {
+        generateFloat: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -153,7 +153,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             );
         },
 
-        generateInt: function(min, max) {
+        generateInt: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -162,7 +162,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return Math.floor(Math.random() * (max_s - min_s + 1) + min_s);
         },
 
-        generateIntSeq: function(min, max) {
+        generateIntSeq: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -175,7 +175,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return numbers.join();
         },
 
-        _doIntIter: function(min, step = 1) {
+        _doIntIter: function (min, step = 1) {
             const store_index = this._intIterStoreIndex++;
             let int_iter_store = this._intIterStore[store_index];
             if (!int_iter_store) {
@@ -188,7 +188,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return (int_iter_store.value += Number(step));
         },
 
-        generateString: function(min, max) {
+        generateString: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -202,7 +202,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return result;
         },
 
-        generateTzDate: function(min, max) {
+        generateTzDate: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -210,7 +210,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return moment(new Date(rdate)).format(time.getLangDateFormat());
         },
 
-        generateDate: function(min, max) {
+        generateDate: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -218,7 +218,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return time.date_to_str(new Date(rdate));
         },
 
-        generateTzTime: function(min, max) {
+        generateTzTime: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -226,7 +226,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return moment(new Date(rdate)).format(time.getLangTimeFormat());
         },
 
-        generateTime: function(min, max) {
+        generateTime: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -234,7 +234,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return time.time_to_str(new Date(rdate));
         },
 
-        generateTzDateTime: function(min, max) {
+        generateTzDateTime: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -242,7 +242,7 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return moment(new Date(rdate)).format(time.getLangDatetimeFormat());
         },
 
-        generateDateTime: function(min, max) {
+        generateDateTime: function (min, max) {
             if (typeof min === "undefined") {
                 return false;
             }
@@ -250,27 +250,27 @@ odoo.define("terminal.core.ParameterGenerator", function(require) {
             return time.datetime_to_str(new Date(rdate));
         },
 
-        getTzDate: function() {
+        getTzDate: function () {
             return moment().format(time.getLangDateFormat());
         },
 
-        getDate: function() {
+        getDate: function () {
             return time.date_to_str(new Date());
         },
 
-        getTzTime: function() {
+        getTzTime: function () {
             return moment().format(time.getLangTimeFormat());
         },
 
-        getTime: function() {
+        getTime: function () {
             return time.time_to_str(new Date());
         },
 
-        getTzDateTime: function() {
+        getTzDateTime: function () {
             return moment().format(time.getLangDatetimeFormat());
         },
 
-        getDateTime: function() {
+        getDateTime: function () {
             return time.datetime_to_str(new Date());
         },
     });

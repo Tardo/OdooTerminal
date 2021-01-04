@@ -1,7 +1,7 @@
 // Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.functions.Common", function(require) {
+odoo.define("terminal.functions.Common", function (require) {
     "use strict";
 
     const tour = require("web_tour.tour");
@@ -15,7 +15,7 @@ odoo.define("terminal.functions.Common", function(require) {
             longpolling_notification: "_onBusNotification",
         }),
 
-        init: function() {
+        init: function () {
             this._super.apply(this, arguments);
 
             // Someone said 'registerCommand' ?¿?? O_o
@@ -288,7 +288,7 @@ odoo.define("terminal.functions.Common", function(require) {
             });
         },
 
-        _cmdCount: function(model, domain = "[]") {
+        _cmdCount: function (model, domain = "[]") {
             return rpc
                 .query({
                     method: "search_count",
@@ -296,19 +296,19 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: [JSON.parse(domain)],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     this.screen.print(`Result: ${result}`);
                     return result;
                 });
         },
 
-        _cmdUpdateAppList: function() {
+        _cmdUpdateAppList: function () {
             return rpc
                 .query({
                     method: "update_list",
                     model: "ir.module.module",
                 })
-                .then(result => {
+                .then((result) => {
                     if (result) {
                         this.screen.print(
                             "The apps list has been updated successfully"
@@ -320,7 +320,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdModuleDepends: function(module_name) {
+        _cmdModuleDepends: function (module_name) {
             return rpc
                 .query({
                     method: "onchange_module",
@@ -328,7 +328,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: [false, false, module_name],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     if (_.isEmpty(result)) {
                         this.screen.printError("The module isn't installed");
                     } else {
@@ -341,18 +341,18 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdPostJSONData: function(url, data) {
+        _cmdPostJSONData: function (url, data) {
             return $.ajax(url, {
                 data: data,
                 contentType: "application/json",
                 type: "POST",
-            }).then(result => {
+            }).then((result) => {
                 this.screen.print(result);
                 return result;
             });
         },
 
-        _cmdRunTour: function(tour_name) {
+        _cmdRunTour: function (tour_name) {
             const tour_names = Object.keys(tour.tours);
             if (tour_name) {
                 if (tour_names.indexOf(tour_name) === -1) {
@@ -369,7 +369,7 @@ odoo.define("terminal.functions.Common", function(require) {
             return Promise.resolve();
         },
 
-        _cmdJSTest: function(module_name, mode) {
+        _cmdJSTest: function (module_name, mode) {
             let mod = module_name || "";
             if (module_name === "*") {
                 mod = "";
@@ -382,14 +382,14 @@ odoo.define("terminal.functions.Common", function(require) {
             return Promise.resolve();
         },
 
-        _cmdShowDBList: function() {
+        _cmdShowDBList: function () {
             return ajax
                 .rpc("/jsonrpc", {
                     service: "db",
                     method: "list",
                     args: {},
                 })
-                .then(databases => {
+                .then((databases) => {
                     const databases_len = databases.length;
                     if (!databases_len) {
                         this.screen.printError("Can't get database names");
@@ -412,7 +412,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdUserHasGroups: function(groups) {
+        _cmdUserHasGroups: function (groups) {
             return rpc
                 .query({
                     method: "user_has_groups",
@@ -420,7 +420,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: [groups],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     if (result) {
                         this.screen.print("Nice! groups are truly evaluated");
                     } else {
@@ -430,7 +430,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdLoginAs: function(database, login_name, pass) {
+        _cmdLoginAs: function (database, login_name, pass) {
             let db = database;
             let login = login_name;
             let passwd = pass || false;
@@ -451,20 +451,20 @@ odoo.define("terminal.functions.Common", function(require) {
             }
             return session
                 ._session_authenticate(db, login, passwd)
-                .then(result => {
+                .then((result) => {
                     this.screen.print(`Successfully logged as '${login}'`);
                     return result;
                 });
         },
 
-        _cmdLogOut: function() {
-            return session.session_logout().then(result => {
+        _cmdLogOut: function () {
+            return session.session_logout().then((result) => {
                 this.screen.print("Logged out");
                 return result;
             });
         },
 
-        _longPollingAddChannel: function(name) {
+        _longPollingAddChannel: function (name) {
             if (typeof name === "undefined") {
                 this.screen.printError("Invalid channel name.");
             } else {
@@ -473,7 +473,7 @@ odoo.define("terminal.functions.Common", function(require) {
             }
         },
 
-        _longPollingDelChannel: function(name) {
+        _longPollingDelChannel: function (name) {
             if (typeof name === "undefined") {
                 this.screen.printError("Invalid channel name.");
             } else {
@@ -482,7 +482,7 @@ odoo.define("terminal.functions.Common", function(require) {
             }
         },
 
-        _cmdLongpolling: function(operation, name) {
+        _cmdLongpolling: function (operation, name) {
             if (!this._longpolling) {
                 return Promise.reject(
                     "Can't use longpolling, 'bus' module is not installed"
@@ -513,7 +513,7 @@ odoo.define("terminal.functions.Common", function(require) {
             return Promise.resolve();
         },
 
-        _cmdShowOdooVersion: function() {
+        _cmdShowOdooVersion: function () {
             try {
                 this.screen.print(
                     `${odoo.session_info.server_version_info
@@ -530,7 +530,7 @@ odoo.define("terminal.functions.Common", function(require) {
             return Promise.resolve();
         },
 
-        _cmdContextOperation: function(operation = "read", values = "false") {
+        _cmdContextOperation: function (operation = "read", values = "false") {
             if (operation === "read") {
                 this.screen.print(session.user_context);
             } else if (operation === "set") {
@@ -545,7 +545,7 @@ odoo.define("terminal.functions.Common", function(require) {
             return Promise.resolve();
         },
 
-        _cmdSearchModelRecordId: function(model, id, field_names) {
+        _cmdSearchModelRecordId: function (model, id, field_names) {
             let fields = ["display_name"];
             if (field_names) {
                 fields =
@@ -561,13 +561,13 @@ odoo.define("terminal.functions.Common", function(require) {
                     model: model,
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     this.screen.printRecords(model, result);
                     return result;
                 });
         },
 
-        _cmdLastSeen: function() {
+        _cmdLastSeen: function () {
             if (!this._longpolling) {
                 return Promise.reject(
                     "Can't use lastseen, 'bus' module is not installed"
@@ -581,7 +581,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     orderBy: [{name: "last_presence", asc: false}],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     let body = "";
                     const len = result.length;
                     for (let x = 0; x < len; ++x) {
@@ -599,7 +599,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdCheckModelAccess: function(model, operation) {
+        _cmdCheckModelAccess: function (model, operation) {
             return rpc
                 .query({
                     method: "check_access_rights",
@@ -607,7 +607,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: [operation, false],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     if (result) {
                         this.screen.print(
                             `You have access rights for '${operation}' on ${model}`
@@ -621,7 +621,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdCheckFieldAccess: function(model, field_names = false) {
+        _cmdCheckFieldAccess: function (model, field_names = false) {
             let fields = false;
             if (field_names) {
                 fields =
@@ -636,7 +636,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: [fields],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     const keys = Object.keys(result).sort();
                     const fieldParams = [
                         "type",
@@ -670,7 +670,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdShowWhoAmI: function() {
+        _cmdShowWhoAmI: function () {
             const uid =
                 window.odoo.session_info.uid ||
                 window.odoo.session_info.user_id;
@@ -690,7 +690,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     model: "res.users",
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     if (result.length) {
                         const record = result[0];
                         this.screen.print(
@@ -711,7 +711,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdSetDebugMode: function(mode) {
+        _cmdSetDebugMode: function (mode) {
             if (mode === 0) {
                 this.screen.print(
                     "Debug mode <strong>disabled</strong>. Reloading page..."
@@ -742,12 +742,12 @@ odoo.define("terminal.functions.Common", function(require) {
             return Promise.resolve();
         },
 
-        _cmdReloadPage: function() {
+        _cmdReloadPage: function () {
             location.reload();
             return Promise.resolve();
         },
 
-        _searchModule: function(module_name) {
+        _searchModule: function (module_name) {
             return rpc.query({
                 method: "search_read",
                 domain: [["name", "=", module_name]],
@@ -757,8 +757,8 @@ odoo.define("terminal.functions.Common", function(require) {
             });
         },
 
-        _cmdUpgradeModule: function(module_name) {
-            return this._searchModule(module_name).then(result => {
+        _cmdUpgradeModule: function (module_name) {
+            return this._searchModule(module_name).then((result) => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_upgrade",
@@ -784,8 +784,8 @@ odoo.define("terminal.functions.Common", function(require) {
             });
         },
 
-        _cmdInstallModule: function(module_name) {
-            return this._searchModule(module_name).then(result => {
+        _cmdInstallModule: function (module_name) {
+            return this._searchModule(module_name).then((result) => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_install",
@@ -811,8 +811,8 @@ odoo.define("terminal.functions.Common", function(require) {
             });
         },
 
-        _cmdUninstallModule: function(module_name) {
-            return this._searchModule(module_name).then(result => {
+        _cmdUninstallModule: function (module_name) {
+            return this._searchModule(module_name).then((result) => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_uninstall",
@@ -838,7 +838,7 @@ odoo.define("terminal.functions.Common", function(require) {
             });
         },
 
-        _cmdCallModelMethod: function(
+        _cmdCallModelMethod: function (
             model,
             method,
             args = "[]",
@@ -855,7 +855,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: JSON.parse(args),
                     kwargs: pkwargs,
                 })
-                .then(result => {
+                .then((result) => {
                     this.screen.print(result);
                     return result;
                 });
@@ -868,7 +868,7 @@ odoo.define("terminal.functions.Common", function(require) {
          * @param {String} orderBy
          * @returns {Array}
          */
-        _deserializeSort: function(orderBy) {
+        _deserializeSort: function (orderBy) {
             const res = [];
             if (!orderBy) {
                 return res;
@@ -889,7 +889,7 @@ odoo.define("terminal.functions.Common", function(require) {
             return res;
         },
 
-        _cmdSearchModelRecord: function(
+        _cmdSearchModelRecord: function (
             model,
             field_names,
             domain = "[]",
@@ -938,7 +938,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     orderBy: this._deserializeSort(order),
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     const need_truncate =
                         !this._mute_mode && result.length > lines_total;
                     let sresult = result;
@@ -962,7 +962,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdCreateModelRecord: function(model, values) {
+        _cmdCreateModelRecord: function (model, values) {
             if (typeof values === "undefined") {
                 return this.do_action({
                     type: "ir.actions.act_window",
@@ -980,7 +980,7 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: [JSON.parse(values)],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     this.screen.print(
                         this._templates.render("RECORD_CREATED", {
                             model: model,
@@ -991,7 +991,7 @@ odoo.define("terminal.functions.Common", function(require) {
                 });
         },
 
-        _cmdUnlinkModelRecord: function(model, id) {
+        _cmdUnlinkModelRecord: function (model, id) {
             return rpc
                 .query({
                     method: "unlink",
@@ -999,13 +999,13 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: [id],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     this.screen.print(`${model} record deleted successfully`);
                     return result;
                 });
         },
 
-        _cmdWriteModelRecord: function(model, id, values) {
+        _cmdWriteModelRecord: function (model, id, values) {
             return rpc
                 .query({
                     method: "write",
@@ -1013,13 +1013,13 @@ odoo.define("terminal.functions.Common", function(require) {
                     args: [id, JSON.parse(values)],
                     kwargs: {context: this._getContext()},
                 })
-                .then(result => {
+                .then((result) => {
                     this.screen.print(`${model} record updated successfully`);
                     return result;
                 });
         },
 
-        _cmdCallAction: function(action) {
+        _cmdCallAction: function (action) {
             let paction = action;
             try {
                 paction = JSON.parse(action);
@@ -1029,14 +1029,14 @@ odoo.define("terminal.functions.Common", function(require) {
             return this.do_action(paction);
         },
 
-        _cmdPostData: function(url, data) {
-            return ajax.post(url, JSON.parse(data)).then(result => {
+        _cmdPostData: function (url, data) {
+            return ajax.post(url, JSON.parse(data)).then((result) => {
                 this.screen.print(result);
             });
         },
 
         //
-        _onBusNotification: function(notifications) {
+        _onBusNotification: function (notifications) {
             const NotifDatas = Object.values(notifications.data);
             const l = NotifDatas.length;
             for (let x = 0; x < l; ++x) {

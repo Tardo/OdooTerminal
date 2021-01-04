@@ -1,7 +1,7 @@
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.Storage", function(require) {
+odoo.define("terminal.core.Storage", function (require) {
     "use strict";
 
     const Class = require("web.Class");
@@ -12,7 +12,7 @@ odoo.define("terminal.core.Storage", function(require) {
         /**
          * @param {Widget} parent - Odoo Widget
          */
-        init: function(parent) {
+        init: function (parent) {
             this._parent = parent;
         },
 
@@ -20,7 +20,7 @@ odoo.define("terminal.core.Storage", function(require) {
          * @param {String} item
          */
         // eslint-disable-next-line
-        getItem: function(item) {
+        getItem: function (item) {
             throw Error("Not Implemented!");
         },
 
@@ -29,7 +29,7 @@ odoo.define("terminal.core.Storage", function(require) {
          * @param {Object} value
          */
         // eslint-disable-next-line
-        setItem: function(item, value, on_error = false) {
+        setItem: function (item, value, on_error = false) {
             throw Error("Not Implemented!");
         },
 
@@ -37,7 +37,7 @@ odoo.define("terminal.core.Storage", function(require) {
          * @params {String} item
          */
         // eslint-disable-next-line
-        removeItem: function(item) {
+        removeItem: function (item) {
             throw Error("Not Implemented!");
         },
 
@@ -47,7 +47,7 @@ odoo.define("terminal.core.Storage", function(require) {
          * @param {Exception} err
          * @returns {Boolean}
          */
-        _checkError: function(err) {
+        _checkError: function (err) {
             if (err.name !== "QuotaExceededError") {
                 return false;
             }
@@ -67,11 +67,11 @@ odoo.define("terminal.core.Storage", function(require) {
     });
 
     const StorageSession = AbstractStorage.extend({
-        getItem: function(item) {
+        getItem: function (item) {
             return JSON.parse(sessionStorage.getItem(item)) || undefined;
         },
 
-        setItem: function(item, value, on_error = false) {
+        setItem: function (item, value, on_error = false) {
             try {
                 return sessionStorage.setItem(item, JSON.stringify(value));
             } catch (err) {
@@ -86,17 +86,17 @@ odoo.define("terminal.core.Storage", function(require) {
             return false;
         },
 
-        removeItem: function(item) {
+        removeItem: function (item) {
             return sessionStorage.removeItem(item) || undefined;
         },
     });
 
     const StorageLocal = AbstractStorage.extend({
-        getItem: function(item) {
+        getItem: function (item) {
             return JSON.parse(localStorage.getItem(item)) || undefined;
         },
 
-        setItem: function(item, value, on_error = false) {
+        setItem: function (item, value, on_error = false) {
             try {
                 return localStorage.setItem(item, JSON.stringify(value));
             } catch (err) {
@@ -111,7 +111,7 @@ odoo.define("terminal.core.Storage", function(require) {
             return false;
         },
 
-        removeItem: function(item) {
+        removeItem: function (item) {
             return localStorage.removeItem(item) || undefined;
         },
     });

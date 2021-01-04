@@ -6,7 +6,7 @@
     A first attempt for fuzzing in Odoo
 */
 
-odoo.define("terminal.functions.Fuzz", function(require) {
+odoo.define("terminal.functions.Fuzz", function (require) {
     "use strict";
 
     const Terminal = require("terminal.Terminal");
@@ -22,7 +22,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
         _minNumber: 4,
         _maxNumber: 999999,
 
-        init: function() {
+        init: function () {
             this._generators = {
                 char: this._generateCharValue.bind(this),
                 text: this._generateTextValue.bind(this),
@@ -45,7 +45,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             this._parameterGenerator = new ParameterGenerator();
         },
 
-        process: function(field, omitted_values) {
+        process: function (field, omitted_values) {
             const hasWidgetGenerator = field.widget in this._generators;
             const callback = this._generators[
                 hasWidgetGenerator ? field.widget : field.type
@@ -57,57 +57,57 @@ odoo.define("terminal.functions.Fuzz", function(require) {
         },
 
         /* CORE TYPES */
-        _generateCharValue: function() {
+        _generateCharValue: function () {
             return this._parameterGenerator.generateString(
                 this._minStr,
                 this._maxStr
             );
         },
 
-        _generateTextValue: function() {
+        _generateTextValue: function () {
             return this._parameterGenerator.generateString(
                 this._minStr,
                 this._maxStr * 10
             );
         },
 
-        _generateHTML: function() {
+        _generateHTML: function () {
             return `<p>${this._generateTextValue()}</p>`;
         },
 
-        _generateFloatValue: function() {
+        _generateFloatValue: function () {
             return this._parameterGenerator.generateFloat(
                 this._minNumber,
                 this._maxNumber
             );
         },
 
-        _generateIntValue: function() {
+        _generateIntValue: function () {
             return this._parameterGenerator.generateInt(
                 this._minNumber,
                 this._maxNumber
             );
         },
 
-        _generateDateValue: function() {
+        _generateDateValue: function () {
             const cur_time = new Date().getTime();
             return field_utils.parse.date(
                 this._parameterGenerator.generateDate(cur_time / 2, cur_time)
             );
         },
 
-        _generateDatetimeValue: function() {
+        _generateDatetimeValue: function () {
             const cur_time = new Date().getTime();
             return field_utils.parse.datetime(
                 this._parameterGenerator.generateDate(cur_time / 2, cur_time)
             );
         },
 
-        _generateSelectionValue: function(field) {
+        _generateSelectionValue: function (field) {
             return _.sample(field.values);
         },
 
-        _generateOne2ManyValue: function(field) {
+        _generateOne2ManyValue: function (field) {
             const keys = Object.keys(field.values);
             const keys_len = keys.length;
             if (!keys_len) {
@@ -128,7 +128,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             };
         },
 
-        _generateMany2OneValue: function(field, omitted_values) {
+        _generateMany2OneValue: function (field, omitted_values) {
             const value = _.sample(
                 _.difference(field.values, omitted_values || [])
             );
@@ -138,7 +138,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             return false;
         },
 
-        _generateMany2ManyValue: function(field) {
+        _generateMany2ManyValue: function (field) {
             const num = this._parameterGenerator.generateInt(
                 0,
                 field.values.length - 1
@@ -147,31 +147,31 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             if (ids.length) {
                 return {
                     operation: "ADD_M2M",
-                    ids: _.map(ids, id => Object({id: id})),
+                    ids: _.map(ids, (id) => Object({id: id})),
                 };
             }
             return false;
         },
 
-        _generateBooleanValue: function() {
+        _generateBooleanValue: function () {
             return Boolean(this._parameterGenerator.generateInt(0, 1));
         },
 
         /* WIDGETS */
-        _generatePhoneValue: function() {
+        _generatePhoneValue: function () {
             return this._parameterGenerator
                 .generateInt(100000000, 999999999)
                 .toString();
         },
 
-        _generateEmailValue: function() {
+        _generateEmailValue: function () {
             return this._parameterGenerator.generateEmail(
                 this._minStr,
                 this._maxStr
             );
         },
 
-        _generateUrlValue: function() {
+        _generateUrlValue: function () {
             return this._parameterGenerator.generateUrl(
                 this._minStr,
                 this._maxStr
@@ -180,16 +180,16 @@ odoo.define("terminal.functions.Fuzz", function(require) {
     });
 
     const FuzzForm = Class.extend({
-        init: function(term) {
+        init: function (term) {
             this._term = term;
             this._fieldValueGenerator = new FieldValueGenerator();
         },
 
-        destroy: function() {
+        destroy: function () {
             this._fieldValueGenerator.destroy();
         },
 
-        processFormFields: function(controller, fields, o2m_num_records = 1) {
+        processFormFields: function (controller, fields, o2m_num_records = 1) {
             return new Promise(async (resolve, reject) => {
                 const controller_state = controller.widget.renderer.state;
                 const controller_fields = controller_state.fields;
@@ -202,7 +202,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                     controller.widget.renderer.arch
                 );
                 if (!_.isEmpty(fields)) {
-                    fields_view = _.filter(fields_view, item => {
+                    fields_view = _.filter(fields_view, (item) => {
                         return fields.indexOf(item?.attrs.name) !== -1;
                     });
                 }
@@ -258,7 +258,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             });
         },
 
-        _convertData2State: function(data) {
+        _convertData2State: function (data) {
             const res = {};
             const keys = Object.keys(data);
             const keys_len = keys.length;
@@ -276,8 +276,8 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             return res;
         },
 
-        _fillField: function(controller, field, field_info) {
-            return new Promise(async resolve => {
+        _fillField: function (controller, field, field_info) {
+            return new Promise(async (resolve) => {
                 const local_data =
                     controller.widget.model.localData[controller.widget.handle];
                 const domain = controller.widget.model._getDomain(local_data, {
@@ -319,7 +319,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                     } else if (raw_value.operation === "ADD_M2M") {
                         raw_value = _.map(
                             raw_value.ids,
-                            item => item.id
+                            (item) => item.id
                         ).join();
                     } else if (raw_value.operation === "CREATE") {
                         raw_value = raw_value.data;
@@ -343,14 +343,14 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                     await model.trigger_up("field_changed", {
                         dataPointID: record_id,
                         changes: changes,
-                        onSuccess: datas => {
+                        onSuccess: (datas) => {
                             const fields_affected = _.reject(
                                 this._processFieldChanges(
                                     field_info.name,
                                     datas,
                                     state_data
                                 ),
-                                item => item === field_info.name
+                                (item) => item === field_info.name
                             );
                             this._term.screen.eprint(
                                 ` [i] Random value for '${field_info.name}' written`
@@ -371,7 +371,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             });
         },
 
-        _getArchFields: function(arch) {
+        _getArchFields: function (arch) {
             let fields = [];
             const childrens = arch?.children || [];
             const childrens_len = childrens.length;
@@ -388,7 +388,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             return fields;
         },
 
-        _getChangesValues: function(changes) {
+        _getChangesValues: function (changes) {
             const values = {};
             const keys = Object.keys(changes);
             const keys_len = keys.length;
@@ -400,7 +400,10 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                     if (change.operation === "ADD") {
                         values[field_name] = change.id;
                     } else if (change.operation === "ADD_M2M") {
-                        values[field_name] = _.map(change.ids, item => item.id);
+                        values[field_name] = _.map(
+                            change.ids,
+                            (item) => item.id
+                        );
                     } else if (change.operation === "CREATE") {
                         values[field_name] = change.data;
                     }
@@ -412,7 +415,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             return values;
         },
 
-        _processO2MRequiredField: function(
+        _processO2MRequiredField: function (
             parent_field_name,
             field_name,
             field_view,
@@ -436,9 +439,9 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             }
         },
 
-        _generateChangesFieldO2M: async function(field_info, widget) {
+        _generateChangesFieldO2M: async function (field_info, widget) {
             // eslint-disable-next-line
-            return new Promise(async resolve => {
+            return new Promise(async (resolve) => {
                 const changes = {};
                 changes[field_info.name] = {
                     operation: "CREATE",
@@ -535,8 +538,8 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             });
         },
 
-        _generateFieldDef: function(field, field_info = false, domain = []) {
-            return new Promise(async resolve => {
+        _generateFieldDef: function (field, field_info = false, domain = []) {
+            return new Promise(async (resolve) => {
                 const gen_field_def = {
                     type: field.type,
                     relation: field.relation,
@@ -573,7 +576,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             });
         },
 
-        _processFieldChanges: function(field_name, datas, state_data) {
+        _processFieldChanges: function (field_name, datas, state_data) {
             const fields_changed = [];
             const datas_len = datas.length;
             let index = 0;
@@ -604,7 +607,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
     });
 
     Terminal.include({
-        init: function() {
+        init: function () {
             this._super.apply(this, arguments);
 
             this.registerCommand("fuzz", {
@@ -624,7 +627,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             });
         },
 
-        _cmdFuzzActive: function(fields, o2m_num_records) {
+        _cmdFuzzActive: function (fields, o2m_num_records) {
             const current_state = this.getParent()._current_state;
             if (!current_state) {
                 return Promise.reject("Can't detect the active state!");
@@ -644,7 +647,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             return this._runFuzz(form_controller, fields, o2m_num_records);
         },
 
-        _cmdFuzz: function(model, view_ref = false) {
+        _cmdFuzz: function (model, view_ref = false) {
             return new Promise(async (resolve, reject) => {
                 try {
                     this.screen.eprint(`Opening selected ${model} form...`);
@@ -680,7 +683,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                             this.doShow();
                             return resolve(record.res_id);
                         })
-                        .catch(err => {
+                        .catch((err) => {
                             return reject(err);
                         });
                 } catch (err) {
@@ -691,7 +694,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             });
         },
 
-        _runFuzz: function(form_controller, fields, o2m_num_records) {
+        _runFuzz: function (form_controller, fields, o2m_num_records) {
             return new Promise(async (resolve, reject) => {
                 try {
                     this.screen.eprint("Writing random values...");
@@ -705,7 +708,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
                         o2m_num_records
                     );
                     const required_count = _.size(
-                        _.filter(processed_fields, field => field.required)
+                        _.filter(processed_fields, (field) => field.required)
                     );
                     this.screen.eprint(
                         ` - Founded ${_.size(
@@ -725,7 +728,7 @@ odoo.define("terminal.functions.Fuzz", function(require) {
             });
         },
 
-        _getController: function(controller_id) {
+        _getController: function (controller_id) {
             return this.getParent().action_manager.controllers[controller_id];
         },
     });

@@ -4,7 +4,7 @@
 /**
  * This file is 'only' for better readability of the source.
  */
-odoo.define("terminal.core.TemplateManager", function(require) {
+odoo.define("terminal.core.TemplateManager", function (require) {
     "use strict";
 
     const Class = require("web.Class");
@@ -82,11 +82,11 @@ odoo.define("terminal.core.TemplateManager", function(require) {
             DEPRECATED_COMMAND: `** This command is deprecated, please use '<%= cmd %>' instead.`,
         },
 
-        render: function(templateid, values) {
+        render: function (templateid, values) {
             return _.template(this.TEMPLATES[templateid])(values);
         },
 
-        get: function(templateid) {
+        get: function (templateid) {
             return this.TEMPLATES[templateid];
         },
     });
