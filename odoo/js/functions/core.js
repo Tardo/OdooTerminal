@@ -19,6 +19,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     "<> ~> Required Parameter<br/>- [] ~> Optional Parameter",
                 syntaxis: "[STRING: COMMAND]",
                 args: "?s",
+                example: "search",
             });
             this.registerCommand("clear", {
                 definition: "Clean terminal section (screen by default)",
@@ -26,6 +27,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Available sections: screen (default), history.",
                 syntaxis: "[STRING: SECTION]",
                 args: "?s",
+                example: "history",
             });
             this.registerCommand("print", {
                 definition: "Print a message",
@@ -33,6 +35,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Eval parameters and print the result.",
                 syntaxis: "<STRING: MSG>",
                 args: "",
+                example: "This is a example",
             });
             this.registerCommand("load", {
                 definition: "Load external resource",
@@ -40,6 +43,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Load external source (javascript & css)",
                 syntaxis: "<STRING: URL>",
                 args: "s",
+                example: "https://example.com/libs/term_extra.js",
             });
             this.registerCommand("context_term", {
                 definition: "Operations over terminal context dictionary",
@@ -51,6 +55,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     "By default is 'read'. ",
                 syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
                 args: "?ss",
+                example: "write &quot;{'the_example': 1}&quot;",
             });
             this.registerCommand("alias", {
                 definition: "Create aliases",
@@ -67,6 +72,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: "?s*",
                 sanitized: false,
                 generators: false,
+                example: "myalias print &quot;Hello, $1!&quot;",
             });
             this.registerCommand("quit", {
                 definition: "Close terminal",
@@ -83,6 +89,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: "*",
                 sanitized: false,
                 generators: false,
+                example: "search res.partner",
             });
             this.registerCommand("exportfile", {
                 definition: "Exports the command result to a text/json file",
@@ -92,6 +99,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: "*",
                 sanitized: false,
                 generators: false,
+                example: "search res.partner",
             });
             this.registerCommand("chrono", {
                 definition: "Print the time expended executing a command",
@@ -103,6 +111,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: "*",
                 sanitized: false,
                 generators: false,
+                example: "search res.partner",
             });
             this.registerCommand("repeat", {
                 definition: "Repeat a command N times",
@@ -112,6 +121,8 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: "i*",
                 sanitized: false,
                 generators: false,
+                example:
+                    "20 create res.partner &quot;{'name': 'Example Partner #$INTITER'}&quot;",
             });
             this.registerCommand("mute", {
                 definition: "Only prints errors",
@@ -122,6 +133,8 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: "*",
                 sanitized: false,
                 generators: false,
+                example:
+                    "repeat 20 create res.partner &quot;{'name': 'Example Partner #$INTITER'}&quot;",
             });
         },
 
@@ -142,6 +155,15 @@ odoo.define("terminal.functions.Core", function (require) {
                     def: cmd_def.definition,
                 })
             );
+        },
+
+        _printHelpDetailed: function (cmd, cmd_def) {
+            this.screen.print(cmd_def.detail);
+            this.screen.print(" ");
+            this.screen.eprint(`Syntaxis: ${cmd} ${cmd_def.syntaxis}`);
+            if (cmd_def.example) {
+                this.screen.eprint(`Example: ${cmd} ${cmd_def.example}`);
+            }
         },
 
         _cmdPrintHelp: function (cmd) {
@@ -170,12 +192,6 @@ odoo.define("terminal.functions.Core", function (require) {
                 }
             }
             return Promise.resolve();
-        },
-
-        _printHelpDetailed: function (cmd, cmd_def) {
-            this.screen.print(cmd_def.detail);
-            this.screen.print(" ");
-            this.screen.eprint(`Syntaxis: ${cmd} ${cmd_def.syntaxis}`);
         },
 
         _cmdClear: function (section) {

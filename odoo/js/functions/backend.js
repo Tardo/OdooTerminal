@@ -23,6 +23,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                 syntaxis:
                     "<STRING: MODEL NAME> [INT: RECORD ID] [STRING: VIEW REF]",
                 args: "s?is",
+                example: "res.partner 10 base.view_partner_simple_form",
             });
             this.registerCommand("settings", {
                 definition: "Open settings page",
@@ -32,6 +33,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                     "<br>[MODULE NAME] The module technical name (default is 'general_settings')",
                 syntaxis: "[STRING: MODULE NAME]",
                 args: "?s",
+                example: "sale_management",
             });
         },
 

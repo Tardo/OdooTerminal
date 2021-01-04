@@ -180,6 +180,7 @@ odoo.define("terminal.Terminal", function (require) {
                     aliases: [],
                     sanitized: true,
                     generators: true,
+                    example: "",
                 },
                 cmd_def
             );

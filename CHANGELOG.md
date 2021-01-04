@@ -6,8 +6,10 @@
 IMP: Print to screen performance
 IMP: Fuzz feature
 IMP: Loops performance
+IMP: Only start the terminal if needed
 
-ADD: Command 'fuzz_active': Fill fields on the active form
+ADD: Help examples
+ADD: Command 'fill': Fill fields on the active form
 ```
 
 **7.1.0**
