@@ -195,8 +195,11 @@ odoo.define("terminal.core.ParameterGenerator", function (require) {
             const rlen = this.generateInt(min, max);
             let result = "";
             let index = 0;
-            while (index < rlen) {
-                result += this._rndLetter[index];
+            for (const letter of this._rndLetter) {
+                if (index >= rlen) {
+                    break;
+                }
+                result += letter;
                 ++index;
             }
             return result;

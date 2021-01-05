@@ -30,7 +30,7 @@ rules:
       ignoreInlineComments: true
   complexity:
     - warn
-    - 11
+    - 13
   constructor-super: warn
   dot-notation: warn
   eqeqeq: warn

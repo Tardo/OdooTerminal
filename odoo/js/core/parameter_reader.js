@@ -21,10 +21,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 s: this._formatString,
                 i: this._formatInt,
             };
-            this._regexSanitize = new RegExp("'", "g");
+            this._regexSanitize = new RegExp(/'/g);
             this._regexParams = new RegExp(
-                /(["'])(?:(?=(\\?))\2.)*?\1|[^\s]+/,
-                "g"
+                /(["'])(?:(?=(\\?))\2.)*?\1|[^\s]+/g
             );
             this._regexArgs = new RegExp(/[l?*]/);
             this._parameterGenerator = new ParameterGenerator();
@@ -100,6 +99,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     carg = args[++i];
                     list_mode = true;
                 } else if (carg === "*") {
+                    // No more 'carg' will be interpreted
                     for (; checkedCount < params.length; ++checkedCount) {
                         formatted_params.push(
                             this._formatters.s(params[checkedCount])
@@ -107,9 +107,25 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     }
                     break;
                 }
+
                 // Parameter validation & formatting
                 const param = params[checkedCount];
-                if (!this._validators[carg](param, list_mode)) {
+
+                if (carg === "-") {
+                    const formatted_param = this._tryAllFormatters(
+                        param,
+                        list_mode
+                    );
+                    if (!_.isNull(formatted_param)) {
+                        formatted_params.push(formatted_param);
+                        ++checkedCount;
+                        continue;
+                    }
+
+                    // Not found any compatible formatter
+                    // fallback to generic string
+                    carg = "s";
+                } else if (!this._validators[carg](param, list_mode)) {
                     break;
                 }
                 formatted_params.push(this._formatters[carg](param, list_mode));
@@ -145,6 +161,22 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          */
         resetStores: function () {
             this._parameterGenerator.resetStores();
+        },
+
+        _tryAllFormatters: function (param, list_mode) {
+            // Try all possible validators/formatters
+            let formatted_param = null;
+            for (const key in this._validators) {
+                if (key === "s") {
+                    continue;
+                }
+                if (this._validators[key](param, list_mode)) {
+                    formatted_param = this._formatters[key](param, list_mode);
+                    break;
+                }
+            }
+
+            return formatted_param;
         },
 
         /**

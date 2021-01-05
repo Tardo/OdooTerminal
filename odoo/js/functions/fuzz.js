@@ -189,7 +189,12 @@ odoo.define("terminal.functions.Fuzz", function (require) {
             this._fieldValueGenerator.destroy();
         },
 
-        processFormFields: function (controller, fields, o2m_num_records = 1) {
+        processFormFields: function (
+            controller,
+            fields,
+            def_value,
+            o2m_num_records = 1
+        ) {
             return new Promise(async (resolve, reject) => {
                 const controller_state = controller.widget.renderer.state;
                 const controller_fields = controller_state.fields;
@@ -240,7 +245,8 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                                 ] = await this._fillField(
                                     controller,
                                     field,
-                                    field_info
+                                    field_info,
+                                    def_value
                                 );
                                 processed[field_name] = field_def;
                                 fields_ignored = _.union(
@@ -276,7 +282,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
             return res;
         },
 
-        _fillField: function (controller, field, field_info) {
+        _fillField: function (controller, field, field_info, def_value) {
             return new Promise(async (resolve) => {
                 const local_data =
                     controller.widget.model.localData[controller.widget.handle];
@@ -301,6 +307,13 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                         field_info,
                         controller.widget
                     );
+                    if (def_value) {
+                        changes[field_info.name].data = $.extend(
+                            true,
+                            changes[field_info.name].data,
+                            def_value
+                        );
+                    }
                 } else {
                     gen_field_def = await this._generateFieldDef(
                         field,
@@ -310,6 +323,17 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                     changes[
                         field_info.name
                     ] = this._fieldValueGenerator.process(gen_field_def);
+                    if (def_value) {
+                        if (field.type === "many2one") {
+                            changes[field_info.name].id = Number(def_value);
+                        } else if (field.type === "many2many") {
+                            changes[field_info.name].ids.push(
+                                Number(def_value)
+                            );
+                        } else {
+                            changes[field_info.name] = def_value;
+                        }
+                    }
                 }
                 // Get the raw value to human printing
                 let raw_value = changes[field_info.name];
@@ -368,6 +392,8 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                         ` [x] Can't write the value for '${field_info.name}': ${err}`
                     );
                 }
+
+                return resolve([false, false]);
             });
         },
 
@@ -469,6 +495,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                                 field_info.mode
                             ][field_view_name];
                         if (!field_info_view) {
+                            ++index;
                             continue;
                         }
                         const is_invisible = utils.toBoolElse(
@@ -482,6 +509,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                             field_view_name.startsWith("_") ||
                             field_view_name === "id"
                         ) {
+                            ++index;
                             continue;
                         }
 
@@ -618,37 +646,38 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 args: "s?s",
                 example: "res.partner base.view_partner_simple_form",
             });
-            this.registerCommand("fill", {
+            this.registerCommand("fuzz_fill", {
                 definition:
                     "Fill a field with a random or given values on the active form",
-                callback: this._cmdFuzzActive,
+                callback: this._cmdFuzzFill,
                 detail:
                     "Fill a field/s with a random or given values on the active form",
                 syntaxis:
-                    "[LIST: FIELDS] [STRING: VALUES] [INT: O2M RECORDS COUNT]",
-                args: "ls?i",
-                example: "sale.order &quot;{'type_line': false}&quot; 4",
+                    "[LIST: FIELDS] [STRING/INT: VALUE/S] [INT: O2M RECORDS COUNT]",
+                args: "ls?-i",
+                example: "order_line \"{'display_type': false}\" 4",
             });
         },
 
-        _cmdFuzzActive: function (fields, o2m_num_records) {
-            const current_state = this.getParent()._current_state;
-            if (!current_state) {
-                return Promise.reject("Can't detect the active state!");
+        _cmdFuzzFill: function (fields, values, o2m_num_records) {
+            let ovalues = values;
+            if (typeof ovalues !== "undefined") {
+                ovalues = JSON.parse(values);
             }
-            const current_action = _.find(
-                this.getParent().action_manager.actions,
-                {
-                    id: Number(current_state.action),
-                }
-            );
-            if (!current_action) {
-                return Promise.reject("Can't found the active action!");
+            const controller_stack = this.getParent().action_manager
+                .controllerStack;
+            if (!controller_stack.length) {
+                return Promise.reject("Can't detect any controller");
             }
-            const form_controller = this._getController(
-                current_action.controllerID
+            const controller = this._getController(
+                controller_stack[controller_stack.length - 1]
             );
-            return this._runFuzz(form_controller, fields, o2m_num_records);
+            if (controller.viewType !== "form") {
+                return Promise.reject(
+                    "The current controller is not for a form view"
+                );
+            }
+            return this._runFuzz(controller, fields, ovalues, o2m_num_records);
         },
 
         _cmdFuzz: function (model, view_ref = false) {
@@ -698,7 +727,12 @@ odoo.define("terminal.functions.Fuzz", function (require) {
             });
         },
 
-        _runFuzz: function (form_controller, fields, o2m_num_records) {
+        _runFuzz: function (
+            form_controller,
+            fields,
+            def_values,
+            o2m_num_records
+        ) {
             return new Promise(async (resolve, reject) => {
                 try {
                     this.screen.eprint("Writing random values...");
@@ -709,6 +743,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                     ] = await fuzz_form.processFormFields(
                         form_controller,
                         fields,
+                        def_values,
                         o2m_num_records
                     );
                     const required_count = _.size(
@@ -725,7 +760,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                         )} fields affected by an 'onchange'`
                     );
                 } catch (err) {
-                    return reject();
+                    return reject(err);
                 }
 
                 return resolve();

@@ -18,10 +18,10 @@ odoo.define("terminal.Terminal", function (require) {
     const Terminal = Widget.extend({
         VERSION: "7.1.0",
 
-        custom_events: {},
         events: {
             "click .o_terminal_cmd": "_onClickTerminalCommand",
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
+            "click .terminal-screen-icon-pin": "_onClickToggleScreenPin",
         },
 
         _registeredCmds: {},
@@ -108,7 +108,20 @@ odoo.define("terminal.Terminal", function (require) {
             this._injectTerminal();
             this._initGuard();
 
+            // Custom Events
+            this.$el[0].addEventListener("toggle", this.doToggle.bind(this));
+
             this._isLoaded = false;
+
+            // Pinned
+            this._pinned = this._storage.getItem("terminal_pinned");
+            if (this._pinned) {
+                this.start();
+                this.doShow();
+                this.$(".terminal-screen-icon-pin")
+                    .removeClass("btn-dark")
+                    .addClass("btn-light");
+            }
         },
 
         start: function () {
@@ -116,8 +129,6 @@ odoo.define("terminal.Terminal", function (require) {
 
             this.screen.start(this.$el);
 
-            // Custom Events
-            this.$el[0].addEventListener("toggle", this.doToggle.bind(this));
             this.$runningCmdCount = this.$("#terminal_running_cmd_count");
 
             const cachedScreen = this._storage.getItem("terminal_screen");
@@ -260,8 +271,11 @@ odoo.define("terminal.Terminal", function (require) {
                     "<div id='terminal' class='o_terminal'>" +
                     "<div class='terminal-screen-info-zone'>" +
                     "<span class='terminal-screen-running-cmds' id='terminal_running_cmd_count' />" +
-                    "<div class='btn btn-sm btn-dark terminal-screen-icon-maximize p-2' role='button'>" +
+                    "<div class='btn btn-sm btn-dark terminal-screen-icon-maximize p-2' role='button' title='Maximize'>" +
                     "<i class='fa fa-window-maximize'></i>" +
+                    "</div>" +
+                    "<div class='btn btn-sm btn-dark terminal-screen-icon-pin p-2' role='button' title='Pin'>" +
+                    "<i class='fa fa-map-pin'></i>" +
                     "</div>" +
                     "</div>" +
                     "</div>" +
@@ -673,6 +687,20 @@ odoo.define("terminal.Terminal", function (require) {
             this.screen.preventLostInputFocus();
         },
 
+        _onClickToggleScreenPin: function (ev) {
+            const $target = $(ev.currentTarget);
+            this._pinned = !this._storage.getItem("terminal_pinned");
+            this._storage.setItem("terminal_pinned", this._pinned, (err) =>
+                this.screen.printHTML(err)
+            );
+            if (this._pinned) {
+                $target.removeClass("btn-dark").addClass("btn-light");
+            } else {
+                $target.removeClass("btn-light").addClass("btn-dark");
+            }
+            this.screen.preventLostInputFocus();
+        },
+
         _onKeyEnter: function () {
             this.executeCommand(this.screen.getUserInput());
             this._searchCommandQuery = undefined;
@@ -763,7 +791,8 @@ odoo.define("terminal.Terminal", function (require) {
                 this.$el &&
                 !this.$el[0].contains(ev.target) &&
                 this._isTerminalVisible() &&
-                !this._storage.getItem("screen_maximized")
+                !this._storage.getItem("screen_maximized") &&
+                !this._pinned
             ) {
                 this.doHide();
             }

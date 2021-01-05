@@ -55,7 +55,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     "By default is 'read'. ",
                 syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
                 args: "?ss",
-                example: "write &quot;{'the_example': 1}&quot;",
+                example: "write \"{'the_example': 1}\"",
             });
             this.registerCommand("alias", {
                 definition: "Create aliases",
@@ -72,7 +72,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: "?s*",
                 sanitized: false,
                 generators: false,
-                example: "myalias print &quot;Hello, $1!&quot;",
+                example: 'myalias print "Hello, $1!"',
             });
             this.registerCommand("quit", {
                 definition: "Close terminal",
@@ -117,12 +117,12 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Repeat a command N times",
                 callback: this._cmdRepeat,
                 detail: "Repeat a command N times.",
-                syntaxis: "<INT: Times> <STRING: COMMAND>",
+                syntaxis: "<INT: TIMES> <STRING: COMMAND>",
                 args: "i*",
                 sanitized: false,
                 generators: false,
                 example:
-                    "20 create res.partner &quot;{'name': 'Example Partner #$INTITER'}&quot;",
+                    "20 create res.partner \"{'name': 'Example Partner #$INTITER'}\"",
             });
             this.registerCommand("mute", {
                 definition: "Only prints errors",
@@ -134,7 +134,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 sanitized: false,
                 generators: false,
                 example:
-                    "repeat 20 create res.partner &quot;{'name': 'Example Partner #$INTITER'}&quot;",
+                    "repeat 20 create res.partner \"{'name': 'Example Partner #$INTITER'}\"",
             });
         },
 

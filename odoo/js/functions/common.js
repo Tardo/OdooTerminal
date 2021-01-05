@@ -25,7 +25,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Open new model record in form view or directly.",
                 syntaxis: '<STRING: MODEL NAME> "[DICT: VALUES]"',
                 args: "s?s",
-                example: "res.partner &quot;{'name': 'Poldoore'}&quot;",
+                example: "res.partner \"{'name': 'Poldoore'}\"",
             });
             this.registerCommand("unlink", {
                 definition: "Unlink record",
@@ -44,8 +44,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     '"<DICT: NEW VALUES>"',
                 args: "slis",
-                example:
-                    "res.partner 10,4,2 &quot;{'street': 'Diagon Alley'}&quot;",
+                example: "res.partner 10,4,2 \"{'street': 'Diagon Alley'}\"",
             });
             this.registerCommand("search", {
                 definition: "Search model record/s",
@@ -130,7 +129,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Send POST request to selected endpoint",
                 syntaxis: '<STRING: ENDPOINT> "<DICT: DATA>"',
                 args: "ss",
-                example: "/web/endpoint &quot;{'the_example': 42}&quot;",
+                example: "/web/endpoint \"{'the_example': 42}\"",
             });
             this.registerCommand("whoami", {
                 definition: "Know current user login",
@@ -145,7 +144,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Show readable/writeable fields of the selected model",
                 syntaxis: '<STRING: MODEL> "[LIST: FIELDS]"',
                 args: "s?ls",
-                example: "res.partner &quot;name,street&quot;",
+                example: 'res.partner "name,street"',
             });
             this.registerCommand("cam", {
                 definition: "Check model access",
@@ -172,7 +171,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail:
                     "Launch orm search query.<br>[FIELDS] " +
                     "are separated by commas (without spaces) and by default " +
-                    "is 'display_name'",
+                    "is 'display_name'. Can use '*' to show all fields.",
                 syntaxis:
                     "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     "[STRING: FIELDS]",
@@ -188,7 +187,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "By default is 'read'. ",
                 syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
                 args: "?ss",
-                example: "write &quot;{'the_example': 1}&quot;",
+                example: "write \"{'the_example': 1}\"",
             });
             this.registerCommand("version", {
                 definition: "Know Odoo version",
@@ -275,7 +274,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Sends HTTP POST 'application/json' request",
                 syntaxis: '<STRING: ENDPOINT> "<DICT: DATA>"',
                 args: "ss",
-                example: "/web/endpoint &quot;{'the_example': 42}&quot;",
+                example: "/web/endpoint \"{'the_example': 42}\"",
             });
             this.registerCommand("depends", {
                 definition: "Know modules that depends on the given module",
