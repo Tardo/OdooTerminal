@@ -309,6 +309,51 @@ odoo.define("terminal.functions.Common", function (require) {
                 args: "s?s",
                 example: "res.partner ['name', '=ilike', 'A%']",
             });
+            this.registerCommand("ref", {
+                definition: "Resolves xmlid to model and resource id",
+                callback: this._cmdRef,
+                detail: "Resolves xmlid to model and resource id",
+                syntaxis: "<ARRAY: STRING XML ID>",
+                args: "ls",
+                example: "ref base.model_res_partner,base.model_res_partner",
+            });
+        },
+
+        _cmdRef: function (xmlids) {
+            const tasks = [];
+            for (const xmlid of xmlids) {
+                tasks.push(
+                    rpc
+                        .query({
+                            method: "xmlid_to_res_model_res_id",
+                            model: "ir.model.data",
+                            args: [xmlid],
+                            kwargs: {context: this._getContext()},
+                        })
+                        .then(
+                            function (xmlid, result) {
+                                return [xmlid, result[0], result[1]];
+                            }.bind(this, xmlid)
+                        )
+                );
+            }
+
+            return Promise.all(tasks).then((results) => {
+                let body = "";
+                const len = results.length;
+                for (let x = 0; x < len; ++x) {
+                    const item = results[x];
+                    body +=
+                        `<tr><td>${item[0]}</td>` +
+                        `<td>${item[1]}</td>` +
+                        `<td>${item[2]}</td></tr>`;
+                }
+                this.screen.printTable(
+                    ["XML ID", "Res. Model", "Res. ID"],
+                    body
+                );
+                return results;
+            });
         },
 
         _cmdCount: function (model, domain = "[]") {
