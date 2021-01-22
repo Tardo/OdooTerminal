@@ -315,7 +315,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Resolves xmlid to model and resource id",
                 syntaxis: "<ARRAY: STRING XML ID>",
                 args: "ls",
-                example: "ref base.model_res_partner,base.model_res_partner",
+                example: "base.main_company,base.model_res_partner",
             });
         },
 
@@ -331,8 +331,8 @@ odoo.define("terminal.functions.Common", function (require) {
                             kwargs: {context: this._getContext()},
                         })
                         .then(
-                            function (xmlid, result) {
-                                return [xmlid, result[0], result[1]];
+                            function (active_xmlid, result) {
+                                return [active_xmlid, result[0], result[1]];
                             }.bind(this, xmlid)
                         )
                 );
