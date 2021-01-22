@@ -248,11 +248,14 @@ odoo.define("terminal.functions.Core", function (require) {
             const aliases =
                 this._storageLocal.getItem("terminal_aliases") || {};
             if (!name) {
-                const alias_names = Object.keys(aliases);
-                if (alias_names.length) {
-                    this.screen.print(alias_names);
-                } else {
+                if (_.isEmpty(aliases)) {
                     this.screen.print("No aliases defined.");
+                } else {
+                    for (const alias_name in aliases) {
+                        this.screen.printHTML(
+                            ` - ${alias_name}  <small class="text-muted"><i>${aliases[alias_name]}</i></small>`
+                        );
+                    }
                 }
             } else if (name in this._registeredCmds) {
                 this.screen.printError("Invalid alias name");

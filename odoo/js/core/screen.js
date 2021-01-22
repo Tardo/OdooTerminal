@@ -22,7 +22,7 @@ odoo.define("terminal.core.Screen", function (require) {
             this._templates = new TemplateManager();
             this._linesCounter = 0;
             this._lazyVacuum = _.debounce(() => this._vacuum(), 650);
-            this._buff = [];
+            this._buff = "";
         },
 
         start: function () {
@@ -93,15 +93,8 @@ odoo.define("terminal.core.Screen", function (require) {
         /* PRINT */
         flush: function () {
             this._rafID = null;
-            if (this._buff.length > this._max_lines) {
-                this.$screen[0].innerHTML = this._buff.join("");
-            } else {
-                this.$screen[0].insertAdjacentHTML(
-                    "beforeend",
-                    this._buff.join("")
-                );
-            }
-            this._buff = [];
+            this.$screen.append(this._buff);
+            this._buff = "";
             this._lazyVacuum();
             this.scrollDown();
             if ("onSaveScreen" in this._options) {
@@ -110,7 +103,7 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         printHTML: function (html) {
-            this._buff.push(html);
+            this._buff += html;
             if (this._rafID) {
                 window.cancelAnimationFrame(this._rafID);
             }
