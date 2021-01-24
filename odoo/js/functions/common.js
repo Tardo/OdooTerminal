@@ -713,6 +713,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         "required",
                         "readonly",
                         "searchable",
+                        "translate",
                         "depends",
                     ];
                     let body = "";
