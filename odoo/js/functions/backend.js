@@ -1,7 +1,7 @@
 // Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.functions.Backend", function(require) {
+odoo.define("terminal.functions.Backend", function (require) {
     "use strict";
 
     const dialogs = require("web.view_dialogs");
@@ -12,7 +12,7 @@ odoo.define("terminal.functions.Backend", function(require) {
             "click .o_terminal_view": "_onClickTerminalView",
         }),
 
-        init: function() {
+        init: function () {
             this._super.apply(this, arguments);
 
             this.registerCommand("view", {
@@ -23,6 +23,7 @@ odoo.define("terminal.functions.Backend", function(require) {
                 syntaxis:
                     "<STRING: MODEL NAME> [INT: RECORD ID] [STRING: VIEW REF]",
                 args: "s?is",
+                example: "res.partner 10 base.view_partner_simple_form",
             });
             this.registerCommand("settings", {
                 definition: "Open settings page",
@@ -32,10 +33,11 @@ odoo.define("terminal.functions.Backend", function(require) {
                     "<br>[MODULE NAME] The module technical name (default is 'general_settings')",
                 syntaxis: "[STRING: MODULE NAME]",
                 args: "?s",
+                example: "sale_management",
             });
         },
 
-        _cmdOpenSettings: function(module = "general_settings") {
+        _cmdOpenSettings: function (module = "general_settings") {
             return this.do_action({
                 name: "Settings",
                 type: "ir.actions.act_window",
@@ -47,8 +49,8 @@ odoo.define("terminal.functions.Backend", function(require) {
             }).then(() => this.doHide());
         },
 
-        _cmdViewModelRecord: function(model, id, view_ref = false) {
-            const context = _.extend({}, this._getContext(), {
+        _cmdViewModelRecord: function (model, id, view_ref = false) {
+            const context = this._getContext({
                 form_view_ref: view_ref,
             });
             if (id) {
@@ -66,7 +68,7 @@ odoo.define("terminal.functions.Backend", function(require) {
                 res_model: model,
                 title: "Select a record",
                 disable_multiple_selection: true,
-                on_selected: records => {
+                on_selected: (records) => {
                     this.do_action({
                         type: "ir.actions.act_window",
                         name: "View Record",
@@ -83,7 +85,7 @@ odoo.define("terminal.functions.Backend", function(require) {
         },
 
         //
-        _onClickTerminalView: function(ev) {
+        _onClickTerminalView: function (ev) {
             if (
                 Object.prototype.hasOwnProperty.call(
                     ev.target.dataset,

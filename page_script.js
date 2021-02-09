@@ -4,7 +4,7 @@
  * This script is used to collect information about Odoo (if can do it) used
  * to know if can run the terminal and how do it.
  */
-(function() {
+(function () {
     "use strict";
 
     // Flag to run the script once
@@ -50,7 +50,7 @@
         if (foundVer && foundVer.length) {
             gOdooInfo.serverVersionMajor = foundVer[0];
         }
-        const cvers = COMPATIBLE_VERS.filter(function(item) {
+        const cvers = COMPATIBLE_VERS.filter(function (item) {
             return gOdooInfo.serverVersion.startsWith(item);
         });
         if (cvers.length) {
@@ -116,14 +116,14 @@
      */
     function _forceOdooServerVersionDetection() {
         try {
-            gOdooObj.define(0, require => {
+            gOdooObj.define(0, (require) => {
                 require("web.core");
                 _createServiceRpc(
                     {
                         service: "db",
                         method: "server_version",
                     },
-                    rpc_response => {
+                    (rpc_response) => {
                         const version = rpc_response.result;
                         if (
                             !_.isUndefined(version) &&

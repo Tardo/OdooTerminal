@@ -1,5 +1,24 @@
 # Changelog
 
+**7.2.0**
+
+```
+IMP: Print to screen performance
+IMP: Fuzz feature
+IMP: Loops performance
+IMP: Only start the terminal if needed
+IMP: Shows an alert if try close the tab with running jobs
+
+ADD: Help examples
+ADD: Command 'fuzz_field': Fill fields on the active form
+ADD: Command 'ref': Show the referenced model and id of the given xmlid's
+ADD: Command 'jobs': Show running jobs
+
+FIX: Command 'post': Send correct payload
+FIX: Command 'mute': Don't mute other jobs
+FIX: Command 'repeat': Don't block main thread
+```
+
 **7.1.0**
 
 ```

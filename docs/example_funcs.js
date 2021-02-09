@@ -1,4 +1,4 @@
-odoo.define("terminal.MyFuncs", function(require) {
+odoo.define("terminal.MyFuncs", function (require) {
     "use strict";
 
     const Terminal = require("terminal.Terminal").terminal;
@@ -7,7 +7,7 @@ odoo.define("terminal.MyFuncs", function(require) {
         /**
          * @override
          */
-        init: function() {
+        init: function () {
             this._super.apply(this, arguments);
 
             this.registerCommand("mycommand", {
@@ -37,7 +37,7 @@ odoo.define("terminal.MyFuncs", function(require) {
          * @param {Int} param_d
          * @returns {Promise}
          */
-        _cmdMyFunc: function(
+        _cmdMyFunc: function (
             param_a,
             param_b,
             param_c = "DefaultValue",
@@ -64,13 +64,16 @@ odoo.define("terminal.MyFuncs", function(require) {
 
         /**
          * Async/await workaround example
-         * This is necessary to don't brake the inheritance chain
+         * This is necessary to don't brake the inheritance chain.
+         * This results in two promises, one awaitable and other
+         * wrapping them. So for this reason you must use 'return' to
+         * finalize the awaitable promise and propagate the results.
          *
          * @param {Int} param_a
          * @param {Int} param_b
          * @returns {Promise}
          */
-        _cmdMyAsyncFunc: function(param_a, param_b) {
+        _cmdMyAsyncFunc: function (param_a, param_b) {
             return new Promise(async (resolve, reject) => {
                 const result = await Promise.resolve(param_a);
                 const other_result = await Promise.resolve(param_b);

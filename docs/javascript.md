@@ -45,6 +45,7 @@ Commands uses promises
   - '\*' All the rest (unknown) of params are formatted as string
   - 'l' Indicates that the next parameter can be a list (a list is a string of
     values separted by commas. Example: "1, 3, 5")
+  - '-' Avoid check type, the param are formatted as string
 - secured: Hide command from screen & history (default is false)
 - aliases: Used to set deprecated names of the module
 - sanitized: Truncate single quotes (default is true)

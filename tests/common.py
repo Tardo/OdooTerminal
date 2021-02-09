@@ -13,10 +13,10 @@ class SeleniumTestCase(unittest.TestCase):
 
     _ODOO_SERVERS = {
         'ce': {
-            '11': 'https://runbot.odoo-community.org/runbot/162/11.0',
-            '12': 'https://runbot.odoo-community.org/runbot/162/12.0',
-            '13': 'https://runbot.odoo-community.org/runbot/162/13.0',
-            #'14': 'http://runbot.odoo.com/runbot/quick_connect/1',
+            '11': 'https://runbot.odoo-community.org/runbot/189/11.0',
+            '12': 'https://runbot.odoo-community.org/runbot/189/12.0',
+            '13': 'https://runbot.odoo-community.org/runbot/189/13.0',
+            '14': 'https://runbot.odoo-community.org/runbot/189/14.0',
         },
         # 'ee': {
         #     '11': 'http://runbot.odoo.com/runbot/quick_connect/33836',

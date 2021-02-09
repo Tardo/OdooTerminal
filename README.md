@@ -132,6 +132,13 @@ For example:
 - A somewhat more complex:
   `alias search_mod search ir.module.module display_name "[['name', '=', '$1'], ['state', '=', '$2[installed]']]"`
 
+#### + Massive operations
+
+Massive operations are possible using the command `repeat`. Print to screen is a
+expensive task, consider use the command `mute` to increase the performance.
+
+Example: `repeat 5000 mute create res.partner "{'name': '$STR[12] (Test)'}"`
+
 ---
 
 # Extension Permissions
@@ -157,7 +164,7 @@ For example:
 
 # License
 
-Copyright 2019-2020 Alexandre Díaz & contributors
+Copyright 2019-2021 Alexandre Díaz & contributors
 
 AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 

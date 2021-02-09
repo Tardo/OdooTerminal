@@ -1,7 +1,7 @@
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.ParameterReader", function(require) {
+odoo.define("terminal.core.ParameterReader", function (require) {
     "use strict";
 
     const ParameterGenerator = require("terminal.core.ParameterGenerator");
@@ -12,7 +12,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
      * This class is used to parse terminal command parameters.
      */
     const ParameterReader = Class.extend({
-        init: function() {
+        init: function () {
             this._validators = {
                 s: this._validateString,
                 i: this._validateInt,
@@ -21,10 +21,9 @@ odoo.define("terminal.core.ParameterReader", function(require) {
                 s: this._formatString,
                 i: this._formatInt,
             };
-            this._regexSanitize = new RegExp("'", "g");
+            this._regexSanitize = new RegExp(/'/g);
             this._regexParams = new RegExp(
-                /(["'])(?:(?=(\\?))\2.)*?\1|[^\s]+/,
-                "g"
+                /(["'])(?:(?=(\\?))\2.)*?\1|[^\s]+/g
             );
             this._regexArgs = new RegExp(/[l?*]/);
             this._parameterGenerator = new ParameterGenerator();
@@ -36,8 +35,8 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {String} separator
          * @returns {Array}
          */
-        splitAndTrim: function(text, separator) {
-            return _.map(text.split(separator), item => item.trim());
+        splitAndTrim: function (text, separator) {
+            return _.map(text.split(separator), (item) => item.trim());
         },
 
         /**
@@ -46,13 +45,13 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {Object} cmd_def
          * @returns {Object}
          */
-        parse: function(cmd_raw, cmd_def) {
+        parse: function (cmd_raw, cmd_def) {
             const match = this._regexParams[Symbol.matchAll](cmd_raw);
-            let scmd = Array.from(match, x => x[0]);
+            let scmd = Array.from(match, (x) => x[0]);
             const cmd = scmd[0];
             scmd = scmd.slice(1);
             const rawParams = scmd.join(" ");
-            let params = _.map(scmd, item => {
+            let params = _.map(scmd, (item) => {
                 let nvalue = item;
                 if (item[0] === '"' || item[0] === "'") {
                     nvalue = item.substr(1, item.length - 2);
@@ -80,7 +79,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {Array} params
          * @returns {Boolean}
          */
-        validateAndFormat: function(args, params) {
+        validateAndFormat: function (args, params) {
             if (!args.length) {
                 return params;
             }
@@ -100,6 +99,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
                     carg = args[++i];
                     list_mode = true;
                 } else if (carg === "*") {
+                    // No more 'carg' will be interpreted
                     for (; checkedCount < params.length; ++checkedCount) {
                         formatted_params.push(
                             this._formatters.s(params[checkedCount])
@@ -107,9 +107,25 @@ odoo.define("terminal.core.ParameterReader", function(require) {
                     }
                     break;
                 }
+
                 // Parameter validation & formatting
                 const param = params[checkedCount];
-                if (!this._validators[carg](param, list_mode)) {
+
+                if (carg === "-") {
+                    const formatted_param = this._tryAllFormatters(
+                        param,
+                        list_mode
+                    );
+                    if (!_.isNull(formatted_param)) {
+                        formatted_params.push(formatted_param);
+                        ++checkedCount;
+                        continue;
+                    }
+
+                    // Not found any compatible formatter
+                    // fallback to generic string
+                    carg = "s";
+                } else if (!this._validators[carg](param, list_mode)) {
                     break;
                 }
                 formatted_params.push(this._formatters[carg](param, list_mode));
@@ -131,8 +147,8 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {Array} params
          * @returns {String}
          */
-        stringify: function(params) {
-            return _.map(params, function(item) {
+        stringify: function (params) {
+            return _.map(params, function (item) {
                 if (item.indexOf(" ") === -1) {
                     return item;
                 }
@@ -143,8 +159,24 @@ odoo.define("terminal.core.ParameterReader", function(require) {
         /**
          * Free internal stores
          */
-        resetStores: function() {
+        resetStores: function () {
             this._parameterGenerator.resetStores();
+        },
+
+        _tryAllFormatters: function (param, list_mode) {
+            // Try all possible validators/formatters
+            let formatted_param = null;
+            for (const key in this._validators) {
+                if (key === "s") {
+                    continue;
+                }
+                if (this._validators[key](param, list_mode)) {
+                    formatted_param = this._formatters[key](param, list_mode);
+                    break;
+                }
+            }
+
+            return formatted_param;
         },
 
         /**
@@ -152,7 +184,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {String} args
          * @returns {Int}
          */
-        _getNumRequiredArgs: function(args) {
+        _getNumRequiredArgs: function (args) {
             const match = args.match(this._regexArgs);
             return match ? match.index : args.length;
         },
@@ -162,7 +194,7 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {String} str
          * @returns {String}
          */
-        _sanitizeString: function(str) {
+        _sanitizeString: function (str) {
             return str.replace(this._regexSanitize, '"');
         },
 
@@ -172,16 +204,20 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {Boolean} list_mode
          * @returns {Boolean}
          */
-        _validateString: function(param, list_mode = false) {
+        _validateString: function (param, list_mode = false) {
             if (list_mode) {
                 const param_split = param.split(",");
                 let is_valid = true;
-                for (const ps of param_split) {
+                const param_split_len = param_split.length;
+                let index = 0;
+                while (index < param_split_len) {
+                    const ps = param_split[index];
                     const param_sa = ps.trim();
                     if (Number(param_sa) === parseInt(param_sa, 10)) {
                         is_valid = false;
                         break;
                     }
+                    ++index;
                 }
                 return is_valid;
             }
@@ -194,16 +230,20 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {Boolean} list_mode
          * @returns {Boolean}
          */
-        _validateInt: function(param, list_mode = false) {
+        _validateInt: function (param, list_mode = false) {
             if (list_mode) {
                 const param_split = param.split(",");
                 let is_valid = true;
-                for (const ps of param_split) {
+                const param_split_len = param_split.length;
+                let index = 0;
+                while (index < param_split_len) {
+                    const ps = param_split[index];
                     const param_sa = ps.trim();
                     if (Number(param_sa) !== parseInt(param_sa, 10)) {
                         is_valid = false;
                         break;
                     }
+                    ++index;
                 }
                 return is_valid;
             }
@@ -216,9 +256,9 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {Boolean} list_mode
          * @returns {String}
          */
-        _formatString: function(param, list_mode = false) {
+        _formatString: function (param, list_mode = false) {
             if (list_mode) {
-                return _.map(param.split(","), item => item.trim());
+                return _.map(param.split(","), (item) => item.trim());
             }
             return param;
         },
@@ -229,9 +269,9 @@ odoo.define("terminal.core.ParameterReader", function(require) {
          * @param {Boolean} list_mode
          * @returns {Number}
          */
-        _formatInt: function(param, list_mode = false) {
+        _formatInt: function (param, list_mode = false) {
             if (list_mode) {
-                return _.map(param.split(","), item => Number(item.trim()));
+                return _.map(param.split(","), (item) => Number(item.trim()));
             }
             return Number(param);
         },

@@ -1,7 +1,7 @@
 // Copyright 2019-2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.loaders.Frontend", function(require) {
+odoo.define("terminal.loaders.Frontend", function (require) {
     "use strict";
 
     require("web.dom_ready");

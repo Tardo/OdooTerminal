@@ -9,7 +9,7 @@
  * and the 'content script' responds with the internal message
  * 'update_terminal_badge_info'.
  */
-(function() {
+(function () {
     "use strict";
 
     // This is for cross-browser compatibility
@@ -36,7 +36,7 @@
         gBrowserObj.browserAction.setBadgeText({text: ""});
 
         // Query for active tab
-        gBrowserObj.tabs.query({active: true, currentWindow: true}, tabs => {
+        gBrowserObj.tabs.query({active: true, currentWindow: true}, (tabs) => {
             if (tabs.length) {
                 // Request Odoo Info
                 gBrowserObj.tabs.sendMessage(tabs[0].id, {
@@ -59,7 +59,7 @@
     }
 
     // Listen 'content script' reply with the collected information
-    gBrowserObj.runtime.onMessage.addListener(request => {
+    gBrowserObj.runtime.onMessage.addListener((request) => {
         if (request.message === "update_terminal_badge_info") {
             _updateBadgeInfo(request.odooInfo);
         }

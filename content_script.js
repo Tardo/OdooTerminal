@@ -5,7 +5,7 @@
  * This script is used to start the load process, act as a brigde between
  * 'page script' and 'background script'.
  */
-(function() {
+(function () {
     "use strict";
 
     // Flag to run the script once
@@ -140,7 +140,7 @@
     // Listen messages from page script
     window.addEventListener(
         "message",
-        event => {
+        (event) => {
             // We only accept messages from ourselves
             if (event.source !== window) {
                 return;
@@ -159,7 +159,7 @@
                 }
             } else if (event.data.type === "ODOO_TERM_START") {
                 // Load Init Commands
-                gBrowserObj.storage.sync.get(["init_cmds"], result => {
+                gBrowserObj.storage.sync.get(["init_cmds"], (result) => {
                     const cmds = (result.init_cmds || "").split(/\n\r?/);
                     window.postMessage(
                         {
@@ -175,12 +175,12 @@
     );
 
     // Listen messages from background
-    gBrowserObj.runtime.onMessage.addListener(request => {
+    gBrowserObj.runtime.onMessage.addListener((request) => {
         if (request.message === "update_odoo_terminal_info") {
             if (gOdooInfoObj.isLoaded) {
                 _sendOdooInfoToBackground();
             } else {
-                _injectPageScript("page_script.js", ev => {
+                _injectPageScript("page_script.js", (ev) => {
                     ev.target.parentNode.removeChild(ev.target);
                 });
             }

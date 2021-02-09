@@ -1,7 +1,7 @@
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.abstract.Longpolling", function(require) {
+odoo.define("terminal.core.abstract.Longpolling", function (require) {
     "use strict";
 
     const Class = require("web.Class");
@@ -13,7 +13,7 @@ odoo.define("terminal.core.abstract.Longpolling", function(require) {
          * @param {Widget} parent - Odoo Widget
          * @param {Boolean} verbose
          */
-        init: function(parent) {
+        init: function (parent) {
             this._parent = parent;
         },
 
@@ -21,7 +21,7 @@ odoo.define("terminal.core.abstract.Longpolling", function(require) {
          * @param {Array} notifications
          */
         // eslint-disable-next-line
-        _onBusNotification: function(notifications) {
+        _onBusNotification: function (notifications) {
             throw Error("Not Implemented!");
         },
 
@@ -29,7 +29,7 @@ odoo.define("terminal.core.abstract.Longpolling", function(require) {
          * @param {Boolean} status
          */
         // eslint-disable-next-line
-        setVerbose: function(status) {
+        setVerbose: function (status) {
             throw Error("Not Implemented!");
         },
 
@@ -37,7 +37,7 @@ odoo.define("terminal.core.abstract.Longpolling", function(require) {
          * @returns {Boolean}
          */
         // eslint-disable-next-line
-        isVerbose: function() {
+        isVerbose: function () {
             throw Error("Not Implemented!");
         },
 
@@ -45,7 +45,7 @@ odoo.define("terminal.core.abstract.Longpolling", function(require) {
          * @param {String} name
          */
         // eslint-disable-next-line
-        addChannel: function(name) {
+        addChannel: function (name) {
             throw Error("Not Implemented!");
         },
 
@@ -53,17 +53,17 @@ odoo.define("terminal.core.abstract.Longpolling", function(require) {
          * @param {String} name
          */
         // eslint-disable-next-line
-        deleteChannel: function(name) {
+        deleteChannel: function (name) {
             throw Error("Not Implemented!");
         },
 
         // eslint-disable-next-line
-        startPoll: function() {
+        startPoll: function () {
             throw Error("Not Implemented!");
         },
 
         // eslint-disable-next-line
-        stopPoll: function() {
+        stopPoll: function () {
             throw Error("Not Implemented!");
         },
     });
