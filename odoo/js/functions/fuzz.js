@@ -646,10 +646,10 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 args: "s?s",
                 example: "res.partner base.view_partner_simple_form",
             });
-            this.registerCommand("fuzz_fill", {
+            this.registerCommand("fuzz_field", {
                 definition:
                     "Fill a field with a random or given values on the active form",
-                callback: this._cmdFuzzFill,
+                callback: this._cmdFuzzField,
                 detail:
                     "Fill a field/s with a random or given values on the active form",
                 syntaxis:
@@ -659,7 +659,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
             });
         },
 
-        _cmdFuzzFill: function (fields, values, o2m_num_records) {
+        _cmdFuzzField: function (fields, values, o2m_num_records) {
             let ovalues = values;
             if (typeof ovalues !== "undefined") {
                 ovalues = JSON.parse(values);

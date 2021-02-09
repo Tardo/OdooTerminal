@@ -310,9 +310,10 @@ odoo.define("terminal.functions.Common", function (require) {
                 example: "res.partner ['name', '=ilike', 'A%']",
             });
             this.registerCommand("ref", {
-                definition: "Resolves xmlid to model and resource id",
+                definition:
+                    "Show the referenced model and id of the given xmlid's",
                 callback: this._cmdRef,
-                detail: "Resolves xmlid to model and resource id",
+                detail: "Show the referenced model and id of the given xmlid's",
                 syntaxis: "<ARRAY: STRING XML ID>",
                 args: "ls",
                 example: "base.main_company,base.model_res_partner",
@@ -410,14 +411,15 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdPostJSONData: function (url, data) {
-            return $.ajax(url, {
-                data: data,
-                contentType: "application/json",
-                type: "POST",
-            }).then((result) => {
-                this.screen.print(result);
-                return result;
-            });
+            return rpc
+                .query({
+                    route: url,
+                    params: JSON.parse(data),
+                })
+                .then((result) => {
+                    this.screen.print(result);
+                    return result;
+                });
         },
 
         _cmdRunTour: function (tour_name) {
@@ -489,11 +491,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
-                    if (result) {
-                        this.screen.print("Nice! groups are truly evaluated");
-                    } else {
-                        this.screen.print("Groups are negatively evaluated");
-                    }
+                    this.screen.print(result);
                     return result;
                 });
         },
@@ -1008,8 +1006,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
-                    const need_truncate =
-                        !this._mute_mode && result.length > lines_total;
+                    const need_truncate = result.length > lines_total;
                     let sresult = result;
                     if (need_truncate) {
                         this._buffer[this.__meta.name] = {

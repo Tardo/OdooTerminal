@@ -97,6 +97,11 @@ odoo.define("terminal.Terminal", function (require) {
 
             core.bus.on("keydown", this, this._onCoreKeyDown);
             core.bus.on("click", this, this._onCoreClick);
+            window.addEventListener(
+                "beforeunload",
+                this._onCoreBeforeUnload.bind(this),
+                true
+            );
             // NOTE: Listen messages from 'content script'
             window.addEventListener(
                 "message",
@@ -117,6 +122,7 @@ odoo.define("terminal.Terminal", function (require) {
             this._pinned = this._storage.getItem("terminal_pinned");
             if (this._pinned) {
                 this.start();
+                this.screen.flush();
                 this.doShow();
                 this.$(".terminal-screen-icon-pin")
                     .removeClass("btn-dark")
@@ -161,6 +167,11 @@ odoo.define("terminal.Terminal", function (require) {
                 this._observer.disconnect();
             }
             window.removeEventListener("message", this._onWindowMessage, true);
+            window.removeEventListener(
+                "beforeunload",
+                this._onCoreBeforeUnload,
+                true
+            );
             core.bus.off("keydown", this, this._onCoreKeyDown);
             core.bus.off("click", this, this._onCoreClick);
             this._super.apply(this, arguments);
@@ -246,6 +257,7 @@ odoo.define("terminal.Terminal", function (require) {
             // Only start the terminal if needed
             if (!this._isLoaded) {
                 this.start();
+                this.screen.flush();
             }
             this.$el.addClass("terminal-transition-topdown");
             this.screen.focus();
@@ -316,6 +328,7 @@ odoo.define("terminal.Terminal", function (require) {
                 return true;
             }
 
+            this.screen.printCommand(cmd);
             // Search similar commands
             const similar_cmd = this._searchSimiliarCommand(cmd_name);
             if (similar_cmd) {
@@ -807,11 +820,34 @@ odoo.define("terminal.Terminal", function (require) {
                 this.doToggle();
             }
         },
+        _onCoreBeforeUnload: function (ev) {
+            if (this._jobs.length) {
+                if (
+                    this._jobs.length === 1 &&
+                    (!this._jobs[0] || this._jobs[0].scmd.cmd === "reload")
+                ) {
+                    return;
+                }
+                ev.preventDefault();
+                ev.returnValue = "";
+                this.screen.print(
+                    "The terminal has prevented the current tab from closing due to unfinished tasks:"
+                );
+                this.screen.print(
+                    _.map(
+                        this._jobs,
+                        (item) =>
+                            `${item.scmd.cmd} <small><i>${item.scmd.rawParams}</i></small>`
+                    )
+                );
+                this.doShow();
+            }
+        },
 
         // NOTE: This method is only used for extension purposes
         _onWindowMessage: function (ev) {
             // We only accept messages from ourselves
-            if (event.source !== window) {
+            if (ev.source !== window) {
                 return;
             }
             if (

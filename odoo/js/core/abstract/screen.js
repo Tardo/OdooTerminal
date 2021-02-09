@@ -23,6 +23,10 @@ odoo.define("terminal.core.abstract.Screen", function (require) {
             throw Error("Not Implemented!");
         },
 
+        getBuffer: function () {
+            throw Error("Not Implemented!");
+        },
+
         scrollDown: function () {
             throw Error("Not Implemented!");
         },

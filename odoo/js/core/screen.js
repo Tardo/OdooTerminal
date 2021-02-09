@@ -93,6 +93,9 @@ odoo.define("terminal.core.Screen", function (require) {
         /* PRINT */
         flush: function () {
             this._rafID = null;
+            if (!this.$screen || !this.$screen.length) {
+                return;
+            }
             this.$screen.append(this._buff);
             this._buff = "";
             this._lazyVacuum();

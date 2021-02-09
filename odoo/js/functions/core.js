@@ -136,6 +136,16 @@ odoo.define("terminal.functions.Core", function (require) {
                 example:
                     "repeat 20 create res.partner \"{'name': 'Example Partner #$INTITER'}\"",
             });
+            this.registerCommand("jobs", {
+                definition: "Display running jobs",
+                callback: this._cmdJobs,
+                detail: "Display running jobs",
+                syntaxis: "",
+                args: "",
+                sanitized: false,
+                generators: false,
+                example: "",
+            });
         },
 
         _printWelcomeMessage: function () {
@@ -390,25 +400,33 @@ odoo.define("terminal.functions.Core", function (require) {
                 return Promise.reject("Need a valid command to execute!");
             }
 
+            var _this = _.clone(this);
+            _this.screen = _.clone(this.screen);
             // Monkey-Patch screen print
-            const orig_print_ref = this.screen.print;
-            if (!this._mute_mode) {
-                this._mute_mode = true;
-                this.screen.print = () => {
-                    // Do nothing.
-                };
-            }
+            _this.screen.print = () => {
+                // Do nothing.
+            };
 
             const cmd_def = this._registeredCmds[cmd_name];
             const scmd = this._parameterReader.parse(cmd, cmd_def);
-            return this._processCommandJob(scmd, cmd_def).finally(() => {
-                // Revert monkey-patch
-                if (this._mute_mode) {
-                    this.screen.print = orig_print_ref;
-                    this._mute_mode = false;
-                }
-                return true;
-            });
+            return this._processCommandJob.call(_this, scmd, cmd_def);
+        },
+
+        _cmdJobs: function () {
+            this.screen.print(
+                _.map(
+                    this._jobs,
+                    (item) =>
+                        `${item.scmd.cmd} <small><i>${
+                            item.scmd.rawParams
+                        }</i></small> ${
+                            item.healthy
+                                ? ""
+                                : '<span class="text-warning">This job is taking a long time</span>'
+                        }`
+                )
+            );
+            return Promise.resolve();
         },
     });
 });
