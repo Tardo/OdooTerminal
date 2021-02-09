@@ -16,7 +16,7 @@ odoo.define("terminal.Terminal", function (require) {
     const QWeb = core.qweb;
 
     const Terminal = Widget.extend({
-        VERSION: "7.1.0",
+        VERSION: "7.2.0",
 
         events: {
             "click .o_terminal_cmd": "_onClickTerminalCommand",
