@@ -35,6 +35,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Eval parameters and print the result.",
                 syntaxis: "<STRING: MSG>",
                 args: "",
+                aliases: ["echo"],
                 example: "This is a example",
             });
             this.registerCommand("load", {
