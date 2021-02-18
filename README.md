@@ -132,6 +132,14 @@ For example:
 - A somewhat more complex:
   `alias search_mod search ir.module.module display_name "[['name', '=', '$1'], ['state', '=', '$2[installed]']]"`
 
+#### + Runners (subcommands)
+
+You can execute "subcommands" to use the result in a new command call. The
+syntax of runners looks like `{{command}}`, `{{command}}.key` or
+`{{command}}[index]`.
+
+For example: `read res.users {{search res.users id []}}.id`
+
 #### + Massive operations
 
 Massive operations are possible using the command `repeat`. Print to screen is a

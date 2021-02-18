@@ -208,48 +208,83 @@ odoo.define("terminal.Terminal", function (require) {
             );
         },
 
-        executeCommand: function (cmd_raw, store = true) {
-            const cmd = cmd_raw || "";
-            const cmd_split = cmd_raw.split(" ");
+        validateCommand: function (cmd) {
+            if (!cmd) {
+                return [false, false];
+            }
+            const cmd_split = cmd.split(" ");
             const cmd_name = cmd_split[0];
             if (!cmd_name) {
-                return false;
+                return [cmd, false];
+            }
+            return [cmd, cmd_name];
+        },
+
+        executeCommandSimple: function (cmd_raw, context) {
+            const [cmd, cmd_name] = this.validateCommand(cmd_raw);
+            if (!cmd_name) {
+                return Promise.reject("Need a valid command to execute!");
             }
 
-            let cmd_def = this._registeredCmds[cmd_name];
-            let scmd = {};
-
-            // Stop execution if the command doesn't exists
+            const cmd_def = this._registeredCmds[cmd_name];
             if (!cmd_def) {
-                [, cmd_def] = this._searchCommandDefByAlias(cmd_name);
-                if (!cmd_def) {
-                    return this._alternativeExecuteCommand(cmd_raw, store);
-                }
+                return Promise.reject("Need a valid command to execute!");
             }
+            const scmd = this._parameterReader.parse(cmd, cmd_def);
+            return this._processCommandJob.call(context || this, scmd, cmd_def);
+        },
 
-            try {
-                this._parameterReader.resetStores();
-                scmd = this._parameterReader.parse(cmd, cmd_def);
-            } catch (err) {
-                this.screen.printCommand(cmd);
-                this.screen.printError(
-                    `<span class='o_terminal_click ` +
-                        `o_terminal_cmd' data-cmd='help ${cmd_name}'>` +
-                        `${err.message}!</span>`
-                );
-                if (store) {
-                    this._storeUserInput(cmd);
+        executeCommand: function (cmd_raw, store = true) {
+            return new Promise(async (resolve, reject) => {
+                let cmd = cmd_raw || "";
+                const cmd_split = cmd_raw.split(" ");
+                const cmd_name = cmd_split[0];
+                if (!cmd_name) {
+                    return reject();
                 }
+
+                try {
+                    cmd = await this._resolveRunners(cmd);
+                } catch (err) {
+                    return reject(err);
+                }
+                let cmd_def = this._registeredCmds[cmd_name];
+                let scmd = {};
+
+                // Stop execution if the command doesn't exists
+                if (!cmd_def) {
+                    [, cmd_def] = this._searchCommandDefByAlias(cmd_name);
+                    if (!cmd_def) {
+                        return resolve(
+                            this._alternativeExecuteCommand(cmd, store)
+                        );
+                    }
+                }
+
+                try {
+                    this._parameterReader.resetStores();
+                    scmd = this._parameterReader.parse(cmd, cmd_def);
+                } catch (err) {
+                    this.screen.printCommand(cmd);
+                    this.screen.printError(
+                        `<span class='o_terminal_click ` +
+                            `o_terminal_cmd' data-cmd='help ${cmd_name}'>` +
+                            `${err.message}!</span>`
+                    );
+                    if (store) {
+                        this._storeUserInput(cmd_raw);
+                    }
+                    this.screen.cleanInput();
+                    return reject(err);
+                }
+                if (!cmd_def.secured) {
+                    this._storeUserInput(cmd_raw);
+                }
+                this.screen.printCommand(cmd_raw, cmd_def.secured);
                 this.screen.cleanInput();
-                return false;
-            }
-            if (!cmd_def.secured) {
-                this._storeUserInput(cmd);
-            }
-            this.screen.printCommand(cmd_raw, cmd_def.secured);
-            this.screen.cleanInput();
-            this._processCommandJob(scmd, cmd_def);
-            return true;
+                this._processCommandJob(scmd, cmd_def);
+                return resolve();
+            });
         },
 
         /* VISIBILIY */
@@ -295,6 +330,41 @@ odoo.define("terminal.Terminal", function (require) {
                     "</templates>"
             );
             this._rawTerminalTemplate = QWeb.render("terminal");
+        },
+
+        _resolveRunners: function (cmd) {
+            return new Promise(async (resolve, reject) => {
+                const pp_values = this._parameterReader.preparse(cmd);
+                const tasks = [];
+                for (const runner of pp_values.runners) {
+                    tasks.push(this.executeCommandSimple(`mute ${runner.cmd}`));
+                }
+                let pp_cmd = pp_values.cmd;
+                try {
+                    const results = await Promise.all(tasks);
+                    for (const index in results) {
+                        let value = results[index];
+                        const ext = pp_values.runners[index].ext;
+                        if (_.isArray(value)) {
+                            if (ext) {
+                                value = _.map(value, (item) => item[ext]).join(
+                                    ","
+                                );
+                            } else {
+                                value = _.map(value, (item) =>
+                                    JSON.stringify(item)
+                                ).join(",");
+                            }
+                        } else if (ext && _.isObject(value)) {
+                            value = value[ext];
+                        }
+                        pp_cmd = pp_cmd.replace(`{{${index}}}`, value);
+                    }
+                } catch (err) {
+                    return reject(err);
+                }
+                return resolve(pp_cmd);
+            });
         },
 
         _alternativeExecuteCommand: function (cmd_raw, store = true) {
@@ -821,10 +891,11 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
         _onCoreBeforeUnload: function (ev) {
-            if (this._jobs.length) {
+            const jobs = _.compact(this._jobs);
+            if (jobs.length) {
                 if (
-                    this._jobs.length === 1 &&
-                    (!this._jobs[0] || this._jobs[0].scmd.cmd === "reload")
+                    jobs.length === 1 &&
+                    (!jobs[0] || jobs[0].scmd.cmd === "reload")
                 ) {
                     return;
                 }
@@ -835,7 +906,7 @@ odoo.define("terminal.Terminal", function (require) {
                 );
                 this.screen.print(
                     _.map(
-                        this._jobs,
+                        jobs,
                         (item) =>
                             `${item.scmd.cmd} <small><i>${item.scmd.rawParams}</i></small>`
                     )

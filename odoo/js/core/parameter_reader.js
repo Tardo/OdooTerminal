@@ -26,6 +26,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 /(["'])(?:(?=(\\?))\2.)*?\1|[^\s]+/g
             );
             this._regexArgs = new RegExp(/[l?*]/);
+            this._regexRunner = new RegExp(
+                /\{\{(.+?)\}\}(?:\.(\w+)|\[(\d+)\])?/gm
+            );
             this._parameterGenerator = new ParameterGenerator();
         },
 
@@ -37,6 +40,31 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          */
         splitAndTrim: function (text, separator) {
             return _.map(text.split(separator), (item) => item.trim());
+        },
+
+        /**
+         * Used to resolve "runners"
+         *
+         * @param {String} cmd_raw
+         * @returns {Object}
+         */
+        preparse: function (cmd_raw) {
+            const match = this._regexRunner[Symbol.matchAll](cmd_raw);
+            const runners = Array.from(match, (x) => {
+                return {
+                    cmd: x[1],
+                    ext: x[3] || x[2],
+                };
+            });
+            let cc_index = 0;
+            const pp_cmd = cmd_raw.replaceAll(
+                this._regexRunner,
+                () => `{{${cc_index++}}}`
+            );
+            return {
+                cmd: pp_cmd,
+                runners: runners,
+            };
         },
 
         /**
