@@ -415,9 +415,10 @@ odoo.define("terminal.functions.Core", function (require) {
         },
 
         _cmdJobs: function () {
+            const jobs = _.compact(this._jobs);
             this.screen.print(
                 _.map(
-                    this._jobs,
+                    jobs,
                     (item) =>
                         `${item.scmd.cmd} <small><i>${
                             item.scmd.rawParams
