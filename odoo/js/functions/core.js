@@ -35,6 +35,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Eval parameters and print the result.",
                 syntaxis: "<STRING: MSG>",
                 args: "",
+                aliases: ["echo"],
                 example: "This is a example",
             });
             this.registerCommand("load", {
@@ -289,23 +290,21 @@ odoo.define("terminal.functions.Core", function (require) {
             return Promise.resolve();
         },
 
-        _validateCommand: function (defcall) {
+        _validateDefCommand: function (defcall) {
             if (!_.some(defcall)) {
                 return [false, false];
             }
             const cmd = this._parameterReader.stringify(defcall);
-            const cmd_split = cmd.split(" ");
-            const cmd_name = cmd_split[0];
-            if (!cmd_name) {
-                return [cmd, false];
-            }
-            return [cmd, cmd_name];
+            return this.validateCommand(cmd);
         },
 
         _cmdExport: function (...defcall) {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const cmd_name = this._validateCommand(defcall)[1];
+                    // eslint-disable-next-line
+                    const [cmd, cmd_name] = this._validateDefCommand(
+                        defcall
+                    )[1];
                     if (!cmd_name) {
                         return reject("Need a valid command to execute!");
                     }
@@ -324,7 +323,10 @@ odoo.define("terminal.functions.Core", function (require) {
         _cmdExportFile: function (...defcall) {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const cmd_name = this._validateCommand(defcall)[1];
+                    // eslint-disable-next-line
+                    const [cmd, cmd_name] = this._validateDefCommand(
+                        defcall
+                    )[1];
                     if (!cmd_name) {
                         return reject("Need a valid command to execute!");
                     }
@@ -348,7 +350,7 @@ odoo.define("terminal.functions.Core", function (require) {
         _cmdChrono: function (...defcall) {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const [cmd, cmd_name] = this._validateCommand(defcall);
+                    const [cmd, cmd_name] = this._validateDefCommand(defcall);
                     if (!cmd_name) {
                         return reject("Need a valid command to execute!");
                     }
@@ -373,7 +375,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 if (times < 0) {
                     return reject("'Times' parameter must be positive");
                 }
-                const [cmd, cmd_name] = this._validateCommand(defcall);
+                const [cmd, cmd_name] = this._validateDefCommand(defcall);
                 if (!cmd_name) {
                     return reject("Need a valid command to execute!");
                 }
@@ -395,7 +397,7 @@ odoo.define("terminal.functions.Core", function (require) {
         },
 
         _cmdMute: function (...defcall) {
-            const [cmd, cmd_name] = this._validateCommand(defcall);
+            const [cmd, cmd_name] = this._validateDefCommand(defcall);
             if (!cmd_name) {
                 return Promise.reject("Need a valid command to execute!");
             }
@@ -413,9 +415,10 @@ odoo.define("terminal.functions.Core", function (require) {
         },
 
         _cmdJobs: function () {
+            const jobs = _.compact(this._jobs);
             this.screen.print(
                 _.map(
-                    this._jobs,
+                    jobs,
                     (item) =>
                         `${item.scmd.cmd} <small><i>${
                             item.scmd.rawParams

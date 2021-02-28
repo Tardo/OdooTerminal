@@ -1,5 +1,12 @@
 # Changelog
 
+**7.3.0**
+
+```
+ADD: Alias 'echo' for 'print' command
+ADD: Support for 'runners' (subcommands)
+```
+
 **7.2.0**
 
 ```
