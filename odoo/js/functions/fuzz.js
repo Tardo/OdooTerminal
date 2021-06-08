@@ -642,7 +642,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 definition: "Run a 'Fuzz Test'",
                 callback: this._cmdFuzz,
                 detail: "Runs a 'Fuzz Test' over the selected model and view",
-                syntaxis: "<STRING: MODEL NAME> [STRING: VIEW REF]",
+                syntax: "<STRING: MODEL NAME> [STRING: VIEW REF]",
                 args: "s?s",
                 example: "res.partner base.view_partner_simple_form",
             });
@@ -652,7 +652,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 callback: this._cmdFuzzField,
                 detail:
                     "Fill a field/s with a random or given values on the active form",
-                syntaxis:
+                syntax:
                     "[LIST: FIELDS] [STRING/INT: VALUE/S] [INT: O2M RECORDS COUNT]",
                 args: "ls?-i",
                 example: "order_line \"{'display_type': false}\" 4",

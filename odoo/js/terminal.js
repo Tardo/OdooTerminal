@@ -196,7 +196,7 @@ odoo.define("terminal.Terminal", function (require) {
                     callback: this._fallbackExecuteCommand,
                     detail:
                         "This command hasn't a properly detailed information",
-                    syntaxis: "Unknown",
+                    syntax: "Unknown",
                     args: "",
                     secured: false,
                     aliases: [],

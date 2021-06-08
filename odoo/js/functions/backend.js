@@ -20,7 +20,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdViewModelRecord,
                 detail:
                     "Open model record in form view or records in list view.",
-                syntaxis:
+                syntax:
                     "<STRING: MODEL NAME> [INT: RECORD ID] [STRING: VIEW REF]",
                 args: "s?is",
                 example: "res.partner 10 base.view_partner_simple_form",
@@ -31,7 +31,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                 detail:
                     "Open settings page." +
                     "<br>[MODULE NAME] The module technical name (default is 'general_settings')",
-                syntaxis: "[STRING: MODULE NAME]",
+                syntax: "[STRING: MODULE NAME]",
                 args: "?s",
                 example: "sale_management",
             });

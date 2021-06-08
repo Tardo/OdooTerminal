@@ -17,7 +17,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail:
                     "Show commands and a quick definition.<br/>- " +
                     "<> ~> Required Parameter<br/>- [] ~> Optional Parameter",
-                syntaxis: "[STRING: COMMAND]",
+                syntax: "[STRING: COMMAND]",
                 args: "?s",
                 example: "search",
             });
@@ -25,7 +25,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Clean terminal section (screen by default)",
                 callback: this._cmdClear,
                 detail: "Available sections: screen (default), history.",
-                syntaxis: "[STRING: SECTION]",
+                syntax: "[STRING: SECTION]",
                 args: "?s",
                 example: "history",
             });
@@ -33,7 +33,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Print a message",
                 callback: this._cmdPrintText,
                 detail: "Eval parameters and print the result.",
-                syntaxis: "<STRING: MSG>",
+                syntax: "<STRING: MSG>",
                 args: "",
                 aliases: ["echo"],
                 example: "This is a example",
@@ -42,7 +42,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Load external resource",
                 callback: this._cmdLoadResource,
                 detail: "Load external source (javascript & css)",
-                syntaxis: "<STRING: URL>",
+                syntax: "<STRING: URL>",
                 args: "s",
                 example: "https://example.com/libs/term_extra.js",
             });
@@ -54,7 +54,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     "This context only affects to the terminal operations." +
                     "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
                     "By default is 'read'. ",
-                syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
+                syntax: '[STRING: OPERATION] "[DICT: VALUES]" ',
                 args: "?ss",
                 example: "write \"{'the_example': 1}\"",
             });
@@ -69,7 +69,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     "Don't use sensible data if you are using a shared " +
                     "computer." +
                     "<br><br>Can use positional parameters ($1,$2,$3,$N...)",
-                syntaxis: "[STRING: ALIAS] [STRING: DEFINITION]",
+                syntax: "[STRING: ALIAS] [STRING: DEFINITION]",
                 args: "?s*",
                 sanitized: false,
                 generators: false,
@@ -86,7 +86,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 callback: this._cmdExport,
                 detail:
                     "Exports the command result to a browser console variable.",
-                syntaxis: "<STRING: COMMAND>",
+                syntax: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
                 generators: false,
@@ -96,7 +96,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Exports the command result to a text/json file",
                 callback: this._cmdExportFile,
                 detail: "Exports the command result to a text/json file.",
-                syntaxis: "<STRING: COMMAND>",
+                syntax: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
                 generators: false,
@@ -108,7 +108,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail:
                     "Print the elapsed time in seconds to execute a command. " +
                     "<br/>Notice that this time includes the time to format the result!",
-                syntaxis: "<STRING: COMMAND>",
+                syntax: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
                 generators: false,
@@ -118,7 +118,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Repeat a command N times",
                 callback: this._cmdRepeat,
                 detail: "Repeat a command N times.",
-                syntaxis: "<INT: TIMES> <STRING: COMMAND>",
+                syntax: "<INT: TIMES> <STRING: COMMAND>",
                 args: "i*",
                 sanitized: false,
                 generators: false,
@@ -130,7 +130,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 callback: this._cmdMute,
                 detail:
                     "Print to screen is a really slow task, you can improve performance if only prints errors.",
-                syntaxis: "<STRING: COMMAND>",
+                syntax: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
                 generators: false,
@@ -141,7 +141,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Display running jobs",
                 callback: this._cmdJobs,
                 detail: "Display running jobs",
-                syntaxis: "",
+                syntax: "",
                 args: "",
                 sanitized: false,
                 generators: false,
@@ -171,7 +171,7 @@ odoo.define("terminal.functions.Core", function (require) {
         _printHelpDetailed: function (cmd, cmd_def) {
             this.screen.print(cmd_def.detail);
             this.screen.print(" ");
-            this.screen.eprint(`Syntaxis: ${cmd} ${cmd_def.syntaxis}`);
+            this.screen.eprint(`Syntax: ${cmd} ${cmd_def.syntax}`);
             if (cmd_def.example) {
                 this.screen.eprint(`Example: ${cmd} ${cmd_def.example}`);
             }
