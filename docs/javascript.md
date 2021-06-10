@@ -24,7 +24,7 @@ Commands uses promises
   definition: string,
   callback: function,
   detail: string,
-  syntaxis: string,
+  syntax: string,
   args: string,
   secured: boolean,
   aliases: array,
@@ -35,7 +35,7 @@ Commands uses promises
 - definition: Quick definition.
 - callback: Callback function.
 - detail: Command explained.
-- syntaxis: Command Parameters (For Humans)
+- syntax: Command Parameters (For Humans)
   - <> Required
   - [] Optional
 - args: Command Paramerters Types

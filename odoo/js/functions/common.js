@@ -23,7 +23,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Create new record",
                 callback: this._cmdCreateModelRecord,
                 detail: "Open new model record in form view or directly.",
-                syntaxis: '<STRING: MODEL NAME> "[DICT: VALUES]"',
+                syntax: '<STRING: MODEL NAME> "[DICT: VALUES]"',
                 args: "s?s",
                 example: "res.partner \"{'name': 'Poldoore'}\"",
             });
@@ -31,7 +31,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Unlink record",
                 callback: this._cmdUnlinkModelRecord,
                 detail: "Delete a record.",
-                syntaxis:
+                syntax:
                     "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs>",
                 args: "sli",
                 example: "res.partner 10,4,2",
@@ -40,7 +40,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Update record values",
                 callback: this._cmdWriteModelRecord,
                 detail: "Update record values.",
-                syntaxis:
+                syntax:
                     "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     '"<DICT: NEW VALUES>"',
                 args: "slis",
@@ -55,7 +55,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "is 'display_name'. Can use '*' to show all fields of the model" +
                     "<br>[LIMIT] can be zero (no limit)" +
                     "<br>[ORDER] A list of orders separated by comma (Example: 'age DESC, email')",
-                syntaxis:
+                syntax:
                     "<STRING: MODEL NAME> [STRING: FIELDS] " +
                     '"[ARRAY: DOMAIN]" [INT: LIMIT] [INT: OFFSET] ' +
                     '"[STRING: ORDER]"',
@@ -66,7 +66,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Call model method",
                 callback: this._cmdCallModelMethod,
                 detail: "Call model method.",
-                syntaxis:
+                syntax:
                     '<STRING: MODEL> <STRING: METHOD> "[ARRAY: ARGS]" ' +
                     '"[DICT: KWARGS]"',
                 args: "ss?ss",
@@ -76,7 +76,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Upgrade a module",
                 callback: this._cmdUpgradeModule,
                 detail: "Launch upgrade module process.",
-                syntaxis: "<STRING: MODULE NAME>",
+                syntax: "<STRING: MODULE NAME>",
                 args: "s",
                 example: "contacts",
             });
@@ -84,7 +84,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Install a module",
                 callback: this._cmdInstallModule,
                 detail: "Launch module installation process.",
-                syntaxis: "<STRING: MODULE NAME>",
+                syntax: "<STRING: MODULE NAME>",
                 args: "s",
                 example: "contacts",
             });
@@ -92,7 +92,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Uninstall a module",
                 callback: this._cmdUninstallModule,
                 detail: "Launch module deletion process.",
-                syntaxis: "<STRING: MODULE NAME>",
+                syntax: "<STRING: MODULE NAME>",
                 args: "s",
                 exmaple: "contacts",
             });
@@ -100,7 +100,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Reload current page",
                 callback: this._cmdReloadPage,
                 detail: "Reload current page.",
-                syntaxis: "",
+                syntax: "",
                 args: "",
             });
             this.registerCommand("debug", {
@@ -109,7 +109,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail:
                     "Set debug mode:<br>- 0: Disabled<br>- 1: " +
                     "Enabled<br>- 2: Enabled with Assets",
-                syntaxis: "<INT: MODE>",
+                syntax: "<INT: MODE>",
                 args: "i",
                 example: "2",
             });
@@ -119,7 +119,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail:
                     "Call action.<br>&lt;ACTION&gt; Can be an " +
                     "string or object.",
-                syntaxis: '"<STRING|DICT: ACTION>"',
+                syntax: '"<STRING|DICT: ACTION>"',
                 args: "s",
                 example: "134",
             });
@@ -127,7 +127,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Send POST request",
                 callback: this._cmdPostData,
                 detail: "Send POST request to selected endpoint",
-                syntaxis: '<STRING: ENDPOINT> "<DICT: DATA>"',
+                syntax: '<STRING: ENDPOINT> "<DICT: DATA>"',
                 args: "ss",
                 example: "/web/endpoint \"{'the_example': 42}\"",
             });
@@ -135,14 +135,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Know current user login",
                 callback: this._cmdShowWhoAmI,
                 detail: "Shows current user login",
-                syntaxis: "",
+                syntax: "",
                 args: "",
             });
             this.registerCommand("caf", {
                 definition: "Check model fields access",
                 callback: this._cmdCheckFieldAccess,
                 detail: "Show readable/writeable fields of the selected model",
-                syntaxis: '<STRING: MODEL> "[LIST: FIELDS]"',
+                syntax: '<STRING: MODEL> "[LIST: FIELDS]"',
                 args: "s?ls",
                 example: 'res.partner "name,street"',
             });
@@ -154,7 +154,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     " selected model" +
                     "<br>&lt;OPERATION&gt; Can be 'create', 'read', 'write'" +
                     " or 'unlink'",
-                syntaxis: "<STRING: MODEL> <STRING: OPERATION>",
+                syntax: "<STRING: MODEL> <STRING: OPERATION>",
                 args: "ss",
                 example: "res.partner read",
             });
@@ -162,7 +162,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Know user presence",
                 callback: this._cmdLastSeen,
                 detail: "Show users last seen",
-                syntaxis: "",
+                syntax: "",
                 args: "",
             });
             this.registerCommand("read", {
@@ -172,7 +172,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Launch orm search query.<br>[FIELDS] " +
                     "are separated by commas (without spaces) and by default " +
                     "is 'display_name'. Can use '*' to show all fields.",
-                syntaxis:
+                syntax:
                     "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     "[STRING: FIELDS]",
                 args: "sli?s",
@@ -185,7 +185,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Operations over session context dictionary." +
                     "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
                     "By default is 'read'. ",
-                syntaxis: '[STRING: OPERATION] "[DICT: VALUES]" ',
+                syntax: '[STRING: OPERATION] "[DICT: VALUES]" ',
                 args: "?ss",
                 example: "write \"{'the_example': 1}\"",
             });
@@ -193,7 +193,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Know Odoo version",
                 callback: this._cmdShowOdooVersion,
                 detail: "Shows Odoo version",
-                syntaxis: "",
+                syntax: "",
                 args: "",
             });
             this.registerCommand("longpolling", {
@@ -210,7 +210,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "<br> - del_channel > Delete a listening channel" +
                     "<br> - start > Start client longpolling service" +
                     "<br> - stop > Stop client longpolling service",
-                syntaxis: "[STRING: OPERATION] [STRING: PARAM1]",
+                syntax: "[STRING: OPERATION] [STRING: PARAM1]",
                 args: "?ss",
                 example: "add_channel example_channel",
             });
@@ -222,7 +222,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "<br>&lt;DATABASE&gt; Can be '*' to use current database" +
                     "<br>&lt;LOGIN&gt; Can be optionally preceded by the '-'" +
                     " character and it will be used for password too",
-                syntaxis:
+                syntax:
                     "<STRING: DATABASE> <STRING: LOGIN> [STRING: PASSWORD]",
                 args: "ss?s",
                 secured: true,
@@ -236,7 +236,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "<br>&lt;GROUPS&gt; A list of groups separated by " +
                     "commas, a group can be optionally preceded by '!' to " +
                     "say 'is not in group'",
-                syntaxis: "<STRING: GROUPS>",
+                syntax: "<STRING: GROUPS>",
                 args: "s",
                 example: "base.group_user",
             });
@@ -244,7 +244,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Show database names",
                 callback: this._cmdShowDBList,
                 detail: "Show database names",
-                syntaxis: "",
+                syntax: "",
                 args: "",
             });
             this.registerCommand("jstest", {
@@ -254,7 +254,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Runs js tests in desktop or mobile mode for the selected module." +
                     "<br>&lt;MODULE&gt; Module technical name" +
                     "<br>&lt;MODE&gt; Can be 'desktop' or 'mobile' (By default is 'desktop')",
-                syntaxis: "<STRING: MODULE> <STRING: MODE>",
+                syntax: "<STRING: MODULE> <STRING: MODE>",
                 args: "?ss",
                 example: "web mobile",
             });
@@ -264,7 +264,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail:
                     "Runs the selected tour. If no tour given, prints all available tours." +
                     "<br>[TOUR NAME] Tour Name",
-                syntaxis: "[STRING: TOUR NAME]",
+                syntax: "[STRING: TOUR NAME]",
                 args: "?s",
                 example: "mail_tour",
             });
@@ -272,7 +272,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Send POST JSON",
                 callback: this._cmdPostJSONData,
                 detail: "Sends HTTP POST 'application/json' request",
-                syntaxis: '<STRING: ENDPOINT> "<DICT: DATA>"',
+                syntax: '<STRING: ENDPOINT> "<DICT: DATA>"',
                 args: "ss",
                 example: "/web/endpoint \"{'the_example': 42}\"",
             });
@@ -281,7 +281,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdModuleDepends,
                 detail:
                     "Show a list of the modules that depends on the given module",
-                syntaxis: "<STRING: MODULE NAME>",
+                syntax: "<STRING: MODULE NAME>",
                 args: "s",
                 example: "base",
             });
@@ -289,14 +289,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Update apps list",
                 callback: this._cmdUpdateAppList,
                 detail: "Update apps list",
-                syntaxis: "",
+                syntax: "",
                 args: "",
             });
             this.registerCommand("logout", {
                 definition: "Log out",
                 callback: this._cmdLogOut,
                 detail: "Session log out",
-                syntaxis: "",
+                syntax: "",
                 args: "",
             });
             this.registerCommand("count", {
@@ -305,7 +305,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCount,
                 detail:
                     "Gets number of records from the given model in the selected domain",
-                syntaxis: '<STRING MODEL> "[ARRAY: DOMAIN]"',
+                syntax: '<STRING MODEL> "[ARRAY: DOMAIN]"',
                 args: "s?s",
                 example: "res.partner ['name', '=ilike', 'A%']",
             });
@@ -314,7 +314,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Show the referenced model and id of the given xmlid's",
                 callback: this._cmdRef,
                 detail: "Show the referenced model and id of the given xmlid's",
-                syntaxis: "<ARRAY: STRING XML ID>",
+                syntax: "<ARRAY: STRING XML ID>",
                 args: "ls",
                 example: "base.main_company,base.model_res_partner",
             });
