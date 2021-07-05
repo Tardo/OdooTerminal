@@ -52,9 +52,9 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail:
                     "Operations over terminal context dictionary. " +
                     "This context only affects to the terminal operations." +
-                    "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
+                    "<br>[OPERATION] can be 'read', 'write', 'set' or 'delete'. " +
                     "By default is 'read'. ",
-                syntax: '[STRING: OPERATION] "[DICT: VALUES]" ',
+                syntax: '[STRING: OPERATION] "[DICT: VALUES]/[STRING: KEY]" ',
                 args: "?ss",
                 example: "write \"{'the_example': 1}\"",
             });
@@ -249,6 +249,15 @@ odoo.define("terminal.functions.Core", function (require) {
             } else if (operation === "write") {
                 Object.assign(this._userContext, JSON.parse(values));
                 this.screen.print(this._userContext);
+            } else if (operation === "delete") {
+                if (values in this._userContext) {
+                    delete this._userContext[values];
+                    this.screen.print(this._userContext);
+                } else {
+                    this.screen.printError(
+                        "The selected key is not present in the terminal context"
+                    );
+                }
             } else {
                 this.screen.printError("Invalid operation");
             }
