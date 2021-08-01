@@ -5,6 +5,10 @@ odoo.define("terminal.core.Storage", function (require) {
     "use strict";
 
     const Class = require("web.Class");
+    const core = require("web.core");
+
+    const _t = core._t;
+    const _lt = core._lt;
 
     const AbstractStorage = Class.extend({
         _parent: null,
@@ -21,7 +25,7 @@ odoo.define("terminal.core.Storage", function (require) {
          */
         // eslint-disable-next-line
         getItem: function (item) {
-            throw Error("Not Implemented!");
+            throw Error(_lt("Not Implemented!"));
         },
 
         /**
@@ -30,7 +34,7 @@ odoo.define("terminal.core.Storage", function (require) {
          */
         // eslint-disable-next-line
         setItem: function (item, value, on_error = false) {
-            throw Error("Not Implemented!");
+            throw Error(_lt("Not Implemented!"));
         },
 
         /**
@@ -38,7 +42,7 @@ odoo.define("terminal.core.Storage", function (require) {
          */
         // eslint-disable-next-line
         removeItem: function (item) {
-            throw Error("Not Implemented!");
+            throw Error(_lt("Not Implemented!"));
         },
 
         /**
@@ -53,14 +57,18 @@ odoo.define("terminal.core.Storage", function (require) {
             }
             return (
                 "<span style='color:navajowhite'>" +
-                "<strong>WARNING:</strong> Clear the " +
+                `<strong>${_t("WARNING:")}</strong> ${_t("Clear the")} ` +
                 "<b class='o_terminal_click o_terminal_cmd' " +
-                "data-cmd='clear screen' style='color:orange;'>screen</b> " +
-                "or/and " +
+                `data-cmd='clear screen' style='color:orange;'>${_t(
+                    "screen"
+                )}</b> ` +
+                `${_t("or/and")} ` +
                 "<b class='o_terminal_click o_terminal_cmd' " +
                 "data-cmd='clear history' style='color:orange;'>" +
-                "history</b> " +
-                "to free storage space. Browser <u>Storage Quota Exceeded</u>" +
+                `${_t("history")}</b> ` +
+                _t(
+                    "to free storage space. Browser <u>Storage Quota Exceeded</u>"
+                ) +
                 " 😭 </strong><br>"
             );
         },

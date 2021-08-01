@@ -62,8 +62,6 @@ odoo.define("terminal.core.TemplateManager", function (require) {
                 "<%= tbody %>" +
                 "</tbody>" +
                 "</table>",
-            TABLE_BODY_CMD:
-                "<td><span class='o_terminal_click o_terminal_view' data-resid='<%= id %>' data-model='<%= model %>'>#<%= id %></span></td>",
             TABLE_SEARCH_ID:
                 "<td><span class='o_terminal_click o_terminal_view' data-resid='<%= id %>' data-model='<%= model %>'>#<%= id %></span></td>",
             WHOAMI:

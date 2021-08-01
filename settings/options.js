@@ -14,7 +14,7 @@
     }
 
     function _onDOMLoaded() {
-        gBrowserObj.storage.sync.get(["init_cmds"], (result) => {
+        gBrowserObj.storage.sync.get(["init_cmds", "lang"], (result) => {
             document.querySelector("#init_cmds").value = result.init_cmds || "";
         });
 

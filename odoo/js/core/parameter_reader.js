@@ -7,6 +7,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
     const ParameterGenerator = require("terminal.core.ParameterGenerator");
     const Utils = require("terminal.core.Utils");
     const Class = require("web.Class");
+    const core = require("web.core");
+
+    const _t = core._t;
 
     /**
      * This class is used to parse terminal command parameters.
@@ -16,10 +19,12 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             this._validators = {
                 s: this._validateString,
                 i: this._validateInt,
+                j: this._validateJson,
             };
             this._formatters = {
                 s: this._formatString,
                 i: this._formatInt,
+                j: this._formatJson,
             };
             this._regexSanitize = new RegExp(/'/g);
             this._regexParams = new RegExp(
@@ -118,14 +123,11 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 i < args.length && checkedCount < params.length;
                 ++i
             ) {
-                let list_mode = false;
                 let carg = args[i];
+                const list_mode = i > 0 && args[i - 1] === "l";
                 // Determine argument type (modifiers)
-                if (carg === "?") {
-                    carg = args[++i];
-                } else if (carg === "l") {
-                    carg = args[++i];
-                    list_mode = true;
+                if (["?", "l"].indexOf(carg) !== -1) {
+                    continue;
                 } else if (carg === "*") {
                     // No more 'carg' will be interpreted
                     for (; checkedCount < params.length; ++checkedCount) {
@@ -164,7 +166,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 checkedCount !== params.length ||
                 checkedCount < this._getNumRequiredArgs(args)
             ) {
-                throw new Error("Invalid command parameters");
+                throw new Error(_t("Invalid command parameters"));
             }
 
             return formatted_params;
@@ -279,6 +281,41 @@ odoo.define("terminal.core.ParameterReader", function (require) {
         },
 
         /**
+         * Test if is a valid json.
+         * @param {String} param
+         * @param {Boolean} list_mode
+         * @returns {Boolean}
+         */
+        _validateJson: function (param, list_mode = false) {
+            if (list_mode) {
+                const param_split = param.split(",");
+                let is_valid = true;
+                const param_split_len = param_split.length;
+                let index = 0;
+                while (index < param_split_len) {
+                    const ps = param_split[index];
+                    const param_sa = ps.trim();
+
+                    try {
+                        JSON.parse(param_sa);
+                    } catch (e) {
+                        is_valid = false;
+                        break;
+                    }
+                    ++index;
+                }
+                return is_valid;
+            }
+
+            try {
+                JSON.parse(param);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        },
+
+        /**
          * Format value to string
          * @param {String} param
          * @param {Boolean} list_mode
@@ -302,6 +339,21 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 return _.map(param.split(","), (item) => Number(item.trim()));
             }
             return Number(param);
+        },
+
+        /**
+         * Format value to js object
+         * @param {String} param
+         * @param {Boolean} list_mode
+         * @returns {Number}
+         */
+        _formatJson: function (param, list_mode = false) {
+            if (list_mode) {
+                return _.map(param.split(","), (item) =>
+                    JSON.parse(item.trim())
+                );
+            }
+            return JSON.parse(param);
         },
     });
 

@@ -55,7 +55,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     "<br>[OPERATION] can be 'read', 'write', 'set' or 'delete'. " +
                     "By default is 'read'. ",
                 syntax: '[STRING: OPERATION] "[DICT: VALUES]/[STRING: KEY]" ',
-                args: "?ss",
+                args: "?sj",
                 example: "write \"{'the_example': 1}\"",
             });
             this.registerCommand("alias", {
@@ -84,8 +84,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition:
                     "Exports the command result to a browser console variable",
                 callback: this._cmdExport,
-                detail:
-                    "Exports the command result to a browser console variable.",
+                detail: "Exports the command result to a browser console variable.",
                 syntax: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
@@ -128,8 +127,7 @@ odoo.define("terminal.functions.Core", function (require) {
             this.registerCommand("mute", {
                 definition: "Only prints errors",
                 callback: this._cmdMute,
-                detail:
-                    "Print to screen is a really slow task, you can improve performance if only prints errors.",
+                detail: "Print to screen is a really slow task, you can improve performance if only prints errors.",
                 syntax: "<STRING: COMMAND>",
                 args: "*",
                 sanitized: false,
@@ -239,15 +237,15 @@ odoo.define("terminal.functions.Core", function (require) {
 
         _cmdTerminalContextOperation: function (
             operation = "read",
-            values = "false"
+            values = false
         ) {
             if (operation === "read") {
                 this.screen.print(this._userContext);
             } else if (operation === "set") {
-                this._userContext = JSON.parse(values);
+                this._userContext = values;
                 this.screen.print(this._userContext);
             } else if (operation === "write") {
-                Object.assign(this._userContext, JSON.parse(values));
+                Object.assign(this._userContext, values);
                 this.screen.print(this._userContext);
             } else if (operation === "delete") {
                 if (values in this._userContext) {
@@ -311,9 +309,8 @@ odoo.define("terminal.functions.Core", function (require) {
             return new Promise(async (resolve, reject) => {
                 try {
                     // eslint-disable-next-line
-                    const [cmd, cmd_name] = this._validateDefCommand(
-                        defcall
-                    )[1];
+                    const [cmd, cmd_name] =
+                        this._validateDefCommand(defcall)[1];
                     if (!cmd_name) {
                         return reject("Need a valid command to execute!");
                     }
@@ -333,9 +330,8 @@ odoo.define("terminal.functions.Core", function (require) {
             return new Promise(async (resolve, reject) => {
                 try {
                     // eslint-disable-next-line
-                    const [cmd, cmd_name] = this._validateDefCommand(
-                        defcall
-                    )[1];
+                    const [cmd, cmd_name] =
+                        this._validateDefCommand(defcall)[1];
                     if (!cmd_name) {
                         return reject("Need a valid command to execute!");
                     }

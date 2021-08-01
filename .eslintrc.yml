@@ -1,5 +1,6 @@
 env:
   browser: true
+  es6: true
 
 parserOptions:
   ecmaVersion: 2020
@@ -12,10 +13,8 @@ globals:
   jQuery: readonly
   moment: readonly
   odoo: readonly
+  py: readonly
   openerp: off
-  Promise: readonly
-  Symbol: readonly
-  BigInt: readonly
 
 # Styling is handled by Prettier, so we only need to enable AST rules;
 # see https://github.com/OCA/maintainer-quality-tools/pull/618#issuecomment-558576890
@@ -33,7 +32,9 @@ rules:
     - 13
   constructor-super: warn
   dot-notation: warn
-  eqeqeq: warn
+  eqeqeq:
+    - error
+    - smart
   global-require: warn
   handle-callback-err: warn
   id-blacklist: warn
@@ -64,7 +65,6 @@ rules:
   no-empty-function: error
   no-empty-pattern: error
   no-empty: warn
-  no-eq-null: error
   no-eval: error
   no-ex-assign: error
   no-extend-native: warn

@@ -14,8 +14,7 @@ odoo.define("terminal.MyFuncs", function (require) {
                 definition: "This is my command",
                 function: this._cmdMyFunc,
                 detail: "My command explained...",
-                syntax:
-                    "<STRING: ParamA> <INT: ParamB> [STRING: ParamC] [INT: ParamD]",
+                syntax: "<STRING: ParamA> <INT: ParamB> [STRING: ParamC] [INT: ParamD]",
                 args: "si?si",
             });
 

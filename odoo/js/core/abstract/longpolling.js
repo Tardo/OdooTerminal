@@ -5,6 +5,9 @@ odoo.define("terminal.core.abstract.Longpolling", function (require) {
     "use strict";
 
     const Class = require("web.Class");
+    const core = require("web.core");
+
+    const _t = core._t;
 
     const AbstractLongPolling = Class.extend({
         _parent: null,
@@ -22,7 +25,7 @@ odoo.define("terminal.core.abstract.Longpolling", function (require) {
          */
         // eslint-disable-next-line
         _onBusNotification: function (notifications) {
-            throw Error("Not Implemented!");
+            throw Error(_t("Not Implemented!"));
         },
 
         /**
@@ -30,7 +33,7 @@ odoo.define("terminal.core.abstract.Longpolling", function (require) {
          */
         // eslint-disable-next-line
         setVerbose: function (status) {
-            throw Error("Not Implemented!");
+            throw Error(_t("Not Implemented!"));
         },
 
         /**
@@ -38,7 +41,7 @@ odoo.define("terminal.core.abstract.Longpolling", function (require) {
          */
         // eslint-disable-next-line
         isVerbose: function () {
-            throw Error("Not Implemented!");
+            throw Error(_t("Not Implemented!"));
         },
 
         /**
@@ -46,7 +49,7 @@ odoo.define("terminal.core.abstract.Longpolling", function (require) {
          */
         // eslint-disable-next-line
         addChannel: function (name) {
-            throw Error("Not Implemented!");
+            throw Error(_t("Not Implemented!"));
         },
 
         /**
@@ -54,17 +57,17 @@ odoo.define("terminal.core.abstract.Longpolling", function (require) {
          */
         // eslint-disable-next-line
         deleteChannel: function (name) {
-            throw Error("Not Implemented!");
+            throw Error(_t("Not Implemented!"));
         },
 
         // eslint-disable-next-line
         startPoll: function () {
-            throw Error("Not Implemented!");
+            throw Error(_t("Not Implemented!"));
         },
 
         // eslint-disable-next-line
         stopPoll: function () {
-            throw Error("Not Implemented!");
+            throw Error(_t("Not Implemented!"));
         },
     });
 

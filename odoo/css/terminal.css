@@ -22,7 +22,7 @@
     top: -110%;
     transform: translate(-50%, 0);
     width: var(--terminal-screen-width);
-    z-index: 1041;
+    z-index: 1031;
     display: grid; /* Here to force BS4 behavior */
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
@@ -59,9 +59,11 @@
     color: var(--terminal-title-color);
 }
 
+.o_terminal div#terminal_screen .o_terminal_click {
+    text-decoration: underline;
+}
 .o_terminal div#terminal_screen .o_terminal_click:hover {
     cursor: pointer;
-    text-decoration: underline;
 }
 
 .o_terminal div#terminal_screen .error_message {

@@ -1,5 +1,19 @@
 # Changelog
 
+**8.0.0**
+
+```
+IMP: Now terminal is always on top
+IMP: Reflows
+IMP: Parameter reader
+
+ADD: Command 'pot': Operations over translations (issue #30)
+ADD: 'delete' option to context and context_term commands
+
+FIX: Syntax typo (pr #28)
+FIX: Disable 'autocomplete' in chrome
+```
+
 **7.3.0**
 
 ```

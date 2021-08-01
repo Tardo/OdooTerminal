@@ -8,6 +8,8 @@ odoo.define("terminal.loaders.Backend", function (require) {
     const Terminal = require("terminal.Terminal");
     const WebClientObj = require("web.web_client");
 
+    const _t = core._t;
+
     // Ensure load resources
     require("terminal.functions.Core");
     require("terminal.functions.Common");
@@ -36,7 +38,7 @@ odoo.define("terminal.loaders.Backend", function (require) {
             );
         } catch (e) {
             console.error(e);
-            console.warn("[OdooTerminal] Can't initialize the terminal!");
+            console.warn(_t("[OdooTerminal] Can't initialize the terminal!"));
         }
     });
 });

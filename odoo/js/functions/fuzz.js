@@ -1,4 +1,3 @@
-/* global py */
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -47,9 +46,10 @@ odoo.define("terminal.functions.Fuzz", function (require) {
 
         process: function (field, omitted_values) {
             const hasWidgetGenerator = field.widget in this._generators;
-            const callback = this._generators[
-                hasWidgetGenerator ? field.widget : field.type
-            ];
+            const callback =
+                this._generators[
+                    hasWidgetGenerator ? field.widget : field.type
+                ];
             if (callback) {
                 return callback(field, omitted_values);
             }
@@ -239,15 +239,13 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                         this._O2MRequiredStore = {};
                         try {
                             for (let i = 0; i < num_records; ++i) {
-                                const [
-                                    field_def,
-                                    affected_fields,
-                                ] = await this._fillField(
-                                    controller,
-                                    field,
-                                    field_info,
-                                    def_value
-                                );
+                                const [field_def, affected_fields] =
+                                    await this._fillField(
+                                        controller,
+                                        field,
+                                        field_info,
+                                        def_value
+                                    );
                                 processed[field_name] = field_def;
                                 fields_ignored = _.union(
                                     fields_ignored,
@@ -320,9 +318,8 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                         field_info,
                         domain
                     );
-                    changes[
-                        field_info.name
-                    ] = this._fieldValueGenerator.process(gen_field_def);
+                    changes[field_info.name] =
+                        this._fieldValueGenerator.process(gen_field_def);
                     if (def_value) {
                         if (field.type === "many2one") {
                             changes[field_info.name].id = Number(def_value);
@@ -351,7 +348,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 }
                 if (typeof raw_value === "object") {
                     this._term.screen.eprint(
-                        " [o] Writing the new random value:"
+                        ` [o] Writing the new random value:`
                     );
                     this._term.screen.print(
                         this._term.screen._prettyObjectString(raw_value)
@@ -536,18 +533,18 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                         );
                         let omitted_values = null;
                         if (field_info.name in this._O2MRequiredStore) {
-                            omitted_values = this._O2MRequiredStore[
-                                field_info.name
-                            ][field_view_name];
+                            omitted_values =
+                                this._O2MRequiredStore[field_info.name][
+                                    field_view_name
+                                ];
                         }
                         const data = this._fieldValueGenerator.process(
                             gen_field_def,
                             omitted_values
                         );
                         if (data) {
-                            changes[field_info.name].data[
-                                field_view_name
-                            ] = data;
+                            changes[field_info.name].data[field_view_name] =
+                                data;
                             this._processO2MRequiredField(
                                 field_info.name,
                                 field_view_name,
@@ -650,10 +647,8 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 definition:
                     "Fill a field with a random or given values on the active form",
                 callback: this._cmdFuzzField,
-                detail:
-                    "Fill a field/s with a random or given values on the active form",
-                syntax:
-                    "[LIST: FIELDS] [STRING/INT: VALUE/S] [INT: O2M RECORDS COUNT]",
+                detail: "Fill a field/s with a random or given values on the active form",
+                syntax: "[LIST: FIELDS] [STRING/INT: VALUE/S] [INT: O2M RECORDS COUNT]",
                 args: "ls?-i",
                 example: "order_line \"{'display_type': false}\" 4",
             });
@@ -664,8 +659,8 @@ odoo.define("terminal.functions.Fuzz", function (require) {
             if (typeof ovalues !== "undefined") {
                 ovalues = JSON.parse(values);
             }
-            const controller_stack = this.getParent().action_manager
-                .controllerStack;
+            const controller_stack =
+                this.getParent().action_manager.controllerStack;
             if (!controller_stack.length) {
                 return Promise.reject("Can't detect any controller");
             }
@@ -737,15 +732,13 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 try {
                     this.screen.eprint("Writing random values...");
                     const fuzz_form = new FuzzForm(this);
-                    const [
-                        processed_fields,
-                        ignored_fields,
-                    ] = await fuzz_form.processFormFields(
-                        form_controller,
-                        fields,
-                        def_values,
-                        o2m_num_records
-                    );
+                    const [processed_fields, ignored_fields] =
+                        await fuzz_form.processFormFields(
+                            form_controller,
+                            fields,
+                            def_values,
+                            o2m_num_records
+                        );
                     const required_count = _.size(
                         _.filter(processed_fields, (field) => field.required)
                     );

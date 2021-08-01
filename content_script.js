@@ -137,6 +137,17 @@
         return to_inject;
     }
 
+    function getStorageSync(key) {
+        return new Promise((resolve, reject) => {
+            gBrowserObj.storage.sync.get(key, (items) => {
+                if (gBrowserObj.runtime?.lastError) {
+                    return reject(gBrowserObj.runtime.lastError);
+                }
+                resolve(items);
+            });
+        });
+    }
+
     // Listen messages from page script
     window.addEventListener(
         "message",
@@ -159,12 +170,13 @@
                 }
             } else if (event.data.type === "ODOO_TERM_START") {
                 // Load Init Commands
-                gBrowserObj.storage.sync.get(["init_cmds"], (result) => {
-                    const cmds = (result.init_cmds || "").split(/\n\r?/);
+                getStorageSync(["init_cmds"]).then((items) => {
+                    const cmds = (items.init_cmds || "").split(/\n\r?/);
                     window.postMessage(
                         {
-                            type: "ODOO_TERM_EXEC_INIT_CMDS",
-                            cmds: cmds,
+                            type: "ODOO_TERM_CONFIG",
+                            init_cmds: cmds,
+                            user_lang: items.lang,
                         },
                         "*"
                     );

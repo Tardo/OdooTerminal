@@ -24,15 +24,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCreateModelRecord,
                 detail: "Open new model record in form view or directly.",
                 syntax: '<STRING: MODEL NAME> "[DICT: VALUES]"',
-                args: "s?s",
+                args: "s?j",
                 example: "res.partner \"{'name': 'Poldoore'}\"",
             });
             this.registerCommand("unlink", {
                 definition: "Unlink record",
                 callback: this._cmdUnlinkModelRecord,
                 detail: "Delete a record.",
-                syntax:
-                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs>",
+                syntax: "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs>",
                 args: "sli",
                 example: "res.partner 10,4,2",
             });
@@ -43,7 +42,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 syntax:
                     "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     '"<DICT: NEW VALUES>"',
-                args: "slis",
+                args: "slij",
                 example: "res.partner 10,4,2 \"{'street': 'Diagon Alley'}\"",
             });
             this.registerCommand("search", {
@@ -59,17 +58,17 @@ odoo.define("terminal.functions.Common", function (require) {
                     "<STRING: MODEL NAME> [STRING: FIELDS] " +
                     '"[ARRAY: DOMAIN]" [INT: LIMIT] [INT: OFFSET] ' +
                     '"[STRING: ORDER]"',
-                args: "s?ssiis",
+                args: "s?lsjiis",
                 example: "res.partner * [] 100 5 'id DESC, name'",
             });
             this.registerCommand("call", {
                 definition: "Call model method",
                 callback: this._cmdCallModelMethod,
-                detail: "Call model method.",
+                detail: "Call model method. Remember: Methods with @api.model decorator doesn't need the id.",
                 syntax:
                     '<STRING: MODEL> <STRING: METHOD> "[ARRAY: ARGS]" ' +
                     '"[DICT: KWARGS]"',
-                args: "ss?ss",
+                args: "ss?jj",
                 example: "res.partner can_edit_vat [8]",
             });
             this.registerCommand("upgrade", {
@@ -120,7 +119,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Call action.<br>&lt;ACTION&gt; Can be an " +
                     "string or object.",
                 syntax: '"<STRING|DICT: ACTION>"',
-                args: "s",
+                args: "j",
                 example: "134",
             });
             this.registerCommand("post", {
@@ -128,7 +127,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdPostData,
                 detail: "Send POST request to selected endpoint",
                 syntax: '<STRING: ENDPOINT> "<DICT: DATA>"',
-                args: "ss",
+                args: "sj",
                 example: "/web/endpoint \"{'the_example': 42}\"",
             });
             this.registerCommand("whoami", {
@@ -186,7 +185,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
                     "By default is 'read'. ",
                 syntax: '[STRING: OPERATION] "[DICT: VALUES]" ',
-                args: "?ss",
+                args: "?sj",
                 example: "write \"{'the_example': 1}\"",
             });
             this.registerCommand("version", {
@@ -222,8 +221,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "<br>&lt;DATABASE&gt; Can be '*' to use current database" +
                     "<br>&lt;LOGIN&gt; Can be optionally preceded by the '-'" +
                     " character and it will be used for password too",
-                syntax:
-                    "<STRING: DATABASE> <STRING: LOGIN> [STRING: PASSWORD]",
+                syntax: "<STRING: DATABASE> <STRING: LOGIN> [STRING: PASSWORD]",
                 args: "ss?s",
                 secured: true,
                 example: "devel -admin",
@@ -273,14 +271,13 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdPostJSONData,
                 detail: "Sends HTTP POST 'application/json' request",
                 syntax: '<STRING: ENDPOINT> "<DICT: DATA>"',
-                args: "ss",
+                args: "sj",
                 example: "/web/endpoint \"{'the_example': 42}\"",
             });
             this.registerCommand("depends", {
                 definition: "Know modules that depends on the given module",
                 callback: this._cmdModuleDepends,
-                detail:
-                    "Show a list of the modules that depends on the given module",
+                detail: "Show a list of the modules that depends on the given module",
                 syntax: "<STRING: MODULE NAME>",
                 args: "s",
                 example: "base",
@@ -303,10 +300,9 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition:
                     "Gets number of records from the given model in the selected domain",
                 callback: this._cmdCount,
-                detail:
-                    "Gets number of records from the given model in the selected domain",
-                syntax: '<STRING MODEL> "[ARRAY: DOMAIN]"',
-                args: "s?s",
+                detail: "Gets number of records from the given model in the selected domain",
+                syntax: '<STRING: MODEL> "[ARRAY: DOMAIN]"',
+                args: "s?j",
                 example: "res.partner ['name', '=ilike', 'A%']",
             });
             this.registerCommand("ref", {
@@ -317,6 +313,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 syntax: "<ARRAY: STRING XML ID>",
                 args: "ls",
                 example: "base.main_company,base.model_res_partner",
+            });
+            this.registerCommand("pot", {
+                definition: "Operations over translations",
+                callback: this._cmdRef,
+                detail: "Show the referenced model and id of the given xmlid's",
+                syntax: "<STRING: OPERATION> <STRING: MODULE>",
+                args: "ss",
+                example: "export discuss",
             });
         },
 
@@ -357,12 +361,12 @@ odoo.define("terminal.functions.Common", function (require) {
             });
         },
 
-        _cmdCount: function (model, domain = "[]") {
+        _cmdCount: function (model, domain = []) {
             return rpc
                 .query({
                     method: "search_count",
                     model: model,
-                    args: [JSON.parse(domain)],
+                    args: [domain],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -414,7 +418,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return rpc
                 .query({
                     route: url,
-                    params: JSON.parse(data),
+                    params: data,
                 })
                 .then((result) => {
                     this.screen.print(result);
@@ -584,9 +588,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 this.screen.print(
                     `${odoo.session_info.server_version_info
                         .slice(0, 3)
-                        .join(
-                            "."
-                        )} (${odoo.session_info.server_version_info
+                        .join(".")} (${odoo.session_info.server_version_info
                         .slice(3)
                         .join(" ")})`
                 );
@@ -596,15 +598,24 @@ odoo.define("terminal.functions.Common", function (require) {
             return Promise.resolve();
         },
 
-        _cmdContextOperation: function (operation = "read", values = "false") {
+        _cmdContextOperation: function (operation = "read", values = false) {
             if (operation === "read") {
                 this.screen.print(session.user_context);
             } else if (operation === "set") {
-                session.user_context = JSON.parse(values);
+                session.user_context = values;
                 this.screen.print(session.user_context);
             } else if (operation === "write") {
-                Object.assign(session.user_context, JSON.parse(values));
+                Object.assign(session.user_context, values);
                 this.screen.print(session.user_context);
+            } else if (operation === "delete") {
+                if (values in session.user_context) {
+                    delete session.user_context[values];
+                    this.screen.print(session.user_context);
+                } else {
+                    this.screen.printError(
+                        "The selected key is not present in the terminal context"
+                    );
+                }
             } else {
                 this.screen.printError("Invalid operation");
             }
@@ -905,13 +916,8 @@ odoo.define("terminal.functions.Common", function (require) {
             });
         },
 
-        _cmdCallModelMethod: function (
-            model,
-            method,
-            args = "[]",
-            kwargs = "{}"
-        ) {
-            const pkwargs = JSON.parse(kwargs);
+        _cmdCallModelMethod: function (model, method, args = [], kwargs = {}) {
+            const pkwargs = kwargs;
             if (typeof pkwargs.context === "undefined") {
                 pkwargs.context = this._getContext();
             }
@@ -919,7 +925,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 .query({
                     method: method,
                     model: model,
-                    args: JSON.parse(args),
+                    args: args,
                     kwargs: pkwargs,
                 })
                 .then((result) => {
@@ -959,7 +965,7 @@ odoo.define("terminal.functions.Common", function (require) {
         _cmdSearchModelRecord: function (
             model,
             field_names,
-            domain = "[]",
+            domain = [],
             limit,
             offset,
             order
@@ -967,10 +973,7 @@ odoo.define("terminal.functions.Common", function (require) {
             const lines_total = this.screen._max_lines - 3;
             let fields = ["display_name"];
             if (field_names) {
-                fields =
-                    field_names === "*"
-                        ? false
-                        : this._parameterReader.splitAndTrim(field_names, ",");
+                fields = field_names === "*" ? false : field_names;
             }
 
             // Workaround: '--more' is a special model name to handle print the rest of the previous call result
@@ -997,7 +1000,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return rpc
                 .query({
                     method: "search_read",
-                    domain: JSON.parse(domain),
+                    domain: domain,
                     fields: fields,
                     model: model,
                     limit: limit,
@@ -1043,7 +1046,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 .query({
                     method: "create",
                     model: model,
-                    args: [JSON.parse(values)],
+                    args: [values],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -1076,7 +1079,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 .query({
                     method: "write",
                     model: model,
-                    args: [id, JSON.parse(values)],
+                    args: [id, values],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -1086,17 +1089,11 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdCallAction: function (action) {
-            let paction = action;
-            try {
-                paction = JSON.parse(action);
-            } catch (err) {
-                // Do Nothing
-            }
-            return this.do_action(paction);
+            return this.do_action(action);
         },
 
         _cmdPostData: function (url, data) {
-            return ajax.post(url, JSON.parse(data)).then((result) => {
+            return ajax.post(url, data).then((result) => {
                 this.screen.print(result);
             });
         },

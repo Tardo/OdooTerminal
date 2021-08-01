@@ -3,12 +3,6 @@ body {
     padding: 1em;
 }
 
-textarea {
-    height: 200px;
-    white-space: pre;
-    width: 100%;
-}
-
 .btn_zone {
     margin-top: 1em;
     text-align: right;
@@ -16,4 +10,23 @@ textarea {
 
 .btn_zone > button {
     padding: 0.5em;
+}
+
+.optsection textarea {
+    height: 200px;
+    white-space: pre;
+    width: 98%;
+}
+
+.optsection {
+    border: 1px solid gray;
+    padding: 0.3em;
+}
+
+.optsection:not(:first-child) {
+    margin-top: 0.5em;
+}
+
+.optsection h4 {
+    margin: 0;
 }

@@ -18,10 +18,8 @@ odoo.define("terminal.functions.Backend", function (require) {
             this.registerCommand("view", {
                 definition: "View model record/s",
                 callback: this._cmdViewModelRecord,
-                detail:
-                    "Open model record in form view or records in list view.",
-                syntax:
-                    "<STRING: MODEL NAME> [INT: RECORD ID] [STRING: VIEW REF]",
+                detail: "Open model record in form view or records in list view.",
+                syntax: "<STRING: MODEL NAME> [INT: RECORD ID] [STRING: VIEW REF]",
                 args: "s?is",
                 example: "res.partner 10 base.view_partner_simple_form",
             });

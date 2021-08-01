@@ -16,13 +16,14 @@ odoo.define("terminal.core.Screen", function (require) {
 
         _line_selector: ":scope > span .print-table tr, :scope > span",
         _max_lines: 750,
+        _max_buff_lines: 100,
 
         init: function () {
             this._super.apply(this, arguments);
             this._templates = new TemplateManager();
             this._linesCounter = 0;
             this._lazyVacuum = _.debounce(() => this._vacuum(), 650);
-            this._buff = "";
+            this._buff = [];
         },
 
         start: function () {
@@ -92,25 +93,36 @@ odoo.define("terminal.core.Screen", function (require) {
 
         /* PRINT */
         flush: function () {
-            this._rafID = null;
+            if (!this._flushing) {
+                this._flushing = true;
+                window.requestAnimationFrame(this._flush.bind(this));
+            }
+        },
+
+        _flush: function () {
             if (!this.$screen || !this.$screen.length) {
                 return;
             }
-            this.$screen.append(this._buff);
-            this._buff = "";
+            // Make browser happy... split buffer
+            this.$screen.append(
+                this._buff.splice(0, this._max_buff_lines).join("")
+            );
             this._lazyVacuum();
             this.scrollDown();
-            if ("onSaveScreen" in this._options) {
-                this._options.onSaveScreen(this.getContent());
+
+            if (this._buff.length === 0) {
+                if ("onSaveScreen" in this._options) {
+                    this._options.onSaveScreen(this.getContent());
+                }
+                this._flushing = false;
+            } else {
+                window.requestAnimationFrame(this._flush.bind(this));
             }
         },
 
         printHTML: function (html) {
-            this._buff += html;
-            if (this._rafID) {
-                window.cancelAnimationFrame(this._rafID);
-            }
-            this._rafID = window.requestAnimationFrame(this.flush.bind(this));
+            this._buff.push(html);
+            this.flush();
         },
 
         print: function (msg, enl, cls) {
@@ -118,7 +130,7 @@ odoo.define("terminal.core.Screen", function (require) {
             if (!enl) {
                 scls = `line-br ${scls}`;
             }
-            this.printHTML(this._getTerminalLine(msg, scls));
+            this._print(msg, scls);
         },
 
         eprint: function (msg, enl) {
@@ -139,9 +151,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
         printError: function (error, internal = false) {
             if (!internal) {
-                this.printHTML(
-                    this._getTerminalLine(`[!] ${error}`, "line-br")
-                );
+                this._print(`[!] ${error}`, "line-br");
                 return;
             }
             let error_msg = error;
@@ -198,7 +208,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 ++this._errorCount;
             }
 
-            this.printHTML(this._getTerminalLine(error_msg, "error_message"));
+            this._print(error_msg, "error_message");
         },
 
         printTable: function (columns, tbody) {
@@ -240,27 +250,29 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         /* PRIVATE */
-        _getTerminalLine: function (msg, cls) {
+        _print: function (msg, cls) {
             const msg_type = typeof msg;
             if (msg_type === "object") {
                 if (msg instanceof Text) {
-                    return `<span class='line-text ${cls}'>${msg}</span>`;
+                    this.printHTML(
+                        `<span class='line-text ${cls}'>${msg}</span>`
+                    );
                 } else if (msg instanceof Array) {
                     const l = msg.length;
-                    let html_to_print = "";
                     for (let x = 0; x < l; ++x) {
-                        html_to_print += `<span class='line-array ${cls}'>${this._getTerminalLine(
-                            msg[x]
-                        )}</span>`;
+                        this.printHTML(
+                            `<span class='line-array ${cls}'>${msg[x]}</span>`
+                        );
                     }
-                    return html_to_print;
+                } else {
+                    this.printHTML(
+                        `<span class='line-object ${cls}'>` +
+                            `${this._prettyObjectString(msg)}</span>`
+                    );
                 }
-                return (
-                    `<span class='line-object ${cls}'>` +
-                    `${this._prettyObjectString(msg)}</span>`
-                );
+            } else {
+                this.printHTML(`<span class='line-text ${cls}'>${msg}</span>`);
             }
-            return `<span class='line-text ${cls}'>${msg}</span>`;
         },
 
         _vacuum: function () {
@@ -299,8 +311,8 @@ odoo.define("terminal.core.Screen", function (require) {
                 "<div class='d-flex terminal-user-input'>" +
                     "<input class='terminal-prompt' readonly='readonly'/>" +
                     "<div class='flex-fill rich-input'>" +
-                    "<input type='edit' id='terminal_shadow_input' autocomplete='off' readonly='readonly'/>" +
-                    "<input type='edit' id='terminal_input' autocomplete='off' />" +
+                    "<input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' readonly='readonly'/>" +
+                    "<input type='edit' id='terminal_input' autocomplete='off-term' />" +
                     "</div>" +
                     "</div>"
             );
