@@ -103,7 +103,6 @@ odoo.define("terminal.core.Screen", function (require) {
             if (!this.$screen || !this.$screen.length) {
                 return;
             }
-            // Make browser happy... split buffer
             this.$screen.append(
                 this._buff.splice(0, this._max_buff_lines).join("")
             );
@@ -155,38 +154,23 @@ odoo.define("terminal.core.Screen", function (require) {
                 return;
             }
             let error_msg = error;
-            if (
-                typeof error === "object" &&
-                "data" in error &&
-                "exception_type" in error.data
-            ) {
+            if (typeof error === "object" && "data" in error) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
                 error_msg = this._templates.render("ERROR_MESSAGE", {
                     error_name: utils.encodeHTML(error.data.name),
                     error_message: utils.encodeHTML(error.data.message),
                     error_id: error_id,
-                    exception_type: error.data.exception_type,
-                    context: JSON.stringify(error.data.context),
-                    args: JSON.stringify(error.data.arguments),
-                    debug: utils.encodeHTML(error.data.debug),
-                });
-                ++this._errorCount;
-            } else if (
-                typeof error === "object" &&
-                "data" in error &&
-                "type" in error.data
-            ) {
-                // It's an Odoo error report
-                const error_id = new Date().getTime();
-                error_msg = this._templates.render("ERROR_MESSAGE", {
-                    error_name: utils.encodeHTML(error.data.objects[1]),
-                    error_message: utils.encodeHTML(error.message),
-                    error_id: error_id,
-                    exception_type: error.data.type,
-                    context: "",
-                    args: "",
-                    debug: utils.encodeHTML(error.data.debug),
+                    exception_type:
+                        error.data.exception_type || error.data.type,
+                    context:
+                        error.data.context &&
+                        JSON.stringify(error.data.context),
+                    args:
+                        error.data.arguments &&
+                        JSON.stringify(error.data.arguments),
+                    debug:
+                        error.data.debug && utils.encodeHTML(error.data.debug),
                 });
                 ++this._errorCount;
             } else if (

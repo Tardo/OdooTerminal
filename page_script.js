@@ -45,32 +45,28 @@
      * @param {String} ver - Odoo version
      */
     function _setServerVersion(ver) {
-        gOdooInfo.serverVersion = ver;
-        const foundVer = gOdooInfo.serverVersion.match(/\d+/);
+        gOdooInfo.serverVersionRaw = ver;
+        const foundVer = gOdooInfo.serverVersionRaw.match(
+            /(\d+)\.(\d+)(?:([a-z]+)(\d*))?/
+        );
         if (foundVer && foundVer.length) {
-            gOdooInfo.serverVersionMajor = foundVer[0];
+            gOdooInfo.serverVersion = {
+                major: Number(foundVer[1]),
+                minor: Number(foundVer[2]),
+                status: foundVer[3],
+                statusLevel: foundVer[4] && Number(foundVer[4]),
+            };
         }
         const cvers = COMPATIBLE_VERS.filter(function (item) {
-            return gOdooInfo.serverVersion.startsWith(item);
+            return gOdooInfo.serverVersionRaw.startsWith(item);
         });
         if (cvers.length) {
             gOdooInfo.isCompatible = true;
-            window.term_odooVersion = gOdooInfo.serverVersion;
-            window.term_odooVersionMajor = gOdooInfo.serverVersionMajor;
-        } else {
-            if (
-                Object.prototype.hasOwnProperty.call(window, "term_odooVersion")
-            ) {
-                delete window.term_odooVersion;
-            }
-            if (
-                Object.prototype.hasOwnProperty.call(
-                    window,
-                    "term_odooVersionMajor"
-                )
-            ) {
-                delete window.term_odooVersionMajor;
-            }
+            window.term_odooVersionRaw = gOdooInfo.serverVersionRaw;
+        } else if (
+            Object.prototype.hasOwnProperty.call(window, "term_odooVersionRaw")
+        ) {
+            delete window.term_odooVersionRaw;
         }
     }
 
@@ -126,7 +122,7 @@
                     (rpc_response) => {
                         const version = rpc_response.result;
                         if (
-                            !_.isUndefined(version) &&
+                            typeof version !== "undefined" &&
                             typeof version === "string"
                         ) {
                             _setServerVersion(version);
@@ -147,8 +143,9 @@
      * @returns {Boolean}
      */
     function _forceIsOdooBackendDetection() {
-        return _.isNull(
-            document.querySelector("head script[src*='assets_frontend']")
+        return (
+            document.querySelector("head script[src*='assets_frontend']") ===
+            null
         );
     }
 

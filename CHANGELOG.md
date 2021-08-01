@@ -3,9 +3,10 @@
 **8.0.0**
 
 ```
-IMP: Now terminal is always on top
-IMP: Reflows
-IMP: Parameter reader
+IMP: Screen: reflows
+IMP: Parameter reader: support json parameter
+IMP: Command 'caf': hightlight required fields
+IMP: Support with "master" branch (pre 15.0)
 
 ADD: Command 'pot': Operations over translations (issue #30)
 ADD: 'delete' option to context and context_term commands

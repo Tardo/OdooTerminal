@@ -20,10 +20,13 @@
     const gOdooInfoObj = {
         isOdoo: false,
         isLoaded: false,
-        serverVersion: null,
+        serverVersionRaw: null,
         isCompatible: false,
         isFrontend: false,
-        serverVersionMajor: "12",
+        serverVersion: {
+            major: 12,
+            minor: 0,
+        },
     };
 
     /**
@@ -117,12 +120,22 @@
         // Compatibility resources
         // 11 - v11
         // 12+ - v12
-        const odoo_version = Number(info.serverVersionMajor);
-        if (odoo_version === 11) {
+        // 15+ - v15
+        const odoo_version = info.serverVersion;
+        if (odoo_version.major === 11 && odoo_version.minor === 0) {
             to_inject.js.push("odoo/js/core/compat/v11/common.js");
         }
-        if (odoo_version >= 12) {
+        if (
+            (odoo_version.major === 11 && odoo_version.minor > 0) ||
+            odoo_version.major >= 12
+        ) {
             to_inject.js.push("odoo/js/core/compat/v12/common.js");
+        }
+        if (
+            (odoo_version.major === 14 && odoo_version.minor > 0) ||
+            odoo_version.major >= 15
+        ) {
+            to_inject.js.push("odoo/js/core/compat/v15/common.js");
         }
         // Backend/Frontend resources
         if (info.isFrontend) {

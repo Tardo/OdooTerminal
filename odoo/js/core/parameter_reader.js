@@ -166,7 +166,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 checkedCount !== params.length ||
                 checkedCount < this._getNumRequiredArgs(args)
             ) {
-                throw new Error(_t("Invalid command parameters"));
+                throw _t("Invalid command parameters");
             }
 
             return formatted_params;

@@ -57,11 +57,16 @@ odoo.define("terminal.core.Utils", function () {
         }
     };
 
+    const getUID = () => {
+        return odoo.session_info.uid || odoo.session_info.user_id;
+    };
+
     return {
         encodeHTML: encodeHTML,
         genHash: genHash,
         hex2rgb: hex2rgb,
         unescapeSlashes: unescapeSlashes,
         save2File: save2File,
+        getUID: getUID,
     };
 });

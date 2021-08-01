@@ -224,6 +224,7 @@ odoo.define("terminal.Terminal", function (require) {
             if (!cmd_def) {
                 return Promise.reject(_t("Need a valid command to execute!"));
             }
+
             const scmd = this._parameterReader.parse(cmd, cmd_def);
             return this._processCommandJob.call(context || this, scmd, cmd_def);
         },
@@ -245,17 +246,19 @@ odoo.define("terminal.Terminal", function (require) {
                 let cmd_def = this._registeredCmds[cmd_name];
                 let scmd = {};
 
-                // Stop execution if the command doesn't exists
-                if (!cmd_def) {
-                    [, cmd_def] = this._searchCommandDefByAlias(cmd_name);
-                    if (!cmd_def) {
-                        return resolve(
-                            this._alternativeExecuteCommand(cmd, store)
-                        );
-                    }
-                }
-
                 try {
+                    // Stop execution if the command doesn't exists
+                    if (!cmd_def) {
+                        [, cmd_def] = this._searchCommandDefByAlias(cmd_name);
+                        if (!cmd_def) {
+                            const cmd_res = this._alternativeExecuteCommand(
+                                cmd,
+                                store
+                            );
+                            return resolve(cmd_res);
+                        }
+                    }
+
                     this._parameterReader.resetStores();
                     scmd = this._parameterReader.parse(cmd, cmd_def);
                 } catch (err) {
@@ -263,7 +266,7 @@ odoo.define("terminal.Terminal", function (require) {
                     this.screen.printError(
                         `<span class='o_terminal_click ` +
                             `o_terminal_cmd' data-cmd='help ${cmd_name}'>` +
-                            `${err.message}!</span>`
+                            `${err}!</span>`
                     );
                     if (store) {
                         this._storeUserInput(cmd_raw);

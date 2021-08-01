@@ -1,4 +1,4 @@
-// Copyright 2018-2020 Alexandre Díaz <dev@redneboa.es>
+// Copyright 2018-2021 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 odoo.define("terminal.functions.Common", function (require) {
@@ -9,6 +9,7 @@ odoo.define("terminal.functions.Common", function (require) {
     const ajax = require("web.ajax");
     const session = require("web.session");
     const Terminal = require("terminal.Terminal");
+    const Utils = require("terminal.core.Utils");
 
     Terminal.include({
         custom_events: _.extend({}, Terminal.prototype.custom_events, {
@@ -174,7 +175,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 syntax:
                     "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
                     "[STRING: FIELDS]",
-                args: "sli?s",
+                args: "sli?ls",
                 example: "res.partner 10,4,2 name,street",
             });
             this.registerCommand("context", {
@@ -593,7 +594,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         .join(" ")})`
                 );
             } catch (err) {
-                this.screen.print(window.term_odooVersion);
+                this.screen.print(window.term_odooVersionRaw);
             }
             return Promise.resolve();
         },
@@ -625,10 +626,7 @@ odoo.define("terminal.functions.Common", function (require) {
         _cmdSearchModelRecordId: function (model, id, field_names) {
             let fields = ["display_name"];
             if (field_names) {
-                fields =
-                    field_names === "*"
-                        ? false
-                        : this._parameterReader.splitAndTrim(field_names, ",");
+                fields = field_names === "*" ? false : field_names;
             }
             return rpc
                 .query({
@@ -701,10 +699,7 @@ odoo.define("terminal.functions.Common", function (require) {
         _cmdCheckFieldAccess: function (model, field_names = false) {
             let fields = false;
             if (field_names) {
-                fields =
-                    field_names === "*"
-                        ? false
-                        : this._parameterReader.splitAndTrim(field_names, ",");
+                fields = field_names === "*" ? false : field_names;
             }
             return rpc
                 .query({
@@ -729,9 +724,13 @@ odoo.define("terminal.functions.Common", function (require) {
                     const len = keys.length;
                     for (let x = 0; x < len; ++x) {
                         const field = keys[x];
-                        body += "<tr>";
-                        body += `<td>${field}</td>`;
                         const fieldDef = result[field];
+                        body += "<tr>";
+                        if (fieldDef.required) {
+                            body += `<td>* <b style='color:mediumslateblue'>${field}</b></td>`;
+                        } else {
+                            body += `<td>${field}</td>`;
+                        }
                         const l2 = fieldParams.length;
                         for (let x2 = 0; x2 < l2; ++x2) {
                             let value = fieldDef[fieldParams[x2]];
@@ -749,13 +748,10 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdShowWhoAmI: function () {
-            const uid =
-                window.odoo.session_info.uid ||
-                window.odoo.session_info.user_id;
             return rpc
                 .query({
                     method: "search_read",
-                    domain: [["id", "=", uid]],
+                    domain: [["id", "=", Utils.getUID()]],
                     fields: [
                         "id",
                         "display_name",
