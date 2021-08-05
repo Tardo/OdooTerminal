@@ -40,13 +40,13 @@ Commands uses promises
   - [] Optional
 - args: Command Paramerters Types
   - 's' String
-  - 'i' Integer
+  - 'i' Number
+  - 'j' String. Using JSON.parse
   - '?' Indicates that next parameters are optional
   - '\*' All the rest (unknown) of params are formatted as string
   - 'l' Indicates that the next parameter can be a list (a list is a string of
     values separted by commas. Example: "1, 3, 5")
   - '-' Avoid check type, the param are formatted as string
-  - 'j' String. Use JSON.parse
 - secured: Hide command from screen & history (default is false)
 - aliases: Used to set deprecated names of the module
 - sanitized: Truncate single quotes (default is true)
@@ -55,5 +55,6 @@ Commands uses promises
 
 See Code: [example_funcs.js](./example_funcs.js)
 
-> Note that all input params are strings or integers. You may use `JSON.parse`
-> to transform strings if you need a usable Javascript object.
+> Note that all input params are strings or numbers. You may use `j` args to
+> parse automatically or `JSON.parse` to transform strings if you need a usable
+> Javascript object.

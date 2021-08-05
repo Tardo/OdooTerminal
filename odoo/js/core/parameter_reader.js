@@ -298,7 +298,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
 
                     try {
                         JSON.parse(param_sa);
-                    } catch (e) {
+                    } catch (err) {
                         is_valid = false;
                         break;
                     }
@@ -309,7 +309,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
 
             try {
                 JSON.parse(param);
-            } catch (e) {
+            } catch (err) {
                 return false;
             }
             return true;

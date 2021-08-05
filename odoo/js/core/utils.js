@@ -1,8 +1,12 @@
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.Utils", function () {
+odoo.define("terminal.core.Utils", function (require) {
     "use strict";
+
+    const session = require("web.session");
+    const utils = require("web.utils");
+    const framework = require("web.framework");
 
     // See https://en.wikipedia.org/wiki/List_of_Unicode_characters
     const encodeHTML = (text) =>
@@ -43,22 +47,52 @@ odoo.define("terminal.core.Utils", function () {
 
     const save2File = (filename, type, data) => {
         const blob = new Blob([data], {type: type});
-        if (window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveBlob(blob, filename);
-        } else {
-            const elem = window.document.createElement("a");
-            const objURL = window.URL.createObjectURL(blob);
-            elem.href = objURL;
-            elem.download = filename;
-            document.body.appendChild(elem);
-            elem.click();
-            document.body.removeChild(elem);
-            URL.revokeObjectURL(objURL);
-        }
+        const elem = window.document.createElement("a");
+        const objURL = window.URL.createObjectURL(blob);
+        elem.href = objURL;
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+        URL.revokeObjectURL(objURL);
+    };
+
+    const file2Base64 = () => {
+        const input = window.document.createElement("input");
+        input.type = "file";
+        document.body.appendChild(input);
+
+        return new Promise((resolve, reject) => {
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+
+                reader.onerror = reject;
+                reader.onload = (readerEvent) => {
+                    return resolve(readerEvent.target.result);
+                };
+            };
+            input.click();
+        }).finally(() => {
+            document.body.removeChild(input);
+        });
     };
 
     const getUID = () => {
         return odoo.session_info.uid || odoo.session_info.user_id;
+    };
+
+    const getContent = (options, onerror) => {
+        return session.get_file({
+            complete: framework.unblockUI,
+            data: _.extend({}, options, {
+                download: true,
+                data: utils.is_bin_size(options.data) ? null : options.data,
+            }),
+            error: onerror,
+            url: "/web/content",
+        });
     };
 
     return {
@@ -68,5 +102,7 @@ odoo.define("terminal.core.Utils", function () {
         unescapeSlashes: unescapeSlashes,
         save2File: save2File,
         getUID: getUID,
+        getContent: getContent,
+        file2Base64: file2Base64,
     };
 });

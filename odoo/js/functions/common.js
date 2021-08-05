@@ -118,9 +118,9 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCallAction,
                 detail:
                     "Call action.<br>&lt;ACTION&gt; Can be an " +
-                    "string or object.",
+                    "string, number or object.",
                 syntax: '"<STRING|DICT: ACTION>"',
-                args: "j",
+                args: "*",
                 example: "134",
             });
             this.registerCommand("post", {
@@ -311,17 +311,156 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Show the referenced model and id of the given xmlid's",
                 callback: this._cmdRef,
                 detail: "Show the referenced model and id of the given xmlid's",
-                syntax: "<ARRAY: STRING XML ID>",
+                syntax: "<LIST: STRING XML ID>",
                 args: "ls",
                 example: "base.main_company,base.model_res_partner",
             });
             this.registerCommand("pot", {
                 definition: "Operations over translations",
-                callback: this._cmdRef,
-                detail: "Show the referenced model and id of the given xmlid's",
-                syntax: "<STRING: OPERATION> <STRING: MODULE>",
-                args: "ss",
-                example: "export discuss",
+                callback: this._cmdPot,
+                detail:
+                    "Operations over translations." +
+                    "<br>[OPERATION] can be 'export', 'import', 'languages'." +
+                    "<br>[FORMAT] vanilla formats are 'po' and 'csv'. (Default is 'po')",
+                syntax: "<STRING: OPERATION> [STRING: LANGUAGE] [LIST: TECHNICAL MODEL NAMES] [STRING: FORMAT] [INT: OVERWRITE]",
+                args: "s?slsi",
+                example: "export en_US discuss",
+            });
+        },
+
+        _cmdPot: function (
+            operation,
+            lang = false,
+            module_names = [],
+            format = "po",
+            overwrite = true
+        ) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    if (operation === "export") {
+                        if (lang && _.isEmpty(module_names)) {
+                            return reject("Need the technical module name(s)");
+                        } else if (!lang && _.isEmpty(module_names)) {
+                            return this.do_action(
+                                "base.action_wizard_lang_export"
+                            );
+                        }
+                        // Get module ids
+                        let module_ids = await rpc.query({
+                            method: "search_read",
+                            domain: [["name", "in", module_names]],
+                            fields: ["id"],
+                            model: "ir.module.module",
+                            kwargs: {context: this._getContext()},
+                        });
+                        module_ids = _.map(module_ids, "id");
+                        if (_.isEmpty(module_ids)) {
+                            return reject("No modules found!");
+                        }
+                        // Create wizard record
+                        const wizard_id = await rpc.query({
+                            method: "create",
+                            model: "base.language.export",
+                            args: [
+                                {
+                                    state: "choose",
+                                    format: format,
+                                    lang: lang,
+                                    modules: [[6, false, module_ids]],
+                                },
+                            ],
+                            kwargs: {context: this._getContext()},
+                        });
+                        if (!wizard_id) {
+                            return reject("Can't create wizard record!");
+                        }
+
+                        // Get action to export
+                        const action = await rpc.query({
+                            method: "act_getfile",
+                            model: "base.language.export",
+                            args: [[wizard_id]],
+                            kwargs: {context: this._getContext()},
+                        });
+
+                        // Get updated wizard record data
+                        const wizard_record = await rpc.query({
+                            method: "search_read",
+                            domain: [["id", "=", wizard_id]],
+                            fields: false,
+                            model: "base.language.export",
+                            kwargs: {context: this._getContext()},
+                        });
+
+                        // Get file
+                        await Utils.getContent(
+                            {
+                                model: "base.language.export",
+                                id: wizard_id,
+                                field: "data",
+                                filename_field: "name",
+                                filename: wizard_record.name || "",
+                            },
+                            this.printError
+                        );
+
+                        return resolve(action);
+                    }
+                    if (operation === "import") {
+                        if (!lang && _.isEmpty(module_names)) {
+                            return this.do_action(
+                                "base.action_wizard_lang_import"
+                            );
+                        }
+                        // Get file content
+                        const file64 = await Utils.file2Base64();
+                        // Create wizard record
+                        const wizard_id = await rpc.query({
+                            method: "create",
+                            model: "base.language.import",
+                            args: [
+                                {
+                                    name: "CHANGE ME!",
+                                    code: lang,
+                                    filename: `${lang}.${format}`,
+                                    overwrite: overwrite,
+                                    data: file64,
+                                },
+                            ],
+                            kwargs: {context: this._getContext()},
+                        });
+                        if (!wizard_id) {
+                            return reject("Can't create wizard record!");
+                        }
+
+                        // Get action to export
+                        const status = await rpc.query({
+                            method: "import_lang",
+                            model: "base.language.import",
+                            args: [[wizard_id]],
+                            kwargs: {context: this._getContext()},
+                        });
+                        if (status) {
+                            this.screen.print(
+                                "Language file imported successfully"
+                            );
+                        }
+                        return resolve(status);
+                    } else if (operation === "languages") {
+                        const langs = await rpc.query({
+                            method: "get_installed",
+                            model: "res.lang",
+                            kwargs: {context: this._getContext()},
+                        });
+                        for (lang of langs) {
+                            this.screen.print(` - ${lang[0]} (${lang[1]})`);
+                        }
+                        return resolve(langs);
+                    }
+                    return reject("Invalid operation!");
+                } catch (err) {
+                    return reject(err);
+                }
             });
         },
 
@@ -1085,7 +1224,11 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdCallAction: function (action) {
-            return this.do_action(action);
+            let saction = action;
+            if (this._parameterReader._validateJson(action)) {
+                saction = this._parameterReader._formatJson(action);
+            }
+            return this.do_action(saction);
         },
 
         _cmdPostData: function (url, data) {
