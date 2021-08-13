@@ -45,7 +45,10 @@ odoo.define("terminal.functions.Fuzz", function (require) {
         },
 
         process: function (field, omitted_values) {
-            const hasWidgetGenerator = field.widget in this._generators;
+            const hasWidgetGenerator = Object.prototype.hasOwnProperty.call(
+                this._generators,
+                field.widget
+            );
             const callback =
                 this._generators[
                     hasWidgetGenerator ? field.widget : field.type
@@ -334,7 +337,10 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 }
                 // Get the raw value to human printing
                 let raw_value = changes[field_info.name];
-                if (typeof raw_value === "object" && "operation" in raw_value) {
+                if (
+                    typeof raw_value === "object" &&
+                    Object.prototype.hasOwnProperty.call(raw_value, "operation")
+                ) {
                     if (raw_value.operation === "ADD") {
                         raw_value = raw_value.id;
                     } else if (raw_value.operation === "ADD_M2M") {
@@ -419,7 +425,10 @@ odoo.define("terminal.functions.Fuzz", function (require) {
             while (index < keys_len) {
                 const field_name = keys[index];
                 const change = changes[field_name];
-                if (typeof change === "object" && "operation" in change) {
+                if (
+                    typeof change === "object" &&
+                    Object.prototype.hasOwnProperty.call(change, "operation")
+                ) {
                     if (change.operation === "ADD") {
                         values[field_name] = change.id;
                     } else if (change.operation === "ADD_M2M") {
@@ -448,11 +457,19 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 const s_changes = this._getChangesValues(
                     changes[parent_field_name].data
                 );
-                if (!(parent_field_name in this._O2MRequiredStore)) {
+                if (
+                    !Object.prototype.hasOwnProperty.call(
+                        this._O2MRequiredStore,
+                        parent_field_name
+                    )
+                ) {
                     this._O2MRequiredStore[parent_field_name] = {};
                 }
                 if (
-                    !(field_name in this._O2MRequiredStore[parent_field_name])
+                    !Object.prototype.hasOwnProperty.call(
+                        this._O2MRequiredStore[parent_field_name],
+                        field_name
+                    )
                 ) {
                     this._O2MRequiredStore[parent_field_name][field_name] = [];
                 }
@@ -532,7 +549,12 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                             proc_domain
                         );
                         let omitted_values = null;
-                        if (field_info.name in this._O2MRequiredStore) {
+                        if (
+                            Object.prototype.hasOwnProperty.call(
+                                this._O2MRequiredStore,
+                                field_info.name
+                            )
+                        ) {
                             omitted_values =
                                 this._O2MRequiredStore[field_info.name][
                                     field_view_name
@@ -639,25 +661,30 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 definition: "Run a 'Fuzz Test'",
                 callback: this._cmdFuzz,
                 detail: "Runs a 'Fuzz Test' over the selected model and view",
-                syntax: "<STRING: MODEL NAME> [STRING: VIEW REF]",
-                args: "s?s",
-                example: "res.partner base.view_partner_simple_form",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "s::r:ref::0::The view reference name",
+                ],
+                example: "-m res.partner -r base.view_partner_simple_form",
             });
             this.registerCommand("fuzz_field", {
                 definition:
                     "Fill a field with a random or given values on the active form",
                 callback: this._cmdFuzzField,
                 detail: "Fill a field/s with a random or given values on the active form",
-                syntax: "[LIST: FIELDS] [STRING/INT: VALUE/S] [INT: O2M RECORDS COUNT]",
-                args: "ls?-i",
-                example: "order_line \"{'display_type': false}\" 4",
+                args: [
+                    "ls::f:field::1::The field names",
+                    "-::v:value::0::The value to use",
+                    "i::c:count::0::The count of 02M records",
+                ],
+                example: "-f order_line -v \"{'display_type': false}\" -c 4",
             });
         },
 
-        _cmdFuzzField: function (fields, values, o2m_num_records) {
-            let ovalues = values;
+        _cmdFuzzField: function (kwargs) {
+            let ovalues = kwargs.value;
             if (typeof ovalues !== "undefined") {
-                ovalues = JSON.parse(values);
+                ovalues = JSON.parse(kwargs.value);
             }
             const controller_stack =
                 this.getParent().action_manager.controllerStack;
@@ -672,20 +699,27 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                     "The current controller is not for a form view"
                 );
             }
-            return this._runFuzz(controller, fields, ovalues, o2m_num_records);
+            return this._runFuzz(
+                controller,
+                kwargs.field,
+                ovalues,
+                kwargs.count
+            );
         },
 
-        _cmdFuzz: function (model, view_ref = false) {
+        _cmdFuzz: function (kwargs) {
             return new Promise(async (resolve, reject) => {
                 try {
-                    this.screen.eprint(`Opening selected ${model} form...`);
+                    this.screen.eprint(
+                        `Opening selected ${kwargs.model} form...`
+                    );
                     const context = this._getContext({
-                        form_view_ref: view_ref,
+                        form_view_ref: kwargs.ref,
                     });
                     const action = await this.do_action({
                         type: "ir.actions.act_window",
                         name: "View Record",
-                        res_model: model,
+                        res_model: kwargs.model,
                         res_id: false,
                         views: [[false, "form"]],
                         target: "new",

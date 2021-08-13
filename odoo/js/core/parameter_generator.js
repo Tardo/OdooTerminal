@@ -94,7 +94,12 @@ odoo.define("terminal.core.ParameterGenerator", function (require) {
                 let index_b = 0;
                 while (index_b < matches_len) {
                     const match = matches[index_b];
-                    if (match[2] in this._generators) {
+                    if (
+                        Object.prototype.hasOwnProperty.call(
+                            this._generators,
+                            match[2]
+                        )
+                    ) {
                         const gen_val = this._generators[match[2]](
                             ...match.splice(3)
                         );

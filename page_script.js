@@ -79,7 +79,7 @@
      * @param {Function} on_rejected
      */
     function _createRpc(url, fct_name, params, on_fulfilled, on_rejected) {
-        if (!("args" in params)) {
+        if (!Object.prototype.hasOwnProperty.call(params, "args")) {
             params.args = {};
         }
 

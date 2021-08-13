@@ -6,13 +6,16 @@
 IMP: Screen: reflows
 IMP: Parameter reader: support json parameter
 IMP: Command 'caf': hightlight required fields
+IMP: Command 'help': More verbose format
+IMP: Command 'login': Now uses '#' instead of '-'
 IMP: Support with "master" branch (pre 15.0)
+IMP: ParamaterReader: Now supports 'named arguments'
+IMP: Command definition: Rework 'args' and removed unused properties (syntax)
 
-ADD: Command 'pot': Operations over translations (issue #30)
-ADD: 'delete' option to context and context_term commands
+ADD: Command 'lang': Operations over translations (issue #30)
+ADD: 'delete' option to 'context' and 'context_term' commands
 
-FIX: Syntax typo (pr #28)
-FIX: Disable 'autocomplete' in chrome
+FIX: Disable 'native autocomplete' in chrome
 ```
 
 **7.3.0**

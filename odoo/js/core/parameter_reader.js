@@ -25,6 +25,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 s: this._formatString,
                 i: this._formatInt,
                 j: this._formatJson,
+                f: this._formatFlag,
             };
             this._regexSanitize = new RegExp(/'/g);
             this._regexParams = new RegExp(
@@ -45,6 +46,98 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          */
         splitAndTrim: function (text, separator) {
             return _.map(text.split(separator), (item) => item.trim());
+        },
+
+        /**
+         * Resolve argument information
+         *
+         * @param {String} arg
+         * @returns {Object}
+         */
+        getArgumentInfo: function (arg) {
+            const [
+                type,
+                names,
+                is_required,
+                descr,
+                default_value,
+                strict_values,
+            ] = arg.split("::");
+            const [short_name, long_name] = names.split(":");
+            const list_mode = type[0] === "l";
+            let ttype = type[type.length - 1];
+            if (ttype === "-") {
+                ttype = "s";
+            }
+            const s_strict_values = strict_values?.replaceAll(":", ",");
+            return {
+                type: type,
+                names: {
+                    short: short_name,
+                    long: long_name,
+                },
+                description: descr,
+                default_value:
+                    (!_.isEmpty(default_value) &&
+                        this._formatters[ttype](default_value, false)) ||
+                    undefined,
+                strict_values:
+                    (!_.isEmpty(default_value) &&
+                        this._formatters[ttype](s_strict_values, true)) ||
+                    undefined,
+                is_required: Boolean(Number(is_required)),
+                list_mode: list_mode,
+            };
+        },
+
+        /**
+         * @param {Array} args
+         * @param {String} arg_name
+         * @returns {Object}
+         */
+        getArgumentInfoByName: function (args, arg_name) {
+            for (const arg of args) {
+                const arg_info = this.getArgumentInfo(arg);
+                if (
+                    arg_info.names.short === arg_name ||
+                    arg_info.names.long === arg_name
+                ) {
+                    return arg_info;
+                }
+            }
+
+            return null;
+        },
+
+        /**
+         * @param {String} type
+         * @returns {String}
+         */
+        getHumanType: function (type) {
+            const singular_types = ["-", "j"];
+            const name_types = {
+                i: "NUMBER",
+                s: "STRING",
+                j: "JSON",
+                f: "FLAG",
+                "-": "ANY",
+            };
+            let res = "";
+            let carg = type[0];
+            const is_list = carg === "l";
+            if (is_list) {
+                res += "LIST OF ";
+                carg = type[1];
+            }
+            if (Object.prototype.hasOwnProperty.call(name_types, carg)) {
+                res += name_types[carg];
+            } else {
+                res += "UNKNOWN";
+            }
+            if (is_list && singular_types.indexOf(carg) === -1) {
+                res += "S";
+            }
+            return res;
         },
 
         /**
@@ -78,7 +171,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          * @param {Object} cmd_def
          * @returns {Object}
          */
-        parse: function (cmd_raw, cmd_def) {
+        parse: function (cmd_raw, cmd_def = {}) {
             const match = this._regexParams[Symbol.matchAll](cmd_raw);
             let scmd = Array.from(match, (x) => x[0]);
             const cmd = scmd[0];
@@ -113,41 +206,61 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          * @returns {Boolean}
          */
         validateAndFormat: function (args, params) {
-            if (!args.length) {
+            if (_.isEmpty(args)) {
                 return params;
             }
-            const formatted_params = [];
             let checkedCount = 0;
-            for (
-                let i = 0;
-                i < args.length && checkedCount < params.length;
-                ++i
-            ) {
-                let carg = args[i];
-                const list_mode = i > 0 && args[i - 1] === "l";
-                // Determine argument type (modifiers)
-                if (["?", "l"].indexOf(carg) !== -1) {
-                    continue;
-                } else if (carg === "*") {
-                    // No more 'carg' will be interpreted
-                    for (; checkedCount < params.length; ++checkedCount) {
-                        formatted_params.push(
-                            this._formatters.s(params[checkedCount])
-                        );
+            let checkedRequiredCount = 0;
+            let kwargs = {};
+            // Create info structures
+            const required_args = _.chain(args)
+                .filter((x) => this.getArgumentInfo(x)?.is_required)
+                .map((x) => this.getArgumentInfo(x)?.names.long)
+                .value();
+
+            // Create arguments dict
+            for (let i = 0; i < params.length; ++i) {
+                if (checkedCount >= args.length) {
+                    throw _t("Invalid command parameters");
+                }
+                let param = params[i];
+
+                // Get argument info
+                // If not named param given the position will be used
+                // against "required arguments".
+                let arg_info = null;
+                if (param[0] === "-") {
+                    const arg_name = param.substr(param[1] === "-" ? 2 : 1);
+                    arg_info = this.getArgumentInfoByName(args, arg_name);
+                    // Handle 'flag' type, so it don't use a value
+                    if (arg_info.type === "f") {
+                        kwargs[arg_info.names.long.replaceAll("-", "_")] = true;
+                        continue;
                     }
-                    break;
+                    param = params[++i];
+                } else {
+                    arg_info = this.getArgumentInfo(args[checkedCount]);
+                }
+                if (_.isEmpty(arg_info)) {
+                    throw _t("Invalid command parameters");
                 }
 
-                // Parameter validation & formatting
-                const param = params[checkedCount];
+                const arg_long_name = arg_info.names.long;
+                const s_arg_long_name = arg_long_name.replaceAll("-", "_");
+
+                let carg = arg_info.type[0];
+                // Determine argument type (modifiers)
+                if (carg === "l") {
+                    carg = arg_info.type[1];
+                }
 
                 if (carg === "-") {
                     const formatted_param = this._tryAllFormatters(
                         param,
-                        list_mode
+                        arg_info.list_mode
                     );
                     if (!_.isNull(formatted_param)) {
-                        formatted_params.push(formatted_param);
+                        kwargs[s_arg_long_name] = formatted_param;
                         ++checkedCount;
                         continue;
                     }
@@ -155,21 +268,52 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     // Not found any compatible formatter
                     // fallback to generic string
                     carg = "s";
-                } else if (!this._validators[carg](param, list_mode)) {
+                } else if (!this._validators[carg](param, arg_info.list_mode)) {
                     break;
                 }
-                formatted_params.push(this._formatters[carg](param, list_mode));
+                kwargs[s_arg_long_name] = this._formatters[carg](
+                    param,
+                    arg_info.list_mode
+                );
+                if (!_.isEmpty(arg_info.strict_values)) {
+                    if (
+                        arg_info.strict_values.indexOf(
+                            kwargs[s_arg_long_name]
+                        ) === -1
+                    ) {
+                        throw _t(`Invalid '${arg_long_name}' parameter value`);
+                    }
+                }
                 ++checkedCount;
+                if (arg_info.is_required) {
+                    ++checkedRequiredCount;
+                }
             }
 
+            // Apply default values
+            let default_values = _.chain(args)
+                .map((x) => this.getArgumentInfo(x))
+                .filter((x) => typeof x.default_value !== "undefined")
+                .map((x) => [x.names.long, x.default_value])
+                .value();
+            default_values = _.isEmpty(default_values)
+                ? {}
+                : Object.fromEntries(default_values);
+            kwargs = _.extend({}, default_values, kwargs);
+
+            // Check that all is correct
+            const param_values_num = _.filter(
+                params,
+                (x) => x[0] !== "-"
+            ).length;
             if (
-                checkedCount !== params.length ||
-                checkedCount < this._getNumRequiredArgs(args)
+                checkedCount !== param_values_num ||
+                checkedRequiredCount !== required_args.length
             ) {
                 throw _t("Invalid command parameters");
             }
 
-            return formatted_params;
+            return kwargs;
         },
 
         /**
@@ -349,11 +493,26 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          */
         _formatJson: function (param, list_mode = false) {
             if (list_mode) {
-                return _.map(param.split(","), (item) =>
-                    JSON.parse(item.trim())
+                return _.map(this.splitAndTrim(param), (item) =>
+                    JSON.parse(item)
                 );
             }
             return JSON.parse(param);
+        },
+
+        /**
+         * Format value to boolean
+         * @param {String} param
+         * @param {Boolean} list_mode
+         * @returns {Number}
+         */
+        _formatFlag: function (param, list_mode = false) {
+            if (list_mode) {
+                return _.map(this.splitAndTrim(param), (item) =>
+                    Boolean(Number(item))
+                );
+            }
+            return Boolean(Number(param));
         },
     });
 

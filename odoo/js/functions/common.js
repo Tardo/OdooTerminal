@@ -24,286 +24,262 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Create new record",
                 callback: this._cmdCreateModelRecord,
                 detail: "Open new model record in form view or directly.",
-                syntax: '<STRING: MODEL NAME> "[DICT: VALUES]"',
-                args: "s?j",
-                example: "res.partner \"{'name': 'Poldoore'}\"",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "j::v:value::0::The values to write",
+                ],
+                example: "-m res.partner -v \"{'name': 'Poldoore'}\"",
             });
             this.registerCommand("unlink", {
                 definition: "Unlink record",
                 callback: this._cmdUnlinkModelRecord,
                 detail: "Delete a record.",
-                syntax: "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs>",
-                args: "sli",
-                example: "res.partner 10,4,2",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "li::i:id::1::The record id's",
+                ],
+                example: "-m res.partner -i 10,4,2",
             });
             this.registerCommand("write", {
                 definition: "Update record values",
                 callback: this._cmdWriteModelRecord,
                 detail: "Update record values.",
-                syntax:
-                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
-                    '"<DICT: NEW VALUES>"',
-                args: "slij",
-                example: "res.partner 10,4,2 \"{'street': 'Diagon Alley'}\"",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "li::i:id::1::The record id's",
+                    "j::v:value::1::The values to write",
+                ],
+                example:
+                    "-m res.partner -i 10,4,2 -v \"{'street': 'Diagon Alley'}\"",
             });
             this.registerCommand("search", {
                 definition: "Search model record/s",
                 callback: this._cmdSearchModelRecord,
-                detail:
-                    "Launch orm search query.<br>[FIELDS] " +
-                    "are separated by commas (without spaces) and by default " +
-                    "is 'display_name'. Can use '*' to show all fields of the model" +
-                    "<br>[LIMIT] can be zero (no limit)" +
-                    "<br>[ORDER] A list of orders separated by comma (Example: 'age DESC, email')",
-                syntax:
-                    "<STRING: MODEL NAME> [STRING: FIELDS] " +
-                    '"[ARRAY: DOMAIN]" [INT: LIMIT] [INT: OFFSET] ' +
-                    '"[STRING: ORDER]"',
-                args: "s?lsjiis",
-                example: "res.partner * [] 100 5 'id DESC, name'",
+                detail: "Launch orm search query",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "ls::f:field::0::The field names to request<br/>Can use '*' to show all fields of the model::display_name",
+                    "j::d:domain::0::The domain::[]",
+                    "i::l:limit::0::The limit of records to request",
+                    "i::of:offset::0::The offset (from)<br/>Can be zero (no limit)",
+                    "s::o:order::0::The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
+                    "f::more:more::0::Flag to indicate that show more results",
+                ],
+                example: "-m res.partner -f * -l 100 -of 5 -o 'id DESC, name'",
             });
             this.registerCommand("call", {
                 definition: "Call model method",
                 callback: this._cmdCallModelMethod,
                 detail: "Call model method. Remember: Methods with @api.model decorator doesn't need the id.",
-                syntax:
-                    '<STRING: MODEL> <STRING: METHOD> "[ARRAY: ARGS]" ' +
-                    '"[DICT: KWARGS]"',
-                args: "ss?jj",
-                example: "res.partner can_edit_vat [8]",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "s::c:call::1::The method name to call",
+                    "j::a:argument::0::The arguments list::[]",
+                    "j::k:kwarg::0::The arguments dictionary::{}",
+                ],
+                example: "-m res.partner -c can_edit_vat -a [8]",
             });
             this.registerCommand("upgrade", {
                 definition: "Upgrade a module",
                 callback: this._cmdUpgradeModule,
                 detail: "Launch upgrade module process.",
-                syntax: "<STRING: MODULE NAME>",
-                args: "s",
-                example: "contacts",
+                args: ["s::m:module::1::The module technical name"],
+                example: "-m contacts",
             });
             this.registerCommand("install", {
                 definition: "Install a module",
                 callback: this._cmdInstallModule,
                 detail: "Launch module installation process.",
-                syntax: "<STRING: MODULE NAME>",
-                args: "s",
-                example: "contacts",
+                args: ["s::m:module::1::The module technical name"],
+                example: "-m contacts",
             });
             this.registerCommand("uninstall", {
                 definition: "Uninstall a module",
                 callback: this._cmdUninstallModule,
                 detail: "Launch module deletion process.",
-                syntax: "<STRING: MODULE NAME>",
-                args: "s",
-                exmaple: "contacts",
+                args: ["s::m:module::1::The module technical name"],
+                exmaple: "-m contacts",
             });
             this.registerCommand("reload", {
                 definition: "Reload current page",
                 callback: this._cmdReloadPage,
                 detail: "Reload current page.",
-                syntax: "",
-                args: "",
             });
             this.registerCommand("debug", {
                 definition: "Set debug mode",
                 callback: this._cmdSetDebugMode,
-                detail:
-                    "Set debug mode:<br>- 0: Disabled<br>- 1: " +
-                    "Enabled<br>- 2: Enabled with Assets",
-                syntax: "<INT: MODE>",
-                args: "i",
-                example: "2",
+                detail: "Set debug mode",
+                args: [
+                    "i::m:mode::1::The mode<br>- 0: Disabled<br>- 1: Enabled<br>- 2: Enabled with Assets::::0:1:2",
+                ],
+                example: "-m 2",
             });
             this.registerCommand("action", {
                 definition: "Call action",
                 callback: this._cmdCallAction,
-                detail:
-                    "Call action.<br>&lt;ACTION&gt; Can be an " +
-                    "string, number or object.",
-                syntax: '"<STRING|DICT: ACTION>"',
-                args: "*",
-                example: "134",
+                detail: "Call action",
+                args: [
+                    "-::a:action::1::The action to launch<br/>Can be an string, number or object",
+                ],
+                example: "-a 134",
             });
             this.registerCommand("post", {
                 definition: "Send POST request",
                 callback: this._cmdPostData,
                 detail: "Send POST request to selected endpoint",
-                syntax: '<STRING: ENDPOINT> "<DICT: DATA>"',
-                args: "sj",
-                example: "/web/endpoint \"{'the_example': 42}\"",
+                args: [
+                    "s::e:endpoint::1::The endpoint",
+                    "j::d:data::1::The data",
+                ],
+                example: "-e /web/endpoint -d \"{'the_example': 42}\"",
             });
             this.registerCommand("whoami", {
                 definition: "Know current user login",
                 callback: this._cmdShowWhoAmI,
                 detail: "Shows current user login",
-                syntax: "",
-                args: "",
             });
             this.registerCommand("caf", {
                 definition: "Check model fields access",
                 callback: this._cmdCheckFieldAccess,
                 detail: "Show readable/writeable fields of the selected model",
-                syntax: '<STRING: MODEL> "[LIST: FIELDS]"',
-                args: "s?ls",
-                example: 'res.partner "name,street"',
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "ls::f:field::0::The field names to request",
+                ],
+                example: "-m res.partner -f name,street",
             });
             this.registerCommand("cam", {
                 definition: "Check model access",
                 callback: this._cmdCheckModelAccess,
                 detail:
                     "Show access rights for the selected operation on the" +
-                    " selected model" +
-                    "<br>&lt;OPERATION&gt; Can be 'create', 'read', 'write'" +
-                    " or 'unlink'",
-                syntax: "<STRING: MODEL> <STRING: OPERATION>",
-                args: "ss",
-                example: "res.partner read",
+                    " selected model",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "s::o:operation::1::The operation to do::::create:read:write:unlink",
+                ],
+                example: "-m res.partner -o read",
             });
             this.registerCommand("lastseen", {
                 definition: "Know user presence",
                 callback: this._cmdLastSeen,
                 detail: "Show users last seen",
-                syntax: "",
-                args: "",
             });
             this.registerCommand("read", {
                 definition: "Search model record",
                 callback: this._cmdSearchModelRecordId,
-                detail:
-                    "Launch orm search query.<br>[FIELDS] " +
-                    "are separated by commas (without spaces) and by default " +
-                    "is 'display_name'. Can use '*' to show all fields.",
-                syntax:
-                    "<STRING: MODEL NAME> <INT: RECORD ID or LIST OF IDs> " +
-                    "[STRING: FIELDS]",
-                args: "sli?ls",
-                example: "res.partner 10,4,2 name,street",
+                detail: "Launch orm search query.",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "li::i:id::1::The record id's",
+                    "ls::f:field::0::The fields to request<br/>Can use '*' to show all fields::display_name",
+                ],
+                example: "-m res.partner -i 10,4,2 -f name,street",
             });
             this.registerCommand("context", {
                 definition: "Operations over session context dictionary",
                 callback: this._cmdContextOperation,
-                detail:
-                    "Operations over session context dictionary." +
-                    "<br>[OPERATION] can be 'read', 'write' or 'set'. " +
-                    "By default is 'read'. ",
-                syntax: '[STRING: OPERATION] "[DICT: VALUES]" ',
-                args: "?sj",
-                example: "write \"{'the_example': 1}\"",
+                detail: "Operations over session context dictionary.",
+                args: [
+                    "s::o:operation::0::The operation to do::read::read:write:set",
+                    "j::v:value::0::The values",
+                ],
+                example: "-o write -v \"{'the_example': 1}\"",
             });
             this.registerCommand("version", {
                 definition: "Know Odoo version",
                 callback: this._cmdShowOdooVersion,
                 detail: "Shows Odoo version",
-                syntax: "",
-                args: "",
             });
             this.registerCommand("longpolling", {
                 definition: "Long-Polling operations",
                 callback: this._cmdLongpolling,
-                detail:
-                    "Operations over long-polling." +
-                    "<br>[OPERATION] can be 'verbose', 'off', 'add_channel'," +
-                    " 'del_channel', 'start', 'stop' or empty. " +
-                    "If empty, prints current value." +
-                    "<br> - verbose > Print incoming notificacions" +
-                    "<br> - off > Stop verbose mode" +
-                    "<br> - add_channel > Add a channel to listen" +
-                    "<br> - del_channel > Delete a listening channel" +
-                    "<br> - start > Start client longpolling service" +
-                    "<br> - stop > Stop client longpolling service",
-                syntax: "[STRING: OPERATION] [STRING: PARAM1]",
-                args: "?ss",
+                detail: "Operations over long-polling.",
+                args: [
+                    "s::o:operation::0::The operation to do<br>- verbose > Print incoming notificacions<br>- off > Stop verbose mode<br>- add_channel > Add a channel to listen<br>- del_channel > Delete a listening channel<br>- start > Start client longpolling service<br> - stop > Stop client longpolling service::::verbose:off:add_channel:del_channel:start:stop",
+                    "s::p:param::0::The parameter",
+                ],
                 example: "add_channel example_channel",
             });
             this.registerCommand("login", {
                 definition: "Login as...",
                 callback: this._cmdLoginAs,
-                detail:
-                    "Login as selected user." +
-                    "<br>&lt;DATABASE&gt; Can be '*' to use current database" +
-                    "<br>&lt;LOGIN&gt; Can be optionally preceded by the '-'" +
-                    " character and it will be used for password too",
-                syntax: "<STRING: DATABASE> <STRING: LOGIN> [STRING: PASSWORD]",
-                args: "ss?s",
+                detail: "Login as selected user.",
+                args: [
+                    "s::d:database::1::The database<br/>Can be '*' to use current database",
+                    "s::u:user::1::The login<br/>Can be optionally preceded by the '#' character and it will be used for password too",
+                    "s::p:password::0::The password",
+                ],
                 secured: true,
-                example: "devel -admin",
+                example: "-d devel -u #admin",
             });
             this.registerCommand("uhg", {
                 definition: "Check if user is in the selected groups",
                 callback: this._cmdUserHasGroups,
-                detail:
-                    "Check if user is in the selected groups." +
-                    "<br>&lt;GROUPS&gt; A list of groups separated by " +
-                    "commas, a group can be optionally preceded by '!' to " +
-                    "say 'is not in group'",
-                syntax: "<STRING: GROUPS>",
-                args: "s",
-                example: "base.group_user",
+                detail: "Check if user is in the selected groups.",
+                args: [
+                    "ls::g:group::1::The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'",
+                ],
+                example: "-g base.group_user",
             });
             this.registerCommand("dblist", {
                 definition: "Show database names",
                 callback: this._cmdShowDBList,
                 detail: "Show database names",
-                syntax: "",
-                args: "",
             });
             this.registerCommand("jstest", {
                 definition: "Launch JS Tests",
                 callback: this._cmdJSTest,
-                detail:
-                    "Runs js tests in desktop or mobile mode for the selected module." +
-                    "<br>&lt;MODULE&gt; Module technical name" +
-                    "<br>&lt;MODE&gt; Can be 'desktop' or 'mobile' (By default is 'desktop')",
-                syntax: "<STRING: MODULE> <STRING: MODE>",
-                args: "?ss",
-                example: "web mobile",
+                detail: "Runs js tests in desktop or mobile mode for the selected module.",
+                args: [
+                    "s::m:module::0::The module technical name",
+                    "s::d:device::0::The device to test::desktop::desktop:mobile",
+                ],
+                example: "-m web -d mobile",
             });
             this.registerCommand("tour", {
                 definition: "Launch Tour",
                 callback: this._cmdRunTour,
-                detail:
-                    "Runs the selected tour. If no tour given, prints all available tours." +
-                    "<br>[TOUR NAME] Tour Name",
-                syntax: "[STRING: TOUR NAME]",
-                args: "?s",
-                example: "mail_tour",
+                detail: "Runs the selected tour. If no tour given, prints all available tours.",
+                args: ["s::n:name::0::The tour technical name"],
+                example: "-n mail_tour",
             });
             this.registerCommand("json", {
                 definition: "Send POST JSON",
                 callback: this._cmdPostJSONData,
                 detail: "Sends HTTP POST 'application/json' request",
-                syntax: '<STRING: ENDPOINT> "<DICT: DATA>"',
-                args: "sj",
+                args: [
+                    "s::e:endpoint::1::The endpoint",
+                    "j::d:data::1::The data to send",
+                ],
                 example: "/web/endpoint \"{'the_example': 42}\"",
             });
             this.registerCommand("depends", {
                 definition: "Know modules that depends on the given module",
                 callback: this._cmdModuleDepends,
                 detail: "Show a list of the modules that depends on the given module",
-                syntax: "<STRING: MODULE NAME>",
-                args: "s",
+                args: ["s::m:module::0::The module technical name"],
                 example: "base",
             });
             this.registerCommand("ual", {
                 definition: "Update apps list",
                 callback: this._cmdUpdateAppList,
                 detail: "Update apps list",
-                syntax: "",
-                args: "",
             });
             this.registerCommand("logout", {
                 definition: "Log out",
                 callback: this._cmdLogOut,
                 detail: "Session log out",
-                syntax: "",
-                args: "",
             });
             this.registerCommand("count", {
                 definition:
                     "Gets number of records from the given model in the selected domain",
                 callback: this._cmdCount,
                 detail: "Gets number of records from the given model in the selected domain",
-                syntax: '<STRING: MODEL> "[ARRAY: DOMAIN]"',
-                args: "s?j",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "j::d:domain::0::The domain::[]",
+                ],
                 example: "res.partner ['name', '=ilike', 'A%']",
             });
             this.registerCommand("ref", {
@@ -311,44 +287,51 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Show the referenced model and id of the given xmlid's",
                 callback: this._cmdRef,
                 detail: "Show the referenced model and id of the given xmlid's",
-                syntax: "<LIST: STRING XML ID>",
-                args: "ls",
-                example: "base.main_company,base.model_res_partner",
+                args: ["ls::x:xmlid::1::The XML-ID"],
+                example: "-x base.main_company,base.model_res_partner",
             });
-            this.registerCommand("pot", {
+            this.registerCommand("lang", {
                 definition: "Operations over translations",
-                callback: this._cmdPot,
-                detail:
-                    "Operations over translations." +
-                    "<br>[OPERATION] can be 'export', 'import', 'languages'." +
-                    "<br>[FORMAT] vanilla formats are 'po' and 'csv'. (Default is 'po')",
-                syntax: "<STRING: OPERATION> [STRING: LANGUAGE] [LIST: TECHNICAL MODEL NAMES] [STRING: FORMAT] [INT: OVERWRITE]",
-                args: "s?slsi",
-                example: "export en_US discuss",
+                callback: this._cmdLang,
+                detail: "Operations over translations.",
+                args: [
+                    "s::o:operation::1::The operation::::export:import:list",
+                    "s::l:lang::0::The language<br/>Can use '__new__' for new language (empty translation template)",
+                    "ls::m:module::0::The technical module name",
+                    "s::f:format::0::The format to use::po::po:csv",
+                    "s::n:name::0::The language name",
+                    "f::no-overwrite:no-overwrite::0::Flag to indicate dont overwrite current translations",
+                ],
+                example: "-o export -l en_US -m mail",
             });
         },
 
-        _cmdPot: function (
-            operation,
-            lang = false,
-            module_names = [],
-            format = "po",
-            overwrite = true
-        ) {
+        _cmdLang: function (kwargs) {
             return new Promise(async (resolve, reject) => {
                 try {
-                    if (operation === "export") {
-                        if (lang && _.isEmpty(module_names)) {
-                            return reject("Need the technical module name(s)");
-                        } else if (!lang && _.isEmpty(module_names)) {
-                            return this.do_action(
-                                "base.action_wizard_lang_export"
+                    const is_empty_args = _.chain(kwargs)
+                        .omit(["operation", "format"])
+                        .isEmpty()
+                        .value();
+                    if (kwargs.operation === "export") {
+                        if (is_empty_args) {
+                            return resolve(
+                                this.do_action("base.action_wizard_lang_export")
+                            );
+                        }
+                        if (
+                            !kwargs.lang ||
+                            !kwargs.format ||
+                            _.isEmpty(kwargs.module)
+                        ) {
+                            return reject(
+                                "'export' operation needs the following arguments: --lang, --format, --module"
                             );
                         }
                         // Get module ids
                         let module_ids = await rpc.query({
                             method: "search_read",
-                            domain: [["name", "in", module_names]],
+                            domain: [["name", "in", kwargs.module]],
                             fields: ["id"],
                             model: "ir.module.module",
                             kwargs: {context: this._getContext()},
@@ -364,8 +347,8 @@ odoo.define("terminal.functions.Common", function (require) {
                             args: [
                                 {
                                     state: "choose",
-                                    format: format,
-                                    lang: lang,
+                                    format: kwargs.format,
+                                    lang: kwargs.lang,
                                     modules: [[6, false, module_ids]],
                                 },
                             ],
@@ -405,11 +388,22 @@ odoo.define("terminal.functions.Common", function (require) {
                         );
 
                         return resolve(action);
-                    }
-                    if (operation === "import") {
-                        if (!lang && _.isEmpty(module_names)) {
-                            return this.do_action(
-                                "base.action_wizard_lang_import"
+                    } else if (kwargs.operation === "import") {
+                        if (is_empty_args) {
+                            return resolve(
+                                this.do_action(
+                                    "base.action_view_base_import_language"
+                                )
+                            );
+                        }
+                        if (
+                            !kwargs.name ||
+                            !kwargs.lang ||
+                            !kwargs.format ||
+                            _.isEmpty(kwargs.module)
+                        ) {
+                            return reject(
+                                "'import' operation needs the following arguments: --name, --lang, --format, --module"
                             );
                         }
                         // Get file content
@@ -420,10 +414,10 @@ odoo.define("terminal.functions.Common", function (require) {
                             model: "base.language.import",
                             args: [
                                 {
-                                    name: "CHANGE ME!",
-                                    code: lang,
-                                    filename: `${lang}.${format}`,
-                                    overwrite: overwrite,
+                                    name: kwargs.name,
+                                    code: kwargs.lang,
+                                    filename: `${kwargs.lang}.${kwargs.format}`,
+                                    overwrite: !kwargs.no_overwrite,
                                     data: file64,
                                 },
                             ],
@@ -446,13 +440,13 @@ odoo.define("terminal.functions.Common", function (require) {
                             );
                         }
                         return resolve(status);
-                    } else if (operation === "languages") {
+                    } else if (kwargs.operation === "list") {
                         const langs = await rpc.query({
                             method: "get_installed",
                             model: "res.lang",
                             kwargs: {context: this._getContext()},
                         });
-                        for (lang of langs) {
+                        for (const lang of langs) {
                             this.screen.print(` - ${lang[0]} (${lang[1]})`);
                         }
                         return resolve(langs);
@@ -464,9 +458,9 @@ odoo.define("terminal.functions.Common", function (require) {
             });
         },
 
-        _cmdRef: function (xmlids) {
+        _cmdRef: function (kwargs) {
             const tasks = [];
-            for (const xmlid of xmlids) {
+            for (const xmlid of kwargs.xmlid) {
                 tasks.push(
                     rpc
                         .query({
@@ -501,12 +495,12 @@ odoo.define("terminal.functions.Common", function (require) {
             });
         },
 
-        _cmdCount: function (model, domain = []) {
+        _cmdCount: function (kwargs) {
             return rpc
                 .query({
                     method: "search_count",
-                    model: model,
-                    args: [domain],
+                    model: kwargs.model,
+                    args: [kwargs.domain],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -533,12 +527,12 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdModuleDepends: function (module_name) {
+        _cmdModuleDepends: function (kwargs) {
             return rpc
                 .query({
                     method: "onchange_module",
                     model: "res.config.settings",
-                    args: [false, false, module_name],
+                    args: [false, false, kwargs.module],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -554,11 +548,11 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdPostJSONData: function (url, data) {
+        _cmdPostJSONData: function (kwargs) {
             return rpc
                 .query({
-                    route: url,
-                    params: data,
+                    route: kwargs.endpoint,
+                    params: kwargs.data,
                 })
                 .then((result) => {
                     this.screen.print(result);
@@ -566,13 +560,13 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdRunTour: function (tour_name) {
+        _cmdRunTour: function (kwargs) {
             const tour_names = Object.keys(tour.tours);
-            if (tour_name) {
-                if (tour_names.indexOf(tour_name) === -1) {
+            if (kwargs.name) {
+                if (tour_names.indexOf(kwargs.name) === -1) {
                     this.screen.printError("The given tour doesn't exists!");
                 } else {
-                    odoo.__DEBUG__.services["web_tour.tour"].run(tour_name);
+                    odoo.__DEBUG__.services["web_tour.tour"].run(kwargs.name);
                     this.screen.print("Running tour...");
                 }
             } else if (tour_names.length) {
@@ -583,15 +577,16 @@ odoo.define("terminal.functions.Common", function (require) {
             return Promise.resolve();
         },
 
-        _cmdJSTest: function (module_name, mode) {
-            let mod = module_name || "";
-            if (module_name === "*") {
+        _cmdJSTest: function (kwargs) {
+            let mod = kwargs.module || "";
+            if (kwargs.module === "*") {
                 mod = "";
             }
-            let url = `/web/tests?module=${mod}`;
-            if (mode === "mobile") {
-                url = `/web/tests/mobile?module=${mod}`;
+            let url = "/web/tests";
+            if (kwargs.device === "mobile") {
+                url += "/mobile";
             }
+            url += `?module=${mod}`;
             window.location = url;
             return Promise.resolve();
         },
@@ -626,12 +621,12 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdUserHasGroups: function (groups) {
+        _cmdUserHasGroups: function (kwargs) {
             return rpc
                 .query({
                     method: "user_has_groups",
                     model: "res.users",
-                    args: [groups],
+                    args: [kwargs.group],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -640,11 +635,11 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdLoginAs: function (database, login_name, pass) {
-            let db = database;
-            let login = login_name;
-            let passwd = pass || false;
-            if (login[0] === "-" && !passwd) {
+        _cmdLoginAs: function (kwargs) {
+            let db = kwargs.database;
+            let login = kwargs.user;
+            let passwd = kwargs.password || false;
+            if (login[0] === "#" && !passwd) {
                 login = login.substr(1);
                 passwd = login;
             }
@@ -692,29 +687,29 @@ odoo.define("terminal.functions.Common", function (require) {
             }
         },
 
-        _cmdLongpolling: function (operation, name) {
+        _cmdLongpolling: function (kwargs) {
             if (!this._longpolling) {
                 return Promise.reject(
                     "Can't use longpolling, 'bus' module is not installed"
                 );
             }
 
-            if (typeof operation === "undefined") {
+            if (typeof kwargs.operation === "undefined") {
                 this.screen.print(this._longpolling.isVerbose() || "off");
-            } else if (operation === "verbose") {
+            } else if (kwargs.operation === "verbose") {
                 this._longpolling.setVerbose(true);
                 this.screen.print("Now long-polling is in verbose mode.");
-            } else if (operation === "off") {
+            } else if (kwargs.operation === "off") {
                 this._longpolling.setVerbose(false);
                 this.screen.print("Now long-polling verbose mode is disabled");
-            } else if (operation === "add_channel") {
-                this._longPollingAddChannel(name);
-            } else if (operation === "del_channel") {
-                this._longPollingDelChannel(name);
-            } else if (operation === "start") {
+            } else if (kwargs.operation === "add_channel") {
+                this._longPollingAddChannel(kwargs.param);
+            } else if (kwargs.operation === "del_channel") {
+                this._longPollingDelChannel(kwargs.param);
+            } else if (kwargs.operation === "start") {
                 this._longpolling.startPoll();
                 this.screen.print("Longpolling started");
-            } else if (operation === "stop") {
+            } else if (kwargs.operation === "stop") {
                 this._longpolling.stopPoll();
                 this.screen.print("Longpolling stopped");
             } else {
@@ -738,45 +733,45 @@ odoo.define("terminal.functions.Common", function (require) {
             return Promise.resolve();
         },
 
-        _cmdContextOperation: function (operation = "read", values = false) {
-            if (operation === "read") {
+        _cmdContextOperation: function (kwargs) {
+            if (kwargs.operation === "read") {
                 this.screen.print(session.user_context);
-            } else if (operation === "set") {
-                session.user_context = values;
+            } else if (kwargs.operation === "set") {
+                session.user_context = kwargs.value;
                 this.screen.print(session.user_context);
-            } else if (operation === "write") {
-                Object.assign(session.user_context, values);
+            } else if (kwargs.operation === "write") {
+                Object.assign(session.user_context, kwargs.value);
                 this.screen.print(session.user_context);
-            } else if (operation === "delete") {
-                if (values in session.user_context) {
-                    delete session.user_context[values];
+            } else if (kwargs.operation === "delete") {
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        session.user_context,
+                        kwargs.value
+                    )
+                ) {
+                    delete session.user_context[kwargs.value];
                     this.screen.print(session.user_context);
                 } else {
                     this.screen.printError(
                         "The selected key is not present in the terminal context"
                     );
                 }
-            } else {
-                this.screen.printError("Invalid operation");
             }
             return Promise.resolve();
         },
 
-        _cmdSearchModelRecordId: function (model, id, field_names) {
-            let fields = ["display_name"];
-            if (field_names) {
-                fields = field_names === "*" ? false : field_names;
-            }
+        _cmdSearchModelRecordId: function (kwargs) {
+            const fields = kwargs.field[0] === "*" ? false : kwargs.field;
             return rpc
                 .query({
                     method: "search_read",
-                    domain: [["id", "in", id]],
+                    domain: [["id", "in", kwargs.id]],
                     fields: fields,
-                    model: model,
+                    model: kwargs.model,
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
-                    this.screen.printRecords(model, result);
+                    this.screen.printRecords(kwargs.model, result);
                     return result;
                 });
         },
@@ -813,37 +808,34 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdCheckModelAccess: function (model, operation) {
+        _cmdCheckModelAccess: function (kwargs) {
             return rpc
                 .query({
                     method: "check_access_rights",
-                    model: model,
-                    args: [operation, false],
+                    model: kwargs.model,
+                    args: [kwargs.operation, false],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
                     if (result) {
                         this.screen.print(
-                            `You have access rights for '${operation}' on ${model}`
+                            `You have access rights for '${kwargs.operation}' on ${kwargs.model}`
                         );
                     } else {
                         this.screen.print(
-                            `You can't '${operation}' on ${model}`
+                            `You can't '${kwargs.operation}' on ${kwargs.model}`
                         );
                     }
                     return result;
                 });
         },
 
-        _cmdCheckFieldAccess: function (model, field_names = false) {
-            let fields = false;
-            if (field_names) {
-                fields = field_names === "*" ? false : field_names;
-            }
+        _cmdCheckFieldAccess: function (kwargs) {
+            const fields = kwargs.field[0] === "*" ? false : kwargs.field;
             return rpc
                 .query({
                     method: "fields_get",
-                    model: model,
+                    model: kwargs.model,
                     args: [fields],
                     kwargs: {context: this._getContext()},
                 })
@@ -924,15 +916,15 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdSetDebugMode: function (mode) {
-            if (mode === 0) {
+        _cmdSetDebugMode: function (kwargs) {
+            if (kwargs.mode === 0) {
                 this.screen.print(
                     "Debug mode <strong>disabled</strong>. Reloading page..."
                 );
                 const qs = $.deparam.querystring();
                 delete qs.debug;
                 window.location.search = "?" + $.param(qs);
-            } else if (mode === 1) {
+            } else if (kwargs.mode === 1) {
                 this.screen.print(
                     "Debug mode <strong>enabled</strong>. Reloading page..."
                 );
@@ -940,7 +932,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     window.location.href,
                     "debug=1"
                 );
-            } else if (mode === 2) {
+            } else if (kwargs.mode === 2) {
                 this.screen.print(
                     "Debug mode with assets <strong>enabled</strong>. " +
                         "Reloading page..."
@@ -970,8 +962,8 @@ odoo.define("terminal.functions.Common", function (require) {
             });
         },
 
-        _cmdUpgradeModule: function (module_name) {
-            return this._searchModule(module_name).then((result) => {
+        _cmdUpgradeModule: function (kwargs) {
+            return this._searchModule(kwargs.module).then((result) => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_upgrade",
@@ -980,25 +972,25 @@ odoo.define("terminal.functions.Common", function (require) {
                     }).then(
                         () => {
                             this.screen.print(
-                                `'${module_name}' module successfully upgraded`
+                                `'${kwargs.module}' module successfully upgraded`
                             );
                         },
                         () => {
                             this.screen.printError(
-                                `Can't upgrade '${module_name}' module`
+                                `Can't upgrade '${kwargs.module}' module`
                             );
                         }
                     );
                 } else {
                     this.screen.printError(
-                        `'${module_name}' module doesn't exists`
+                        `'${kwargs.module}' module doesn't exists`
                     );
                 }
             });
         },
 
-        _cmdInstallModule: function (module_name) {
-            return this._searchModule(module_name).then((result) => {
+        _cmdInstallModule: function (kwargs) {
+            return this._searchModule(kwargs.module).then((result) => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_install",
@@ -1007,25 +999,25 @@ odoo.define("terminal.functions.Common", function (require) {
                     }).then(
                         () => {
                             this.screen.print(
-                                `'${module_name}' module successfully installed`
+                                `'${kwargs.module}' module successfully installed`
                             );
                         },
                         () => {
                             this.screen.printError(
-                                `Can't install '${module_name}' module`
+                                `Can't install '${kwargs.module}' module`
                             );
                         }
                     );
                 } else {
                     this.screen.printError(
-                        `'${module_name}' module doesn't exists`
+                        `'${kwargs.module}' module doesn't exists`
                     );
                 }
             });
         },
 
-        _cmdUninstallModule: function (module_name) {
-            return this._searchModule(module_name).then((result) => {
+        _cmdUninstallModule: function (kwargs) {
+            return this._searchModule(kwargs.module).then((result) => {
                 if (result.length) {
                     rpc.query({
                         method: "button_immediate_uninstall",
@@ -1034,33 +1026,33 @@ odoo.define("terminal.functions.Common", function (require) {
                     }).then(
                         () => {
                             this.screen.print(
-                                `'${module_name}' module successfully uninstalled`
+                                `'${kwargs.module}' module successfully uninstalled`
                             );
                         },
                         () => {
                             this.screen.printError(
-                                `Can't uninstall '${module_name}' module`
+                                `Can't uninstall '${kwargs.module}' module`
                             );
                         }
                     );
                 } else {
                     this.screen.printError(
-                        `'${module_name}' module doesn't exists`
+                        `'${kwargs.module}' module doesn't exists`
                     );
                 }
             });
         },
 
-        _cmdCallModelMethod: function (model, method, args = [], kwargs = {}) {
-            const pkwargs = kwargs;
+        _cmdCallModelMethod: function (kwargs) {
+            const pkwargs = kwargs.kwarg;
             if (typeof pkwargs.context === "undefined") {
                 pkwargs.context = this._getContext();
             }
             return rpc
                 .query({
-                    method: method,
-                    model: model,
-                    args: args,
+                    method: kwargs.method,
+                    model: kwargs.model,
+                    args: kwargs.arguments,
                     kwargs: pkwargs,
                 })
                 .then((result) => {
@@ -1097,22 +1089,11 @@ odoo.define("terminal.functions.Common", function (require) {
             return res;
         },
 
-        _cmdSearchModelRecord: function (
-            model,
-            field_names,
-            domain = [],
-            limit,
-            offset,
-            order
-        ) {
+        _cmdSearchModelRecord: function (kwargs) {
             const lines_total = this.screen._max_lines - 3;
-            let fields = ["display_name"];
-            if (field_names) {
-                fields = field_names === "*" ? false : field_names;
-            }
+            const fields = kwargs.field[0] === "*" ? false : kwargs.field;
 
-            // Workaround: '--more' is a special model name to handle print the rest of the previous call result
-            if (model === "--more") {
+            if (kwargs.more) {
                 const buff = this._buffer[this.__meta.name];
                 if (!buff || !buff.data.length) {
                     this.screen.printError(
@@ -1135,12 +1116,12 @@ odoo.define("terminal.functions.Common", function (require) {
             return rpc
                 .query({
                     method: "search_read",
-                    domain: domain,
+                    domain: kwargs.domain,
                     fields: fields,
-                    model: model,
-                    limit: limit,
-                    offset: offset,
-                    orderBy: this._deserializeSort(order),
+                    model: kwargs.model,
+                    limit: kwargs.limit,
+                    offset: kwargs.offset,
+                    orderBy: this._deserializeSort(kwargs.order),
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -1148,12 +1129,12 @@ odoo.define("terminal.functions.Common", function (require) {
                     let sresult = result;
                     if (need_truncate) {
                         this._buffer[this.__meta.name] = {
-                            model: model,
+                            model: kwargs.model,
                             data: sresult.slice(lines_total),
                         };
                         sresult = sresult.slice(0, lines_total);
                     }
-                    this.screen.printRecords(model, sresult);
+                    this.screen.printRecords(kwargs.model, sresult);
                     if (need_truncate) {
                         this.screen.printError(
                             `<strong class='text-warning'>Result truncated!</strong> The query is too big to be displayed entirely. Use '<strong class='o_terminal_click o_terminal_cmd' data-cmd='search --more'>search --more</strong>' to print the rest of the results (${
@@ -1166,11 +1147,11 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdCreateModelRecord: function (model, values) {
-            if (typeof values === "undefined") {
+        _cmdCreateModelRecord: function (kwargs) {
+            if (typeof kwargs.value === "undefined") {
                 return this.do_action({
                     type: "ir.actions.act_window",
-                    res_model: model,
+                    res_model: kwargs.model,
                     views: [[false, "form"]],
                     target: "current",
                 }).then(() => {
@@ -1180,14 +1161,14 @@ odoo.define("terminal.functions.Common", function (require) {
             return rpc
                 .query({
                     method: "create",
-                    model: model,
-                    args: [values],
+                    model: kwargs.model,
+                    args: [kwargs.value],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
                     this.screen.print(
                         this._templates.render("RECORD_CREATED", {
-                            model: model,
+                            model: kwargs.model,
                             new_id: result,
                         })
                     );
@@ -1195,44 +1176,48 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
-        _cmdUnlinkModelRecord: function (model, id) {
+        _cmdUnlinkModelRecord: function (kwargs) {
             return rpc
                 .query({
                     method: "unlink",
-                    model: model,
-                    args: [id],
+                    model: kwargs.model,
+                    args: [kwargs.id],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
-                    this.screen.print(`${model} record deleted successfully`);
+                    this.screen.print(
+                        `${kwargs.model} record deleted successfully`
+                    );
                     return result;
                 });
         },
 
-        _cmdWriteModelRecord: function (model, id, values) {
+        _cmdWriteModelRecord: function (kwargs) {
             return rpc
                 .query({
                     method: "write",
-                    model: model,
-                    args: [id, values],
+                    model: kwargs.model,
+                    args: [kwargs.id, kwargs.value],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
-                    this.screen.print(`${model} record updated successfully`);
+                    this.screen.print(
+                        `${kwargs.model} record updated successfully`
+                    );
                     return result;
                 });
         },
 
-        _cmdCallAction: function (action) {
-            let saction = action;
-            if (this._parameterReader._validateJson(action)) {
-                saction = this._parameterReader._formatJson(action);
+        _cmdCallAction: function (kwargs) {
+            let saction = kwargs.action;
+            if (this._parameterReader._validateJson(kwargs.action)) {
+                saction = this._parameterReader._formatJson(kwargs.action);
             }
             return this.do_action(saction);
         },
 
-        _cmdPostData: function (url, data) {
-            return ajax.post(url, data).then((result) => {
+        _cmdPostData: function (kwargs) {
+            return ajax.post(kwargs.endpoint, kwargs.data).then((result) => {
                 this.screen.print(result);
             });
         },

@@ -47,22 +47,28 @@ You can toggle terminal using one of these options:
 
 ## Example Commands
 
-| Description                                         | Terminal Command                                   |
-| --------------------------------------------------- | -------------------------------------------------- |
-| Create 'res.partner' record                         | `create res.partner "{'name': 'The One'}"`         |
-| Search 'res.partner' records                        | `search res.partner name,email "[['id', '>', 5]]"` |
-| Search all fields of selected 'res.partner' records | `search res.partner * "[['id', '>', 5]]"`          |
-| Read all fields of selected 'res.partner' record    | `read res.partner 5 *`                             |
-| Read all fields of various 'res.partner' records    | `read res.partner 5,15,8 *`                        |
-| View 'res.partner' records _(only backend)_         | `view res.partner`                                 |
-| View selected 'res.partner' record _(only backend)_ | `view res.partner 4`                               |
-| Install module                                      | `install mymodule`                                 |
-| Create alias                                        | `alias myalias print My name is $1`                |
+| Description                                         | Terminal Command                                                            |
+| --------------------------------------------------- | --------------------------------------------------------------------------- |
+| Create 'res.partner' record                         | `create -m res.partner -v "{'name': 'Hipcut', 'street': 'Mystery street'}"` |
+| Search 'res.partner' records                        | `search -m res.partner -f name,email -d "[['id', '>', 5]]"`                 |
+| Search all fields of selected 'res.partner' records | `search -m res.partner -f * -d "[['id', '>', 5]]"`                          |
+| Read all fields of selected 'res.partner' record    | `read -m res.partner -i 5 -f *`                                             |
+| Read all fields of various 'res.partner' records    | `read -m res.partner -i 5,15,8 -f *`                                        |
+| View 'res.partner' records _(only backend)_         | `view -m res.partner`                                                       |
+| View selected 'res.partner' record _(only backend)_ | `view -m res.partner -i 4`                                                  |
+| Install module                                      | `install -m mymodule`                                                       |
+| Create alias                                        | `alias -n myalias -c "print My name is $1"`                                 |
 
 > Notice the usage of quotes when use parameters with spaces.
 
 > Notice that a list is an string of values separated by commas. Example: "5,
 > 15, 8"
+
+> Notice that can call commands without 'named arguments', for example:
+> `create res.partner "{'name': 'Hipcut', 'street': 'Mystery street'}"` The rule
+> is that 'unnamed arguments' fill values following the order of the command
+> arguments definition. So mix 'unnamed' with 'named' arguments can be done as
+> long as the order is maintained.
 
 ## Notes
 
@@ -111,8 +117,8 @@ The anatomy of a generator is: `$type[min,max]`, `$type[max]` or `$type`
 For example:
 
 - create a new record with a random string:
-  `create res.partner "{'name': '$STR[4,30]'}"`
-- print the current time: `print $NOWTIME`
+  `create -m res.partner -v "{'name': '$STR[4,30]'}"`
+- print the current time: `print -m $NOWTIME`
 
 > Notice that 'date' min and max are the milliseconds since 1970/01/01
 
@@ -126,11 +132,11 @@ The anatomy of a positional replacement is: `$num[default_value]` or `$num`
 For example:
 
 - First positional replacement (without default value = empty):
-  `alias my_alias print Hello, $1`
+  `alias -n my_alias -c "print Hello, $1"`
 - Fist position replacement with default value 'world':
-  `alias my_alias print Hello, $1[world]`
+  `alias -n my_alias -c "print Hello, $1[world]"`
 - A somewhat more complex:
-  `alias search_mod search ir.module.module display_name "[['name', '=', '$1'], ['state', '=', '$2[installed]']]"`
+  `alias -n search_mod -c "search ir.module.module display_name \"[['name', '=', '$1'], ['state', '=', '$2[installed]']]\""`
 
 #### + Runners (subcommands)
 
@@ -138,14 +144,15 @@ You can execute "subcommands" to use the result in a new command call. The
 syntax of runners looks like `{{command}}`, `{{command}}.key` or
 `{{command}}[index]`.
 
-For example: `read res.users {{search res.users id []}}.id`
+For example: `read -m res.users -i {{search res.users id []}}.id`
 
 #### + Massive operations
 
 Massive operations are possible using the command `repeat`. Print to screen is a
 expensive task, consider use the command `mute` to increase the performance.
 
-Example: `repeat 5000 mute create res.partner "{'name': '$STR[12] (Test)'}"`
+Example:
+`repeat -t 5000 -c "mute -c \"create res.partner \"{'name': '$STR[12] (Test)'}\"\""`
 
 ---
 

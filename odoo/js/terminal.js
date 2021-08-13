@@ -190,8 +190,7 @@ odoo.define("terminal.Terminal", function (require) {
                     detail: _lt(
                         "This command hasn't a properly detailed information"
                     ),
-                    syntax: "Unknown",
-                    args: "",
+                    args: null,
                     secured: false,
                     aliases: [],
                     sanitized: true,
@@ -397,7 +396,7 @@ odoo.define("terminal.Terminal", function (require) {
             // Try alias
             let alias_cmd = this.getAliasCommand(cmd_name);
             if (alias_cmd) {
-                const scmd = this._parameterReader.parse(cmd, {args: "*"});
+                const scmd = this._parameterReader.parse(cmd);
                 const params_len = scmd.params.length;
                 let index = 0;
                 while (index < params_len) {
@@ -686,7 +685,7 @@ odoo.define("terminal.Terminal", function (require) {
                         def: cmd_def,
                         jobIndex: job_index,
                     };
-                    result = await cmd_def.callback.apply(this, scmd.params);
+                    result = await cmd_def.callback.call(this, scmd.params);
                     delete this.__meta;
                 } catch (err) {
                     is_failed = true;
@@ -767,8 +766,8 @@ odoo.define("terminal.Terminal", function (require) {
                 );
                 if (
                     typeof result === "object" &&
-                    !("data" in result) &&
-                    "message" in result
+                    !Object.prototype.hasOwnProperty.call(result, "data") &&
+                    Object.prototype.hasOwnProperty.call(result, "message")
                 ) {
                     this.screen.printError(result.message, true);
                 } else {

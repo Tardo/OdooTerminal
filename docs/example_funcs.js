@@ -14,45 +14,43 @@ odoo.define("terminal.MyFuncs", function (require) {
                 definition: "This is my command",
                 function: this._cmdMyFunc,
                 detail: "My command explained...",
-                syntax: "<STRING: ParamA> <INT: ParamB> [STRING: ParamC] [INT: ParamD]",
-                args: "si?si",
+                args: [
+                    "s::pa:parama::1::The Param A",
+                    "i::pb:paramb::1::The Param B",
+                    "s::pc:paramc::0::The Param C::DefaultValue",
+                    "i::pd:paramd::0::The Param D::-1",
+                ],
             });
 
             this.registerCommand("myasynccommand", {
                 definition: "This is my async command",
                 function: this._cmdMyAsyncFunc,
                 detail: "My async command explained...",
-                syntax: "<INT: ParamA> <INT: ParamB>",
-                args: "si",
+                args: [
+                    "s::pa:parama::1::The Param A",
+                    "i::pb:paramb::1::The Param B",
+                ],
             });
         },
 
         /**
          * Basic implementation example for the 'mycommand' command
          *
-         * @param {String} param_a
-         * @param {Int} param_b
-         * @param {String} param_c
-         * @param {Int} param_d
+         * @param {Object} kwargs
          * @returns {Promise}
          */
-        _cmdMyFunc: function (
-            param_a,
-            param_b,
-            param_c = "DefaultValue",
-            param_d = -1
-        ) {
+        _cmdMyFunc: function (kwargs) {
             this.screen.print("Hello, World!");
-            this.screen.eprint("ParamA (String): " + param_a);
-            this.screen.eprint("ParamB (Int): " + param_b);
-            this.screen.eprint("ParamC (Optional String): " + param_c);
-            this.screen.eprint("ParamD (Optional Int): " + param_d);
+            this.screen.eprint("ParamA (String): " + kwargs.parama);
+            this.screen.eprint("ParamB (Int): " + kwargs.paramb);
+            this.screen.eprint("ParamC (Optional String): " + kwargs.paramc);
+            this.screen.eprint("ParamD (Optional Int): " + kwargs.paramd);
 
-            if (param_b instanceof Number) {
+            if (kwargs.paramb instanceof Number) {
                 this.screen.print("ParamB is a Number!");
             }
 
-            if (param_a !== param_c) {
+            if (kwargs.parama !== kwargs.paramc) {
                 this.screen.printError(
                     "Invalid! ParamA need be the same as ParamC"
                 );
@@ -68,14 +66,13 @@ odoo.define("terminal.MyFuncs", function (require) {
          * wrapping them. So for this reason you must use 'return' to
          * finalize the awaitable promise and propagate the results.
          *
-         * @param {Int} param_a
-         * @param {Int} param_b
+         * @param {Object} kwargs
          * @returns {Promise}
          */
-        _cmdMyAsyncFunc: function (param_a, param_b) {
+        _cmdMyAsyncFunc: function (kwargs) {
             return new Promise(async (resolve, reject) => {
-                const result = await Promise.resolve(param_a);
-                const other_result = await Promise.resolve(param_b);
+                const result = await Promise.resolve(kwargs.parama);
+                const other_result = await Promise.resolve(kwargs.paramb);
 
                 if (result !== other_result) {
                     return reject("Something is wrong!");

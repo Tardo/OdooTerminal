@@ -19,23 +19,26 @@ odoo.define("terminal.functions.Backend", function (require) {
                 definition: "View model record/s",
                 callback: this._cmdViewModelRecord,
                 detail: "Open model record in form view or records in list view.",
-                syntax: "<STRING: MODEL NAME> [INT: RECORD ID] [STRING: VIEW REF]",
-                args: "s?is",
-                example: "res.partner 10 base.view_partner_simple_form",
+                args: [
+                    "s::m:model::1::The model technical name",
+                    "i::i:id::0::The record id",
+                    "s::r:ref::0::The view reference name",
+                ],
+                example:
+                    "-m res.partner -i 10 -r base.view_partner_simple_form",
             });
             this.registerCommand("settings", {
                 definition: "Open settings page",
                 callback: this._cmdOpenSettings,
-                detail:
-                    "Open settings page." +
-                    "<br>[MODULE NAME] The module technical name (default is 'general_settings')",
-                syntax: "[STRING: MODULE NAME]",
-                args: "?s",
-                example: "sale_management",
+                detail: "Open settings page.",
+                args: [
+                    "s::m:module::0::The module technical name::general_settings",
+                ],
+                example: "-m sale_management",
             });
         },
 
-        _cmdOpenSettings: function (module = "general_settings") {
+        _cmdOpenSettings: function (kwargs) {
             return this.do_action({
                 name: "Settings",
                 type: "ir.actions.act_window",
@@ -43,34 +46,34 @@ odoo.define("terminal.functions.Backend", function (require) {
                 view_mode: "form",
                 views: [[false, "form"]],
                 target: "inline",
-                context: {module: module},
+                context: {module: kwargs.module},
             }).then(() => this.doHide());
         },
 
-        _cmdViewModelRecord: function (model, id, view_ref = false) {
+        _cmdViewModelRecord: function (kwargs) {
             const context = this._getContext({
-                form_view_ref: view_ref,
+                form_view_ref: kwargs.ref,
             });
-            if (id) {
+            if (kwargs.id) {
                 return this.do_action({
                     type: "ir.actions.act_window",
                     name: "View Record",
-                    res_model: model,
-                    res_id: id,
+                    res_model: kwargs.model,
+                    res_id: kwargs.id,
                     views: [[false, "form"]],
                     target: "new",
                     context: context,
                 }).then(() => this.doHide());
             }
             new dialogs.SelectCreateDialog(this, {
-                res_model: model,
+                res_model: kwargs.model,
                 title: "Select a record",
                 disable_multiple_selection: true,
                 on_selected: (records) => {
                     this.do_action({
                         type: "ir.actions.act_window",
                         name: "View Record",
-                        res_model: model,
+                        res_model: kwargs.model,
                         res_id: records[0].id,
                         views: [[false, "form"]],
                         target: "new",
