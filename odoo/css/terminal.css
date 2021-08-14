@@ -202,6 +202,6 @@
 /* TRANSITIONS */
 .terminal-transition-topdown {
     top: 0;
-    transition: 700ms;
+    transition: 350ms;
     transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }

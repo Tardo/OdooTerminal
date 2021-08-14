@@ -52,7 +52,7 @@ odoo.define("terminal.functions.Backend", function (require) {
 
         _cmdViewModelRecord: function (kwargs) {
             const context = this._getContext({
-                form_view_ref: kwargs.ref,
+                form_view_ref: kwargs.ref || false,
             });
             if (kwargs.id) {
                 return this.do_action({
