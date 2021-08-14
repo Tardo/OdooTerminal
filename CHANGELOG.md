@@ -8,6 +8,7 @@ IMP: Parameter reader: support json parameter
 IMP: Command 'caf': hightlight required fields
 IMP: Command 'help': More verbose format
 IMP: Command 'login': Now uses '#' instead of '-'
+IMP: Command 'repeat': New argument '--silent'
 IMP: Support with "master" branch (pre 15.0)
 IMP: ParamaterReader: Now supports 'named arguments'
 IMP: Command definition: Rework 'args' and removed unused properties (syntax)
@@ -16,6 +17,8 @@ ADD: Command 'lang': Operations over translations (issue #30)
 ADD: 'delete' option to 'context' and 'context_term' commands
 
 FIX: Disable 'native autocomplete' in chrome
+
+DEL: Command 'mute'. Now is part of the execution implementation
 ```
 
 **7.3.0**

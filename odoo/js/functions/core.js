@@ -118,21 +118,12 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: [
                     "i::t:times::1::Times to run",
                     "s::c:cmd::1::The command to run",
+                    "f::silent:silent::0::Used to don't print command output",
                 ],
                 sanitized: false,
                 generators: false,
                 example:
-                    "-t 20 -c \"create res.partner \\\"{'name': 'Example Partner #$INTITER'}\\\"\"",
-            });
-            this.registerCommand("mute", {
-                definition: "Only prints errors",
-                callback: this._cmdMute,
-                detail: "Print to screen is a really slow task, you can improve performance if only prints errors.",
-                args: ["s::c:cmd::1::The command to run"],
-                sanitized: false,
-                generators: false,
-                example:
-                    "-c \"repeat 20 create res.partner \\\"{'name': 'Example Partner #$INTITER'}\\\"\"",
+                    '-t 20 -c "create res.partner \'{\\"name\\": \\"Example Partner #$INTITER\\"}\'"',
             });
             this.registerCommand("jobs", {
                 definition: "Display running jobs",
@@ -367,7 +358,11 @@ odoo.define("terminal.functions.Core", function (require) {
                         return reject("Need a valid command to execute!");
                     }
                     const varname = _.uniqueId("term");
-                    window[varname] = await this._cmdMute({cmd: kwargs.cmd});
+                    window[varname] = await this.executeCommand(
+                        kwargs.cmd,
+                        false,
+                        true
+                    );
                     this.screen.print(
                         `Command result exported! now you can use '${varname}' variable in the browser console`
                     );
@@ -387,7 +382,11 @@ odoo.define("terminal.functions.Core", function (require) {
                         return reject("Need a valid command to execute!");
                     }
                     const filename = `${cmd_name}_${new Date().getTime()}.json`;
-                    const result = await this._cmdMute({cmd: kwargs.cmd});
+                    const result = await this.executeCommand(
+                        kwargs.cmd,
+                        false,
+                        true
+                    );
                     Utils.save2File(
                         filename,
                         "text/json",
@@ -439,35 +438,19 @@ odoo.define("terminal.functions.Core", function (require) {
                 const do_repeat = (rtimes) => {
                     if (!rtimes) {
                         this.screen.print(
-                            `<i>** Repeat finsihed: command called ${kwargs.times} times</i>`
+                            `<i>** Repeat finsihed: '${cmd_name}' command called ${kwargs.times} times</i>`
                         );
                         return resolve();
                     }
                     const scmd = this._parameterReader.parse(cmd, cmd_def);
-                    this._processCommandJob(scmd, cmd_def).finally(() =>
-                        do_repeat(rtimes - 1)
-                    );
+                    this._processCommandJob(
+                        scmd,
+                        cmd_def,
+                        kwargs.silent
+                    ).finally(() => do_repeat(rtimes - 1));
                 };
                 do_repeat(kwargs.times);
             });
-        },
-
-        _cmdMute: function (kwargs) {
-            const [cmd, cmd_name] = this.validateCommand(kwargs.cmd);
-            if (!cmd_name) {
-                return Promise.reject("Need a valid command to execute!");
-            }
-
-            var _this = _.clone(this);
-            _this.screen = _.clone(this.screen);
-            // Monkey-Patch screen print
-            _this.screen.print = () => {
-                // Do nothing.
-            };
-
-            const cmd_def = this._registeredCmds[cmd_name];
-            const scmd = this._parameterReader.parse(cmd, cmd_def);
-            return this._processCommandJob.call(_this, scmd, cmd_def);
         },
 
         _cmdJobs: function () {

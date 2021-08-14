@@ -213,22 +213,7 @@ odoo.define("terminal.Terminal", function (require) {
             return [cmd, cmd_name];
         },
 
-        executeCommandSimple: function (cmd_raw, context) {
-            const [cmd, cmd_name] = this.validateCommand(cmd_raw);
-            if (!cmd_name) {
-                return Promise.reject(_t("Need a valid command to execute!"));
-            }
-
-            const cmd_def = this._registeredCmds[cmd_name];
-            if (!cmd_def) {
-                return Promise.reject(_t("Need a valid command to execute!"));
-            }
-
-            const scmd = this._parameterReader.parse(cmd, cmd_def);
-            return this._processCommandJob.call(context || this, scmd, cmd_def);
-        },
-
-        executeCommand: function (cmd_raw, store = true) {
+        executeCommand: function (cmd_raw, store = true, silent = false) {
             return new Promise(async (resolve, reject) => {
                 let cmd = cmd_raw || "";
                 const cmd_split = cmd_raw.split(" ");
@@ -252,7 +237,8 @@ odoo.define("terminal.Terminal", function (require) {
                         if (!cmd_def) {
                             const cmd_res = this._alternativeExecuteCommand(
                                 cmd,
-                                store
+                                store,
+                                silent
                             );
                             return resolve(cmd_res);
                         }
@@ -261,25 +247,33 @@ odoo.define("terminal.Terminal", function (require) {
                     this._parameterReader.resetStores();
                     scmd = this._parameterReader.parse(cmd, cmd_def);
                 } catch (err) {
-                    this.screen.printCommand(cmd);
+                    if (!silent) {
+                        this.screen.printCommand(cmd);
+                    }
                     this.screen.printError(
                         `<span class='o_terminal_click ` +
                             `o_terminal_cmd' data-cmd='help ${cmd_name}'>` +
                             `${err}!</span>`
                     );
-                    if (store) {
+                    if (store && !cmd_def.secured) {
                         this._storeUserInput(cmd_raw);
                     }
                     this.screen.cleanInput();
                     return reject(err);
                 }
-                if (!cmd_def.secured) {
+                if (store && !cmd_def.secured) {
                     this._storeUserInput(cmd_raw);
                 }
-                this.screen.printCommand(cmd_raw, cmd_def.secured);
+                if (!silent) {
+                    this.screen.printCommand(cmd_raw, cmd_def.secured);
+                }
                 this.screen.cleanInput();
-                this._processCommandJob(scmd, cmd_def);
-                return resolve();
+                const res = await this._processCommandJob(
+                    scmd,
+                    cmd_def,
+                    silent
+                );
+                return resolve(res);
             });
         },
 
@@ -359,7 +353,7 @@ odoo.define("terminal.Terminal", function (require) {
                 const pp_values = this._parameterReader.preparse(cmd);
                 const tasks = [];
                 for (const runner of pp_values.runners) {
-                    tasks.push(this.executeCommandSimple(`mute ${runner.cmd}`));
+                    tasks.push(this.executeCommand(runner.cmd, false, true));
                 }
                 let pp_cmd = pp_values.cmd;
                 try {
@@ -389,7 +383,11 @@ odoo.define("terminal.Terminal", function (require) {
             });
         },
 
-        _alternativeExecuteCommand: function (cmd_raw, store = true) {
+        _alternativeExecuteCommand: function (
+            cmd_raw,
+            store = true,
+            silent = false
+        ) {
             const cmd = cmd_raw || "";
             const cmd_split = cmd_raw.split(" ");
             const cmd_name = cmd_split[0];
@@ -416,11 +414,13 @@ odoo.define("terminal.Terminal", function (require) {
                 if (store) {
                     this._storeUserInput(cmd);
                 }
-                this.executeCommand(alias_cmd, false);
+                this.executeCommand(alias_cmd, false, silent);
                 return true;
             }
 
-            this.screen.printCommand(cmd);
+            if (!silent) {
+                this.screen.printCommand(cmd);
+            }
             // Search similar commands
             const similar_cmd = this._searchSimiliarCommand(cmd_name);
             if (similar_cmd) {
@@ -673,7 +673,7 @@ odoo.define("terminal.Terminal", function (require) {
             return this._inputHistory[this._searchHistoryIter];
         },
 
-        _processCommandJob: function (scmd, cmd_def) {
+        _processCommandJob: function (scmd, cmd_def, silent = false) {
             return new Promise(async (resolve) => {
                 const job_index = this.onStartCommand(scmd, cmd_def);
                 let result = "";
@@ -684,8 +684,20 @@ odoo.define("terminal.Terminal", function (require) {
                         rawParams: scmd.rawParams,
                         def: cmd_def,
                         jobIndex: job_index,
+                        silent: silent,
                     };
-                    result = await cmd_def.callback.call(this, scmd.params);
+
+                    let _this = this;
+                    if (silent) {
+                        _this = _.clone(this);
+                        _this.screen = _.clone(this.screen);
+                        // Monkey-Patch screen print
+                        _this.screen.print = () => {
+                            // Do nothing.
+                        };
+                    }
+
+                    result = await cmd_def.callback.call(_this, scmd.params);
                     delete this.__meta;
                 } catch (err) {
                     is_failed = true;

@@ -20,6 +20,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 s: this._validateString,
                 i: this._validateInt,
                 j: this._validateJson,
+                f: this._validateInt,
             };
             this._formatters = {
                 s: this._formatString,
@@ -79,10 +80,10 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 description: descr,
                 default_value:
                     (!_.isEmpty(default_value) &&
-                        this._formatters[ttype](default_value, false)) ||
+                        this._formatters[ttype](default_value, list_mode)) ||
                     undefined,
                 strict_values:
-                    (!_.isEmpty(default_value) &&
+                    (!_.isEmpty(s_strict_values) &&
                         this._formatters[ttype](s_strict_values, true)) ||
                     undefined,
                 is_required: Boolean(Number(is_required)),
