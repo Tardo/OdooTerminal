@@ -19,7 +19,7 @@ odoo.define("terminal.Terminal", function (require) {
     const _lt = core._lt;
 
     const Terminal = Widget.extend({
-        VERSION: "7.3.0",
+        VERSION: "8.0.0",
 
         events: {
             "click .o_terminal_cmd": "_onClickTerminalCommand",
