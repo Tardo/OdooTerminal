@@ -360,7 +360,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         }
 
                         // Get action to export
-                        const action = await rpc.query({
+                        await rpc.query({
                             method: "act_getfile",
                             model: "base.language.export",
                             args: [[wizard_id]],
@@ -377,7 +377,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         });
 
                         // Get file
-                        await Utils.getContent(
+                        const content_def = Utils.getContent(
                             {
                                 model: "base.language.export",
                                 id: wizard_id,
@@ -388,7 +388,7 @@ odoo.define("terminal.functions.Common", function (require) {
                             this.printError
                         );
 
-                        return resolve(action);
+                        return resolve(content_def);
                     } else if (kwargs.operation === "import") {
                         if (is_empty_args) {
                             return resolve(
@@ -409,6 +409,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         }
                         // Get file content
                         const file64 = await Utils.file2Base64();
+
                         // Create wizard record
                         const wizard_id = await rpc.query({
                             method: "create",

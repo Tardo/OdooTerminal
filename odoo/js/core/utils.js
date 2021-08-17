@@ -58,24 +58,31 @@ odoo.define("terminal.core.Utils", function (require) {
     };
 
     const file2Base64 = () => {
-        const input = window.document.createElement("input");
-        input.type = "file";
-        document.body.appendChild(input);
+        const input_elm = window.document.createElement("input");
+        input_elm.type = "file";
+        document.body.appendChild(input_elm);
+        const onBodyFocus = (reject) => {
+            if (!input_elm.value.length) {
+                return reject("Aborted by user. No file given...");
+            }
+        };
 
         return new Promise((resolve, reject) => {
-            input.onchange = (e) => {
+            window.addEventListener("focus", onBodyFocus.bind(this, reject));
+            input_elm.onchange = (e) => {
                 const file = e.target.files[0];
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
 
                 reader.onerror = reject;
-                reader.onload = (readerEvent) => {
-                    return resolve(readerEvent.target.result);
-                };
+                reader.onabort = reject;
+                reader.onload = (readerEvent) =>
+                    resolve(readerEvent.target.result);
             };
-            input.click();
+            input_elm.click();
         }).finally(() => {
-            document.body.removeChild(input);
+            window.removeEventListener("focus", onBodyFocus);
+            document.body.removeChild(input_elm);
         });
     };
 
