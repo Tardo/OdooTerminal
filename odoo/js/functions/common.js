@@ -1209,11 +1209,7 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdCallAction: function (kwargs) {
-            let saction = kwargs.action;
-            if (this._parameterReader._validateJson(kwargs.action)) {
-                saction = this._parameterReader._formatJson(kwargs.action);
-            }
-            return this.do_action(saction);
+            return this.do_action(kwargs.action);
         },
 
         _cmdPostData: function (kwargs) {

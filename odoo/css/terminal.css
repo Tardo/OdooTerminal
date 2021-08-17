@@ -4,6 +4,7 @@
     --terminal-screen-width: 70%;
     --terminal-screen-width-maximized: 100%;
     --terminal-screen-background-color: black;
+    --terminal-screen-assistant-background-color: #222300;
     --terminal-screen-text-color: lightgray;
     --terminal-screen-font: "Lucida Console", Monaco, monospace;
     --terminal-screen-extra-info-color: darkkhaki;
@@ -109,6 +110,11 @@
 }
 .o_terminal div#terminal_screen .line-array:before {
     content: "- ";
+}
+
+.o_terminal div#terminal_assistant {
+    background-color: var(--terminal-screen-assistant-background-color);
+    font-size: x-small;
 }
 
 .o_terminal .terminal-user-input {

@@ -12,6 +12,7 @@ odoo.define("terminal.Terminal", function (require) {
     const ParameterReader = require("terminal.core.ParameterReader");
     const TemplateManager = require("terminal.core.TemplateManager");
     const Storage = require("terminal.core.Storage");
+    const CommandAssistant = require("terminal.core.CommandAssistant");
 
     const QWeb = core.qweb;
     const _t = core._t;
@@ -93,6 +94,7 @@ odoo.define("terminal.Terminal", function (require) {
                 onInput: this._onInput.bind(this),
             });
             this._parameterReader = new ParameterReader();
+            this._commandAssistant = new CommandAssistant(this);
             this._jobs = [];
             this._errorCount = 0;
 
@@ -681,7 +683,7 @@ odoo.define("terminal.Terminal", function (require) {
                 try {
                     this.__meta = {
                         name: scmd.cmd,
-                        rawParams: scmd.rawParams,
+                        cmdRaw: scmd.cmdRaw,
                         def: cmd_def,
                         jobIndex: job_index,
                         silent: silent,
@@ -860,34 +862,110 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
         _onKeyArrowRight: function (ev) {
-            if (
-                this.screen.getUserInput() &&
-                ev.target.selectionStart === this.screen.getUserInput().length
-            ) {
-                this._searchCommandQuery = this.screen.getUserInput();
+            const user_input = this.screen.getUserInput();
+            this._assistantOptions = this._commandAssistant.getAvailableOptions(
+                user_input,
+                this.screen.getInputCaretStartPos()
+            );
+            this._selAssistanOption = -1;
+            this.screen.updateAssistantPanelOptions(
+                this._assistantOptions,
+                this._selAssistanOption
+            );
+            if (user_input && ev.target.selectionStart === user_input.length) {
+                this._searchCommandQuery = user_input;
                 this._searchHistoryIter = this._inputHistory.length;
                 this._onKeyArrowUp();
-                this._searchCommandQuery = this.screen.getUserInput();
+                this._searchCommandQuery = user_input;
                 this._searchHistoryIter = this._inputHistory.length;
             }
         },
+        _onKeyArrowLeft: function () {
+            const user_input = this.screen.getUserInput();
+            this._assistantOptions = this._commandAssistant.getAvailableOptions(
+                user_input,
+                this.screen.getInputCaretStartPos()
+            );
+            this._selAssistanOption = -1;
+            this.screen.updateAssistantPanelOptions(
+                this._assistantOptions,
+                this._selAssistanOption
+            );
+        },
         _onKeyTab: function () {
-            if (this.screen.getUserInput()) {
-                if (_.isUndefined(this._searchCommandQuery)) {
-                    this._searchCommandQuery = this.screen.getUserInput();
-                }
-                const found_cmd = this._doSearchCommand();
-                if (found_cmd) {
-                    this.screen.updateInput(found_cmd + " ");
-                }
+            const user_input = this.screen.getUserInput();
+            if (_.isEmpty(user_input)) {
+                return;
             }
+            const scmd = this._parameterReader.parse(user_input);
+            const caret_pos = this.screen.getInputCaretStartPos();
+            const sel_param_index =
+                this._commandAssistant.getSelectedParameterIndex(
+                    scmd,
+                    caret_pos
+                );
+            ++this._selAssistanOption;
+            if (this._selAssistanOption >= this._assistantOptions.length) {
+                this._selAssistanOption = 0;
+            }
+            const option = this._assistantOptions[this._selAssistanOption];
+            if (_.isEmpty(option)) {
+                return;
+            }
+
+            let res_str = "";
+            let n_caret_pos = -1;
+            if (sel_param_index === -1) {
+                res_str = option.string;
+                n_caret_pos = res_str.length;
+                if (scmd.params.length > 0) {
+                    res_str += ` ${scmd.params.join(" ")}`;
+                }
+            } else {
+                const s_params = _.clone(scmd.params);
+                if (sel_param_index >= s_params.length) {
+                    s_params.push(option.string);
+                } else {
+                    s_params[sel_param_index] = option.string;
+                    n_caret_pos = scmd.cmd.length + 1;
+                    for (const index in s_params) {
+                        if (index > sel_param_index) {
+                            break;
+                        }
+                        const s_param = s_params[index];
+                        n_caret_pos +=
+                            s_param.length + (index < sel_param_index ? 1 : 0);
+                    }
+                }
+                res_str = `${scmd.cmd} ${s_params.join(" ")}`;
+            }
+            if (!_.isEmpty(res_str)) {
+                this.screen.updateInput(res_str);
+            }
+            if (n_caret_pos !== -1) {
+                this.screen.setInputCaretPos(n_caret_pos);
+            }
+            this.screen.updateAssistantPanelOptions(
+                this._assistantOptions,
+                this._selAssistanOption
+            );
         },
 
         _onInput: function () {
             // Fish-like feature
             this.screen.cleanShadowInput();
-            if (this.screen.getUserInput()) {
-                this._searchCommandQuery = this.screen.getUserInput();
+            const user_input = this.screen.getUserInput();
+            this._assistantOptions = this._commandAssistant.getAvailableOptions(
+                user_input,
+                this.screen.getInputCaretStartPos()
+            );
+            this._selAssistanOption = -1;
+            this.screen.updateAssistantPanelOptions(
+                this._assistantOptions,
+                this._selAssistanOption
+            );
+            if (user_input) {
+                this._searchCommandQuery = user_input;
                 this._searchHistoryIter = this._inputHistory.length;
                 new Promise((resolve) => {
                     resolve(this._doSearchPrevHistory());
@@ -906,6 +984,8 @@ odoo.define("terminal.Terminal", function (require) {
                 this._onKeyArrowDown(ev);
             } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
                 this._onKeyArrowRight(ev);
+            } else if (ev.keyCode === $.ui.keyCode.LEFT) {
+                this._onKeyArrowLeft(ev);
             } else if (ev.keyCode === $.ui.keyCode.TAB) {
                 this._onKeyTab(ev);
             } else {
@@ -959,7 +1039,7 @@ odoo.define("terminal.Terminal", function (require) {
                     _.map(
                         jobs,
                         (item) =>
-                            `${item.scmd.cmd} <small><i>${item.scmd.rawParams}</i></small>`
+                            `${item.scmd.cmd} <small><i>${item.scmd.cmdRaw}</i></small>`
                     )
                 );
                 this.doShow();

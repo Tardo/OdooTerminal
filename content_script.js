@@ -108,6 +108,7 @@
                 "odoo/js/core/abstract/screen.js",
                 "odoo/js/core/storage.js",
                 "odoo/js/core/template_manager.js",
+                "odoo/js/core/command_assistant.js",
                 "odoo/js/core/screen.js",
                 "odoo/js/core/longpolling.js",
                 "odoo/js/core/parameter_reader.js",

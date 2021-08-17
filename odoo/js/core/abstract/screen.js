@@ -51,6 +51,10 @@ odoo.define("terminal.core.abstract.Screen", function (require) {
             throw Error(_t("Not Implemented!"));
         },
 
+        getInputCaretStartPos: function () {
+            throw Error(_t("Not Implemented!"));
+        },
+
         // eslint-disable-next-line
         updateShadowInput: function (str) {
             throw Error(_t("Not Implemented!"));

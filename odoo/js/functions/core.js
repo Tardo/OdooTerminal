@@ -460,7 +460,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     jobs,
                     (item) =>
                         `${item.scmd.cmd} <small><i>${
-                            item.scmd.rawParams
+                            item.scmd.cmdRaw
                         }</i></small> ${
                             item.healthy
                                 ? ""

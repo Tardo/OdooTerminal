@@ -6,7 +6,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
     const AbstractScreen = require("terminal.core.abstract.Screen");
     const TemplateManager = require("terminal.core.TemplateManager");
-    const utils = require("terminal.core.Utils");
+    const Utils = require("terminal.core.Utils");
 
     /**
      * This class is used to manage 'terminal screen'
@@ -29,6 +29,7 @@ odoo.define("terminal.core.Screen", function (require) {
         start: function () {
             this._super.apply(this, arguments);
             this._createScreen();
+            this._createAssistantPanel();
             this._createUserInput();
         },
 
@@ -62,6 +63,7 @@ odoo.define("terminal.core.Screen", function (require) {
         cleanInput: function () {
             this.$input.val("");
             this.cleanShadowInput();
+            this.updateAssistantPanelOptions([], -1);
         },
 
         cleanShadowInput: function () {
@@ -73,11 +75,40 @@ odoo.define("terminal.core.Screen", function (require) {
             this.cleanShadowInput();
         },
 
+        getInputCaretStartPos: function () {
+            return this.$input[0].selectionStart;
+        },
+
+        setInputCaretPos: function (start, end) {
+            this.$input[0].selectionStart = start;
+            this.$input[0].selectionEnd = end || start;
+        },
+
         updateShadowInput: function (str) {
             this.$shadowInput.val(str);
             // Deferred to ensure that has updated values
             _.defer(() =>
                 this.$shadowInput.scrollLeft(this.$input.scrollLeft())
+            );
+        },
+
+        updateAssistantPanelOptions: function (options, selected_option_index) {
+            const html_options = [];
+            for (let index in options) {
+                index = Number(index);
+                const option = options[index];
+                html_options.push(
+                    `<li class="nav-item"><a class="nav-link ${
+                        option.is_default ? "text-secondary" : ""
+                    } ${option.is_required ? "text-warning" : ""} ${
+                        index === selected_option_index ? "bg-info active" : ""
+                    }" data-string="${option.string}" href="#">${
+                        option.name
+                    }</a></li>`
+                );
+            }
+            this.$assistant.html(
+                `<ul class="nav">${html_options.join("")}</ul>`
             );
         },
 
@@ -143,7 +174,7 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         eprint: function (msg, enl) {
-            this.print(utils.encodeHTML(msg), enl);
+            this.print(Utils.encodeHTML(msg), enl);
         },
 
         printCommand: function (cmd, secured = false) {
@@ -171,8 +202,8 @@ odoo.define("terminal.core.Screen", function (require) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
                 error_msg = this._templates.render("ERROR_MESSAGE", {
-                    error_name: utils.encodeHTML(error.data.name),
-                    error_message: utils.encodeHTML(error.data.message),
+                    error_name: Utils.encodeHTML(error.data.name),
+                    error_message: Utils.encodeHTML(error.data.message),
                     error_id: error_id,
                     exception_type:
                         error.data.exception_type || error.data.type,
@@ -183,7 +214,7 @@ odoo.define("terminal.core.Screen", function (require) {
                         error.data.arguments &&
                         JSON.stringify(error.data.arguments),
                     debug:
-                        error.data.debug && utils.encodeHTML(error.data.debug),
+                        error.data.debug && Utils.encodeHTML(error.data.debug),
                 });
                 ++this._errorCount;
             } else if (
@@ -194,13 +225,13 @@ odoo.define("terminal.core.Screen", function (require) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
                 error_msg = this._templates.render("ERROR_MESSAGE", {
-                    error_name: utils.encodeHTML(error.statusText),
-                    error_message: utils.encodeHTML(error.statusText),
+                    error_name: Utils.encodeHTML(error.statusText),
+                    error_message: Utils.encodeHTML(error.statusText),
                     error_id: error_id,
                     exception_type: "Invalid HTTP Request",
                     context: "",
                     args: "",
-                    debug: utils.encodeHTML(error.responseText),
+                    debug: Utils.encodeHTML(error.responseText),
                 });
                 ++this._errorCount;
             }
@@ -237,8 +268,10 @@ odoo.define("terminal.core.Screen", function (require) {
                         ++index;
                         continue;
                     }
-                    columns.push(field);
-                    tbody += `<td>${item[field]}</td>`;
+                    columns.push(Utils.encodeHTML(field));
+                    tbody += `<td>${Utils.encodeHTML(
+                        String(item[field])
+                    )}</td>`;
                     ++index;
                 }
                 tbody += "</tr>";
@@ -292,7 +325,7 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         _prettyObjectString: function (obj) {
-            return utils.encodeHTML(JSON.stringify(obj, null, 4));
+            return Utils.encodeHTML(JSON.stringify(obj, null, 4));
         },
 
         _createScreen: function () {
@@ -301,6 +334,13 @@ odoo.define("terminal.core.Screen", function (require) {
             );
             this.$screen.appendTo(this.$container);
             this.$screen.on("keydown", this.preventLostInputFocus.bind(this));
+        },
+
+        _createAssistantPanel: function () {
+            this.$assistant = $(
+                "<div class='col-sm-12 col-lg-12 col-12' id='terminal_assistant' tabindex='-1' />"
+            );
+            this.$assistant.appendTo(this.$container);
         },
 
         _createUserInput: function () {
@@ -327,8 +367,8 @@ odoo.define("terminal.core.Screen", function (require) {
                 !host.startsWith("localhost") &&
                 !host.startsWith("127.0.0.1")
             ) {
-                const [r, g, b] = utils.hex2rgb(
-                    utils.genHash(window.location.host)
+                const [r, g, b] = Utils.hex2rgb(
+                    Utils.genHash(window.location.host)
                 );
                 this.$prompt.css("background-color", `rgb(${r},${g},${b})`);
                 const gv =

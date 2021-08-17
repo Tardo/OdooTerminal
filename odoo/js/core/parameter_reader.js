@@ -177,7 +177,6 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             let scmd = Array.from(match, (x) => x[0]);
             const cmd = scmd[0];
             scmd = scmd.slice(1);
-            const rawParams = scmd.join(" ");
             let params = _.map(scmd, (item) => {
                 let nvalue = item;
                 if (item[0] === '"' || item[0] === "'") {
@@ -195,7 +194,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
 
             return {
                 cmd: cmd,
-                rawParams: rawParams,
+                cmdRaw: cmd_raw,
                 params: params,
             };
         },
@@ -263,6 +262,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     if (!_.isNull(formatted_param)) {
                         kwargs[s_arg_long_name] = formatted_param;
                         ++checkedCount;
+                        if (arg_info.is_required) {
+                            ++checkedRequiredCount;
+                        }
                         continue;
                     }
 
