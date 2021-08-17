@@ -144,7 +144,8 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Show readable/writeable fields of the selected model",
                 args: [
                     "s::m:model::1::The model technical name",
-                    "ls::f:field::0::The field names to request",
+                    "ls::f:field::0::The field names to request::*",
+                    "j::fi:filter::0::The filter to apply",
                 ],
                 example: "-m res.partner -f name,street",
             });
@@ -840,7 +841,19 @@ odoo.define("terminal.functions.Common", function (require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
+                    let s_result = null;
                     const keys = Object.keys(result).sort();
+                    if (_.isEmpty(kwargs.filter)) {
+                        s_result = result;
+                    } else {
+                        s_result = [];
+                        for (const key of keys) {
+                            if (_.isMatch(result[key], kwargs.filter)) {
+                                s_result[key] = result[key];
+                            }
+                        }
+                    }
+                    const s_keys = Object.keys(s_result).sort();
                     const fieldParams = [
                         "type",
                         "string",
@@ -852,10 +865,10 @@ odoo.define("terminal.functions.Common", function (require) {
                         "depends",
                     ];
                     let body = "";
-                    const len = keys.length;
+                    const len = s_keys.length;
                     for (let x = 0; x < len; ++x) {
-                        const field = keys[x];
-                        const fieldDef = result[field];
+                        const field = s_keys[x];
+                        const fieldDef = s_result[field];
                         body += "<tr>";
                         if (fieldDef.required) {
                             body += `<td>* <b style='color:mediumslateblue'>${field}</b></td>`;
@@ -874,7 +887,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     }
                     fieldParams.unshift("field");
                     this.screen.printTable(fieldParams, body);
-                    return result;
+                    return s_result;
                 });
         },
 
