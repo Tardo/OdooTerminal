@@ -173,8 +173,9 @@ odoo.define("terminal.core.Screen", function (require) {
             this._print(msg, scls);
         },
 
-        eprint: function (msg, enl) {
-            this.print(Utils.encodeHTML(msg), enl);
+        eprint: function (msg, enl, cls) {
+            const emsg = typeof msg === "string" ? Utils.encodeHTML(msg) : msg;
+            this.print(emsg, enl, cls);
         },
 
         printCommand: function (cmd, secured = false) {
@@ -222,7 +223,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 Object.prototype.hasOwnProperty.call(error, "status") &&
                 error.status !== "200"
             ) {
-                // It's an Odoo error report
+                // It's an Odoo/jQuery error report
                 const error_id = new Date().getTime();
                 error_msg = this._templates.render("ERROR_MESSAGE", {
                     error_name: Utils.encodeHTML(error.statusText),
@@ -231,7 +232,7 @@ odoo.define("terminal.core.Screen", function (require) {
                     exception_type: "Invalid HTTP Request",
                     context: "",
                     args: "",
-                    debug: Utils.encodeHTML(error.responseText),
+                    debug: Utils.encodeHTML(error.responseText || ""),
                 });
                 ++this._errorCount;
             }
@@ -280,28 +281,37 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         /* PRIVATE */
-        _print: function (msg, cls) {
+        _formatPrint: function (msg, cls) {
             const msg_type = typeof msg;
+            const res = [];
             if (msg_type === "object") {
                 if (msg instanceof Text) {
-                    this.printHTML(
-                        `<span class='line-text ${cls}'>${msg}</span>`
-                    );
+                    res.push(`<span class='line-text ${cls}'>${msg}</span>`);
                 } else if (msg instanceof Array) {
                     const l = msg.length;
                     for (let x = 0; x < l; ++x) {
-                        this.printHTML(
-                            `<span class='line-array ${cls}'>${msg[x]}</span>`
+                        res.push(
+                            `<span class='line-array ${cls}'>${this._formatPrint(
+                                msg[x]
+                            )}</span>`
                         );
                     }
                 } else {
-                    this.printHTML(
+                    res.push(
                         `<span class='line-object ${cls}'>` +
                             `${this._prettyObjectString(msg)}</span>`
                     );
                 }
             } else {
-                this.printHTML(`<span class='line-text ${cls}'>${msg}</span>`);
+                res.push(`<span class='line-text ${cls}'>${msg}</span>`);
+            }
+            return res;
+        },
+
+        _print: function (msg, cls) {
+            const formatted_msgs = this._formatPrint(msg, cls);
+            for (const line of formatted_msgs) {
+                this.printHTML(line);
             }
         },
 

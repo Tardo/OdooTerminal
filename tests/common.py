@@ -9,7 +9,18 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 
 
+class CommandTestInfoParam(object):
+    def __init__(self, string, selector):
+        self.string = string
+        self.selector = selector
+
+class CommandTestInfo(object):
+    def __init__(self, params):
+        self.params = params
+
 class SeleniumTestCase(unittest.TestCase):
+    ODOO_INSTANCE = ''
+    ODOO_INSTANCE_TYPE = 'ce'
 
     _ODOO_SERVERS = {
         'ce': {
@@ -29,20 +40,20 @@ class SeleniumTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.browser.quit
+        cls.browser.quit()
 
     def _relative_get(self, url):
         self.browser.get(urllib.parse.urljoin(self.base_url, url))
 
-    def _waitForElement(self, elementId, delay, by=By.ID):
+    def _wait_for_element(self, elementId, delay=None, by=By.ID):
         try:
-            founded_elem = WebDriverWait(self.browser, delay).until(
+            founded_elem = WebDriverWait(self.browser, delay or self._WAIT_SECS).until(
                 EC.presence_of_element_located((by, elementId)))
         except TimeoutException:
-            founded_elem = False
+            founded_elem = None
         return founded_elem
 
-    def _loginAs(self, login, password):
+    def _login_as(self, login, password):
         self._relative_get('web/login')
         self.browser.find_element_by_xpath("//input[@id='login']")\
             .send_keys(login)
@@ -50,79 +61,89 @@ class SeleniumTestCase(unittest.TestCase):
             .send_keys(password)
         self.browser.find_element_by_xpath("//button[@type='submit']")\
             .click()
-        elem = self._waitForElement(
-            'p.alert-danger', self._WAIT_SECS, by=By.CSS_SELECTOR)
+        elem = self._wait_for_element(
+            'p.alert-danger', delay=self._WAIT_SECS*2, by=By.CSS_SELECTOR)
         if elem and not 'Only employee can access this database' in elem.text:
             raise Exception('Ooops! Invalid login :/')
 
-    def _send_terminal_command(self, cmd):
-        elem = self.browser.find_element_by_css_selector(
-            'input#terminal_input')
-        elem.send_keys(cmd)
-        elem.send_keys(Keys.RETURN)
+    def _run_tests(self):
+        self.browser.execute_script("document.querySelector('.o_terminal')"
+                                    + ".dispatchEvent(new Event('start_terminal_tests'));")
+        elem = self._wait_for_element(
+            '.o_terminal .terminal-test-ok', delay=600, by=By.CSS_SELECTOR)
+        self.assertTrue(elem)
 
-    def _do_user_actions(self, delay, wait_cmd):
-        elem = self._waitForElement('terminal', delay)
+    def _open_terminal(self):
+        elem = self._wait_for_element('terminal')
         self.assertTrue(elem)
         self.browser.execute_script("document.querySelector('.o_terminal')"
                                     + ".dispatchEvent(new Event('toggle'));")
-        self._waitForElement(
-            "#terminal[style='top 0px;']", 3, by=By.CSS_SELECTOR)
-        self._send_terminal_command('help')
-        elem = self._waitForElement(
-            "strong[data-cmd='help %s']" % wait_cmd, 3, By.CSS_SELECTOR)
-        self.assertTrue(elem)
+        self._wait_for_element(
+            "#terminal[style='top 0px;']", by=By.CSS_SELECTOR)
+        elem_pin_btn = self._wait_for_element('#terminal .terminal-screen-icon-pin', by=By.CSS_SELECTOR)
+        elem_pin_btn_classes = elem_pin_btn.get_attribute('class').split()
+        if 'btn-light' not in elem_pin_btn_classes:
+            elem_pin_btn.click()
+        elem_pin_btn_classes = elem_pin_btn.get_attribute('class').split()
+        self.assertTrue('btn-light' in elem_pin_btn_classes)
+        elem_maximize_btn = self._wait_for_element('#terminal .terminal-screen-icon-maximize', by=By.CSS_SELECTOR)
+        elem_maximize_btn_classes = elem_maximize_btn.get_attribute('class').split()
+        if 'btn-light' not in elem_maximize_btn_classes:
+            elem_maximize_btn.click()
+        elem_maximize_btn_classes = elem_maximize_btn.get_attribute('class').split()
+        self.assertTrue('btn-light' in elem_maximize_btn_classes)
+        return elem
 
-    def _execute_test_empty(self):
+    def execute_test_empty(self):
         self.browser.get('http://www.duckduckgo.com')
         self.assertIn('DuckDuckGo', self.browser.title)
-        elem = self._waitForElement('terminal', 3)
+        elem = self._wait_for_element('terminal')
         self.assertFalse(elem)
 
-    def _execute_test_ce(self, serv_url):
+    def execute_test_ce(self, serv_url):
         self.browser.get(serv_url)
         url_parse = urllib.parse.urlparse(self.browser.current_url)
-        self.base_url = '%s://%s' % (url_parse.scheme, url_parse.netloc)
+        self.base_url = '{}://{}'.format(url_parse.scheme, url_parse.netloc)
 
         # Public
-        self._do_user_actions(self._WAIT_SECS, 'whoami')
+        self._open_terminal()
 
         # Portal
-        self._loginAs('portal', 'portal')
-        self._do_user_actions(self._WAIT_SECS, 'whoami')
+        self._login_as('portal', 'portal')
+        self._open_terminal()
 
         # Admin
-        self._loginAs('admin', 'admin')
-        self._do_user_actions(self._WAIT_SECS*2, 'view')
+        self._login_as('admin', 'admin')
+        self._open_terminal()
+        # Tests run as admin user to avoid access rights issues
+        self._run_tests()
 
         # Close Session
         self._relative_get('/web/session/logout')
 
-    def _execute_test_ee(self, serv_url):
+    def execute_test_ee(self, serv_url):
         self.browser.get(serv_url)
         url_parse = urllib.parse.urlparse(self.browser.current_url)
-        self.base_url = '%s://%s' % (url_parse.scheme, url_parse.netloc)
+        self.base_url = '{}://{}'.format(url_parse.scheme, url_parse.netloc)
 
         # Public
-        self._do_user_actions(self._WAIT_SECS, 'whoami')
+        self._open_terminal()
 
         # Portal
-        self._loginAs('portal', 'portal')
-        self._do_user_actions(self._WAIT_SECS, 'whoami')
+        self._login_as('portal', 'portal')
+        self._open_terminal()
 
         # Admin
-        self._loginAs('admin', 'admin')
-        elem = self._waitForElement(
+        self._login_as('admin', 'admin')
+        elem = self._wait_for_element(
             "a.o_menuitem:not([data-action-id='']):first-child",
-            self._WAIT_SECS,
             by=By.CSS_SELECTOR)
         elem.click()
-        elem = self._waitForElement(
+        elem = self._wait_for_element(
             'body:not(.o_home_menu_background):not(.o_app_switcher_background)',
-            self._WAIT_SECS*2,
             by=By.CSS_SELECTOR)
         self.assertTrue(elem)
-        self._do_user_actions(self._WAIT_SECS*2, 'view')
+        self._exec_full_command_test()
 
         # Close Session
         self._relative_get('/web/session/logout')

@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.com/Tardo/OdooTerminal.svg?branch=master)](https://travis-ci.com/Tardo/OdooTerminal)
 ![Odoo Ver](https://img.shields.io/badge/Odoo-11.0-yellowgreen)
 ![Odoo Ver](https://img.shields.io/badge/Odoo-12.0-green)
 ![Odoo Ver](https://img.shields.io/badge/Odoo-13.0-green)

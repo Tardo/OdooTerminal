@@ -129,7 +129,8 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Send POST request to selected endpoint",
                 args: [
                     "s::e:endpoint::1::The endpoint",
-                    "j::d:data::1::The data",
+                    "-::d:data::1::The data",
+                    "s::m:mode::0::The mode::odoo::odoo:raw",
                 ],
                 example: "-e /web/endpoint -d \"{'the_example': 42}\"",
             });
@@ -182,8 +183,8 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdContextOperation,
                 detail: "Operations over session context dictionary.",
                 args: [
-                    "s::o:operation::0::The operation to do::read::read:write:set",
-                    "j::v:value::0::The values",
+                    "s::o:operation::0::The operation to do::read::read:write:set:delete",
+                    "-::v:value::0::The values",
                 ],
                 example: "-o write -v \"{'the_example': 1}\"",
             });
@@ -227,6 +228,9 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Show database names",
                 callback: this._cmdShowDBList,
                 detail: "Show database names",
+                args: [
+                    "f::only-active:only-active::0::Indicates that only print the active database name",
+                ],
             });
             this.registerCommand("jstest", {
                 definition: "Launch JS Tests",
@@ -253,7 +257,8 @@ odoo.define("terminal.functions.Common", function (require) {
                     "s::e:endpoint::1::The endpoint",
                     "j::d:data::1::The data to send",
                 ],
-                example: "/web/endpoint \"{'the_example': 42}\"",
+                example:
+                    "-e /web_editor/public_render_template -d \"{'args':['web.layout']}\"",
             });
             this.registerCommand("depends", {
                 definition: "Know modules that depends on the given module",
@@ -290,173 +295,6 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Show the referenced model and id of the given xmlid's",
                 args: ["ls::x:xmlid::1::The XML-ID"],
                 example: "-x base.main_company,base.model_res_partner",
-            });
-            this.registerCommand("lang", {
-                definition: "Operations over translations",
-                callback: this._cmdLang,
-                detail: "Operations over translations.",
-                args: [
-                    "s::o:operation::1::The operation::::export:import:list",
-                    "s::l:lang::0::The language<br/>Can use '__new__' for new language (empty translation template)",
-                    "ls::m:module::0::The technical module name",
-                    "s::f:format::0::The format to use::po::po:csv",
-                    "s::n:name::0::The language name",
-                    "f::no-overwrite:no-overwrite::0::Flag to indicate dont overwrite current translations",
-                ],
-                example: "-o export -l en_US -m mail",
-            });
-        },
-
-        _cmdLang: function (kwargs) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    const is_empty_args = _.chain(kwargs)
-                        .omit(["operation", "format"])
-                        .isEmpty()
-                        .value();
-                    if (kwargs.operation === "export") {
-                        if (is_empty_args) {
-                            return resolve(
-                                this.do_action("base.action_wizard_lang_export")
-                            );
-                        }
-                        if (
-                            !kwargs.lang ||
-                            !kwargs.format ||
-                            _.isEmpty(kwargs.module)
-                        ) {
-                            return reject(
-                                "'export' operation needs the following arguments: --lang, --format, --module"
-                            );
-                        }
-                        // Get module ids
-                        let module_ids = await rpc.query({
-                            method: "search_read",
-                            domain: [["name", "in", kwargs.module]],
-                            fields: ["id"],
-                            model: "ir.module.module",
-                            kwargs: {context: this._getContext()},
-                        });
-                        module_ids = _.map(module_ids, "id");
-                        if (_.isEmpty(module_ids)) {
-                            return reject("No modules found!");
-                        }
-                        // Create wizard record
-                        const wizard_id = await rpc.query({
-                            method: "create",
-                            model: "base.language.export",
-                            args: [
-                                {
-                                    state: "choose",
-                                    format: kwargs.format,
-                                    lang: kwargs.lang,
-                                    modules: [[6, false, module_ids]],
-                                },
-                            ],
-                            kwargs: {context: this._getContext()},
-                        });
-                        if (!wizard_id) {
-                            return reject("Can't create wizard record!");
-                        }
-
-                        // Get action to export
-                        await rpc.query({
-                            method: "act_getfile",
-                            model: "base.language.export",
-                            args: [[wizard_id]],
-                            kwargs: {context: this._getContext()},
-                        });
-
-                        // Get updated wizard record data
-                        const wizard_record = await rpc.query({
-                            method: "search_read",
-                            domain: [["id", "=", wizard_id]],
-                            fields: false,
-                            model: "base.language.export",
-                            kwargs: {context: this._getContext()},
-                        });
-
-                        // Get file
-                        const content_def = Utils.getContent(
-                            {
-                                model: "base.language.export",
-                                id: wizard_id,
-                                field: "data",
-                                filename_field: "name",
-                                filename: wizard_record.name || "",
-                            },
-                            this.printError
-                        );
-
-                        return resolve(content_def);
-                    } else if (kwargs.operation === "import") {
-                        if (is_empty_args) {
-                            return resolve(
-                                this.do_action(
-                                    "base.action_view_base_import_language"
-                                )
-                            );
-                        }
-                        if (
-                            !kwargs.name ||
-                            !kwargs.lang ||
-                            !kwargs.format ||
-                            _.isEmpty(kwargs.module)
-                        ) {
-                            return reject(
-                                "'import' operation needs the following arguments: --name, --lang, --format, --module"
-                            );
-                        }
-                        // Get file content
-                        const file64 = await Utils.file2Base64();
-
-                        // Create wizard record
-                        const wizard_id = await rpc.query({
-                            method: "create",
-                            model: "base.language.import",
-                            args: [
-                                {
-                                    name: kwargs.name,
-                                    code: kwargs.lang,
-                                    filename: `${kwargs.lang}.${kwargs.format}`,
-                                    overwrite: !kwargs.no_overwrite,
-                                    data: file64,
-                                },
-                            ],
-                            kwargs: {context: this._getContext()},
-                        });
-                        if (!wizard_id) {
-                            return reject("Can't create wizard record!");
-                        }
-
-                        // Get action to export
-                        const status = await rpc.query({
-                            method: "import_lang",
-                            model: "base.language.import",
-                            args: [[wizard_id]],
-                            kwargs: {context: this._getContext()},
-                        });
-                        if (status) {
-                            this.screen.print(
-                                "Language file imported successfully"
-                            );
-                        }
-                        return resolve(status);
-                    } else if (kwargs.operation === "list") {
-                        const langs = await rpc.query({
-                            method: "get_installed",
-                            model: "res.lang",
-                            kwargs: {context: this._getContext()},
-                        });
-                        for (const lang of langs) {
-                            this.screen.print(` - ${lang[0]} (${lang[1]})`);
-                        }
-                        return resolve(langs);
-                    }
-                    return reject("Invalid operation!");
-                } catch (err) {
-                    return reject(err);
-                }
             });
         },
 
@@ -557,7 +395,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     params: kwargs.data,
                 })
                 .then((result) => {
-                    this.screen.print(result);
+                    this.screen.eprint(result, false, "line-pre");
                     return result;
                 });
         },
@@ -566,13 +404,13 @@ odoo.define("terminal.functions.Common", function (require) {
             const tour_names = Object.keys(tour.tours);
             if (kwargs.name) {
                 if (tour_names.indexOf(kwargs.name) === -1) {
-                    this.screen.printError("The given tour doesn't exists!");
-                } else {
-                    odoo.__DEBUG__.services["web_tour.tour"].run(kwargs.name);
-                    this.screen.print("Running tour...");
+                    return Promise.reject("The given tour doesn't exists!");
                 }
+                odoo.__DEBUG__.services["web_tour.tour"].run(kwargs.name);
+                this.screen.print("Running tour...");
             } else if (tour_names.length) {
                 this.screen.print(tour_names);
+                return Promise.resolve(tour_names);
             } else {
                 this.screen.print("The tour list is empty");
             }
@@ -593,7 +431,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return Promise.resolve();
         },
 
-        _cmdShowDBList: function () {
+        _cmdShowDBList: function (kwargs) {
             return ajax
                 .rpc("/jsonrpc", {
                     service: "db",
@@ -608,17 +446,30 @@ odoo.define("terminal.functions.Common", function (require) {
                     }
                     // Search active database
                     let index = 0;
+                    const s_databases = [];
                     while (index < databases_len) {
                         const database = databases[index];
-                        if (database === session.db) {
-                            databases[
-                                index
-                            ] = `<strong>${database}</strong> (Active Database)`;
-                            break;
+                        if (kwargs.only_active) {
+                            if (database === session.db) {
+                                this.screen.print(
+                                    `<strong>${database}</strong> (Active Database)`
+                                );
+                                return database;
+                            }
+                        } else if (database === session.db) {
+                            s_databases.push(
+                                `<strong>${database}</strong> (Active Database)`
+                            );
+                        } else {
+                            s_databases.push(database);
                         }
                         ++index;
                     }
-                    this.screen.print(databases);
+
+                    if (kwargs.only_active) {
+                        return false;
+                    }
+                    this.screen.print(s_databases);
                     return databases;
                 });
         },
@@ -628,7 +479,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 .query({
                     method: "user_has_groups",
                     model: "res.users",
-                    args: [kwargs.group],
+                    args: [kwargs.group.join(",")],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -647,12 +498,11 @@ odoo.define("terminal.functions.Common", function (require) {
             }
             if (db === "*") {
                 if (!session.db) {
-                    this.screen.printError(
+                    return Promise.reject(
                         "Unknown active database. Try using " +
                             "'<span class='o_terminal_click o_terminal_cmd' " +
                             "data-cmd='dblist'>dblist</span>' command."
                     );
-                    return Promise.resolve();
                 }
                 db = session.db;
             }
@@ -675,7 +525,7 @@ odoo.define("terminal.functions.Common", function (require) {
             if (typeof name === "undefined") {
                 this.screen.printError("Invalid channel name.");
             } else {
-                this.screen.print(this._longpolling.addChannel(name));
+                this._longpolling.addChannel(name);
                 this.screen.print(`Joined the '${name}' channel.`);
             }
         },
@@ -715,7 +565,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 this._longpolling.stopPoll();
                 this.screen.print("Longpolling stopped");
             } else {
-                this.screen.printError("Invalid Operation.");
+                return Promise.reject("Invalid Operation.");
             }
             return Promise.resolve();
         },
@@ -736,14 +586,10 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdContextOperation: function (kwargs) {
-            if (kwargs.operation === "read") {
-                this.screen.print(session.user_context);
-            } else if (kwargs.operation === "set") {
+            if (kwargs.operation === "set") {
                 session.user_context = kwargs.value;
-                this.screen.print(session.user_context);
             } else if (kwargs.operation === "write") {
                 Object.assign(session.user_context, kwargs.value);
-                this.screen.print(session.user_context);
             } else if (kwargs.operation === "delete") {
                 if (
                     Object.prototype.hasOwnProperty.call(
@@ -752,14 +598,14 @@ odoo.define("terminal.functions.Common", function (require) {
                     )
                 ) {
                     delete session.user_context[kwargs.value];
-                    this.screen.print(session.user_context);
                 } else {
-                    this.screen.printError(
+                    return Promise.reject(
                         "The selected key is not present in the terminal context"
                     );
                 }
             }
-            return Promise.resolve();
+            this.screen.print(session.user_context);
+            return Promise.resolve(session.user_context);
         },
 
         _cmdSearchModelRecordId: function (kwargs) {
@@ -956,7 +802,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "debug=assets"
                 );
             } else {
-                this.screen.printError("Invalid debug mode");
+                return Promise.reject("Invalid debug mode");
             }
             return Promise.resolve();
         },
@@ -977,83 +823,90 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdUpgradeModule: function (kwargs) {
-            return this._searchModule(kwargs.module).then((result) => {
-                if (result.length) {
-                    rpc.query({
-                        method: "button_immediate_upgrade",
-                        model: "ir.module.module",
-                        args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.screen.print(
-                                `'${kwargs.module}' module successfully upgraded`
-                            );
-                        },
-                        () => {
-                            this.screen.printError(
-                                `Can't upgrade '${kwargs.module}' module`
-                            );
-                        }
-                    );
-                } else {
-                    this.screen.printError(
-                        `'${kwargs.module}' module doesn't exists`
-                    );
-                }
+            return new Promise((resolve, reject) => {
+                this._searchModule(kwargs.module).then((result) => {
+                    if (result.length) {
+                        rpc.query({
+                            method: "button_immediate_upgrade",
+                            model: "ir.module.module",
+                            args: [result[0].id],
+                        }).then(
+                            () => {
+                                this.screen.print(
+                                    `'${kwargs.module}' module successfully upgraded`
+                                );
+                                resolve(result);
+                            },
+                            () => {
+                                reject(
+                                    `Can't upgrade '${kwargs.module}' module`
+                                );
+                            }
+                        );
+                    } else {
+                        reject(`'${kwargs.module}' module doesn't exists`);
+                    }
+                });
             });
         },
 
         _cmdInstallModule: function (kwargs) {
-            return this._searchModule(kwargs.module).then((result) => {
-                if (result.length) {
-                    rpc.query({
-                        method: "button_immediate_install",
-                        model: "ir.module.module",
-                        args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.screen.print(
-                                `'${kwargs.module}' module successfully installed`
-                            );
-                        },
-                        () => {
-                            this.screen.printError(
-                                `Can't install '${kwargs.module}' module`
-                            );
-                        }
-                    );
-                } else {
-                    this.screen.printError(
-                        `'${kwargs.module}' module doesn't exists`
-                    );
-                }
+            return new Promise((resolve, reject) => {
+                this._searchModule(kwargs.module).then((result) => {
+                    if (result.length) {
+                        rpc.query({
+                            method: "button_immediate_install",
+                            model: "ir.module.module",
+                            args: [result[0].id],
+                        }).then(
+                            () => {
+                                this.screen.print(
+                                    `'${kwargs.module}' module successfully installed`
+                                );
+                                resolve(result);
+                            },
+                            () => {
+                                reject(
+                                    `Can't install '${kwargs.module}' module`
+                                );
+                            }
+                        );
+                    } else {
+                        reject(`'${kwargs.module}' module doesn't exists`);
+                    }
+
+                    return result;
+                });
             });
         },
 
         _cmdUninstallModule: function (kwargs) {
-            return this._searchModule(kwargs.module).then((result) => {
-                if (result.length) {
-                    rpc.query({
-                        method: "button_immediate_uninstall",
-                        model: "ir.module.module",
-                        args: [result[0].id],
-                    }).then(
-                        () => {
-                            this.screen.print(
-                                `'${kwargs.module}' module successfully uninstalled`
-                            );
-                        },
-                        () => {
-                            this.screen.printError(
-                                `Can't uninstall '${kwargs.module}' module`
-                            );
-                        }
-                    );
-                } else {
-                    this.screen.printError(
-                        `'${kwargs.module}' module doesn't exists`
-                    );
-                }
+            return new Promise((resolve, reject) => {
+                this._searchModule(kwargs.module).then((result) => {
+                    if (result.length) {
+                        rpc.query({
+                            method: "button_immediate_uninstall",
+                            model: "ir.module.module",
+                            args: [result[0].id],
+                        }).then(
+                            () => {
+                                this.screen.print(
+                                    `'${kwargs.module}' module successfully uninstalled`
+                                );
+                                resolve(result);
+                            },
+                            () => {
+                                reject(
+                                    `Can't uninstall '${kwargs.module}' module`
+                                );
+                            }
+                        );
+                    } else {
+                        reject(`'${kwargs.module}' module doesn't exists`);
+                    }
+
+                    return result;
+                });
             });
         },
 
@@ -1064,9 +917,9 @@ odoo.define("terminal.functions.Common", function (require) {
             }
             return rpc
                 .query({
-                    method: kwargs.method,
+                    method: kwargs.call,
                     model: kwargs.model,
-                    args: kwargs.arguments,
+                    args: kwargs.argument,
                     kwargs: pkwargs,
                 })
                 .then((result) => {
@@ -1110,10 +963,7 @@ odoo.define("terminal.functions.Common", function (require) {
             if (kwargs.more) {
                 const buff = this._buffer[this.__meta.name];
                 if (!buff || !buff.data.length) {
-                    this.screen.printError(
-                        "There are no more results to print"
-                    );
-                    return Promise.resolve();
+                    return Promise.reject("There are no more results to print");
                 }
                 const sresult = buff.data.slice(0, lines_total);
                 buff.data = buff.data.slice(lines_total);
@@ -1227,8 +1077,18 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdPostData: function (kwargs) {
-            return ajax.post(kwargs.endpoint, kwargs.data).then((result) => {
-                this.screen.print(result);
+            if (kwargs.mode === "odoo") {
+                return ajax
+                    .post(kwargs.endpoint, kwargs.data)
+                    .then((result) => {
+                        this.screen.eprint(result, false, "line-pre");
+                        return result;
+                    });
+            }
+
+            return $.post(kwargs.endpoint, kwargs.data, (result) => {
+                this.screen.eprint(result, false, "line-pre");
+                return result;
             });
         },
 

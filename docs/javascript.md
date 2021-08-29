@@ -24,8 +24,7 @@ Commands uses promises
   definition: string,
   callback: function,
   detail: string,
-  syntax: string,
-  args: string,
+  syntax: array,
   secured: boolean,
   aliases: array,
   sanitized: boolean,
@@ -35,11 +34,8 @@ Commands uses promises
 - definition: Quick definition.
 - callback: Callback function.
 - detail: Command explained.
-- syntax: Command Parameters (For Humans)
-  - <> Required
-  - [] Optional
 - args: Command Arguments
-  - String with the format:
+  - Array of strings with the format:
     "TYPE::NAME_SHORT:NAME_LONG::REQUIRED::DESCRIPTION::DEFAULT_VALUE::STRICT_VALUES"
     - The 'TYPE' can be:
       - 's' String
@@ -53,7 +49,7 @@ Commands uses promises
 - aliases: Used to set deprecated names of the module
 - sanitized: Truncate single quotes (default is true)
 
-**Basic Example**::
+**Basic Example**:
 
 See Code: [example_funcs.js](./example_funcs.js)
 
