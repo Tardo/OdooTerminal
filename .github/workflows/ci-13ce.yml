@@ -1,4 +1,4 @@
-name: CI
+name: CI 13.0-CE
 
 on:
   push:
@@ -10,11 +10,13 @@ jobs:
   selenium:
     strategy:
       matrix:
-        # Use only the starred instances
-        instance: [12.0, 13.0, 14.0]
-        type: [ce]
-        browser: [firefox, chrome]
-        python: [3.9.6]
+        include:
+          - instance: "162/13.0"
+            type: ce
+            browser: firefox
+          - instance: "153/13.0"
+            type: ce
+            browser: chrome
     runs-on: ubuntu-latest
 
     steps:
@@ -22,6 +24,7 @@ jobs:
         with:
           path: |
             ~/.wdm
+          key: ${{ runner.os }}-wdm
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -31,16 +34,22 @@ jobs:
       - name: Switch to current branch
         run: git checkout ${{ env.BRANCH }}
 
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python 3.9.6
         uses: actions/setup-python@v1
         with:
-          python-version: ${{ matrix.python }}
+          python-version: 3.9.6
 
-      - name: Install browser ${{ matrix.browser }}
-        uses: browser-actions/setup-${{ matrix.browser }}@latest
+      - name: Install browser firefox
+        uses: browser-actions/setup-firefox@latest
         with:
-          chrome-version: "beta"
-          firefox-version: "latest-beta"
+          firefox-version: "latest"
+        if: ${{ matrix.browser == 'firefox' }}
+
+      - name: Install browser chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: "stable"
+        if: ${{ matrix.browser == 'chrome' }}
 
       - name: Install dependencies
         run: |
@@ -52,9 +61,9 @@ jobs:
 
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
         env:
-          TEST_ODOO_INSTANCE:
-            https://runbot.odoo-community.org/runbot/162/${{ matrix.instance }}
+          TEST_ODOO_INSTANCE: https://runbot.odoo-community.org/runbot/${{ matrix.instance }}
           TEST_ODOO_INSTANCE_TYPE: ${{ matrix.type }}
+          DISPLAY: :99
         uses: GabrielBB/xvfb-action@v1
         with:
           run: python3 -m unittest tests.test_${{ matrix.browser }}

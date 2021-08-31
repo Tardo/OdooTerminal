@@ -1,7 +1,6 @@
-![Odoo Ver](https://img.shields.io/badge/Odoo-11.0-yellowgreen)
-![Odoo Ver](https://img.shields.io/badge/Odoo-12.0-green)
-![Odoo Ver](https://img.shields.io/badge/Odoo-13.0-green)
-![Odoo Ver](https://img.shields.io/badge/Odoo-14.0-green)
+[![12.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-12ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-12ce.yml)
+[![13.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-13ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-13ce.yml)
+[![14.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-14ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-14ce.yml)
 
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)

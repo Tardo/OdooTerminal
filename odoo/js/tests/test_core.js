@@ -241,7 +241,7 @@ odoo.define("terminal.tests.core", function (require) {
 
         test_jobs: async function () {
             const res = await this.terminal.executeCommand("jobs", false, true);
-            this.assertEqual(res[0].scmd.cmd, "jobs");
+            this.assertEqual(res[0]?.scmd.cmd, "jobs");
         },
     });
 });

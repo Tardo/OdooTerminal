@@ -65,7 +65,7 @@ odoo.define("terminal.tests", function (require) {
 
         isFormOpen: function () {
             return !_.isNull(
-                document.querySelector(".o_action_manager .o_form_view")
+                document.querySelector(".o_view_controller .o_form_view")
             );
         },
 
