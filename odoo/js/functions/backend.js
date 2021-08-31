@@ -235,7 +235,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                         resolve();
                     });
                 }
-                return new dialogs.SelectCreateDialog(this, {
+                const dialog = new dialogs.SelectCreateDialog(this, {
                     res_model: kwargs.model,
                     title: "Select a record",
                     disable_multiple_selection: true,
@@ -250,11 +250,9 @@ odoo.define("terminal.functions.Backend", function (require) {
                             context: context,
                         });
                     },
-                })
-                    .open()
-                    .then((dialog) => {
-                        dialog.opened().then(resolve);
-                    });
+                });
+                dialog.open();
+                return dialog.opened().then(resolve);
             });
         },
     });
