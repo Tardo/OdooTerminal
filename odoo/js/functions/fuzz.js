@@ -11,7 +11,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
     const Terminal = require("terminal.Terminal");
     const ParameterGenerator = require("terminal.core.ParameterGenerator");
     const Class = require("web.Class");
-    const rpc = require("web.rpc");
+    const rpc = require("terminal.core.rpc");
     const field_utils = require("web.field_utils");
     const utils = require("web.utils");
 

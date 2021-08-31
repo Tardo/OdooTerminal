@@ -1,16 +1,12 @@
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.Utils", function (require) {
+odoo.define("terminal.core.Utils", function () {
     "use strict";
-
-    const session = require("web.session");
-    const utils = require("web.utils");
-    const framework = require("web.framework");
 
     // See https://en.wikipedia.org/wiki/List_of_Unicode_characters
     const encodeHTML = (text) =>
-        text.replace(
+        text?.replace(
             /[\u00A0-\u9999\u003C-\u003E\u0022-\u002F]/gim,
             (i) => `&#${i.charCodeAt(0)};`
         );
@@ -90,16 +86,8 @@ odoo.define("terminal.core.Utils", function (require) {
         return odoo.session_info.uid || odoo.session_info.user_id;
     };
 
-    const getContent = (options, onerror) => {
-        return session.get_file({
-            complete: framework.unblockUI,
-            data: _.extend({}, options, {
-                download: true,
-                data: utils.is_bin_size(options.data) ? null : options.data,
-            }),
-            error: onerror,
-            url: "/web/content",
-        });
+    const asyncSleep = (ms) => {
+        return new Promise((resolve) => setTimeout(resolve, ms));
     };
 
     return {
@@ -109,7 +97,7 @@ odoo.define("terminal.core.Utils", function (require) {
         unescapeSlashes: unescapeSlashes,
         save2File: save2File,
         getUID: getUID,
-        getContent: getContent,
         file2Base64: file2Base64,
+        asyncSleep: asyncSleep,
     };
 });

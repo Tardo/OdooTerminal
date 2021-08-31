@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  selenium:
+    strategy:
+      matrix:
+        # Use only the starred instances
+        instance: [12.0, 13.0, 14.0]
+        type: [ce]
+        browser: [firefox, chrome]
+        python: [3.9.6]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.wdm
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Switch to current branch
+        run: git checkout ${{ env.BRANCH }}
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install browser ${{ matrix.browser }}
+        uses: browser-actions/setup-${{ matrix.browser }}@latest
+        with:
+          chrome-version: "beta"
+          firefox-version: "latest-beta"
+
+      - name: Install dependencies
+        run: |
+          pip install -r tests/requirements.txt
+          pip install -r tools/requirements.txt
+
+      - name: Create .zip package
+        run: python3 tools/release.py
+
+      - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
+        env:
+          TEST_ODOO_INSTANCE:
+            https://runbot.odoo-community.org/runbot/162/${{ matrix.instance }}
+          TEST_ODOO_INSTANCE_TYPE: ${{ matrix.type }}
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: python3 -m unittest tests.test_${{ matrix.browser }}

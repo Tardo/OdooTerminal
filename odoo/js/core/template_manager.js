@@ -63,7 +63,7 @@ odoo.define("terminal.core.TemplateManager", function (require) {
                 "</tbody>" +
                 "</table>",
             TABLE_SEARCH_ID:
-                "<td><span class='o_terminal_click o_terminal_view' data-resid='<%= id %>' data-model='<%= model %>'>#<%= id %></span></td>",
+                "<td><span class='o_terminal_click o_terminal_cmd' data-cmd='view <%= model %> <%= id %>'>#<%= id %></span></td>",
             WHOAMI:
                 "<span style='color: gray;'>Login</span>: <%= login %><br>" +
                 "<span style='color: gray;'>User</span>: <%= display_name %> (#<%= user_id %>)<br>" +
@@ -76,7 +76,7 @@ odoo.define("terminal.core.TemplateManager", function (require) {
             PROMPT_CMD: `<%= prompt %> <%= cmd %>`,
             WELCOME: `<strong class='o_terminal_title'>Odoo Terminal v<%= ver %></strong>`,
             HELP_CMD: `<strong class='o_terminal_click o_terminal_cmd' data-cmd='help <%= cmd %>'><%= cmd %></strong> - <i><%= def %></i>`,
-            RECORD_CREATED: `<%= model %> record created successfully: <span class='o_terminal_click o_terminal_view' data-resid='<%= new_id %>' data-model='<%= model %>'><%= new_id %></span>`,
+            RECORD_CREATED: `<%= model %> record created successfully: <span class='o_terminal_click o_terminal_cmd' data-cmd='view <%= model %> <%= new_id %>'><%= new_id %></span>`,
             DEPRECATED_COMMAND: `** This command is deprecated, please use '<%= cmd %>' instead.`,
         },
 

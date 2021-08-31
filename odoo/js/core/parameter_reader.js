@@ -232,6 +232,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 if (param[0] === "-") {
                     const arg_name = param.substr(param[1] === "-" ? 2 : 1);
                     arg_info = this.getArgumentInfoByName(args, arg_name);
+                    if (_.isEmpty(arg_info)) {
+                        throw _t("Invalid command parameters");
+                    }
                     // Handle 'flag' type, so it don't use a value
                     if (arg_info.type === "f") {
                         kwargs[arg_info.names.long.replaceAll("-", "_")] = true;
@@ -240,9 +243,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     param = params[++i];
                 } else {
                     arg_info = this.getArgumentInfo(args[checkedCount]);
-                }
-                if (_.isEmpty(arg_info)) {
-                    throw _t("Invalid command parameters");
+                    if (_.isEmpty(arg_info)) {
+                        throw _t("Invalid command parameters");
+                    }
                 }
 
                 const arg_long_name = arg_info.names.long;

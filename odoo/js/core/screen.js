@@ -108,7 +108,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 );
             }
             this.$assistant.html(
-                `<ul class="nav">${html_options.join("")}</ul>`
+                `<ul class="nav nav-pills">${html_options.join("")}</ul>`
             );
         },
 
@@ -173,8 +173,9 @@ odoo.define("terminal.core.Screen", function (require) {
             this._print(msg, scls);
         },
 
-        eprint: function (msg, enl) {
-            this.print(Utils.encodeHTML(msg), enl);
+        eprint: function (msg, enl, cls) {
+            const emsg = typeof msg === "string" ? Utils.encodeHTML(msg) : msg;
+            this.print(emsg, enl, cls);
         },
 
         printCommand: function (cmd, secured = false) {
@@ -222,7 +223,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 Object.prototype.hasOwnProperty.call(error, "status") &&
                 error.status !== "200"
             ) {
-                // It's an Odoo error report
+                // It's an Odoo/jQuery error report
                 const error_id = new Date().getTime();
                 error_msg = this._templates.render("ERROR_MESSAGE", {
                     error_name: Utils.encodeHTML(error.statusText),
@@ -231,7 +232,7 @@ odoo.define("terminal.core.Screen", function (require) {
                     exception_type: "Invalid HTTP Request",
                     context: "",
                     args: "",
-                    debug: Utils.encodeHTML(error.responseText),
+                    debug: Utils.encodeHTML(error.responseText || ""),
                 });
                 ++this._errorCount;
             }
@@ -280,28 +281,37 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         /* PRIVATE */
-        _print: function (msg, cls) {
+        _formatPrint: function (msg, cls) {
             const msg_type = typeof msg;
+            const res = [];
             if (msg_type === "object") {
                 if (msg instanceof Text) {
-                    this.printHTML(
-                        `<span class='line-text ${cls}'>${msg}</span>`
-                    );
+                    res.push(`<span class='line-text ${cls}'>${msg}</span>`);
                 } else if (msg instanceof Array) {
                     const l = msg.length;
                     for (let x = 0; x < l; ++x) {
-                        this.printHTML(
-                            `<span class='line-array ${cls}'>${msg[x]}</span>`
+                        res.push(
+                            `<span class='line-array ${cls}'>${this._formatPrint(
+                                msg[x]
+                            )}</span>`
                         );
                     }
                 } else {
-                    this.printHTML(
+                    res.push(
                         `<span class='line-object ${cls}'>` +
                             `${this._prettyObjectString(msg)}</span>`
                     );
                 }
             } else {
-                this.printHTML(`<span class='line-text ${cls}'>${msg}</span>`);
+                res.push(`<span class='line-text ${cls}'>${msg}</span>`);
+            }
+            return res;
+        },
+
+        _print: function (msg, cls) {
+            const formatted_msgs = this._formatPrint(msg, cls);
+            for (const line of formatted_msgs) {
+                this.printHTML(line);
             }
         },
 
@@ -344,40 +354,47 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         _createUserInput: function () {
+            const host = window.location.host;
             const to_inject = $(
-                "<div class='d-flex terminal-user-input'>" +
-                    "<input class='terminal-prompt' readonly='readonly'/>" +
-                    "<div class='flex-fill rich-input'>" +
-                    "<input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' readonly='readonly'/>" +
-                    "<input type='edit' id='terminal_input' autocomplete='off-term' />" +
-                    "</div>" +
-                    "</div>"
+                `<div class='d-flex terminal-user-input'>
+                    <div class='terminal-prompt-container d-flex'>
+                        <span class='terminal-prompt font-weight-bold' title='${host}'>${host}</span><span>${Utils.encodeHTML(
+                    this.PROMPT
+                )}</span>
+                    </div>
+                    <div class='flex-fill rich-input'>
+                        <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' readonly='readonly'/>
+                        <input type='edit' id='terminal_input' autocomplete='off-term' />
+                    </div>
+                </div>`
             );
             to_inject.appendTo(this.$container);
-            this.$prompt = to_inject.find(".terminal-prompt");
+            this.$promptContainer = to_inject.find(
+                ".terminal-prompt-container"
+            );
+            this.$prompt = this.$promptContainer.find(".terminal-prompt");
             this.$input = to_inject.find("#terminal_input");
             this.$shadowInput = to_inject.find("#terminal_shadow_input");
-            this.$prompt.val(this.PROMPT);
             this.$input.on("keyup", this._options.onInputKeyUp);
             this.$input.on("keydown", this._onInputKeyDown.bind(this));
             this.$input.on("input", this._options.onInput);
             // Custom color indicator per host
-            const host = window.location.host;
-            if (
-                !host.startsWith("localhost") &&
-                !host.startsWith("127.0.0.1")
-            ) {
+            if (host.startsWith("localhost") || host.startsWith("127.0.0.1")) {
+                this.$promptContainer.css({
+                    "background-color": "#adb5bd",
+                    color: "black",
+                });
+            } else {
                 const [r, g, b] = Utils.hex2rgb(
                     Utils.genHash(window.location.host)
                 );
-                this.$prompt.css("background-color", `rgb(${r},${g},${b})`);
                 const gv =
                     1 -
                     (0.2126 * (r / 255) +
                         0.7152 * (g / 255) +
                         0.0722 * (b / 255));
-                this.$prompt.css({
-                    background_color: `rgb(${r},${g},${b})`,
+                this.$promptContainer.css({
+                    "background-color": `rgb(${r},${g},${b})`,
                     color: gv < 0.5 ? "#000" : "#fff",
                 });
             }

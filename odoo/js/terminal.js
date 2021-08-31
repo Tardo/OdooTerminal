@@ -169,6 +169,7 @@ odoo.define("terminal.Terminal", function (require) {
             );
             core.bus.off("keydown", this, this._onCoreKeyDown);
             core.bus.off("click", this, this._onCoreClick);
+            this.$el[0].removeEventListener("toggle", this.doToggle.bind(this));
             this._super.apply(this, arguments);
         },
 
@@ -237,11 +238,12 @@ odoo.define("terminal.Terminal", function (require) {
                     if (!cmd_def) {
                         [, cmd_def] = this._searchCommandDefByAlias(cmd_name);
                         if (!cmd_def) {
-                            const cmd_res = this._alternativeExecuteCommand(
-                                cmd,
-                                store,
-                                silent
-                            );
+                            const cmd_res =
+                                await this._alternativeExecuteCommand(
+                                    cmd,
+                                    store,
+                                    silent
+                                );
                             return resolve(cmd_res);
                         }
                     }
@@ -416,8 +418,7 @@ odoo.define("terminal.Terminal", function (require) {
                 if (store) {
                     this._storeUserInput(cmd);
                 }
-                this.executeCommand(alias_cmd, false, silent);
-                return true;
+                return this.executeCommand(alias_cmd, false, silent);
             }
 
             if (!silent) {
@@ -439,7 +440,7 @@ odoo.define("terminal.Terminal", function (require) {
                 this._storeUserInput(cmd);
             }
             this.screen.cleanInput();
-            return false;
+            return Promise.resolve();
         },
 
         _getContext: function (extra_context) {
@@ -678,7 +679,8 @@ odoo.define("terminal.Terminal", function (require) {
         _processCommandJob: function (scmd, cmd_def, silent = false) {
             return new Promise(async (resolve) => {
                 const job_index = this.onStartCommand(scmd, cmd_def);
-                let result = "";
+                let result = false;
+                let error = false;
                 let is_failed = false;
                 try {
                     this.__meta = {
@@ -699,17 +701,19 @@ odoo.define("terminal.Terminal", function (require) {
                         };
                     }
 
-                    result = await cmd_def.callback.call(_this, scmd.params);
+                    result =
+                        (await cmd_def.callback.call(_this, scmd.params)) ||
+                        true;
                     delete this.__meta;
                 } catch (err) {
                     is_failed = true;
-                    result =
+                    error =
                         err ||
                         `[!] ${_t(
                             "Oops! Unknown error! (no detailed error message given :/)"
                         )}`;
                 } finally {
-                    this.onFinishCommand(job_index, is_failed, result);
+                    this.onFinishCommand(job_index, is_failed, error || result);
                 }
                 return resolve(result);
             });
