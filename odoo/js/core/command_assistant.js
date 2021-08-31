@@ -89,14 +89,17 @@ odoo.define("terminal.core.CommandAssistant", function (require) {
             } else {
                 let offset = scmd.cmd.length + 1;
                 for (const index_param in scmd.params) {
+                    const params_len =
+                        scmd.params[index_param].length +
+                        (scmd.params[index_param].indexOf(" ") === -1 ? 0 : 2);
                     if (
                         caret_pos >= offset &&
-                        caret_pos <= offset + scmd.params[index_param].length
+                        caret_pos <= offset + params_len
                     ) {
                         sel_param_index = index_param;
                     }
                     // +1 because space
-                    offset += scmd.params[index_param].length + 1;
+                    offset += params_len + 1;
                 }
             }
 
