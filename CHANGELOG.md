@@ -6,7 +6,7 @@
 IMP: Integration tests
 IMP: Command 'post': New argument '--mode' to select the mode (odoo or raw, default is odoo)
 IMP: Command 'dblist' New argument '--only-active' to print only the active database name
-IMP: Screen: Pretty print array of objects
+IMP: Screen: Pretty print array of objects and show the host in the prompt
 
 ADD: Unit tests
 ADD: RPC: Modified implementation to do rpc queries (issue #33)
@@ -22,7 +22,7 @@ FIX: Command 'lang': Moved to backend
 FIX: ParameterReader: Argument definition not found in 'validateAndFormat'
 FIX: ParameterReader: Correct detection of invalid arguments in subcommands
 FIX: Screen: Open view on click id (issue #32)
-FIX: CommandAssistant: Parameters with spaces
+FIX: CommandAssistant: Parameters with spaces and nav mode in 11.0
 ```
 
 **8.0.0**

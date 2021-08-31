@@ -108,7 +108,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 );
             }
             this.$assistant.html(
-                `<ul class="nav">${html_options.join("")}</ul>`
+                `<ul class="nav nav-pills">${html_options.join("")}</ul>`
             );
         },
 
@@ -354,40 +354,47 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         _createUserInput: function () {
+            const host = window.location.host;
             const to_inject = $(
-                "<div class='d-flex terminal-user-input'>" +
-                    "<input class='terminal-prompt' readonly='readonly'/>" +
-                    "<div class='flex-fill rich-input'>" +
-                    "<input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' readonly='readonly'/>" +
-                    "<input type='edit' id='terminal_input' autocomplete='off-term' />" +
-                    "</div>" +
-                    "</div>"
+                `<div class='d-flex terminal-user-input'>
+                    <div class='terminal-prompt-container d-flex'>
+                        <span class='terminal-prompt font-weight-bold' title='${host}'>${host}</span><span>${Utils.encodeHTML(
+                    this.PROMPT
+                )}</span>
+                    </div>
+                    <div class='flex-fill rich-input'>
+                        <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' readonly='readonly'/>
+                        <input type='edit' id='terminal_input' autocomplete='off-term' />
+                    </div>
+                </div>`
             );
             to_inject.appendTo(this.$container);
-            this.$prompt = to_inject.find(".terminal-prompt");
+            this.$promptContainer = to_inject.find(
+                ".terminal-prompt-container"
+            );
+            this.$prompt = this.$promptContainer.find(".terminal-prompt");
             this.$input = to_inject.find("#terminal_input");
             this.$shadowInput = to_inject.find("#terminal_shadow_input");
-            this.$prompt.val(this.PROMPT);
             this.$input.on("keyup", this._options.onInputKeyUp);
             this.$input.on("keydown", this._onInputKeyDown.bind(this));
             this.$input.on("input", this._options.onInput);
             // Custom color indicator per host
-            const host = window.location.host;
-            if (
-                !host.startsWith("localhost") &&
-                !host.startsWith("127.0.0.1")
-            ) {
+            if (host.startsWith("localhost") || host.startsWith("127.0.0.1")) {
+                this.$promptContainer.css({
+                    "background-color": "#adb5bd",
+                    color: "black",
+                });
+            } else {
                 const [r, g, b] = Utils.hex2rgb(
                     Utils.genHash(window.location.host)
                 );
-                this.$prompt.css("background-color", `rgb(${r},${g},${b})`);
                 const gv =
                     1 -
                     (0.2126 * (r / 255) +
                         0.7152 * (g / 255) +
                         0.0722 * (b / 255));
-                this.$prompt.css({
-                    background_color: `rgb(${r},${g},${b})`,
+                this.$promptContainer.css({
+                    "background-color": `rgb(${r},${g},${b})`,
                     color: gv < 0.5 ? "#000" : "#fff",
                 });
             }

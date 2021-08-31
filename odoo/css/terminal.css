@@ -138,13 +138,23 @@
     display: flex; /* Here to force BS4 behavior */
 }
 
-.o_terminal .terminal-user-input > .terminal-prompt {
-    width: 1.2em;
+.o_terminal .terminal-user-input > .terminal-prompt-container {
+    padding: 3px;
+    max-width: 15%;
+    display: flex; /* Here for 11.0 */
+}
+.o_terminal
+    .terminal-user-input
+    > .terminal-prompt-container
+    > .terminal-prompt {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .o_terminal .terminal-user-input .rich-input {
     position: relative;
-    width: 100%; /* Here to 11.0 */
+    flex: 1 1 auto; /* Here for 11.0 */
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input {
     background-color: transparent;
@@ -158,6 +168,7 @@
     flex: 1 1 auto; /* Here to force BS4 behavior */
     position: absolute;
     width: 100%;
+    padding: 3px;
 }
 
 .o_terminal .terminal-user-input input {
