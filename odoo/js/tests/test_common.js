@@ -6,7 +6,7 @@ odoo.define("terminal.tests.common", function (require) {
 
     const TerminalTestSuite = require("terminal.tests");
     const Utils = require("terminal.core.Utils");
-    const rpc = require("web.rpc");
+    const rpc = require("terminal.core.rpc");
 
     TerminalTestSuite.include({
         // Can't test 'lang'
@@ -27,7 +27,7 @@ odoo.define("terminal.tests.common", function (require) {
                         fields: ["id"],
                         model: "res.currency",
                         limit: 1,
-                        orderBy: [{name: "id", asc: false}],
+                        orderBy: "id DESC",
                         kwargs: {context: this.terminal._getContext()},
                     })
                     .then((result) => {
@@ -46,7 +46,7 @@ odoo.define("terminal.tests.common", function (require) {
                         domain: [["id", ">", this._last_res_currency_id]],
                         fields: ["id"],
                         model: "res.currency",
-                        orderBy: [{name: "id", asc: false}],
+                        orderBy: "id DESC",
                         kwargs: {context: this.terminal._getContext()},
                     })
                     .then((result) => {

@@ -5,7 +5,7 @@ odoo.define("terminal.functions.Common", function (require) {
     "use strict";
 
     const tour = require("web_tour.tour");
-    const rpc = require("web.rpc");
+    const rpc = require("terminal.core.rpc");
     const ajax = require("web.ajax");
     const session = require("web.session");
     const Terminal = require("terminal.Terminal");
@@ -635,7 +635,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     method: "search_read",
                     fields: ["user_id", "last_presence"],
                     model: "bus.presence",
-                    orderBy: [{name: "last_presence", asc: false}],
+                    orderBy: "last_presence DESC",
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
@@ -985,7 +985,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     model: kwargs.model,
                     limit: kwargs.limit,
                     offset: kwargs.offset,
-                    orderBy: this._deserializeSort(kwargs.order),
+                    orderBy: kwargs.order,
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {

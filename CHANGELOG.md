@@ -9,6 +9,7 @@ IMP: Command 'dblist' New argument '--only-active' to print only the active data
 IMP: Screen: Pretty print array of objects
 
 ADD: Unit tests
+ADD: RPC: Modified implementation to do rpc queries
 
 FIX: Command 'load': Return native promise
 FIX: Command 'context_term': Operation 'delete' and '--value' argument type changed to any

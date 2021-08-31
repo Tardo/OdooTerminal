@@ -5,7 +5,7 @@ odoo.define("terminal.functions.Backend", function (require) {
     "use strict";
 
     const dialogs = require("web.view_dialogs");
-    const rpc = require("web.rpc");
+    const rpc = require("terminal.core.rpc");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
     const UtilsBackend = require("terminal.core.UtilsBackend");

@@ -103,6 +103,7 @@
         const to_inject = {
             css: ["odoo/css/terminal.css"],
             js: [
+                "odoo/js/core/rpc.js",
                 "odoo/js/core/utils.js",
                 "odoo/js/core/abstract/longpolling.js",
                 "odoo/js/core/abstract/screen.js",
