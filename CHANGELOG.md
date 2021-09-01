@@ -1,5 +1,12 @@
 # Changelog
 
+**8.2.0**
+
+```
+FIX: Disable native browser autocomplete
+
+```
+
 **8.1.0**
 
 ```

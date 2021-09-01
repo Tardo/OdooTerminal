@@ -364,7 +364,7 @@ odoo.define("terminal.core.Screen", function (require) {
                     </div>
                     <div class='flex-fill rich-input'>
                         <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' readonly='readonly'/>
-                        <input type='edit' id='terminal_input' autocomplete='off-term' />
+                        <input type='edit' id='terminal_input' autocomplete='off' />
                     </div>
                 </div>`
             );
