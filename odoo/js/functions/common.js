@@ -923,7 +923,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     kwargs: pkwargs,
                 })
                 .then((result) => {
-                    this.screen.print(result);
+                    this.screen.eprint(result, false, "line-pre");
                     return result;
                 });
         },
