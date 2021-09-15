@@ -34,7 +34,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             );
             this._regexArgs = new RegExp(/[l?*]/);
             this._regexRunner = new RegExp(
-                /\{\{(.+?)\}\}(?:\.(\w+)|\[(\d+)\])?/gm
+                /[=]\{(.+?)\}(?:\.(\w+)|\[(\d+)\])?/gm
             );
             this._parameterGenerator = new ParameterGenerator();
         },
@@ -158,7 +158,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             let cc_index = 0;
             const pp_cmd = cmd_raw.replaceAll(
                 this._regexRunner,
-                () => `{{${cc_index++}}}`
+                () => `={${cc_index++}}`
             );
             return {
                 cmd: pp_cmd,

@@ -139,10 +139,10 @@ For example:
 #### + Runners (subcommands)
 
 You can execute "subcommands" to use the result in a new command call. The
-syntax of runners looks like `{{command}}`, `{{command}}.key` or
-`{{command}}[index]`.
+syntax of runners looks like `[[command]]`, `[[command]].key` or
+`[[command]][index]`.
 
-For example: `read -m res.users -i {{search -m res.users -f id}}.id`
+For example: `read -m res.users -i [[search -m res.users -f id]].id`
 
 #### + Massive operations
 

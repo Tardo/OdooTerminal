@@ -3,6 +3,8 @@
 **8.2.0**
 
 ```
+IMP: Changed subcommand template from {{subcommand}} to ${subcommand}: This is done to avoid collisions with jinja2 payloads
+
 FIX: Disable native browser autocomplete
 FIX: Command 'call': Escape output
 
