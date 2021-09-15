@@ -572,10 +572,9 @@ odoo.define("terminal.functions.Common", function (require) {
 
         _cmdShowOdooVersion: function () {
             try {
+                const version_info = Utils.getOdooVersionInfo();
                 this.screen.print(
-                    `${odoo.session_info.server_version_info
-                        .slice(0, 3)
-                        .join(".")} (${odoo.session_info.server_version_info
+                    `${version_info.slice(0, 3).join(".")} (${version_info
                         .slice(3)
                         .join(" ")})`
                 );

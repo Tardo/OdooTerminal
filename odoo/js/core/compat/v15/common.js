@@ -20,4 +20,40 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
         }
         return uid;
     };
+
+    const origGetUsername = Utils.getUsername;
+    Utils.getUsername = () => {
+        let username = null;
+        try {
+            username = origGetUsername();
+        } catch (e) {
+            username = odoo.__DEBUG__.services["@web/session"].session.username;
+        }
+        return username;
+    };
+
+    const origGetOdooVersion = Utils.getOdooVersion;
+    Utils.getOdooVersion = () => {
+        let ver = null;
+        try {
+            ver = origGetOdooVersion();
+        } catch (e) {
+            ver =
+                odoo.__DEBUG__.services["@web/session"].session.server_version;
+        }
+        return ver;
+    };
+
+    const origGetOdooVersionInfo = Utils.getOdooVersionInfo;
+    Utils.getOdooVersionInfo = () => {
+        let ver = null;
+        try {
+            ver = origGetOdooVersionInfo();
+        } catch (e) {
+            ver =
+                odoo.__DEBUG__.services["@web/session"].session
+                    .server_version_info;
+        }
+        return ver;
+    };
 });

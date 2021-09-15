@@ -16,6 +16,7 @@ odoo.define("terminal.core.abstract.Screen", function (require) {
 
         start: function ($container) {
             this.$container = $container;
+            return Promise.resolve();
         },
 
         destroy: function () {

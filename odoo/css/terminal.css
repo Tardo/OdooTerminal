@@ -152,6 +152,17 @@
     white-space: nowrap;
 }
 
+.o_terminal .terminal-user-input > .terminal-prompt-info-container {
+    padding: 3px;
+    display: flex; /* Here for 11.0 */
+}
+.o_terminal
+    .terminal-user-input
+    > .terminal-prompt-info-container
+    > .terminal-prompt-info {
+    white-space: nowrap;
+}
+
 .o_terminal .terminal-user-input .rich-input {
     position: relative;
     flex: 1 1 auto; /* Here for 11.0 */
