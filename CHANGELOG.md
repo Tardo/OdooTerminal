@@ -4,6 +4,9 @@
 
 ```
 IMP: Changed subcommand template from {{subcommand}} to ${subcommand}: This is done to avoid collisions with jinja2 payloads
+IMP: Support for Odoo 15.0: The command 'context' is not fully supported due to the reduced avaible services for the legacy environment.
+
+ADD: Command 'rpc': Execute RPC with custom options
 
 FIX: Disable native browser autocomplete
 FIX: Command 'call': Escape output

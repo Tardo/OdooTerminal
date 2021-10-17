@@ -5,7 +5,11 @@
 odoo.define("terminal.core.compat.15.Common", function (require) {
     "use strict";
 
+    const session = require("web.session");
     const Utils = require("terminal.core.Utils");
+    require("terminal.functions.Common");
+    const Terminal = require("terminal.Terminal");
+    const rpc = require("terminal.core.rpc");
 
     /**
      * Monkey patch to get correct user id
@@ -16,7 +20,11 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
         try {
             uid = origGetUID();
         } catch (e) {
-            uid = odoo.__DEBUG__.services["@web/session"].session.user_id;
+            // Do nothing
+        }
+
+        if (!uid) {
+            uid = session.user_id;
         }
         return uid;
     };
@@ -27,7 +35,11 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
         try {
             username = origGetUsername();
         } catch (e) {
-            username = odoo.__DEBUG__.services["@web/session"].session.username;
+            // Do nothing
+        }
+
+        if (!username) {
+            username = session.username;
         }
         return username;
     };
@@ -38,8 +50,11 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
         try {
             ver = origGetOdooVersion();
         } catch (e) {
-            ver =
-                odoo.__DEBUG__.services["@web/session"].session.server_version;
+            // Do nothing
+        }
+
+        if (!ver) {
+            ver = session.server_version;
         }
         return ver;
     };
@@ -50,10 +65,108 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
         try {
             ver = origGetOdooVersionInfo();
         } catch (e) {
-            ver =
-                odoo.__DEBUG__.services["@web/session"].session
-                    .server_version_info;
+            // Do nothing
+        }
+
+        if (!ver) {
+            ver = session.server_version_info;
         }
         return ver;
     };
+
+    Terminal.include({
+        /**
+         * @override
+         */
+        init: function (parent, mode) {
+            this._super.apply(this, arguments);
+            if (mode === this.MODES.BACKEND_NEW) {
+                this.env = parent.env;
+            }
+        },
+
+        /**
+         * Call to legacy action manager
+         * FIXME: Now can't now when the action is completed... :(
+         *
+         * @override
+         */
+        do_action: function (action, options) {
+            this.env.bus.trigger("do-action", {
+                action: action,
+                options: options,
+            });
+
+            // Simulate action completion time..
+            // FIXME: this makes me cry
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({id: action});
+                }, 450);
+            });
+        },
+
+        /** *
+         * Common
+         ***/
+
+        /**
+         * @override
+         */
+        _cmdContextOperation: function (kwargs) {
+            if (
+                kwargs.operation === "set" ||
+                kwargs.operation === "write" ||
+                kwargs.operation === "delete"
+            ) {
+                return Promise.reject(
+                    "This operation is currently not supported in v15.0+"
+                );
+            }
+            this.screen.print(session.user_context);
+            return Promise.resolve(session.user_context);
+        },
+
+        /**
+         * @override
+         */
+        _cmdRef: function (kwargs) {
+            const tasks = [];
+            for (const xmlid of kwargs.xmlid) {
+                const xmlid_parts = xmlid.split(".");
+                const xmlid_module = xmlid_parts.shift();
+                tasks.push(
+                    rpc
+                        .query({
+                            method: "check_object_reference",
+                            model: "ir.model.data",
+                            args: [xmlid_module, xmlid_parts.join(".")],
+                            kwargs: {context: this._getContext()},
+                        })
+                        .then(
+                            function (active_xmlid, result) {
+                                return [active_xmlid, result[0], result[1]];
+                            }.bind(this, xmlid)
+                        )
+                );
+            }
+
+            return Promise.all(tasks).then((results) => {
+                let body = "";
+                const len = results.length;
+                for (let x = 0; x < len; ++x) {
+                    const item = results[x];
+                    body +=
+                        `<tr><td>${item[0]}</td>` +
+                        `<td>${item[1]}</td>` +
+                        `<td>${item[2]}</td></tr>`;
+                }
+                this.screen.printTable(
+                    ["XML ID", "Res. Model", "Res. ID"],
+                    body
+                );
+                return results;
+            });
+        },
+    });
 });

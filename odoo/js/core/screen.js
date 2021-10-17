@@ -288,6 +288,20 @@ odoo.define("terminal.core.Screen", function (require) {
             this.printTable(_.unique(columns), tbody);
         },
 
+        updateInputInfo: function (username, version, host) {
+            if (username) {
+                this.$userInput.find("#terminal-prompt-main").text(username);
+            }
+            if (version) {
+                this.$userInput
+                    .find("#terminal-prompt-info-version")
+                    .text(version);
+            }
+            if (host) {
+                this.$userInput.find("#terminal-prompt-info-host").text(host);
+            }
+        },
+
         /* PRIVATE */
         _formatPrint: function (msg, cls) {
             const msg_type = typeof msg;
@@ -368,10 +382,10 @@ odoo.define("terminal.core.Screen", function (require) {
             const host = window.location.host;
             const username = Utils.getUsername();
             const version = Utils.getOdooVersion();
-            const to_inject = $(
+            this.$userInput = $(
                 `<div class='d-flex terminal-user-input'>
                     <div class='terminal-prompt-container d-flex'>
-                        <span class='terminal-prompt font-weight-bold' title='${username}'>${username}&nbsp;</span>
+                        <span id="terminal-prompt-main" class='terminal-prompt font-weight-bold' title='${username}'>${username}&nbsp;</span>
                         <span>${Utils.encodeHTML(this.PROMPT)}</span>
                     </div>
                     <div class='flex-fill rich-input'>
@@ -379,26 +393,26 @@ odoo.define("terminal.core.Screen", function (require) {
                         <input type='edit' id='terminal_input' autocomplete='off' />
                     </div>
                     <div class="terminal-prompt-info-container d-none d-lg-inline-flex">
-                        <span class='terminal-prompt-info' title='${version}'>${version}</span>
+                        <span id="terminal-prompt-info-version" class='terminal-prompt-info' title='${version}'>${version}</span>
                     </div>
                     <div class="terminal-prompt-container d-none d-lg-inline-flex">
-                        <span class='terminal-prompt' title='${host}'>${host}</span>
+                        <span id="terminal-prompt-info-host" class='terminal-prompt' title='${host}'>${host}</span>
                     </div>
                 </div>`
             );
-            to_inject.appendTo(this.$container);
-            this.$promptContainer = to_inject.find(
+            this.$userInput.appendTo(this.$container);
+            this.$promptContainer = this.$userInput.find(
                 ".terminal-prompt-container"
             );
             this.$prompt = this.$promptContainer.find(".terminal-prompt");
-            this.$promptInfoContainer = to_inject.find(
+            this.$promptInfoContainer = this.$userInput.find(
                 ".terminal-prompt-info-container"
             );
             this.$promptInfo = this.$promptContainer.find(
                 ".terminal-prompt-info"
             );
-            this.$input = to_inject.find("#terminal_input");
-            this.$shadowInput = to_inject.find("#terminal_shadow_input");
+            this.$input = this.$userInput.find("#terminal_input");
+            this.$shadowInput = this.$userInput.find("#terminal_shadow_input");
             this.$input.on("keyup", this._options.onInputKeyUp);
             this.$input.on("keydown", this._onInputKeyDown.bind(this));
             this.$input.on("input", this._options.onInput);

@@ -131,11 +131,12 @@ odoo.define("terminal.tests.common", function (require) {
                 false,
                 true
             );
+            await new Promise((resolve) => setTimeout(resolve, 800));
             this.assertTrue(this.isFormOpen());
             const record_id = await this.terminal.executeCommand(
-                `create -m res.partner.industry -v \"{'name': '${_.uniqueId(
+                `create -m res.partner.industry -v "{'name': '${_.uniqueId(
                     "This is a Test #"
-                )}'}\"`,
+                )}'}"`,
                 false,
                 true
             );
@@ -147,11 +148,12 @@ odoo.define("terminal.tests.common", function (require) {
                 false,
                 true
             );
+            await new Promise((resolve) => setTimeout(resolve, 800));
             this.assertTrue(this.isFormOpen());
             const record_id = await this.terminal.executeCommand(
-                `create res.partner.industry \"{'name': '${_.uniqueId(
+                `create res.partner.industry "{'name': '${_.uniqueId(
                     "This is a Test #"
-                )}'}\"`,
+                )}'}"`,
                 false,
                 true
             );
@@ -160,9 +162,9 @@ odoo.define("terminal.tests.common", function (require) {
 
         test_unlink: async function () {
             const record_id = await this.terminal.executeCommand(
-                `create -m res.partner.industry -v \"{'name': '${_.uniqueId(
+                `create -m res.partner.industry -v "{'name': '${_.uniqueId(
                     "This is a Test #"
-                )}'}\"`,
+                )}'}"`,
                 false,
                 true
             );
@@ -175,9 +177,9 @@ odoo.define("terminal.tests.common", function (require) {
         },
         test_unlink__no_arg: async function () {
             const record_id = await this.terminal.executeCommand(
-                `create res.partner.industry \"{'name': '${_.uniqueId(
+                `create res.partner.industry "{'name': '${_.uniqueId(
                     "This is a Test #"
-                )}'}\"`,
+                )}'}"`,
                 false,
                 true
             );
@@ -191,16 +193,16 @@ odoo.define("terminal.tests.common", function (require) {
 
         test_write: async function () {
             const record_a_id = await this.terminal.executeCommand(
-                `create -m res.partner.industry -v \"{'name': '${_.uniqueId(
+                `create -m res.partner.industry -v "{'name': '${_.uniqueId(
                     "This is a Test #"
-                )}'}\"`,
+                )}'}"`,
                 false,
                 true
             );
             const record_b_id = await this.terminal.executeCommand(
-                `create -m res.partner.industry -v \"{'name': '${_.uniqueId(
+                `create -m res.partner.industry -v "{'name': '${_.uniqueId(
                     "This is a Test #"
-                )}'}\"`,
+                )}'}"`,
                 false,
                 true
             );
@@ -223,16 +225,16 @@ odoo.define("terminal.tests.common", function (require) {
         },
         test_write__no_arg: async function () {
             const record_a_id = await this.terminal.executeCommand(
-                `create -m res.partner.industry -v \"{'name': '${_.uniqueId(
+                `create -m res.partner.industry -v "{'name': '${_.uniqueId(
                     "This is a Test #"
-                )}'}\"`,
+                )}'}"`,
                 false,
                 true
             );
             const record_b_id = await this.terminal.executeCommand(
-                `create res.partner.industry \"{'name': '${_.uniqueId(
+                `create res.partner.industry "{'name': '${_.uniqueId(
                     "This is a Test #"
-                )}'}\"`,
+                )}'}"`,
                 false,
                 true
             );
@@ -496,24 +498,27 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             this.assertIn(res, "uid");
-            res = await this.terminal.executeCommand(
-                "context -o write -v \"{'test_key': 'test_value'}\"",
-                false,
-                true
-            );
-            this.assertIn(res, "test_key");
-            res = await this.terminal.executeCommand(
-                "context -o set -v \"{'test_key': 'test_value_change'}\"",
-                false,
-                true
-            );
-            this.assertEqual(res.test_key, "test_value_change");
-            res = await this.terminal.executeCommand(
-                "context -o delete -v test_key",
-                false,
-                true
-            );
-            this.assertNotIn(res, "test_key");
+            // At the moment operations with the context are not possible in legacy mode
+            if (this.terminal._mode !== this.terminal.MODES.BACKEND_NEW) {
+                res = await this.terminal.executeCommand(
+                    "context -o write -v \"{'test_key': 'test_value'}\"",
+                    false,
+                    true
+                );
+                this.assertIn(res, "test_key");
+                res = await this.terminal.executeCommand(
+                    "context -o set -v \"{'test_key': 'test_value_change'}\"",
+                    false,
+                    true
+                );
+                this.assertEqual(res.test_key, "test_value_change");
+                res = await this.terminal.executeCommand(
+                    "context -o delete -v test_key",
+                    false,
+                    true
+                );
+                this.assertNotIn(res, "test_key");
+            }
         },
         test_context__no_arg: async function () {
             let res = await this.terminal.executeCommand(
@@ -522,24 +527,27 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             this.assertIn(res, "uid");
-            res = await this.terminal.executeCommand(
-                "context write \"{'test_key': 'test_value'}\"",
-                false,
-                true
-            );
-            this.assertIn(res, "test_key");
-            res = await this.terminal.executeCommand(
-                "context set \"{'test_key': 'test_value_change'}\"",
-                false,
-                true
-            );
-            this.assertEqual(res.test_key, "test_value_change");
-            res = await this.terminal.executeCommand(
-                "context delete test_key",
-                false,
-                true
-            );
-            this.assertNotIn(res, "test_key");
+            // At the moment operations with the context are not possible in legacy mode
+            if (this.terminal._mode !== this.terminal.MODES.BACKEND_NEW) {
+                res = await this.terminal.executeCommand(
+                    "context write \"{'test_key': 'test_value'}\"",
+                    false,
+                    true
+                );
+                this.assertIn(res, "test_key");
+                res = await this.terminal.executeCommand(
+                    "context set \"{'test_key': 'test_value_change'}\"",
+                    false,
+                    true
+                );
+                this.assertEqual(res.test_key, "test_value_change");
+                res = await this.terminal.executeCommand(
+                    "context delete test_key",
+                    false,
+                    true
+                );
+                this.assertNotIn(res, "test_key");
+            }
         },
 
         test_version: async function () {

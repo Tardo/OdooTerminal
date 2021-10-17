@@ -10,6 +10,22 @@ odoo.define("terminal.functions.Backend", function (require) {
     const Utils = require("terminal.core.Utils");
     const UtilsBackend = require("terminal.core.UtilsBackend");
 
+    function OdooEvent(target, name, data) {
+        this.target = target;
+        this.name = name;
+        this.data = Object.create(null);
+        _.extend(this.data, data);
+        this.stopped = false;
+    }
+
+    OdooEvent.prototype.stopPropagation = function () {
+        this.stopped = true;
+    };
+
+    OdooEvent.prototype.is_stopped = function () {
+        return this.stopped;
+    };
+
     Terminal.include({
         init: function () {
             this._super.apply(this, arguments);
@@ -49,6 +65,20 @@ odoo.define("terminal.functions.Backend", function (require) {
                 ],
                 example: "-o export -l en_US -m mail",
             });
+            this.registerCommand("action", {
+                definition: "Call action",
+                callback: this._cmdCallAction,
+                detail: "Call action",
+                args: [
+                    "-::a:action::1::The action to launch<br/>Can be an string, number or object",
+                    "j::o:options::0::The extra options to use",
+                ],
+                example: "-a 134",
+            });
+        },
+
+        _cmdCallAction: function (kwargs) {
+            return this.do_action(kwargs.action, kwargs.options);
         },
 
         _cmdLang: function (kwargs) {
@@ -228,7 +258,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                         res_model: kwargs.model,
                         res_id: kwargs.id,
                         views: [[false, "form"]],
-                        target: "new",
+                        target: "current",
                         context: context,
                     }).then(() => {
                         this.doHide();
@@ -246,7 +276,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                             res_model: kwargs.model,
                             res_id: records[0].id,
                             views: [[false, "form"]],
-                            target: "new",
+                            target: "current",
                             context: context,
                         });
                     },

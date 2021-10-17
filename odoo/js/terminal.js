@@ -21,6 +21,12 @@ odoo.define("terminal.Terminal", function (require) {
     const Terminal = Widget.extend({
         VERSION: "8.1.0",
 
+        MODES: {
+            BACKEND_NEW: 1,
+            BACKEND_OLD: 2,
+            FRONTEND: 3,
+        },
+
         events: {
             "click .o_terminal_cmd": "_onClickTerminalCommand",
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
@@ -65,8 +71,9 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
 
-        init: function () {
+        init: function (parent, mode) {
             this._super.apply(this, arguments);
+            this._mode = mode;
             this._buffer = {};
             this._storage = new Storage.StorageSession();
             this._storageLocal = new Storage.StorageLocal();
@@ -303,7 +310,7 @@ odoo.define("terminal.Terminal", function (require) {
         /* VISIBILIY */
         doShow: function () {
             if (!this._wasLoaded) {
-                return;
+                return Promise.resolve();
             }
             const doTransition = () => {
                 this.$el.addClass("terminal-transition-topdown");
@@ -311,13 +318,14 @@ odoo.define("terminal.Terminal", function (require) {
             };
             // Only start the terminal if needed
             if (!this._wasStart) {
-                this.start().then(() => {
+                return this.start().then(() => {
                     this.screen.flush();
                     doTransition();
                 });
-            } else {
-                doTransition();
             }
+            doTransition();
+
+            return Promise.resolve();
         },
 
         doHide: function () {
@@ -758,13 +766,10 @@ odoo.define("terminal.Terminal", function (require) {
         onLoaded: function () {
             this._wasLoaded = true;
             if (this._pinned) {
-                this.start().then(() => {
-                    this.screen.flush();
-                    this.doShow();
-                    this.$(".terminal-screen-icon-pin")
-                        .removeClass("btn-dark")
-                        .addClass("btn-light");
-                });
+                this.doShow();
+                this.$(".terminal-screen-icon-pin")
+                    .removeClass("btn-dark")
+                    .addClass("btn-light");
             }
         },
 

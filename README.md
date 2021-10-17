@@ -20,7 +20,11 @@ The BFG10k for Odoo developers
 All the power of Odoo json-rpc in a really easy way!
 </p>
 
-This web extension adds a terminal-like to control Odoo (11, 12, 13 & 14).
+This web extension adds a terminal-like to control Odoo (11, 12, 13, 14 & 15).
+All implemented commands use the tools provided by the Odoo framework. An
+unwavering policy when developing this extension is to not modify or alter in
+any way the Odoo classes. This sometimes results in certain commands having
+reduced/increased capabilities depending on the Odoo version.
 
 **Downloads**
 

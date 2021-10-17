@@ -36,7 +36,12 @@
      */
     function _injectPageScript(script, callback) {
         const script_page = document.createElement("script");
-        script_page.setAttribute("type", "text/javascript");
+        const [script_ext] = script.split(".").slice(-1);
+        if (script_ext === "mjs") {
+            script_page.setAttribute("type", "module");
+        } else {
+            script_page.setAttribute("type", "text/javascript");
+        }
         (document.head || document.documentElement).appendChild(script_page);
         if (callback) {
             script_page.onload = callback;
@@ -99,38 +104,20 @@
      * @returns {Array}
      */
     function _getTerminalResources(info) {
-        // Common resources
         const to_inject = {
-            css: ["odoo/css/terminal.css"],
-            js: [
-                "odoo/js/core/rpc.js",
-                "odoo/js/core/utils.js",
-                "odoo/js/core/abstract/longpolling.js",
-                "odoo/js/core/abstract/screen.js",
-                "odoo/js/core/storage.js",
-                "odoo/js/core/template_manager.js",
-                "odoo/js/core/command_assistant.js",
-                "odoo/js/core/screen.js",
-                "odoo/js/core/longpolling.js",
-                "odoo/js/core/parameter_reader.js",
-                "odoo/js/core/parameter_generator.js",
-                "odoo/js/tests/tests.js",
-                "odoo/js/tests/test_core.js",
-                "odoo/js/tests/test_common.js",
-                "odoo/js/tests/test_backend.js",
-                "odoo/js/terminal.js",
-                "odoo/js/functions/core.js",
-                "odoo/js/functions/common.js",
-            ],
+            css: [],
+            js: [],
         };
         // Compatibility resources
         // 11 - v11
         // 12+ - v12
         // 15+ - v15
+        let compat_mode = null;
         const odoo_version = info.serverVersion;
         if (odoo_version.major === 11 && odoo_version.minor === 0) {
             // Version 11.0
             to_inject.js.push("odoo/js/core/compat/v11/common.js");
+            compat_mode = 11;
         }
         if (
             (odoo_version.major === 11 && odoo_version.minor > 0) ||
@@ -138,6 +125,7 @@
         ) {
             // Version 12.0
             to_inject.js.push("odoo/js/core/compat/v12/common.js");
+            compat_mode = 12;
         }
         if (
             (odoo_version.major === 14 && odoo_version.minor > 0) ||
@@ -145,18 +133,43 @@
         ) {
             // Version 15.0
             to_inject.js.push("odoo/js/core/compat/v15/common.js");
+            compat_mode = 15;
         }
         // Backend/Frontend resources
         if (info.isFrontend) {
-            to_inject.js.push("odoo/js/loaders/frontend.js");
+            to_inject.js.push(`odoo/js/loaders/frontend.js`);
         } else {
-            to_inject.js = [
+            to_inject.js = to_inject.js.concat([
                 "odoo/js/core/utils_backend.js",
                 "odoo/js/functions/backend.js",
                 "odoo/js/functions/fuzz.js",
-                "odoo/js/loaders/backend.js",
-            ].concat(to_inject.js);
+                `odoo/js/loaders/backend_${
+                    compat_mode < 15 ? "old" : "new"
+                }.js`,
+            ]);
         }
+        // Common resources
+        to_inject.css = to_inject.css.concat(["odoo/css/terminal.css"]);
+        to_inject.js = to_inject.js.concat([
+            "odoo/js/core/rpc.js",
+            "odoo/js/core/utils.js",
+            "odoo/js/core/abstract/longpolling.js",
+            "odoo/js/core/abstract/screen.js",
+            "odoo/js/core/storage.js",
+            "odoo/js/core/template_manager.js",
+            "odoo/js/core/command_assistant.js",
+            "odoo/js/core/screen.js",
+            "odoo/js/core/longpolling.js",
+            "odoo/js/core/parameter_reader.js",
+            "odoo/js/core/parameter_generator.js",
+            "odoo/js/tests/tests.js",
+            "odoo/js/tests/test_core.js",
+            "odoo/js/tests/test_common.js",
+            "odoo/js/tests/test_backend.js",
+            "odoo/js/terminal.js",
+            "odoo/js/functions/core.js",
+            "odoo/js/functions/common.js",
+        ]);
         return to_inject;
     }
 

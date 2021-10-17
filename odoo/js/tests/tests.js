@@ -102,9 +102,10 @@ odoo.define("terminal.tests", function (require) {
 
         _onStartTests: function (ev) {
             const test_names = _.compact((ev.detail || "").split(","));
-            this.doShow();
-            this.screen.clean();
-            this._runTests(test_names);
+            this.doShow().then(() => {
+                this.screen.clean();
+                this._runTests(test_names);
+            });
         },
 
         _getTestMethods: function (obj) {

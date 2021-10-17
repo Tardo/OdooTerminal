@@ -15,7 +15,7 @@
     {
       "js": ["content_script.js"],
       "matches": ["<all_urls>"],
-      "run_at": "document_idle"
+      "run_at": "document_end"
     }
   ],
   "description": "Terminal-like to send json-rpc requests and use tools for Odoo developers",
