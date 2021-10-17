@@ -7,6 +7,7 @@ IMP: Changed subcommand template from {{subcommand}} to ${subcommand}: This is d
 IMP: Support for Odoo 15.0: The command 'context' is not fully supported due to the reduced avaible services for the legacy environment.
 
 ADD: Command 'rpc': Execute RPC with custom options
+ADD: Command 'metadata': Show record metadata
 
 FIX: Disable native browser autocomplete
 FIX: Command 'call': Escape output

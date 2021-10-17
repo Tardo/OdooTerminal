@@ -78,6 +78,13 @@ odoo.define("terminal.core.TemplateManager", function (require) {
             HELP_CMD: `<strong class='o_terminal_click o_terminal_cmd' data-cmd='help <%= cmd %>'><%= cmd %></strong> - <i><%= def %></i>`,
             RECORD_CREATED: `<%= model %> record created successfully: <span class='o_terminal_click o_terminal_cmd' data-cmd='view <%= model %> <%= new_id %>'><%= new_id %></span>`,
             DEPRECATED_COMMAND: `** This command is deprecated, please use '<%= cmd %>' instead.`,
+            METADATA:
+                "<span style='color: gray;'>Create UID</span>: <%= create_uid %><br>" +
+                "<span style='color: gray;'>Create Date</span>: <%= create_date %><br>" +
+                "<span style='color: gray;'>Write UID</span>: <%= write_uid %><br>" +
+                "<span style='color: gray;'>Write Date</span>: <%= write_date %><br>" +
+                "<span style='color: gray;'>No Update</span>: <%= noupdate %><br>" +
+                "<span style='color: gray;'>XML-ID</span>: <%= xmlid %>",
         },
 
         render: function (templateid, values) {
