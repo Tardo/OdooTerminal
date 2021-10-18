@@ -1,4 +1,4 @@
-name: CI 13.0-CE
+name: CI 15.0-CE
 
 on:
   push:
@@ -11,10 +11,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - instance: "162/13.0"
+          - instance: "162/15.0"
             type: ce
             browser: firefox
-          - instance: "153/13.0"
+          - instance: "153/15.0"
             type: ce
             browser: chrome
     runs-on: ubuntu-latest

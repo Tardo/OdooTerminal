@@ -398,7 +398,7 @@ odoo.define("terminal.Terminal", function (require) {
                         } else if (ext && _.isObject(value)) {
                             value = value[ext];
                         }
-                        pp_cmd = pp_cmd.replace(`={${index}}`, value);
+                        pp_cmd = pp_cmd.replace(`=={${index}}`, value);
                     }
                 } catch (err) {
                     return reject(err);

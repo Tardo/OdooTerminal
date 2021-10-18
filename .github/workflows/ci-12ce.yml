@@ -34,10 +34,10 @@ jobs:
       - name: Switch to current branch
         run: git checkout ${{ env.BRANCH }}
 
-      - name: Set up Python 3.9.6
+      - name: Set up Python 3.9.7
         uses: actions/setup-python@v1
         with:
-          python-version: 3.9.6
+          python-version: 3.9.7
 
       - name: Install browser firefox
         uses: browser-actions/setup-firefox@latest
