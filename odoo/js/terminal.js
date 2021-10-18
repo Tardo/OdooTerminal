@@ -21,6 +21,12 @@ odoo.define("terminal.Terminal", function (require) {
     const Terminal = Widget.extend({
         VERSION: "8.1.0",
 
+        MODES: {
+            BACKEND_NEW: 1,
+            BACKEND_OLD: 2,
+            FRONTEND: 3,
+        },
+
         events: {
             "click .o_terminal_cmd": "_onClickTerminalCommand",
             "click .terminal-screen-icon-maximize": "_onClickToggleMaximize",
@@ -65,8 +71,9 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
 
-        init: function () {
+        init: function (parent, mode) {
             this._super.apply(this, arguments);
+            this._mode = mode;
             this._buffer = {};
             this._storage = new Storage.StorageSession();
             this._storageLocal = new Storage.StorageLocal();
@@ -123,38 +130,44 @@ odoo.define("terminal.Terminal", function (require) {
 
         start: function () {
             if (!this._wasLoaded) {
-                return;
+                return Promise.reject();
             }
 
-            this._super.apply(this, arguments);
+            return new Promise(async (resolve, reject) => {
+                try {
+                    await this._super.apply(this, arguments);
+                    await this.screen.start(this.$el);
+                } catch (err) {
+                    return reject(err);
+                }
 
-            this.screen.start(this.$el);
+                this.$runningCmdCount = this.$("#terminal_running_cmd_count");
 
-            this.$runningCmdCount = this.$("#terminal_running_cmd_count");
+                const cachedScreen = this._storage.getItem("terminal_screen");
+                if (_.isUndefined(cachedScreen)) {
+                    this._printWelcomeMessage();
+                    this.screen.print("");
+                } else {
+                    this.screen.printHTML(cachedScreen);
+                    requestAnimationFrame(() => this.screen.scrollDown());
+                }
+                const cachedHistory = this._storage.getItem("terminal_history");
+                if (!_.isUndefined(cachedHistory)) {
+                    this._inputHistory = cachedHistory;
+                    this._searchHistoryIter = this._inputHistory.length;
+                }
 
-            const cachedScreen = this._storage.getItem("terminal_screen");
-            if (_.isUndefined(cachedScreen)) {
-                this._printWelcomeMessage();
-                this.screen.print("");
-            } else {
-                this.screen.printHTML(cachedScreen);
-                requestAnimationFrame(() => this.screen.scrollDown());
-            }
-            const cachedHistory = this._storage.getItem("terminal_history");
-            if (!_.isUndefined(cachedHistory)) {
-                this._inputHistory = cachedHistory;
-                this._searchHistoryIter = this._inputHistory.length;
-            }
+                const isMaximized = this._storage.getItem("screen_maximized");
+                if (isMaximized) {
+                    this.$el.addClass("term-maximized");
+                    this.$(".terminal-screen-icon-maximize")
+                        .removeClass("btn-dark")
+                        .addClass("btn-light");
+                }
 
-            const isMaximized = this._storage.getItem("screen_maximized");
-            if (isMaximized) {
-                this.$el.addClass("term-maximized");
-                this.$(".terminal-screen-icon-maximize")
-                    .removeClass("btn-dark")
-                    .addClass("btn-light");
-            }
-
-            this._wasStart = true;
+                this._wasStart = true;
+                return resolve();
+            });
         },
 
         destroy: function () {
@@ -297,15 +310,22 @@ odoo.define("terminal.Terminal", function (require) {
         /* VISIBILIY */
         doShow: function () {
             if (!this._wasLoaded) {
-                return;
+                return Promise.resolve();
             }
+            const doTransition = () => {
+                this.$el.addClass("terminal-transition-topdown");
+                this.screen.focus();
+            };
             // Only start the terminal if needed
             if (!this._wasStart) {
-                this.start();
-                this.screen.flush();
+                return this.start().then(() => {
+                    this.screen.flush();
+                    doTransition();
+                });
             }
-            this.$el.addClass("terminal-transition-topdown");
-            this.screen.focus();
+            doTransition();
+
+            return Promise.resolve();
         },
 
         doHide: function () {
@@ -378,7 +398,7 @@ odoo.define("terminal.Terminal", function (require) {
                         } else if (ext && _.isObject(value)) {
                             value = value[ext];
                         }
-                        pp_cmd = pp_cmd.replace(`{{${index}}}`, value);
+                        pp_cmd = pp_cmd.replace(`=={${index}}`, value);
                     }
                 } catch (err) {
                     return reject(err);
@@ -746,8 +766,6 @@ odoo.define("terminal.Terminal", function (require) {
         onLoaded: function () {
             this._wasLoaded = true;
             if (this._pinned) {
-                this.start();
-                this.screen.flush();
                 this.doShow();
                 this.$(".terminal-screen-icon-pin")
                     .removeClass("btn-dark")

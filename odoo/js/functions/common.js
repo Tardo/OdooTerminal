@@ -114,15 +114,6 @@ odoo.define("terminal.functions.Common", function (require) {
                 ],
                 example: "-m 2",
             });
-            this.registerCommand("action", {
-                definition: "Call action",
-                callback: this._cmdCallAction,
-                detail: "Call action",
-                args: [
-                    "-::a:action::1::The action to launch<br/>Can be an string, number or object",
-                ],
-                example: "-a 134",
-            });
             this.registerCommand("post", {
                 definition: "Send POST request",
                 callback: this._cmdPostData,
@@ -295,6 +286,21 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Show the referenced model and id of the given xmlid's",
                 args: ["ls::x:xmlid::1::The XML-ID"],
                 example: "-x base.main_company,base.model_res_partner",
+            });
+            this.registerCommand("rpc", {
+                definition: "Execute raw rpc",
+                callback: this._cmdRpc,
+                detail: "Execute raw rpc",
+                args: ["j::o:options::1::The rpc query options"],
+                example:
+                    "-o \"{'route': '/jsonrpc', 'method': 'server_version', 'params': {'service': 'db'}}\"",
+            });
+        },
+
+        _cmdRpc: function (kwargs) {
+            return rpc.query(kwargs.options).then((result) => {
+                this.screen.eprint(result);
+                return result;
             });
         },
 
@@ -509,6 +515,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return session
                 ._session_authenticate(db, login, passwd)
                 .then((result) => {
+                    this.screen.updateInputInfo(login);
                     this.screen.print(`Successfully logged as '${login}'`);
                     return result;
                 });
@@ -516,6 +523,7 @@ odoo.define("terminal.functions.Common", function (require) {
 
         _cmdLogOut: function () {
             return session.session_logout().then((result) => {
+                this.screen.updateInputInfo("Public User");
                 this.screen.print("Logged out");
                 return result;
             });
@@ -572,10 +580,9 @@ odoo.define("terminal.functions.Common", function (require) {
 
         _cmdShowOdooVersion: function () {
             try {
+                const version_info = Utils.getOdooVersionInfo();
                 this.screen.print(
-                    `${odoo.session_info.server_version_info
-                        .slice(0, 3)
-                        .join(".")} (${odoo.session_info.server_version_info
+                    `${version_info.slice(0, 3).join(".")} (${version_info
                         .slice(3)
                         .join(" ")})`
                 );
@@ -923,7 +930,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     kwargs: pkwargs,
                 })
                 .then((result) => {
-                    this.screen.print(result);
+                    this.screen.eprint(result, false, "line-pre");
                     return result;
                 });
         },
@@ -1070,10 +1077,6 @@ odoo.define("terminal.functions.Common", function (require) {
                     );
                     return result;
                 });
-        },
-
-        _cmdCallAction: function (kwargs) {
-            return this.do_action(kwargs.action);
         },
 
         _cmdPostData: function (kwargs) {

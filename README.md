@@ -1,6 +1,7 @@
 [![12.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-12ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-12ce.yml)
 [![13.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-13ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-13ce.yml)
 [![14.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-14ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-14ce.yml)
+[![15.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-15ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-15ce.yml)
 
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)
@@ -20,7 +21,11 @@ The BFG10k for Odoo developers
 All the power of Odoo json-rpc in a really easy way!
 </p>
 
-This web extension adds a terminal-like to control Odoo (11, 12, 13 & 14).
+This web extension adds a terminal-like to control Odoo (11, 12, 13, 14 & 15).
+All implemented commands use the tools provided by the Odoo framework. An
+unwavering policy when developing this extension is to not modify or alter in
+any way the Odoo classes. This sometimes results in certain commands having
+reduced/increased capabilities depending on the Odoo version.
 
 **Downloads**
 
@@ -48,6 +53,7 @@ You can toggle terminal using one of these options:
 | Description                                         | Terminal Command                                                            |
 | --------------------------------------------------- | --------------------------------------------------------------------------- |
 | Create 'res.partner' record                         | `create -m res.partner -v "{'name': 'Hipcut', 'street': 'Mystery street'}"` |
+| Create 'res.partner' record (simple mode)           | `create -m res.partner -v "name=Hipcut street='Mystery street'"`            |
 | Search 'res.partner' records                        | `search -m res.partner -f name,email -d "[['id', '>', 5]]"`                 |
 | Search all fields of selected 'res.partner' records | `search -m res.partner -f * -d "[['id', '>', 5]]"`                          |
 | Read all fields of selected 'res.partner' record    | `read -m res.partner -i 5 -f *`                                             |
@@ -63,10 +69,14 @@ You can toggle terminal using one of these options:
 > 15, 8"
 
 > Notice that can call commands without 'named arguments', for example:
-> `create res.partner "{'name': 'Hipcut', 'street': 'Mystery street'}"` The rule
-> is that 'unnamed arguments' fill values following the order of the command
-> arguments definition. So mix 'unnamed' with 'named' arguments can be done as
-> long as the order is maintained.
+> `create res.partner "name=Hipcut street='Mystery street'"` The rule is that
+> 'unnamed arguments' fill values following the order of the command arguments
+> definition. So mix 'unnamed' with 'named' arguments can be done as long as the
+> order is maintained.
+
+> Notice that can use "simple json" format instead of normal syntaxis. For
+> example "{'keyA':'this is a value', 'keyB':42}" can be done in a simple way
+> "keyA='this is a value' keyB=42"
 
 ## Notes
 
@@ -115,7 +125,7 @@ The anatomy of a generator is: `$type[min,max]`, `$type[max]` or `$type`
 For example:
 
 - create a new record with a random string:
-  `create -m res.partner -v "{'name': '$STR[4,30]'}"`
+  `create -m res.partner -v name='$STR[4,30]'`
 - print the current time: `print -m $NOWTIME`
 
 > Notice that 'date' min and max are the milliseconds since 1970/01/01
@@ -139,10 +149,10 @@ For example:
 #### + Runners (subcommands)
 
 You can execute "subcommands" to use the result in a new command call. The
-syntax of runners looks like `{{command}}`, `{{command}}.key` or
-`{{command}}[index]`.
+syntax of runners looks like `=={command}`, `=={command}.key` or
+`=={command}[index]`.
 
-For example: `read -m res.users -i {{search -m res.users -f id}}.id`
+For example: `read -m res.users -i =={search -m res.users -f id}.id`
 
 #### + Massive operations
 
@@ -151,7 +161,7 @@ expensive task, consider use the `--slient` argument to increase the
 performance.
 
 Example:
-`repeat -t 5000 -c "create -m res.partner -v '{\"name\": \"$STR[12] (Test)\"}'" --silent`
+`repeat -t 5000 -c "create -m res.partner -v 'name=\"$STR[12] (Test)\"'" --silent`
 
 ---
 

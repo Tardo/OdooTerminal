@@ -23,7 +23,10 @@ odoo.define("terminal.loaders.Backend", function (require) {
     $(() => {
         // A generic try-catch to avoid stop scripts execution.
         try {
-            const terminal = new Terminal(WebClientObj);
+            const terminal = new Terminal(
+                WebClientObj,
+                Terminal.prototype.MODES.BACKEND_OLD
+            );
             core.bus.on("toggle_terminal", this, () => {
                 terminal.doToggle();
             });

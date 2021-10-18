@@ -13,6 +13,7 @@ odoo.define("terminal.tests.backend", function (require) {
                 false,
                 true
             );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
             let $modal = this.getModalOpen();
             this.assertTrue(this.isModalType($modal, "list"));
             this.closeModal($modal);
@@ -21,6 +22,7 @@ odoo.define("terminal.tests.backend", function (require) {
                 false,
                 true
             );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
             $modal = this.getModalOpen();
             this.assertTrue(this.isModalType($modal, "form"));
             this.closeModal($modal);
@@ -29,12 +31,14 @@ odoo.define("terminal.tests.backend", function (require) {
                 false,
                 true
             );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
             $modal = this.getModalOpen();
             this.assertTrue(this.isModalType($modal, "form"));
             this.closeModal($modal);
         },
         test_view__no_arg: async function () {
             await this.terminal.executeCommand("view res.partner", false, true);
+            await new Promise((resolve) => setTimeout(resolve, 2500));
             let $modal = this.getModalOpen();
             this.assertTrue(this.isModalType($modal, "list"));
             this.closeModal($modal);
@@ -43,6 +47,7 @@ odoo.define("terminal.tests.backend", function (require) {
                 false,
                 true
             );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
             $modal = this.getModalOpen();
             this.assertTrue(this.isModalType($modal, "form"));
             this.closeModal($modal);
@@ -51,6 +56,7 @@ odoo.define("terminal.tests.backend", function (require) {
                 false,
                 true
             );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
             $modal = this.getModalOpen();
             this.assertTrue(this.isModalType($modal, "form"));
             this.closeModal($modal);

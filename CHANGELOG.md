@@ -1,5 +1,20 @@
 # Changelog
 
+**8.2.0**
+
+```
+IMP: Changed subcommand template from {{subcommand}} to =={subcommand}: This is done to avoid collisions with jinja2 payloads
+IMP: Support for Odoo 15.0: The command 'context' is not fully supported due to the reduced available services for the legacy environment.
+
+ADD: Command 'rpc': Execute RPC with custom options
+ADD: Command 'metadata': Show record metadata (issue #37)
+ADD: Support for 'simple json' format (issue #38)
+
+FIX: Disable native browser autocomplete
+FIX: Command 'call': Escape output
+
+```
+
 **8.1.0**
 
 ```

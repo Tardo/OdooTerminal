@@ -86,8 +86,90 @@ odoo.define("terminal.core.Utils", function () {
         return odoo.session_info.uid || odoo.session_info.user_id;
     };
 
+    const getUsername = () => {
+        return odoo.session_info.username;
+    };
+
+    const getOdooVersion = () => {
+        return odoo.session_info.server_version;
+    };
+
+    const getOdooVersionInfo = () => {
+        return odoo.session_info.server_version_info;
+    };
+
     const asyncSleep = (ms) => {
         return new Promise((resolve) => setTimeout(resolve, ms));
+    };
+
+    const genColorFromString = (str) => {
+        const [r, g, b] = hex2rgb(genHash(str));
+        const gv =
+            1 - (0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255));
+        return {
+            rgb: [r, g, b],
+            gv: gv,
+        };
+    };
+
+    const rgb2hsv = (r, g, b) => {
+        const h_min = Math.min(Math.min(r, g), b);
+        const h_max = Math.max(Math.max(r, g), b);
+
+        // Hue
+        let hue = 0.0;
+
+        if (h_max === h_min) {
+            hue = 0.0;
+        } else if (h_max === r) {
+            hue = (g - b) / (h_max - h_min);
+        } else if (h_max === g) {
+            hue = 2.0 + (b - r) / (h_max - h_min);
+        } else {
+            hue = 4.0 + (r - g) / (h_max - h_min);
+        }
+
+        hue /= 6.0;
+
+        if (hue < 0.0) {
+            hue += 1.0;
+        }
+
+        // Saturation
+        let s = 0.0;
+        if (h_max !== 0.0) {
+            s = (h_max - h_min) / h_max;
+        }
+
+        // Value
+        const v = h_max;
+
+        return [hue, s, v];
+    };
+
+    const hsv2rgb = (x, y, z) => {
+        const h = Number(x * 6.0).toFixed();
+        const f = x * 6.0 - h;
+        const p = z * (1.0 - y);
+        const q = z * (1.0 - y * f);
+        const t = z * (1.0 - y * (1.0 - f));
+
+        let rgb = [0.0, 0.0, 0.0];
+        const _h = h % 6;
+        if (_h === 0) {
+            rgb = [z, t, p];
+        } else if (_h === 1) {
+            rgb = [q, z, p];
+        } else if (_h === 2) {
+            rgb = [q, z, t];
+        } else if (_h === 3) {
+            rgb = [p, q, z];
+        } else if (_h === 4) {
+            rgb = [t, p, z];
+        } else if (_h === 5) {
+            rgb = [z, p, q];
+        }
+        return rgb;
     };
 
     return {
@@ -97,7 +179,13 @@ odoo.define("terminal.core.Utils", function () {
         unescapeSlashes: unescapeSlashes,
         save2File: save2File,
         getUID: getUID,
+        getUsername: getUsername,
+        getOdooVersion: getOdooVersion,
+        getOdooVersionInfo: getOdooVersionInfo,
         file2Base64: file2Base64,
         asyncSleep: asyncSleep,
+        genColorFromString: genColorFromString,
+        rgb2hsv: rgb2hsv,
+        hsv2rgb: hsv2rgb,
     };
 });

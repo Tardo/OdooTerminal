@@ -6,6 +6,7 @@ odoo.define("terminal.loaders.Frontend", function (require) {
 
     require("web.dom_ready");
     const core = require("web.core");
+    const Utils = require("terminal.core.Utils");
     const Terminal = require("terminal.Terminal");
 
     const _t = core._t;
@@ -14,10 +15,82 @@ odoo.define("terminal.loaders.Frontend", function (require) {
     require("terminal.functions.Core");
     require("terminal.functions.Common");
 
+    const session_info = {};
+
+    Terminal.include({
+        start: function () {
+            const sup_prom = this._super.apply(this, arguments);
+            return new Promise(async (resolve, reject) => {
+                await sup_prom;
+                const uid = Utils.getUID();
+                try {
+                    const server_version = await this.executeCommand(
+                        "rpc -o \"{'route': '/jsonrpc', 'method': 'server_version', 'params': {'service': 'db'}}\"",
+                        false,
+                        true
+                    );
+                    session_info.server_version = server_version;
+                    if (uid > 0) {
+                        session_info.uid = uid;
+                        const whoami = await this.executeCommand(
+                            "whoami",
+                            false,
+                            true
+                        );
+                        session_info.username = whoami[0].login;
+                    } else {
+                        session_info.uid = -1;
+                        session_info.username = "Public User";
+                    }
+                    this.screen.updateInputInfo(
+                        session_info.username,
+                        session_info.server_version
+                    );
+                } catch (err) {
+                    return reject(err);
+                }
+                return resolve();
+            });
+        },
+    });
+
+    const origGetUsername = Utils.getUsername;
+    Utils.getUsername = () => {
+        let username = null;
+        try {
+            username = origGetUsername();
+        } catch (e) {
+            // Do nothing
+        }
+
+        if (!username) {
+            username = session_info.username;
+        }
+        return username;
+    };
+
+    const origGetOdooVersion = Utils.getOdooVersion;
+    Utils.getOdooVersion = () => {
+        let ver = null;
+        try {
+            ver = origGetOdooVersion();
+        } catch (e) {
+            // Do nothing
+        }
+
+        if (!ver) {
+            ver = session_info.server_version;
+        }
+        return ver;
+    };
+
     $(() => {
         // A generic try-catch to avoid stop scripts execution.
         try {
-            const terminal = new Terminal(null, $("body").data());
+            const terminal = new Terminal(
+                null,
+                Terminal.prototype.MODES.FRONTEND
+            );
 
             core.bus.on("toggle_terminal", this, () => {
                 terminal.doToggle();

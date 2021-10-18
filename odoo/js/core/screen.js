@@ -27,10 +27,18 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         start: function () {
-            this._super.apply(this, arguments);
-            this._createScreen();
-            this._createAssistantPanel();
-            this._createUserInput();
+            const prom = this._super.apply(this, arguments);
+            return new Promise(async (resolve, reject) => {
+                try {
+                    await prom;
+                    this._createScreen();
+                    this._createAssistantPanel();
+                    await this._createUserInput();
+                } catch (err) {
+                    return reject(err);
+                }
+                return resolve();
+            });
         },
 
         destroy: function () {
@@ -280,6 +288,20 @@ odoo.define("terminal.core.Screen", function (require) {
             this.printTable(_.unique(columns), tbody);
         },
 
+        updateInputInfo: function (username, version, host) {
+            if (username) {
+                this.$userInput.find("#terminal-prompt-main").text(username);
+            }
+            if (version) {
+                this.$userInput
+                    .find("#terminal-prompt-info-version")
+                    .text(version);
+            }
+            if (host) {
+                this.$userInput.find("#terminal-prompt-info-host").text(host);
+            }
+        },
+
         /* PRIVATE */
         _formatPrint: function (msg, cls) {
             const msg_type = typeof msg;
@@ -353,28 +375,44 @@ odoo.define("terminal.core.Screen", function (require) {
             this.$assistant.appendTo(this.$container);
         },
 
+        /**
+         * @returns {Promise}
+         */
         _createUserInput: function () {
             const host = window.location.host;
-            const to_inject = $(
+            const username = Utils.getUsername();
+            const version = Utils.getOdooVersion();
+            this.$userInput = $(
                 `<div class='d-flex terminal-user-input'>
                     <div class='terminal-prompt-container d-flex'>
-                        <span class='terminal-prompt font-weight-bold' title='${host}'>${host}</span><span>${Utils.encodeHTML(
-                    this.PROMPT
-                )}</span>
+                        <span id="terminal-prompt-main" class='terminal-prompt font-weight-bold' title='${username}'>${username}&nbsp;</span>
+                        <span>${Utils.encodeHTML(this.PROMPT)}</span>
                     </div>
                     <div class='flex-fill rich-input'>
                         <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' readonly='readonly'/>
-                        <input type='edit' id='terminal_input' autocomplete='off-term' />
+                        <input type='edit' id='terminal_input' autocomplete='off' />
+                    </div>
+                    <div class="terminal-prompt-info-container d-none d-lg-inline-flex">
+                        <span id="terminal-prompt-info-version" class='terminal-prompt-info' title='${version}'>${version}</span>
+                    </div>
+                    <div class="terminal-prompt-container d-none d-lg-inline-flex">
+                        <span id="terminal-prompt-info-host" class='terminal-prompt' title='${host}'>${host}</span>
                     </div>
                 </div>`
             );
-            to_inject.appendTo(this.$container);
-            this.$promptContainer = to_inject.find(
+            this.$userInput.appendTo(this.$container);
+            this.$promptContainer = this.$userInput.find(
                 ".terminal-prompt-container"
             );
             this.$prompt = this.$promptContainer.find(".terminal-prompt");
-            this.$input = to_inject.find("#terminal_input");
-            this.$shadowInput = to_inject.find("#terminal_shadow_input");
+            this.$promptInfoContainer = this.$userInput.find(
+                ".terminal-prompt-info-container"
+            );
+            this.$promptInfo = this.$promptContainer.find(
+                ".terminal-prompt-info"
+            );
+            this.$input = this.$userInput.find("#terminal_input");
+            this.$shadowInput = this.$userInput.find("#terminal_shadow_input");
             this.$input.on("keyup", this._options.onInputKeyUp);
             this.$input.on("keydown", this._onInputKeyDown.bind(this));
             this.$input.on("input", this._options.onInput);
@@ -384,18 +422,28 @@ odoo.define("terminal.core.Screen", function (require) {
                     "background-color": "#adb5bd",
                     color: "black",
                 });
+                this.$promptInfoContainer.css({
+                    "background-color": "#828587",
+                    color: "black",
+                });
             } else {
-                const [r, g, b] = Utils.hex2rgb(
-                    Utils.genHash(window.location.host)
+                const color_info = Utils.genColorFromString(
+                    window.location.host
                 );
-                const gv =
-                    1 -
-                    (0.2126 * (r / 255) +
-                        0.7152 * (g / 255) +
-                        0.0722 * (b / 255));
                 this.$promptContainer.css({
-                    "background-color": `rgb(${r},${g},${b})`,
-                    color: gv < 0.5 ? "#000" : "#fff",
+                    "background-color": `rgb(${color_info.rgb[0]},${color_info.rgb[1]},${color_info.rgb[2]})`,
+                    color: color_info.gv < 0.5 ? "#000" : "#fff",
+                });
+                let [h, s, v] = Utils.rgb2hsv(
+                    color_info.rgb[0] / 255.0,
+                    color_info.rgb[1] / 255.0,
+                    color_info.rgb[2] / 255.0
+                );
+                v -= 0.2;
+                const [r, g, b] = Utils.hsv2rgb(h, s, v);
+                this.$promptInfoContainer.css({
+                    "background-color": `rgb(${r * 255},${g * 255},${b * 255})`,
+                    color: color_info.gv < 0.5 ? "#000" : "#fff",
                 });
             }
         },
