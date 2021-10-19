@@ -390,7 +390,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          */
         _conv2JSON: function (str) {
             // FIXME: Ugly test to know is using pure json format or simple
-            if (!str || str[0] === "{") {
+            if (!str || str[0] === "{" || str[0] === "[") {
                 return str;
             }
 
