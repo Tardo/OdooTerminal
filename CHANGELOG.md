@@ -1,5 +1,11 @@
 # Changelog
 
+**8.2.1**
+
+```
+FIX: _conv2JSON: Ignore native arrays
+```
+
 **8.2.0**
 
 ```
