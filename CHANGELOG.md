@@ -5,6 +5,8 @@
 ```
 IMP: ParameterReader: Error messages (issue #41 #42)
 
+ADD: Integration test for 'rpc' and 'metadata'
+
 FIX: Command 'metadata': Show a more understandable error (issue #42) and moved from backend to common zone
 ```
 
