@@ -1,5 +1,11 @@
 # Changelog
 
+**8.3.0**
+
+```
+IMP: ParameterReader: Error messages (issue #41 #42)
+```
+
 **8.2.1**
 
 ```

@@ -212,19 +212,17 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             if (_.isEmpty(args)) {
                 return params;
             }
-            let checkedCount = 0;
-            let checkedRequiredCount = 0;
+            const checked_args = [];
+            const checked_args_required = [];
             let kwargs = {};
-            // Create info structures
-            const required_args = _.chain(args)
-                .filter((x) => this.getArgumentInfo(x)?.is_required)
-                .map((x) => this.getArgumentInfo(x)?.names.long)
-                .value();
 
             // Create arguments dict
             for (let i = 0; i < params.length; ++i) {
-                if (checkedCount >= args.length) {
-                    throw _t("Invalid command parameters");
+                const checked_args_count = checked_args.length;
+                if (checked_args_count >= args.length) {
+                    throw _t(
+                        "Invalid command parameters: More arguments are being passed than the command accepts"
+                    );
                 }
                 let param = params[i];
 
@@ -236,7 +234,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     const arg_name = param.substr(param[1] === "-" ? 2 : 1);
                     arg_info = this.getArgumentInfoByName(args, arg_name);
                     if (_.isEmpty(arg_info)) {
-                        throw _t("Invalid command parameters");
+                        throw _t(
+                            `The argument '${args[checked_args_count]}' does not exist`
+                        );
                     }
                     // Handle 'flag' type, so it don't use a value
                     if (arg_info.type === "f") {
@@ -245,9 +245,11 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     }
                     param = params[++i];
                 } else {
-                    arg_info = this.getArgumentInfo(args[checkedCount]);
+                    arg_info = this.getArgumentInfo(args[checked_args_count]);
                     if (_.isEmpty(arg_info)) {
-                        throw _t("Invalid command parameters");
+                        throw _t(
+                            `The argument '${args[checked_args_count]}' does not exist`
+                        );
                     }
                 }
 
@@ -267,9 +269,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     );
                     if (!_.isNull(formatted_param)) {
                         kwargs[s_arg_long_name] = formatted_param;
-                        ++checkedCount;
+                        checked_args.push(s_arg_long_name);
                         if (arg_info.is_required) {
-                            ++checkedRequiredCount;
+                            checked_args_required.push(s_arg_long_name);
                         }
                         continue;
                     }
@@ -278,7 +280,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     // fallback to generic string
                     carg = "s";
                 } else if (!this._validators[carg](param, arg_info.list_mode)) {
-                    break;
+                    throw _t(
+                        `Invalid parameter for '${arg_long_name}' argument: '${param}'`
+                    );
                 }
                 kwargs[s_arg_long_name] = this._formatters[carg](
                     param,
@@ -290,14 +294,26 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                             kwargs[s_arg_long_name]
                         ) === -1
                     ) {
-                        throw _t(`Invalid '${arg_long_name}' parameter value`);
+                        throw _t(
+                            `Invalid parameter for '${arg_long_name}' argument: '${param}' (Only ${arg_info.strict_values.join(
+                                ","
+                            )} is allowed)`
+                        );
                     }
                 }
-                ++checkedCount;
+                checked_args.push(s_arg_long_name);
                 if (arg_info.is_required) {
-                    ++checkedRequiredCount;
+                    checked_args_required.push(s_arg_long_name);
                 }
             }
+
+            // Check that all is correct
+            this._assertParams(
+                args,
+                params,
+                checked_args,
+                checked_args_required
+            );
 
             // Apply default values
             let default_values = _.chain(args)
@@ -309,19 +325,6 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 ? {}
                 : Object.fromEntries(default_values);
             kwargs = _.extend({}, default_values, kwargs);
-
-            // Check that all is correct
-            const param_values_num = _.filter(
-                params,
-                (x) => x[0] !== "-"
-            ).length;
-            if (
-                checkedCount !== param_values_num ||
-                checkedRequiredCount !== required_args.length
-            ) {
-                throw _t("Invalid command parameters");
-            }
-
             return kwargs;
         },
 
@@ -344,6 +347,64 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          */
         resetStores: function () {
             this._parameterGenerator.resetStores();
+        },
+
+        /**
+         * Check that the parameters match the expected number.
+         *
+         *
+         * @param {Array} params
+         * @param {Array} checked_args
+         * @param {Array} checked_args_required
+         */
+        _assertParams: function (
+            args,
+            params,
+            checked_args,
+            checked_args_required
+        ) {
+            const normalized_arg_names = _.chain(args)
+                .map((x) => this.getArgumentInfo(x)?.names.long)
+                .value();
+            const required_args = _.chain(args)
+                .filter((x) => this.getArgumentInfo(x)?.is_required)
+                .map((x) => this.getArgumentInfo(x)?.names.long)
+                .value();
+            const param_values = _.filter(params, (x) => x[0] !== "-");
+            const param_values_count = param_values.length;
+            const checked_args_count = checked_args.length;
+            const checked_required_args_count = checked_args_required.length;
+            if (checked_args_count < param_values_count) {
+                const args_diff = _.difference(
+                    normalized_arg_names,
+                    checked_args
+                );
+                throw _t(
+                    `Invalid command parameters: Lack of parameters (${args_diff.join(
+                        ","
+                    )})`
+                );
+            } else if (checked_args_count > param_values_count) {
+                const args_diff = _.difference(
+                    checked_args,
+                    normalized_arg_names
+                );
+                throw _t(
+                    `Invalid command parameters: Too many parameters (${args_diff.join(
+                        ","
+                    )})`
+                );
+            } else if (checked_required_args_count < required_args.length) {
+                const args_diff = _.difference(
+                    normalized_arg_names,
+                    checked_args_required
+                );
+                throw _t(
+                    `Invalid command parameters: Required arguments missing (${args_diff.join(
+                        ","
+                    )})`
+                );
+            }
         },
 
         _tryAllFormatters: function (param, list_mode) {
@@ -388,7 +449,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          * @param {String} str
          * @returns {String}
          */
-        _conv2JSON: function (str) {
+        _simple2JSON: function (str) {
             // FIXME: Ugly test to know is using pure json format or simple
             if (!str || str[0] === "{" || str[0] === "[") {
                 return str;
@@ -482,7 +543,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     const param_sa = ps.trim();
 
                     try {
-                        JSON.parse(this._conv2JSON(param_sa));
+                        JSON.parse(this._simple2JSON(param_sa));
                     } catch (err) {
                         is_valid = false;
                         break;
@@ -493,7 +554,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             }
 
             try {
-                JSON.parse(this._conv2JSON(param.trim()));
+                JSON.parse(this._simple2JSON(param.trim()));
             } catch (err) {
                 return false;
             }
@@ -535,10 +596,10 @@ odoo.define("terminal.core.ParameterReader", function (require) {
         _formatJson: function (param, list_mode = false) {
             if (list_mode) {
                 return _.map(this.splitAndTrim(param), (item) =>
-                    JSON.parse(this._conv2JSON(item))
+                    JSON.parse(this._simple2JSON(item))
                 );
             }
-            return JSON.parse(this._conv2JSON(param.trim()));
+            return JSON.parse(this._simple2JSON(param.trim()));
         },
 
         /**
