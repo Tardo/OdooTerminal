@@ -817,5 +817,41 @@ odoo.define("terminal.tests.common", function (require) {
             this.assertNotEmpty(res);
             this.assertEqual(res.length, 2);
         },
+
+        test_rpc: async function () {
+            const res = await this.terminal.executeCommand(
+                "rpc -o \"{'route': '/jsonrpc', 'method': 'server_version', 'params': {'service': 'db'}}\"",
+                false,
+                true
+            );
+            this.assertNotEmpty(res);
+        },
+        test_rpc__no_arg: async function () {
+            const res = await this.terminal.executeCommand(
+                "rpc \"{'route': '/jsonrpc', 'method': 'server_version', 'params': {'service': 'db'}}\"",
+                false,
+                true
+            );
+            this.assertNotEmpty(res);
+        },
+
+        test_metadata: async function () {
+            const res = await this.terminal.executeCommand(
+                "metadata -m res.partner -i 1",
+                false,
+                true
+            );
+            this.assertNotEmpty(res);
+            this.assertEqual(res.xmlid, "base.main_partner");
+        },
+        test_metadata__no_arg: async function () {
+            const res = await this.terminal.executeCommand(
+                "metadata res.partner 1",
+                false,
+                true
+            );
+            this.assertNotEmpty(res);
+            this.assertEqual(res.xmlid, "base.main_partner");
+        },
     });
 });
