@@ -4,6 +4,8 @@
 
 ```
 IMP: ParameterReader: Error messages (issue #41 #42)
+
+FIX: Command 'metadata': Show a more understandable error (issue #42) and moved from backend to common zone
 ```
 
 **8.2.1**

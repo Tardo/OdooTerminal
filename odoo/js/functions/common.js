@@ -295,6 +295,45 @@ odoo.define("terminal.functions.Common", function (require) {
                 example:
                     "-o \"{'route': '/jsonrpc', 'method': 'server_version', 'params': {'service': 'db'}}\"",
             });
+            this.registerCommand("metadata", {
+                definition: "View record metadata",
+                callback: this._cmdMetadata,
+                detail: "View record metadata",
+                args: [
+                    "s::m:model::1::The record model",
+                    "i::i:id::1::The record id",
+                ],
+                example: "-m res.partner -i 1",
+            });
+        },
+
+        _cmdMetadata: function (kwargs) {
+            return new Promise(async (resolve, reject) => {
+                let metadata = {};
+                try {
+                    metadata = (
+                        await rpc.query({
+                            method: "get_metadata",
+                            model: kwargs.model,
+                            args: [[kwargs.id]],
+                            kwargs: {context: this._getContext()},
+                        })
+                    )[0];
+
+                    if (typeof metadata === "undefined") {
+                        this.screen.print(
+                            "Can't found any metadata for the given id"
+                        );
+                    } else {
+                        this.screen.print(
+                            this._templates.render("METADATA", metadata)
+                        );
+                    }
+                } catch (err) {
+                    return reject(err);
+                }
+                return resolve(metadata);
+            });
         },
 
         _cmdRpc: function (kwargs) {
