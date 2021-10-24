@@ -14,7 +14,7 @@ odoo.define("terminal.tests.backend", function (require) {
                 true
             );
             await new Promise((resolve) => setTimeout(resolve, 2500));
-            let $modal = this.getModalOpen();
+            const $modal = this.getModalOpen();
             this.assertTrue(this.isModalType($modal, "list"));
             this.closeModal($modal);
             await this.terminal.executeCommand(
@@ -23,23 +23,19 @@ odoo.define("terminal.tests.backend", function (require) {
                 true
             );
             await new Promise((resolve) => setTimeout(resolve, 2500));
-            $modal = this.getModalOpen();
-            this.assertTrue(this.isModalType($modal, "form"));
-            this.closeModal($modal);
+            this.assertTrue(this.isFormOpen());
             await this.terminal.executeCommand(
                 "view -m res.partner -i 1 -r base.view_partner_simple_form",
                 false,
                 true
             );
             await new Promise((resolve) => setTimeout(resolve, 2500));
-            $modal = this.getModalOpen();
-            this.assertTrue(this.isModalType($modal, "form"));
-            this.closeModal($modal);
+            this.assertTrue(this.isFormOpen());
         },
         test_view__no_arg: async function () {
             await this.terminal.executeCommand("view res.partner", false, true);
             await new Promise((resolve) => setTimeout(resolve, 2500));
-            let $modal = this.getModalOpen();
+            const $modal = this.getModalOpen();
             this.assertTrue(this.isModalType($modal, "list"));
             this.closeModal($modal);
             await this.terminal.executeCommand(
@@ -48,18 +44,14 @@ odoo.define("terminal.tests.backend", function (require) {
                 true
             );
             await new Promise((resolve) => setTimeout(resolve, 2500));
-            $modal = this.getModalOpen();
-            this.assertTrue(this.isModalType($modal, "form"));
-            this.closeModal($modal);
+            this.assertTrue(this.isFormOpen());
             await this.terminal.executeCommand(
                 "view res.partner 1 base.view_partner_simple_form",
                 false,
                 true
             );
             await new Promise((resolve) => setTimeout(resolve, 2500));
-            $modal = this.getModalOpen();
-            this.assertTrue(this.isModalType($modal, "form"));
-            this.closeModal($modal);
+            this.assertTrue(this.isFormOpen());
         },
 
         test_settings: async function () {
