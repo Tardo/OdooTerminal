@@ -443,23 +443,28 @@ odoo.define("terminal.core.ParameterReader", function (require) {
         },
 
         /**
-         * Try to convert input to json string.
+         * Try to convert input to json.
          * This is used to parse "simple json"
+         * Input:
+         *      "name=Test street='The Street'"
+         * Output:
+         *      {'name': 'Test', 'street': 'The Street'}
          *
          * @param {String} str
          * @returns {String}
          */
         _simple2JSON: function (str) {
-            // FIXME: Ugly test to know is using pure json format or simple
-            if (!str || str[0] === "{" || str[0] === "[") {
-                return str;
+            let params = {};
+            // Check if is a valid simple format string
+            try {
+                params = str.match(this._regexSimpleJSON);
+                const json = JSON.parse(str);
+                return json;
+            } catch (err) {
+                if (_.isEmpty(params)) {
+                    throw err;
+                }
             }
-
-            const params = str.match(this._regexSimpleJSON);
-            if (_.isEmpty(params)) {
-                return "{}";
-            }
-
             const obj = {};
             for (const param of params) {
                 let [param_name, param_value] = param.trim().split("=");
@@ -469,9 +474,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 ) {
                     param_value = param_value.substr(1, param_value.length - 2);
                 }
-                obj[param_name] = param_value;
+                obj[param_name] = this._tryAllFormatters(param_value);
             }
-            return JSON.stringify(obj);
+            return obj;
         },
 
         /**
@@ -543,7 +548,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     const param_sa = ps.trim();
 
                     try {
-                        JSON.parse(this._simple2JSON(param_sa));
+                        this._simple2JSON(param_sa);
                     } catch (err) {
                         is_valid = false;
                         break;
@@ -554,7 +559,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             }
 
             try {
-                JSON.parse(this._simple2JSON(param.trim()));
+                this._simple2JSON(param.trim());
             } catch (err) {
                 return false;
             }
@@ -596,10 +601,10 @@ odoo.define("terminal.core.ParameterReader", function (require) {
         _formatJson: function (param, list_mode = false) {
             if (list_mode) {
                 return _.map(this.splitAndTrim(param), (item) =>
-                    JSON.parse(this._simple2JSON(item))
+                    this._simple2JSON(item)
                 );
             }
-            return JSON.parse(this._simple2JSON(param.trim()));
+            return this._simple2JSON(param.trim());
         },
 
         /**

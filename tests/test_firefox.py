@@ -5,7 +5,6 @@ import pathlib
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 from webdriver_manager.firefox import GeckoDriverManager
 from tests.common import SeleniumTestCase
 
@@ -17,7 +16,7 @@ class FirefoxTestCase(SeleniumTestCase):
         cls.ODOO_INSTANCE_TYPE = os.environ.get('TEST_ODOO_INSTANCE_TYPE', SeleniumTestCase.ODOO_INSTANCE_TYPE)
         service = Service(GeckoDriverManager(log_level=0).install())
         options = Options()
-        options.profile = FirefoxProfile()
+        options.set_preference('profile', False)
         cls.browser = webdriver.Firefox(service=service, options=options)
         cls.browser.install_addon(str(pathlib.Path('./OdooTerminal.zip').absolute()), temporary=True)
 

@@ -10,6 +10,7 @@ ADD: Integration test for 'rpc' and 'metadata'
 
 FIX: Command 'metadata': Show a more understandable error (issue #42) and moved from backend to common zone
 FIX: Integration test for 'view'
+FIX: '_simple2JSON': Detect simple format before try convert
 ```
 
 **8.2.1**
