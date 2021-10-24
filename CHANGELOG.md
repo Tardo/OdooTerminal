@@ -4,6 +4,7 @@
 
 ```
 IMP: ParameterReader: Error messages (issue #41 #42)
+IMP: '_searchSimiliarCommand': Trying to make it a little more precise
 
 ADD: Integration test for 'rpc' and 'metadata'
 
