@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - instance: "162/12.0"
+          - instance: "167/12.0"
             type: ce
             browser: firefox
           - instance: "153/12.0"

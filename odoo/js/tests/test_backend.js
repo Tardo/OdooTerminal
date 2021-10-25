@@ -56,7 +56,9 @@ odoo.define("terminal.tests.backend", function (require) {
 
         test_settings: async function () {
             await this.terminal.executeCommand("settings", false, true);
-            this.assertTrue($(".o_form_view .settings").length > 0);
+            this.assertTrue(
+                $(".o_form_view .settings, .o_form_view > .settings").length > 0
+            );
         },
     });
 });

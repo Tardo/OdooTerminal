@@ -12,6 +12,7 @@ ADD: Command 'parse_simple_json': Returns a JSON from simple format string
 FIX: Command 'metadata': Show a more understandable error (issue #42) and moved from backend to common zone
 FIX: Integration test for 'view'
 FIX: '_simple2JSON': Detect simple format before try convert
+FIX: Integration tests for v15.0+
 ```
 
 **8.2.1**

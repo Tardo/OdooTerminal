@@ -360,19 +360,34 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             this.assertEqual(res.id, 5);
-            res = await this.terminal.executeCommand(
-                "action -a base.action_res_company_form",
-                false,
-                true
-            );
-            this.assertEqual(res.xml_id, "base.action_res_company_form");
-            res = await this.terminal.executeCommand(
-                "action -a \"{'type': 'ir.actions.act_window', 'res_model': 'res.currency', 'view_type': 'form', 'view_mode': 'form', 'views': [[false, 'form']], 'target': 'current', 'res_id': 1}\"",
-                false,
-                true
-            );
-            this.assertEqual(res.res_model, "res.currency");
-            this.assertEqual(res.res_id, 1);
+            if (this.terminal._mode === this.terminal.MODES.BACKEND_NEW) {
+                res = await this.terminal.executeCommand(
+                    "action -a base.action_res_company_form",
+                    false,
+                    true
+                );
+                this.assertEqual(res.id, "base.action_res_company_form");
+                res = await this.terminal.executeCommand(
+                    "action -a \"{'type': 'ir.actions.act_window', 'res_model': 'res.currency', 'view_type': 'form', 'view_mode': 'form', 'views': [[false, 'form']], 'target': 'current', 'res_id': 1}\"",
+                    false,
+                    true
+                );
+                this.assertNotEmpty(res);
+            } else {
+                res = await this.terminal.executeCommand(
+                    "action -a base.action_res_company_form",
+                    false,
+                    true
+                );
+                this.assertEqual(res.xml_id, "base.action_res_company_form");
+                res = await this.terminal.executeCommand(
+                    "action -a \"{'type': 'ir.actions.act_window', 'res_model': 'res.currency', 'view_type': 'form', 'view_mode': 'form', 'views': [[false, 'form']], 'target': 'current', 'res_id': 1}\"",
+                    false,
+                    true
+                );
+                this.assertEqual(res.res_model, "res.currency");
+                this.assertEqual(res.res_id, 1);
+            }
         },
         test_action__no_arg: async function () {
             let res = await this.terminal.executeCommand(
@@ -381,19 +396,34 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             this.assertEqual(res.id, 5);
-            res = await this.terminal.executeCommand(
-                "action base.action_res_company_form",
-                false,
-                true
-            );
-            this.assertEqual(res.xml_id, "base.action_res_company_form");
-            res = await this.terminal.executeCommand(
-                "action \"{'type': 'ir.actions.act_window', 'res_model': 'res.currency', 'view_type': 'form', 'view_mode': 'form', 'views': [[false, 'form']], 'target': 'current', 'res_id': 1}\"",
-                false,
-                true
-            );
-            this.assertEqual(res.res_model, "res.currency");
-            this.assertEqual(res.res_id, 1);
+            if (this.terminal._mode === this.terminal.MODES.BACKEND_NEW) {
+                res = await this.terminal.executeCommand(
+                    "action base.action_res_company_form",
+                    false,
+                    true
+                );
+                this.assertEqual(res.id, "base.action_res_company_form");
+                res = await this.terminal.executeCommand(
+                    "action \"{'type': 'ir.actions.act_window', 'res_model': 'res.currency', 'view_type': 'form', 'view_mode': 'form', 'views': [[false, 'form']], 'target': 'current', 'res_id': 1}\"",
+                    false,
+                    true
+                );
+                this.assertNotEmpty(res);
+            } else {
+                res = await this.terminal.executeCommand(
+                    "action base.action_res_company_form",
+                    false,
+                    true
+                );
+                this.assertEqual(res.xml_id, "base.action_res_company_form");
+                res = await this.terminal.executeCommand(
+                    "action \"{'type': 'ir.actions.act_window', 'res_model': 'res.currency', 'view_type': 'form', 'view_mode': 'form', 'views': [[false, 'form']], 'target': 'current', 'res_id': 1}\"",
+                    false,
+                    true
+                );
+                this.assertEqual(res.res_model, "res.currency");
+                this.assertEqual(res.res_id, 1);
+            }
         },
 
         test_whoami: async function () {
