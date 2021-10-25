@@ -305,6 +305,18 @@ odoo.define("terminal.functions.Common", function (require) {
                 ],
                 example: "-m res.partner -i 1",
             });
+            this.registerCommand("parse_simple_json", {
+                definition: "Parse string simple format to json object",
+                callback: this._cmdParseSimpleJSON,
+                detail: "Parse string simple format to json object. Also accepts native json format.",
+                args: ["j::i:input::1::The input string in simple format"],
+                example: "-i \"KeyA=ValueA keyB='The ValueB'\"",
+            });
+        },
+
+        _cmdParseSimpleJSON: function (kwargs) {
+            this.screen.print(kwargs.input);
+            return Promise.resolve(kwargs.input);
         },
 
         _cmdMetadata: function (kwargs) {

@@ -30,14 +30,14 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             };
             this._regexSanitize = new RegExp(/'/g);
             this._regexParams = new RegExp(
-                /(["'])(?:(?=(\\?))\2.)*?\1|[^\s]+/g
+                /(\\?["'`])(?:(?=(\\?))\2.)*?\1|[^\s]+/g
             );
             this._regexArgs = new RegExp(/[l?*]/);
             this._regexRunner = new RegExp(
                 /[=]=\{(.+?)\}(?:\.(\w+)|\[(\d+)\])?/gm
             );
             this._regexSimpleJSON = new RegExp(
-                /([^=\s]*)\s?=\s?(["'])(?:(?=(\\?))\3.)*?\2|([^=\s]*)\s?=\s?([^\s]+)/g
+                /([^=\s]*)\s?=\s?(\\?["'`])(?:(?=(\\?))\3.)*?\2|([^=\s]*)\s?=\s?([^\s]+)/g
             );
             this._parameterGenerator = new ParameterGenerator();
         },
@@ -181,10 +181,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             const cmd = scmd[0];
             scmd = scmd.slice(1);
             let params = _.map(scmd, (item) => {
-                let nvalue = item;
-                if (item[0] === '"' || item[0] === "'") {
-                    nvalue = item.substr(1, item.length - 2);
-                }
+                const nvalue = this._trimQuotes(item);
                 return cmd_def.sanitized
                     ? this._sanitizeString(Utils.unescapeSlashes(nvalue))
                     : nvalue;
@@ -443,6 +440,22 @@ odoo.define("terminal.core.ParameterReader", function (require) {
         },
 
         /**
+         * @param {String} str
+         * @returns {String}
+         */
+        _trimQuotes: function (str) {
+            const str_length = str.length;
+            if (
+                (str[0] === '"' && str[str_length - 1] === '"') ||
+                (str[0] === "'" && str[str_length - 1] === "'") ||
+                (str[0] === "`" && str[str_length - 1] === "`")
+            ) {
+                return str.substr(1, str_length - 2);
+            }
+            return str;
+        },
+
+        /**
          * Try to convert input to json.
          * This is used to parse "simple json"
          * Input:
@@ -467,14 +480,12 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             }
             const obj = {};
             for (const param of params) {
-                let [param_name, param_value] = param.trim().split("=");
-                if (
-                    param_value[0] === '"' &&
-                    param_value[param_value.length - 1] === '"'
-                ) {
-                    param_value = param_value.substr(1, param_value.length - 2);
-                }
-                obj[param_name] = this._tryAllFormatters(param_value);
+                let [param_name, ...param_value] = param.trim().split("=");
+                param_value = this._trimQuotes(
+                    Utils.unescapeSlashes(param_value.join("="))
+                );
+                const formatted_param = this._tryAllFormatters(param_value);
+                obj[param_name] = formatted_param || param_value;
             }
             return obj;
         },

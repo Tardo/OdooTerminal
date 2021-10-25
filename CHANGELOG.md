@@ -7,6 +7,7 @@ IMP: ParameterReader: Error messages (issue #41 #42)
 IMP: '_searchSimiliarCommand': Trying to make it a little more precise
 
 ADD: Integration test for 'rpc' and 'metadata'
+ADD: Command 'parse_simple_json': Returns a JSON from simple format string
 
 FIX: Command 'metadata': Show a more understandable error (issue #42) and moved from backend to common zone
 FIX: Integration test for 'view'
