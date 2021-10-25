@@ -33,6 +33,7 @@ odoo.define("terminal.core.Utils", function () {
     // See https://stackoverflow.com/a/48855846
     const unescapeSlashes = (text) => {
         let parsed_text = text.replace(/(^|[^\\])(\\\\)*\\$/, "$&\\");
+        parsed_text = parsed_text.replace(/(^|[^\\])((\\\\)*")/g, "$1\\$2");
         try {
             parsed_text = JSON.parse(`"${parsed_text}"`);
         } catch (e) {

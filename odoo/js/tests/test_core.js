@@ -243,5 +243,53 @@ odoo.define("terminal.tests.core", function (require) {
             const res = await this.terminal.executeCommand("jobs", false, true);
             this.assertEqual(res[0]?.scmd.cmd, "jobs");
         },
+
+        test_parse_simple_json: async function () {
+            let res = await this.terminal.executeCommand(
+                "parse_simple_json -i \"keyA=ValueA keyB='Complex ValueB' keyC=1234 keyD='keyDA=ValueDA keyDB=\\'Complex ValueDB\\' keyDC=1234'\"",
+                false,
+                true
+            );
+            this.assertEqual(res.keyA, "ValueA");
+            this.assertEqual(res.keyB, "Complex ValueB");
+            this.assertEqual(res.keyC, 1234);
+            this.assertNotEmpty(res.keyD);
+            this.assertEqual(res.keyD.keyDA, "ValueDA");
+            this.assertEqual(res.keyD.keyDB, "Complex ValueDB");
+            this.assertEqual(res.keyD.keyDC, 1234);
+            res = await this.terminal.executeCommand(
+                "parse_simple_json -i \"{'keyA': 'ValueA', 'keyB': 'Complex ValueB', 'keyC': 1234, 'keyD': { 'keyDA': 'ValueDA', 'keyDB': 'Complex ValueDB', 'keyDC': 1234 }}\"",
+                false,
+                true
+            );
+            this.assertEqual(res.keyA, "ValueA");
+            this.assertEqual(res.keyB, "Complex ValueB");
+            this.assertEqual(res.keyC, 1234);
+            this.assertNotEmpty(res.keyD);
+            this.assertEqual(res.keyD.keyDA, "ValueDA");
+            this.assertEqual(res.keyD.keyDB, "Complex ValueDB");
+            this.assertEqual(res.keyD.keyDC, 1234);
+            res = await this.terminal.executeCommand(
+                "parse_simple_json -i \"[['test', '=', 'value']]\"",
+                false,
+                true
+            );
+            this.assertNotEmpty(res);
+            this.assertEqual(res[0][0], "test");
+            this.assertEqual(res[0][1], "=");
+            this.assertEqual(res[0][2], "value");
+            res = await this.terminal.executeCommand(
+                "parse_simple_json -i 1234",
+                false,
+                true
+            );
+            this.assertEqual(res, 1234);
+            res = await this.terminal.executeCommand(
+                "parse_simple_json -i \"'Simple Text'\"",
+                false,
+                true
+            );
+            this.assertEqual(res, "Simple Text");
+        },
     });
 });

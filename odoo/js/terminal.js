@@ -529,6 +529,7 @@ odoo.define("terminal.Terminal", function (require) {
             // Columns per Key and Rows per Key
             const cpk = 10,
                 rpk = 3;
+            const max_dist = Math.sqrt(cpk + rpk);
             const _get_key_dist = function (from, to) {
                 // FIXME: Inaccurate keymap
                 //      '_' and '-' positions are only valid for spanish layout
@@ -594,19 +595,31 @@ odoo.define("terminal.Terminal", function (require) {
                 if (search_index === -1) {
                     // Penalize word length diff
                     cmd_score =
-                        (Math.abs(sanitized_in_cmd.length - cmd.length) / 2) *
-                        cpk *
-                        rpk;
+                        Math.abs(sanitized_in_cmd.length - cmd.length) / 2 +
+                        max_dist;
                     // Analize letter key distances
                     for (let i = 0; i < sanitized_in_cmd.length; ++i) {
                         if (i < cmd.length) {
-                            cmd_score += _get_key_dist(
+                            const score = _get_key_dist(
                                 sanitized_in_cmd.charAt(i),
                                 cmd.charAt(i)
                             );
+                            if (score === 0) {
+                                --cmd_score;
+                            } else {
+                                cmd_score += score;
+                            }
                         } else {
                             break;
                         }
+                    }
+                    // Using all letters?
+                    const cmd_vec = _.map(cmd, (k) => k.charCodeAt(0));
+                    const in_cmd_vec = _.map(sanitized_in_cmd, (k) =>
+                        k.charCodeAt(0)
+                    );
+                    if (_.difference(in_cmd_vec, cmd_vec).length === 0) {
+                        cmd_score -= max_dist;
                     }
                 } else {
                     cmd_score =

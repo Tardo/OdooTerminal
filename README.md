@@ -3,6 +3,10 @@
 [![14.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-14ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-14ce.yml)
 [![15.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-15ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-15ce.yml)
 
+\*\* It is difficult not to have errors in CI because the instances used to test
+the extension may not exist or may have been modified in unpredictable ways by
+other users.
+
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)

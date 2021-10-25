@@ -87,7 +87,7 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
 
         /**
          * Call to legacy action manager
-         * FIXME: Now can't now when the action is completed... :(
+         * FIXME: Now can't know when the action is completed... :(
          *
          * @override
          */
