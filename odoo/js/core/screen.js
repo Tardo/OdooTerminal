@@ -389,8 +389,8 @@ odoo.define("terminal.core.Screen", function (require) {
                         <span>${Utils.encodeHTML(this.PROMPT)}</span>
                     </div>
                     <div class='flex-fill rich-input'>
-                        <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' readonly='readonly'/>
-                        <input type='edit' id='terminal_input' autocomplete='off' />
+                        <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' spellcheck="false" autocapitalize="off" readonly='readonly'/>
+                        <input type='edit' id='terminal_input' autocomplete='off' spellcheck="false" autocapitalize="off" />
                     </div>
                     <div class="terminal-prompt-info-container d-none d-lg-inline-flex">
                         <span id="terminal-prompt-info-version" class='terminal-prompt-info' title='${version}'>${version}</span>
