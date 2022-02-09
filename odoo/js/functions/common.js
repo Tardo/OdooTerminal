@@ -568,6 +568,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 .then((result) => {
                     this.screen.updateInputInfo(login);
                     this.screen.print(`Successfully logged as '${login}'`);
+                    this.executeCommand("reload", false, true);
                     return result;
                 });
         },
@@ -576,6 +577,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return session.session_logout().then((result) => {
                 this.screen.updateInputInfo("Public User");
                 this.screen.print("Logged out");
+                this.executeCommand("reload", false, true);
                 return result;
             });
         },

@@ -4,6 +4,7 @@
 
 ```
 FIX: Get initial information (username and version): Now work correctly with public users
+FIX: Command 'login' and 'logout': Reload page to get updated session information
 ```
 
 **8.3.0**
