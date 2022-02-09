@@ -1,8 +1,10 @@
 # Changelog
 
-**8.4.0**
+**8.3.1**
 
 ```
+UPD: Remove github worflow
+
 FIX: Get initial information (username and version): Now work correctly with public users
 FIX: Command 'login' and 'logout': Reload page to get updated session information
 ```
