@@ -56,6 +56,20 @@ odoo.define("terminal.core.rpc", function (require) {
                 params.kwargs = _.extend(params.kwargs || {}, options.kwargs);
                 params.kwargs.context =
                     options.context || params.context || params.kwargs.context;
+
+                // Compatibility with Odoo 12.0-
+                if (
+                    options.route === "/jsonrpc" &&
+                    options.method === "server_version"
+                ) {
+                    const keys_count = Object.keys(params.kwargs).length;
+                    if (
+                        !keys_count ||
+                        (keys_count === 1 && !params.kwargs.context)
+                    ) {
+                        delete params.kwargs;
+                    }
+                }
             }
 
             if (

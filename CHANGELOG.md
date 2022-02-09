@@ -1,5 +1,11 @@
 # Changelog
 
+**8.4.0**
+
+```
+FIX: Get initial information (username and version): Now work correctly with public users
+```
+
 **8.3.0**
 
 ```
