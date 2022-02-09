@@ -1155,18 +1155,9 @@ odoo.define("terminal.functions.Common", function (require) {
             for (let x = 0; x < l; ++x) {
                 const notif = NotifDatas[x];
                 this.screen.print(
-                    "<strong>[<i class='fa fa-envelope-o'></i>] New Longpolling Notification:</stron>"
+                    `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</stron>`
                 );
-                if (notif[0] !== "not") {
-                    this.screen.print(
-                        [
-                            `From: ${notif[0][0]}`,
-                            `Channel: ${notif[0][1]}`,
-                            `To: ${notif[0][2]}`,
-                        ],
-                        true
-                    );
-                }
+                this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
                 this.screen.print(notif[1], false);
             }
         },
