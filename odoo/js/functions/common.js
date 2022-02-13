@@ -1150,10 +1150,10 @@ odoo.define("terminal.functions.Common", function (require) {
 
         //
         _onBusNotification: function (notifications) {
-            const NotifDatas = Object.values(notifications.data);
-            const l = NotifDatas.length;
+            const notif_datas = Object.values(notifications.data);
+            const l = notif_datas.length;
             for (let x = 0; x < l; ++x) {
-                const notif = NotifDatas[x];
+                const notif = notif_datas[x];
                 this.screen.print(
                     `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</stron>`
                 );
