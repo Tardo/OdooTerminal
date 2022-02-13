@@ -122,6 +122,21 @@ odoo.define("terminal.Terminal", function (require) {
 
             this._wasStart = false;
 
+            // Cached content
+            const cachedScreen = this._storage.getItem("terminal_screen");
+            if (_.isUndefined(cachedScreen)) {
+                this._printWelcomeMessage();
+                this.screen.print("");
+            } else {
+                this.screen.printHTML(cachedScreen);
+                // RequestAnimationFrame(() => this.screen.scrollDown());
+            }
+            const cachedHistory = this._storage.getItem("terminal_history");
+            if (!_.isUndefined(cachedHistory)) {
+                this._inputHistory = cachedHistory;
+                this._searchHistoryIter = this._inputHistory.length;
+            }
+
             // Pinned
             this._pinned = this._storage.getItem("terminal_pinned");
 
@@ -142,20 +157,6 @@ odoo.define("terminal.Terminal", function (require) {
                 }
 
                 this.$runningCmdCount = this.$("#terminal_running_cmd_count");
-
-                const cachedScreen = this._storage.getItem("terminal_screen");
-                if (_.isUndefined(cachedScreen)) {
-                    this._printWelcomeMessage();
-                    this.screen.print("");
-                } else {
-                    this.screen.printHTML(cachedScreen);
-                    requestAnimationFrame(() => this.screen.scrollDown());
-                }
-                const cachedHistory = this._storage.getItem("terminal_history");
-                if (!_.isUndefined(cachedHistory)) {
-                    this._inputHistory = cachedHistory;
-                    this._searchHistoryIter = this._inputHistory.length;
-                }
 
                 const isMaximized = this._storage.getItem("screen_maximized");
                 if (isMaximized) {

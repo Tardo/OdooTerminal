@@ -145,6 +145,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
         _flush: function () {
             if (!this.$screen || !this.$screen.length) {
+                this._flushing = false;
                 return;
             }
             this.$screen.append(
