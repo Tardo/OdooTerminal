@@ -84,19 +84,37 @@ odoo.define("terminal.core.Utils", function () {
     };
 
     const getUID = () => {
-        return odoo.session_info.uid || odoo.session_info.user_id;
+        return (
+            odoo.session_info?.uid ||
+            odoo.session_info?.user_id ||
+            odoo.__DEBUG__.services["@web/session"]?.session.user_id ||
+            -1
+        );
     };
 
     const getUsername = () => {
-        return odoo.session_info.username;
+        return odoo.session_info?.username;
     };
 
     const getOdooVersion = () => {
-        return odoo.session_info.server_version;
+        return (
+            odoo.session_info?.server_version ||
+            odoo.__DEBUG__.services["@web/session"]?.session.server_version
+        );
     };
 
     const getOdooVersionInfo = () => {
-        return odoo.session_info.server_version_info;
+        return (
+            odoo.session_info?.server_version_info ||
+            odoo.__DEBUG__.services["@web/session"]?.session.server_version_info
+        );
+    };
+
+    const isPublicUser = () => {
+        return (
+            odoo.session_info?.is_website_user ||
+            odoo.__DEBUG__.services["@web/session"]?.session.is_website_user
+        );
     };
 
     const asyncSleep = (ms) => {
@@ -183,6 +201,7 @@ odoo.define("terminal.core.Utils", function () {
         getUsername: getUsername,
         getOdooVersion: getOdooVersion,
         getOdooVersionInfo: getOdooVersionInfo,
+        isPublicUser: isPublicUser,
         file2Base64: file2Base64,
         asyncSleep: asyncSleep,
         genColorFromString: genColorFromString,

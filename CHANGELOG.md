@@ -1,5 +1,19 @@
 # Changelog
 
+**8.3.1**
+
+```
+UPD: Remove github workflow
+
+IMP: Longpolling print
+IMP: Terminal style
+IMP: Adapt to load in master branch
+
+FIX: Get initial information (username and version): Now work correctly with public users
+FIX: Command 'login' and 'logout': Reload page to get updated session information
+FIX: Command 'print': Prevent print from being blocked
+```
+
 **8.3.0**
 
 ```

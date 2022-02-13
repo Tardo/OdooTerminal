@@ -1,12 +1,3 @@
-[![12.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-12ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-12ce.yml)
-[![13.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-13ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-13ce.yml)
-[![14.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-14ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-14ce.yml)
-[![15.0 CE](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-15ce.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/ci-15ce.yml)
-
-\*\* It is difficult not to have errors in CI because the instances used to test
-the extension may not exist or may have been modified in unpredictable ways by
-other users.
-
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)
 ![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)
@@ -25,11 +16,14 @@ The BFG10k for Odoo developers
 All the power of Odoo json-rpc in a really easy way!
 </p>
 
-This web extension adds a terminal-like to control Odoo (11, 12, 13, 14 & 15).
-All implemented commands use the tools provided by the Odoo framework. An
-unwavering policy when developing this extension is to not modify or alter in
-any way the Odoo classes. This sometimes results in certain commands having
+This web extension adds a terminal-like to control Odoo (11 to 15). All
+implemented commands use the tools provided by the Odoo framework. An unwavering
+policy when developing this extension is to not modify or alter in any way the
+Odoo classes. This sometimes results in certain commands having
 reduced/increased capabilities depending on the Odoo version.
+
+The terminal is fully initialized when it is first opened after loading the
+page. So the impact on page loading is minimal.
 
 **Downloads**
 

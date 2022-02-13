@@ -30,17 +30,22 @@ odoo.define("terminal.loaders.Frontend", function (require) {
                         true
                     );
                     session_info.server_version = server_version;
-                    if (uid > 0) {
-                        session_info.uid = uid;
-                        const whoami = await this.executeCommand(
-                            "whoami",
-                            false,
-                            true
-                        );
-                        session_info.username = whoami[0].login;
-                    } else {
+                    if (Utils.isPublicUser() || Utils.getUID() === -1) {
                         session_info.uid = -1;
                         session_info.username = "Public User";
+                    } else {
+                        session_info.uid = uid;
+                        try {
+                            const whoami = await this.executeCommand(
+                                "whoami",
+                                false,
+                                true
+                            );
+                            session_info.username = whoami[0].login;
+                        } catch (err) {
+                            session_info.uid = -1;
+                            session_info.username = "Public User";
+                        }
                     }
                     this.screen.updateInputInfo(
                         session_info.username,

@@ -18,6 +18,7 @@
     border: 0 solid gray;
     border-width: 1px 1px 0 1px;
     font-family: var(--terminal-screen-font);
+    font-size: 14px;
     left: 50%;
     position: fixed;
     top: -110%;
@@ -50,6 +51,15 @@
     scrollbar-color: var(--terminal-screen-text-color)
         var(--terminal-screen-background-color);
     white-space: pre;
+}
+.o_terminal div#terminal_screen::-webkit-scrollbar {
+    width: 6px;
+}
+.o_terminal div#terminal_screen::-webkit-scrollbar-track {
+    background: transparent;
+}
+.o_terminal div#terminal_screen::-webkit-scrollbar-thumb {
+    background-color: var(--terminal-screen-text-color);
 }
 
 .o_terminal div#terminal_screen hr {

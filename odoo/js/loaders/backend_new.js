@@ -24,7 +24,7 @@ odoo.define("terminal.loaders.Backend", function (require) {
     (async function boot() {
         // A generic try-catch to avoid stop scripts execution.
         try {
-            await owl.utils.whenReady();
+            await (owl.utils?.whenReady() || owl.whenReady());
             await legacySession.is_bound;
             const terminal = new Terminal(
                 rootWidget,
