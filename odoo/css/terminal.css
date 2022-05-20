@@ -25,7 +25,7 @@
     transform: translate(-50%, 0);
     width: var(--terminal-screen-width);
     z-index: 1041;
-    display: grid; /* Here to force BS4 behavior */
+    display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
     transition: 200ms;
@@ -145,13 +145,13 @@
     border-width: 1px 0 0 0;
     color: var(--terminal-screen-text-color);
 
-    display: flex; /* Here to force BS4 behavior */
+    display: flex;
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt-container {
     padding: 3px;
     max-width: 15%;
-    display: flex; /* Here for 11.0 */
+    display: flex;
 }
 .o_terminal
     .terminal-user-input
@@ -160,6 +160,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: bold;
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt-info-container {
@@ -175,7 +176,7 @@
 
 .o_terminal .terminal-user-input .rich-input {
     position: relative;
-    flex: 1 1 auto; /* Here for 11.0 */
+    flex: 1 1 auto;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input {
     background-color: transparent;

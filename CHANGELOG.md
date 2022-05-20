@@ -1,5 +1,11 @@
 # Changelog
 
+**8.4.0**
+
+```
+IMP: Screen: Use fewer css classes
+```
+
 **8.3.1**
 
 ```
