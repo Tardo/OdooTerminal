@@ -4,6 +4,8 @@
 
 ```
 IMP: Screen: Use fewer css classes
+
+FIX: Command 'lang': UtilsBackend is undefined (issue #55)
 ```
 
 **8.3.1**

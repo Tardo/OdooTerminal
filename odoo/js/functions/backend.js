@@ -8,7 +8,7 @@ odoo.define("terminal.functions.Backend", function (require) {
     const rpc = require("terminal.core.rpc");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
-    const UtilsBackend = require("terminal.core.UtilsBackend");
+    require("terminal.core.UtilsBackend");
 
     function OdooEvent(target, name, data) {
         this.target = target;
@@ -151,7 +151,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                         });
 
                         // Get file
-                        const content_def = UtilsBackend.getContent(
+                        const content_def = Utils.getContent(
                             {
                                 model: "base.language.export",
                                 id: wizard_id,
