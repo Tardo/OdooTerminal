@@ -191,6 +191,10 @@ odoo.define("terminal.core.Utils", function () {
         return rgb;
     };
 
+    const getOdooService = (name) => {
+        return odoo.__DEBUG__.services[name];
+    };
+
     return {
         encodeHTML: encodeHTML,
         genHash: genHash,
@@ -207,5 +211,6 @@ odoo.define("terminal.core.Utils", function () {
         genColorFromString: genColorFromString,
         rgb2hsv: rgb2hsv,
         hsv2rgb: hsv2rgb,
+        getOdooService: getOdooService,
     };
 });

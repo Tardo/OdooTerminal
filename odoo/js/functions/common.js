@@ -312,6 +312,74 @@ odoo.define("terminal.functions.Common", function (require) {
                 args: ["j::i:input::1::The input string in simple format"],
                 example: "-i \"KeyA=ValueA keyB='The ValueB'\"",
             });
+            this.registerCommand("barcode", {
+                definition: "Operations over barcode",
+                callback: this._cmdBarcode,
+                detail: "See information and send barcode strings",
+                args: [
+                    "s::o:operation::1::The operation::send::info:send",
+                    "la::d:data::0::The data to send",
+                    "i::pd:pressdelay::0::The delay between presskey events (in ms)::3",
+                    "i::bd:barcodedelay::0::The delay between barcodes reads (in ms)::150",
+                ],
+                example: "-o send -d 1234ABCD,5678EFGH",
+            });
+        },
+
+        _cmdBarcode: function (kwargs) {
+            // Soft-dependency... this don't exists if barcodes module is not installed
+            const BarcodeEvents = Utils.getOdooService(
+                "barcodes.BarcodeEvents"
+            );
+            if (!BarcodeEvents) {
+                this.screen.printError(
+                    "The 'barcode' module is not installed!"
+                );
+                return Promise.resolve();
+            }
+            return new Promise(async (resolve, reject) => {
+                if (kwargs.operation === "info") {
+                    const info = [
+                        `Max. time between keys (ms): ${BarcodeEvents.BarcodeEvents.max_time_between_keys_in_ms}`,
+                        `Reserved barcode prefixes: ${BarcodeEvents.ReservedBarcodePrefixes.join(
+                            ", "
+                        )}`,
+                        `Currently accepting barcode scanning? ${
+                            BarcodeEvents.BarcodeEvents.$barcodeInput.length > 0
+                                ? "Yes"
+                                : "No"
+                        }`,
+                    ];
+                    this.screen.eprint(info);
+                    return resolve(info);
+                } else if (kwargs.operation === "send") {
+                    if (!kwargs.data) {
+                        return reject("No data given!");
+                    }
+
+                    for (const barcode of kwargs.data) {
+                        for (
+                            let i = 0,
+                                bardoce_len = barcode.length,
+                                keyCode = barcode.charCodeAt(i);
+                            i < bardoce_len;
+                            keyCode = barcode.charCodeAt(++i)
+                        ) {
+                            document.body.dispatchEvent(
+                                new KeyboardEvent("keypress", {
+                                    keyCode: keyCode,
+                                    which: keyCode,
+                                })
+                            );
+                            await Utils.asyncSleep(kwargs.pressdelay);
+                        }
+                        await Utils.asyncSleep(kwargs.barcodedelay);
+                    }
+                } else {
+                    return reject("Invalid operation!");
+                }
+                return resolve();
+            });
         },
 
         _cmdParseSimpleJSON: function (kwargs) {
