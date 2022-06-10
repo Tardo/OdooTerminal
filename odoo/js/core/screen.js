@@ -384,19 +384,19 @@ odoo.define("terminal.core.Screen", function (require) {
             const username = Utils.getUsername();
             const version = Utils.getOdooVersion();
             this.$userInput = $(
-                `<div class='d-flex terminal-user-input'>
-                    <div class='terminal-prompt-container d-flex'>
-                        <span id="terminal-prompt-main" class='terminal-prompt font-weight-bold' title='${username}'>${username}&nbsp;</span>
+                `<div class='terminal-user-input'>
+                    <div class='terminal-prompt-container'>
+                        <span id="terminal-prompt-main" class='terminal-prompt' title='${username}'>${username}&nbsp;</span>
                         <span>${Utils.encodeHTML(this.PROMPT)}</span>
                     </div>
-                    <div class='flex-fill rich-input'>
+                    <div class='rich-input'>
                         <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' spellcheck="false" autocapitalize="off" readonly='readonly'/>
                         <input type='edit' id='terminal_input' autocomplete='off' spellcheck="false" autocapitalize="off" />
                     </div>
-                    <div class="terminal-prompt-info-container d-none d-lg-inline-flex">
+                    <div class="terminal-prompt-info-container">
                         <span id="terminal-prompt-info-version" class='terminal-prompt-info' title='${version}'>${version}</span>
                     </div>
-                    <div class="terminal-prompt-container d-none d-lg-inline-flex">
+                    <div class="terminal-prompt-container">
                         <span id="terminal-prompt-info-host" class='terminal-prompt' title='${host}'>${host}</span>
                     </div>
                 </div>`

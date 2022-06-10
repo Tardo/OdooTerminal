@@ -1,5 +1,16 @@
 # Changelog
 
+**8.4.0**
+
+```
+IMP: Screen: Use fewer css classes
+IMP: Support last version of Odoo (master branch)
+
+ADD: Command 'barcode': Simulate barcode scanning and info
+
+FIX: Command 'lang': UtilsBackend is undefined (issue #55)
+```
+
 **8.3.1**
 
 ```

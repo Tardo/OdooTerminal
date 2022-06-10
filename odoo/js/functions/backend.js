@@ -8,7 +8,7 @@ odoo.define("terminal.functions.Backend", function (require) {
     const rpc = require("terminal.core.rpc");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
-    const UtilsBackend = require("terminal.core.UtilsBackend");
+    require("terminal.core.UtilsBackend");
 
     function OdooEvent(target, name, data) {
         this.target = target;
@@ -151,7 +151,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                         });
 
                         // Get file
-                        const content_def = UtilsBackend.getContent(
+                        const content_def = Utils.getContent(
                             {
                                 model: "base.language.export",
                                 id: wizard_id,
@@ -246,6 +246,9 @@ odoo.define("terminal.functions.Backend", function (require) {
             }).then(() => this.doHide());
         },
 
+        _getDialogParent: function () {
+            return this;
+        },
         _cmdViewModelRecord: function (kwargs) {
             const context = this._getContext({
                 form_view_ref: kwargs.ref || false,
@@ -265,22 +268,25 @@ odoo.define("terminal.functions.Backend", function (require) {
                         resolve();
                     });
                 }
-                const dialog = new dialogs.SelectCreateDialog(this, {
-                    res_model: kwargs.model,
-                    title: "Select a record",
-                    disable_multiple_selection: true,
-                    on_selected: (records) => {
-                        this.do_action({
-                            type: "ir.actions.act_window",
-                            name: "View Record",
-                            res_model: kwargs.model,
-                            res_id: records[0].id,
-                            views: [[false, "form"]],
-                            target: "current",
-                            context: context,
-                        });
-                    },
-                });
+                const dialog = new dialogs.SelectCreateDialog(
+                    this._getDialogParent(),
+                    {
+                        res_model: kwargs.model,
+                        title: "Select a record",
+                        disable_multiple_selection: true,
+                        on_selected: (records) => {
+                            this.do_action({
+                                type: "ir.actions.act_window",
+                                name: "View Record",
+                                res_model: kwargs.model,
+                                res_id: records[0].id,
+                                views: [[false, "form"]],
+                                target: "current",
+                                context: context,
+                            });
+                        },
+                    }
+                );
                 dialog.open();
                 return dialog.opened().then(resolve);
             });

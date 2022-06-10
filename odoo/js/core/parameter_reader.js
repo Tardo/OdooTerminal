@@ -21,12 +21,14 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 i: this._validateInt.bind(this),
                 j: this._validateJson.bind(this),
                 f: this._validateInt.bind(this),
+                a: this._valideAlphanumeric.bind(this),
             };
             this._formatters = {
                 s: this._formatString.bind(this),
                 i: this._formatInt.bind(this),
                 j: this._formatJson.bind(this),
                 f: this._formatFlag.bind(this),
+                a: this._formatAlphanumeric.bind(this),
             };
             this._regexSanitize = new RegExp(/'/g);
             this._regexParams = new RegExp(
@@ -543,6 +545,19 @@ odoo.define("terminal.core.ParameterReader", function (require) {
         },
 
         /**
+         * Test if is an alphanumeric.
+         * @param {String} param
+         * @param {Boolean} list_mode
+         * @returns {Boolean}
+         */
+        _valideAlphanumeric: function (param, list_mode = false) {
+            return (
+                this._validateInt(param, list_mode) ||
+                this._validateString(param, list_mode)
+            );
+        },
+
+        /**
          * Test if is a valid json.
          * @param {String} param
          * @param {Boolean} list_mode
@@ -601,6 +616,16 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 return _.map(this.splitAndTrim(param), (item) => Number(item));
             }
             return Number(param);
+        },
+
+        /**
+         * Format value to string
+         * @param {String} param
+         * @param {Boolean} list_mode
+         * @returns {Number}
+         */
+        _formatAlphanumeric: function (param, list_mode = false) {
+            return this._formatString(param, list_mode);
         },
 
         /**
