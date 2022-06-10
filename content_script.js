@@ -133,6 +133,7 @@
         ) {
             // Version 15.0
             to_inject.js.push("odoo/js/core/compat/v15/common.js");
+            to_inject.js.push("odoo/js/core/compat/v15/backend.js");
             compat_mode = 15;
         }
         // Backend/Frontend resources
