@@ -66,11 +66,13 @@ odoo.define("terminal.core.TemplateManager", function (require) {
                 "<td><span class='o_terminal_click o_terminal_cmd' data-cmd='view <%= model %> <%= id %>'>#<%= id %></span></td>",
             WHOAMI:
                 "<span style='color: gray;'>Login</span>: <%= login %><br>" +
-                "<span style='color: gray;'>User</span>: <%= display_name %> (#<%= user_id %>)<br>" +
-                "<span style='color: gray;'>Partner</span>: <%= partner[1] %> (#<%= partner[0] %>)<br>" +
-                "<span style='color: gray;'>Company</span>: <%= company[1] %> (#<%= company[0] %>)<br>" +
-                "<span style='color: gray;'>In Companies (ids)</span>: <%= companies %><br>" +
-                "<span style='color: gray;'>In Groups (ids)</span>: <%= groups %>",
+                "<span style='color: gray;'>User</span>: <%= display_name %> (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.users <%= user_id %>'>#<%= user_id %></span>)<br>" +
+                "<span style='color: gray;'>Partner</span>: <%= partner[1] %> (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.partner <%= partner[0] %>'>#<%= partner[0] %></span>)<br>" +
+                "<span style='color: gray;'>Active Company</span>: <%= company[1] %> (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.company <%= company[0] %>'>#<%= company[0] %></span>)<br>" +
+                "<span style='color: gray;'>In Companies</span>: <%= companies %><br>" +
+                "<span style='color: gray;'>In Groups</span>: <%= groups %>",
+            WHOAMI_LIST_ITEM:
+                "<br>\u00A0\u00A0- <%= name %> (<span class='o_terminal_click o_terminal_cmd' data-cmd='view <%= model %> <%= id %>'>#<%= id %></span>)",
             UNKNOWN_COMMAND: `Unknown command. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='<%= cmd %> <%= params %>'><%= cmd %></strong>'?`,
             PROMPT_CMD_HIDDEN_ARGS: `<%= prompt %> <%= cmd.split(" ")[0] %> *****`,
             PROMPT_CMD: `<%= prompt %> <%= cmd %>`,

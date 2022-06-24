@@ -886,16 +886,59 @@ odoo.define("terminal.functions.Common", function (require) {
                 .then((result) => {
                     if (result.length) {
                         const record = result[0];
-                        this.screen.print(
-                            this._templates.render("WHOAMI", {
+                        return Promise.all([
+                            rpc.query({
+                                method: "name_get",
+                                model: "res.groups",
+                                args: [record.groups_id],
+                                kwargs: {context: this._getContext()},
+                            }),
+                            rpc.query({
+                                method: "name_get",
+                                model: "res.company",
+                                args: [record.company_ids],
+                                kwargs: {context: this._getContext()},
+                            }),
+                        ]).then((result_tasks) => {
+                            let groups_list = "";
+                            for (const group of result_tasks[0]) {
+                                groups_list += this._templates.render(
+                                    "WHOAMI_LIST_ITEM",
+                                    {
+                                        name: group[1],
+                                        model: "res.groups",
+                                        id: group[0],
+                                    }
+                                );
+                            }
+                            let companies_list = "";
+                            for (const company of result_tasks[1]) {
+                                companies_list += this._templates.render(
+                                    "WHOAMI_LIST_ITEM",
+                                    {
+                                        name: company[1],
+                                        model: "res.company",
+                                        id: company[0],
+                                    }
+                                );
+                            }
+                            return {
                                 login: record.login,
                                 display_name: record.display_name,
                                 user_id: record.id,
                                 partner: record.partner_id,
                                 company: record.company_id,
-                                companies: record.company_ids,
-                                groups: record.groups_id,
-                            })
+                                companies: companies_list,
+                                groups: groups_list,
+                            };
+                        });
+                    }
+                    return false;
+                })
+                .then((result) => {
+                    if (result) {
+                        this.screen.print(
+                            this._templates.render("WHOAMI", result)
                         );
                     } else {
                         this.screen.printError("Oops! can't get the login :/");

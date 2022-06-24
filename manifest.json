@@ -4,7 +4,7 @@
   },
   "browser_action": {
     "default_icon": "icons/terminal-disabled-32.png",
-    "default_title": "Odoo Terminal (CTRL + 1)"
+    "default_title": "Odoo Terminal (ALT + T)"
   },
   "browser_specific_settings": {
     "gecko": {

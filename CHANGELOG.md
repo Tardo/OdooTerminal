@@ -1,5 +1,12 @@
 # Changelog
 
+**8.5.0**
+
+```
+IMP: Command 'whoami': Show groups and companies names
+IMP: Toggle terminal keybind changed to ALT + T (CTRL + 1 is deprecated)
+```
+
 **8.4.0**
 
 ```
