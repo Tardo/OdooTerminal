@@ -30,9 +30,10 @@ odoo.define("terminal.loaders.Frontend", function (require) {
                         true
                     );
                     session_info.server_version = server_version;
-                    if (Utils.isPublicUser() || Utils.getUID() === -1) {
+                    session_info.is_public_user = Utils.isPublicUser();
+                    if (Utils.getUID() === -1) {
                         session_info.uid = -1;
-                        session_info.username = "Public User";
+                        session_info.username = "Unregistered User";
                     } else {
                         session_info.uid = uid;
                         try {
@@ -41,10 +42,10 @@ odoo.define("terminal.loaders.Frontend", function (require) {
                                 false,
                                 true
                             );
-                            session_info.username = whoami[0].login;
+                            session_info.username = whoami.login;
                         } catch (err) {
                             session_info.uid = -1;
-                            session_info.username = "Public User";
+                            session_info.username = "Unknown User";
                         }
                     }
                     this.screen.updateInputInfo(
