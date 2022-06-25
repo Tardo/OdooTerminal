@@ -333,7 +333,7 @@ odoo.define("terminal.functions.Common", function (require) {
             );
             if (!BarcodeEvents) {
                 this.screen.printError(
-                    "The 'barcode' module is not installed!"
+                    "The 'barcode' module is not installed/available"
                 );
                 return Promise.resolve();
             }
