@@ -59,6 +59,11 @@ def update_version(mode, create_tag=False):
         'odoo/js/terminal.js',
         r'VERSION: "\d+\.\d+\.\d+"',
         'VERSION: "%s"' % extension_ver)
+    # pyproject.toml
+    _file_sub(
+        'pyproject.toml',
+        r'version = "\d+\.\d+\.\d+"',
+        'version = "%s"' % extension_ver)
 
     # git release commit
     if create_tag:

@@ -1076,7 +1076,8 @@ odoo.define("terminal.Terminal", function (require) {
             if (jobs.length) {
                 if (
                     jobs.length === 1 &&
-                    (!jobs[0] || jobs[0].scmd.cmd === "reload")
+                    (!jobs[0] ||
+                        ["reload", "login"].indexOf(jobs[0].scmd.cmd) !== -1)
                 ) {
                     return;
                 }

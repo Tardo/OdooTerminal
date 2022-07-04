@@ -7,6 +7,14 @@ odoo.define("terminal.tests", function (require) {
     const Terminal = require("terminal.Terminal");
     const Class = require("web.Class");
 
+    class TerminalTestValidationError extends Error {
+        constructor(message) {
+            super(message);
+            this.name = "TERMINAL_TEST_VALIDATION_ERROR";
+            this.message = message;
+        }
+    }
+
     const TerminalTestSuite = Class.extend({
         init: function (terminal) {
             this.terminal = terminal;
@@ -14,47 +22,47 @@ odoo.define("terminal.tests", function (require) {
 
         assertTrue: function (val, msg = "") {
             if (!val) {
-                throw Error(msg);
+                throw new TerminalTestValidationError(msg);
             }
         },
         assertFalse: function (val, msg = "") {
             if (val) {
-                throw Error(msg);
+                throw new TerminalTestValidationError(msg);
             }
         },
         assertEqual: function (valA, valB, msg = "") {
             if (valA !== valB) {
-                throw Error(msg);
+                throw new TerminalTestValidationError(msg);
             }
         },
         assertNotEqual: function (valA, valB, msg = "") {
             if (valA === valB) {
-                throw Error(msg);
+                throw new TerminalTestValidationError(msg);
             }
         },
         assertIn: function (obj, key, msg = "") {
             if (!Object.prototype.hasOwnProperty.call(obj, key)) {
-                throw Error(msg);
+                throw new TerminalTestValidationError(msg);
             }
         },
         assertNotIn: function (obj, key, msg = "") {
             if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                throw Error(msg);
+                throw new TerminalTestValidationError(msg);
             }
         },
         assertEmpty: function (val, msg = "") {
             if (!_.isEmpty(val)) {
-                throw Error(msg);
+                throw new TerminalTestValidationError(msg);
             }
         },
         assertNotEmpty: function (val, msg = "") {
             if (_.isEmpty(val)) {
-                throw Error(msg);
+                throw new TerminalTestValidationError(msg);
             }
         },
 
         getModalOpen: function () {
-            return $(".modal.show");
+            return $(".modal.show,.modal.in");
         },
         isModalType: function ($modal, type) {
             return $modal.find(`.o_${type}_view`).length > 0;
@@ -65,7 +73,9 @@ odoo.define("terminal.tests", function (require) {
 
         isFormOpen: function () {
             return !_.isNull(
-                document.querySelector(".o_view_controller .o_form_view")
+                document.querySelector(
+                    ".o_view_controller .o_form_view,.o_view_manager_content .o_form_view"
+                )
             );
         },
 

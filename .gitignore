@@ -1,6 +1,9 @@
 # Distribution extension package
 OdooTerminal.zip
 
+#Virtualenv
+.env/
+
 # Test logs
 *.log
 

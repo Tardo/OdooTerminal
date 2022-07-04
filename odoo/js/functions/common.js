@@ -77,7 +77,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "j::a:argument::0::The arguments list::[]",
                     "j::k:kwarg::0::The arguments dictionary::{}",
                 ],
-                example: "-m res.partner -c can_edit_vat -a [8]",
+                example: "-m res.partner -c address_get -a [8]",
             });
             this.registerCommand("upgrade", {
                 definition: "Upgrade a module",
@@ -202,6 +202,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "s::d:database::1::The database<br/>Can be '*' to use current database",
                     "s::u:user::1::The login<br/>Can be optionally preceded by the '#' character and it will be used for password too",
                     "s::p:password::0::The password",
+                    "f::nr:no-reload::0::No reload",
                 ],
                 secured: true,
                 example: "-d devel -u #admin",
@@ -636,7 +637,9 @@ odoo.define("terminal.functions.Common", function (require) {
                 .then((result) => {
                     this.screen.updateInputInfo(login);
                     this.screen.print(`Successfully logged as '${login}'`);
-                    this.executeCommand("reload", false, true);
+                    if (!kwargs.no_reload) {
+                        this.executeCommand("reload", false, true);
+                    }
                     return result;
                 });
         },
@@ -867,84 +870,80 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdShowWhoAmI: function () {
-            return rpc
-                .query({
-                    method: "search_read",
-                    domain: [["id", "=", Utils.getUID()]],
-                    fields: [
-                        "id",
-                        "display_name",
-                        "login",
-                        "partner_id",
-                        "company_id",
-                        "company_ids",
-                        "groups_id",
-                    ],
-                    model: "res.users",
-                    kwargs: {context: this._getContext()},
-                })
-                .then((result) => {
-                    if (result.length) {
-                        const record = result[0];
-                        return Promise.all([
-                            rpc.query({
-                                method: "name_get",
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const result = await rpc.query({
+                        method: "search_read",
+                        domain: [["id", "=", Utils.getUID()]],
+                        fields: [
+                            "id",
+                            "display_name",
+                            "login",
+                            "partner_id",
+                            "company_id",
+                            "company_ids",
+                            "groups_id",
+                        ],
+                        model: "res.users",
+                        kwargs: {context: this._getContext()},
+                    });
+                    if (!result.length) {
+                        return reject("Oops! can't get the login :/");
+                    }
+                    const record = result[0];
+                    const result_tasks = await Promise.all([
+                        rpc.query({
+                            method: "name_get",
+                            model: "res.groups",
+                            args: [record.groups_id],
+                            kwargs: {context: this._getContext()},
+                        }),
+                        rpc.query({
+                            method: "name_get",
+                            model: "res.company",
+                            args: [record.company_ids],
+                            kwargs: {context: this._getContext()},
+                        }),
+                    ]);
+                    let groups_list = "";
+                    for (const group of result_tasks[0]) {
+                        groups_list += this._templates.render(
+                            "WHOAMI_LIST_ITEM",
+                            {
+                                name: group[1],
                                 model: "res.groups",
-                                args: [record.groups_id],
-                                kwargs: {context: this._getContext()},
-                            }),
-                            rpc.query({
-                                method: "name_get",
-                                model: "res.company",
-                                args: [record.company_ids],
-                                kwargs: {context: this._getContext()},
-                            }),
-                        ]).then((result_tasks) => {
-                            let groups_list = "";
-                            for (const group of result_tasks[0]) {
-                                groups_list += this._templates.render(
-                                    "WHOAMI_LIST_ITEM",
-                                    {
-                                        name: group[1],
-                                        model: "res.groups",
-                                        id: group[0],
-                                    }
-                                );
+                                id: group[0],
                             }
-                            let companies_list = "";
-                            for (const company of result_tasks[1]) {
-                                companies_list += this._templates.render(
-                                    "WHOAMI_LIST_ITEM",
-                                    {
-                                        name: company[1],
-                                        model: "res.company",
-                                        id: company[0],
-                                    }
-                                );
-                            }
-                            return {
-                                login: record.login,
-                                display_name: record.display_name,
-                                user_id: record.id,
-                                partner: record.partner_id,
-                                company: record.company_id,
-                                companies: companies_list,
-                                groups: groups_list,
-                            };
-                        });
-                    }
-                    return false;
-                })
-                .then((result) => {
-                    if (result) {
-                        this.screen.print(
-                            this._templates.render("WHOAMI", result)
                         );
-                    } else {
-                        this.screen.printError("Oops! can't get the login :/");
                     }
-                    return result;
-                });
+                    let companies_list = "";
+                    for (const company of result_tasks[1]) {
+                        companies_list += this._templates.render(
+                            "WHOAMI_LIST_ITEM",
+                            {
+                                name: company[1],
+                                model: "res.company",
+                                id: company[0],
+                            }
+                        );
+                    }
+                    const template_values = {
+                        login: record.login,
+                        display_name: record.display_name,
+                        user_id: record.id,
+                        partner: record.partner_id,
+                        company: record.company_id,
+                        companies: companies_list,
+                        groups: groups_list,
+                    };
+                    this.screen.print(
+                        this._templates.render("WHOAMI", template_values)
+                    );
+                    return resolve(template_values);
+                } catch (err) {
+                    return reject(err);
+                }
+            });
         },
 
         _cmdSetDebugMode: function (kwargs) {
@@ -1193,22 +1192,25 @@ odoo.define("terminal.functions.Common", function (require) {
                     this.doHide();
                 });
             }
-            return rpc
-                .query({
-                    method: "create",
-                    model: kwargs.model,
-                    args: [kwargs.value],
-                    kwargs: {context: this._getContext()},
-                })
-                .then((result) => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const result = await rpc.query({
+                        method: "create",
+                        model: kwargs.model,
+                        args: [kwargs.value],
+                        kwargs: {context: this._getContext()},
+                    });
                     this.screen.print(
                         this._templates.render("RECORD_CREATED", {
                             model: kwargs.model,
                             new_id: result,
                         })
                     );
-                    return result;
-                });
+                    return resolve(result);
+                } catch (err) {
+                    return reject(err);
+                }
+            });
         },
 
         _cmdUnlinkModelRecord: function (kwargs) {

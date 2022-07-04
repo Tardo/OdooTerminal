@@ -4,7 +4,13 @@
 
 ```
 IMP: Command 'whoami': Show groups and companies names
+IMP: Command 'login': Add '--no-reload' argument
 IMP: Toggle terminal keybind changed to ALT + T (CTRL + 1 is deprecated)
+IMP: Tests
+
+FIX: Command 'create' in Odoo 11.0
+FIX: Command 'whoami' in Odoo 11.0
+FIX: Init commands (issue #63)
 ```
 
 **8.4.0**

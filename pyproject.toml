@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "OdooTerminal"
+version = "8.4.0"
+description = "All the power of Odoo json-rpc in a really easy way!"
+authors = ["Alexandre D. Díaz <dev@redneboa.es>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+docker-compose = "^1.29.2"
+pytest = "^7.1.2"
+selenium = "^4.3.0"
+webdriver-manager = "^3.7.1"
+python-on-whales = "^0.47.0"
+GitPython = "^3.1.27"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

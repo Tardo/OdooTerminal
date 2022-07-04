@@ -1,8 +1,10 @@
 // Copyright 2020 Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.Utils", function () {
+odoo.define("terminal.core.Utils", function (require) {
     "use strict";
+
+    const session = require("web.session");
 
     // See https://en.wikipedia.org/wiki/List_of_Unicode_characters
     const encodeHTML = (text) =>
@@ -85,6 +87,7 @@ odoo.define("terminal.core.Utils", function () {
 
     const getUID = () => {
         return (
+            session.user_context?.uid ||
             odoo.session_info?.uid ||
             odoo.session_info?.user_id ||
             odoo.__DEBUG__.services["@web/session"]?.session.user_id ||
