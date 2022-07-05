@@ -758,6 +758,9 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         _updateJobsInfo: function () {
+            if (!this._wasStart) {
+                return;
+            }
             const count = this._jobs.filter(Object).length;
             if (count) {
                 const count_unhealthy = this._jobs.filter(

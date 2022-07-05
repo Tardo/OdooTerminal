@@ -24,6 +24,7 @@ odoo.define("terminal.core.Screen", function (require) {
             this._linesCounter = 0;
             this._lazyVacuum = _.debounce(() => this._vacuum(), 650);
             this._buff = [];
+            this._wasStart = false;
         },
 
         start: function () {
@@ -37,11 +38,15 @@ odoo.define("terminal.core.Screen", function (require) {
                 } catch (err) {
                     return reject(err);
                 }
+                this._wasStart = true;
                 return resolve();
             });
         },
 
         destroy: function () {
+            if (!this._wasStart) {
+                return;
+            }
             this.$screen.off("keydown");
             this.$input.off("keyup");
             this.$input.off("keydown");
@@ -49,14 +54,23 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         getContent: function () {
+            if (!this._wasStart) {
+                return "";
+            }
             return this.$screen.html();
         },
 
         scrollDown: function () {
+            if (!this._wasStart) {
+                return;
+            }
             this.$screen[0].scrollTop = this.$screen[0].scrollHeight;
         },
 
         clean: function () {
+            if (!this._wasStart) {
+                return;
+            }
             this.$screen.html("");
             if (
                 Object.prototype.hasOwnProperty.call(
@@ -69,30 +83,48 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         cleanInput: function () {
+            if (!this._wasStart) {
+                return;
+            }
             this.$input.val("");
             this.cleanShadowInput();
             this.updateAssistantPanelOptions([], -1);
         },
 
         cleanShadowInput: function () {
+            if (!this._wasStart) {
+                return;
+            }
             this.$shadowInput.val("");
         },
 
         updateInput: function (str) {
+            if (!this._wasStart) {
+                return;
+            }
             this.$input.val(str);
             this.cleanShadowInput();
         },
 
         getInputCaretStartPos: function () {
+            if (!this._wasStart) {
+                return -1;
+            }
             return this.$input[0].selectionStart;
         },
 
         setInputCaretPos: function (start, end) {
+            if (!this._wasStart) {
+                return;
+            }
             this.$input[0].selectionStart = start;
             this.$input[0].selectionEnd = end || start;
         },
 
         updateShadowInput: function (str) {
+            if (!this._wasStart) {
+                return;
+            }
             this.$shadowInput.val(str);
             // Deferred to ensure that has updated values
             _.defer(() =>
@@ -101,6 +133,9 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         updateAssistantPanelOptions: function (options, selected_option_index) {
+            if (!this._wasStart) {
+                return;
+            }
             const html_options = [];
             for (let index in options) {
                 index = Number(index);
@@ -121,6 +156,9 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         preventLostInputFocus: function (ev) {
+            if (!this._wasStart) {
+                return;
+            }
             const isCKey = ev && (ev.ctrlKey || ev.altKey);
             if (!isCKey) {
                 this.focus();
@@ -128,10 +166,16 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         focus: function () {
+            if (!this._wasStart) {
+                return;
+            }
             this.$input.focus();
         },
 
         getUserInput: function () {
+            if (!this._wasStart) {
+                return;
+            }
             return this.$input.val();
         },
 
@@ -144,7 +188,7 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         _flush: function () {
-            if (!this.$screen || !this.$screen.length) {
+            if (!this._wasStart) {
                 this._flushing = false;
                 return;
             }
@@ -290,6 +334,9 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         updateInputInfo: function (username, version, host) {
+            if (!this._wasStart) {
+                return;
+            }
             if (username) {
                 this.$userInput.find("#terminal-prompt-main").text(username);
             }
