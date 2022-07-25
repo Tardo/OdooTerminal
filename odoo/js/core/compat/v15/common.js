@@ -168,5 +168,11 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
                 return results;
             });
         },
+
+        //
+        _printLongpollingValues: function (notif) {
+            this.screen.print([`Type: ${JSON.stringify(notif.type)}`]);
+            this.screen.print(notif.payload, false);
+        },
     });
 });

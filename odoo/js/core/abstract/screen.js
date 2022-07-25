@@ -12,6 +12,8 @@ odoo.define("terminal.core.abstract.Screen", function (require) {
     const AbstractScreen = Class.extend({
         init: function (options) {
             this._options = options;
+            this._questions = [];
+            this._question_active = undefined;
         },
 
         start: function ($container) {
@@ -111,6 +113,25 @@ odoo.define("terminal.core.abstract.Screen", function (require) {
 
         // eslint-disable-next-line
         printTable: function (columns, tbody) {
+            throw Error(_t("Not Implemented!"));
+        },
+
+        // eslint-disable-next-line
+        showQuestion: function (question_spec) {
+            throw Error(_t("Not Implemented!"));
+        },
+
+        getQuestionActive: function () {
+            return this._question_active;
+        },
+
+        // eslint-disable-next-line
+        responseQuestion: function (question, response) {
+            throw Error(_t("Not Implemented!"));
+        },
+
+        // eslint-disable-next-line
+        rejectQuestion: function (question) {
             throw Error(_t("Not Implemented!"));
         },
     });

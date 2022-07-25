@@ -493,22 +493,33 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
+        _sanitizeCmdModuleDepends: function (module_name) {
+            return module_name;
+        },
+
         _cmdModuleDepends: function (kwargs) {
             return rpc
                 .query({
                     method: "onchange_module",
                     model: "res.config.settings",
-                    args: [false, false, kwargs.module],
+                    args: [
+                        false,
+                        false,
+                        this._sanitizeCmdModuleDepends(kwargs.module),
+                    ],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
                     if (_.isEmpty(result)) {
-                        this.screen.printError("The module isn't installed");
+                        this.screen.printError(
+                            `The module '${kwargs.module}' isn't installed`
+                        );
                     } else {
                         const depend_names = result.warning.message
                             .substr(result.warning.message.search("\n") + 1)
                             .split("\n");
                         this.screen.print(depend_names);
+                        return depend_names;
                     }
                     return result;
                 });
@@ -986,7 +997,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return rpc.query({
                 method: "search_read",
                 domain: [["name", "=", module_name]],
-                fields: ["name"],
+                fields: ["display_name"],
                 model: "ir.module.module",
                 kwargs: {context: this._getContext()},
             });
@@ -1031,13 +1042,13 @@ odoo.define("terminal.functions.Common", function (require) {
                         }).then(
                             () => {
                                 this.screen.print(
-                                    `'${kwargs.module}' module successfully installed`
+                                    `'${kwargs.module}' (${result.display_name}) module successfully installed`
                                 );
                                 resolve(result);
                             },
                             () => {
                                 reject(
-                                    `Can't install '${kwargs.module}' module`
+                                    `Can't install '${kwargs.module}' (${result.display_name}) module`
                                 );
                             }
                         );
@@ -1052,30 +1063,56 @@ odoo.define("terminal.functions.Common", function (require) {
 
         _cmdUninstallModule: function (kwargs) {
             return new Promise((resolve, reject) => {
-                this._searchModule(kwargs.module).then((result) => {
+                return this._searchModule(kwargs.module).then((result) => {
                     if (result.length) {
-                        rpc.query({
-                            method: "button_immediate_uninstall",
-                            model: "ir.module.module",
-                            args: [result[0].id],
-                        }).then(
-                            () => {
+                        return this.executeCommand(
+                            `depends -m ${kwargs.module}`,
+                            false,
+                            true
+                        ).then(async (depends) => {
+                            if (!_.isEmpty(depends)) {
                                 this.screen.print(
-                                    `'${kwargs.module}' module successfully uninstalled`
+                                    "This operation will remove these modules too:"
                                 );
-                                resolve(result);
-                            },
-                            () => {
-                                reject(
-                                    `Can't uninstall '${kwargs.module}' module`
-                                );
+                                this.screen.print(depends);
+                                let res = "";
+                                try {
+                                    res = await this.screen.showQuestion(
+                                        "Do you want to continue?::y:n::n"
+                                    );
+                                    res = res.toLowerCase();
+                                } catch (_) {
+                                    reject(`Operation aborted`);
+                                    return false;
+                                }
+                                if (res !== "y") {
+                                    resolve();
+                                    return false;
+                                }
                             }
-                        );
-                    } else {
-                        reject(`'${kwargs.module}' module doesn't exists`);
+                            return rpc
+                                .query({
+                                    method: "button_immediate_uninstall",
+                                    model: "ir.module.module",
+                                    args: [result[0].id],
+                                })
+                                .then(
+                                    () => {
+                                        this.screen.print(
+                                            `'${kwargs.module}' module successfully uninstalled`
+                                        );
+                                        resolve(result);
+                                    },
+                                    () => {
+                                        reject(
+                                            `Can't uninstall '${kwargs.module}' module`
+                                        );
+                                    }
+                                );
+                        });
                     }
-
-                    return result;
+                    reject(`'${kwargs.module}' module doesn't exists`);
+                    return false;
                 });
             });
         },
@@ -1138,12 +1175,18 @@ odoo.define("terminal.functions.Common", function (require) {
                 const sresult = buff.data.slice(0, lines_total);
                 buff.data = buff.data.slice(lines_total);
                 this.screen.printRecords(buff.model, sresult);
-                if (buff.data.length) {
-                    this.screen.print(
-                        `There are still results to print (${buff.data.length}). Continue using '<strong class='o_terminal_click o_terminal_cmd' data-cmd='search --more'>--more</strong>'...`
-                    );
-                }
                 this.screen.print(`Records count: ${sresult.length}`);
+                if (buff.data.length) {
+                    return new Promise(async (resolve) => {
+                        const res = await this.screen.showQuestion(
+                            `There are still results to print (${buff.data.length}). Show more?::y:n::y`
+                        );
+                        if (res === "y") {
+                            this.executeCommand(`search --more`, false, true);
+                        }
+                        resolve(sresult);
+                    });
+                }
                 return Promise.resolve(sresult);
             }
 
@@ -1262,16 +1305,17 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         //
+        _printLongpollingValues: function (notif) {
+            this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
+            this.screen.print(notif[1], false);
+        },
         _onBusNotification: function (notifications) {
-            const notif_datas = Object.values(notifications.data);
-            const l = notif_datas.length;
+            const l = notifications.length;
             for (let x = 0; x < l; ++x) {
-                const notif = notif_datas[x];
                 this.screen.print(
-                    `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</stron>`
+                    `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</strong>`
                 );
-                this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
-                this.screen.print(notif[1], false);
+                this._printLongpollingValues(notifications[x]);
             }
         },
     });

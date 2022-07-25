@@ -1015,24 +1015,32 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         _onInputKeyUp: function (ev) {
-            if (ev.keyCode === $.ui.keyCode.ENTER) {
-                this._onKeyEnter(ev);
-            } else if (ev.keyCode === $.ui.keyCode.UP) {
-                this._onKeyArrowUp(ev);
-            } else if (ev.keyCode === $.ui.keyCode.DOWN) {
-                this._onKeyArrowDown(ev);
-            } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
-                this._onKeyArrowRight(ev);
-            } else if (ev.keyCode === $.ui.keyCode.LEFT) {
-                this._onKeyArrowLeft(ev);
-            } else if (ev.keyCode === $.ui.keyCode.TAB) {
-                this._onKeyTab(ev);
-            } else {
-                this._searchHistoryIter = this._inputHistory.length;
-                this._searchCommandIter = Object.keys(
-                    this._registeredCmds
-                ).length;
-                this._searchCommandQuery = undefined;
+            const question_active = this.screen.getQuestionActive();
+            if (_.isEmpty(question_active)) {
+                if (ev.keyCode === $.ui.keyCode.ENTER) {
+                    this._onKeyEnter(ev);
+                } else if (ev.keyCode === $.ui.keyCode.UP) {
+                    this._onKeyArrowUp(ev);
+                } else if (ev.keyCode === $.ui.keyCode.DOWN) {
+                    this._onKeyArrowDown(ev);
+                } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
+                    this._onKeyArrowRight(ev);
+                } else if (ev.keyCode === $.ui.keyCode.LEFT) {
+                    this._onKeyArrowLeft(ev);
+                } else if (ev.keyCode === $.ui.keyCode.TAB) {
+                    this._onKeyTab(ev);
+                } else {
+                    this._searchHistoryIter = this._inputHistory.length;
+                    this._searchCommandIter = Object.keys(
+                        this._registeredCmds
+                    ).length;
+                    this._searchCommandQuery = undefined;
+                }
+            } else if (ev.keyCode === $.ui.keyCode.ENTER) {
+                this.screen.responseQuestion(question_active, ev.target.value);
+            } else if (ev.keyCode === $.ui.keyCode.ESCAPE) {
+                this.screen.rejectQuestion(question_active);
+                ev.preventDefault();
             }
         },
 
@@ -1049,7 +1057,10 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
         _onCoreKeyDown: function (ev) {
-            if (ev.keyCode === 27) {
+            if (
+                ev.keyCode === 27 &&
+                _.isEmpty(this.screen.getQuestionActive())
+            ) {
                 // Press Escape
                 this.doHide();
             } else if (

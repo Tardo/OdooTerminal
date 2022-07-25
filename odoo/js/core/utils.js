@@ -198,6 +198,16 @@ odoo.define("terminal.core.Utils", function (require) {
         return odoo.__DEBUG__.services[name];
     };
 
+    // FIXME: This is an anti-pattern. Use only if you know what you are doing.
+    const defer = () => {
+        const deferred = {};
+        deferred.promise = new Promise((resolve, reject) => {
+            deferred.resolve = resolve;
+            deferred.reject = reject;
+        });
+        return deferred;
+    };
+
     return {
         encodeHTML: encodeHTML,
         genHash: genHash,
@@ -215,5 +225,6 @@ odoo.define("terminal.core.Utils", function (require) {
         rgb2hsv: rgb2hsv,
         hsv2rgb: hsv2rgb,
         getOdooService: getOdooService,
+        defer: defer,
     };
 });

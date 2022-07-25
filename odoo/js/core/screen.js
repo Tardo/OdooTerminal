@@ -350,6 +350,67 @@ odoo.define("terminal.core.Screen", function (require) {
             }
         },
 
+        showQuestion: function (question_spec) {
+            const defer = Utils.defer();
+            let [question, values, def_value] = question_spec.split("::");
+            if (typeof values !== "undefined") {
+                values = values.split(":");
+            }
+            this._questions.push({
+                question: question,
+                values: values,
+                def_value: def_value,
+                defer: defer,
+            });
+            this.updateQuestions();
+            return defer.promise;
+        },
+
+        updateQuestions: function () {
+            if (
+                typeof this._question_active === "undefined" &&
+                this._questions.length
+            ) {
+                this._question_active = this._questions.shift();
+                const values = _.map(this._question_active.values, (item) => {
+                    if (item === this._question_active.def_value) {
+                        return `<strong>${item.toUpperCase()}</strong>`;
+                    }
+                    return item;
+                });
+                if (_.isEmpty(values)) {
+                    this.$interactiveContainer.html(
+                        `<span>${this._question_active.question}</span>`
+                    );
+                } else {
+                    this.$interactiveContainer.html(
+                        `<span>${this._question_active.question} [${values.join(
+                            "/"
+                        )}]</span>`
+                    );
+                }
+                this.$interactiveContainer.removeClass("d-none");
+            } else {
+                this._question_active = undefined;
+                this.$interactiveContainer.html("");
+                this.$interactiveContainer.addClass("d-none");
+            }
+        },
+
+        responseQuestion: function (question, response) {
+            question.defer.resolve(
+                (_.isEmpty(response) && question.def_value) || response
+            );
+            this.updateQuestions();
+            this.cleanInput();
+        },
+
+        rejectQuestion: function (question) {
+            question.defer.reject();
+            this.updateQuestions();
+            this.cleanInput();
+        },
+
         /* PRIVATE */
         _formatPrint: function (msg, cls) {
             const msg_type = typeof msg;
@@ -423,9 +484,6 @@ odoo.define("terminal.core.Screen", function (require) {
             this.$assistant.appendTo(this.$container);
         },
 
-        /**
-         * @returns {Promise}
-         */
         _createUserInput: function () {
             const host = window.location.host;
             const username = Utils.getUsername();
@@ -436,28 +494,29 @@ odoo.define("terminal.core.Screen", function (require) {
                         <span id="terminal-prompt-main" class='terminal-prompt' title='${username}'>${username}&nbsp;</span>
                         <span>${Utils.encodeHTML(this.PROMPT)}</span>
                     </div>
+                    <div class='terminal-prompt-container terminal-prompt-interactive d-none'></div>
                     <div class='rich-input'>
                         <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' spellcheck="false" autocapitalize="off" readonly='readonly'/>
                         <input type='edit' id='terminal_input' autocomplete='off' spellcheck="false" autocapitalize="off" />
                     </div>
-                    <div class="terminal-prompt-info-container">
+                    <div class="terminal-prompt-container terminal-prompt-info">
                         <span id="terminal-prompt-info-version" class='terminal-prompt-info' title='${version}'>${version}</span>
                     </div>
-                    <div class="terminal-prompt-container">
+                    <div class="terminal-prompt-container terminal-prompt-host-container">
                         <span id="terminal-prompt-info-host" class='terminal-prompt' title='${host}'>${host}</span>
                     </div>
                 </div>`
             );
             this.$userInput.appendTo(this.$container);
-            this.$promptContainer = this.$userInput.find(
+            this.$promptContainers = this.$userInput.find(
                 ".terminal-prompt-container"
             );
-            this.$prompt = this.$promptContainer.find(".terminal-prompt");
-            this.$promptInfoContainer = this.$userInput.find(
-                ".terminal-prompt-info-container"
+            this.$interactiveContainer = this.$userInput.find(
+                ".terminal-prompt-container.terminal-prompt-interactive"
             );
-            this.$promptInfo = this.$promptContainer.find(
-                ".terminal-prompt-info"
+            this.$prompt = this.$promptContainers.find(".terminal-prompt");
+            this.$promptInfoContainer = this.$userInput.find(
+                ".terminal-prompt-container.terminal-prompt-info"
             );
             this.$input = this.$userInput.find("#terminal_input");
             this.$shadowInput = this.$userInput.find("#terminal_shadow_input");
@@ -466,7 +525,7 @@ odoo.define("terminal.core.Screen", function (require) {
             this.$input.on("input", this._options.onInput);
             // Custom color indicator per host
             if (host.startsWith("localhost") || host.startsWith("127.0.0.1")) {
-                this.$promptContainer.css({
+                this.$promptContainers.css({
                     "background-color": "#adb5bd",
                     color: "black",
                 });
@@ -478,7 +537,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 const color_info = Utils.genColorFromString(
                     window.location.host
                 );
-                this.$promptContainer.css({
+                this.$promptContainers.css({
                     "background-color": `rgb(${color_info.rgb[0]},${color_info.rgb[1]},${color_info.rgb[2]})`,
                     color: color_info.gv < 0.5 ? "#000" : "#fff",
                 });
@@ -501,6 +560,24 @@ odoo.define("terminal.core.Screen", function (require) {
             if (ev.keyCode === 9) {
                 // Press Tab
                 ev.preventDefault();
+            }
+            // Only allow valid responses to questions
+            if (
+                ev.keyCode !== 8 &&
+                typeof this._question_active !== "undefined" &&
+                this._question_active.values.length
+            ) {
+                const cur_value = ev.target.value;
+                const future_value = `${cur_value}${String.fromCharCode(
+                    ev.keyCode
+                )}`.toLowerCase();
+                const is_invalid = _.chain(this._question_active.values)
+                    .filter((item) => item.startsWith(future_value))
+                    .isEmpty()
+                    .value();
+                if (is_invalid) {
+                    ev.preventDefault();
+                }
             }
         },
     });
