@@ -54,7 +54,9 @@ jobs:
         if: ${{ matrix.browser == 'chrome' }}
 
       - name: Install Compose
-        uses: ndeloof/install-compose-action@v0.0.1
+        uses: KengoTODA/actions-setup-docker-compose@main
+        with:
+          version: '1.29.2'
 
       - name: Install poetry
         uses: abatilo/actions-poetry@v2.0.0

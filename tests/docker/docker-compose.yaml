@@ -21,7 +21,7 @@ services:
 
   db:
     image: ghcr.io/tecnativa/postgres-autoconf:13-alpine
-    shm_size: 4gb
+    shm_size: 3gb
     environment:
       POSTGRES_DB: *dbname
       POSTGRES_USER: *dbuser

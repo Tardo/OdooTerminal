@@ -352,6 +352,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          * Check that the parameters match the expected number.
          *
          *
+         * @param {String} args
          * @param {Array} params
          * @param {Array} checked_args
          * @param {Array} checked_args_required
@@ -394,8 +395,15 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                     )})`
                 );
             } else if (checked_required_args_count < required_args.length) {
+                const normalized_arg_names_required = _.chain(args)
+                    .map((x) => {
+                        const args_info = this.getArgumentInfo(x);
+                        return args_info?.is_required && args_info?.names.long;
+                    })
+                    .filter((x) => x)
+                    .value();
                 const args_diff = _.difference(
-                    normalized_arg_names,
+                    normalized_arg_names_required,
                     checked_args_required
                 );
                 throw _t(

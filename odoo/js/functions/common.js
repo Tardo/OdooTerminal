@@ -318,31 +318,43 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdBarcode,
                 detail: "See information and send barcode strings",
                 args: [
-                    "s::o:operation::1::The operation::send::info:send",
+                    "s::o:operation::0::The operation::send::info:send",
                     "la::d:data::0::The data to send",
                     "i::pd:pressdelay::0::The delay between presskey events (in ms)::3",
                     "i::bd:barcodedelay::0::The delay between barcodes reads (in ms)::150",
                 ],
-                example: "-o send -d 1234ABCD,5678EFGH",
+                example: "-o send -d O-CMD.NEXT",
             });
         },
 
+        _getBarcodeService: function () {
+            return Utils.getOdooService("barcodes.BarcodeEvents");
+        },
+        _AVAILABLE_BARCODE_COMMANDS: [
+            "O-CMD.EDIT",
+            "O-CMD.DISCARD",
+            "O-CMD.SAVE",
+            "O-CMD.PREV",
+            "O-CMD.NEXT",
+            "O-CMD.PAGER-FIRST",
+            "O-CMD.PAGER-LAST",
+        ],
         _cmdBarcode: function (kwargs) {
             // Soft-dependency... this don't exists if barcodes module is not installed
-            const BarcodeEvents = Utils.getOdooService(
-                "barcodes.BarcodeEvents"
-            );
+            const BarcodeEvents = this._getBarcodeService();
             if (!BarcodeEvents) {
-                this.screen.printError(
+                return Promise.reject(
                     "The 'barcode' module is not installed/available"
                 );
-                return Promise.resolve();
             }
             return new Promise(async (resolve, reject) => {
                 if (kwargs.operation === "info") {
                     const info = [
                         `Max. time between keys (ms): ${BarcodeEvents.BarcodeEvents.max_time_between_keys_in_ms}`,
                         `Reserved barcode prefixes: ${BarcodeEvents.ReservedBarcodePrefixes.join(
+                            ", "
+                        )}`,
+                        `Available commands: ${this._AVAILABLE_BARCODE_COMMANDS.join(
                             ", "
                         )}`,
                         `Currently accepting barcode scanning? ${

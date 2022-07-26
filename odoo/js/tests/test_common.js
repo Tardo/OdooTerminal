@@ -884,5 +884,64 @@ odoo.define("terminal.tests.common", function (require) {
             this.assertNotEmpty(res);
             this.assertEqual(res.xmlid, "base.main_partner");
         },
+
+        test_barcode: async function () {
+            const res = await this.terminal.executeCommand(
+                "barcode -o info",
+                false,
+                true
+            );
+            this.assertNotEmpty(res);
+            await this.terminal.executeCommand(
+                "view -m res.partner -i 1",
+                false,
+                true
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+            this.assertTrue($(".o_cp_buttons .o_form_button_edit").length > 0);
+            await this.terminal.executeCommand(
+                "barcode -o send -d O-CMD.EDIT",
+                false,
+                true
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+            this.assertTrue($(".o_cp_buttons .o_form_button_save").length > 0);
+            await this.terminal.executeCommand(
+                "barcode -o send -d O-CMD.DISCARD,O-CMD.EDIT,O-CMD.DISCARD",
+                false,
+                true
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+            this.assertTrue($(".o_cp_buttons .o_form_button_edit").length > 0);
+        },
+        test_barcode__no_arg: async function () {
+            const res = await this.terminal.executeCommand(
+                "barcode info",
+                false,
+                true
+            );
+            this.assertNotEmpty(res);
+            await this.terminal.executeCommand(
+                "view res.partner 1",
+                false,
+                true
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+            this.assertTrue($(".o_cp_buttons .o_form_button_edit").length > 0);
+            await this.terminal.executeCommand(
+                "barcode send O-CMD.EDIT",
+                false,
+                true
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+            this.assertTrue($(".o_cp_buttons .o_form_button_save").length > 0);
+            await this.terminal.executeCommand(
+                "barcode send O-CMD.DISCARD,O-CMD.EDIT,O-CMD.DISCARD",
+                false,
+                true
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+            this.assertTrue($(".o_cp_buttons .o_form_button_edit").length > 0);
+        },
     });
 });

@@ -14,6 +14,7 @@ ADD: Interactive questions
 FIX: Command 'create' in Odoo 11.0
 FIX: Command 'whoami' in Odoo 11.0
 FIX: Init commands (issue #63)
+FIX: Terminal: now report correct required arguments
 ```
 
 **8.4.0**
