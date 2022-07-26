@@ -405,8 +405,8 @@ odoo.define("terminal.core.Screen", function (require) {
             this.cleanInput();
         },
 
-        rejectQuestion: function (question) {
-            question.defer.reject();
+        rejectQuestion: function (question, reason) {
+            question.defer.reject(reason);
             this.updateQuestions();
             this.cleanInput();
         },

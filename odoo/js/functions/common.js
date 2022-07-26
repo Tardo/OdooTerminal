@@ -97,7 +97,10 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Uninstall a module",
                 callback: this._cmdUninstallModule,
                 detail: "Launch module deletion process.",
-                args: ["s::m:module::1::The module technical name"],
+                args: [
+                    "s::m:module::1::The module technical name",
+                    "f::f:force::0::Forced mode",
+                ],
                 exmaple: "-m contacts",
             });
             this.registerCommand("reload", {
@@ -327,9 +330,6 @@ odoo.define("terminal.functions.Common", function (require) {
             });
         },
 
-        _getBarcodeService: function () {
-            return Utils.getOdooService("barcodes.BarcodeEvents");
-        },
         _AVAILABLE_BARCODE_COMMANDS: [
             "O-CMD.EDIT",
             "O-CMD.DISCARD",
@@ -339,30 +339,43 @@ odoo.define("terminal.functions.Common", function (require) {
             "O-CMD.PAGER-FIRST",
             "O-CMD.PAGER-LAST",
         ],
+        _getBarcodeService: function () {
+            return Utils.getOdooService("barcodes.BarcodeEvents");
+        },
+        _getBarcodeEvent: function (data) {
+            const keyCode = data.charCodeAt(0);
+            return new KeyboardEvent("keypress", {
+                keyCode: keyCode,
+                which: keyCode,
+            });
+        },
+        _getBarcodeInfo: function (barcodeService) {
+            return [
+                `Max. time between keys (ms): ${barcodeService.BarcodeEvents.max_time_between_keys_in_ms}`,
+                `Reserved barcode prefixes: ${barcodeService.ReservedBarcodePrefixes.join(
+                    ", "
+                )}`,
+                `Available commands: ${this._AVAILABLE_BARCODE_COMMANDS.join(
+                    ", "
+                )}`,
+                `Currently accepting barcode scanning? ${
+                    barcodeService.BarcodeEvents.$barcodeInput.length > 0
+                        ? "Yes"
+                        : "No"
+                }`,
+            ];
+        },
         _cmdBarcode: function (kwargs) {
             // Soft-dependency... this don't exists if barcodes module is not installed
-            const BarcodeEvents = this._getBarcodeService();
-            if (!BarcodeEvents) {
+            const barcodeService = this._getBarcodeService();
+            if (!barcodeService) {
                 return Promise.reject(
                     "The 'barcode' module is not installed/available"
                 );
             }
             return new Promise(async (resolve, reject) => {
                 if (kwargs.operation === "info") {
-                    const info = [
-                        `Max. time between keys (ms): ${BarcodeEvents.BarcodeEvents.max_time_between_keys_in_ms}`,
-                        `Reserved barcode prefixes: ${BarcodeEvents.ReservedBarcodePrefixes.join(
-                            ", "
-                        )}`,
-                        `Available commands: ${this._AVAILABLE_BARCODE_COMMANDS.join(
-                            ", "
-                        )}`,
-                        `Currently accepting barcode scanning? ${
-                            BarcodeEvents.BarcodeEvents.$barcodeInput.length > 0
-                                ? "Yes"
-                                : "No"
-                        }`,
-                    ];
+                    const info = this._getBarcodeInfo(barcodeService);
                     this.screen.eprint(info);
                     return resolve(info);
                 } else if (kwargs.operation === "send") {
@@ -372,17 +385,12 @@ odoo.define("terminal.functions.Common", function (require) {
 
                     for (const barcode of kwargs.data) {
                         for (
-                            let i = 0,
-                                bardoce_len = barcode.length,
-                                keyCode = barcode.charCodeAt(i);
+                            let i = 0, bardoce_len = barcode.length;
                             i < bardoce_len;
-                            keyCode = barcode.charCodeAt(++i)
+                            i++
                         ) {
                             document.body.dispatchEvent(
-                                new KeyboardEvent("keypress", {
-                                    keyCode: keyCode,
-                                    which: keyCode,
-                                })
+                                this._getBarcodeEvent(barcode[i])
                             );
                             await Utils.asyncSleep(kwargs.pressdelay);
                         }
@@ -1009,7 +1017,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return rpc.query({
                 method: "search_read",
                 domain: [["name", "=", module_name]],
-                fields: ["display_name"],
+                fields: ["name", "display_name"],
                 model: "ir.module.module",
                 kwargs: {context: this._getContext()},
             });
@@ -1019,26 +1027,27 @@ odoo.define("terminal.functions.Common", function (require) {
             return new Promise((resolve, reject) => {
                 this._searchModule(kwargs.module).then((result) => {
                     if (result.length) {
-                        rpc.query({
-                            method: "button_immediate_upgrade",
-                            model: "ir.module.module",
-                            args: [result[0].id],
-                        }).then(
-                            () => {
-                                this.screen.print(
-                                    `'${kwargs.module}' module successfully upgraded`
-                                );
-                                resolve(result);
-                            },
-                            () => {
-                                reject(
-                                    `Can't upgrade '${kwargs.module}' module`
-                                );
-                            }
-                        );
-                    } else {
-                        reject(`'${kwargs.module}' module doesn't exists`);
+                        return rpc
+                            .query({
+                                method: "button_immediate_upgrade",
+                                model: "ir.module.module",
+                                args: [result[0].id],
+                            })
+                            .then(
+                                () => {
+                                    this.screen.print(
+                                        `'${kwargs.module}' (${result[0].display_name}) module successfully upgraded`
+                                    );
+                                    resolve(result[0]);
+                                },
+                                () => {
+                                    reject(
+                                        `Can't upgrade '${kwargs.module}' module`
+                                    );
+                                }
+                            );
                     }
+                    reject(`'${kwargs.module}' module doesn't exists`);
                 });
             });
         },
@@ -1047,85 +1056,74 @@ odoo.define("terminal.functions.Common", function (require) {
             return new Promise((resolve, reject) => {
                 this._searchModule(kwargs.module).then((result) => {
                     if (result.length) {
-                        rpc.query({
-                            method: "button_immediate_install",
-                            model: "ir.module.module",
-                            args: [result[0].id],
-                        }).then(
-                            () => {
-                                this.screen.print(
-                                    `'${kwargs.module}' (${result.display_name}) module successfully installed`
-                                );
-                                resolve(result);
-                            },
-                            () => {
-                                reject(
-                                    `Can't install '${kwargs.module}' (${result.display_name}) module`
-                                );
-                            }
-                        );
-                    } else {
-                        reject(`'${kwargs.module}' module doesn't exists`);
+                        return rpc
+                            .query({
+                                method: "button_immediate_install",
+                                model: "ir.module.module",
+                                args: [result[0].id],
+                            })
+                            .then(
+                                () => {
+                                    this.screen.print(
+                                        `'${kwargs.module}' (${result[0].display_name}) module successfully installed`
+                                    );
+                                    resolve(result[0]);
+                                },
+                                () => {
+                                    reject(
+                                        `Can't install '${kwargs.module}' (${result.display_name}) module`
+                                    );
+                                }
+                            );
                     }
-
-                    return result;
+                    return reject(`'${kwargs.module}' module doesn't exists`);
                 });
             });
         },
 
         _cmdUninstallModule: function (kwargs) {
-            return new Promise((resolve, reject) => {
-                return this._searchModule(kwargs.module).then((result) => {
-                    if (result.length) {
-                        return this.executeCommand(
-                            `depends -m ${kwargs.module}`,
-                            false,
-                            true
-                        ).then(async (depends) => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const modue_infos = await this._searchModule(kwargs.module);
+                    if (!_.isEmpty(modue_infos)) {
+                        if (!kwargs.force) {
+                            const depends = await this.executeCommand(
+                                `depends -m ${kwargs.module}`,
+                                false,
+                                true
+                            );
                             if (!_.isEmpty(depends)) {
                                 this.screen.print(
                                     "This operation will remove these modules too:"
                                 );
                                 this.screen.print(depends);
-                                let res = "";
-                                try {
-                                    res = await this.screen.showQuestion(
-                                        "Do you want to continue?::y:n::n"
+                                const res = await this.screen.showQuestion(
+                                    "Do you want to continue?::y:n::n"
+                                );
+                                if (res?.toLowerCase() !== "y") {
+                                    this.screen.printError(
+                                        "Operation cancelled"
                                     );
-                                    res = res.toLowerCase();
-                                } catch (_) {
-                                    reject(`Operation aborted`);
-                                    return false;
-                                }
-                                if (res !== "y") {
-                                    resolve();
-                                    return false;
+                                    return resolve(false);
                                 }
                             }
-                            return rpc
-                                .query({
-                                    method: "button_immediate_uninstall",
-                                    model: "ir.module.module",
-                                    args: [result[0].id],
-                                })
-                                .then(
-                                    () => {
-                                        this.screen.print(
-                                            `'${kwargs.module}' module successfully uninstalled`
-                                        );
-                                        resolve(result);
-                                    },
-                                    () => {
-                                        reject(
-                                            `Can't uninstall '${kwargs.module}' module`
-                                        );
-                                    }
-                                );
+                        }
+
+                        await rpc.query({
+                            method: "button_immediate_uninstall",
+                            model: "ir.module.module",
+                            args: [modue_infos[0].id],
                         });
+
+                        this.screen.print(
+                            `'${kwargs.module}' (${modue_infos[0].display_name}) module successfully uninstalled`
+                        );
+                        return resolve(modue_infos[0]);
                     }
-                    reject(`'${kwargs.module}' module doesn't exists`);
-                    return false;
-                });
+                } catch (err) {
+                    return reject(err);
+                }
+                return reject(`'${kwargs.module}' module doesn't exists`);
             });
         },
 

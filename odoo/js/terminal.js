@@ -1039,7 +1039,10 @@ odoo.define("terminal.Terminal", function (require) {
             } else if (ev.keyCode === $.ui.keyCode.ENTER) {
                 this.screen.responseQuestion(question_active, ev.target.value);
             } else if (ev.keyCode === $.ui.keyCode.ESCAPE) {
-                this.screen.rejectQuestion(question_active);
+                this.screen.rejectQuestion(
+                    question_active,
+                    "Operation aborted"
+                );
                 ev.preventDefault();
             }
         },

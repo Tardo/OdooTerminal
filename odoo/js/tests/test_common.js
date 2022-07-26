@@ -78,14 +78,7 @@ odoo.define("terminal.tests.common", function (require) {
                         });
                 } else if (
                     test_name === "test_upgrade" ||
-                    test_name === "test_upgrade__no_arg"
-                ) {
-                    return this.terminal.executeCommand(
-                        "install -m sms",
-                        false,
-                        true
-                    );
-                } else if (
+                    test_name === "test_upgrade__no_arg" ||
                     test_name === "test_uninstall" ||
                     test_name === "test_uninstall__no_arg"
                 ) {
@@ -117,7 +110,7 @@ odoo.define("terminal.tests.common", function (require) {
                     test_name === "test_upgrade__no_arg"
                 ) {
                     return this.terminal.executeCommand(
-                        "uninstall -m sms",
+                        "uninstall -m sms --force",
                         false,
                         true
                     );
@@ -297,7 +290,7 @@ odoo.define("terminal.tests.common", function (require) {
                 false,
                 true
             );
-            this.assertEqual(res[0]?.name, "sms");
+            this.assertEqual(res?.name, "sms");
             await Utils.asyncSleep(6000);
         },
         test_upgrade__no_arg: async function () {
@@ -308,7 +301,7 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             await Utils.asyncSleep(6000);
-            this.assertEqual(res[0]?.name, "sms");
+            this.assertEqual(res?.name, "sms");
         },
 
         test_install: async function () {
@@ -319,7 +312,7 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             await Utils.asyncSleep(6000);
-            this.assertEqual(res[0]?.name, "sms");
+            this.assertEqual(res?.name, "sms");
         },
         test_install__no_arg: async function () {
             await Utils.asyncSleep(6000);
@@ -329,28 +322,28 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             await Utils.asyncSleep(6000);
-            this.assertEqual(res[0]?.name, "sms");
+            this.assertEqual(res?.name, "sms");
         },
 
         test_uninstall: async function () {
             await Utils.asyncSleep(6000);
             const res = await this.terminal.executeCommand(
-                "uninstall -m sms",
+                "uninstall -m sms --force",
                 false,
                 true
             );
             await Utils.asyncSleep(6000);
-            this.assertEqual(res[0]?.name, "sms");
+            this.assertEqual(res?.name, "sms");
         },
         test_uninstall__no_arg: async function () {
             await Utils.asyncSleep(6000);
             const res = await this.terminal.executeCommand(
-                "uninstall sms",
+                "uninstall sms --force",
                 false,
                 true
             );
             await Utils.asyncSleep(6000);
-            this.assertEqual(res[0]?.name, "sms");
+            this.assertEqual(res?.name, "sms");
         },
 
         test_action: async function () {

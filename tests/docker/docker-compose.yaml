@@ -8,6 +8,7 @@ services:
         UID: "${UID:-1000}"
         GID: "${GID:-1000}"
         WITHOUT_DEMO: ""
+    shm_size: 1gb
     environment:
       EMAIL_FROM: ""
       PGDATABASE: &dbname test
