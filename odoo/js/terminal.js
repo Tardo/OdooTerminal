@@ -758,6 +758,9 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         _updateJobsInfo: function () {
+            if (!this._wasStart) {
+                return;
+            }
             const count = this._jobs.filter(Object).length;
             if (count) {
                 const count_unhealthy = this._jobs.filter(
@@ -1012,24 +1015,35 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         _onInputKeyUp: function (ev) {
-            if (ev.keyCode === $.ui.keyCode.ENTER) {
-                this._onKeyEnter(ev);
-            } else if (ev.keyCode === $.ui.keyCode.UP) {
-                this._onKeyArrowUp(ev);
-            } else if (ev.keyCode === $.ui.keyCode.DOWN) {
-                this._onKeyArrowDown(ev);
-            } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
-                this._onKeyArrowRight(ev);
-            } else if (ev.keyCode === $.ui.keyCode.LEFT) {
-                this._onKeyArrowLeft(ev);
-            } else if (ev.keyCode === $.ui.keyCode.TAB) {
-                this._onKeyTab(ev);
-            } else {
-                this._searchHistoryIter = this._inputHistory.length;
-                this._searchCommandIter = Object.keys(
-                    this._registeredCmds
-                ).length;
-                this._searchCommandQuery = undefined;
+            const question_active = this.screen.getQuestionActive();
+            if (_.isEmpty(question_active)) {
+                if (ev.keyCode === $.ui.keyCode.ENTER) {
+                    this._onKeyEnter(ev);
+                } else if (ev.keyCode === $.ui.keyCode.UP) {
+                    this._onKeyArrowUp(ev);
+                } else if (ev.keyCode === $.ui.keyCode.DOWN) {
+                    this._onKeyArrowDown(ev);
+                } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
+                    this._onKeyArrowRight(ev);
+                } else if (ev.keyCode === $.ui.keyCode.LEFT) {
+                    this._onKeyArrowLeft(ev);
+                } else if (ev.keyCode === $.ui.keyCode.TAB) {
+                    this._onKeyTab(ev);
+                } else {
+                    this._searchHistoryIter = this._inputHistory.length;
+                    this._searchCommandIter = Object.keys(
+                        this._registeredCmds
+                    ).length;
+                    this._searchCommandQuery = undefined;
+                }
+            } else if (ev.keyCode === $.ui.keyCode.ENTER) {
+                this.screen.responseQuestion(question_active, ev.target.value);
+            } else if (ev.keyCode === $.ui.keyCode.ESCAPE) {
+                this.screen.rejectQuestion(
+                    question_active,
+                    "Operation aborted"
+                );
+                ev.preventDefault();
             }
         },
 
@@ -1046,11 +1060,27 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
         _onCoreKeyDown: function (ev) {
-            if (ev.keyCode === 27) {
+            if (
+                ev.keyCode === 27 &&
+                _.isEmpty(this.screen.getQuestionActive())
+            ) {
                 // Press Escape
                 this.doHide();
-            } else if (ev.ctrlKey && ev.key === "1") {
-                // Press Ctrl + 1
+            } else if (
+                (ev.ctrlKey && ev.key === "1") ||
+                (ev.altKey && ev.key && ev.key.toLowerCase() === "t")
+            ) {
+                // Press Alt + t (and mark as deprecated CTRL + 1)
+                if (
+                    !this._advDeprecatedShortcut &&
+                    ev.ctrlKey &&
+                    ev.key === "1"
+                ) {
+                    this.screen.print(
+                        "<strong style='color:orange'>** INFO: The terminal has been opened using a keyboard shortcut that will no longer be supported in the next release because it collides with browser shortcuts. Please use 'ALT + T' to open the terminal.</strong>"
+                    );
+                    this._advDeprecatedShortcut = true;
+                }
                 ev.preventDefault();
                 this.doToggle();
             }
@@ -1060,7 +1090,8 @@ odoo.define("terminal.Terminal", function (require) {
             if (jobs.length) {
                 if (
                     jobs.length === 1 &&
-                    (!jobs[0] || jobs[0].scmd.cmd === "reload")
+                    (!jobs[0] ||
+                        ["reload", "login"].indexOf(jobs[0].scmd.cmd) !== -1)
                 ) {
                     return;
                 }

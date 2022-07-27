@@ -12,8 +12,7 @@ odoo.define("terminal.core.compat.12.Common", function (require) {
             return this._parent.call("bus_service", method, ...params);
         },
 
-        init: function () {
-            this._super.apply(this, arguments);
+        setup: function () {
             this._busServ("onNotification", this, this._onBusNotification);
         },
 

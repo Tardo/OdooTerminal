@@ -7,6 +7,7 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
 
     const session = require("web.session");
     const Utils = require("terminal.core.Utils");
+    require("terminal.core.compat.12.Common");
     require("terminal.functions.Common");
     const Terminal = require("terminal.Terminal");
     const rpc = require("terminal.core.rpc");
@@ -167,6 +168,12 @@ odoo.define("terminal.core.compat.15.Common", function (require) {
                 );
                 return results;
             });
+        },
+
+        //
+        _printLongpollingValues: function (notif) {
+            this.screen.print([`Type: ${JSON.stringify(notif.type)}`]);
+            this.screen.print(notif.payload, false);
         },
     });
 });

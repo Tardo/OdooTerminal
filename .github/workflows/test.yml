@@ -1,0 +1,87 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  selenium:
+    strategy:
+      matrix:
+        # Use only the starred instances
+        instance: [11.0, 12.0, 13.0, 14.0, 15.0]
+        browser: [chrome]
+        include:
+          - instance: 15.0
+            browser: firefox
+      fail-fast: false
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/cache@v3
+        with:
+          path: |
+            .venv
+            .cache
+            ~/.wdm
+          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Switch to current branch
+        run: git checkout ${{ env.BRANCH }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install browser firefox
+        uses: browser-actions/setup-firefox@latest
+        with:
+          firefox-version: "latest"
+        if: ${{ matrix.browser == 'firefox' }}
+
+      - name: Install browser chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: "stable"
+        if: ${{ matrix.browser == 'chrome' }}
+
+      - name: Install Compose
+        uses: KengoTODA/actions-setup-docker-compose@main
+        with:
+          version: '1.29.2'
+
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.0.0
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install
+
+      - name: Create .zip package
+        run: poetry run python tools/release.py
+
+      - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
+        id: xtests
+        uses: GabrielBB/xvfb-action@v1
+        env:
+          DISPLAY: :99
+        with:
+          run: poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
+        continue-on-error: true
+
+      - name: Retry test for ${{ matrix.instance }} (${{ matrix.browser }})
+        if: steps.xtests.outcome != 'success'
+        uses: GabrielBB/xvfb-action@v1
+        env:
+          DISPLAY: :99
+        with:
+          run: poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}

@@ -8,42 +8,21 @@ compatible Odoo versions.
 _For environments without a real X11 server see 'xvfb' (X11 Virtual
 FrameBuffer)_
 
+Test env. uses 'docker compose v2'!
+
 ```
-apt-get install python python-pip
-pip install -r tests/requirements.txt
-pip install -r tools/requirements.txt
+apt-get install python poetry
+poetry install
 ```
 
 #### Usage
 
-First need set 'TEST_ODOO_INSTANCE' and 'TEST_ODOO_INSTANCE_TYPE' (ce or ee,
-default is ce) env. variables:
-
 ```
-export TEST_ODOO_INSTANCE=https://runbot.odoo-community.org/runbot/142/14.0
+poetry run pytest --browser chromium --odoo-version 15
 ```
 
-\*\* This example uses OCA CE 14.0 instance to run the test
-
-- All (Automated packaging)
-
-```
-python -m tests
-```
-
-- Chrome
-
-```
-python tools/release.py
-python -m unittest tests.test_chrome
-```
-
-- Firefox
-
-```
-python tools/release.py
-python -m unittest tests.test_firefox
-```
+** Available browsers: firefox, chromium, chrome ** Avaiblable versions: 11, 12,
+13, 14, 15
 
 ## Unit Tests
 
@@ -64,3 +43,5 @@ python -m unittest tests.test_firefox
 - tour (partial)
 - logout
 - lang
+- login
+- barcode

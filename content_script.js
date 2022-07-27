@@ -136,17 +136,27 @@
             to_inject.js.push("odoo/js/core/compat/v15/backend.js");
             compat_mode = 15;
         }
+        if (
+            (odoo_version.major === 15 && odoo_version.minor > 0) ||
+            odoo_version.major >= 16
+        ) {
+            // Version 16.0
+            to_inject.js.push("odoo/js/core/compat/v16/common.js");
+            compat_mode = 16;
+        }
         // Backend/Frontend resources
         if (info.isFrontend) {
             to_inject.js.push(`odoo/js/loaders/frontend.js`);
         } else {
+            let backend_loader = "";
+            if (compat_mode >= 15) {
+                backend_loader = "_owl_legacy";
+            }
             to_inject.js = to_inject.js.concat([
                 "odoo/js/core/utils_backend.js",
                 "odoo/js/functions/backend.js",
                 "odoo/js/functions/fuzz.js",
-                `odoo/js/loaders/backend_${
-                    compat_mode < 15 ? "old" : "new"
-                }.js`,
+                `odoo/js/loaders/backend${backend_loader}.js`,
             ]);
         }
         // Common resources

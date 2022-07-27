@@ -5,6 +5,7 @@ odoo.define("terminal.tests.backend", function (require) {
     "use strict";
 
     const TerminalTestSuite = require("terminal.tests");
+    const Utils = require("terminal.core.Utils");
 
     TerminalTestSuite.include({
         test_view: async function () {
@@ -56,6 +57,7 @@ odoo.define("terminal.tests.backend", function (require) {
 
         test_settings: async function () {
             await this.terminal.executeCommand("settings", false, true);
+            await Utils.asyncSleep(2000);
             this.assertTrue(
                 $(".o_form_view .settings, .o_form_view > .settings").length > 0
             );

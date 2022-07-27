@@ -77,7 +77,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "j::a:argument::0::The arguments list::[]",
                     "j::k:kwarg::0::The arguments dictionary::{}",
                 ],
-                example: "-m res.partner -c can_edit_vat -a [8]",
+                example: "-m res.partner -c address_get -a [8]",
             });
             this.registerCommand("upgrade", {
                 definition: "Upgrade a module",
@@ -97,7 +97,10 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Uninstall a module",
                 callback: this._cmdUninstallModule,
                 detail: "Launch module deletion process.",
-                args: ["s::m:module::1::The module technical name"],
+                args: [
+                    "s::m:module::1::The module technical name",
+                    "f::f:force::0::Forced mode",
+                ],
                 exmaple: "-m contacts",
             });
             this.registerCommand("reload", {
@@ -202,6 +205,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "s::d:database::1::The database<br/>Can be '*' to use current database",
                     "s::u:user::1::The login<br/>Can be optionally preceded by the '#' character and it will be used for password too",
                     "s::p:password::0::The password",
+                    "f::nr:no-reload::0::No reload",
                 ],
                 secured: true,
                 example: "-d devel -u #admin",
@@ -317,39 +321,61 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdBarcode,
                 detail: "See information and send barcode strings",
                 args: [
-                    "s::o:operation::1::The operation::send::info:send",
+                    "s::o:operation::0::The operation::send::info:send",
                     "la::d:data::0::The data to send",
                     "i::pd:pressdelay::0::The delay between presskey events (in ms)::3",
                     "i::bd:barcodedelay::0::The delay between barcodes reads (in ms)::150",
                 ],
-                example: "-o send -d 1234ABCD,5678EFGH",
+                example: "-o send -d O-CMD.NEXT",
             });
         },
 
+        _AVAILABLE_BARCODE_COMMANDS: [
+            "O-CMD.EDIT",
+            "O-CMD.DISCARD",
+            "O-CMD.SAVE",
+            "O-CMD.PREV",
+            "O-CMD.NEXT",
+            "O-CMD.PAGER-FIRST",
+            "O-CMD.PAGER-LAST",
+        ],
+        _getBarcodeService: function () {
+            return Utils.getOdooService("barcodes.BarcodeEvents");
+        },
+        _getBarcodeEvent: function (data) {
+            const keyCode = data.charCodeAt(0);
+            return new KeyboardEvent("keypress", {
+                keyCode: keyCode,
+                which: keyCode,
+            });
+        },
+        _getBarcodeInfo: function (barcodeService) {
+            return [
+                `Max. time between keys (ms): ${barcodeService.BarcodeEvents.max_time_between_keys_in_ms}`,
+                `Reserved barcode prefixes: ${barcodeService.ReservedBarcodePrefixes.join(
+                    ", "
+                )}`,
+                `Available commands: ${this._AVAILABLE_BARCODE_COMMANDS.join(
+                    ", "
+                )}`,
+                `Currently accepting barcode scanning? ${
+                    barcodeService.BarcodeEvents.$barcodeInput.length > 0
+                        ? "Yes"
+                        : "No"
+                }`,
+            ];
+        },
         _cmdBarcode: function (kwargs) {
             // Soft-dependency... this don't exists if barcodes module is not installed
-            const BarcodeEvents = Utils.getOdooService(
-                "barcodes.BarcodeEvents"
-            );
-            if (!BarcodeEvents) {
-                this.screen.printError(
-                    "The 'barcode' module is not installed!"
+            const barcodeService = this._getBarcodeService();
+            if (!barcodeService) {
+                return Promise.reject(
+                    "The 'barcode' module is not installed/available"
                 );
-                return Promise.resolve();
             }
             return new Promise(async (resolve, reject) => {
                 if (kwargs.operation === "info") {
-                    const info = [
-                        `Max. time between keys (ms): ${BarcodeEvents.BarcodeEvents.max_time_between_keys_in_ms}`,
-                        `Reserved barcode prefixes: ${BarcodeEvents.ReservedBarcodePrefixes.join(
-                            ", "
-                        )}`,
-                        `Currently accepting barcode scanning? ${
-                            BarcodeEvents.BarcodeEvents.$barcodeInput.length > 0
-                                ? "Yes"
-                                : "No"
-                        }`,
-                    ];
+                    const info = this._getBarcodeInfo(barcodeService);
                     this.screen.eprint(info);
                     return resolve(info);
                 } else if (kwargs.operation === "send") {
@@ -359,17 +385,12 @@ odoo.define("terminal.functions.Common", function (require) {
 
                     for (const barcode of kwargs.data) {
                         for (
-                            let i = 0,
-                                bardoce_len = barcode.length,
-                                keyCode = barcode.charCodeAt(i);
+                            let i = 0, bardoce_len = barcode.length;
                             i < bardoce_len;
-                            keyCode = barcode.charCodeAt(++i)
+                            i++
                         ) {
                             document.body.dispatchEvent(
-                                new KeyboardEvent("keypress", {
-                                    keyCode: keyCode,
-                                    which: keyCode,
-                                })
+                                this._getBarcodeEvent(barcode[i])
                             );
                             await Utils.asyncSleep(kwargs.pressdelay);
                         }
@@ -492,22 +513,33 @@ odoo.define("terminal.functions.Common", function (require) {
                 });
         },
 
+        _sanitizeCmdModuleDepends: function (module_name) {
+            return module_name;
+        },
+
         _cmdModuleDepends: function (kwargs) {
             return rpc
                 .query({
                     method: "onchange_module",
                     model: "res.config.settings",
-                    args: [false, false, kwargs.module],
+                    args: [
+                        false,
+                        false,
+                        this._sanitizeCmdModuleDepends(kwargs.module),
+                    ],
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
                     if (_.isEmpty(result)) {
-                        this.screen.printError("The module isn't installed");
+                        this.screen.printError(
+                            `The module '${kwargs.module}' isn't installed`
+                        );
                     } else {
                         const depend_names = result.warning.message
                             .substr(result.warning.message.search("\n") + 1)
                             .split("\n");
                         this.screen.print(depend_names);
+                        return depend_names;
                     }
                     return result;
                 });
@@ -636,7 +668,9 @@ odoo.define("terminal.functions.Common", function (require) {
                 .then((result) => {
                     this.screen.updateInputInfo(login);
                     this.screen.print(`Successfully logged as '${login}'`);
-                    this.executeCommand("reload", false, true);
+                    if (!kwargs.no_reload) {
+                        this.executeCommand("reload", false, true);
+                    }
                     return result;
                 });
         },
@@ -867,41 +901,80 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdShowWhoAmI: function () {
-            return rpc
-                .query({
-                    method: "search_read",
-                    domain: [["id", "=", Utils.getUID()]],
-                    fields: [
-                        "id",
-                        "display_name",
-                        "login",
-                        "partner_id",
-                        "company_id",
-                        "company_ids",
-                        "groups_id",
-                    ],
-                    model: "res.users",
-                    kwargs: {context: this._getContext()},
-                })
-                .then((result) => {
-                    if (result.length) {
-                        const record = result[0];
-                        this.screen.print(
-                            this._templates.render("WHOAMI", {
-                                login: record.login,
-                                display_name: record.display_name,
-                                user_id: record.id,
-                                partner: record.partner_id,
-                                company: record.company_id,
-                                companies: record.company_ids,
-                                groups: record.groups_id,
-                            })
-                        );
-                    } else {
-                        this.screen.printError("Oops! can't get the login :/");
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const result = await rpc.query({
+                        method: "search_read",
+                        domain: [["id", "=", Utils.getUID()]],
+                        fields: [
+                            "id",
+                            "display_name",
+                            "login",
+                            "partner_id",
+                            "company_id",
+                            "company_ids",
+                            "groups_id",
+                        ],
+                        model: "res.users",
+                        kwargs: {context: this._getContext()},
+                    });
+                    if (!result.length) {
+                        return reject("Oops! can't get the login :/");
                     }
-                    return result;
-                });
+                    const record = result[0];
+                    const result_tasks = await Promise.all([
+                        rpc.query({
+                            method: "name_get",
+                            model: "res.groups",
+                            args: [record.groups_id],
+                            kwargs: {context: this._getContext()},
+                        }),
+                        rpc.query({
+                            method: "name_get",
+                            model: "res.company",
+                            args: [record.company_ids],
+                            kwargs: {context: this._getContext()},
+                        }),
+                    ]);
+                    let groups_list = "";
+                    for (const group of result_tasks[0]) {
+                        groups_list += this._templates.render(
+                            "WHOAMI_LIST_ITEM",
+                            {
+                                name: group[1],
+                                model: "res.groups",
+                                id: group[0],
+                            }
+                        );
+                    }
+                    let companies_list = "";
+                    for (const company of result_tasks[1]) {
+                        companies_list += this._templates.render(
+                            "WHOAMI_LIST_ITEM",
+                            {
+                                name: company[1],
+                                model: "res.company",
+                                id: company[0],
+                            }
+                        );
+                    }
+                    const template_values = {
+                        login: record.login,
+                        display_name: record.display_name,
+                        user_id: record.id,
+                        partner: record.partner_id,
+                        company: record.company_id,
+                        companies: companies_list,
+                        groups: groups_list,
+                    };
+                    this.screen.print(
+                        this._templates.render("WHOAMI", template_values)
+                    );
+                    return resolve(template_values);
+                } catch (err) {
+                    return reject(err);
+                }
+            });
         },
 
         _cmdSetDebugMode: function (kwargs) {
@@ -944,7 +1017,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return rpc.query({
                 method: "search_read",
                 domain: [["name", "=", module_name]],
-                fields: ["name"],
+                fields: ["name", "display_name"],
                 model: "ir.module.module",
                 kwargs: {context: this._getContext()},
             });
@@ -954,26 +1027,27 @@ odoo.define("terminal.functions.Common", function (require) {
             return new Promise((resolve, reject) => {
                 this._searchModule(kwargs.module).then((result) => {
                     if (result.length) {
-                        rpc.query({
-                            method: "button_immediate_upgrade",
-                            model: "ir.module.module",
-                            args: [result[0].id],
-                        }).then(
-                            () => {
-                                this.screen.print(
-                                    `'${kwargs.module}' module successfully upgraded`
-                                );
-                                resolve(result);
-                            },
-                            () => {
-                                reject(
-                                    `Can't upgrade '${kwargs.module}' module`
-                                );
-                            }
-                        );
-                    } else {
-                        reject(`'${kwargs.module}' module doesn't exists`);
+                        return rpc
+                            .query({
+                                method: "button_immediate_upgrade",
+                                model: "ir.module.module",
+                                args: [result[0].id],
+                            })
+                            .then(
+                                () => {
+                                    this.screen.print(
+                                        `'${kwargs.module}' (${result[0].display_name}) module successfully upgraded`
+                                    );
+                                    resolve(result[0]);
+                                },
+                                () => {
+                                    reject(
+                                        `Can't upgrade '${kwargs.module}' module`
+                                    );
+                                }
+                            );
                     }
+                    reject(`'${kwargs.module}' module doesn't exists`);
                 });
             });
         },
@@ -982,59 +1056,74 @@ odoo.define("terminal.functions.Common", function (require) {
             return new Promise((resolve, reject) => {
                 this._searchModule(kwargs.module).then((result) => {
                     if (result.length) {
-                        rpc.query({
-                            method: "button_immediate_install",
-                            model: "ir.module.module",
-                            args: [result[0].id],
-                        }).then(
-                            () => {
-                                this.screen.print(
-                                    `'${kwargs.module}' module successfully installed`
-                                );
-                                resolve(result);
-                            },
-                            () => {
-                                reject(
-                                    `Can't install '${kwargs.module}' module`
-                                );
-                            }
-                        );
-                    } else {
-                        reject(`'${kwargs.module}' module doesn't exists`);
+                        return rpc
+                            .query({
+                                method: "button_immediate_install",
+                                model: "ir.module.module",
+                                args: [result[0].id],
+                            })
+                            .then(
+                                () => {
+                                    this.screen.print(
+                                        `'${kwargs.module}' (${result[0].display_name}) module successfully installed`
+                                    );
+                                    resolve(result[0]);
+                                },
+                                () => {
+                                    reject(
+                                        `Can't install '${kwargs.module}' (${result.display_name}) module`
+                                    );
+                                }
+                            );
                     }
-
-                    return result;
+                    return reject(`'${kwargs.module}' module doesn't exists`);
                 });
             });
         },
 
         _cmdUninstallModule: function (kwargs) {
-            return new Promise((resolve, reject) => {
-                this._searchModule(kwargs.module).then((result) => {
-                    if (result.length) {
-                        rpc.query({
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const modue_infos = await this._searchModule(kwargs.module);
+                    if (!_.isEmpty(modue_infos)) {
+                        if (!kwargs.force) {
+                            const depends = await this.executeCommand(
+                                `depends -m ${kwargs.module}`,
+                                false,
+                                true
+                            );
+                            if (!_.isEmpty(depends)) {
+                                this.screen.print(
+                                    "This operation will remove these modules too:"
+                                );
+                                this.screen.print(depends);
+                                const res = await this.screen.showQuestion(
+                                    "Do you want to continue?::y:n::n"
+                                );
+                                if (res?.toLowerCase() !== "y") {
+                                    this.screen.printError(
+                                        "Operation cancelled"
+                                    );
+                                    return resolve(false);
+                                }
+                            }
+                        }
+
+                        await rpc.query({
                             method: "button_immediate_uninstall",
                             model: "ir.module.module",
-                            args: [result[0].id],
-                        }).then(
-                            () => {
-                                this.screen.print(
-                                    `'${kwargs.module}' module successfully uninstalled`
-                                );
-                                resolve(result);
-                            },
-                            () => {
-                                reject(
-                                    `Can't uninstall '${kwargs.module}' module`
-                                );
-                            }
-                        );
-                    } else {
-                        reject(`'${kwargs.module}' module doesn't exists`);
-                    }
+                            args: [modue_infos[0].id],
+                        });
 
-                    return result;
-                });
+                        this.screen.print(
+                            `'${kwargs.module}' (${modue_infos[0].display_name}) module successfully uninstalled`
+                        );
+                        return resolve(modue_infos[0]);
+                    }
+                } catch (err) {
+                    return reject(err);
+                }
+                return reject(`'${kwargs.module}' module doesn't exists`);
             });
         },
 
@@ -1096,12 +1185,18 @@ odoo.define("terminal.functions.Common", function (require) {
                 const sresult = buff.data.slice(0, lines_total);
                 buff.data = buff.data.slice(lines_total);
                 this.screen.printRecords(buff.model, sresult);
-                if (buff.data.length) {
-                    this.screen.print(
-                        `There are still results to print (${buff.data.length}). Continue using '<strong class='o_terminal_click o_terminal_cmd' data-cmd='search --more'>--more</strong>'...`
-                    );
-                }
                 this.screen.print(`Records count: ${sresult.length}`);
+                if (buff.data.length) {
+                    return new Promise(async (resolve) => {
+                        const res = await this.screen.showQuestion(
+                            `There are still results to print (${buff.data.length}). Show more?::y:n::y`
+                        );
+                        if (res === "y") {
+                            this.executeCommand(`search --more`, false, true);
+                        }
+                        resolve(sresult);
+                    });
+                }
                 return Promise.resolve(sresult);
             }
 
@@ -1150,22 +1245,25 @@ odoo.define("terminal.functions.Common", function (require) {
                     this.doHide();
                 });
             }
-            return rpc
-                .query({
-                    method: "create",
-                    model: kwargs.model,
-                    args: [kwargs.value],
-                    kwargs: {context: this._getContext()},
-                })
-                .then((result) => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const result = await rpc.query({
+                        method: "create",
+                        model: kwargs.model,
+                        args: [kwargs.value],
+                        kwargs: {context: this._getContext()},
+                    });
                     this.screen.print(
                         this._templates.render("RECORD_CREATED", {
                             model: kwargs.model,
                             new_id: result,
                         })
                     );
-                    return result;
-                });
+                    return resolve(result);
+                } catch (err) {
+                    return reject(err);
+                }
+            });
         },
 
         _cmdUnlinkModelRecord: function (kwargs) {
@@ -1217,16 +1315,17 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         //
+        _printLongpollingValues: function (notif) {
+            this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
+            this.screen.print(notif[1], false);
+        },
         _onBusNotification: function (notifications) {
-            const notif_datas = Object.values(notifications.data);
-            const l = notif_datas.length;
+            const l = notifications.length;
             for (let x = 0; x < l; ++x) {
-                const notif = notif_datas[x];
                 this.screen.print(
-                    `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</stron>`
+                    `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</strong>`
                 );
-                this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
-                this.screen.print(notif[1], false);
+                this._printLongpollingValues(notifications[x]);
             }
         },
     });

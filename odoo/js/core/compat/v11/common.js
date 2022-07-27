@@ -9,8 +9,7 @@ odoo.define("terminal.core.compat.11.Common", function (require) {
     const Bus = require("bus.bus").bus;
 
     AbstractLongpolling.include({
-        start: function () {
-            this._super.apply(this, arguments);
+        setup: function () {
             Bus.on("notification", this, this._onBusNotification);
         },
 

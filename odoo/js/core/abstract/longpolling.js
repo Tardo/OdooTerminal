@@ -18,6 +18,11 @@ odoo.define("terminal.core.abstract.Longpolling", function (require) {
          */
         init: function (parent) {
             this._parent = parent;
+            this.setup();
+        },
+
+        setup: function () {
+            throw Error(_t("Not Implemented!"));
         },
 
         /**
