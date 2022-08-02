@@ -1,5 +1,11 @@
 # Changelog
 
+**8.5.1**
+
+```
+FIX: ParameterReader: quotes (issue #65)
+```
+
 **8.5.0**
 
 ```
