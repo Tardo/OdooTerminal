@@ -64,6 +64,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     "i::of:offset::0::The offset (from)<br/>Can be zero (no limit)",
                     "s::o:order::0::The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
                     "f::more:more::0::Flag to indicate that show more results",
+                    "f::all:all::0::Show all records (not truncated)",
                 ],
                 example: "-m res.partner -f * -l 100 -of 5 -o 'id DESC, name'",
             });
@@ -1185,16 +1186,26 @@ odoo.define("terminal.functions.Common", function (require) {
                 const sresult = buff.data.slice(0, lines_total);
                 buff.data = buff.data.slice(lines_total);
                 this.screen.printRecords(buff.model, sresult);
-                this.screen.print(`Records count: ${sresult.length}`);
                 if (buff.data.length) {
-                    return new Promise(async (resolve) => {
-                        const res = await this.screen.showQuestion(
-                            `There are still results to print (${buff.data.length}). Show more?::y:n::y`
-                        );
-                        if (res === "y") {
-                            this.executeCommand(`search --more`, false, true);
+                    this.screen.printError(
+                        `<strong class='text-warning'>Result truncated to ${sresult.length} records!</strong> The query is too big to be displayed entirely.`
+                    );
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            const res = await this.screen.showQuestion(
+                                `There are still results to print (${buff.data.length} records). Show more?::y:n::y`
+                            );
+                            if (res === "y") {
+                                this.executeCommand(
+                                    `search -m ${buff.model} --more`,
+                                    false,
+                                    false
+                                );
+                            }
+                        } catch (err) {
+                            return reject(err);
                         }
-                        resolve(sresult);
+                        return resolve(sresult);
                     });
                 }
                 return Promise.resolve(sresult);
@@ -1212,7 +1223,10 @@ odoo.define("terminal.functions.Common", function (require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
-                    const need_truncate = result.length > lines_total;
+                    const need_truncate =
+                        !this.__meta.silent &&
+                        !kwargs.all &&
+                        result.length > lines_total;
                     let sresult = result;
                     if (need_truncate) {
                         this._buffer[this.__meta.name] = {
@@ -1222,14 +1236,32 @@ odoo.define("terminal.functions.Common", function (require) {
                         sresult = sresult.slice(0, lines_total);
                     }
                     this.screen.printRecords(kwargs.model, sresult);
+                    this.screen.print(`Records count: ${result.length}`);
                     if (need_truncate) {
                         this.screen.printError(
-                            `<strong class='text-warning'>Result truncated!</strong> The query is too big to be displayed entirely. Use '<strong class='o_terminal_click o_terminal_cmd' data-cmd='search --more'>search --more</strong>' to print the rest of the results (${
-                                this._buffer[this.__meta.name].data.length
-                            })...`
+                            `<strong class='text-warning'>Result truncated to ${sresult.length} records!</strong> The query is too big to be displayed entirely.`
                         );
+                        return new Promise(async (resolve, reject) => {
+                            try {
+                                const res = await this.screen.showQuestion(
+                                    `There are still results to print (${
+                                        this._buffer[this.__meta.name].data
+                                            .length
+                                    } records). Show more?::y:n::y`
+                                );
+                                if (res === "y") {
+                                    this.executeCommand(
+                                        `search -m ${kwargs.model} --more`,
+                                        false,
+                                        false
+                                    );
+                                }
+                            } catch (err) {
+                                return reject(err);
+                            }
+                            return resolve(sresult);
+                        });
                     }
-                    this.screen.print(`Records count: ${sresult.length}`);
                     return result;
                 });
         },

@@ -3,6 +3,8 @@
 **8.5.1**
 
 ```
+IMP: Command 'search': better output
+
 FIX: ParameterReader: quotes (issue #65)
 ```
 
