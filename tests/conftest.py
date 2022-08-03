@@ -1,4 +1,5 @@
-# GMG Copyright 2022 - Alexandre Díaz
+# Copyright  Alexandre Díaz <dev@redneboa.es>
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import os
 import os.path
 import time

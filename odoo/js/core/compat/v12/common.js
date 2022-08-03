@@ -1,4 +1,4 @@
-// Copyright 2019-2020 Alexandre Díaz <dev@redneboa.es>
+// Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 /** Implementations for Odoo 12.0+ **/
