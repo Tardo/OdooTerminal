@@ -12,7 +12,7 @@ odoo.define("terminal.MyFuncs", function (require) {
 
             this.registerCommand("mycommand", {
                 definition: "This is my command",
-                function: this._cmdMyFunc,
+                callback: this._cmdMyFunc,
                 detail: "My command explained...",
                 args: [
                     "s::pa:parama::1::The Param A",
@@ -20,16 +20,18 @@ odoo.define("terminal.MyFuncs", function (require) {
                     "s::pc:paramc::0::The Param C::DefaultValue",
                     "i::pd:paramd::0::The Param D::-1",
                 ],
+                example: "-pa foo -pb bar",
             });
 
             this.registerCommand("myasynccommand", {
                 definition: "This is my async command",
-                function: this._cmdMyAsyncFunc,
+                callback: this._cmdMyAsyncFunc,
                 detail: "My async command explained...",
                 args: [
                     "s::pa:parama::1::The Param A",
                     "i::pb:paramb::1::The Param B",
                 ],
+                example: "-pa foo -pb bar",
             });
         },
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright 2020 Alexandre Díaz
+# Copyright  Alexandre Díaz <dev@redneboa.es>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 """
 This script makes a package and can changes the version number

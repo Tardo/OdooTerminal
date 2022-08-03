@@ -1,4 +1,4 @@
-// Copyright 2021 Alexandre Díaz <dev@redneboa.es>
+// Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 /** Implementations for Odoo 15.0+ **/
@@ -9,13 +9,27 @@ odoo.define("terminal.core.compat.16.Common", function (require) {
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
     const AbstractLongpolling = require("terminal.core.abstract.Longpolling");
+    const Longpolling = require("terminal.core.Longpolling");
 
     AbstractLongpolling.include({
         /**
          * @override
          */
         setup: function () {
-            this._busServ("onNotification", this._onBusNotification.bind(this));
+            this._busServ(
+                "addEventListener",
+                "notification",
+                this._onBusNotification.bind(this)
+            );
+        },
+    });
+
+    Longpolling.include({
+        /**
+         * @override
+         */
+        _getNotificationsData: function (data) {
+            return data.detail;
         },
     });
 

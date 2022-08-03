@@ -1,4 +1,4 @@
-// Copyright 2020 Alexandre Díaz <dev@redneboa.es>
+// Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 odoo.define("terminal.core.Longpolling", function (require) {
@@ -24,9 +24,15 @@ odoo.define("terminal.core.Longpolling", function (require) {
         },
 
         //
-        _onBusNotification: function (notifications) {
+        _getNotificationsData: function (data) {
+            return data;
+        },
+        _onBusNotification: function (data) {
             if (this.isVerbose()) {
-                this._parent.trigger("longpolling_notification", notifications);
+                this._parent.trigger(
+                    "longpolling_notification",
+                    this._getNotificationsData(data)
+                );
             }
         },
     });

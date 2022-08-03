@@ -1,19 +1,5 @@
 # Contributing
 
-## Fast Guidelines
-
-- Naming Convention:
-  - Classes: Pascal Case
-  - Member Variables: Camel Case
-  - Methods: Camel Case
-  - Variables: Snake Case
-  - 'Constants': Screaming Snake Case
-  - Follow 'Private Variables' Python convention
-    (https://docs.python.org/3/tutorial/classes.html#tut-private)
-- Indentation Style: K&R - 1TBS Variant
-  (https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS))
-- ECMAScript: 2020
-
 ## Pre-commit
 
 If you want collaborate, you need this to make travis happy.
@@ -45,5 +31,6 @@ last ('web-ext').
 
 ---
 
-Testing: [testing.md](./docs/testing.md) Hacking Terminal:
-[javascript.md](./docs/javascript.md)
+Testing: [testing.md](./testing.md)
+
+Hacking Terminal: [javascript.md](./javascript.md)

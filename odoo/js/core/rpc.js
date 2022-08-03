@@ -1,3 +1,6 @@
+// Copyright  Alexandre Díaz <dev@redneboa.es>
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 /** This is a clone of Odoo implementation but without data transformations */
 odoo.define("terminal.core.rpc", function (require) {
     "use strict";

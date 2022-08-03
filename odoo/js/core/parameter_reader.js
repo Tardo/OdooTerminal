@@ -1,4 +1,4 @@
-// Copyright 2020 Alexandre Díaz <dev@redneboa.es>
+// Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 odoo.define("terminal.core.ParameterReader", function (require) {
@@ -30,7 +30,6 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 f: this._formatFlag.bind(this),
                 a: this._formatAlphanumeric.bind(this),
             };
-            this._regexSanitize = new RegExp(/'/g);
             this._regexParams = new RegExp(
                 /(\\?["'`])(?:(?=(\\?))\2.)*?\1|[^\s]+/g
             );
@@ -185,7 +184,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             let params = _.map(scmd, (item) => {
                 const nvalue = this._trimQuotes(item);
                 return cmd_def.sanitized
-                    ? this._sanitizeString(Utils.unescapeSlashes(nvalue))
+                    ? this._sanitizeString(nvalue)
                     : nvalue;
             });
 
@@ -328,20 +327,6 @@ odoo.define("terminal.core.ParameterReader", function (require) {
         },
 
         /**
-         * Convert array of command params to 'raw' string params
-         * @param {Array} params
-         * @returns {String}
-         */
-        stringify: function (params) {
-            return _.map(params, function (item) {
-                if (item.indexOf(" ") === -1) {
-                    return item;
-                }
-                return `"${item}"`;
-            }).join(" ");
-        },
-
-        /**
          * Free internal stores
          */
         resetStores: function () {
@@ -446,7 +431,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          * @returns {String}
          */
         _sanitizeString: function (str) {
-            return str.replace(this._regexSanitize, '"');
+            return str.replaceAll("'", '"');
         },
 
         /**
@@ -460,7 +445,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 (str[0] === "'" && str[str_length - 1] === "'") ||
                 (str[0] === "`" && str[str_length - 1] === "`")
             ) {
-                return str.substr(1, str_length - 2);
+                return str.substring(1, str_length - 1);
             }
             return str;
         },
@@ -480,10 +465,9 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             let params = {};
             // Check if is a valid simple format string
             try {
-                params = str.match(this._regexSimpleJSON);
-                const json = JSON.parse(str);
-                return json;
+                return JSON.parse(str);
             } catch (err) {
+                params = str.match(this._regexSimpleJSON);
                 if (_.isEmpty(params)) {
                     throw err;
                 }

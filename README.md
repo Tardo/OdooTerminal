@@ -186,7 +186,7 @@ Example:
 
 # License
 
-Copyright 2019-2021 Alexandre Díaz & contributors
+Copyright Alexandre Díaz & contributors
 
 AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
