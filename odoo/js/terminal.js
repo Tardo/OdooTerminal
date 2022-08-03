@@ -1066,21 +1066,8 @@ odoo.define("terminal.Terminal", function (require) {
             ) {
                 // Press Escape
                 this.doHide();
-            } else if (
-                (ev.ctrlKey && ev.key === "1") ||
-                (ev.altKey && ev.key && ev.key.toLowerCase() === "t")
-            ) {
-                // Press Alt + t (and mark as deprecated CTRL + 1)
-                if (
-                    !this._advDeprecatedShortcut &&
-                    ev.ctrlKey &&
-                    ev.key === "1"
-                ) {
-                    this.screen.print(
-                        "<strong style='color:orange'>** INFO: The terminal has been opened using a keyboard shortcut that will no longer be supported in the next release because it collides with browser shortcuts. Please use 'ALT + T' to open the terminal.</strong>"
-                    );
-                    this._advDeprecatedShortcut = true;
-                }
+            } else if (ev.altKey && ev.key && ev.key.toLowerCase() === "t") {
+                // Press Alt + t
                 ev.preventDefault();
                 this.doToggle();
             }
