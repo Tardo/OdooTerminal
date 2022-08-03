@@ -1,18 +1,3 @@
-# PUBLIC METHODS
-
-| Command                        | Description             |
-| ------------------------------ | ----------------------- |
-| `print(str, bool, str)`        | Print a message         |
-| `eprint(str)`                  | Print a escaped message |
-| `printTable(array, str)`       | Print a table           |
-| `clean()`                      | Clean terminal          |
-| `cleanInput()`                 | Clean input             |
-| `registerCommand(str, cmdDef)` | Register new command    |
-| `executeCommand(str)`          | Execute a command       |
-| `do_show()`                    | Show terminal           |
-| `do_hide()`                    | Hide terminal           |
-| `do_toggle()`                  | Toggle visibility       |
-
 # DEFINE NEW COMMANDS
 
 Commands uses promises
@@ -24,10 +9,12 @@ Commands uses promises
   definition: string,
   callback: function,
   detail: string,
-  syntax: array,
+  args: string,
   secured: boolean,
   aliases: array,
   sanitized: boolean,
+  generator: boolean,
+  example: string,
 }
 ```
 
@@ -48,6 +35,8 @@ Commands uses promises
 - secured: Hide command from screen & history (default is false)
 - aliases: Used to set deprecated names of the module
 - sanitized: Truncate single quotes (default is true)
+- generators: Resolve input generators (default is true)
+- example: Shows and example (command name not required)
 
 **Basic Example**:
 
