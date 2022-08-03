@@ -106,13 +106,13 @@ this result on an exception. See the valid escape sequences in JSON format:
 ![Valid JSON escape sequences](https://i.stack.imgur.com/SHLOB.gif)
 
 So... the way to send escaped sequences is by using double-slashed escape
-sequences. You write something like `"this \\_ is a test"` and the code reads
+sequences. You write something like `"this \\_ is a test"` and the engine reads
 `"this \\\\_ is a test"`. In this case JSON.parse can unescape `\\` to `\`.
 
 Escaped quotes (`\' and \"`) are special because they are truncated by the
-terminal. So, when you write `this \' is a test`, the terminal reads
+terminal. So, when you write `"this \' is a test"`, the terminal reads
 `"this ' is a test"`. If you need send this characters escaped you must use
-'triple-slash': `this \\\' is a test`.
+'triple-slash': `"this \\\' is a test"`.
 
 #### + Parameter Generators
 
