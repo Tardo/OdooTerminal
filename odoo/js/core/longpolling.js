@@ -24,9 +24,15 @@ odoo.define("terminal.core.Longpolling", function (require) {
         },
 
         //
-        _onBusNotification: function (notifications) {
+        _getNotificationsData: function (data) {
+            return data;
+        },
+        _onBusNotification: function (data) {
             if (this.isVerbose()) {
-                this._parent.trigger("longpolling_notification", notifications);
+                this._parent.trigger(
+                    "longpolling_notification",
+                    this._getNotificationsData(data)
+                );
             }
         },
     });
