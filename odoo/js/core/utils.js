@@ -32,16 +32,8 @@ odoo.define("terminal.core.Utils", function (require) {
         return [r, g, b];
     };
 
-    // See https://stackoverflow.com/a/48855846
-    const unescapeSlashes = (text) => {
-        let parsed_text = text.replace(/(^|[^\\])(\\\\)*\\$/, "$&\\");
-        parsed_text = parsed_text.replace(/(^|[^\\])((\\\\)*")/g, "$1\\$2");
-        try {
-            parsed_text = JSON.parse(`"${parsed_text}"`);
-        } catch (e) {
-            return text;
-        }
-        return parsed_text;
+    const unescapeQuotes = (text) => {
+        return text.replaceAll(/\\(['"])/g, "$1");
     };
 
     const save2File = (filename, type, data) => {
@@ -212,7 +204,7 @@ odoo.define("terminal.core.Utils", function (require) {
         encodeHTML: encodeHTML,
         genHash: genHash,
         hex2rgb: hex2rgb,
-        unescapeSlashes: unescapeSlashes,
+        unescapeQuotes: unescapeQuotes,
         save2File: save2File,
         getUID: getUID,
         getUsername: getUsername,
