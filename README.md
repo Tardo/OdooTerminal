@@ -92,6 +92,28 @@ You can toggle terminal using one of these options:
 
 ## Advance Usage
 
+#### + Escaped Sequences
+
+Reading the value of a "edit input" will get the string with the escaped
+slashes. So, when you write something like `"this \_ is a test"`, the engine
+reads `"this \\_ is a test"`. This is great for keeping escaped sentences
+unresolved.
+
+But, this cause problems when you try to resolve them with "JSON.parse", because
+the engine resolves the escaped slashes and JSON.parse try to resolve `"\_"` and
+this result on an exception. See the valid escape sequences in JSON format:
+
+![Valid JSON escape sequences](https://i.stack.imgur.com/SHLOB.gif)
+
+So... the way to send escaped sequences is by using double-slashed escape
+sequences. You write something like `"this \\_ is a test"` and the engine reads
+`"this \\\\_ is a test"`. In this case JSON.parse can unescape `\\` to `\`.
+
+Escaped quotes (`\' and \"`) are special because they are truncated by the
+terminal. So, when you write `"this \' is a test"`, the terminal reads
+`"this ' is a test"`. If you need send this characters escaped you must use
+'triple-slash': `"this \\\' is a test"`.
+
 #### + Parameter Generators
 
 You can use "parameter generator" to create values.

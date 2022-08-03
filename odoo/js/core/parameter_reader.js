@@ -30,6 +30,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 f: this._formatFlag.bind(this),
                 a: this._formatAlphanumeric.bind(this),
             };
+            this._regexSanitize = new RegExp(/(?<!\\)'/g);
             this._regexParams = new RegExp(
                 /(\\?["'`])(?:(?=(\\?))\2.)*?\1|[^\s]+/g
             );
@@ -125,6 +126,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 s: "STRING",
                 j: "JSON",
                 f: "FLAG",
+                a: "ALPHANUMERIC",
                 "-": "ANY",
             };
             let res = "";
@@ -182,10 +184,11 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             const cmd = scmd[0];
             scmd = scmd.slice(1);
             let params = _.map(scmd, (item) => {
-                const nvalue = this._trimQuotes(item);
-                return cmd_def.sanitized
+                let nvalue = this._trimQuotes(item);
+                nvalue = cmd_def.sanitized
                     ? this._sanitizeString(nvalue)
                     : nvalue;
+                return Utils.unescapeQuotes(nvalue);
             });
 
             if (cmd_def.generators) {
@@ -431,7 +434,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          * @returns {String}
          */
         _sanitizeString: function (str) {
-            return str.replaceAll("'", '"');
+            return str.replaceAll(this._regexSanitize, '"');
         },
 
         /**
@@ -468,15 +471,15 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 return JSON.parse(str);
             } catch (err) {
                 params = str.match(this._regexSimpleJSON);
-                if (_.isEmpty(params)) {
+                if (str[0] === "[" || str[0] === "{" || _.isEmpty(params)) {
                     throw err;
                 }
             }
             const obj = {};
             for (const param of params) {
                 let [param_name, ...param_value] = param.trim().split("=");
-                param_value = this._trimQuotes(
-                    Utils.unescapeSlashes(param_value.join("="))
+                param_value = Utils.unescapeQuotes(
+                    this._trimQuotes(param_value.join("="))
                 );
                 const formatted_param = this._tryAllFormatters(param_value);
                 obj[param_name] = formatted_param || param_value;

@@ -6,6 +6,8 @@
 IMP: Command 'search': better output
 
 FIX: ParameterReader: quotes (issue #65)
+FIX: ParameterReader: escaped sequences (issue #65)
+FIX: ParameterReader: simpleJSON
 ```
 
 **8.5.0**
