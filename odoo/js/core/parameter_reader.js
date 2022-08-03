@@ -471,7 +471,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 return JSON.parse(str);
             } catch (err) {
                 params = str.match(this._regexSimpleJSON);
-                if (_.isEmpty(params)) {
+                if (str[0] === "[" || str[0] === "{" || _.isEmpty(params)) {
                     throw err;
                 }
             }
