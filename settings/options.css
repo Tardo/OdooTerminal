@@ -15,21 +15,51 @@ body {
     padding: 0.5em;
 }
 
+.optsection {
+    border: 1px solid gray;
+    padding: 0.3em;
+}
+.optsection:not(:first-child) {
+    margin-top: 0.5em;
+}
+.optsection h4 {
+    margin: 0;
+    font-size: 1.8em;
+}
 .optsection textarea {
     height: 200px;
     white-space: pre;
     width: 98%;
 }
-
-.optsection {
-    border: 1px solid gray;
+.optsection table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #999;
+}
+.optsection table tr:nth-child(odd) {
+    background-color: rgb(209, 209, 209);
+}
+.optsection table > thead > tr > th {
     padding: 0.3em;
+    text-align: left;
+    border: 1px solid #999;
 }
-
-.optsection:not(:first-child) {
-    margin-top: 0.5em;
+.optsection table > tbody > tr:hover {
+    background-color: rgb(193, 211, 199);
 }
-
-.optsection h4 {
-    margin: 0;
+.optsection table > tbody > tr > td {
+    padding: 0.3em;
+    border: 1px solid #999;
+}
+.optsection .shortcut_btn_zone {
+    display: flex;
+    gap: 0.2em;
+    flex-direction: row;
+    margin-top: 1em;
+}
+.optsection .shortcut_btn_zone input#shortcut_keybind {
+    width: 13%;
+}
+.optsection .shortcut_btn_zone input#shortcut_commands {
+    flex-grow: 1;
 }

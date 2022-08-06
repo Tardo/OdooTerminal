@@ -10,10 +10,10 @@
     "use strict";
 
     // Flag to run the script once
-    if (window.hasRun) {
+    if (window.__OdooTerminal.hasRun) {
         return;
     }
-    window.hasRun = true;
+    window.__OdooTerminal.hasRun = true;
 
     // This is for cross-browser compatibility
     const gBrowserObj = typeof chrome === "undefined" ? browser : chrome;
@@ -107,7 +107,7 @@
     function _getTerminalResources(info) {
         const to_inject = {
             css: [],
-            js: [],
+            js: ["globals.js"],
         };
         // Compatibility resources
         // 11 - v11
@@ -218,17 +218,21 @@
                 }
             } else if (event.data.type === "ODOO_TERM_START") {
                 // Load Init Commands
-                getStorageSync(["init_cmds"]).then((items) => {
-                    const cmds = (items.init_cmds || "").split(/\n\r?/);
-                    window.postMessage(
-                        {
-                            type: "ODOO_TERM_CONFIG",
-                            init_cmds: cmds,
-                            user_lang: items.lang,
-                        },
-                        "*"
-                    );
-                });
+                getStorageSync(window.__OdooTerminal.SETTING_NAMES).then(
+                    (items) => {
+                        const data = {};
+                        for (const config_name in items) {
+                            data[config_name] = items[config_name];
+                        }
+                        window.postMessage(
+                            {
+                                type: "ODOO_TERM_CONFIG",
+                                config: data,
+                            },
+                            "*"
+                        );
+                    }
+                );
             }
         },
         false

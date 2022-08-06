@@ -7,7 +7,7 @@
  * 'click' event to send the 'toggle' event to the terminal widget.
  *
  * Sends the internal message 'update_odoo_terminal_info' to 'content script'
- * and the 'content script' responds with the internal message
+ * and the 'content script' reply with the internal message
  * 'update_terminal_badge_info'.
  */
 (function () {
@@ -17,7 +17,7 @@
     const gBrowserObj = typeof chrome === "undefined" ? browser : chrome;
 
     /**
-     * Handle click event.
+     * Handle browser action click event.
      * @param {Object} tab - The active tab
      */
     function onClickBrowserAction(tab) {
@@ -65,8 +65,35 @@
             _updateBadgeInfo(request.odooInfo);
         }
     });
+    // Listen 'installed' event to set default settings
+    gBrowserObj.runtime.onInstalled.addListener(() => {
+        gBrowserObj.storage.sync.get(
+            window.__OdooTerminal.SETTING_NAMES,
+            (items) => {
+                const to_update = {};
+                for (const setting_name of window.__OdooTerminal
+                    .SETTING_NAMES) {
+                    if (
+                        typeof items[setting_name] === "undefined" &&
+                        typeof window.__OdooTerminal.SETTING_DEFAULTS[
+                            setting_name
+                        ] !== "undefined"
+                    ) {
+                        to_update[setting_name] =
+                            window.__OdooTerminal.SETTING_DEFAULTS[
+                                setting_name
+                            ];
+                    }
+                }
+                gBrowserObj.storage.sync.set(to_update);
+            }
+        );
+    });
 
+    // Listen actived tab and updates to update info
     gBrowserObj.tabs.onUpdated.addListener(refreshOdooInfo);
     gBrowserObj.tabs.onActivated.addListener(refreshOdooInfo);
+
+    // Listen the extension browser icon click event to toggle terminal visibility
     gBrowserObj.browserAction.onClicked.addListener(onClickBrowserAction);
 })();

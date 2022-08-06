@@ -24,7 +24,7 @@ odoo.define("terminal.core.Storage", function (require) {
          * @param {String} item
          */
         // eslint-disable-next-line
-        getItem: function (item) {
+        getItem: function (item, def_value) {
             throw Error(_lt("Not Implemented!"));
         },
 
@@ -75,8 +75,12 @@ odoo.define("terminal.core.Storage", function (require) {
     });
 
     const StorageSession = AbstractStorage.extend({
-        getItem: function (item) {
-            return JSON.parse(sessionStorage.getItem(item)) || undefined;
+        getItem: function (item, def_value) {
+            const res = sessionStorage.getItem(item);
+            if (res === null) {
+                return def_value;
+            }
+            return JSON.parse(res);
         },
 
         setItem: function (item, value, on_error = false) {
@@ -100,8 +104,12 @@ odoo.define("terminal.core.Storage", function (require) {
     });
 
     const StorageLocal = AbstractStorage.extend({
-        getItem: function (item) {
-            return JSON.parse(localStorage.getItem(item)) || undefined;
+        getItem: function (item, def_value) {
+            const res = localStorage.getItem(item);
+            if (res === null) {
+                return def_value;
+            }
+            return JSON.parse(res);
         },
 
         setItem: function (item, value, on_error = false) {
