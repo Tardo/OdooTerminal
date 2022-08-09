@@ -43,7 +43,7 @@ odoo.define("terminal.Terminal", function (require) {
         _longpolling: null,
 
         _hasExecInitCmds: false,
-        _userContext: {active_test: false},
+        _userContext: {},
 
         _commandTimeout: 30000,
         _errorCount: 0,
@@ -137,9 +137,6 @@ odoo.define("terminal.Terminal", function (require) {
                 this._searchHistoryIter = this._inputHistory.length;
             }
 
-            // Pinned
-            this._pinned = this._storage.getItem("terminal_pinned");
-
             this._createTerminal();
         },
 
@@ -152,21 +149,11 @@ odoo.define("terminal.Terminal", function (require) {
                 try {
                     await this._super.apply(this, arguments);
                     await this.screen.start(this.$el);
+                    this.screen.applyStyle("opacity", this._config.opacity);
                 } catch (err) {
                     return reject(err);
                 }
-
                 this.$runningCmdCount = this.$("#terminal_running_cmd_count");
-
-                const isMaximized = this._storage.getItem("screen_maximized");
-                if (isMaximized) {
-                    this.$el.addClass("term-maximized");
-                    this.$(".terminal-screen-icon-maximize")
-                        .removeClass("btn-dark")
-                        .addClass("btn-light");
-                }
-
-                this._wasStart = true;
                 return resolve();
             });
         },
@@ -239,6 +226,8 @@ odoo.define("terminal.Terminal", function (require) {
                     return reject();
                 }
 
+                await this._wakeUp();
+
                 try {
                     cmd = await this._resolveRunners(cmd);
                 } catch (err) {
@@ -308,37 +297,49 @@ odoo.define("terminal.Terminal", function (require) {
             );
         },
 
+        _wakeUp: function () {
+            return new Promise((resolve, reject) => {
+                if (this._wasLoaded) {
+                    if (this._wasStart) {
+                        resolve();
+                    } else {
+                        this._wasStart = true;
+                        return this.start()
+                            .then(() => {
+                                this.screen.flush();
+                                resolve();
+                            })
+                            .catch((err) => reject(err));
+                    }
+                } else {
+                    reject();
+                }
+            });
+        },
+
         /* VISIBILIY */
         doShow: function () {
             if (!this._wasLoaded) {
                 return Promise.resolve();
             }
-            const doTransition = () => {
+            // Only start the terminal if needed
+            return this._wakeUp().then(() => {
                 this.$el.addClass("terminal-transition-topdown");
                 this.screen.focus();
-            };
-            // Only start the terminal if needed
-            if (!this._wasStart) {
-                return this.start().then(() => {
-                    this.screen.flush();
-                    doTransition();
-                });
-            }
-            doTransition();
-
-            return Promise.resolve();
+            });
         },
 
         doHide: function () {
             this.$el.removeClass("terminal-transition-topdown");
+            return Promise.resolve();
         },
 
         doToggle: function () {
             if (this._isTerminalVisible()) {
-                this.doHide();
-            } else {
-                this.doShow();
+                return this.doHide();
             }
+
+            return this.doShow();
         },
 
         /* PRIVATE METHODS*/
@@ -779,12 +780,45 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
 
+        _applyConfig: function (config) {
+            this._config = {
+                pinned: this._storage.getItem("terminal_pinned", config.pinned),
+                maximized: this._storage.getItem(
+                    "screen_maximized",
+                    config.maximized
+                ),
+                opacity: config.opacity * 0.01,
+                shortcuts: config.shortcuts,
+                term_context: config.term_context || {},
+            };
+
+            this._userContext = _.extend(
+                {},
+                this._config.term_context,
+                this._userContext
+            );
+
+            if (!this._hasExecInitCmds) {
+                if (config.init_cmds) {
+                    this._executeCommands(config.init_cmds.split(/\r?\n/));
+                }
+                this._hasExecInitCmds = true;
+            }
+        },
+
         /* HANDLE EVENTS */
-        onLoaded: function () {
+        onLoaded: function (config) {
+            this._applyConfig(config);
             this._wasLoaded = true;
-            if (this._pinned) {
+            if (this._config.pinned) {
                 this.doShow();
                 this.$(".terminal-screen-icon-pin")
+                    .removeClass("btn-dark")
+                    .addClass("btn-light");
+            }
+            if (this._config.maximized) {
+                this.$el.addClass("term-maximized");
+                this.$(".terminal-screen-icon-maximize")
                     .removeClass("btn-dark")
                     .addClass("btn-light");
             }
@@ -845,16 +879,18 @@ odoo.define("terminal.Terminal", function (require) {
 
         _onClickToggleMaximize: function (ev) {
             const $target = $(ev.currentTarget);
-            const is_maximized = this._storage.getItem("screen_maximized");
-            if (is_maximized) {
-                this.$el.removeClass("term-maximized");
-                $target.removeClass("btn-light").addClass("btn-dark");
-            } else {
+            this._config.maximized = !this._config.maximized;
+            if (this._config.maximized) {
                 this.$el.addClass("term-maximized");
                 $target.removeClass("btn-dark").addClass("btn-light");
+            } else {
+                this.$el.removeClass("term-maximized");
+                $target.removeClass("btn-light").addClass("btn-dark");
             }
-            this._storage.setItem("screen_maximized", !is_maximized, (err) =>
-                this.screen.printHTML(err)
+            this._storage.setItem(
+                "screen_maximized",
+                this._config.maximized,
+                (err) => this.screen.printHTML(err)
             );
             this.screen.scrollDown();
             this.screen.preventLostInputFocus();
@@ -862,11 +898,13 @@ odoo.define("terminal.Terminal", function (require) {
 
         _onClickToggleScreenPin: function (ev) {
             const $target = $(ev.currentTarget);
-            this._pinned = !this._storage.getItem("terminal_pinned");
-            this._storage.setItem("terminal_pinned", this._pinned, (err) =>
-                this.screen.printHTML(err)
+            this._config.pinned = !this._config.pinned;
+            this._storage.setItem(
+                "terminal_pinned",
+                this._config.pinned,
+                (err) => this.screen.printHTML(err)
             );
-            if (this._pinned) {
+            if (this._config.pinned) {
                 $target.removeClass("btn-dark").addClass("btn-light");
             } else {
                 $target.removeClass("btn-light").addClass("btn-dark");
@@ -1053,8 +1091,8 @@ odoo.define("terminal.Terminal", function (require) {
                 this.$el &&
                 !this.$el[0].contains(ev.target) &&
                 this._isTerminalVisible() &&
-                !this._storage.getItem("screen_maximized") &&
-                !this._pinned
+                !this._config.maximized &&
+                !this._config.pinned
             ) {
                 this.doHide();
             }
@@ -1066,10 +1104,14 @@ odoo.define("terminal.Terminal", function (require) {
             ) {
                 // Press Escape
                 this.doHide();
-            } else if (ev.altKey && ev.key && ev.key.toLowerCase() === "t") {
-                // Press Alt + t
-                ev.preventDefault();
-                this.doToggle();
+            } else {
+                const keybind = window.__OdooTerminal.process_keybind(ev);
+                const keybind_str = JSON.stringify(keybind);
+                const keybind_cmds = this._config.shortcuts[keybind_str];
+                if (keybind_cmds) {
+                    this.executeCommand(keybind_cmds, false, true);
+                    ev.preventDefault();
+                }
             }
         },
         _onCoreBeforeUnload: function (ev) {
@@ -1107,11 +1149,7 @@ odoo.define("terminal.Terminal", function (require) {
                 return;
             }
             if (ev.data.type === "ODOO_TERM_CONFIG") {
-                if (!this._hasExecInitCmds) {
-                    this._executeCommands(ev.data.init_cmds);
-                    this._hasExecInitCmds = true;
-                }
-                this.onLoaded();
+                this.onLoaded(ev.data.config);
             }
         },
         // NOTE-END

@@ -43,7 +43,7 @@ available commands.
 
 You can toggle terminal using one of these options:
 
-- Press ALT + T
+- Press CTRL + , (by default)
 - Use extension browser action icon
 
 ## Example Commands

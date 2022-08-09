@@ -1,5 +1,13 @@
 # Changelog
 
+**8.6.0**
+
+```
+IMP: Options
+
+FIX: Shortcut on firefox (issue #69)
+```
+
 **8.5.1**
 
 ```

@@ -411,6 +411,10 @@ odoo.define("terminal.core.Screen", function (require) {
             this.cleanInput();
         },
 
+        applyStyle: function (name, value) {
+            this.$screen.css(name, value);
+        },
+
         /* PRIVATE */
         _formatPrint: function (msg, cls) {
             const msg_type = typeof msg;
@@ -447,6 +451,10 @@ odoo.define("terminal.core.Screen", function (require) {
         },
 
         _vacuum: function () {
+            if (!this._wasStart) {
+                return;
+            }
+
             const $lines = Array.from(
                 this.$screen[0].querySelectorAll(this._line_selector)
             );

@@ -134,6 +134,19 @@ odoo.define("terminal.functions.Core", function (require) {
                 generators: false,
                 example: "",
             });
+            this.registerCommand("toggle_term", {
+                definition: "Toggle terminal visibility",
+                callback: this._cmdToggleTerm,
+                detail: "Toggle terminal visibility",
+                args: "",
+                sanitized: false,
+                generators: false,
+                example: "",
+            });
+        },
+
+        _cmdToggleTerm: function () {
+            return this.doToggle();
         },
 
         _printWelcomeMessage: function () {
