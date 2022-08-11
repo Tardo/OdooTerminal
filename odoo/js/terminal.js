@@ -853,8 +853,8 @@ odoo.define("terminal.Terminal", function (require) {
                 );
                 if (
                     typeof result === "object" &&
-                    !Object.prototype.hasOwnProperty.call(result, "data") &&
-                    Object.prototype.hasOwnProperty.call(result, "message")
+                    !Object.hasOwn(result, "data") &&
+                    Object.hasOwn(result, "message")
                 ) {
                     this.screen.printError(result.message, true);
                 } else {
@@ -870,9 +870,7 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         _onClickTerminalCommand: function (ev) {
-            if (
-                Object.prototype.hasOwnProperty.call(ev.target.dataset, "cmd")
-            ) {
+            if (Object.hasOwn(ev.target.dataset, "cmd")) {
                 this.executeCommand(ev.target.dataset.cmd);
             }
         },

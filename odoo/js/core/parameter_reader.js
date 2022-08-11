@@ -136,7 +136,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
                 res += "LIST OF ";
                 carg = type[1];
             }
-            if (Object.prototype.hasOwnProperty.call(name_types, carg)) {
+            if (Object.hasOwn(name_types, carg)) {
                 res += name_types[carg];
             } else {
                 res += "UNKNOWN";

@@ -760,12 +760,7 @@ odoo.define("terminal.functions.Common", function (require) {
             } else if (kwargs.operation === "write") {
                 Object.assign(session.user_context, kwargs.value);
             } else if (kwargs.operation === "delete") {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        session.user_context,
-                        kwargs.value
-                    )
-                ) {
+                if (Object.hasOwn(session.user_context, kwargs.value)) {
                     delete session.user_context[kwargs.value];
                 } else {
                     return Promise.reject(

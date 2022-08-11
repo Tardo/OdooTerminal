@@ -41,12 +41,12 @@ odoo.define("terminal.tests", function (require) {
             }
         },
         assertIn: function (obj, key, msg = "") {
-            if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (!Object.hasOwn(obj, key)) {
                 throw new TerminalTestValidationError(msg);
             }
         },
         assertNotIn: function (obj, key, msg = "") {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (Object.hasOwn(obj, key)) {
                 throw new TerminalTestValidationError(msg);
             }
         },

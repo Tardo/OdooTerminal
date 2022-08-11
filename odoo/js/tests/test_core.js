@@ -192,7 +192,7 @@ odoo.define("terminal.tests.core", function (require) {
                 false,
                 true
             );
-            this.assertTrue(Object.prototype.hasOwnProperty.call(window, res));
+            this.assertTrue(Object.hasOwn(window, res));
             this.assertEqual(window[res], "This is a test");
         },
         test_exportvar__no_arg: async function () {
@@ -201,7 +201,7 @@ odoo.define("terminal.tests.core", function (require) {
                 false,
                 true
             );
-            this.assertTrue(Object.prototype.hasOwnProperty.call(window, res));
+            this.assertTrue(Object.hasOwn(window, res));
             this.assertEqual(window[res], "This is a test");
         },
 

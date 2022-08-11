@@ -127,12 +127,7 @@ odoo.define("terminal.core.CommandAssistant", function (require) {
                         is_command: true,
                     });
                 }
-            } else if (
-                Object.prototype.hasOwnProperty.call(
-                    this._registeredCmds,
-                    scmd.cmd
-                )
-            ) {
+            } else if (Object.hasOwn(this._registeredCmds, scmd.cmd)) {
                 const param = scmd.params[sel_param_index];
                 if ((param && param[0] === "-") || sel_param_index === 0) {
                     // Its a argument

@@ -72,12 +72,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 return;
             }
             this.$screen.html("");
-            if (
-                Object.prototype.hasOwnProperty.call(
-                    this._options,
-                    "onCleanScreen"
-                )
-            ) {
+            if (Object.hasOwn(this._options, "onCleanScreen")) {
                 this._options.onCleanScreen(this.getContent());
             }
         },
@@ -199,12 +194,7 @@ odoo.define("terminal.core.Screen", function (require) {
             this.scrollDown();
 
             if (this._buff.length === 0) {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        this._options,
-                        "onSaveScreen"
-                    )
-                ) {
+                if (Object.hasOwn(this._options, "onSaveScreen")) {
                     this._options.onSaveScreen(this.getContent());
                 }
                 this._flushing = false;
@@ -249,10 +239,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 return;
             }
             let error_msg = error;
-            if (
-                typeof error === "object" &&
-                Object.prototype.hasOwnProperty.call(error, "data")
-            ) {
+            if (typeof error === "object" && Object.hasOwn(error, "data")) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
                 error_msg = this._templates.render("ERROR_MESSAGE", {
@@ -273,7 +260,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 ++this._errorCount;
             } else if (
                 typeof error === "object" &&
-                Object.prototype.hasOwnProperty.call(error, "status") &&
+                Object.hasOwn(error, "status") &&
                 error.status !== "200"
             ) {
                 // It's an Odoo/jQuery error report

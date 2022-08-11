@@ -66,9 +66,7 @@
         if (cvers.length) {
             gOdooInfo.isCompatible = true;
             window.term_odooVersionRaw = gOdooInfo.serverVersionRaw;
-        } else if (
-            Object.prototype.hasOwnProperty.call(window, "term_odooVersionRaw")
-        ) {
+        } else if (Object.hasOwn(window, "term_odooVersionRaw")) {
             delete window.term_odooVersionRaw;
         }
     }
@@ -82,7 +80,7 @@
      * @param {Function} on_rejected
      */
     function _createRpc(url, fct_name, params, on_fulfilled, on_rejected) {
-        if (!Object.prototype.hasOwnProperty.call(params, "args")) {
+        if (!Object.hasOwn(params, "args")) {
             params.args = {};
         }
 
@@ -158,7 +156,7 @@
             isOdoo: true,
         });
 
-        if (Object.prototype.hasOwnProperty.call(gOdooObj, "session_info")) {
+        if (Object.hasOwn(gOdooObj, "session_info")) {
             gOdooInfo.isFrontend = gOdooObj.session_info.is_frontend;
             if (gOdooObj.session_info.server_version) {
                 _setServerVersion(gOdooObj.session_info.server_version);

@@ -234,12 +234,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     const _cmd = sorted_cmd_keys[x];
                     this._printHelpSimple(_cmd, this._registeredCmds[_cmd]);
                 }
-            } else if (
-                Object.prototype.hasOwnProperty.call(
-                    this._registeredCmds,
-                    kwargs.cmd
-                )
-            ) {
+            } else if (Object.hasOwn(this._registeredCmds, kwargs.cmd)) {
                 this._printHelpDetailed(
                     kwargs.cmd,
                     this._registeredCmds[kwargs.cmd]
@@ -301,12 +296,7 @@ odoo.define("terminal.functions.Core", function (require) {
             } else if (kwargs.operation === "write") {
                 Object.assign(this._userContext, kwargs.value);
             } else if (kwargs.operation === "delete") {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        this._userContext,
-                        kwargs.value
-                    )
-                ) {
+                if (Object.hasOwn(this._userContext, kwargs.value)) {
                     delete this._userContext[kwargs.value];
                 } else {
                     return Promise.reject(
@@ -332,20 +322,13 @@ odoo.define("terminal.functions.Core", function (require) {
                     }
                 }
                 return Promise.resolve(aliases);
-            } else if (
-                Object.prototype.hasOwnProperty.call(
-                    this._registeredCmds,
-                    kwargs.name
-                )
-            ) {
+            } else if (Object.hasOwn(this._registeredCmds, kwargs.name)) {
                 return Promise.reject("Invalid alias name");
             }
             if (_.some(kwargs.cmd)) {
                 aliases[kwargs.name] = kwargs.cmd;
                 this.screen.print("Alias created successfully");
-            } else if (
-                Object.prototype.hasOwnProperty.call(aliases, kwargs.name)
-            ) {
+            } else if (Object.hasOwn(aliases, kwargs.name)) {
                 delete aliases[kwargs.name];
                 this.screen.print("Alias removed successfully");
             } else {

@@ -45,7 +45,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
         },
 
         process: function (field, omitted_values) {
-            const hasWidgetGenerator = Object.prototype.hasOwnProperty.call(
+            const hasWidgetGenerator = Object.hasOwn(
                 this._generators,
                 field.widget
             );
@@ -339,7 +339,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 let raw_value = changes[field_info.name];
                 if (
                     typeof raw_value === "object" &&
-                    Object.prototype.hasOwnProperty.call(raw_value, "operation")
+                    Object.hasOwn(raw_value, "operation")
                 ) {
                     if (raw_value.operation === "ADD") {
                         raw_value = raw_value.id;
@@ -427,7 +427,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 const change = changes[field_name];
                 if (
                     typeof change === "object" &&
-                    Object.prototype.hasOwnProperty.call(change, "operation")
+                    Object.hasOwn(change, "operation")
                 ) {
                     if (change.operation === "ADD") {
                         values[field_name] = change.id;
@@ -457,16 +457,11 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 const s_changes = this._getChangesValues(
                     changes[parent_field_name].data
                 );
-                if (
-                    !Object.prototype.hasOwnProperty.call(
-                        this._O2MRequiredStore,
-                        parent_field_name
-                    )
-                ) {
+                if (!Object.hasOwn(this._O2MRequiredStore, parent_field_name)) {
                     this._O2MRequiredStore[parent_field_name] = {};
                 }
                 if (
-                    !Object.prototype.hasOwnProperty.call(
+                    !Object.hasOwn(
                         this._O2MRequiredStore[parent_field_name],
                         field_name
                     )
@@ -550,7 +545,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                         );
                         let omitted_values = null;
                         if (
-                            Object.prototype.hasOwnProperty.call(
+                            Object.hasOwn(
                                 this._O2MRequiredStore,
                                 field_info.name
                             )
