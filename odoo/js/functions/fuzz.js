@@ -686,9 +686,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
             if (!controller_stack.length) {
                 return Promise.reject("Can't detect any controller");
             }
-            const controller = this._getController(
-                controller_stack[controller_stack.length - 1]
-            );
+            const controller = this._getController(controller_stack.at(-1));
             if (controller.viewType !== "form") {
                 return Promise.reject(
                     "The current controller is not for a form view"

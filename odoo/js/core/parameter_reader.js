@@ -71,7 +71,7 @@ odoo.define("terminal.core.ParameterReader", function (require) {
             ] = arg.split("::");
             const [short_name, long_name] = names.split(":");
             const list_mode = type[0] === "l";
-            let ttype = type[type.length - 1];
+            let ttype = type.at(-1);
             if (ttype === "-") {
                 ttype = "s";
             }
@@ -442,13 +442,14 @@ odoo.define("terminal.core.ParameterReader", function (require) {
          * @returns {String}
          */
         _trimQuotes: function (str) {
-            const str_length = str.length;
+            const first_char = str[0];
+            const last_char = str.at(-1);
             if (
-                (str[0] === '"' && str[str_length - 1] === '"') ||
-                (str[0] === "'" && str[str_length - 1] === "'") ||
-                (str[0] === "`" && str[str_length - 1] === "`")
+                (first_char === '"' && last_char === '"') ||
+                (first_char === "'" && last_char === "'") ||
+                (first_char === "`" && last_char === "`")
             ) {
-                return str.substring(1, str_length - 1);
+                return str.substring(1, str.length - 1);
             }
             return str;
         },
