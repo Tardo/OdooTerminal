@@ -10,7 +10,6 @@ Commands uses promises
   callback: function,
   detail: string,
   args: string,
-  secured: boolean,
   aliases: array,
   sanitized: boolean,
   generator: boolean,
@@ -26,13 +25,13 @@ Commands uses promises
     "TYPE::NAME_SHORT:NAME_LONG::REQUIRED::DESCRIPTION::DEFAULT_VALUE::STRICT_VALUES"
     - The 'TYPE' can be:
       - 's' String
-      - 'i' Number
-      - 'j' String. Using JSON.parse
-      - 'l' Indicates that the next parameter can be a list (a list is a string
-        of values separted by commas. Example: "1, 3, 5")
-      - 'f' None. Used as flag
+      - 'n' Number
+      - 'd' Dictionary
+      - 'f' Boolean. Used as flag
       - '-' Avoid check type, the param are formatted as string
-- secured: Hide command from screen & history (default is false)
+      - 'l' Indicates that the next parameter can be a list (Ex. 'l-' -> Array
+        of any type | 'ln' -> Array of numbers)
+      - 'l-' Array of any type
 - aliases: Used to set deprecated names of the module
 - sanitized: Truncate single quotes (default is true)
 - generators: Resolve input generators (default is true)

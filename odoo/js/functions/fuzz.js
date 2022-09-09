@@ -476,108 +476,102 @@ odoo.define("terminal.functions.Fuzz", function (require) {
 
         _generateChangesFieldO2M: async function (field_info, widget) {
             // eslint-disable-next-line
-            return new Promise(async (resolve) => {
-                const changes = {};
-                changes[field_info.name] = {
-                    operation: "CREATE",
-                    data: {},
-                };
-                if (field_info.views) {
-                    const o2m_fields = this._getArchFields(
-                        field_info.views[field_info.mode]?.arch
-                    );
-                    const o2m_fields_len = o2m_fields.length;
-                    let index = 0;
-                    while (index < o2m_fields_len) {
-                        const field = o2m_fields[index];
-                        const field_view_name = field.attrs.name;
-                        const field_view_def =
-                            field_info.views[field_info.mode].fields[
-                                field_view_name
-                            ];
-                        const field_view =
-                            field_info.views[field_info.mode].fields[
-                                field_view_name
-                            ];
-                        const field_info_view =
-                            field_info.views[field_info.mode].fieldsInfo[
-                                field_info.mode
-                            ][field_view_name];
-                        if (!field_info_view) {
-                            ++index;
-                            continue;
-                        }
-                        const is_invisible = utils.toBoolElse(
-                            field_info_view.modifiers?.invisible,
-                            false
-                        );
-                        if (
-                            field_view.type === "one2many" ||
-                            is_invisible ||
-                            field_view_def.readonly ||
-                            field_view_name.startsWith("_") ||
-                            field_view_name === "id"
-                        ) {
-                            ++index;
-                            continue;
-                        }
-
-                        const model_data = widget.model.get(widget.handle);
-                        const state = this._convertData2State(model_data.data);
-                        const proc_domain =
-                            (field.attrs.domain &&
-                                py.eval(
-                                    field.attrs.domain,
-                                    _.extend(
-                                        {
-                                            parent: state,
-                                        },
-                                        this._getChangesValues(
-                                            changes[field_info.name].data
-                                        )
-                                    )
-                                )) ||
-                            [];
-                        const gen_field_def = await this._generateFieldDef(
-                            field_view,
-                            field_info_view,
-                            proc_domain
-                        );
-                        let omitted_values = null;
-                        if (
-                            Object.hasOwn(
-                                this._O2MRequiredStore,
-                                field_info.name
-                            )
-                        ) {
-                            omitted_values =
-                                this._O2MRequiredStore[field_info.name][
-                                    field_view_name
-                                ];
-                        }
-                        const data = this._fieldValueGenerator.process(
-                            gen_field_def,
-                            omitted_values
-                        );
-                        if (data) {
-                            changes[field_info.name].data[field_view_name] =
-                                data;
-                            this._processO2MRequiredField(
-                                field_info.name,
-                                field_view_name,
-                                field_view,
-                                changes
-                            );
-                        }
+            const changes = {};
+            changes[field_info.name] = {
+                operation: "CREATE",
+                data: {},
+            };
+            if (field_info.views) {
+                const o2m_fields = this._getArchFields(
+                    field_info.views[field_info.mode]?.arch
+                );
+                const o2m_fields_len = o2m_fields.length;
+                let index = 0;
+                while (index < o2m_fields_len) {
+                    const field = o2m_fields[index];
+                    const field_view_name = field.attrs.name;
+                    const field_view_def =
+                        field_info.views[field_info.mode].fields[
+                            field_view_name
+                        ];
+                    const field_view =
+                        field_info.views[field_info.mode].fields[
+                            field_view_name
+                        ];
+                    const field_info_view =
+                        field_info.views[field_info.mode].fieldsInfo[
+                            field_info.mode
+                        ][field_view_name];
+                    if (!field_info_view) {
                         ++index;
+                        continue;
                     }
+                    const is_invisible = utils.toBoolElse(
+                        field_info_view.modifiers?.invisible,
+                        false
+                    );
+                    if (
+                        field_view.type === "one2many" ||
+                        is_invisible ||
+                        field_view_def.readonly ||
+                        field_view_name.startsWith("_") ||
+                        field_view_name === "id"
+                    ) {
+                        ++index;
+                        continue;
+                    }
+
+                    const model_data = widget.model.get(widget.handle);
+                    const state = this._convertData2State(model_data.data);
+                    const proc_domain =
+                        (field.attrs.domain &&
+                            py.eval(
+                                field.attrs.domain,
+                                _.extend(
+                                    {
+                                        parent: state,
+                                    },
+                                    this._getChangesValues(
+                                        changes[field_info.name].data
+                                    )
+                                )
+                            )) ||
+                        [];
+                    const gen_field_def = await this._generateFieldDef(
+                        field_view,
+                        field_info_view,
+                        proc_domain
+                    );
+                    let omitted_values = null;
+                    if (
+                        Object.hasOwn(this._O2MRequiredStore, field_info.name)
+                    ) {
+                        omitted_values =
+                            this._O2MRequiredStore[field_info.name][
+                                field_view_name
+                            ];
+                    }
+                    const data = this._fieldValueGenerator.process(
+                        gen_field_def,
+                        omitted_values
+                    );
+                    if (data) {
+                        changes[field_info.name].data[field_view_name] = data;
+                        this._processO2MRequiredField(
+                            field_info.name,
+                            field_view_name,
+                            field_view,
+                            changes
+                        );
+                    }
+                    ++index;
                 }
-                // Do not apply changes if doesn't exists changes to apply
-                if (!Object.keys(changes[field_info.name].data).length) {
-                    changes[field_info.name] = false;
-                }
-                return resolve(changes);
-            });
+            }
+            // Do not apply changes if doesn't exists changes to apply
+            if (!Object.keys(changes[field_info.name].data).length) {
+                changes[field_info.name] = false;
+            }
+            return changes;
         },
 
         _generateFieldDef: function (field, field_info = false, domain = []) {
@@ -657,8 +651,8 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 callback: this._cmdFuzz,
                 detail: "Runs a 'Fuzz Test' over the selected model and view",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "s::r:ref::0::The view reference name",
+                    ["s", ["m", "model"], true, "The model technical name"],
+                    ["s", ["r", "ref"], false, "The view reference name"],
                 ],
                 example: "-m res.partner -r base.view_partner_simple_form",
             });
@@ -668,9 +662,9 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 callback: this._cmdFuzzField,
                 detail: "Fill a field/s with a random or given values on the active form",
                 args: [
-                    "ls::f:field::1::The field names",
-                    "-::v:value::0::The value to use",
-                    "i::c:count::0::The count of 02M records",
+                    ["ls", ["f", "field"], true, "The field names"],
+                    ["-", ["v", "value"], false, "The value to use"],
+                    ["n", ["c", "count"], false, "The count of 02M records"],
                 ],
                 example: "-f order_line -v \"{'display_type': false}\" -c 4",
             });

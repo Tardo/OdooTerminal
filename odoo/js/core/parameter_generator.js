@@ -52,64 +52,6 @@ odoo.define("terminal.core.ParameterGenerator", function (require) {
         _intIterStore: [],
         _intIterStoreIndex: 0,
 
-        init: function () {
-            this._generators = {
-                FLOAT: this.generateFloat.bind(this),
-                INT: this.generateInt.bind(this),
-                INTSEQ: this.generateIntSeq.bind(this),
-                INTITER: this._doIntIter.bind(this),
-                STR: this.generateString.bind(this),
-                DATE: this.generateDate.bind(this),
-                TZDATE: this.generateTzDate.bind(this),
-                TIME: this.generateTime.bind(this),
-                TZTIME: this.generateTzTime.bind(this),
-                DATETIME: this.generateDateTime.bind(this),
-                TZDATETIME: this.generateTzDateTime.bind(this),
-                NOW: this.getDateTime,
-                TZNOW: this.getTzDateTime,
-                NOWTIME: this.getTime,
-                TZNOWTIME: this.getTzTime,
-                NOWDATE: this.getDate,
-                TZNOWDATE: this.getTzDate,
-                EMAIL: this.generateEmail.bind(this),
-                URL: this.generateUrl.bind(this),
-            };
-            this._regexParamGenerator = new RegExp(
-                /(\$(\w+)(?:\[(\d+)(?:,(\d+))?\])*)/,
-                "g"
-            );
-        },
-
-        parse: function (params) {
-            const parsed_params = [];
-            this._resetStoreIndexes();
-            const params_len = params.length;
-            let index = 0;
-            while (index < params_len) {
-                let param = params[index];
-                const matches = [
-                    ...String(param).matchAll(this._regexParamGenerator),
-                ];
-                const matches_len = matches.length;
-                let index_b = 0;
-                while (index_b < matches_len) {
-                    const match = matches[index_b];
-                    if (Object.hasOwn(this._generators, match[2])) {
-                        const gen_val = this._generators[match[2]](
-                            ...match.splice(3)
-                        );
-                        if (gen_val !== false) {
-                            param = param.replace(match[0], gen_val);
-                        }
-                    }
-                    ++index_b;
-                }
-                parsed_params.push(param);
-                ++index;
-            }
-            return parsed_params;
-        },
-
         resetStores: function () {
             this._intIterStore = [];
             this._resetStoreIndexes();
@@ -175,7 +117,7 @@ odoo.define("terminal.core.ParameterGenerator", function (require) {
             return numbers.join();
         },
 
-        _doIntIter: function (min, step = 1) {
+        doIntIter: function (min, step = 1) {
             const store_index = this._intIterStoreIndex++;
             let int_iter_store = this._intIterStore[store_index];
             if (!int_iter_store) {
@@ -251,30 +193,6 @@ odoo.define("terminal.core.ParameterGenerator", function (require) {
             }
             const rdate = this.generateInt(min, max);
             return time.datetime_to_str(new Date(rdate));
-        },
-
-        getTzDate: function () {
-            return moment().format(time.getLangDateFormat());
-        },
-
-        getDate: function () {
-            return time.date_to_str(new Date());
-        },
-
-        getTzTime: function () {
-            return moment().format(time.getLangTimeFormat());
-        },
-
-        getTime: function () {
-            return time.time_to_str(new Date());
-        },
-
-        getTzDateTime: function () {
-            return moment().format(time.getLangDatetimeFormat());
-        },
-
-        getDateTime: function () {
-            return time.datetime_to_str(new Date());
         },
     });
 

@@ -73,7 +73,7 @@ odoo.define("terminal.core.TemplateManager", function (require) {
                 "<span style='color: gray;'>In Groups</span>: <%= groups %>",
             WHOAMI_LIST_ITEM:
                 "<br>\u00A0\u00A0- <%= name %> (<span class='o_terminal_click o_terminal_cmd' data-cmd='view <%= model %> <%= id %>'>#<%= id %></span>)",
-            UNKNOWN_COMMAND: `Unknown command. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='<%= cmd %> <%= params %>'><%= cmd %></strong>'?`,
+            UNKNOWN_COMMAND: `Unknown command '<%= org_cmd %>' at <%= pos[0] %>:<%= pos[1] %>. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help <%= cmd %>'><%= cmd %></strong>'?`,
             PROMPT_CMD_HIDDEN_ARGS: `<%= prompt %> <%= cmd.split(" ")[0] %> *****`,
             PROMPT_CMD: `<%= prompt %> <%= cmd %>`,
             WELCOME: `<strong class='o_terminal_title'>Odoo Terminal v<%= ver %></strong>`,
@@ -98,5 +98,6 @@ odoo.define("terminal.core.TemplateManager", function (require) {
         },
     });
 
-    return TemplateManager;
+    const templateManager = new TemplateManager();
+    return templateManager;
 });

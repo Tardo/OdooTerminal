@@ -48,18 +48,17 @@ You can toggle terminal using one of these options:
 
 ## Example Commands
 
-| Description                                         | Terminal Command                                                            |
-| --------------------------------------------------- | --------------------------------------------------------------------------- |
-| Create 'res.partner' record                         | `create -m res.partner -v "{'name': 'Hipcut', 'street': 'Mystery street'}"` |
-| Create 'res.partner' record (simple mode)           | `create -m res.partner -v "name=Hipcut street='Mystery street'"`            |
-| Search 'res.partner' records                        | `search -m res.partner -f name,email -d "[['id', '>', 5]]"`                 |
-| Search all fields of selected 'res.partner' records | `search -m res.partner -f * -d "[['id', '>', 5]]"`                          |
-| Read all fields of selected 'res.partner' record    | `read -m res.partner -i 5 -f *`                                             |
-| Read all fields of various 'res.partner' records    | `read -m res.partner -i 5,15,8 -f *`                                        |
-| View 'res.partner' records _(only backend)_         | `view -m res.partner`                                                       |
-| View selected 'res.partner' record _(only backend)_ | `view -m res.partner -i 4`                                                  |
-| Install module                                      | `install -m mymodule`                                                       |
-| Create alias                                        | `alias -n myalias -c "print My name is $1"`                                 |
+| Description                                         | Terminal Command                                                      |
+| --------------------------------------------------- | --------------------------------------------------------------------- |
+| Create 'res.partner' record                         | `create -m res.partner -v {name: 'Hipcut', street: 'Mystery street'}` |
+| Search 'res.partner' records                        | `search -m res.partner -f name,email -d [['id', '>', 5]]`             |
+| Search all fields of selected 'res.partner' records | `search -m res.partner -f * -d [['id', '>', 5]]`                      |
+| Read all fields of selected 'res.partner' record    | `read -m res.partner -i 5 -f *`                                       |
+| Read all fields of various 'res.partner' records    | `read -m res.partner -i 5,15,8 -f *`                                  |
+| View 'res.partner' records _(only backend)_         | `view -m res.partner`                                                 |
+| View selected 'res.partner' record _(only backend)_ | `view -m res.partner -i 4`                                            |
+| Install module                                      | `install -m mymodule`                                                 |
+| Create alias                                        | `alias -n myalias -c "print My name is $1"`                           |
 
 > Notice the usage of quotes when use parameters with spaces.
 
@@ -99,9 +98,9 @@ slashes. So, when you write something like `"this \_ is a test"`, the engine
 reads `"this \\_ is a test"`. This is great for keeping escaped sentences
 unresolved.
 
-But, this cause problems when you try to resolve them with "JSON.parse", because
-the engine resolves the escaped slashes and JSON.parse try to resolve `"\_"` and
-this result on an exception. See the valid escape sequences in JSON format:
+But, this cause conflicts when you try to resolve them with "TraSH", because the
+js engine resolves the escaped slashes and TraSH try to resolve `"\_"` and this
+result on an exception. See the valid escape sequences in JSON format:
 
 ![Valid JSON escape sequences](https://i.stack.imgur.com/SHLOB.gif)
 
@@ -113,42 +112,6 @@ Escaped quotes (`\' and \"`) are special because they are truncated by the
 terminal. So, when you write `"this \' is a test"`, the terminal reads
 `"this ' is a test"`. If you need send this characters escaped you must use
 'triple-slash': `"this \\\' is a test"`.
-
-#### + Parameter Generators
-
-You can use "parameter generator" to create values.
-
-| Generator    | Arguments | Default   | Description                                                                   |
-| ------------ | --------- | --------- | ----------------------------------------------------------------------------- |
-| \$STR        | min,max   | max = min | Generates a random string with a length between the given min and max         |
-| \$FLOAT      | min,max   | max = min | Generates a random float between the given min and max                        |
-| \$INT        | min,max   | max = min | Generates a random int between the given min and max                          |
-| \$INTSEQ     | min,max   | max = min | Generates a list of int's starting from min to max                            |
-| \$INTITER    | min,step  | step = 1  | Generates a consecutive int starting from min (useful with 'repeat' command)  |
-| \$DATE       | min,max   | max = min | Generates a random date between the given min and max                         |
-| \$TZDATE     | min,max   | max = min | Generates a random date between the given min and max (time zone format)      |
-| \$TIME       | min,max   | max = min | Generates a random time between the given min and max                         |
-| \$TZTIME     | min,max   | max = min | Generates a random time between the given min and max (time zone format)      |
-| \$DATETIME   | min,max   | max = min | Generates a random date time between the given min and max                    |
-| \$TZDATETIME | min,max   | max = min | Generates a random date time between the given min and max (time zone format) |
-| \$EMAIL      | min,max   | max = min | Generates a random email                                                      |
-| \$URL        | min,max   | max = min | Generates a random url                                                        |
-| \$NOWDATE    |           |           | Gets the current date                                                         |
-| \$TZNOWDATE  |           |           | Gets the current date (time zone format)                                      |
-| \$NOWTIME    |           |           | Gets the current time                                                         |
-| \$TZNOWTIME  |           |           | Gets the current time (time zone format)                                      |
-| \$NOW        |           |           | Gets the current date time                                                    |
-| \$TZNOW      |           |           | Gets the current date time (time zone format)                                 |
-
-The anatomy of a generator is: `$type[min,max]`, `$type[max]` or `$type`
-
-For example:
-
-- create a new record with a random string:
-  `create -m res.partner -v name='$STR[4,30]'`
-- print the current time: `print -m $NOWTIME`
-
-> Notice that 'date' min and max are the milliseconds since 1970/01/01
 
 #### + Positional replacements for aliases
 
@@ -164,24 +127,24 @@ For example:
 - Fist position replacement with default value 'world':
   `alias -n my_alias -c "print -m 'Hello, $1[world]'"`
 - A somewhat more complex:
-  `alias -n search_mod -c "search -m ir.module.module -f display_name -d '[[\"name\", \"=\", \"$1\"], [\"state\", \"=\", \"$2[installed]\"]]'"`
+  `alias -n search_mod -c "search -m ir.module.module -f display_name -d [[name, =, '$1'], [state, =, '$2[installed]']]"`
 
 #### + Runners (subcommands)
 
 You can execute "subcommands" to use the result in a new command call. The
-syntax of runners looks like `=={command}`, `=={command}.key` or
-`=={command}[index]`.
+syntax of runners looks like `=={command}`.
 
-For example: `read -m res.users -i =={search -m res.users -f id}.id`
+For example: `read -m res.users -i $(search -m res.users -f id)[0]['id']` or
+`read -m res.users -i $(search -m res.users -f id)['id']`
 
 #### + Massive operations
 
 Massive operations are possible using the command `repeat`. Print to screen is a
-expensive task, consider use the `--slient` argument to increase the
+expensive task, consider use the `--silent` argument to increase the
 performance.
 
 Example:
-`repeat -t 5000 -c "create -m res.partner -v 'name=\"$STR[12] (Test)\"'" --silent`
+`repeat -t 5000 -c "create -m res.partner -v {name: $(gen str 12 8) + ' (Test)'}" --silent`
 
 ---
 

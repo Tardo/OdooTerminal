@@ -35,9 +35,9 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdViewModelRecord,
                 detail: "Open model record in form view or records in list view.",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "i::i:id::0::The record id",
-                    "s::r:ref::0::The view reference name",
+                    ["s", ["m", "model"], true, "The model technical name"],
+                    ["n", ["i", "id"], false, "The record id"],
+                    ["s", ["r", "ref"], false, "The view reference name"],
                 ],
                 example:
                     "-m res.partner -i 10 -r base.view_partner_simple_form",
@@ -47,7 +47,13 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdOpenSettings,
                 detail: "Open settings page.",
                 args: [
-                    "s::m:module::0::The module technical name::general_settings",
+                    [
+                        "s",
+                        ["m", "module"],
+                        false,
+                        "The module technical name",
+                        "general_settings",
+                    ],
                 ],
                 example: "-m sale_management",
             });
@@ -56,12 +62,36 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdLang,
                 detail: "Operations over translations.",
                 args: [
-                    "s::o:operation::1::The operation::::export:import:list",
-                    "s::l:lang::0::The language<br/>Can use '__new__' for new language (empty translation template)",
-                    "ls::m:module::0::The technical module name",
-                    "s::f:format::0::The format to use::po::po:csv",
-                    "s::n:name::0::The language name",
-                    "f::no-overwrite:no-overwrite::0::Flag to indicate dont overwrite current translations",
+                    [
+                        "s",
+                        ["o", "operation"],
+                        true,
+                        "The operation",
+                        "export",
+                        ["export", "import", "list"],
+                    ],
+                    [
+                        "s",
+                        ["l", "lang"],
+                        false,
+                        "The language<br/>Can use '__new__' for new language (empty translation template)",
+                    ],
+                    ["ls", ["m", "module"], false, "The technical module name"],
+                    [
+                        "s",
+                        ["f", "format"],
+                        false,
+                        "The format to use",
+                        "po",
+                        ["po", "csv"],
+                    ],
+                    ["s", ["n", "name"], false, "The language name"],
+                    [
+                        "f",
+                        ["no", "no-overwrite"],
+                        false,
+                        "Flag to indicate dont overwrite current translations",
+                    ],
                 ],
                 example: "-o export -l en_US -m mail",
             });
@@ -70,8 +100,13 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdCallAction,
                 detail: "Call action",
                 args: [
-                    "-::a:action::1::The action to launch<br/>Can be an string, number or object",
-                    "j::o:options::0::The extra options to use",
+                    [
+                        "-",
+                        ["a", "action"],
+                        true,
+                        "The action to launch<br/>Can be an string, number or object",
+                    ],
+                    ["d", ["o", "options"], false, "The extra options to use"],
                 ],
                 example: "-a 134",
             });

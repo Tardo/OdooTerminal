@@ -20,7 +20,6 @@ odoo.define("terminal.core.Screen", function (require) {
 
         init: function () {
             this._super.apply(this, arguments);
-            this._templates = new TemplateManager();
             this._linesCounter = 0;
             this._lazyVacuum = _.debounce(() => this._vacuum(), 650);
             this._buff = [];
@@ -223,7 +222,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
         printCommand: function (cmd, secured = false) {
             this.eprint(
-                this._templates.render(
+                TemplateManager.render(
                     secured ? "PROMPT_CMD_HIDDEN_ARGS" : "PROMPT_CMD",
                     {
                         prompt: this.PROMPT,
@@ -242,7 +241,7 @@ odoo.define("terminal.core.Screen", function (require) {
             if (typeof error === "object" && Object.hasOwn(error, "data")) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
-                error_msg = this._templates.render("ERROR_MESSAGE", {
+                error_msg = TemplateManager.render("ERROR_MESSAGE", {
                     error_name: Utils.encodeHTML(error.data.name),
                     error_message: Utils.encodeHTML(error.data.message),
                     error_id: error_id,
@@ -265,7 +264,7 @@ odoo.define("terminal.core.Screen", function (require) {
             ) {
                 // It's an Odoo/jQuery error report
                 const error_id = new Date().getTime();
-                error_msg = this._templates.render("ERROR_MESSAGE", {
+                error_msg = TemplateManager.render("ERROR_MESSAGE", {
                     error_name: Utils.encodeHTML(error.statusText),
                     error_message: Utils.encodeHTML(error.statusText),
                     error_id: error_id,
@@ -282,7 +281,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
         printTable: function (columns, tbody) {
             this.print(
-                this._templates.render("TABLE", {
+                TemplateManager.render("TABLE", {
                     thead: columns.join("</th><th>"),
                     tbody: tbody,
                 })
@@ -296,7 +295,7 @@ odoo.define("terminal.core.Screen", function (require) {
             for (let x = 0; x < len; ++x) {
                 const item = records[x];
                 tbody += "<tr>";
-                tbody += this._templates.render("TABLE_SEARCH_ID", {
+                tbody += TemplateManager.render("TABLE_SEARCH_ID", {
                     id: item.id,
                     model: model,
                 });
@@ -337,12 +336,8 @@ odoo.define("terminal.core.Screen", function (require) {
             }
         },
 
-        showQuestion: function (question_spec) {
+        showQuestion: function (question, values, def_value) {
             const defer = Utils.defer();
-            let [question, values, def_value] = question_spec.split("::");
-            if (typeof values !== "undefined") {
-                values = values.split(":");
-            }
             this._questions.push({
                 question: question,
                 values: values,
