@@ -4,7 +4,6 @@
 odoo.define("terminal.functions.Common", function (require) {
     "use strict";
 
-    const tour = require("web_tour.tour");
     const rpc = require("terminal.core.rpc");
     const ajax = require("web.ajax");
     const session = require("web.session");
@@ -559,12 +558,19 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdRunTour: function (kwargs) {
+            // Loaded in this way because 'tour' is not initialized on mobile mode.
+            const tour = odoo.__DEBUG__.services["web_tour.tour"];
+            if (!tour) {
+                return Promise.reject(
+                    "tour not accesible! Can't use this command now."
+                );
+            }
             const tour_names = Object.keys(tour.tours);
             if (kwargs.name) {
                 if (tour_names.indexOf(kwargs.name) === -1) {
                     return Promise.reject("The given tour doesn't exists!");
                 }
-                odoo.__DEBUG__.services["web_tour.tour"].run(kwargs.name);
+                tour.run(kwargs.name);
                 this.screen.print("Running tour...");
             } else if (tour_names.length) {
                 this.screen.print(tour_names);
