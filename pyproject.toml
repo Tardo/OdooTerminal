@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "OdooTerminal"
-version = "8.6.0"
+version = "8.6.1"
 description = "All the power of Odoo json-rpc in a really easy way!"
 authors = ["Alexandre D. Díaz <dev@redneboa.es>"]
 
