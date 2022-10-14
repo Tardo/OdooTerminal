@@ -15,12 +15,27 @@ odoo.define("terminal.core.compat.16.Common", function (require) {
         /**
          * @override
          */
+        _busServ: function (method, ...params) {
+            return this._parent.env.services.bus_service[method](...params);
+        },
+
+        /**
+         * @override
+         */
         setup: function () {
             this._busServ(
                 "addEventListener",
                 "notification",
                 this._onBusNotification.bind(this)
             );
+        },
+
+        stopPoll: function () {
+            return this._busServ("stop");
+        },
+
+        startPoll: function () {
+            return this._busServ("forceUpdateChannels");
         },
     });
 

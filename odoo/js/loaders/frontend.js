@@ -25,7 +25,7 @@ odoo.define("terminal.loaders.Frontend", function (require) {
                 const uid = Utils.getUID();
                 try {
                     const server_version = await this.execute(
-                        "rpc -o \"{'route': '/jsonrpc', 'method': 'server_version', 'params': {'service': 'db'}}\"",
+                        "rpc -o {route: '/jsonrpc', method: 'server_version', params: {service: 'db'}}",
                         false,
                         true
                     );

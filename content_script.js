@@ -134,7 +134,9 @@
         ) {
             // Version 15.0
             to_inject.js.push("odoo/js/core/compat/v15/common.js");
-            to_inject.js.push("odoo/js/core/compat/v15/backend.js");
+            if (!info.isFrontend) {
+                to_inject.js.push("odoo/js/core/compat/v15/backend.js");
+            }
             compat_mode = 15;
         }
         if (
@@ -143,6 +145,9 @@
         ) {
             // Version 16.0
             to_inject.js.push("odoo/js/core/compat/v16/common.js");
+            if (!info.isFrontend) {
+                to_inject.js.push("odoo/js/core/compat/v16/backend.js");
+            }
             compat_mode = 16;
         }
         // Backend/Frontend resources

@@ -70,9 +70,10 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
 
-        init: function (parent, mode) {
+        init: function (parent, mode, options) {
             this._super.apply(this, arguments);
             this._mode = mode;
+            this.env = options?.env;
             this._buffer = {};
             this._jobs = [];
             this._storage = new Storage.StorageSession();
@@ -833,20 +834,25 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
         _onCoreKeyDown: function (ev) {
-            if (
-                ev.keyCode === 27 &&
-                _.isEmpty(this.screen.getQuestionActive())
-            ) {
-                // Press Escape
-                this.doHide();
-            } else {
-                const keybind = window.__OdooTerminal.process_keybind(ev);
-                const keybind_str = JSON.stringify(keybind);
-                const keybind_cmds = this._config.shortcuts[keybind_str];
-                if (keybind_cmds) {
-                    this.execute(keybind_cmds, false, true);
-                    ev.preventDefault();
+            // Don't crash when press keys!
+            try {
+                if (
+                    ev.keyCode === 27 &&
+                    _.isEmpty(this.screen.getQuestionActive())
+                ) {
+                    // Press Escape
+                    this.doHide();
+                } else {
+                    const keybind = window.__OdooTerminal.process_keybind(ev);
+                    const keybind_str = JSON.stringify(keybind);
+                    const keybind_cmds = this._config.shortcuts[keybind_str];
+                    if (keybind_cmds) {
+                        this.execute(keybind_cmds, false, true);
+                        ev.preventDefault();
+                    }
                 }
+            } catch (err) {
+                // Do nothing
             }
         },
         _onCoreBeforeUnload: function (ev) {

@@ -9,6 +9,7 @@ IMP: Args. definition
 ADD: 'TraSH' a language inspired in sh command language
 ADD: Command 'gen': Replace for generators
 ADD: Command 'now': Shows current time/date/datetime
+ADD: Support Odoo 16.0
 
 DEL: SimpleJSON
 DEL: Generators

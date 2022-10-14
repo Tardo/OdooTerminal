@@ -535,7 +535,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 } else {
                     return reject("Invalid operation!");
                 }
-                return resolve();
+                return resolve(kwargs.data);
             });
         },
 

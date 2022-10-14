@@ -25,6 +25,8 @@
         "saas~14",
         "15.",
         "saas~15",
+        "16.",
+        "saas~16",
     ];
     const gOdooObj = window.odoo;
     const gOdooInfo = {};

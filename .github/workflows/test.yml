@@ -10,12 +10,9 @@ jobs:
   selenium:
     strategy:
       matrix:
-        # Use only the starred instances
-        instance: [11.0, 12.0, 13.0, 14.0, 15.0]
-        browser: [chrome]
-        include:
-          - instance: 15.0
-            browser: firefox
+        # Use only lower and higher versions
+        instance: [11.0, 16.0]
+        browser: [chrome, firefox]
       fail-fast: false
     runs-on: ubuntu-latest
 

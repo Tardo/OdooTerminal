@@ -284,47 +284,53 @@ odoo.define("terminal.functions.Backend", function (require) {
         _getDialogParent: function () {
             return this;
         },
+        _openSelectCreateDialog: function (model, title, domain, on_selected) {
+            const dialog = new dialogs.SelectCreateDialog(
+                this._getDialogParent(),
+                {
+                    res_model: model,
+                    title: title,
+                    domain: domain || "[]",
+                    disable_multiple_selection: true,
+                    on_selected: on_selected,
+                }
+            );
+            dialog.open();
+            return dialog.opened();
+        },
         _cmdViewModelRecord: function (kwargs) {
             const context = this._getContext({
                 form_view_ref: kwargs.ref || false,
             });
-            return new Promise((resolve) => {
-                if (kwargs.id) {
-                    return this.do_action({
+            if (kwargs.id) {
+                return this.do_action({
+                    type: "ir.actions.act_window",
+                    name: "View Record",
+                    res_model: kwargs.model,
+                    res_id: kwargs.id,
+                    views: [[false, "form"]],
+                    target: "current",
+                    context: context,
+                }).then(() => {
+                    this.doHide();
+                });
+            }
+            return this._openSelectCreateDialog(
+                kwargs.model,
+                "Select a record",
+                "",
+                (records) => {
+                    this.do_action({
                         type: "ir.actions.act_window",
                         name: "View Record",
                         res_model: kwargs.model,
-                        res_id: kwargs.id,
+                        res_id: records[0].id || records[0],
                         views: [[false, "form"]],
                         target: "current",
                         context: context,
-                    }).then(() => {
-                        this.doHide();
-                        resolve();
                     });
                 }
-                const dialog = new dialogs.SelectCreateDialog(
-                    this._getDialogParent(),
-                    {
-                        res_model: kwargs.model,
-                        title: "Select a record",
-                        disable_multiple_selection: true,
-                        on_selected: (records) => {
-                            this.do_action({
-                                type: "ir.actions.act_window",
-                                name: "View Record",
-                                res_model: kwargs.model,
-                                res_id: records[0].id,
-                                views: [[false, "form"]],
-                                target: "current",
-                                context: context,
-                            });
-                        },
-                    }
-                );
-                dialog.open();
-                return dialog.opened().then(resolve);
-            });
+            );
         },
     });
 });

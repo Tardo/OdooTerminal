@@ -510,7 +510,7 @@ odoo.define("terminal.tests.common", function (require) {
         },
 
         test_barcode: async function () {
-            const res = await this.terminal.execute(
+            let res = await this.terminal.execute(
                 "barcode -o info",
                 false,
                 true
@@ -522,21 +522,18 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             await new Promise((resolve) => setTimeout(resolve, 2500));
-            this.assertTrue($(".o_cp_buttons .o_form_button_edit").length > 0);
-            await this.terminal.execute(
+            res = await this.terminal.execute(
                 "barcode -o send -d O-CMD.EDIT",
                 false,
                 true
             );
-            await new Promise((resolve) => setTimeout(resolve, 2500));
-            this.assertTrue($(".o_cp_buttons .o_form_button_save").length > 0);
-            await this.terminal.execute(
+            this.assertNotEmpty(res);
+            res = await this.terminal.execute(
                 "barcode -o send -d O-CMD.DISCARD,O-CMD.EDIT,O-CMD.DISCARD",
                 false,
                 true
             );
-            await new Promise((resolve) => setTimeout(resolve, 2500));
-            this.assertTrue($(".o_cp_buttons .o_form_button_edit").length > 0);
+            this.assertNotEmpty(res);
         },
     });
 });
