@@ -30,7 +30,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Clean the selected section",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["s", "section"],
                         false,
                         "The section to clear<br/>- screen: Clean the screen<br/>- history: Clean the command history",
@@ -44,7 +44,14 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Print a message",
                 callback: this._cmdPrintText,
                 detail: "Eval parameters and print the result.",
-                args: [["a", ["m", "msg"], true, "The message to print"]],
+                args: [
+                    [
+                        TrashConst.ARG.Any,
+                        ["m", "msg"],
+                        true,
+                        "The message to print",
+                    ],
+                ],
                 aliases: ["echo"],
                 example: "-m 'This is a example'",
             });
@@ -52,7 +59,14 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Load external resource",
                 callback: this._cmdLoadResource,
                 detail: "Load external source (javascript & css)",
-                args: [["s", ["u", "url"], true, "The URL of the asset"]],
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["u", "url"],
+                        true,
+                        "The URL of the asset",
+                    ],
+                ],
                 example: "-u https://example.com/libs/term_extra.js",
             });
             this.registerCommand("context_term", {
@@ -63,7 +77,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     "This context only affects to the terminal operations.",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["o", "operation"],
                         false,
                         "The operation to do",
@@ -86,8 +100,18 @@ odoo.define("terminal.functions.Core", function (require) {
                     "computer." +
                     "<br><br>Can use positional parameters ($1,$2,$3,$N...)",
                 args: [
-                    ["s", ["n", "name"], false, "The name of the alias"],
-                    ["s", ["c", "cmd"], false, "The command to run"],
+                    [
+                        TrashConst.ARG.String,
+                        ["n", "name"],
+                        false,
+                        "The name of the alias",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["c", "cmd"],
+                        false,
+                        "The command to run",
+                    ],
                 ],
                 sanitized: false,
                 example: "-n myalias -c \"print 'Hello, $1!'\"",
@@ -102,7 +126,14 @@ odoo.define("terminal.functions.Core", function (require) {
                     "Exports the command result to a browser console variable",
                 callback: this._cmdExportVar,
                 detail: "Exports the command result to a browser console variable.",
-                args: [["-", ["v", "value"], true, "The value to export"]],
+                args: [
+                    [
+                        TrashConst.ARG.Any,
+                        ["v", "value"],
+                        true,
+                        "The value to export",
+                    ],
+                ],
                 sanitized: false,
                 example: "-v $(search res.partner)",
             });
@@ -112,7 +143,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Exports the command result to a text/json file.",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["c", "cmd"],
                         true,
                         "The command to run and export the result",
@@ -128,7 +159,14 @@ odoo.define("terminal.functions.Core", function (require) {
                     "Print the elapsed time in seconds to execute a command. " +
                     "<br/>Notice that this time includes the time to format the result!",
                 syntax: "<STRING: COMMAND>",
-                args: [["s", ["c", "cmd"], true, "The command to run"]],
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["c", "cmd"],
+                        true,
+                        "The command to run",
+                    ],
+                ],
                 sanitized: false,
                 example: "-c 'search res.partner'",
             });
@@ -137,10 +175,20 @@ odoo.define("terminal.functions.Core", function (require) {
                 callback: this._cmdRepeat,
                 detail: "Repeat a command N times.",
                 args: [
-                    ["n", ["t", "times"], true, "Times to run"],
-                    ["s", ["c", "cmd"], true, "The command to run"],
                     [
-                        "f",
+                        TrashConst.ARG.Number,
+                        ["t", "times"],
+                        true,
+                        "Times to run",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["c", "cmd"],
+                        true,
+                        "The command to run",
+                    ],
+                    [
+                        TrashConst.ARG.Flag,
                         ["silent", "silent"],
                         false,
                         "Used to don't print command output",
@@ -166,7 +214,9 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Dissasembler bytecode",
                 callback: this._cmdDis,
                 detail: "Shows the bytecode generated for the input",
-                args: [["s", ["c", "code"], true, "TraSH Code"]],
+                args: [
+                    [TrashConst.ARG.String, ["c", "code"], true, "TraSH Code"],
+                ],
                 sanitized: false,
                 example: "-c \"print $var[0]['key'] + ' -> ' + 1234\"",
             });
@@ -176,7 +226,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Shows the bytecode generated for the input",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["t", "type"],
                         true,
                         "Generator type",
@@ -197,8 +247,14 @@ odoo.define("terminal.functions.Core", function (require) {
                             "url",
                         ],
                     ],
-                    ["n", ["mi", "min"], false, "Min. value", 1],
-                    ["n", ["ma", "max"], false, "Max. value"],
+                    [
+                        TrashConst.ARG.Number,
+                        ["mi", "min"],
+                        false,
+                        "Min. value",
+                        1,
+                    ],
+                    [TrashConst.ARG.Number, ["ma", "max"], false, "Max. value"],
                 ],
                 sanitized: false,
                 example: "-t str -mi 2 -ma 4",
@@ -209,14 +265,20 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Prints the current time",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["t", "type"],
                         false,
                         "Date type",
                         "full",
                         ["full", "date", "time"],
                     ],
-                    ["f", ["tz", "tz"], false, "Use timezone", false],
+                    [
+                        TrashConst.ARG.Flag,
+                        ["tz", "tz"],
+                        false,
+                        "Use timezone",
+                        false,
+                    ],
                 ],
                 sanitized: false,
                 example: "-t time --tz",
@@ -339,7 +401,7 @@ odoo.define("terminal.functions.Core", function (require) {
                 }
 
                 this.screen.print(
-                    `${this._virtMachine.getHumanType(instr[0])} (${lvalue})`
+                    `${TrashConst.PARSER.getHumanType(instr[0])} (${lvalue})`
                 );
             }
 
@@ -397,7 +459,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     : ["[", "]"];
                 arg_info_str += `${arg_symbols[0]}${lnames.join(
                     ", "
-                )} [${this._virtMachine.getHumanType(arg_info.type)}`;
+                )} [${TrashConst.ARG.getHumanType(arg_info.type)}`;
                 if (_.isEmpty(arg_info.strict_values)) {
                     arg_info_str += `]${arg_symbols[1]}`;
                 } else {
@@ -407,9 +469,9 @@ odoo.define("terminal.functions.Core", function (require) {
                 }
                 if (typeof arg_info.default_value !== "undefined") {
                     arg_info_str += ` (default is ${
-                        arg_info.type[0] === "l"
+                        arg_info.type[0] === TrashConst.ARG.List
                             ? arg_info.default_value.join(",")
-                            : arg_info.type[0] === "d"
+                            : arg_info.type[0] === TrashConst.ARG.Dictionary
                             ? JSON.stringify(arg_info.default_value)
                             : arg_info.default_value
                     })`;

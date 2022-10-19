@@ -16,23 +16,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
         init: function (parent, storage_local) {
             this.setParent(parent);
             this._storageLocal = storage_local;
-            this._validators = {
-                s: this._validateString.bind(this),
-                n: this._validateNumber.bind(this),
-                d: this._validateDict.bind(this),
-                f: this._validateFlag.bind(this),
-                a: this._validateAlphanumeric.bind(this),
-                "-": this._validateAny.bind(this),
-            };
-            // To mantain the support with old syntax
-            this._formatters = {
-                s: this._formatString.bind(this),
-                n: this._formatNumber.bind(this),
-                d: this._formatDict.bind(this),
-                f: this._formatFlag.bind(this),
-                a: this._formatAlphanumeric.bind(this),
-                "-": this._formatAny.bind(this),
-            };
             this._regexSanitize = new RegExp(/(?<!\\)'/g);
             this._regexComments = new RegExp(
                 /^(\s*)?\/\/.*|^(\s*)?\/\*.+\*\//gm
@@ -66,7 +49,8 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 strict_values,
             ] = arg;
             const [short_name, long_name] = names;
-            const list_mode = type[0] === "l";
+            const list_mode =
+                (type & TrashConst.ARG.List) === TrashConst.ARG.List;
             return {
                 type: type,
                 names: {
@@ -99,38 +83,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
             }
 
             return null;
-        },
-
-        /**
-         * @param {String} type
-         * @returns {String}
-         */
-        getHumanType: function (type) {
-            const singular_types = ["-", "j"];
-            const name_types = {
-                i: "NUMBER",
-                s: "STRING",
-                j: "JSON",
-                f: "FLAG",
-                a: "ALPHANUMERIC",
-                "-": "ANY",
-            };
-            let res = "";
-            let carg = type[0];
-            const is_list = carg === "l";
-            if (is_list) {
-                res += "LIST OF ";
-                carg = type[1];
-            }
-            if (Object.hasOwn(name_types, carg)) {
-                res += name_types[carg];
-            } else {
-                res += "UNKNOWN";
-            }
-            if (is_list && singular_types.indexOf(carg) === -1) {
-                res += "S";
-            }
-            return res;
         },
 
         parseAliases: function (cmd_name, args) {
@@ -196,42 +148,8 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 rpk = 3;
             const max_dist = Math.sqrt(cpk + rpk);
             const _get_key_dist = function (from, to) {
-                // FIXME: Inaccurate keymap
-                //      '_' and '-' positions are only valid for spanish layout
-                const keymap = [
-                    "q",
-                    "w",
-                    "e",
-                    "r",
-                    "t",
-                    "y",
-                    "u",
-                    "i",
-                    "o",
-                    "p",
-                    "a",
-                    "s",
-                    "d",
-                    "f",
-                    "g",
-                    "h",
-                    "j",
-                    "k",
-                    "l",
-                    null,
-                    "z",
-                    "x",
-                    "c",
-                    "v",
-                    "b",
-                    "n",
-                    "m",
-                    "_",
-                    "-",
-                    null,
-                ];
                 const _get_key_pos2d = function (key) {
-                    const i = keymap.indexOf(key);
+                    const i = TrashConst.KEYMAP.indexOf(key);
                     if (i === -1) {
                         return [cpk, rpk];
                     }
@@ -245,10 +163,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 return Math.sqrt(x + y);
             };
 
-            const sanitized_in_cmd = in_cmd
-                .toLowerCase()
-                .replace(/^[^a-z]+|[^a-z]+$/g, "")
-                .trim();
+            const sanitized_in_cmd = in_cmd.toLowerCase();
             const sorted_cmd_keys = _.keys(registered_cmds).sort();
             const min_score = [0, ""];
             const sorted_keys_len = sorted_cmd_keys.length;
@@ -597,6 +512,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 values: [],
                 arguments: [],
             };
+            let last_token_index = -1;
             for (let index = 0; index < tokens_len; ++index) {
                 const token = parse_info.inputTokens[index];
                 const token_next = parse_info.inputTokens[index + 1];
@@ -727,16 +643,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     case TrashConst.LEXER.Assignment:
                         const last_instr = parse_info.stack.instructions.at(-1);
                         if (last_instr) {
-                            if (last_instr[0] === TrashConst.PARSER.LOAD_NAME) {
-                                parse_info.stack.instructions.pop();
-                                to_append_eoc.names.push(
-                                    parse_info.stack.names.pop()
-                                );
-                                to_append_eoc.instructions.push([
-                                    TrashConst.PARSER.STORE_NAME,
-                                    index - 1,
-                                ]);
-                            } else if (
+                            if (
                                 last_instr[0] ===
                                 TrashConst.PARSER.LOAD_DATA_ATTR
                             ) {
@@ -745,7 +652,29 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                                     TrashConst.PARSER.STORE_SUBSCR,
                                     index,
                                 ]);
+                            } else {
+                                parse_info.stack.instructions.pop();
+                                if (
+                                    last_instr[0] ===
+                                    TrashConst.PARSER.LOAD_NAME
+                                ) {
+                                    to_append_eoc.names.push(
+                                        parse_info.stack.names.pop()
+                                    );
+                                } else {
+                                    to_append_eoc.names.push(undefined);
+                                }
+                                to_append_eoc.instructions.push([
+                                    TrashConst.PARSER.STORE_NAME,
+                                    last_token_index,
+                                ]);
                             }
+                        } else {
+                            to_append_eoc.names.push(undefined);
+                            to_append_eoc.instructions.push([
+                                TrashConst.PARSER.STORE_NAME,
+                                last_token_index,
+                            ]);
                         }
                         break;
                     case TrashConst.LEXER.DataAttribute:
@@ -798,6 +727,10 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     token.type === TrashConst.LEXER.Delimiter
                 ) {
                     pushParseData(to_append_eoc);
+                }
+
+                if (token.type !== TrashConst.LEXER.Space) {
+                    last_token_index = index;
                 }
             }
 
@@ -878,36 +811,17 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 const arg_names = Object.keys(full_kwargs);
                 const new_kwargs = {};
                 for (const arg_name of arg_names) {
-                    let arg_value = full_kwargs[arg_name];
+                    const arg_value = full_kwargs[arg_name];
                     const arg_info = args_infos[arg_name];
                     const arg_long_name = arg_info.names.long;
                     const s_arg_long_name = arg_long_name.replaceAll("-", "_");
-                    let carg = arg_info.type[0];
-                    // Determine argument type (modifiers)
-                    if (carg === "l") {
-                        carg = arg_info.type[1];
-                    }
-
-                    if (
-                        !this._validators[carg](arg_value, arg_info.list_mode)
-                    ) {
-                        return reject(
-                            `Invalid parameter for '${arg_long_name}' argument: '${arg_value}'`
+                    try {
+                        new_kwargs[s_arg_long_name] = await this._format(
+                            arg_value,
+                            arg_info
                         );
-                    }
-
-                    if (typeof arg_value === "string") {
-                        new_kwargs[s_arg_long_name] = await this._formatters[
-                            carg
-                        ](arg_value, arg_info.list_mode);
-                    } else {
-                        if (
-                            arg_info.list_mode &&
-                            !(arg_value instanceof Array)
-                        ) {
-                            arg_value = [arg_value];
-                        }
-                        new_kwargs[s_arg_long_name] = arg_value;
+                    } catch (err) {
+                        return reject(err);
                     }
                 }
 
@@ -919,22 +833,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
             const aliases =
                 this._storageLocal.getItem("terminal_aliases") || {};
             return aliases[cmd_name];
-        },
-
-        _tryAllFormatters: function (param, list_mode) {
-            // Try all possible validators/formatters
-            let formatted_param = null;
-            for (const key in this._validators) {
-                if (key === "s") {
-                    continue;
-                }
-                if (this._validators[key](param, list_mode)) {
-                    formatted_param = this._formatters[key](param, list_mode);
-                    break;
-                }
-            }
-
-            return formatted_param;
         },
 
         /**
@@ -956,238 +854,78 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
         },
 
         /**
-         * Test if is an string.
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {Boolean}
+         * This is necessary to get support to old input format
+         *
+         * @param {Any} param
+         * @param {Object} arg_info
+         * @returns
          */
-        _validateString: function (param, list_mode = false) {
-            const is_string = typeof param === "string";
-            if (list_mode) {
-                let is_valid = true;
-                if (is_string) {
-                    const param_split = param.split(",");
-                    const param_split_len = param_split.length;
-                    let index = 0;
-                    while (index < param_split_len) {
-                        const ps = param_split[index];
-                        const param_sa = ps.trim();
-                        if (Number(param_sa) === parseInt(param_sa, 10)) {
-                            is_valid = false;
-                            break;
-                        }
-                        ++index;
-                    }
-                } else if (param instanceof Array) {
-                    const params_len = param.length;
-                    let index = 0;
-                    while (index < params_len) {
-                        const ps = param[index];
-                        if (typeof ps !== "string") {
-                            is_valid = false;
-                            break;
-                        }
-                        ++index;
-                    }
+        _format: function (param, arg_info) {
+            let san_param = param;
+
+            const doFormat = async (val, type) => {
+                let ret = val;
+                if (
+                    (type & TrashConst.ARG.String) === TrashConst.ARG.String &&
+                    typeof val !== "string"
+                ) {
+                    ret = val.toString();
+                } else if (
+                    (type & TrashConst.ARG.Number) === TrashConst.ARG.Number &&
+                    typeof val !== "number"
+                ) {
+                    ret = Number(val);
+                } else if (
+                    (type & TrashConst.ARG.Flag) === TrashConst.ARG.Flag &&
+                    typeof val !== "boolean"
+                ) {
+                    ret = Boolean(val);
+                } else if (
+                    (type & TrashConst.ARG.Dictionary) ===
+                        TrashConst.ARG.Dictionary &&
+                    val.constructor !== Object
+                ) {
+                    ret = (
+                        await this.getParent().eval(param, {silent: true})
+                    )[0];
+                } else if (
+                    (type & TrashConst.ARG.Any) === TrashConst.ARG.Any &&
+                    typeof val === "string"
+                ) {
+                    ret = (
+                        await this.getParent().eval(param, {
+                            ignoreCommandMode: true,
+                            forceReturn: true,
+                            silent: true,
+                        })
+                    )[0];
                 }
-                return is_valid;
-            }
-            if (is_string) {
-                return true;
-            }
-            return Number(param) !== parseInt(param, 10);
-        },
-
-        /**
-         * Test if is a number.
-         * @param {String/Number} param
-         * @param {Boolean} list_mode
-         * @returns {Boolean}
-         */
-        _validateNumber: function (param, list_mode = false) {
-            if (typeof param === "number") {
-                return true;
-            }
-            if (list_mode) {
-                let is_valid = true;
-                if (param instanceof Array) {
-                    const params_len = param.length;
-                    let index = 0;
-                    while (index < params_len) {
-                        const ps = param[index];
-                        if (!(typeof ps === "number")) {
-                            is_valid = false;
-                            break;
-                        }
-                        ++index;
-                    }
-                } else {
-                    const param_split = param.split(",");
-                    const param_split_len = param_split.length;
-                    let index = 0;
-                    while (index < param_split_len) {
-                        const ps = param_split[index];
-                        const param_sa = ps.trim();
-                        if (Number(param_sa) !== parseInt(param_sa, 10)) {
-                            is_valid = false;
-                            break;
-                        }
-                        ++index;
-                    }
+                if (_.isNull(ret) || _.isNaN(ret) || _.isUndefined(ret)) {
+                    return Promise.reject(`Invalid '${val}' argument!`);
                 }
-                return is_valid;
-            }
-            return Number(param) === parseInt(param, 10);
-        },
+                return ret;
+            };
 
-        /**
-         * Dummy test
-         * @returns {Boolean}
-         */
-        _validateAny: function () {
-            return true;
-        },
-
-        /**
-         * Test if is an alphanumeric.
-         * @param {String/Number} param
-         * @param {Boolean} list_mode
-         * @returns {Boolean}
-         */
-        _validateAlphanumeric: function (param, list_mode = false) {
-            return (
-                this._validateNumber(param, list_mode) ||
-                this._validateString(param, list_mode)
-            );
-        },
-
-        /**
-         * Test if is a valid object.
-         * @param {Object} param
-         * @param {Boolean} list_mode
-         * @returns {Boolean}
-         */
-        _validateDict: function (param, list_mode = false) {
-            if (list_mode) {
-                let is_valid = true;
-                if (param instanceof Array) {
-                    const params_len = param.length;
-                    let index = 0;
-                    while (index < params_len) {
-                        const ps = param[index];
-                        if (!(ps instanceof Object)) {
-                            is_valid = false;
-                            break;
+            return new Promise(async (resolve, reject) => {
+                try {
+                    if (arg_info.list_mode) {
+                        if (typeof param === "string") {
+                            san_param = param.split(",");
+                        } else if (param.constructor !== Array) {
+                            san_param = [param];
                         }
-                        ++index;
-                    }
-                } else {
-                    is_valid = false;
-                }
-                return is_valid;
-            }
 
-            return param instanceof Object;
-        },
-
-        /**
-         * Test if is a valid flag.
-         * @param {Object} param
-         * @param {Boolean} list_mode
-         * @returns {Boolean}
-         */
-        _validateFlag: function (param, list_mode = false) {
-            if (list_mode) {
-                let is_valid = true;
-                if (param instanceof Array) {
-                    const params_len = param.length;
-                    let index = 0;
-                    while (index < params_len) {
-                        const ps = param[index];
-                        if (typeof ps !== "boolean") {
-                            is_valid = false;
-                            break;
+                        const fparam = [];
+                        for (const val of san_param) {
+                            fparam.push(await doFormat(val, arg_info.type));
                         }
-                        ++index;
+                        return resolve(fparam);
                     }
-                } else {
-                    is_valid = false;
+                    return resolve(await doFormat(param, arg_info.type));
+                } catch (err) {
+                    return reject(err);
                 }
-                return is_valid;
-            }
-
-            return typeof param === "boolean";
-        },
-
-        /**
-         * Format value to string
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {String}
-         */
-        _formatString: async function (param, list_mode = false) {
-            if (list_mode) {
-                return this.splitAndTrim(param);
-            }
-            return param;
-        },
-
-        /**
-         * Format value to number
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {Number}
-         */
-        _formatNumber: async function (param, list_mode = false) {
-            if (list_mode) {
-                return _.map(this.splitAndTrim(param), (item) => Number(item));
-            }
-            return Number(param);
-        },
-
-        /**
-         * Format value to string
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {Number}
-         */
-        _formatAlphanumeric: async function (param, list_mode = false) {
-            return this._formatString(param, list_mode);
-        },
-
-        /**
-         * Format value to boolean
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {Number}
-         */
-        _formatFlag: async function (param, list_mode = false) {
-            if (list_mode) {
-                return _.map(this.splitAndTrim(param), (item) => Boolean(item));
-            }
-            return Boolean(param.trim());
-        },
-
-        /**
-         * Format value to any
-         * @param {String} param
-         * @param {Boolean} list_mode
-         * @returns {Number}
-         */
-        _formatAny: async function (param, list_mode = false) {
-            if (list_mode) {
-                return await this.getParent().eval(param)[0];
-            }
-            return param;
-        },
-
-        /**
-         * Format value to any
-         * @param {String} param
-         * @returns {Number}
-         */
-        _formatDict: async function (param) {
-            return (await this.getParent().eval(param))[0];
+            });
         },
     });
 

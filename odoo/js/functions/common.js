@@ -10,6 +10,7 @@ odoo.define("terminal.functions.Common", function (require) {
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
     const TemplateManager = require("terminal.core.TemplateManager");
+    const TrashConst = require("terminal.core.trash.const");
 
     Terminal.include({
         custom_events: _.extend({}, Terminal.prototype.custom_events, {
@@ -25,8 +26,18 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCreateModelRecord,
                 detail: "Open new model record in form view or directly.",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
-                    ["d", ["v", "value"], false, "The values to write"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["v", "value"],
+                        false,
+                        "The values to write",
+                    ],
                 ],
                 example: "-m res.partner -v {name: 'Poldoore'}",
             });
@@ -35,8 +46,18 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdUnlinkModelRecord,
                 detail: "Delete a record.",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
-                    ["ln", ["i", "id"], true, "The record id's"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Number,
+                        ["i", "id"],
+                        true,
+                        "The record id's",
+                    ],
                 ],
                 example: "-m res.partner -i 10,4,2",
             });
@@ -45,9 +66,24 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdWriteModelRecord,
                 detail: "Update record values.",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
-                    ["ln", ["i", "id"], true, "The record id's"],
-                    ["d", ["v", "value"], true, "The values to write"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Number,
+                        ["i", "id"],
+                        true,
+                        "The record id's",
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["v", "value"],
+                        true,
+                        "The values to write",
+                    ],
                 ],
                 example: "-m res.partner -i 10,4,2 -v {street: 'Diagon Alley'}",
             });
@@ -56,41 +92,52 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdSearchModelRecord,
                 detail: "Launch orm search query",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
                     [
-                        "ls",
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
                         ["f", "field"],
                         false,
                         "The field names to request<br/>Can use '*' to show all fields of the model",
                         ["display_name"],
                     ],
-                    ["l-", ["d", "domain"], false, "The domain", []],
                     [
-                        "n",
+                        TrashConst.ARG.List | TrashConst.ARG.Any,
+                        ["d", "domain"],
+                        false,
+                        "The domain",
+                        [],
+                    ],
+                    [
+                        TrashConst.ARG.Number,
                         ["l", "limit"],
                         false,
                         "The limit of records to request",
                     ],
                     [
-                        "n",
+                        TrashConst.ARG.Number,
                         ["of", "offset"],
                         false,
                         "The offset (from)<br/>Can be zero (no limit)",
                     ],
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["o", "order"],
                         false,
                         "The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
                     ],
                     [
-                        "f",
+                        TrashConst.ARG.Flag,
                         ["more", "more"],
                         false,
                         "Flag to indicate that show more results",
                     ],
                     [
-                        "f",
+                        TrashConst.ARG.Flag,
                         ["all", "all"],
                         false,
                         "Show all records (not truncated)",
@@ -103,11 +150,27 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCallModelMethod,
                 detail: "Call model method. Remember: Methods with @api.model decorator doesn't need the id.",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
-                    ["s", ["c", "call"], true, "The method name to call"],
-                    ["l-", ["a", "argument"], false, "The arguments list", []],
                     [
-                        "d",
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["c", "call"],
+                        true,
+                        "The method name to call",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Any,
+                        ["a", "argument"],
+                        false,
+                        "The arguments list",
+                        [],
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
                         ["k", "kwarg"],
                         false,
                         "The arguments dictionary",
@@ -121,7 +184,12 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdUpgradeModule,
                 detail: "Launch upgrade module process.",
                 args: [
-                    ["s", ["m", "module"], true, "The module technical name"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        true,
+                        "The module technical name",
+                    ],
                 ],
                 example: "-m contacts",
             });
@@ -130,7 +198,12 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdInstallModule,
                 detail: "Launch module installation process.",
                 args: [
-                    ["s", ["m", "module"], true, "The module technical name"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        true,
+                        "The module technical name",
+                    ],
                 ],
                 example: "-m contacts",
             });
@@ -139,8 +212,13 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdUninstallModule,
                 detail: "Launch module deletion process.",
                 args: [
-                    ["s", ["m", "module"], true, "The module technical name"],
-                    ["f", ["f", "force"], false, "Forced mode"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        true,
+                        "The module technical name",
+                    ],
+                    [TrashConst.ARG.Flag, ["f", "force"], false, "Forced mode"],
                 ],
                 exmaple: "-m contacts",
             });
@@ -155,7 +233,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Set debug mode",
                 args: [
                     [
-                        "n",
+                        TrashConst.ARG.Number,
                         ["m", "mode"],
                         true,
                         "The mode<br>- 0: Disabled<br>- 1: Enabled<br>- 2: Enabled with Assets",
@@ -170,10 +248,15 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdPostData,
                 detail: "Send POST request to selected endpoint",
                 args: [
-                    ["s", ["e", "endpoint"], true, "The endpoint"],
-                    ["-", ["d", "data"], true, "The data"],
                     [
-                        "s",
+                        TrashConst.ARG.String,
+                        ["e", "endpoint"],
+                        true,
+                        "The endpoint",
+                    ],
+                    [TrashConst.ARG.Any, ["d", "data"], true, "The data"],
+                    [
+                        TrashConst.ARG.String,
                         ["m", "mode"],
                         false,
                         "The mode",
@@ -193,15 +276,25 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCheckFieldAccess,
                 detail: "Show readable/writeable fields of the selected model",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
                     [
-                        "ls",
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
                         ["f", "field"],
                         false,
                         "The field names to request",
                         ["*"],
                     ],
-                    ["d", ["fi", "filter"], false, "The filter to apply"],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["fi", "filter"],
+                        false,
+                        "The filter to apply",
+                    ],
                 ],
                 example: "-m res.partner -f name,street",
             });
@@ -212,9 +305,14 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Show access rights for the selected operation on the" +
                     " selected model",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
                     [
-                        "s",
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
                         ["o", "operation"],
                         true,
                         "The operation to do",
@@ -234,10 +332,20 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdSearchModelRecordId,
                 detail: "Launch orm search query.",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
-                    ["ln", ["i", "id"], true, "The record id's"],
                     [
-                        "ls",
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Number,
+                        ["i", "id"],
+                        true,
+                        "The record id's",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
                         ["f", "field"],
                         false,
                         "The fields to request<br/>Can use '*' to show all fields",
@@ -252,14 +360,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Operations over session context dictionary.",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["o", "operation"],
                         false,
                         "The operation to do",
                         "read",
                         ["read", "write", "set", "delete"],
                     ],
-                    ["-", ["v", "value"], false, "The values"],
+                    [TrashConst.ARG.Any, ["v", "value"], false, "The values"],
                 ],
                 example: "-o write -v {the_example: 1}",
             });
@@ -274,7 +382,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Operations over long-polling.",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["o", "operation"],
                         false,
                         "The operation to do<br>- verbose > Print incoming notificacions<br>- off > Stop verbose mode<br>- add_channel > Add a channel to listen<br>- del_channel > Delete a listening channel<br>- start > Start client longpolling service<br> - stop > Stop client longpolling service",
@@ -288,7 +396,12 @@ odoo.define("terminal.functions.Common", function (require) {
                             "stop",
                         ],
                     ],
-                    ["s", ["p", "param"], false, "The parameter"],
+                    [
+                        TrashConst.ARG.String,
+                        ["p", "param"],
+                        false,
+                        "The parameter",
+                    ],
                 ],
                 example: "add_channel example_channel",
             });
@@ -298,19 +411,29 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Login as selected user.",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["d", "database"],
                         true,
                         "The database<br/>Can be '*' to use current database",
                     ],
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["u", "user"],
                         true,
                         "The login<br/>Can be optionally preceded by the '#' character and it will be used for password too",
                     ],
-                    ["s", ["p", "password"], false, "The password"],
-                    ["f", ["nr", "no-reload"], false, "No reload"],
+                    [
+                        TrashConst.ARG.String,
+                        ["p", "password"],
+                        false,
+                        "The password",
+                    ],
+                    [
+                        TrashConst.ARG.Flag,
+                        ["nr", "no-reload"],
+                        false,
+                        "No reload",
+                    ],
                 ],
                 secured: true,
                 example: "-d devel -u #admin",
@@ -321,7 +444,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Check if user is in the selected groups.",
                 args: [
                     [
-                        "ls",
+                        TrashConst.ARG.List | TrashConst.ARG.String,
                         ["g", "group"],
                         true,
                         "The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'",
@@ -335,7 +458,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Show database names",
                 args: [
                     [
-                        "f",
+                        TrashConst.ARG.Flag,
                         ["oa", "only-active"],
                         false,
                         "Indicates that only print the active database name",
@@ -347,9 +470,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdJSTest,
                 detail: "Runs js tests in desktop or mobile mode for the selected module.",
                 args: [
-                    ["s", ["m", "module"], false, "The module technical name"],
                     [
-                        "s",
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        false,
+                        "The module technical name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
                         ["d", "device"],
                         false,
                         "The device to test",
@@ -363,7 +491,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Launch Tour",
                 callback: this._cmdRunTour,
                 detail: "Runs the selected tour. If no tour given, prints all available tours.",
-                args: [["s", ["n", "name"], false, "The tour technical name"]],
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["n", "name"],
+                        false,
+                        "The tour technical name",
+                    ],
+                ],
                 example: "-n mail_tour",
             });
             this.registerCommand("json", {
@@ -371,8 +506,18 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdPostJSONData,
                 detail: "Sends HTTP POST 'application/json' request",
                 args: [
-                    ["s", ["e", "endpoint"], true, "The endpoint"],
-                    ["d", ["d", "data"], true, "The data to send"],
+                    [
+                        TrashConst.ARG.String,
+                        ["e", "endpoint"],
+                        true,
+                        "The endpoint",
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["d", "data"],
+                        true,
+                        "The data to send",
+                    ],
                 ],
                 example:
                     "-e /web_editor/public_render_template -d {args: ['web.layout']}",
@@ -382,7 +527,12 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdModuleDepends,
                 detail: "Show a list of the modules that depends on the given module",
                 args: [
-                    ["s", ["m", "module"], false, "The module technical name"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        false,
+                        "The module technical name",
+                    ],
                 ],
                 example: "base",
             });
@@ -402,8 +552,19 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCount,
                 detail: "Gets number of records from the given model in the selected domain",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
-                    ["l-", ["d", "domain"], false, "The domain", []],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Any,
+                        ["d", "domain"],
+                        false,
+                        "The domain",
+                        [],
+                    ],
                 ],
                 example: "res.partner ['name', '=ilike', 'A%']",
             });
@@ -412,14 +573,28 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Show the referenced model and id of the given xmlid's",
                 callback: this._cmdRef,
                 detail: "Show the referenced model and id of the given xmlid's",
-                args: [["ls", ["x", "xmlid"], true, "The XML-ID"]],
+                args: [
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["x", "xmlid"],
+                        true,
+                        "The XML-ID",
+                    ],
+                ],
                 example: "-x base.main_company,base.model_res_partner",
             });
             this.registerCommand("rpc", {
                 definition: "Execute raw rpc",
                 callback: this._cmdRpc,
                 detail: "Execute raw rpc",
-                args: [["d", ["o", "options"], true, "The rpc query options"]],
+                args: [
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["o", "options"],
+                        true,
+                        "The rpc query options",
+                    ],
+                ],
                 example:
                     "-o {route: '/jsonrpc', method: 'server_version', params: {service: 'db'}}",
             });
@@ -428,8 +603,13 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdMetadata,
                 detail: "View record metadata",
                 args: [
-                    ["s", ["m", "model"], true, "The record model"],
-                    ["n", ["i", "id"], true, "The record id"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The record model",
+                    ],
+                    [TrashConst.ARG.Number, ["i", "id"], true, "The record id"],
                 ],
                 example: "-m res.partner -i 1",
             });
@@ -439,23 +619,30 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "See information and send barcode strings",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["o", "operation"],
                         false,
                         "The operation",
                         "send",
                         ["send", "info"],
                     ],
-                    ["la", ["d", "data"], false, "The data to send"],
                     [
-                        "n",
+                        TrashConst.ARG.List |
+                            TrashConst.ARG.Number |
+                            TrashConst.ARG.String,
+                        ["d", "data"],
+                        false,
+                        "The data to send",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
                         ["pd", "pressdelay"],
                         false,
                         "The delay between presskey events (in ms)",
                         3,
                     ],
                     [
-                        "n",
+                        TrashConst.ARG.Number,
                         ["bd", "barcodedelay"],
                         false,
                         "The delay between barcodes reads (in ms)",

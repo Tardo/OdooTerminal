@@ -21,17 +21,15 @@ Commands uses promises
 - callback: Callback function.
 - detail: Command explained.
 - args: Command Arguments
-  - Array of strings with the format:
-    "TYPE::NAME_SHORT:NAME_LONG::REQUIRED::DESCRIPTION::DEFAULT_VALUE::STRICT_VALUES"
+  - Array: [TYPE, [NAME_SHORT, NAME_LONG], REQUIRED, DESCRIPTION, DEFAULT_VALUE,
+    STRICT_VALUES]"
     - The 'TYPE' can be:
-      - 's' String
-      - 'n' Number
-      - 'd' Dictionary
-      - 'f' Boolean. Used as flag
-      - '-' Avoid check type, the param are formatted as string
-      - 'l' Indicates that the next parameter can be a list (Ex. 'l-' -> Array
-        of any type | 'ln' -> Array of numbers)
-      - 'l-' Array of any type
+      - String
+      - Number
+      - Dictionary
+      - Flag (Boolean)
+      - Any
+      - List
 - aliases: Used to set deprecated names of the module
 - sanitized: Truncate single quotes (default is true)
 - generators: Resolve input generators (default is true)

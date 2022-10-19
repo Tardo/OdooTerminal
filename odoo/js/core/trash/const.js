@@ -37,6 +37,40 @@ odoo.define("terminal.core.trash.const", function () {
         LOAD_DATA_ATTR: 11,
         BUILD_LIST: 12,
         BUILD_MAP: 13,
+
+        getHumanType: function (type) {
+            const entries = Object.entries(this);
+            for (const entry of entries) {
+                if (entry[1] === type) {
+                    return entry[0];
+                }
+            }
+            return "";
+        },
+    };
+
+    const ARG = {
+        String: 1 << 0,
+        Number: 1 << 1,
+        Dictionary: 1 << 2,
+        Flag: 1 << 3,
+        Any: 1 << 4,
+        List: 1 << 5,
+
+        getHumanType: function (type) {
+            let res = "";
+            if ((type & this.List) === this.List) {
+                res = "LIST OF ";
+            }
+            const utypes = [];
+            const entries = Object.entries(this);
+            for (const entry of entries) {
+                if (entry[1] & (type === type)) {
+                    utypes.push(entry[0].toUpperCase());
+                }
+            }
+            return `${res} ${utypes.join(" or ")}`;
+        },
     };
 
     const SYMBOLS = {
@@ -62,9 +96,46 @@ odoo.define("terminal.core.trash.const", function () {
         ESCAPE: "\\",
     };
 
+    // FIXME: Inaccurate keymap
+    //      '_' and '-' positions are only valid for spanish layout
+    const KEYMAP = [
+        "q",
+        "w",
+        "e",
+        "r",
+        "t",
+        "y",
+        "u",
+        "i",
+        "o",
+        "p",
+        "a",
+        "s",
+        "d",
+        "f",
+        "g",
+        "h",
+        "j",
+        "k",
+        "l",
+        null,
+        "z",
+        "x",
+        "c",
+        "v",
+        "b",
+        "n",
+        "m",
+        "_",
+        "-",
+        null,
+    ];
+
     return {
         LEXER: LEXER,
         PARSER: PARSER,
+        ARG: ARG,
         SYMBOLS: SYMBOLS,
+        KEYMAP: KEYMAP,
     };
 });

@@ -47,24 +47,24 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
 
                     try {
                         kwargs =
-                            await this.interpreter.validateAndFormatArguments(
+                            await this.getInterpreter().validateAndFormatArguments(
                                 cmd_def,
                                 kwargs
                             );
+                        return resolve(
+                            this.options.processCommandJob(
+                                {
+                                    cmdRaw: parse_info.inputRawString,
+                                    cmdName: frame.cmd,
+                                    cmdDef: cmd_def,
+                                    kwargs: kwargs,
+                                },
+                                silent
+                            )
+                        );
                     } catch (err) {
                         return reject(err);
                     }
-                    return resolve(
-                        this.options.processCommandJob(
-                            {
-                                cmdRaw: parse_info.inputRawString,
-                                cmdName: frame.cmd,
-                                cmdDef: cmd_def,
-                                kwargs: kwargs,
-                            },
-                            silent
-                        )
-                    );
                 }
                 // Alias
                 const alias_cmd = this.getInterpreter().parseAliases(
@@ -73,6 +73,29 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                 );
                 return resolve((await this.eval(alias_cmd))[0]);
             });
+        },
+
+        _checkGlobalName: function (global_name, token) {
+            if (
+                !Object.hasOwn(this._registeredCmds, global_name) &&
+                !this.getInterpreter().getAliasCommand(global_name)
+            ) {
+                // Search similar commands
+                const similar_cmd =
+                    this.getInterpreter().searchSimiliarCommand(global_name);
+                if (similar_cmd) {
+                    throw new Error(
+                        TemplateManager.render("UNKNOWN_COMMAND", {
+                            org_cmd: global_name,
+                            cmd: similar_cmd,
+                            pos: [token.start, token.end],
+                        })
+                    );
+                }
+                throw new Error(
+                    `Unknown command '${global_name}' at ${token.start}:${token.end}`
+                );
+            }
         },
 
         eval: function (cmd_raw, options) {
@@ -152,7 +175,7 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                         values: [],
                                     };
                                     frames.push(last_frame);
-                                } else if (!options?.silent) {
+                                } else {
                                     // Search similar commands
                                     const similar_cmd =
                                         this.getInterpreter().searchSimiliarCommand(
@@ -269,20 +292,20 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                 const frame = last_frame || root_frame;
                                 const vname = stack.names.shift();
                                 const vvalue = frame.values.pop();
-                                if (!vname || !_.isNaN(Number(vname))) {
+                                if (!vname) {
+                                    if (!token) {
+                                        return reject("Invalid instruction!");
+                                    }
                                     return reject(
-                                        `Invalid name '${vname}' at ${token.start}:${token.end}`
+                                        `Invalid name '${token.value}' at ${token.start}:${token.end}`
                                     );
                                 } else if (typeof vvalue === "undefined") {
-                                    const prev_token =
-                                        tindex > 0
-                                            ? parse_info.inputTokens[tindex - 1]
-                                            : null;
-                                    const pos = prev_token
-                                        ? [prev_token.start, prev_token.end]
-                                        : [token.start, token.end];
+                                    const value_instr =
+                                        stack.instructions[index - 1];
+                                    const value_token =
+                                        stack.inputTokens[value_instr[1]] || {};
                                     return reject(
-                                        `Invalid token '${token.value}' at ${pos[0]}:${pos[1]}`
+                                        `Invalid token '${value_token.value}' at ${value_token.start}:${value_token.end}`
                                     );
                                 }
                                 frame.store[vname] = vvalue;
@@ -315,7 +338,7 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                     );
                                 } else if (
                                     _.isNaN(Number(attr_name)) &&
-                                    value instanceof Array
+                                    value.constructor === Array
                                 ) {
                                     value = _.pluck(value, attr_name).join(",");
                                 } else {

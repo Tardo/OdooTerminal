@@ -8,6 +8,7 @@ odoo.define("terminal.functions.Backend", function (require) {
     const rpc = require("terminal.core.rpc");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
+    const TrashConst = require("terminal.core.trash.const");
     require("terminal.core.UtilsBackend");
 
     function OdooEvent(target, name, data) {
@@ -35,9 +36,24 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdViewModelRecord,
                 detail: "Open model record in form view or records in list view.",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
-                    ["n", ["i", "id"], false, "The record id"],
-                    ["s", ["r", "ref"], false, "The view reference name"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["i", "id"],
+                        false,
+                        "The record id",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["r", "ref"],
+                        false,
+                        "The view reference name",
+                    ],
                 ],
                 example:
                     "-m res.partner -i 10 -r base.view_partner_simple_form",
@@ -48,7 +64,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                 detail: "Open settings page.",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["m", "module"],
                         false,
                         "The module technical name",
@@ -63,7 +79,7 @@ odoo.define("terminal.functions.Backend", function (require) {
                 detail: "Operations over translations.",
                 args: [
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["o", "operation"],
                         true,
                         "The operation",
@@ -71,23 +87,33 @@ odoo.define("terminal.functions.Backend", function (require) {
                         ["export", "import", "list"],
                     ],
                     [
-                        "s",
+                        TrashConst.ARG.String,
                         ["l", "lang"],
                         false,
                         "The language<br/>Can use '__new__' for new language (empty translation template)",
                     ],
-                    ["ls", ["m", "module"], false, "The technical module name"],
                     [
-                        "s",
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["m", "module"],
+                        false,
+                        "The technical module name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
                         ["f", "format"],
                         false,
                         "The format to use",
                         "po",
                         ["po", "csv"],
                     ],
-                    ["s", ["n", "name"], false, "The language name"],
                     [
-                        "f",
+                        TrashConst.ARG.String,
+                        ["n", "name"],
+                        false,
+                        "The language name",
+                    ],
+                    [
+                        TrashConst.ARG.Flag,
                         ["no", "no-overwrite"],
                         false,
                         "Flag to indicate dont overwrite current translations",
@@ -101,12 +127,17 @@ odoo.define("terminal.functions.Backend", function (require) {
                 detail: "Call action",
                 args: [
                     [
-                        "-",
+                        TrashConst.ARG.Any,
                         ["a", "action"],
                         true,
                         "The action to launch<br/>Can be an string, number or object",
                     ],
-                    ["d", ["o", "options"], false, "The extra options to use"],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["o", "options"],
+                        false,
+                        "The extra options to use",
+                    ],
                 ],
                 example: "-a 134",
             });

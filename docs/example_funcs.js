@@ -48,7 +48,7 @@ odoo.define("terminal.MyFuncs", function (require) {
             this.screen.eprint("ParamC (Optional String): " + kwargs.paramc);
             this.screen.eprint("ParamD (Optional Int): " + kwargs.paramd);
 
-            if (kwargs.paramb instanceof Number) {
+            if (typeof kwargs.paramb === "number") {
                 this.screen.print("ParamB is a Number!");
             }
 

@@ -502,21 +502,26 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         _processCommandJob: function (command_info, silent = false) {
-            return new Promise(async (resolve) => {
+            return new Promise(async (resolve, reject) => {
                 const job_index = this.onStartCommand(command_info);
+                if (job_index === -1) {
+                    return reject(
+                        `Unexpected error: can't initialize the job!`
+                    );
+                }
                 let result = false;
                 let error = false;
                 let is_failed = false;
-                try {
-                    this.__meta = {
-                        name: command_info.cmdName,
-                        cmdRaw: command_info.cmdRaw,
-                        def: command_info.cmdDef,
-                        jobIndex: job_index,
-                        silent: silent,
-                    };
+                this.__meta = {
+                    name: command_info.cmdName,
+                    cmdRaw: command_info.cmdRaw,
+                    def: command_info.cmdDef,
+                    jobIndex: job_index,
+                    silent: silent,
+                };
 
-                    let _this = this;
+                let _this = this;
+                try {
                     if (silent) {
                         _this = _.clone(this);
                         _this.screen = _.clone(this.screen);

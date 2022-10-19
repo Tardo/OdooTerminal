@@ -14,6 +14,7 @@ odoo.define("terminal.functions.Fuzz", function (require) {
     const rpc = require("terminal.core.rpc");
     const field_utils = require("web.field_utils");
     const utils = require("web.utils");
+    const TrashConst = require("terminal.core.trash.const");
 
     const FieldValueGenerator = Class.extend({
         _minStr: 4,
@@ -651,8 +652,18 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 callback: this._cmdFuzz,
                 detail: "Runs a 'Fuzz Test' over the selected model and view",
                 args: [
-                    ["s", ["m", "model"], true, "The model technical name"],
-                    ["s", ["r", "ref"], false, "The view reference name"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["r", "ref"],
+                        false,
+                        "The view reference name",
+                    ],
                 ],
                 example: "-m res.partner -r base.view_partner_simple_form",
             });
@@ -662,9 +673,24 @@ odoo.define("terminal.functions.Fuzz", function (require) {
                 callback: this._cmdFuzzField,
                 detail: "Fill a field/s with a random or given values on the active form",
                 args: [
-                    ["ls", ["f", "field"], true, "The field names"],
-                    ["-", ["v", "value"], false, "The value to use"],
-                    ["n", ["c", "count"], false, "The count of 02M records"],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["f", "field"],
+                        true,
+                        "The field names",
+                    ],
+                    [
+                        TrashConst.ARG.Any,
+                        ["v", "value"],
+                        false,
+                        "The value to use",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["c", "count"],
+                        false,
+                        "The count of 02M records",
+                    ],
                 ],
                 example: "-f order_line -v \"{'display_type': false}\" -c 4",
             });

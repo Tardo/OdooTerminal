@@ -402,9 +402,9 @@ odoo.define("terminal.core.Screen", function (require) {
             const msg_type = typeof msg;
             const res = [];
             if (msg_type === "object") {
-                if (msg instanceof Text) {
+                if (msg.constructor === Text) {
                     res.push(`<span class='line-text ${cls}'>${msg}</span>`);
-                } else if (msg instanceof Array) {
+                } else if (msg.constructor === Array) {
                     const l = msg.length;
                     for (let x = 0; x < l; ++x) {
                         res.push(
