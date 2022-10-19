@@ -888,17 +888,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     ret = (
                         await this.getParent().eval(param, {silent: true})
                     )[0];
-                } else if (
-                    (type & TrashConst.ARG.Any) === TrashConst.ARG.Any &&
-                    typeof val === "string"
-                ) {
-                    ret = (
-                        await this.getParent().eval(param, {
-                            ignoreCommandMode: true,
-                            forceReturn: true,
-                            silent: true,
-                        })
-                    )[0];
                 }
                 if (_.isNull(ret) || _.isNaN(ret) || _.isUndefined(ret)) {
                     return Promise.reject(`Invalid '${val}' argument!`);
