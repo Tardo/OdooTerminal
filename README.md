@@ -16,7 +16,7 @@ The BFG10k for Odoo developers
 All the power of Odoo json-rpc in a really easy way!
 </p>
 
-This web extension adds a terminal-like to control Odoo (11 to 15). All
+This web extension adds a terminal-like to control Odoo (11 to 16). All
 implemented commands use the tools provided by the Odoo framework. An unwavering
 policy when developing this extension is to not modify or alter in any way the
 Odoo classes. This sometimes results in certain commands having
@@ -48,33 +48,26 @@ You can toggle terminal using one of these options:
 
 ## Example Commands
 
-| Description                                         | Terminal Command                                                            |
-| --------------------------------------------------- | --------------------------------------------------------------------------- |
-| Create 'res.partner' record                         | `create -m res.partner -v "{'name': 'Hipcut', 'street': 'Mystery street'}"` |
-| Create 'res.partner' record (simple mode)           | `create -m res.partner -v "name=Hipcut street='Mystery street'"`            |
-| Search 'res.partner' records                        | `search -m res.partner -f name,email -d "[['id', '>', 5]]"`                 |
-| Search all fields of selected 'res.partner' records | `search -m res.partner -f * -d "[['id', '>', 5]]"`                          |
-| Read all fields of selected 'res.partner' record    | `read -m res.partner -i 5 -f *`                                             |
-| Read all fields of various 'res.partner' records    | `read -m res.partner -i 5,15,8 -f *`                                        |
-| View 'res.partner' records _(only backend)_         | `view -m res.partner`                                                       |
-| View selected 'res.partner' record _(only backend)_ | `view -m res.partner -i 4`                                                  |
-| Install module                                      | `install -m mymodule`                                                       |
-| Create alias                                        | `alias -n myalias -c "print My name is $1"`                                 |
-
-> Notice the usage of quotes when use parameters with spaces.
+| Description                                         | Terminal Command                                                      |
+| --------------------------------------------------- | --------------------------------------------------------------------- |
+| Create 'res.partner' record                         | `create -m res.partner -v {name: 'Hipcut', street: 'Mystery street'}` |
+| Search 'res.partner' records                        | `search -m res.partner -f name,email -d [['id', '>', 5]]`             |
+| Search all fields of selected 'res.partner' records | `search -m res.partner -f * -d [['id', '>', 5]]`                      |
+| Read all fields of selected 'res.partner' record    | `read -m res.partner -i 5 -f *`                                       |
+| Read all fields of various 'res.partner' records    | `read -m res.partner -i 5,15,8 -f *`                                  |
+| View 'res.partner' records _(only backend)_         | `view -m res.partner`                                                 |
+| View selected 'res.partner' record _(only backend)_ | `view -m res.partner -i 4`                                            |
+| Install module                                      | `install -m mymodule`                                                 |
+| Create alias                                        | `alias -n myalias -c "print My name is $1"`                           |
 
 > Notice that a list is an string of values separated by commas. Example: "5,
-> 15, 8"
+> 15, 8" (quotes included) or can use array [5, 15, 8]
 
 > Notice that can call commands without 'named arguments', for example:
 > `create res.partner "name=Hipcut street='Mystery street'"` The rule is that
 > 'unnamed arguments' fill values following the order of the command arguments
 > definition. So mix 'unnamed' with 'named' arguments can be done as long as the
 > order is maintained.
-
-> Notice that can use "simple json" format instead of normal syntaxis. For
-> example "{'keyA':'this is a value', 'keyB':42}" can be done in a simple way
-> "keyA='this is a value' keyB=42"
 
 ## Notes
 
@@ -92,63 +85,27 @@ You can toggle terminal using one of these options:
 
 ## Advance Usage
 
-#### + Escaped Sequences
+#### + Recordsets
 
-Reading the value of a "edit input" will get the string with the escaped
-slashes. So, when you write something like `"this \_ is a test"`, the engine
-reads `"this \\_ is a test"`. This is great for keeping escaped sentences
-unresolved.
+`search`, `read` and `create` commands returns `recordsets`. Can use them to
+write values with `commit` command.
 
-But, this cause problems when you try to resolve them with "JSON.parse", because
-the engine resolves the escaped slashes and JSON.parse try to resolve `"\_"` and
-this result on an exception. See the valid escape sequences in JSON format:
+Example:
 
-![Valid JSON escape sequences](https://i.stack.imgur.com/SHLOB.gif)
+```
+$rs = $(search res.partner)
+$rs[4]['name'] = 'The Name'
+$rs[2]['name'] = 'Other Name'
+commit $rs
 
-So... the way to send escaped sequences is by using double-slashed escape
-sequences. You write something like `"this \\_ is a test"` and the engine reads
-`"this \\\\_ is a test"`. In this case JSON.parse can unescape `\\` to `\`.
+$record = $(read res.partner 8)
+$record['name'] = 'Willy Wonka'
+$record['city'] = 'O Courel'
+commit $record
 
-Escaped quotes (`\' and \"`) are special because they are truncated by the
-terminal. So, when you write `"this \' is a test"`, the terminal reads
-`"this ' is a test"`. If you need send this characters escaped you must use
-'triple-slash': `"this \\\' is a test"`.
-
-#### + Parameter Generators
-
-You can use "parameter generator" to create values.
-
-| Generator    | Arguments | Default   | Description                                                                   |
-| ------------ | --------- | --------- | ----------------------------------------------------------------------------- |
-| \$STR        | min,max   | max = min | Generates a random string with a length between the given min and max         |
-| \$FLOAT      | min,max   | max = min | Generates a random float between the given min and max                        |
-| \$INT        | min,max   | max = min | Generates a random int between the given min and max                          |
-| \$INTSEQ     | min,max   | max = min | Generates a list of int's starting from min to max                            |
-| \$INTITER    | min,step  | step = 1  | Generates a consecutive int starting from min (useful with 'repeat' command)  |
-| \$DATE       | min,max   | max = min | Generates a random date between the given min and max                         |
-| \$TZDATE     | min,max   | max = min | Generates a random date between the given min and max (time zone format)      |
-| \$TIME       | min,max   | max = min | Generates a random time between the given min and max                         |
-| \$TZTIME     | min,max   | max = min | Generates a random time between the given min and max (time zone format)      |
-| \$DATETIME   | min,max   | max = min | Generates a random date time between the given min and max                    |
-| \$TZDATETIME | min,max   | max = min | Generates a random date time between the given min and max (time zone format) |
-| \$EMAIL      | min,max   | max = min | Generates a random email                                                      |
-| \$URL        | min,max   | max = min | Generates a random url                                                        |
-| \$NOWDATE    |           |           | Gets the current date                                                         |
-| \$TZNOWDATE  |           |           | Gets the current date (time zone format)                                      |
-| \$NOWTIME    |           |           | Gets the current time                                                         |
-| \$TZNOWTIME  |           |           | Gets the current time (time zone format)                                      |
-| \$NOW        |           |           | Gets the current date time                                                    |
-| \$TZNOW      |           |           | Gets the current date time (time zone format)                                 |
-
-The anatomy of a generator is: `$type[min,max]`, `$type[max]` or `$type`
-
-For example:
-
-- create a new record with a random string:
-  `create -m res.partner -v name='$STR[4,30]'`
-- print the current time: `print -m $NOWTIME`
-
-> Notice that 'date' min and max are the milliseconds since 1970/01/01
+$new_rec = $(create res.partner {name 'The test'})
+print $new_rec
+```
 
 #### + Positional replacements for aliases
 
@@ -164,24 +121,24 @@ For example:
 - Fist position replacement with default value 'world':
   `alias -n my_alias -c "print -m 'Hello, $1[world]'"`
 - A somewhat more complex:
-  `alias -n search_mod -c "search -m ir.module.module -f display_name -d '[[\"name\", \"=\", \"$1\"], [\"state\", \"=\", \"$2[installed]\"]]'"`
+  `alias -n search_mod -c "search -m ir.module.module -f display_name -d [[name, =, '$1'], [state, =, '$2[installed]']]"`
 
 #### + Runners (subcommands)
 
 You can execute "subcommands" to use the result in a new command call. The
-syntax of runners looks like `=={command}`, `=={command}.key` or
-`=={command}[index]`.
+syntax of runners looks like `$(command)`.
 
-For example: `read -m res.users -i =={search -m res.users -f id}.id`
+For example: `read -m res.users -i $(search -m res.users -f id)[0]['id']` or
+`read -m res.users -i $(search -m res.users -f id)['ids']`
 
 #### + Massive operations
 
 Massive operations are possible using the command `repeat`. Print to screen is a
-expensive task, consider use the `--slient` argument to increase the
+expensive task, consider use the `--silent` argument to increase the
 performance.
 
 Example:
-`repeat -t 5000 -c "create -m res.partner -v 'name=\"$STR[12] (Test)\"'" --silent`
+`repeat -t 5000 -c "create -m res.partner -v {name: $(gen str 12 8) + ' (Test)'}" --silent`
 
 ---
 

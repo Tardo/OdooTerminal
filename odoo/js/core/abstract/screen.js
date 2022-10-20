@@ -117,7 +117,7 @@ odoo.define("terminal.core.abstract.Screen", function (require) {
         },
 
         // eslint-disable-next-line
-        showQuestion: function (question_spec) {
+        showQuestion: function (question, values, def_value) {
             throw Error(_t("Not Implemented!"));
         },
 

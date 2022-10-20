@@ -6,6 +6,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
     const AbstractScreen = require("terminal.core.abstract.Screen");
     const TemplateManager = require("terminal.core.TemplateManager");
+    const Recordset = require("terminal.core.recordset");
     const Utils = require("terminal.core.Utils");
 
     /**
@@ -20,7 +21,6 @@ odoo.define("terminal.core.Screen", function (require) {
 
         init: function () {
             this._super.apply(this, arguments);
-            this._templates = new TemplateManager();
             this._linesCounter = 0;
             this._lazyVacuum = _.debounce(() => this._vacuum(), 650);
             this._buff = [];
@@ -72,12 +72,7 @@ odoo.define("terminal.core.Screen", function (require) {
                 return;
             }
             this.$screen.html("");
-            if (
-                Object.prototype.hasOwnProperty.call(
-                    this._options,
-                    "onCleanScreen"
-                )
-            ) {
+            if (Object.hasOwn(this._options, "onCleanScreen")) {
                 this._options.onCleanScreen(this.getContent());
             }
         },
@@ -199,12 +194,7 @@ odoo.define("terminal.core.Screen", function (require) {
             this.scrollDown();
 
             if (this._buff.length === 0) {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        this._options,
-                        "onSaveScreen"
-                    )
-                ) {
+                if (Object.hasOwn(this._options, "onSaveScreen")) {
                     this._options.onSaveScreen(this.getContent());
                 }
                 this._flushing = false;
@@ -233,7 +223,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
         printCommand: function (cmd, secured = false) {
             this.eprint(
-                this._templates.render(
+                TemplateManager.render(
                     secured ? "PROMPT_CMD_HIDDEN_ARGS" : "PROMPT_CMD",
                     {
                         prompt: this.PROMPT,
@@ -249,13 +239,10 @@ odoo.define("terminal.core.Screen", function (require) {
                 return;
             }
             let error_msg = error;
-            if (
-                typeof error === "object" &&
-                Object.prototype.hasOwnProperty.call(error, "data")
-            ) {
+            if (typeof error === "object" && Object.hasOwn(error, "data")) {
                 // It's an Odoo error report
                 const error_id = new Date().getTime();
-                error_msg = this._templates.render("ERROR_MESSAGE", {
+                error_msg = TemplateManager.render("ERROR_MESSAGE", {
                     error_name: Utils.encodeHTML(error.data.name),
                     error_message: Utils.encodeHTML(error.data.message),
                     error_id: error_id,
@@ -273,12 +260,12 @@ odoo.define("terminal.core.Screen", function (require) {
                 ++this._errorCount;
             } else if (
                 typeof error === "object" &&
-                Object.prototype.hasOwnProperty.call(error, "status") &&
+                Object.hasOwn(error, "status") &&
                 error.status !== "200"
             ) {
                 // It's an Odoo/jQuery error report
                 const error_id = new Date().getTime();
-                error_msg = this._templates.render("ERROR_MESSAGE", {
+                error_msg = TemplateManager.render("ERROR_MESSAGE", {
                     error_name: Utils.encodeHTML(error.statusText),
                     error_message: Utils.encodeHTML(error.statusText),
                     error_id: error_id,
@@ -295,7 +282,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
         printTable: function (columns, tbody) {
             this.print(
-                this._templates.render("TABLE", {
+                TemplateManager.render("TABLE", {
                     thead: columns.join("</th><th>"),
                     tbody: tbody,
                 })
@@ -309,7 +296,7 @@ odoo.define("terminal.core.Screen", function (require) {
             for (let x = 0; x < len; ++x) {
                 const item = records[x];
                 tbody += "<tr>";
-                tbody += this._templates.render("TABLE_SEARCH_ID", {
+                tbody += TemplateManager.render("TABLE_SEARCH_ID", {
                     id: item.id,
                     model: model,
                 });
@@ -350,12 +337,8 @@ odoo.define("terminal.core.Screen", function (require) {
             }
         },
 
-        showQuestion: function (question_spec) {
+        showQuestion: function (question, values, def_value) {
             const defer = Utils.defer();
-            let [question, values, def_value] = question_spec.split("::");
-            if (typeof values !== "undefined") {
-                values = values.split(":");
-            }
             this._questions.push({
                 question: question,
                 values: values,
@@ -417,12 +400,13 @@ odoo.define("terminal.core.Screen", function (require) {
 
         /* PRIVATE */
         _formatPrint: function (msg, cls) {
-            const msg_type = typeof msg;
             const res = [];
-            if (msg_type === "object") {
-                if (msg instanceof Text) {
+            if (typeof msg === "object") {
+                if (msg.constructor === Text) {
                     res.push(`<span class='line-text ${cls}'>${msg}</span>`);
-                } else if (msg instanceof Array) {
+                } else if (msg instanceof Recordset) {
+                    this.printRecords(msg.model, msg);
+                } else if (msg.constructor === Array) {
                     const l = msg.length;
                     for (let x = 0; x < l; ++x) {
                         res.push(

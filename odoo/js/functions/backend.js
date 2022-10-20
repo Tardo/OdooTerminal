@@ -8,6 +8,7 @@ odoo.define("terminal.functions.Backend", function (require) {
     const rpc = require("terminal.core.rpc");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
+    const TrashConst = require("terminal.core.trash.const");
     require("terminal.core.UtilsBackend");
 
     function OdooEvent(target, name, data) {
@@ -35,9 +36,24 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdViewModelRecord,
                 detail: "Open model record in form view or records in list view.",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "i::i:id::0::The record id",
-                    "s::r:ref::0::The view reference name",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["i", "id"],
+                        false,
+                        "The record id",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["r", "ref"],
+                        false,
+                        "The view reference name",
+                    ],
                 ],
                 example:
                     "-m res.partner -i 10 -r base.view_partner_simple_form",
@@ -47,7 +63,13 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdOpenSettings,
                 detail: "Open settings page.",
                 args: [
-                    "s::m:module::0::The module technical name::general_settings",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        false,
+                        "The module technical name",
+                        "general_settings",
+                    ],
                 ],
                 example: "-m sale_management",
             });
@@ -56,12 +78,46 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdLang,
                 detail: "Operations over translations.",
                 args: [
-                    "s::o:operation::1::The operation::::export:import:list",
-                    "s::l:lang::0::The language<br/>Can use '__new__' for new language (empty translation template)",
-                    "ls::m:module::0::The technical module name",
-                    "s::f:format::0::The format to use::po::po:csv",
-                    "s::n:name::0::The language name",
-                    "f::no-overwrite:no-overwrite::0::Flag to indicate dont overwrite current translations",
+                    [
+                        TrashConst.ARG.String,
+                        ["o", "operation"],
+                        true,
+                        "The operation",
+                        "export",
+                        ["export", "import", "list"],
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["l", "lang"],
+                        false,
+                        "The language<br/>Can use '__new__' for new language (empty translation template)",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["m", "module"],
+                        false,
+                        "The technical module name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["f", "format"],
+                        false,
+                        "The format to use",
+                        "po",
+                        ["po", "csv"],
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["n", "name"],
+                        false,
+                        "The language name",
+                    ],
+                    [
+                        TrashConst.ARG.Flag,
+                        ["no", "no-overwrite"],
+                        false,
+                        "Flag to indicate dont overwrite current translations",
+                    ],
                 ],
                 example: "-o export -l en_US -m mail",
             });
@@ -70,8 +126,18 @@ odoo.define("terminal.functions.Backend", function (require) {
                 callback: this._cmdCallAction,
                 detail: "Call action",
                 args: [
-                    "-::a:action::1::The action to launch<br/>Can be an string, number or object",
-                    "j::o:options::0::The extra options to use",
+                    [
+                        TrashConst.ARG.Any,
+                        ["a", "action"],
+                        true,
+                        "The action to launch<br/>Can be an string, number or object",
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["o", "options"],
+                        false,
+                        "The extra options to use",
+                    ],
                 ],
                 example: "-a 134",
             });
@@ -249,47 +315,53 @@ odoo.define("terminal.functions.Backend", function (require) {
         _getDialogParent: function () {
             return this;
         },
+        _openSelectCreateDialog: function (model, title, domain, on_selected) {
+            const dialog = new dialogs.SelectCreateDialog(
+                this._getDialogParent(),
+                {
+                    res_model: model,
+                    title: title,
+                    domain: domain || "[]",
+                    disable_multiple_selection: true,
+                    on_selected: on_selected,
+                }
+            );
+            dialog.open();
+            return dialog.opened();
+        },
         _cmdViewModelRecord: function (kwargs) {
             const context = this._getContext({
                 form_view_ref: kwargs.ref || false,
             });
-            return new Promise((resolve) => {
-                if (kwargs.id) {
-                    return this.do_action({
+            if (kwargs.id) {
+                return this.do_action({
+                    type: "ir.actions.act_window",
+                    name: "View Record",
+                    res_model: kwargs.model,
+                    res_id: kwargs.id,
+                    views: [[false, "form"]],
+                    target: "current",
+                    context: context,
+                }).then(() => {
+                    this.doHide();
+                });
+            }
+            return this._openSelectCreateDialog(
+                kwargs.model,
+                "Select a record",
+                "",
+                (records) => {
+                    this.do_action({
                         type: "ir.actions.act_window",
                         name: "View Record",
                         res_model: kwargs.model,
-                        res_id: kwargs.id,
+                        res_id: records[0].id || records[0],
                         views: [[false, "form"]],
                         target: "current",
                         context: context,
-                    }).then(() => {
-                        this.doHide();
-                        resolve();
                     });
                 }
-                const dialog = new dialogs.SelectCreateDialog(
-                    this._getDialogParent(),
-                    {
-                        res_model: kwargs.model,
-                        title: "Select a record",
-                        disable_multiple_selection: true,
-                        on_selected: (records) => {
-                            this.do_action({
-                                type: "ir.actions.act_window",
-                                name: "View Record",
-                                res_model: kwargs.model,
-                                res_id: records[0].id,
-                                views: [[false, "form"]],
-                                target: "current",
-                                context: context,
-                            });
-                        },
-                    }
-                );
-                dialog.open();
-                return dialog.opened().then(resolve);
-            });
+            );
         },
     });
 });

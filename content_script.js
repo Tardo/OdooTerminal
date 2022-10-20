@@ -134,7 +134,9 @@
         ) {
             // Version 15.0
             to_inject.js.push("odoo/js/core/compat/v15/common.js");
-            to_inject.js.push("odoo/js/core/compat/v15/backend.js");
+            if (!info.isFrontend) {
+                to_inject.js.push("odoo/js/core/compat/v15/backend.js");
+            }
             compat_mode = 15;
         }
         if (
@@ -143,6 +145,9 @@
         ) {
             // Version 16.0
             to_inject.js.push("odoo/js/core/compat/v16/common.js");
+            if (!info.isFrontend) {
+                to_inject.js.push("odoo/js/core/compat/v16/backend.js");
+            }
             compat_mode = 16;
         }
         // Backend/Frontend resources
@@ -165,6 +170,7 @@
         to_inject.js = to_inject.js.concat([
             "odoo/js/core/rpc.js",
             "odoo/js/core/utils.js",
+            "odoo/js/core/recordset.js",
             "odoo/js/core/abstract/longpolling.js",
             "odoo/js/core/abstract/screen.js",
             "odoo/js/core/storage.js",
@@ -172,12 +178,15 @@
             "odoo/js/core/command_assistant.js",
             "odoo/js/core/screen.js",
             "odoo/js/core/longpolling.js",
-            "odoo/js/core/parameter_reader.js",
+            "odoo/js/core/trash/const.js",
+            "odoo/js/core/trash/interpreter.js",
+            "odoo/js/core/trash/vmachine.js",
             "odoo/js/core/parameter_generator.js",
             "odoo/js/tests/tests.js",
             "odoo/js/tests/test_core.js",
             "odoo/js/tests/test_common.js",
             "odoo/js/tests/test_backend.js",
+            "odoo/js/tests/test_trash.js",
             "odoo/js/terminal.js",
             "odoo/js/functions/core.js",
             "odoo/js/functions/common.js",

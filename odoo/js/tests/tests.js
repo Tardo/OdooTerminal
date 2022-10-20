@@ -41,12 +41,12 @@ odoo.define("terminal.tests", function (require) {
             }
         },
         assertIn: function (obj, key, msg = "") {
-            if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (!Object.hasOwn(obj, key)) {
                 throw new TerminalTestValidationError(msg);
             }
         },
         assertNotIn: function (obj, key, msg = "") {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (Object.hasOwn(obj, key)) {
                 throw new TerminalTestValidationError(msg);
             }
         },
@@ -62,19 +62,19 @@ odoo.define("terminal.tests", function (require) {
         },
 
         getModalOpen: function () {
-            return $(".modal.show,.modal.in");
+            return $(".modal.show,.modal.in,.modal.o_technical_modal");
         },
         isModalType: function ($modal, type) {
             return $modal.find(`.o_${type}_view`).length > 0;
         },
         closeModal: function ($modal) {
-            $modal.find(".close")[0].click();
+            $modal.find(".close,.btn-close")[0].click();
         },
 
         isFormOpen: function () {
             return !_.isNull(
                 document.querySelector(
-                    ".o_view_controller .o_form_view,.o_view_manager_content .o_form_view"
+                    ".o_view_controller .o_form_view,.o_view_manager_content .o_form_view,.o_view_controller .o_form_view_container"
                 )
             );
         },

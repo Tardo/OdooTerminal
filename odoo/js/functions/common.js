@@ -9,6 +9,9 @@ odoo.define("terminal.functions.Common", function (require) {
     const session = require("web.session");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
+    const TemplateManager = require("terminal.core.TemplateManager");
+    const TrashConst = require("terminal.core.trash.const");
+    const Recordset = require("terminal.core.recordset");
 
     Terminal.include({
         custom_events: _.extend({}, Terminal.prototype.custom_events, {
@@ -24,18 +27,38 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCreateModelRecord,
                 detail: "Open new model record in form view or directly.",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "j::v:value::0::The values to write",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["v", "value"],
+                        false,
+                        "The values to write",
+                    ],
                 ],
-                example: "-m res.partner -v \"{'name': 'Poldoore'}\"",
+                example: "-m res.partner -v {name: 'Poldoore'}",
             });
             this.registerCommand("unlink", {
                 definition: "Unlink record",
                 callback: this._cmdUnlinkModelRecord,
                 detail: "Delete a record.",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "li::i:id::1::The record id's",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Number,
+                        ["i", "id"],
+                        true,
+                        "The record id's",
+                    ],
                 ],
                 example: "-m res.partner -i 10,4,2",
             });
@@ -44,26 +67,82 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdWriteModelRecord,
                 detail: "Update record values.",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "li::i:id::1::The record id's",
-                    "j::v:value::1::The values to write",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Number,
+                        ["i", "id"],
+                        true,
+                        "The record id's",
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["v", "value"],
+                        true,
+                        "The values to write",
+                    ],
                 ],
-                example:
-                    "-m res.partner -i 10,4,2 -v \"{'street': 'Diagon Alley'}\"",
+                example: "-m res.partner -i 10,4,2 -v {street: 'Diagon Alley'}",
             });
             this.registerCommand("search", {
                 definition: "Search model record/s",
                 callback: this._cmdSearchModelRecord,
                 detail: "Launch orm search query",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "ls::f:field::0::The field names to request<br/>Can use '*' to show all fields of the model::display_name",
-                    "j::d:domain::0::The domain::[]",
-                    "i::l:limit::0::The limit of records to request",
-                    "i::of:offset::0::The offset (from)<br/>Can be zero (no limit)",
-                    "s::o:order::0::The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
-                    "f::more:more::0::Flag to indicate that show more results",
-                    "f::all:all::0::Show all records (not truncated)",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["f", "field"],
+                        false,
+                        "The field names to request<br/>Can use '*' to show all fields of the model",
+                        ["display_name"],
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Any,
+                        ["d", "domain"],
+                        false,
+                        "The domain",
+                        [],
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["l", "limit"],
+                        false,
+                        "The limit of records to request",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["of", "offset"],
+                        false,
+                        "The offset (from)<br/>Can be zero (no limit)",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["o", "order"],
+                        false,
+                        "The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
+                    ],
+                    [
+                        TrashConst.ARG.Flag,
+                        ["more", "more"],
+                        false,
+                        "Flag to indicate that show more results",
+                    ],
+                    [
+                        TrashConst.ARG.Flag,
+                        ["all", "all"],
+                        false,
+                        "Show all records (not truncated)",
+                    ],
                 ],
                 example: "-m res.partner -f * -l 100 -of 5 -o 'id DESC, name'",
             });
@@ -72,10 +151,32 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCallModelMethod,
                 detail: "Call model method. Remember: Methods with @api.model decorator doesn't need the id.",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "s::c:call::1::The method name to call",
-                    "j::a:argument::0::The arguments list::[]",
-                    "j::k:kwarg::0::The arguments dictionary::{}",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["c", "call"],
+                        true,
+                        "The method name to call",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Any,
+                        ["a", "argument"],
+                        false,
+                        "The arguments list",
+                        [],
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["k", "kwarg"],
+                        false,
+                        "The arguments dictionary",
+                        {},
+                    ],
                 ],
                 example: "-m res.partner -c address_get -a [8]",
             });
@@ -83,14 +184,28 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Upgrade a module",
                 callback: this._cmdUpgradeModule,
                 detail: "Launch upgrade module process.",
-                args: ["s::m:module::1::The module technical name"],
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        true,
+                        "The module technical name",
+                    ],
+                ],
                 example: "-m contacts",
             });
             this.registerCommand("install", {
                 definition: "Install a module",
                 callback: this._cmdInstallModule,
                 detail: "Launch module installation process.",
-                args: ["s::m:module::1::The module technical name"],
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        true,
+                        "The module technical name",
+                    ],
+                ],
                 example: "-m contacts",
             });
             this.registerCommand("uninstall", {
@@ -98,8 +213,13 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdUninstallModule,
                 detail: "Launch module deletion process.",
                 args: [
-                    "s::m:module::1::The module technical name",
-                    "f::f:force::0::Forced mode",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        true,
+                        "The module technical name",
+                    ],
+                    [TrashConst.ARG.Flag, ["f", "force"], false, "Forced mode"],
                 ],
                 exmaple: "-m contacts",
             });
@@ -113,7 +233,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdSetDebugMode,
                 detail: "Set debug mode",
                 args: [
-                    "i::m:mode::1::The mode<br>- 0: Disabled<br>- 1: Enabled<br>- 2: Enabled with Assets::::0:1:2",
+                    [
+                        TrashConst.ARG.Number,
+                        ["m", "mode"],
+                        true,
+                        "The mode<br>- 0: Disabled<br>- 1: Enabled<br>- 2: Enabled with Assets",
+                        undefined,
+                        [0, 1, 2],
+                    ],
                 ],
                 example: "-m 2",
             });
@@ -122,11 +249,23 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdPostData,
                 detail: "Send POST request to selected endpoint",
                 args: [
-                    "s::e:endpoint::1::The endpoint",
-                    "-::d:data::1::The data",
-                    "s::m:mode::0::The mode::odoo::odoo:raw",
+                    [
+                        TrashConst.ARG.String,
+                        ["e", "endpoint"],
+                        true,
+                        "The endpoint",
+                    ],
+                    [TrashConst.ARG.Any, ["d", "data"], true, "The data"],
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "mode"],
+                        false,
+                        "The mode",
+                        "odoo",
+                        ["odoo", "raw"],
+                    ],
                 ],
-                example: "-e /web/endpoint -d \"{'the_example': 42}\"",
+                example: "-e /web/endpoint -d {the_example: 42}",
             });
             this.registerCommand("whoami", {
                 definition: "Know current user login",
@@ -138,9 +277,25 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCheckFieldAccess,
                 detail: "Show readable/writeable fields of the selected model",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "ls::f:field::0::The field names to request::*",
-                    "j::fi:filter::0::The filter to apply",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["f", "field"],
+                        false,
+                        "The field names to request",
+                        ["*"],
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["fi", "filter"],
+                        false,
+                        "The filter to apply",
+                    ],
                 ],
                 example: "-m res.partner -f name,street",
             });
@@ -151,8 +306,20 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Show access rights for the selected operation on the" +
                     " selected model",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "s::o:operation::1::The operation to do::::create:read:write:unlink",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["o", "operation"],
+                        true,
+                        "The operation to do",
+                        undefined,
+                        ["create", "read", "write", "unlink"],
+                    ],
                 ],
                 example: "-m res.partner -o read",
             });
@@ -166,9 +333,25 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdSearchModelRecordId,
                 detail: "Launch orm search query.",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "li::i:id::1::The record id's",
-                    "ls::f:field::0::The fields to request<br/>Can use '*' to show all fields::display_name",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Number,
+                        ["i", "id"],
+                        true,
+                        "The record id's",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["f", "field"],
+                        false,
+                        "The fields to request<br/>Can use '*' to show all fields",
+                        ["display_name"],
+                    ],
                 ],
                 example: "-m res.partner -i 10,4,2 -f name,street",
             });
@@ -177,10 +360,17 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdContextOperation,
                 detail: "Operations over session context dictionary.",
                 args: [
-                    "s::o:operation::0::The operation to do::read::read:write:set:delete",
-                    "-::v:value::0::The values",
+                    [
+                        TrashConst.ARG.String,
+                        ["o", "operation"],
+                        false,
+                        "The operation to do",
+                        "read",
+                        ["read", "write", "set", "delete"],
+                    ],
+                    [TrashConst.ARG.Any, ["v", "value"], false, "The values"],
                 ],
-                example: "-o write -v \"{'the_example': 1}\"",
+                example: "-o write -v {the_example: 1}",
             });
             this.registerCommand("version", {
                 definition: "Know Odoo version",
@@ -192,8 +382,27 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdLongpolling,
                 detail: "Operations over long-polling.",
                 args: [
-                    "s::o:operation::0::The operation to do<br>- verbose > Print incoming notificacions<br>- off > Stop verbose mode<br>- add_channel > Add a channel to listen<br>- del_channel > Delete a listening channel<br>- start > Start client longpolling service<br> - stop > Stop client longpolling service::::verbose:off:add_channel:del_channel:start:stop",
-                    "s::p:param::0::The parameter",
+                    [
+                        TrashConst.ARG.String,
+                        ["o", "operation"],
+                        false,
+                        "The operation to do<br>- verbose > Print incoming notificacions<br>- off > Stop verbose mode<br>- add_channel > Add a channel to listen<br>- del_channel > Delete a listening channel<br>- start > Start client longpolling service<br> - stop > Stop client longpolling service",
+                        undefined,
+                        [
+                            "verbose",
+                            "off",
+                            "add_channel",
+                            "del_channel",
+                            "start",
+                            "stop",
+                        ],
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["p", "param"],
+                        false,
+                        "The parameter",
+                    ],
                 ],
                 example: "add_channel example_channel",
             });
@@ -202,10 +411,30 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdLoginAs,
                 detail: "Login as selected user.",
                 args: [
-                    "s::d:database::1::The database<br/>Can be '*' to use current database",
-                    "s::u:user::1::The login<br/>Can be optionally preceded by the '#' character and it will be used for password too",
-                    "s::p:password::0::The password",
-                    "f::nr:no-reload::0::No reload",
+                    [
+                        TrashConst.ARG.String,
+                        ["d", "database"],
+                        true,
+                        "The database<br/>Can be '*' to use current database",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["u", "user"],
+                        true,
+                        "The login<br/>Can be optionally preceded by the '#' character and it will be used for password too",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["p", "password"],
+                        false,
+                        "The password",
+                    ],
+                    [
+                        TrashConst.ARG.Flag,
+                        ["nr", "no-reload"],
+                        false,
+                        "No reload",
+                    ],
                 ],
                 secured: true,
                 example: "-d devel -u #admin",
@@ -215,7 +444,12 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdUserHasGroups,
                 detail: "Check if user is in the selected groups.",
                 args: [
-                    "ls::g:group::1::The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'",
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["g", "group"],
+                        true,
+                        "The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'",
+                    ],
                 ],
                 example: "-g base.group_user",
             });
@@ -224,7 +458,12 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdShowDBList,
                 detail: "Show database names",
                 args: [
-                    "f::only-active:only-active::0::Indicates that only print the active database name",
+                    [
+                        TrashConst.ARG.Flag,
+                        ["oa", "only-active"],
+                        false,
+                        "Indicates that only print the active database name",
+                    ],
                 ],
             });
             this.registerCommand("jstest", {
@@ -232,8 +471,20 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdJSTest,
                 detail: "Runs js tests in desktop or mobile mode for the selected module.",
                 args: [
-                    "s::m:module::0::The module technical name",
-                    "s::d:device::0::The device to test::desktop::desktop:mobile",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        false,
+                        "The module technical name",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["d", "device"],
+                        false,
+                        "The device to test",
+                        "desktop",
+                        ["desktop", "mobile"],
+                    ],
                 ],
                 example: "-m web -d mobile",
             });
@@ -241,7 +492,14 @@ odoo.define("terminal.functions.Common", function (require) {
                 definition: "Launch Tour",
                 callback: this._cmdRunTour,
                 detail: "Runs the selected tour. If no tour given, prints all available tours.",
-                args: ["s::n:name::0::The tour technical name"],
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["n", "name"],
+                        false,
+                        "The tour technical name",
+                    ],
+                ],
                 example: "-n mail_tour",
             });
             this.registerCommand("json", {
@@ -249,17 +507,34 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdPostJSONData,
                 detail: "Sends HTTP POST 'application/json' request",
                 args: [
-                    "s::e:endpoint::1::The endpoint",
-                    "j::d:data::1::The data to send",
+                    [
+                        TrashConst.ARG.String,
+                        ["e", "endpoint"],
+                        true,
+                        "The endpoint",
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["d", "data"],
+                        true,
+                        "The data to send",
+                    ],
                 ],
                 example:
-                    "-e /web_editor/public_render_template -d \"{'args':['web.layout']}\"",
+                    "-e /web_editor/public_render_template -d {args: ['web.layout']}",
             });
             this.registerCommand("depends", {
                 definition: "Know modules that depends on the given module",
                 callback: this._cmdModuleDepends,
                 detail: "Show a list of the modules that depends on the given module",
-                args: ["s::m:module::0::The module technical name"],
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "module"],
+                        false,
+                        "The module technical name",
+                    ],
+                ],
                 example: "base",
             });
             this.registerCommand("ual", {
@@ -278,8 +553,19 @@ odoo.define("terminal.functions.Common", function (require) {
                 callback: this._cmdCount,
                 detail: "Gets number of records from the given model in the selected domain",
                 args: [
-                    "s::m:model::1::The model technical name",
-                    "j::d:domain::0::The domain::[]",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The model technical name",
+                    ],
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.Any,
+                        ["d", "domain"],
+                        false,
+                        "The domain",
+                        [],
+                    ],
                 ],
                 example: "res.partner ['name', '=ilike', 'A%']",
             });
@@ -288,43 +574,81 @@ odoo.define("terminal.functions.Common", function (require) {
                     "Show the referenced model and id of the given xmlid's",
                 callback: this._cmdRef,
                 detail: "Show the referenced model and id of the given xmlid's",
-                args: ["ls::x:xmlid::1::The XML-ID"],
+                args: [
+                    [
+                        TrashConst.ARG.List | TrashConst.ARG.String,
+                        ["x", "xmlid"],
+                        true,
+                        "The XML-ID",
+                    ],
+                ],
                 example: "-x base.main_company,base.model_res_partner",
             });
             this.registerCommand("rpc", {
                 definition: "Execute raw rpc",
                 callback: this._cmdRpc,
                 detail: "Execute raw rpc",
-                args: ["j::o:options::1::The rpc query options"],
+                args: [
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["o", "options"],
+                        true,
+                        "The rpc query options",
+                    ],
+                ],
                 example:
-                    "-o \"{'route': '/jsonrpc', 'method': 'server_version', 'params': {'service': 'db'}}\"",
+                    "-o {route: '/jsonrpc', method: 'server_version', params: {service: 'db'}}",
             });
             this.registerCommand("metadata", {
                 definition: "View record metadata",
                 callback: this._cmdMetadata,
                 detail: "View record metadata",
                 args: [
-                    "s::m:model::1::The record model",
-                    "i::i:id::1::The record id",
+                    [
+                        TrashConst.ARG.String,
+                        ["m", "model"],
+                        true,
+                        "The record model",
+                    ],
+                    [TrashConst.ARG.Number, ["i", "id"], true, "The record id"],
                 ],
                 example: "-m res.partner -i 1",
-            });
-            this.registerCommand("parse_simple_json", {
-                definition: "Parse string simple format to json object",
-                callback: this._cmdParseSimpleJSON,
-                detail: "Parse string simple format to json object. Also accepts native json format.",
-                args: ["j::i:input::1::The input string in simple format"],
-                example: "-i \"KeyA=ValueA keyB='The ValueB'\"",
             });
             this.registerCommand("barcode", {
                 definition: "Operations over barcode",
                 callback: this._cmdBarcode,
                 detail: "See information and send barcode strings",
                 args: [
-                    "s::o:operation::0::The operation::send::info:send",
-                    "la::d:data::0::The data to send",
-                    "i::pd:pressdelay::0::The delay between presskey events (in ms)::3",
-                    "i::bd:barcodedelay::0::The delay between barcodes reads (in ms)::150",
+                    [
+                        TrashConst.ARG.String,
+                        ["o", "operation"],
+                        false,
+                        "The operation",
+                        "send",
+                        ["send", "info"],
+                    ],
+                    [
+                        TrashConst.ARG.List |
+                            TrashConst.ARG.Number |
+                            TrashConst.ARG.String,
+                        ["d", "data"],
+                        false,
+                        "The data to send",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["pd", "pressdelay"],
+                        false,
+                        "The delay between presskey events (in ms)",
+                        3,
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["bd", "barcodedelay"],
+                        false,
+                        "The delay between barcodes reads (in ms)",
+                        150,
+                    ],
                 ],
                 example: "-o send -d O-CMD.NEXT",
             });
@@ -399,13 +723,8 @@ odoo.define("terminal.functions.Common", function (require) {
                 } else {
                     return reject("Invalid operation!");
                 }
-                return resolve();
+                return resolve(kwargs.data);
             });
-        },
-
-        _cmdParseSimpleJSON: function (kwargs) {
-            this.screen.print(kwargs.input);
-            return Promise.resolve(kwargs.input);
         },
 
         _cmdMetadata: function (kwargs) {
@@ -427,7 +746,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         );
                     } else {
                         this.screen.print(
-                            this._templates.render("METADATA", metadata)
+                            TemplateManager.render("METADATA", metadata)
                         );
                     }
                 } catch (err) {
@@ -676,7 +995,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     this.screen.updateInputInfo(login);
                     this.screen.print(`Successfully logged as '${login}'`);
                     if (!kwargs.no_reload) {
-                        this.executeCommand("reload", false, true);
+                        this.execute("reload", false, true);
                     }
                     return result;
                 });
@@ -686,7 +1005,7 @@ odoo.define("terminal.functions.Common", function (require) {
             return session.session_logout().then((result) => {
                 this.screen.updateInputInfo("Public User");
                 this.screen.print("Logged out");
-                this.executeCommand("reload", false, true);
+                this.execute("reload", false, true);
                 return result;
             });
         },
@@ -760,12 +1079,7 @@ odoo.define("terminal.functions.Common", function (require) {
             } else if (kwargs.operation === "write") {
                 Object.assign(session.user_context, kwargs.value);
             } else if (kwargs.operation === "delete") {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        session.user_context,
-                        kwargs.value
-                    )
-                ) {
+                if (Object.hasOwn(session.user_context, kwargs.value)) {
                     delete session.user_context[kwargs.value];
                 } else {
                     return Promise.reject(
@@ -789,7 +1103,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 })
                 .then((result) => {
                     this.screen.printRecords(kwargs.model, result);
-                    return result;
+                    return Recordset.make(kwargs.model, result);
                 });
         },
 
@@ -945,7 +1259,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     ]);
                     let groups_list = "";
                     for (const group of result_tasks[0]) {
-                        groups_list += this._templates.render(
+                        groups_list += TemplateManager.render(
                             "WHOAMI_LIST_ITEM",
                             {
                                 name: group[1],
@@ -956,7 +1270,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     }
                     let companies_list = "";
                     for (const company of result_tasks[1]) {
-                        companies_list += this._templates.render(
+                        companies_list += TemplateManager.render(
                             "WHOAMI_LIST_ITEM",
                             {
                                 name: company[1],
@@ -975,7 +1289,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         groups: groups_list,
                     };
                     this.screen.print(
-                        this._templates.render("WHOAMI", template_values)
+                        TemplateManager.render("WHOAMI", template_values)
                     );
                     return resolve(template_values);
                 } catch (err) {
@@ -1094,7 +1408,7 @@ odoo.define("terminal.functions.Common", function (require) {
                     const modue_infos = await this._searchModule(kwargs.module);
                     if (!_.isEmpty(modue_infos)) {
                         if (!kwargs.force) {
-                            const depends = await this.executeCommand(
+                            const depends = await this.execute(
                                 `depends -m ${kwargs.module}`,
                                 false,
                                 true
@@ -1105,7 +1419,9 @@ odoo.define("terminal.functions.Common", function (require) {
                                 );
                                 this.screen.print(depends);
                                 const res = await this.screen.showQuestion(
-                                    "Do you want to continue?::y:n::n"
+                                    "Do you want to continue?",
+                                    ["y", "n"],
+                                    "n"
                                 );
                                 if (res?.toLowerCase() !== "y") {
                                     this.screen.printError(
@@ -1164,7 +1480,7 @@ odoo.define("terminal.functions.Common", function (require) {
             if (!orderBy) {
                 return res;
             }
-            const orders = this._parameterReader.splitAndTrim(orderBy, ",");
+            const orders = this._virtMachine.splitAndTrim(orderBy, ",");
             const orders_len = orders.length;
             let index = 0;
             while (index < orders_len) {
@@ -1199,10 +1515,12 @@ odoo.define("terminal.functions.Common", function (require) {
                     return new Promise(async (resolve, reject) => {
                         try {
                             const res = await this.screen.showQuestion(
-                                `There are still results to print (${buff.data.length} records). Show more?::y:n::y`
+                                `There are still results to print (${buff.data.length} records). Show more?`,
+                                ["y", "n"],
+                                "y"
                             );
                             if (res === "y") {
-                                this.executeCommand(
+                                this.execute(
                                     `search -m ${buff.model} --more`,
                                     false,
                                     false
@@ -1253,10 +1571,12 @@ odoo.define("terminal.functions.Common", function (require) {
                                     `There are still results to print (${
                                         this._buffer[this.__meta.name].data
                                             .length
-                                    } records). Show more?::y:n::y`
+                                    } records). Show more?`,
+                                    ["y", "n"],
+                                    "y"
                                 );
                                 if (res === "y") {
-                                    this.executeCommand(
+                                    this.execute(
                                         `search -m ${kwargs.model} --more`,
                                         false,
                                         false
@@ -1265,10 +1585,12 @@ odoo.define("terminal.functions.Common", function (require) {
                             } catch (err) {
                                 return reject(err);
                             }
-                            return resolve(sresult);
+                            return resolve(
+                                Recordset.make(kwargs.model, sresult)
+                            );
                         });
                     }
-                    return result;
+                    return Recordset.make(kwargs.model, result);
                 });
         },
 
@@ -1292,12 +1614,16 @@ odoo.define("terminal.functions.Common", function (require) {
                         kwargs: {context: this._getContext()},
                     });
                     this.screen.print(
-                        this._templates.render("RECORD_CREATED", {
+                        TemplateManager.render("RECORD_CREATED", {
                             model: kwargs.model,
                             new_id: result,
                         })
                     );
-                    return resolve(result);
+                    return resolve(
+                        Recordset.make(kwargs.model, [
+                            _.extend({}, kwargs.value, {id: result}),
+                        ])
+                    );
                 } catch (err) {
                     return reject(err);
                 }
@@ -1321,6 +1647,9 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdWriteModelRecord: function (kwargs) {
+            if (kwargs.value.constructor !== Object) {
+                Promise.reject("Invalid values!");
+            }
             return rpc
                 .query({
                     method: "write",

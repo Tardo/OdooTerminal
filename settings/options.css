@@ -2,7 +2,7 @@
 /* License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). */
 
 body {
-    background-color: #dedede;
+    background-color: #efefef;
     padding: 1em;
 }
 
@@ -17,7 +17,10 @@ body {
 
 .optsection {
     border: 1px solid gray;
-    padding: 0.3em;
+    padding: 0.8em;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: #cecece 1px 1px 5px;
 }
 .optsection:not(:first-child) {
     margin-top: 0.5em;
@@ -29,7 +32,7 @@ body {
 .optsection textarea {
     height: 200px;
     white-space: pre;
-    width: 98%;
+    width: 100%;
 }
 .optsection table {
     width: 100%;

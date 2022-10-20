@@ -31,9 +31,9 @@ odoo.define("terminal.loaders.Backend", function (require) {
             await legacySession.is_bound;
             const terminal = new Terminal(
                 rootWidget,
-                Terminal.prototype.MODES.BACKEND_NEW
+                Terminal.prototype.MODES.BACKEND_NEW,
+                {env: rootWidget.env}
             );
-            terminal.env = rootWidget.env;
             core.bus.on("toggle_terminal", this, () => {
                 terminal.doToggle();
             });
