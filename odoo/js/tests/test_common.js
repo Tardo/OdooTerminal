@@ -110,18 +110,19 @@ odoo.define("terminal.tests.common", function (require) {
             await this.terminal.execute("create -m res.partner", false, true);
             await new Promise((resolve) => setTimeout(resolve, 800));
             this.assertTrue(this.isFormOpen());
-            const record_id = await this.terminal.execute(
+            const recordset = await this.terminal.execute(
                 `create -m res.partner -v {name: '${_.uniqueId(
                     "This is a Test #"
                 )}'}`,
                 false,
                 true
             );
-            this.assertTrue(record_id > 0);
+            this.assertEqual(recordset.model, "res.partner");
+            this.assertEqual(recordset.length, 1);
         },
 
         test_unlink: async function () {
-            const record_id = await this.terminal.execute(
+            const record = await this.terminal.execute(
                 `create -m res.partner -v {name: '${_.uniqueId(
                     "This is a Test #"
                 )}'}`,
@@ -129,7 +130,7 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             const res = await this.terminal.execute(
-                `unlink -m res.partner -i ${record_id}`,
+                `unlink -m res.partner -i ${record.id}`,
                 false,
                 true
             );
@@ -137,14 +138,14 @@ odoo.define("terminal.tests.common", function (require) {
         },
 
         test_write: async function () {
-            const record_a_id = await this.terminal.execute(
+            const record_a = await this.terminal.execute(
                 `create -m res.partner -v {name: '${_.uniqueId(
                     "This is a Test #"
                 )}'}`,
                 false,
                 true
             );
-            const record_b_id = await this.terminal.execute(
+            const record_b = await this.terminal.execute(
                 `create -m res.partner -v {name: '${_.uniqueId(
                     "This is a Test #"
                 )}'}`,
@@ -152,7 +153,7 @@ odoo.define("terminal.tests.common", function (require) {
                 true
             );
             let res = await this.terminal.execute(
-                `write -m res.partner -i ${record_b_id} -v {name: '${_.uniqueId(
+                `write -m res.partner -i ${record_a.id} -v {name: '${_.uniqueId(
                     "Other name Test #"
                 )}'}`,
                 false,
@@ -160,9 +161,9 @@ odoo.define("terminal.tests.common", function (require) {
             );
             this.assertTrue(res);
             res = await this.terminal.execute(
-                `write -m res.partner -i "${record_a_id}, ${record_b_id}" -v {name: '${_.uniqueId(
-                    "Other name Test #"
-                )}'}`,
+                `write -m res.partner -i "${record_a.id}, ${
+                    record_b.id
+                }" -v {name: '${_.uniqueId("Other name Test #")}'}`,
                 false,
                 true
             );

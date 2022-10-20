@@ -114,7 +114,7 @@ odoo.define("terminal.core.ParameterGenerator", function (require) {
             for (let i = min_s; i <= max_s; ++i) {
                 numbers.push(i);
             }
-            return numbers.join();
+            return numbers;
         },
 
         doIntIter: function (min, step = 1) {

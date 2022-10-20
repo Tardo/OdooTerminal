@@ -170,6 +170,7 @@
         to_inject.js = to_inject.js.concat([
             "odoo/js/core/rpc.js",
             "odoo/js/core/utils.js",
+            "odoo/js/core/recordset.js",
             "odoo/js/core/abstract/longpolling.js",
             "odoo/js/core/abstract/screen.js",
             "odoo/js/core/storage.js",

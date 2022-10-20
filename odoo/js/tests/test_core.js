@@ -167,5 +167,140 @@ odoo.define("terminal.tests.core", function (require) {
             const res = await this.terminal.execute("jobs", false, true);
             this.assertEqual(res[0]?.cmdInfo.cmdName, "jobs");
         },
+
+        test_gen: async function () {
+            let res = await this.terminal.execute(
+                "gen -t str -mi 4 -ma 4",
+                false,
+                true
+            );
+            this.assertEqual(res.length, 4);
+            res = await this.terminal.execute(
+                "gen -t int -mi 5 -ma 10",
+                false,
+                true
+            );
+            this.assertTrue(res >= 5 && res <= 10);
+            res = await this.terminal.execute(
+                "gen -t float -mi 5 -ma 10",
+                false,
+                true
+            );
+            this.assertTrue(res >= 5.0 && res < 11.0);
+            res = await this.terminal.execute(
+                "gen -t intseq -mi 5 -ma 10",
+                false,
+                true
+            );
+            this.assertEqual(res[0], 5);
+            this.assertEqual(res[5], 10);
+            res = await this.terminal.execute(
+                "gen -t intiter -mi 5 -ma 10",
+                false,
+                true
+            );
+            this.assertEqual(res, 5);
+            res = await this.terminal.execute(
+                "gen -t intiter -mi 5 -ma 10",
+                false,
+                true
+            );
+            this.assertEqual(res, 15);
+            res = await this.terminal.execute(
+                "gen -t date -mi 500000000 -ma 500000000",
+                false,
+                true
+            );
+            this.assertTrue(res);
+            res = await this.terminal.execute(
+                "gen -t tzdate -mi 500000000 -ma 500000000",
+                false,
+                true
+            );
+            this.assertTrue(res);
+            res = await this.terminal.execute(
+                "gen -t time -mi 500000000 -ma 500000000",
+                false,
+                true
+            );
+            this.assertTrue(res);
+            res = await this.terminal.execute(
+                "gen -t tztime -mi 500000000 -ma 500000000",
+                false,
+                true
+            );
+            this.assertTrue(res);
+            res = await this.terminal.execute(
+                "gen -t datetime -mi 500000000 -ma 500000000",
+                false,
+                true
+            );
+            this.assertTrue(res);
+            res = await this.terminal.execute(
+                "gen -t tzdatetime -mi 500000000 -ma 500000000",
+                false,
+                true
+            );
+            this.assertTrue(res);
+            res = await this.terminal.execute(
+                "gen -t email -mi 8 -ma 15",
+                false,
+                true
+            );
+            this.assertTrue(res.indexOf("@") > 0);
+            res = await this.terminal.execute(
+                "gen -t url -mi 8 -ma 15",
+                false,
+                true
+            );
+            this.assertTrue(res.startsWith("https://www."));
+        },
+
+        test_now: async function () {
+            let res = await this.terminal.execute("now", false, true);
+            this.assertTrue(res);
+            res = await this.terminal.execute("now -t date", false, true);
+            this.assertTrue(res);
+            res = await this.terminal.execute("now -t time", false, true);
+            this.assertTrue(res);
+            res = await this.terminal.execute("now -t date --tz", false, true);
+            this.assertTrue(res);
+            res = await this.terminal.execute("now -t time --tz", false, true);
+            this.assertTrue(res);
+            res = await this.terminal.execute("now -t full --tz", false, true);
+            this.assertTrue(res);
+        },
+
+        test_commit: async function () {
+            await this.terminal.execute(
+                "$rs = $(read res.partner 8); $rs['name'] = 'Willy Wonka';",
+                false,
+                true
+            );
+            let res = await this.terminal.execute("print $rs", false, true);
+            this.assertNotEmpty(res.toWrite());
+            res = await this.terminal.execute("commit $rs", false, true);
+            this.assertTrue(res);
+            res = await this.terminal.execute("print $rs", false, true);
+            this.assertEmpty(res.toWrite());
+            res = await this.terminal.execute(
+                "read res.partner 8 -f name",
+                false,
+                true
+            );
+            this.assertEqual(res.name, "Willy Wonka");
+        },
+
+        test_rollback: async function () {
+            await this.terminal.execute(
+                "$rsb = $(read res.partner 8); $rsb['name'] = 'Willy Wonka';",
+                false,
+                true
+            );
+            const res = await this.terminal.execute("print $rsb", false, true);
+            this.assertNotEmpty(res.toWrite());
+            await this.terminal.execute("rollback $rsb", false, true);
+            this.assertEmpty(res.toWrite());
+        },
     });
 });

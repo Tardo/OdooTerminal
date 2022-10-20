@@ -6,6 +6,7 @@ odoo.define("terminal.core.Screen", function (require) {
 
     const AbstractScreen = require("terminal.core.abstract.Screen");
     const TemplateManager = require("terminal.core.TemplateManager");
+    const Recordset = require("terminal.core.recordset");
     const Utils = require("terminal.core.Utils");
 
     /**
@@ -399,11 +400,12 @@ odoo.define("terminal.core.Screen", function (require) {
 
         /* PRIVATE */
         _formatPrint: function (msg, cls) {
-            const msg_type = typeof msg;
             const res = [];
-            if (msg_type === "object") {
+            if (typeof msg === "object") {
                 if (msg.constructor === Text) {
                     res.push(`<span class='line-text ${cls}'>${msg}</span>`);
+                } else if (msg instanceof Recordset) {
+                    this.printRecords(msg.model, msg);
                 } else if (msg.constructor === Array) {
                     const l = msg.length;
                     for (let x = 0; x < l; ++x) {

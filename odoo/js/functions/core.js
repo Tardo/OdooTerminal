@@ -4,11 +4,13 @@
 odoo.define("terminal.functions.Core", function (require) {
     "use strict";
 
+    const rpc = require("terminal.core.rpc");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
     const TrashConst = require("terminal.core.trash.const");
     const ParameterGenerator = require("terminal.core.ParameterGenerator");
     const TemplateManager = require("terminal.core.TemplateManager");
+    const Recordset = require("terminal.core.recordset");
     const time = require("web.time");
 
     Terminal.include({
@@ -42,7 +44,7 @@ odoo.define("terminal.functions.Core", function (require) {
             });
             this.registerCommand("print", {
                 definition: "Print a message",
-                callback: this._cmdPrintText,
+                callback: this._cmdPrint,
                 detail: "Eval parameters and print the result.",
                 args: [
                     [
@@ -113,7 +115,6 @@ odoo.define("terminal.functions.Core", function (require) {
                         "The command to run",
                     ],
                 ],
-                sanitized: false,
                 example: "-n myalias -c \"print 'Hello, $1!'\"",
             });
             this.registerCommand("quit", {
@@ -134,7 +135,6 @@ odoo.define("terminal.functions.Core", function (require) {
                         "The value to export",
                     ],
                 ],
-                sanitized: false,
                 example: "-v $(search res.partner)",
             });
             this.registerCommand("exportfile", {
@@ -143,13 +143,12 @@ odoo.define("terminal.functions.Core", function (require) {
                 detail: "Exports the command result to a text/json file.",
                 args: [
                     [
-                        TrashConst.ARG.String,
-                        ["c", "cmd"],
+                        TrashConst.ARG.Any,
+                        ["v", "value"],
                         true,
-                        "The command to run and export the result",
+                        "The value to export",
                     ],
                 ],
-                sanitized: false,
                 example: "-c 'search res.partner'",
             });
             this.registerCommand("chrono", {
@@ -167,7 +166,6 @@ odoo.define("terminal.functions.Core", function (require) {
                         "The command to run",
                     ],
                 ],
-                sanitized: false,
                 example: "-c 'search res.partner'",
             });
             this.registerCommand("repeat", {
@@ -194,7 +192,6 @@ odoo.define("terminal.functions.Core", function (require) {
                         "Used to don't print command output",
                     ],
                 ],
-                sanitized: false,
                 example:
                     "-t 20 -c \"create res.partner {name: 'Example Partner #$INTITER'}\"",
             });
@@ -202,13 +199,11 @@ odoo.define("terminal.functions.Core", function (require) {
                 definition: "Display running jobs",
                 callback: this._cmdJobs,
                 detail: "Display running jobs",
-                sanitized: false,
             });
             this.registerCommand("toggle_term", {
                 definition: "Toggle terminal visibility",
                 callback: this._cmdToggleTerm,
                 detail: "Toggle terminal visibility",
-                sanitized: false,
             });
             this.registerCommand("dis", {
                 definition: "Dissasembler bytecode",
@@ -217,7 +212,6 @@ odoo.define("terminal.functions.Core", function (require) {
                 args: [
                     [TrashConst.ARG.String, ["c", "code"], true, "TraSH Code"],
                 ],
-                sanitized: false,
                 example: "-c \"print $var[0]['key'] + ' -> ' + 1234\"",
             });
             this.registerCommand("gen", {
@@ -256,7 +250,6 @@ odoo.define("terminal.functions.Core", function (require) {
                     ],
                     [TrashConst.ARG.Number, ["ma", "max"], false, "Max. value"],
                 ],
-                sanitized: false,
                 example: "-t str -mi 2 -ma 4",
             });
             this.registerCommand("now", {
@@ -280,8 +273,81 @@ odoo.define("terminal.functions.Core", function (require) {
                         false,
                     ],
                 ],
-                sanitized: false,
                 example: "-t time --tz",
+            });
+            this.registerCommand("commit", {
+                definition: "Commit recordset changes",
+                callback: this._cmdCommit,
+                detail: "Write recordset changes",
+                args: [
+                    [
+                        TrashConst.ARG.Any,
+                        ["r", "recordset"],
+                        true,
+                        "The Recordset",
+                    ],
+                ],
+                example: "-r $recordset",
+            });
+            this.registerCommand("rollback", {
+                definition: "Revert recordset changes",
+                callback: this._cmdRollback,
+                detail: "Undo recordset changes",
+                args: [
+                    [
+                        TrashConst.ARG.Any,
+                        ["r", "recordset"],
+                        true,
+                        "The Recordset",
+                    ],
+                ],
+                example: "-r $recordset",
+            });
+        },
+
+        _cmdCommit: function (kwargs) {
+            return new Promise(async (resolve, reject) => {
+                if (!Recordset.isValid(kwargs.recordset)) {
+                    return reject(`Invalid recordset`);
+                }
+
+                const values_to_write = kwargs.recordset.toWrite();
+                if (_.isEmpty(values_to_write)) {
+                    this.screen.printError("Nothing to commit!");
+                    return resolve(false);
+                }
+                const pids = [];
+                const tasks = [];
+                for (const [rec_id, values] of values_to_write) {
+                    tasks.push(
+                        rpc.query({
+                            method: "write",
+                            model: kwargs.recordset.model,
+                            args: [rec_id, values],
+                            kwargs: {context: this._getContext()},
+                        })
+                    );
+                    pids.push(rec_id);
+                }
+
+                await Promise.all(tasks);
+                kwargs.recordset.persist();
+                this.screen.print(
+                    `Records '${pids}' of ${kwargs.recordset.model} updated successfully`
+                );
+                return resolve(true);
+            });
+        },
+
+        _cmdRollback: function (kwargs) {
+            return new Promise(async (resolve, reject) => {
+                if (!Recordset.isValid(kwargs.recordset)) {
+                    return reject(`Invalid recordset`);
+                }
+
+                kwargs.recordset.rollback();
+                this.screen.print(`Recordset changes undone`);
+                return resolve(true);
             });
         },
 
@@ -346,7 +412,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     kwargs.min,
                     kwargs.max
                 );
-            } else if (type === "data") {
+            } else if (type === "date") {
                 result = parameterGenerator.generateDate(
                     kwargs.min,
                     kwargs.max
@@ -519,7 +585,7 @@ odoo.define("terminal.functions.Core", function (require) {
             return Promise.resolve();
         },
 
-        _cmdPrintText: function (kwargs) {
+        _cmdPrint: function (kwargs) {
             this.screen.print(kwargs.msg);
             return Promise.resolve(kwargs.msg);
         },

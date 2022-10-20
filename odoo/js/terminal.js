@@ -196,7 +196,6 @@ odoo.define("terminal.Terminal", function (require) {
                     args: null,
                     secured: false,
                     aliases: [],
-                    sanitized: true,
                     example: "",
                 },
                 cmd_def
@@ -236,7 +235,7 @@ odoo.define("terminal.Terminal", function (require) {
                         cmd_res.push(result);
                     }
                 } catch (err) {
-                    this.screen.print(err);
+                    this.screen.printError(err);
                     return reject(err);
                 }
 

@@ -11,6 +11,7 @@ odoo.define("terminal.functions.Common", function (require) {
     const Utils = require("terminal.core.Utils");
     const TemplateManager = require("terminal.core.TemplateManager");
     const TrashConst = require("terminal.core.trash.const");
+    const Recordset = require("terminal.core.recordset");
 
     Terminal.include({
         custom_events: _.extend({}, Terminal.prototype.custom_events, {
@@ -1102,7 +1103,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 })
                 .then((result) => {
                     this.screen.printRecords(kwargs.model, result);
-                    return result;
+                    return Recordset.make(kwargs.model, result);
                 });
         },
 
@@ -1584,10 +1585,12 @@ odoo.define("terminal.functions.Common", function (require) {
                             } catch (err) {
                                 return reject(err);
                             }
-                            return resolve(sresult);
+                            return resolve(
+                                Recordset.make(kwargs.model, sresult)
+                            );
                         });
                     }
-                    return result;
+                    return Recordset.make(kwargs.model, result);
                 });
         },
 
@@ -1616,7 +1619,11 @@ odoo.define("terminal.functions.Common", function (require) {
                             new_id: result,
                         })
                     );
-                    return resolve(result);
+                    return resolve(
+                        Recordset.make(kwargs.model, [
+                            _.extend({}, kwargs.value, {id: result}),
+                        ])
+                    );
                 } catch (err) {
                     return reject(err);
                 }
@@ -1640,6 +1647,9 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdWriteModelRecord: function (kwargs) {
+            if (kwargs.value.constructor !== Object) {
+                Promise.reject("Invalid values!");
+            }
             return rpc
                 .query({
                     method: "write",

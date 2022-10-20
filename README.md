@@ -60,20 +60,14 @@ You can toggle terminal using one of these options:
 | Install module                                      | `install -m mymodule`                                                 |
 | Create alias                                        | `alias -n myalias -c "print My name is $1"`                           |
 
-> Notice the usage of quotes when use parameters with spaces.
-
 > Notice that a list is an string of values separated by commas. Example: "5,
-> 15, 8"
+> 15, 8" (quotes included) or can use array [5, 15, 8]
 
 > Notice that can call commands without 'named arguments', for example:
 > `create res.partner "name=Hipcut street='Mystery street'"` The rule is that
 > 'unnamed arguments' fill values following the order of the command arguments
 > definition. So mix 'unnamed' with 'named' arguments can be done as long as the
 > order is maintained.
-
-> Notice that can use "simple json" format instead of normal syntaxis. For
-> example "{'keyA':'this is a value', 'keyB':42}" can be done in a simple way
-> "keyA='this is a value' keyB=42"
 
 ## Notes
 
@@ -91,27 +85,27 @@ You can toggle terminal using one of these options:
 
 ## Advance Usage
 
-#### + Escaped Sequences
+#### + Recordsets
 
-Reading the value of a "edit input" will get the string with the escaped
-slashes. So, when you write something like `"this \_ is a test"`, the engine
-reads `"this \\_ is a test"`. This is great for keeping escaped sentences
-unresolved.
+`search`, `read` and `create` commands returns `recordsets`. Can use them to
+write values with `commit` command.
 
-But, this cause conflicts when you try to resolve them with "TraSH", because the
-js engine resolves the escaped slashes and TraSH try to resolve `"\_"` and this
-result on an exception. See the valid escape sequences in JSON format:
+Example:
 
-![Valid JSON escape sequences](https://i.stack.imgur.com/SHLOB.gif)
+```
+$rs = $(search res.partner)
+$rs[4]['name'] = 'The Name'
+$rs[2]['name'] = 'Other Name'
+commit $rs
 
-So... the way to send escaped sequences is by using double-slashed escape
-sequences. You write something like `"this \\_ is a test"` and the engine reads
-`"this \\\\_ is a test"`. In this case JSON.parse can unescape `\\` to `\`.
+$record = $(read res.partner 8)
+$record['name'] = 'Willy Wonka'
+$record['city'] = 'O Courel'
+commit $record
 
-Escaped quotes (`\' and \"`) are special because they are truncated by the
-terminal. So, when you write `"this \' is a test"`, the terminal reads
-`"this ' is a test"`. If you need send this characters escaped you must use
-'triple-slash': `"this \\\' is a test"`.
+$new_rec = $(create res.partner {name 'The test'})
+print $new_rec
+```
 
 #### + Positional replacements for aliases
 
@@ -132,10 +126,10 @@ For example:
 #### + Runners (subcommands)
 
 You can execute "subcommands" to use the result in a new command call. The
-syntax of runners looks like `=={command}`.
+syntax of runners looks like `$(command)`.
 
 For example: `read -m res.users -i $(search -m res.users -f id)[0]['id']` or
-`read -m res.users -i $(search -m res.users -f id)['id']`
+`read -m res.users -i $(search -m res.users -f id)['ids']`
 
 #### + Massive operations
 

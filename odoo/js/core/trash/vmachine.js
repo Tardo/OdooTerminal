@@ -99,6 +99,9 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
         },
 
         eval: function (cmd_raw, options) {
+            if (cmd_raw.constructor !== String) {
+                return Promise.reject("Invalid input!");
+            }
             return new Promise(async (resolve, reject) => {
                 const parse_info = this.interpreter.parse(cmd_raw, {
                     registeredCmds: this._registeredCmds,
@@ -376,16 +379,6 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                 _.extend(this._registeredNames, root_frame.store);
                 return resolve(return_values);
             });
-        },
-
-        getHumanType: function (type) {
-            const entries = Object.entries(TrashConst.PARSER);
-            for (const entry of entries) {
-                if (entry[1] === type) {
-                    return entry[0];
-                }
-            }
-            return "";
         },
     });
 

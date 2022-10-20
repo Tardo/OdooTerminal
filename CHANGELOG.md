@@ -5,10 +5,15 @@
 ```
 IMP: Runners
 IMP: Args. definition
+IMP: Command 'search': return a recordset
+IMP: Command 'read': return a recordset
+IMP: Command 'create': return a recordset
 
-ADD: 'TraSH' a language inspired in sh command language
-ADD: Command 'gen': Replace for generators
+ADD: 'TraSH'
+ADD: Command 'gen': Replacement for generators
 ADD: Command 'now': Shows current time/date/datetime
+ADD: Command 'commit': Write recordset changes
+ADD: Comand: 'rollback': Undo recordset changes
 ADD: Support Odoo 16.0
 
 DEL: SimpleJSON

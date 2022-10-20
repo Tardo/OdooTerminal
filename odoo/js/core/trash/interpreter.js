@@ -865,26 +865,34 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
 
             const doFormat = async (val, type) => {
                 let ret = val;
-                if (
-                    (type & TrashConst.ARG.String) === TrashConst.ARG.String &&
-                    typeof val !== "string"
-                ) {
+                if ((type & TrashConst.ARG.String) === TrashConst.ARG.String) {
+                    if (typeof val === "string") {
+                        return ret;
+                    }
                     ret = val.toString();
                 } else if (
-                    (type & TrashConst.ARG.Number) === TrashConst.ARG.Number &&
-                    typeof val !== "number"
+                    (type & TrashConst.ARG.Number) ===
+                    TrashConst.ARG.Number
                 ) {
+                    if (typeof val === "number") {
+                        return ret;
+                    }
                     ret = Number(val);
                 } else if (
-                    (type & TrashConst.ARG.Flag) === TrashConst.ARG.Flag &&
-                    typeof val !== "boolean"
+                    (type & TrashConst.ARG.Flag) ===
+                    TrashConst.ARG.Flag
                 ) {
+                    if (typeof val === "boolean") {
+                        return ret;
+                    }
                     ret = Boolean(val);
                 } else if (
                     (type & TrashConst.ARG.Dictionary) ===
-                        TrashConst.ARG.Dictionary &&
-                    val.constructor !== Object
+                    TrashConst.ARG.Dictionary
                 ) {
+                    if (val.constructor === Object) {
+                        return ret;
+                    }
                     ret = (
                         await this.getParent().eval(param, {silent: true})
                     )[0];
