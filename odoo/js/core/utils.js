@@ -59,7 +59,10 @@ odoo.define("terminal.core.Utils", function (require) {
         };
 
         return new Promise((resolve, reject) => {
-            window.addEventListener("focus", onBodyFocus.bind(this, reject));
+            window.addEventListener(
+                "focus",
+                _.debounce(onBodyFocus.bind(this, reject), 200)
+            );
             input_elm.onchange = (e) => {
                 const file = e.target.files[0];
                 const reader = new FileReader();
@@ -69,6 +72,44 @@ odoo.define("terminal.core.Utils", function (require) {
                 reader.onabort = reject;
                 reader.onload = (readerEvent) =>
                     resolve(readerEvent.target.result);
+            };
+            input_elm.click();
+        }).finally(() => {
+            window.removeEventListener("focus", onBodyFocus);
+            document.body.removeChild(input_elm);
+        });
+    };
+
+    const file2File = (filename, options) => {
+        options = _.defaults(options, {type: "application/octet-stream"});
+        const input_elm = window.document.createElement("input");
+        input_elm.type = "file";
+        document.body.appendChild(input_elm);
+        const onBodyFocus = (reject) => {
+            if (!input_elm.value.length) {
+                return reject("Aborted by user. No file given...");
+            }
+        };
+
+        return new Promise((resolve, reject) => {
+            window.addEventListener(
+                "focus",
+                _.debounce(onBodyFocus.bind(this, reject), 200)
+            );
+            input_elm.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.readAsArrayBuffer(file);
+
+                reader.onerror = reject;
+                reader.onabort = reject;
+                reader.onload = (readerEvent) => {
+                    const blob = new Blob([readerEvent.target.result], options);
+                    if (!filename) {
+                        filename = input_elm.value;
+                    }
+                    return resolve(new File([blob], filename, options));
+                };
             };
             input_elm.click();
         }).finally(() => {
@@ -212,6 +253,7 @@ odoo.define("terminal.core.Utils", function (require) {
         getOdooVersionInfo: getOdooVersionInfo,
         isPublicUser: isPublicUser,
         file2Base64: file2Base64,
+        file2File: file2File,
         asyncSleep: asyncSleep,
         genColorFromString: genColorFromString,
         rgb2hsv: rgb2hsv,

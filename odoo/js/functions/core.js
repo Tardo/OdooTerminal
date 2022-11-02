@@ -303,6 +303,30 @@ odoo.define("terminal.functions.Core", function (require) {
                 ],
                 example: "-r $recordset",
             });
+            this.registerCommand("genfile", {
+                definition: "Generate a File object",
+                callback: this._cmdGenFile,
+                detail: "Open a browser file dialog and instanciates a File object with the content of the file selected",
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["n", "name"],
+                        false,
+                        "The File object file name",
+                    ],
+                    [
+                        TrashConst.ARG.Dictionary,
+                        ["o", "options"],
+                        false,
+                        "The File object options",
+                    ],
+                ],
+                example: "-n unnecessaryName.png",
+            });
+        },
+
+        _cmdGenFile: function (kwargs) {
+            return Utils.file2File(kwargs.name, kwargs.options);
         },
 
         _cmdCommit: function (kwargs) {

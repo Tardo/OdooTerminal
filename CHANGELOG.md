@@ -1,5 +1,13 @@
 # Changelog
 
+**9.0.1**
+
+```
+IMP: file utils operations
+
+ADD: Command 'genfile': Generates a File object
+```
+
 **9.0.0**
 
 ```

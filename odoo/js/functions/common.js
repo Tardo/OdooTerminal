@@ -4,8 +4,8 @@
 odoo.define("terminal.functions.Common", function (require) {
     "use strict";
 
-    const rpc = require("terminal.core.rpc");
     const ajax = require("web.ajax");
+    const rpc = require("terminal.core.rpc");
     const session = require("web.session");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
@@ -915,11 +915,14 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdShowDBList: function (kwargs) {
-            return ajax
-                .rpc("/jsonrpc", {
-                    service: "db",
-                    method: "list",
-                    args: {},
+            return rpc
+                .query({
+                    route: "/jsonrpc",
+                    params: {
+                        service: "db",
+                        method: "list",
+                        args: {},
+                    },
                 })
                 .then((databases) => {
                     const databases_len = databases.length;
@@ -1674,7 +1677,6 @@ odoo.define("terminal.functions.Common", function (require) {
                         return result;
                     });
             }
-
             return $.post(kwargs.endpoint, kwargs.data, (result) => {
                 this.screen.eprint(result, false, "line-pre");
                 return result;
