@@ -39,6 +39,9 @@ window.__OdooTerminal.process_keybind = function (e) {
     if (e.metaKey) {
         keybind.push("Meta");
     }
+    if (e.key === "Escape") {
+        keybind.push("Escape");
+    }
     if (window.__OdooTerminal.IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
         keybind.push(e.key);
     }

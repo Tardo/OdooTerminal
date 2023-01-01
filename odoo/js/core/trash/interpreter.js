@@ -336,6 +336,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
             if (value) {
                 tokens.push(value);
             }
+            // Console.log("TOKENS: ", tokens);
             return tokens;
         },
 
@@ -419,7 +420,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 ) {
                     ttype = TrashConst.LEXER.Math;
                     token_san = token_san
-                        .substr(3, token_san.length - 4)
+                        .substr(3, token_san.length - 5)
                         .trim();
                 } else if (
                     token_san[0] === TrashConst.SYMBOLS.VARIABLE &&
@@ -836,23 +837,16 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                         ignore_instr_eoi = true;
                         break;
                     case TrashConst.LEXER.Math:
-                        const parsed_math = this.parse(
-                            token.value,
-                            {
-                                needResetStores: false,
-                                registeredCmds: options.registeredCmds,
-                                silent: true,
-                                math: true,
-                            },
-                            ++mlevel
-                        );
-                        res.stack.values.push(...parsed_runner.stack.values);
-                        res.stack.names.push(...parsed_math.stack.names);
-                        to_append.inputTokens.push(...parsed_math.inputTokens);
+                        to_append.values.push(token.value);
+                        const dindex = res.stack.values[0].length;
                         to_append.instructions.push(
-                            ...parsed_math.stack.instructions
+                            new Instruction(
+                                TrashConst.PARSER.LOAD_MATH,
+                                index,
+                                level,
+                                dindex
+                            )
                         );
-                        mlevel = parsed_math.maxULevel;
                         break;
                 }
 

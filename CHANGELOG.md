@@ -5,7 +5,10 @@
 ```
 IMP: file utils operations
 
+FIX: TrasSH: 'inline' load runner result data attribute (issue #92)
+
 ADD: Command 'genfile': Generates a File object
+ADD: Math operations
 ```
 
 **9.0.0**

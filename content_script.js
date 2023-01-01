@@ -178,6 +178,7 @@
             "odoo/js/core/command_assistant.js",
             "odoo/js/core/screen.js",
             "odoo/js/core/longpolling.js",
+            "odoo/js/core/trash/external/mparser.js",
             "odoo/js/core/trash/const.js",
             "odoo/js/core/trash/interpreter.js",
             "odoo/js/core/trash/vmachine.js",

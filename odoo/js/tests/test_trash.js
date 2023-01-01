@@ -58,6 +58,19 @@ odoo.define("terminal.tests.TraSH", function (require) {
             results = await this.terminal._virtMachine.eval("$test");
             this.assertEqual(results[0].this, "blablabla; and, bla");
 
+            // Runners
+            await this.terminal._virtMachine.eval(
+                "$test = $(search res.partner)"
+            );
+            results = await this.terminal._virtMachine.eval("$test['ids']");
+            this.assertEqual(results[0].constructor, Array);
+            this.assertTrue(results[0].length > 0);
+            results = await this.terminal._virtMachine.eval(
+                "$(search res.partner)['ids']"
+            );
+            this.assertEqual(results[0].constructor, Array);
+            this.assertTrue(results[0].length > 0);
+
             // Concat
             results = await this.terminal._virtMachine.eval(
                 "$a = 'blabla'; $b = 1234; $a + '---' + $b;"
@@ -67,6 +80,14 @@ odoo.define("terminal.tests.TraSH", function (require) {
                 "$a = [{test: 124, this: 'lelele lololo'}]; $b = [54,42]; $a[0]['this'] + '---' + $b[1];"
             );
             this.assertEqual(results[0], "lelele lololo---42");
+
+            // Math
+            results = await this.terminal._virtMachine.eval("$(((5+5)*2))");
+            this.assertEqual(results[0], 20);
+            results = await this.terminal._virtMachine.eval(
+                "$val = $((5*2)); $((5+$val))"
+            );
+            this.assertEqual(results[0], 15);
         },
     });
 });

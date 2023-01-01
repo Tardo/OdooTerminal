@@ -4,22 +4,23 @@
 odoo.define("terminal.core.TraSH.vmachine", function (require) {
     "use strict";
 
+    const MParser = require("terminal.external.mparser");
     const TrashConst = require("terminal.core.trash.const");
     const Interpreter = require("terminal.core.TraSH.interpreter");
     const TemplateManager = require("terminal.core.TemplateManager");
     const Class = require("web.Class");
 
-    const Block = Class.extend({
-        init: function () {
-            this.values = [];
-            this.store = {};
-        },
-    });
+    // Const Block = Class.extend({
+    //     init: function () {
+    //         this.values = [];
+    //         this.store = {};
+    //     },
+    // });
 
     const Frame = Class.extend({
         init: function (cmd_name, prev_frame) {
             this.cmd = cmd_name;
-            this.blocks = [];
+            // This.blocks = [];
             this.store = {};
             this.args = [];
             this.values = [];
@@ -260,6 +261,20 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                     last_frame.values.push(true);
                                 }
                                 last_frame.args.push(arg);
+                            }
+                            break;
+                        case TrashConst.PARSER.LOAD_MATH:
+                            const frame = last_frame || root_frame;
+                            const value =
+                                stack.values[instr.level][instr.dataIndex];
+                            try {
+                                frame.values.push(
+                                    MParser.parse(value).evaluate(
+                                        this._registeredNames
+                                    )
+                                );
+                            } catch (err) {
+                                frame.values.push(NaN);
                             }
                             break;
                         case TrashConst.PARSER.ADD:
