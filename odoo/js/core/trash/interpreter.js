@@ -294,9 +294,14 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                         } else if (!in_data_type) {
                             if (
                                 char === TrashConst.SYMBOLS.ASSIGNMENT ||
+                                char === TrashConst.SYMBOLS.ADD ||
+                                prev_char === TrashConst.SYMBOLS.ASSIGNMENT ||
+                                prev_char === TrashConst.SYMBOLS.ADD
+                            ) {
+                                do_cut = true;
+                            } else if (
                                 char === TrashConst.SYMBOLS.EOC ||
                                 char === TrashConst.SYMBOLS.EOL ||
-                                char === TrashConst.SYMBOLS.ADD ||
                                 char === TrashConst.SYMBOLS.VARIABLE
                             ) {
                                 do_cut = true;
