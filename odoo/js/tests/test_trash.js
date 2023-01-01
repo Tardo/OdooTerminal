@@ -73,7 +73,11 @@ odoo.define("terminal.tests.TraSH", function (require) {
 
             // Concat
             results = await this.terminal._virtMachine.eval(
-                "$a = 'blabla'; $b = 1234; $a+'---' + $b;"
+                "$a = 'blabla'; $b = 1234;$a+'---' + $b;"
+            );
+            this.assertEqual(results[0], "blabla---1234");
+            results = await this.terminal._virtMachine.eval(
+                "$a = 'blabla'\n $b = 1234\n$a+'---' + $b;"
             );
             this.assertEqual(results[0], "blabla---1234");
             results = await this.terminal._virtMachine.eval(

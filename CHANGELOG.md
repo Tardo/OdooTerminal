@@ -6,6 +6,7 @@
 IMP: file utils operations
 
 FIX: TrasSH: 'inline' load runner result data attribute (issue #92)
+FIX: Init. Commands (issue #88)
 
 ADD: Command 'genfile': Generates a File object
 ADD: Math operations

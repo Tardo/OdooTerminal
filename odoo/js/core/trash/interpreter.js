@@ -293,16 +293,15 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                             --in_runner;
                         } else if (!in_data_type) {
                             if (
-                                char === TrashConst.SYMBOLS.ASSIGNMENT ||
-                                char === TrashConst.SYMBOLS.ADD ||
-                                prev_char === TrashConst.SYMBOLS.ASSIGNMENT ||
-                                prev_char === TrashConst.SYMBOLS.ADD
-                            ) {
-                                do_cut = true;
-                            } else if (
                                 char === TrashConst.SYMBOLS.EOC ||
                                 char === TrashConst.SYMBOLS.EOL ||
-                                char === TrashConst.SYMBOLS.VARIABLE
+                                char === TrashConst.SYMBOLS.VARIABLE ||
+                                char === TrashConst.SYMBOLS.ASSIGNMENT ||
+                                char === TrashConst.SYMBOLS.ADD ||
+                                prev_char === TrashConst.SYMBOLS.EOC ||
+                                prev_char === TrashConst.SYMBOLS.EOL ||
+                                prev_char === TrashConst.SYMBOLS.ASSIGNMENT ||
+                                prev_char === TrashConst.SYMBOLS.ADD
                             ) {
                                 do_cut = true;
                             } else if (
@@ -360,7 +359,12 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 const token_san_lower = token_san.toLocaleLowerCase();
                 let ttype = TrashConst.LEXER.String;
                 if (!token_san) {
-                    ttype = TrashConst.LEXER.Space;
+                    if (token === TrashConst.SYMBOLS.EOL) {
+                        num_word = 0;
+                        ttype = TrashConst.LEXER.Delimiter;
+                    } else {
+                        ttype = TrashConst.LEXER.Space;
+                    }
                 } else if (token_san[0] === TrashConst.SYMBOLS.ARGUMENT) {
                     if (token_san[1] === TrashConst.SYMBOLS.ARGUMENT) {
                         ttype = TrashConst.LEXER.ArgumentLong;
@@ -369,10 +373,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                         ttype = TrashConst.LEXER.ArgumentShort;
                         token_san = token_san.substr(1);
                     }
-                } else if (
-                    token_san === TrashConst.SYMBOLS.EOC ||
-                    token_san === TrashConst.SYMBOLS.EOL
-                ) {
+                } else if (token_san === TrashConst.SYMBOLS.EOC) {
                     num_word = 0;
                     ttype = TrashConst.LEXER.Delimiter;
                 } else if (token_san === TrashConst.SYMBOLS.ADD) {
@@ -472,6 +473,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     ++num_word;
                 }
             });
+            // Console.log("TINFO: ", tokens_info);
             return tokens_info;
         },
 

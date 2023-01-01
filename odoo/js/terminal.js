@@ -142,6 +142,7 @@ odoo.define("terminal.Terminal", function (require) {
             }
 
             return new Promise(async (resolve, reject) => {
+                this.$runningCmdCount = this.$("#terminal_running_cmd_count");
                 try {
                     this._virtMachine = new VMachine(
                         this._registeredCmds,
@@ -155,10 +156,19 @@ odoo.define("terminal.Terminal", function (require) {
                     await this._super.apply(this, arguments);
                     await this.screen.start(this.$el);
                     this.screen.applyStyle("opacity", this._config.opacity);
+                    if (!this._hasExecInitCmds) {
+                        if (this._config.init_cmds) {
+                            await this.execute(
+                                this._config.init_cmds,
+                                false,
+                                true
+                            );
+                        }
+                        this._hasExecInitCmds = true;
+                    }
                 } catch (err) {
                     return reject(err);
                 }
-                this.$runningCmdCount = this.$("#terminal_running_cmd_count");
                 return resolve();
             });
         },
@@ -457,6 +467,7 @@ odoo.define("terminal.Terminal", function (require) {
                 opacity: config.opacity * 0.01,
                 shortcuts: config.shortcuts,
                 term_context: config.term_context || {},
+                init_cmds: config.init_cmds,
             };
 
             this._userContext = _.extend(
@@ -464,15 +475,6 @@ odoo.define("terminal.Terminal", function (require) {
                 this._config.term_context,
                 this._userContext
             );
-
-            if (!this._hasExecInitCmds) {
-                if (config.init_cmds) {
-                    this.execute(config.init_cmds, {silent: true}).catch(() => {
-                        // Do nothing
-                    });
-                }
-                this._hasExecInitCmds = true;
-            }
         },
 
         _processCommandJob: function (command_info, silent = false) {
