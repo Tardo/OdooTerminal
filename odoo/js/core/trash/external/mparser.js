@@ -180,8 +180,7 @@ odoo.define("terminal.external.mparser", function (require) {
                 return ret;
             },
 
-            evaluate: function (values) {
-                values = values || {};
+            evaluate: async function (vmachine) {
                 var nstack = [];
                 var n1 = undefined;
                 var n2 = undefined;
@@ -200,8 +199,9 @@ odoo.define("terminal.external.mparser", function (require) {
                         f = this.ops2[item.index_];
                         nstack.push(f(n1, n2));
                     } else if (type_ === TVAR) {
-                        if (item.index_ in values) {
-                            nstack.push(values[item.index_]);
+                        const result = await vmachine.eval(item.index_);
+                        if (result && typeof result[0] !== "undefined") {
+                            nstack.push(result[0]);
                         } else if (item.index_ in this.functions) {
                             nstack.push(this.functions[item.index_]);
                         } else {
@@ -887,20 +887,21 @@ odoo.define("terminal.external.mparser", function (require) {
 
             isVar: function () {
                 var str = "";
+                if (
+                    this.expression.charAt(this.pos) !==
+                    TrashConst.SYMBOLS.VARIABLE
+                ) {
+                    return false;
+                }
                 for (var i = this.pos; i < this.expression.length; i++) {
                     var c = this.expression.charAt(i);
-                    if (
-                        c.toUpperCase() === c.toLowerCase() &&
-                        c !== TrashConst.SYMBOLS.VARIABLE
-                    ) {
-                        if (i === this.pos || c < "0" || c > "9") {
-                            break;
-                        }
+                    if (c === " " || c in this.ops2) {
+                        break;
                     }
                     str += c;
                 }
                 if (str.length > 0 && str[0] === TrashConst.SYMBOLS.VARIABLE) {
-                    this.tokenindex = str.substring(1);
+                    this.tokenindex = str;
                     this.tokenprio = 4;
                     this.pos += str.length;
                     return true;

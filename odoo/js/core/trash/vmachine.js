@@ -269,9 +269,7 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                 stack.values[instr.level][instr.dataIndex];
                             try {
                                 frame.values.push(
-                                    MParser.parse(value).evaluate(
-                                        this._registeredNames
-                                    )
+                                    MParser.parse(value).evaluate(this)
                                 );
                             } catch (err) {
                                 frame.values.push(NaN);

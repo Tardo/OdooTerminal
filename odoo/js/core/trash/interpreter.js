@@ -361,10 +361,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 let ttype = TrashConst.LEXER.String;
                 if (!token_san) {
                     ttype = TrashConst.LEXER.Space;
-                } else if (
-                    !options?.math &&
-                    token_san[0] === TrashConst.SYMBOLS.ARGUMENT
-                ) {
+                } else if (token_san[0] === TrashConst.SYMBOLS.ARGUMENT) {
                     if (token_san[1] === TrashConst.SYMBOLS.ARGUMENT) {
                         ttype = TrashConst.LEXER.ArgumentLong;
                         token_san = token_san.substr(2);
@@ -380,16 +377,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     ttype = TrashConst.LEXER.Delimiter;
                 } else if (token_san === TrashConst.SYMBOLS.ADD) {
                     ttype = TrashConst.LEXER.Add;
-                } else if (
-                    options?.math &&
-                    token_san === TrashConst.SYMBOLS.SUBTRACT
-                ) {
-                    ttype = TrashConst.LEXER.SUBTRACT;
-                } else if (
-                    options?.math &&
-                    token_san === TrashConst.SYMBOLS.MULTIPLY
-                ) {
-                    ttype = TrashConst.LEXER.MULTIPLY;
                 } else if (token_san === TrashConst.SYMBOLS.ASSIGNMENT) {
                     ttype = TrashConst.LEXER.Assignment;
                 } else if (
