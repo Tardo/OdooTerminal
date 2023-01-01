@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -34,7 +34,7 @@ jobs:
         run: git checkout ${{ env.BRANCH }}
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
@@ -56,7 +56,9 @@ jobs:
           version: '1.29.2'
 
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.0.0
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.3.1
 
       - name: Install dependencies
         run: |
