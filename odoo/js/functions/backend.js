@@ -349,7 +349,7 @@ odoo.define("terminal.functions.Backend", function (require) {
             return this._openSelectCreateDialog(
                 kwargs.model,
                 "Select a record",
-                "",
+                [],
                 (records) => {
                     this.do_action({
                         type: "ir.actions.act_window",

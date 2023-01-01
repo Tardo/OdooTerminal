@@ -40,7 +40,7 @@ window.__OdooTerminal.process_keybind = function (e) {
         keybind.push("Meta");
     }
     if (window.__OdooTerminal.IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
-        keybind.push(e.key);
+        keybind.push(e.key === " " ? "Space" : e.key);
     }
     return keybind;
 };

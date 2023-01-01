@@ -4,10 +4,33 @@
 odoo.define("terminal.core.TraSH.vmachine", function (require) {
     "use strict";
 
+    const MParser = require("terminal.external.mparser");
     const TrashConst = require("terminal.core.trash.const");
     const Interpreter = require("terminal.core.TraSH.interpreter");
     const TemplateManager = require("terminal.core.TemplateManager");
     const Class = require("web.Class");
+
+    // Const Block = Class.extend({
+    //     init: function () {
+    //         this.values = [];
+    //         this.store = {};
+    //     },
+    // });
+
+    const Frame = Class.extend({
+        init: function (cmd_name, prev_frame) {
+            this.cmd = cmd_name;
+            // This.blocks = [];
+            this.store = {};
+            this.args = [];
+            this.values = [];
+            this.prevFrame = prev_frame;
+
+            if (this.prevFrame) {
+                this.store = _.clone(this.prevFrame.store);
+            }
+        },
+    });
 
     const VMachine = Class.extend({
         init: function (registered_cmds, storage_local, options) {
@@ -112,21 +135,24 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                 });
                 const stack = parse_info.stack;
                 const stack_instr_len = stack.instructions.length;
-                const root_frame = {
-                    store: {},
-                    values: [],
-                };
+                const root_frame = new Frame();
+                root_frame.store = this._registeredNames;
                 const frames = [];
                 const return_values = [];
-                let last_frame = null;
+                let last_frame = root_frame;
                 for (let index = 0; index < stack_instr_len; ++index) {
-                    const [type, tindex, aindex] = stack.instructions[index];
+                    const instr = stack.instructions[index];
                     const token =
-                        tindex >= 0 ? parse_info.inputTokens[tindex] : null;
-                    switch (type) {
+                        instr.inputTokenIndex >= 0
+                            ? parse_info.inputTokens[instr.level][
+                                  instr.inputTokenIndex
+                              ]
+                            : null;
+                    switch (instr.type) {
                         case TrashConst.PARSER.LOAD_NAME:
                             {
-                                const cmd_name = stack.names.shift();
+                                const cmd_name =
+                                    stack.names[instr.level][instr.dataIndex];
 
                                 // Check stores
                                 const frame = last_frame || root_frame;
@@ -161,7 +187,8 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                             break;
                         case TrashConst.PARSER.LOAD_GLOBAL:
                             {
-                                const cmd_name = stack.names.shift();
+                                const cmd_name =
+                                    stack.names[instr.level][instr.dataIndex];
                                 if (
                                     Object.hasOwn(
                                         this._registeredCmds,
@@ -171,12 +198,10 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                         cmd_name
                                     )
                                 ) {
-                                    last_frame = {
-                                        cmd: cmd_name,
-                                        store: {},
-                                        args: [],
-                                        values: [],
-                                    };
+                                    last_frame = new Frame(
+                                        cmd_name,
+                                        last_frame
+                                    );
                                     frames.push(last_frame);
                                 } else {
                                     // Search similar commands
@@ -209,28 +234,48 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                         case TrashConst.PARSER.LOAD_CONST:
                             {
                                 const frame = last_frame || root_frame;
-                                const value = stack.values.shift();
+                                const value =
+                                    stack.values[instr.level][instr.dataIndex];
                                 frame.values.push(value);
                             }
                             break;
                         case TrashConst.PARSER.LOAD_ARG:
                             {
-                                const arg = stack.arguments.shift();
+                                const arg =
+                                    stack.arguments[instr.level][
+                                        instr.dataIndex
+                                    ];
                                 if (!last_frame) {
                                     return reject(
                                         `Argument '${arg}' not expected at ${token.start}:${token.end}`
                                     );
                                 }
                                 // Flag arguments can be implicit
-                                const [next_type] =
-                                    stack.instructions[index + 1] || [];
-                                if (next_type > TrashConst.PARSER.LOAD_CONST) {
+                                const next_instr =
+                                    stack.instructions[index + 1];
+                                if (
+                                    next_instr &&
+                                    next_instr.type >
+                                        TrashConst.PARSER.LOAD_CONST
+                                ) {
                                     last_frame.values.push(true);
                                 }
                                 last_frame.args.push(arg);
                             }
                             break;
-                        case TrashConst.PARSER.CONCAT:
+                        case TrashConst.PARSER.LOAD_MATH:
+                            const frame = last_frame || root_frame;
+                            const value =
+                                stack.values[instr.level][instr.dataIndex];
+                            try {
+                                frame.values.push(
+                                    await MParser.parse(value).evaluate(this)
+                                );
+                            } catch (err) {
+                                frame.values.push(NaN);
+                            }
+                            break;
+                        case TrashConst.PARSER.ADD:
                             {
                                 const allowed_types = [
                                     TrashConst.PARSER.LOAD_CONST,
@@ -244,10 +289,10 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                     stack.instructions[index - 1];
                                 if (
                                     prev_instr_a &&
-                                    allowed_types.indexOf(prev_instr_a[0]) ===
+                                    allowed_types.indexOf(prev_instr_a.type) ===
                                         -1 &&
                                     prev_instr_b &&
-                                    allowed_types.indexOf(prev_instr_b[0]) ===
+                                    allowed_types.indexOf(prev_instr_b.type) ===
                                         -1
                                 ) {
                                     return reject(
@@ -268,7 +313,7 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                     const ret = await this._callFunction(
                                         frame,
                                         parse_info,
-                                        type ===
+                                        instr.type ===
                                             TrashConst.PARSER
                                                 .CALL_FUNCTION_SILENT ||
                                             options?.silent
@@ -293,7 +338,8 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                         case TrashConst.PARSER.STORE_NAME:
                             {
                                 const frame = last_frame || root_frame;
-                                const vname = stack.names.shift();
+                                const vname =
+                                    stack.names[instr.level][instr.dataIndex];
                                 const vvalue = frame.values.pop();
                                 if (!vname) {
                                     if (!token) {
@@ -306,7 +352,9 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                     const value_instr =
                                         stack.instructions[index - 1];
                                     const value_token =
-                                        stack.inputTokens[value_instr[1]] || {};
+                                        stack.inputTokens[
+                                            value_instr.inputTokenIndex
+                                        ] || {};
                                     return reject(
                                         `Invalid token '${value_token.value}' at ${value_token.start}:${value_token.end}`
                                     );
@@ -317,7 +365,8 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                         case TrashConst.PARSER.STORE_SUBSCR:
                             {
                                 const frame = last_frame || root_frame;
-                                const vname = stack.names.shift();
+                                const vname =
+                                    stack.names[instr.level][instr.datIndex];
                                 const attr_value = frame.values.pop();
                                 const attr_name = frame.values.pop();
                                 const data = frame.values.pop();
@@ -334,26 +383,40 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                 const frame = last_frame || root_frame;
                                 const attr_name = frame.values.pop();
                                 const index_value = frame.values.length - 1;
-                                let value = frame.values[index_value];
+                                const value = frame.values[index_value];
                                 if (typeof value === "undefined") {
                                     return reject(
                                         `Cannot read properties of undefined (reading '${attr_name}')`
                                     );
-                                } else if (
-                                    _.isNaN(Number(attr_name)) &&
-                                    value.constructor === Array
-                                ) {
-                                    value = _.pluck(value, attr_name).join(",");
-                                } else {
-                                    value = value[attr_name];
                                 }
-                                frame.values[index_value] = value;
+                                let res_value = value[attr_name];
+                                if (typeof res_value === "undefined") {
+                                    if (
+                                        _.isNaN(Number(attr_name)) &&
+                                        value.constructor === Array
+                                    ) {
+                                        res_value = _.pluck(value, attr_name);
+                                        if (
+                                            _.every(res_value, (item) =>
+                                                _.isUndefined(item)
+                                            )
+                                        ) {
+                                            res_value = undefined;
+                                        } else {
+                                            res_value = res_value.join(",");
+                                        }
+                                    }
+                                }
+                                frame.values[index_value] = res_value;
                             }
                             break;
                         case TrashConst.PARSER.BUILD_LIST:
                             {
                                 const frame = last_frame || root_frame;
-                                const iter_count = aindex;
+                                const iter_count = _.countBy(
+                                    stack.instructions,
+                                    {level: instr.dataIndex}
+                                ).true;
                                 const value = [];
                                 for (let i = 0; i < iter_count; ++i) {
                                     value.push(frame.values.pop());
@@ -364,7 +427,10 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                         case TrashConst.PARSER.BUILD_MAP:
                             {
                                 const frame = last_frame || root_frame;
-                                const iter_count = aindex / 2;
+                                const iter_count =
+                                    _.countBy(stack.instructions, {
+                                        level: instr.dataIndex,
+                                    }).true / 2;
                                 const value = {};
                                 for (let i = 0; i < iter_count; ++i) {
                                     const val = frame.values.pop();
@@ -376,7 +442,6 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                             break;
                     }
                 }
-                _.extend(this._registeredNames, root_frame.store);
                 return resolve(return_values);
             });
         },

@@ -4,8 +4,8 @@
 odoo.define("terminal.functions.Common", function (require) {
     "use strict";
 
-    const rpc = require("terminal.core.rpc");
     const ajax = require("web.ajax");
+    const rpc = require("terminal.core.rpc");
     const session = require("web.session");
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
@@ -915,11 +915,14 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdShowDBList: function (kwargs) {
-            return ajax
-                .rpc("/jsonrpc", {
-                    service: "db",
-                    method: "list",
-                    args: {},
+            return rpc
+                .query({
+                    route: "/jsonrpc",
+                    params: {
+                        service: "db",
+                        method: "list",
+                        args: {},
+                    },
                 })
                 .then((databases) => {
                     const databases_len = databases.length;
@@ -989,24 +992,36 @@ odoo.define("terminal.functions.Common", function (require) {
                 }
                 db = session.db;
             }
-            return session
-                ._session_authenticate(db, login, passwd)
-                .then((result) => {
-                    this.screen.updateInputInfo(login);
-                    this.screen.print(`Successfully logged as '${login}'`);
-                    if (!kwargs.no_reload) {
+            return new Promise(async (resolve, reject) => {
+                const res = await session._session_authenticate(
+                    db,
+                    login,
+                    passwd
+                );
+                this.screen.updateInputInfo(login);
+                this.screen.print(`Successfully logged as '${login}'`);
+                if (!kwargs.no_reload) {
+                    try {
                         this.execute("reload", false, true);
+                    } catch (err) {
+                        return reject(err);
                     }
-                    return result;
-                });
+                }
+                return resolve(res);
+            });
         },
 
         _cmdLogOut: function () {
-            return session.session_logout().then((result) => {
+            return new Promise(async (resolve, reject) => {
+                const res = await session.session_logout();
                 this.screen.updateInputInfo("Public User");
                 this.screen.print("Logged out");
-                this.execute("reload", false, true);
-                return result;
+                try {
+                    this.execute("reload", false, true);
+                } catch (err) {
+                    return reject(err);
+                }
+                return resolve(res);
             });
         },
 
@@ -1674,7 +1689,6 @@ odoo.define("terminal.functions.Common", function (require) {
                         return result;
                     });
             }
-
             return $.post(kwargs.endpoint, kwargs.data, (result) => {
                 this.screen.eprint(result, false, "line-pre");
                 return result;
