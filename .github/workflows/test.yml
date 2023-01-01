@@ -70,17 +70,15 @@ jobs:
 
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
         id: xtests
-        uses: GabrielBB/xvfb-action@v1
-        env:
-          DISPLAY: :99
+        uses: coactions/setup-xvfb@v1
         with:
           run: poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - name: Retry test for ${{ matrix.instance }} (${{ matrix.browser }})
         if: steps.xtests.outcome != 'success'
-        uses: GabrielBB/xvfb-action@v1
-        env:
-          DISPLAY: :99
+        uses: coactions/setup-xvfb@v1
         with:
           run: poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
