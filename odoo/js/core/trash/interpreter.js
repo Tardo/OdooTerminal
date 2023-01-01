@@ -9,6 +9,15 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
     const Class = require("web.Class");
     const mixins = require("web.mixins");
 
+    const Instruction = Class.extend({
+        init: function (type, input_token_index, level, dataIndex = -1) {
+            this.type = type;
+            this.inputTokenIndex = input_token_index;
+            this.level = level;
+            this.dataIndex = dataIndex;
+        },
+    });
+
     /**
      * This is TraSH
      */
@@ -16,7 +25,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
         init: function (parent, storage_local) {
             this.setParent(parent);
             this._storageLocal = storage_local;
-            this._regexSanitize = new RegExp(/(?<!\\)'/g);
             this._regexComments = new RegExp(
                 /^(\s*)?\/\/.*|^(\s*)?\/\*.+\*\//gm
             );
@@ -238,6 +246,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
             let do_skip = false;
             let prev_char = "";
             for (const char of clean_data) {
+                const in_data_type = in_array || in_dict || in_runner;
                 if (prev_char !== TrashConst.SYMBOLS.ESCAPE) {
                     if (
                         char === TrashConst.SYMBOLS.STRING ||
@@ -245,12 +254,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     ) {
                         if (in_string && char === in_string) {
                             in_string = "";
-                        } else if (
-                            !in_string &&
-                            !in_array &&
-                            !in_dict &&
-                            !in_runner
-                        ) {
+                        } else if (!in_string && !in_data_type) {
                             in_string = char;
                             do_cut = true;
                         }
@@ -287,38 +291,31 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                             char === TrashConst.SYMBOLS.RUNNER_END
                         ) {
                             --in_runner;
-                        } else if (
-                            !in_array &&
-                            !in_dict &&
-                            !in_runner &&
-                            (char === TrashConst.SYMBOLS.ASSIGNMENT ||
+                        } else if (!in_data_type) {
+                            if (
+                                char === TrashConst.SYMBOLS.ASSIGNMENT ||
                                 char === TrashConst.SYMBOLS.EOC ||
                                 char === TrashConst.SYMBOLS.EOL ||
-                                char === TrashConst.SYMBOLS.CONCAT ||
-                                char === TrashConst.SYMBOLS.VARIABLE)
-                        ) {
-                            do_cut = true;
-                        } else if (
-                            !in_array &&
-                            !in_dict &&
-                            !in_runner &&
-                            ((prev_char !== TrashConst.SYMBOLS.SPACE &&
-                                char === TrashConst.SYMBOLS.SPACE) ||
+                                char === TrashConst.SYMBOLS.ADD ||
+                                char === TrashConst.SYMBOLS.VARIABLE
+                            ) {
+                                do_cut = true;
+                            } else if (
+                                (prev_char !== TrashConst.SYMBOLS.SPACE &&
+                                    char === TrashConst.SYMBOLS.SPACE) ||
                                 (prev_char === TrashConst.SYMBOLS.SPACE &&
-                                    char !== TrashConst.SYMBOLS.SPACE))
-                        ) {
-                            do_cut = true;
-                        } else if (
-                            options?.ignoreCommandMode &&
-                            !in_array &&
-                            !in_dict &&
-                            !in_runner &&
-                            (char === TrashConst.SYMBOLS.ITEM_DELIMITER ||
-                                char ===
-                                    TrashConst.SYMBOLS.DICTIONARY_SEPARATOR)
-                        ) {
-                            do_cut = true;
-                            do_skip = true;
+                                    char !== TrashConst.SYMBOLS.SPACE)
+                            ) {
+                                do_cut = true;
+                            } else if (
+                                options?.ignoreCommandMode &&
+                                (char === TrashConst.SYMBOLS.ITEM_DELIMITER ||
+                                    char ===
+                                        TrashConst.SYMBOLS.DICTIONARY_SEPARATOR)
+                            ) {
+                                do_cut = true;
+                                do_skip = true;
+                            }
                         }
                     }
 
@@ -329,10 +326,9 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                         }
                         do_cut = false;
                     }
-                }
-
-                if (!do_skip) {
-                    value += char;
+                    if (!do_skip) {
+                        value += char;
+                    }
                 }
                 prev_char = char;
                 do_skip = false;
@@ -340,7 +336,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
             if (value) {
                 tokens.push(value);
             }
-
             return tokens;
         },
 
@@ -361,7 +356,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 if (!token_san) {
                     ttype = TrashConst.LEXER.Space;
                 } else if (
-                    !options?.ignoreCommandMode &&
+                    !options?.math &&
                     token_san[0] === TrashConst.SYMBOLS.ARGUMENT
                 ) {
                     if (token_san[1] === TrashConst.SYMBOLS.ARGUMENT) {
@@ -377,8 +372,18 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 ) {
                     num_word = 0;
                     ttype = TrashConst.LEXER.Delimiter;
-                } else if (token_san === TrashConst.SYMBOLS.CONCAT) {
-                    ttype = TrashConst.LEXER.Concat;
+                } else if (token_san === TrashConst.SYMBOLS.ADD) {
+                    ttype = TrashConst.LEXER.Add;
+                } else if (
+                    options?.math &&
+                    token_san === TrashConst.SYMBOLS.SUBTRACT
+                ) {
+                    ttype = TrashConst.LEXER.SUBTRACT;
+                } else if (
+                    options?.math &&
+                    token_san === TrashConst.SYMBOLS.MULTIPLY
+                ) {
+                    ttype = TrashConst.LEXER.MULTIPLY;
                 } else if (token_san === TrashConst.SYMBOLS.ASSIGNMENT) {
                     ttype = TrashConst.LEXER.Assignment;
                 } else if (
@@ -391,7 +396,8 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                         prev_token_info &&
                         (prev_token_info.type === TrashConst.LEXER.Variable ||
                             prev_token_info.type ===
-                                TrashConst.LEXER.DataAttribute)
+                                TrashConst.LEXER.DataAttribute ||
+                            prev_token_info.type === TrashConst.LEXER.Runner)
                     ) {
                         ttype = TrashConst.LEXER.DataAttribute;
                     } else {
@@ -404,6 +410,17 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     token_san = token_san.substr(1, token_san.length - 2);
                     token_san = token_san.trim();
                     ttype = TrashConst.LEXER.Dictionary;
+                } else if (
+                    token_san[0] === TrashConst.SYMBOLS.VARIABLE &&
+                    token_san[1] === TrashConst.SYMBOLS.RUNNER_START &&
+                    token_san[2] === TrashConst.SYMBOLS.MATH_START &&
+                    token_san.at(-1) === TrashConst.SYMBOLS.RUNNER_END &&
+                    token_san.at(-2) === TrashConst.SYMBOLS.MATH_END
+                ) {
+                    ttype = TrashConst.LEXER.Math;
+                    token_san = token_san
+                        .substr(3, token_san.length - 4)
+                        .trim();
                 } else if (
                     token_san[0] === TrashConst.SYMBOLS.VARIABLE &&
                     token_san[1] === TrashConst.SYMBOLS.RUNNER_START &&
@@ -472,50 +489,64 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
          * @param {Boolean} need_reset_stores
          * @returns {Object}
          */
-        parse: function (data, options) {
+        parse: function (data, options, level = 0) {
             if (options?.needResetStores) {
                 this._parameterGenerator.resetStores();
             }
-            const parse_info = {
-                inputRawString: data,
-                inputTokens: this.lex(data, options),
+            const blevel = level;
+            let mlevel = level;
+            const res = {
                 stack: {
                     instructions: [],
-                    names: [],
-                    values: [],
-                    arguments: [],
+                    names: [[]],
+                    values: [[]],
+                    arguments: [[]],
                 },
+                inputTokens: [this.lex(data, options)],
             };
 
             const pushParseData = (parse_data) => {
-                parse_info.stack.instructions.push(...parse_data.instructions);
-                parse_info.stack.arguments.push(...parse_data.arguments);
-                parse_info.stack.values.push(...parse_data.values);
-                parse_info.stack.names.push(...parse_data.names);
+                res.stack.instructions.push(...parse_data.instructions);
+                if (parse_data.arguments.length) {
+                    res.stack.arguments[0].push(...parse_data.arguments);
+                }
+                if (parse_data.values.length) {
+                    res.stack.values[0].push(...parse_data.values);
+                }
+                if (parse_data.names.length) {
+                    res.stack.names[0].push(...parse_data.names);
+                }
+                if (parse_data.inputTokens.length) {
+                    res.inputTokens.push(...parse_data.inputTokens);
+                }
+
                 parse_data.instructions = [];
                 parse_data.arguments = [];
                 parse_data.values = [];
                 parse_data.names = [];
+                parse_data.inputTokens = [];
             };
 
             // Create Stack Entries
-            const tokens_len = parse_info.inputTokens.length;
+            const tokens_len = res.inputTokens[0].length;
             const to_append_eoc = {
                 instructions: [],
                 names: [],
                 values: [],
                 arguments: [],
+                inputTokens: [],
             };
             const to_append_eoi = {
                 instructions: [],
                 names: [],
                 values: [],
                 arguments: [],
+                inputTokens: [],
             };
             let last_token_index = -1;
             for (let index = 0; index < tokens_len; ++index) {
-                const token = parse_info.inputTokens[index];
-                const token_next = parse_info.inputTokens[index + 1];
+                const token = res.inputTokens[0][index];
+                const token_next = res.inputTokens[0][index + 1];
                 let ignore_instr_eoi =
                     token_next?.type !== TrashConst.LEXER.Space;
                 const to_append = {
@@ -523,197 +554,305 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     names: [],
                     values: [],
                     arguments: [],
+                    inputTokens: [],
                 };
                 switch (token.type) {
                     case TrashConst.LEXER.Variable:
-                        to_append.names.push(token.value);
-                        to_append.instructions.push([
-                            TrashConst.PARSER.LOAD_NAME,
-                            index,
-                        ]);
+                        {
+                            to_append.names.push(token.value);
+                            const dindex = res.stack.names[0].length;
+                            to_append.instructions.push(
+                                new Instruction(
+                                    TrashConst.PARSER.LOAD_NAME,
+                                    index,
+                                    level,
+                                    dindex
+                                )
+                            );
+                        }
                         break;
                     case TrashConst.LEXER.Command:
-                        to_append.names.push(token.value);
-                        to_append.instructions.push([
-                            TrashConst.PARSER.LOAD_GLOBAL,
-                            index,
-                        ]);
-                        to_append_eoc.instructions.push([
-                            options?.silent
-                                ? TrashConst.PARSER.CALL_FUNCTION_SILENT
-                                : TrashConst.PARSER.CALL_FUNCTION,
-                            -1,
-                        ]);
+                        {
+                            to_append.names.push(token.value);
+                            const dindex = res.stack.names[0].length;
+                            to_append.instructions.push(
+                                new Instruction(
+                                    TrashConst.PARSER.LOAD_GLOBAL,
+                                    index,
+                                    level,
+                                    dindex
+                                )
+                            );
+                            to_append_eoc.instructions.push(
+                                new Instruction(
+                                    options?.silent
+                                        ? TrashConst.PARSER.CALL_FUNCTION_SILENT
+                                        : TrashConst.PARSER.CALL_FUNCTION,
+                                    -1,
+                                    level
+                                )
+                            );
+                        }
                         break;
                     case TrashConst.LEXER.ArgumentLong:
                     case TrashConst.LEXER.ArgumentShort:
-                        to_append.arguments.push(token.value);
-                        to_append.instructions.push([
-                            TrashConst.PARSER.LOAD_ARG,
-                            index,
-                        ]);
+                        {
+                            to_append.arguments.push(token.value);
+                            const dindex = res.stack.arguments[0].length;
+                            to_append.instructions.push(
+                                new Instruction(
+                                    TrashConst.PARSER.LOAD_ARG,
+                                    index,
+                                    level,
+                                    dindex
+                                )
+                            );
+                        }
                         break;
-                    case TrashConst.LEXER.Concat:
+                    case TrashConst.LEXER.Add:
                         ignore_instr_eoi = true;
-                        to_append_eoi.instructions.push([
-                            TrashConst.PARSER.CONCAT,
-                            index,
-                        ]);
+                        to_append_eoi.instructions.push(
+                            new Instruction(TrashConst.PARSER.ADD, index, level)
+                        );
                         break;
                     case TrashConst.LEXER.Number:
-                        to_append.values.push(Number(token.value));
-                        to_append.instructions.push([
-                            TrashConst.PARSER.LOAD_CONST,
-                            index,
-                        ]);
+                        {
+                            to_append.values.push(Number(token.value));
+                            const dindex = res.stack.values[0].length;
+                            to_append.instructions.push(
+                                new Instruction(
+                                    TrashConst.PARSER.LOAD_CONST,
+                                    index,
+                                    level,
+                                    dindex
+                                )
+                            );
+                        }
                         break;
                     case TrashConst.LEXER.Boolean:
-                        to_append.values.push(
-                            token.value.toLocaleLowerCase() === "true"
-                        );
-                        to_append.instructions.push([
-                            TrashConst.PARSER.LOAD_CONST,
-                            index,
-                        ]);
+                        {
+                            to_append.values.push(
+                                token.value.toLocaleLowerCase() === "true"
+                            );
+                            const dindex = res.stack.values[0].length;
+                            to_append.instructions.push(
+                                new Instruction(
+                                    TrashConst.PARSER.LOAD_CONST,
+                                    index,
+                                    level,
+                                    dindex
+                                )
+                            );
+                        }
                         break;
                     case TrashConst.LEXER.String:
                     case TrashConst.LEXER.StringSimple:
-                        to_append.values.push(token.value);
-                        to_append.instructions.push([
-                            TrashConst.PARSER.LOAD_CONST,
-                            index,
-                        ]);
+                        {
+                            to_append.values.push(token.value);
+                            const dindex = res.stack.values[0].length;
+                            to_append.instructions.push(
+                                new Instruction(
+                                    TrashConst.PARSER.LOAD_CONST,
+                                    index,
+                                    level,
+                                    dindex
+                                )
+                            );
+                        }
                         break;
                     case TrashConst.LEXER.Array:
                         {
-                            const parsed_array = this.parse(token.value, {
-                                needResetStores: false,
-                                registeredCmds: options.registeredCmds,
-                                silent: true,
-                                ignoreCommandMode: true,
-                            });
-                            const num_values = _.reject(
-                                parsed_array.inputTokens,
+                            const parsed_array = this.parse(
+                                token.value,
                                 {
-                                    type: TrashConst.LEXER.Space,
-                                }
-                            ).length;
-                            to_append.arguments.push(
-                                ...parsed_array.stack.arguments
+                                    needResetStores: false,
+                                    registeredCmds: options.registeredCmds,
+                                    silent: true,
+                                    ignoreCommandMode: true,
+                                },
+                                ++mlevel
                             );
-                            to_append.values.push(...parsed_array.stack.values);
-                            to_append.names.push(...parsed_array.stack.names);
-                            to_append.instructions =
-                                parsed_array.stack.instructions;
-                            to_append.instructions.push([
-                                TrashConst.PARSER.BUILD_LIST,
-                                index,
-                                num_values,
-                            ]);
+                            res.stack.values.push(...parsed_array.stack.values);
+                            res.stack.names.push(...parsed_array.stack.names);
+                            to_append.inputTokens.push(
+                                ...parsed_array.inputTokens
+                            );
+                            to_append.instructions.push(
+                                ...parsed_array.stack.instructions
+                            );
+                            to_append.instructions.push(
+                                new Instruction(
+                                    TrashConst.PARSER.BUILD_LIST,
+                                    index,
+                                    level,
+                                    mlevel
+                                )
+                            );
+                            mlevel = parsed_array.maxULevel;
                         }
                         break;
                     case TrashConst.LEXER.Dictionary:
                         {
-                            const parsed_dict = this.parse(token.value, {
-                                needResetStores: false,
-                                registeredCmds: options.registeredCmds,
-                                silent: true,
-                                ignoreCommandMode: true,
-                            });
-                            const num_values = _.reject(
-                                parsed_dict.inputTokens,
+                            const parsed_dict = this.parse(
+                                token.value,
                                 {
-                                    type: TrashConst.LEXER.Space,
-                                }
-                            ).length;
-                            to_append.arguments.push(
-                                ...parsed_dict.stack.arguments
+                                    needResetStores: false,
+                                    registeredCmds: options.registeredCmds,
+                                    silent: true,
+                                    ignoreCommandMode: true,
+                                },
+                                ++mlevel
                             );
-                            to_append.values.push(...parsed_dict.stack.values);
-                            to_append.names.push(...parsed_dict.stack.names);
-                            to_append.instructions =
-                                parsed_dict.stack.instructions;
-                            to_append.instructions.push([
-                                TrashConst.PARSER.BUILD_MAP,
-                                index,
-                                num_values,
-                            ]);
+                            res.stack.values.push(...parsed_dict.stack.values);
+                            res.stack.names.push(...parsed_dict.stack.names);
+                            to_append.inputTokens.push(
+                                ...parsed_dict.inputTokens
+                            );
+                            to_append.instructions.push(
+                                ...parsed_dict.stack.instructions
+                            );
+                            to_append.instructions.push(
+                                new Instruction(
+                                    TrashConst.PARSER.BUILD_MAP,
+                                    index,
+                                    level,
+                                    mlevel
+                                )
+                            );
+                            mlevel = parsed_dict.maxULevel;
                         }
                         break;
                     case TrashConst.LEXER.Assignment:
-                        const last_instr = parse_info.stack.instructions.at(-1);
-                        if (last_instr) {
-                            if (
-                                last_instr[0] ===
-                                TrashConst.PARSER.LOAD_DATA_ATTR
-                            ) {
-                                parse_info.stack.instructions.pop();
-                                to_append_eoc.instructions.push([
-                                    TrashConst.PARSER.STORE_SUBSCR,
-                                    index,
-                                ]);
-                            } else {
-                                parse_info.stack.instructions.pop();
+                        {
+                            const last_instr = res.stack.instructions.at(-1);
+                            if (last_instr) {
                                 if (
-                                    last_instr[0] ===
-                                    TrashConst.PARSER.LOAD_NAME
+                                    last_instr.type ===
+                                    TrashConst.PARSER.LOAD_DATA_ATTR
                                 ) {
-                                    to_append_eoc.names.push(
-                                        parse_info.stack.names.pop()
+                                    res.stack.instructions.pop();
+                                    to_append_eoc.instructions.push(
+                                        new Instruction(
+                                            TrashConst.PARSER.STORE_SUBSCR,
+                                            index,
+                                            level,
+                                            res.stack.names.length - 1
+                                        )
                                     );
                                 } else {
-                                    to_append_eoc.names.push(undefined);
+                                    res.stack.instructions.pop();
+                                    let dindex = -1;
+                                    if (
+                                        last_instr.type ===
+                                        TrashConst.PARSER.LOAD_NAME
+                                    ) {
+                                        to_append_eoc.names.push(
+                                            res.stack.names[0].pop()
+                                        );
+                                        dindex = res.stack.names[0].length;
+                                    } else {
+                                        to_append_eoc.names.push(undefined);
+                                        dindex = res.stack.names[0].length - 1;
+                                    }
+                                    to_append_eoc.instructions.push(
+                                        new Instruction(
+                                            TrashConst.PARSER.STORE_NAME,
+                                            last_token_index,
+                                            level,
+                                            dindex
+                                        )
+                                    );
                                 }
-                                to_append_eoc.instructions.push([
-                                    TrashConst.PARSER.STORE_NAME,
-                                    last_token_index,
-                                ]);
+                            } else {
+                                to_append_eoc.names.push(undefined);
+                                const dindex = res.stack.names[0].length;
+                                to_append_eoc.instructions.push(
+                                    new Instruction(
+                                        TrashConst.PARSER.STORE_NAME,
+                                        last_token_index,
+                                        level,
+                                        dindex
+                                    )
+                                );
                             }
-                        } else {
-                            to_append_eoc.names.push(undefined);
-                            to_append_eoc.instructions.push([
-                                TrashConst.PARSER.STORE_NAME,
-                                last_token_index,
-                            ]);
                         }
                         break;
                     case TrashConst.LEXER.DataAttribute:
                         ignore_instr_eoi = true;
-                        const parsed_attribute = this.parse(token.value, {
-                            needResetStores: false,
-                            registeredCmds: options.registeredCmds,
-                            silent: true,
-                            ignoreCommandMode: true,
-                        });
+                        const parsed_attribute = this.parse(
+                            token.value,
+                            {
+                                needResetStores: false,
+                                registeredCmds: options.registeredCmds,
+                                silent: true,
+                                ignoreCommandMode: true,
+                            },
+                            ++mlevel
+                        );
                         to_append.arguments.push(
                             ...parsed_attribute.stack.arguments
                         );
-                        to_append.values.push(...parsed_attribute.stack.values);
-                        to_append.names.push(...parsed_attribute.stack.names);
-                        const instr = parsed_attribute.stack.instructions[0];
-                        instr[1] = index;
-                        to_append.instructions.push(instr);
-                        to_append.instructions.push([
-                            TrashConst.PARSER.LOAD_DATA_ATTR,
-                            index,
-                        ]);
+                        res.stack.values.push(...parsed_attribute.stack.values);
+                        res.stack.names.push(...parsed_attribute.stack.names);
+                        to_append.inputTokens.push(
+                            ...parsed_attribute.inputTokens
+                        );
+                        to_append.instructions.push(
+                            ...parsed_attribute.stack.instructions
+                        );
+                        to_append.instructions.push(
+                            new Instruction(
+                                TrashConst.PARSER.LOAD_DATA_ATTR,
+                                index,
+                                level
+                            )
+                        );
+                        mlevel = parsed_attribute.maxULevel;
                         break;
                     case TrashConst.LEXER.Runner:
-                        const parsed_runner = this.parse(token.value, {
-                            needResetStores: false,
-                            registeredCmds: options.registeredCmds,
-                            silent: true,
-                        });
-                        to_append.arguments.push(
-                            ...parsed_runner.stack.arguments
+                        const parsed_runner = this.parse(
+                            token.value,
+                            {
+                                needResetStores: false,
+                                registeredCmds: options.registeredCmds,
+                                silent: true,
+                            },
+                            ++mlevel
                         );
-                        to_append.values.push(...parsed_runner.stack.values);
-                        to_append.names.push(...parsed_runner.stack.names);
-                        to_append.instructions =
-                            parsed_runner.stack.instructions;
+                        to_append.arguments.push(
+                            ...parsed_runner.stack.arguments[0]
+                        );
+                        res.stack.values.push(...parsed_runner.stack.values);
+                        res.stack.names.push(...parsed_runner.stack.names);
+                        to_append.inputTokens.push(
+                            ...parsed_runner.inputTokens
+                        );
+                        to_append.instructions.push(
+                            ...parsed_runner.stack.instructions
+                        );
+                        mlevel = parsed_runner.maxULevel;
                         break;
                     case TrashConst.LEXER.Space:
                         ignore_instr_eoi = true;
+                        break;
+                    case TrashConst.LEXER.Math:
+                        const parsed_math = this.parse(
+                            token.value,
+                            {
+                                needResetStores: false,
+                                registeredCmds: options.registeredCmds,
+                                silent: true,
+                                math: true,
+                            },
+                            ++mlevel
+                        );
+                        res.stack.values.push(...parsed_runner.stack.values);
+                        res.stack.names.push(...parsed_math.stack.names);
+                        to_append.inputTokens.push(...parsed_math.inputTokens);
+                        to_append.instructions.push(
+                            ...parsed_math.stack.instructions
+                        );
+                        mlevel = parsed_math.maxULevel;
                         break;
                 }
 
@@ -735,14 +874,22 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
             }
 
             if (!options?.ignoreCommandMode || options?.forceReturn) {
-                parse_info.stack.instructions.push([
-                    TrashConst.PARSER.RETURN_VALUE,
-                    -1,
-                ]);
+                res.stack.instructions.push(
+                    new Instruction(TrashConst.PARSER.RETURN_VALUE, -1, blevel)
+                );
             }
 
-            // Console.log(parse_info);
-            return parse_info;
+            return {
+                inputRawString: data,
+                inputTokens: res.inputTokens,
+                stack: {
+                    instructions: res.stack.instructions,
+                    names: res.stack.names,
+                    values: res.stack.values,
+                    arguments: res.stack.arguments,
+                },
+                maxULevel: mlevel,
+            };
         },
 
         /**

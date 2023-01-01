@@ -6,7 +6,7 @@ odoo.define("terminal.core.trash.const", function () {
 
     const LEXER = {
         Delimiter: 1,
-        Concat: 2,
+        Add: 2,
         Variable: 3,
         Command: 4,
         ArgumentShort: 5,
@@ -21,6 +21,7 @@ odoo.define("terminal.core.trash.const", function () {
         Dictionary: 14,
         Boolean: 15,
         Space: 16,
+        Math: 17,
     };
 
     const PARSER = {
@@ -30,22 +31,20 @@ odoo.define("terminal.core.trash.const", function () {
         LOAD_CONST: 4,
         STORE_NAME: 5,
         STORE_SUBSCR: 6,
-        CONCAT: 7,
-        CALL_FUNCTION: 8,
-        CALL_FUNCTION_SILENT: 9,
-        RETURN_VALUE: 10,
-        LOAD_DATA_ATTR: 11,
-        BUILD_LIST: 12,
-        BUILD_MAP: 13,
+        CALL_FUNCTION: 7,
+        CALL_FUNCTION_SILENT: 8,
+        RETURN_VALUE: 9,
+        LOAD_DATA_ATTR: 10,
+        BUILD_LIST: 11,
+        BUILD_MAP: 12,
+        ADD: 13,
+        SUBTRACT: 14,
+        MULTIPLY: 15,
+        DIVIDE: 16,
+        MODULO: 17,
 
         getHumanType: function (type) {
-            const entries = Object.entries(this);
-            for (const entry of entries) {
-                if (entry[1] === type) {
-                    return entry[0];
-                }
-            }
-            return "";
+            return Object.entries(this).find((item) => item[1] === type) || "";
         },
     };
 
@@ -58,10 +57,6 @@ odoo.define("terminal.core.trash.const", function () {
         List: 1 << 5,
 
         getHumanType: function (type) {
-            let res = "";
-            if ((type & this.List) === this.List) {
-                res = "LIST OF ";
-            }
             const utypes = [];
             const entries = Object.entries(this);
             for (const entry of entries) {
@@ -69,12 +64,15 @@ odoo.define("terminal.core.trash.const", function () {
                     utypes.push(entry[0].toUpperCase());
                 }
             }
-            return `${res} ${utypes.join(" or ")}`;
+            if ((type & this.List) === this.List) {
+                return `LIST OF ${utypes.join(" or ")}`;
+            }
+            return utypes.join(" or ");
         },
     };
 
     const SYMBOLS = {
-        CONCAT: "+",
+        ADD: "+",
         ASSIGNMENT: "=",
         ARGUMENT: "-",
         ARRAY_START: "[",
@@ -94,6 +92,8 @@ odoo.define("terminal.core.trash.const", function () {
         TRUE: "true",
         FALSE: "false",
         ESCAPE: "\\",
+        MATH_START: "(",
+        MATH_END: ")",
     };
 
     // FIXME: Inaccurate keymap

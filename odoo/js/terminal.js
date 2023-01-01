@@ -323,33 +323,6 @@ odoo.define("terminal.Terminal", function (require) {
             this.$el[0].addEventListener("toggle", this.doToggle.bind(this));
         },
 
-        _executeAlias: function (command_info, silent = false) {
-            let alias_cmd = this.getAliasCommand(command_info.cmdName);
-            if (alias_cmd) {
-                const params_len = command_info.params.length;
-                let index = 0;
-                while (index < params_len) {
-                    const re = new RegExp(
-                        `\\$${Number(index) + 1}(?:\\[[^\\]]+\\])?`,
-                        "g"
-                    );
-                    alias_cmd = alias_cmd.replaceAll(
-                        re,
-                        command_info.params[index][1]
-                    );
-                    ++index;
-                }
-                alias_cmd = alias_cmd.replaceAll(
-                    /\$\d+(?:\[([^\]]+)\])?/g,
-                    (_, group) => {
-                        return group || "";
-                    }
-                );
-                return this.execute(alias_cmd, {silent: silent});
-            }
-            return Promise.resolve(null);
-        },
-
         _getContext: function (extra_context) {
             return _.extend(
                 {},
@@ -494,7 +467,9 @@ odoo.define("terminal.Terminal", function (require) {
 
             if (!this._hasExecInitCmds) {
                 if (config.init_cmds) {
-                    this.execute(config.init_cmds, {silent: true});
+                    this.execute(config.init_cmds, {silent: true}).catch(() => {
+                        // Do nothing
+                    });
                 }
                 this._hasExecInitCmds = true;
             }
@@ -614,7 +589,9 @@ odoo.define("terminal.Terminal", function (require) {
 
         _onClickTerminalCommand: function (ev) {
             if (Object.hasOwn(ev.target.dataset, "cmd")) {
-                this.execute(ev.target.dataset.cmd);
+                this.execute(ev.target.dataset.cmd).catch(() => {
+                    // Do nothing
+                });
             }
         },
 
@@ -654,7 +631,9 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         _onKeyEnter: function () {
-            this.execute(this.screen.getUserInput());
+            this.execute(this.screen.getUserInput()).catch(() => {
+                // Do nothing
+            });
             this._searchCommandQuery = undefined;
             this.screen.preventLostInputFocus();
         },
@@ -739,7 +718,7 @@ odoo.define("terminal.Terminal", function (require) {
             if (sel_cmd_index === null) {
                 return;
             }
-            const cur_token = parse_info.inputTokens[sel_token_index];
+            const cur_token = parse_info.inputTokens[0][sel_token_index];
             ++this._selAssistanOption;
             if (this._selAssistanOption >= this._assistantOptions.length) {
                 this._selAssistanOption = 0;

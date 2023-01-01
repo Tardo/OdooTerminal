@@ -85,12 +85,16 @@ odoo.define("terminal.core.CommandAssistant", function (require) {
             let end_i = instr_count;
             // Found selected token and EOC/EOL
             for (let index = 0; index < instr_count; ++index) {
-                const [type, tindex] = stack.instructions[index];
-                const token = parse_info.inputTokens[tindex];
+                const instr = stack.instructions[index];
+                if (instr.level > 0) {
+                    continue;
+                }
+                const token =
+                    parse_info.inputTokens[instr.level][instr.inputTokenIndex];
                 if (!token) {
                     if (
                         sel_token_index !== -1 &&
-                        type === TrashConst.PARSER.CALL_FUNCTION
+                        instr.type === TrashConst.PARSER.CALL_FUNCTION
                     ) {
                         end_i = index;
                         break;
@@ -98,27 +102,31 @@ odoo.define("terminal.core.CommandAssistant", function (require) {
                     continue;
                 }
                 if (caret_pos > token.start && caret_pos <= token.end) {
-                    sel_token_index = tindex;
+                    sel_token_index = instr.inputTokenIndex;
                 }
             }
             for (let cindex = end_i; cindex >= 0; --cindex) {
-                const [type, tindex] = stack.instructions[cindex];
-                const token = parse_info.inputTokens[tindex];
+                const instr = stack.instructions[cindex];
+                if (instr.level > 0) {
+                    continue;
+                }
+                const token =
+                    parse_info.inputTokens[instr.level][instr.inputTokenIndex];
                 if (!token) {
                     continue;
                 }
                 if (
                     sel_arg_index === -1 &&
-                    type === TrashConst.PARSER.LOAD_ARG
+                    instr.type === TrashConst.PARSER.LOAD_ARG
                 ) {
-                    sel_arg_index = tindex;
+                    sel_arg_index = instr.inputTokenIndex;
                     continue;
                 }
                 if (
                     sel_token_index !== -1 &&
-                    type === TrashConst.PARSER.LOAD_GLOBAL
+                    instr.type === TrashConst.PARSER.LOAD_GLOBAL
                 ) {
-                    sel_cmd_index = tindex;
+                    sel_cmd_index = instr.inputTokenIndex;
                     break;
                 }
             }
@@ -137,9 +145,9 @@ odoo.define("terminal.core.CommandAssistant", function (require) {
             const ret = [];
             const [sel_cmd_index, sel_token_index, sel_arg_index] =
                 this.getSelectedParameterIndex(parse_info, caret_pos);
-            const cmd_token = parse_info.inputTokens[sel_cmd_index];
-            const cur_token = parse_info.inputTokens[sel_token_index];
-            const arg_token = parse_info.inputTokens[sel_arg_index];
+            const cmd_token = parse_info.inputTokens[0][sel_cmd_index];
+            const cur_token = parse_info.inputTokens[0][sel_token_index];
+            const arg_token = parse_info.inputTokens[0][sel_arg_index];
             if (cur_token === cmd_token) {
                 // Command name
                 const cmd_names = this._getAvailableCommandNames(

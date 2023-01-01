@@ -471,29 +471,46 @@ odoo.define("terminal.functions.Core", function (require) {
                 kwargs.code,
                 {registeredCmds: this._registeredCmds}
             );
+            let body = "";
             const stack = parse_info.stack;
             for (const instr of stack.instructions) {
-                const [type] = instr;
                 let lvalue = "";
-                switch (type) {
+                switch (instr.type) {
                     case TrashConst.PARSER.LOAD_NAME:
                     case TrashConst.PARSER.LOAD_GLOBAL:
                     case TrashConst.PARSER.STORE_NAME:
                     case TrashConst.PARSER.STORE_SUBSCR:
-                        lvalue = stack.names.shift();
+                        lvalue = stack.names[instr.level][instr.dataIndex];
                         break;
                     case TrashConst.PARSER.LOAD_CONST:
-                        lvalue = stack.values.shift();
+                        lvalue = stack.values[instr.level][instr.dataIndex];
                         break;
                     case TrashConst.PARSER.LOAD_ARG:
-                        lvalue = stack.arguments.shift();
+                        lvalue = stack.arguments[instr.level][instr.dataIndex];
                         break;
                 }
 
-                this.screen.print(
-                    `${TrashConst.PARSER.getHumanType(instr[0])} (${lvalue})`
-                );
+                const humanType = TrashConst.PARSER.getHumanType(instr.type);
+                body += `<tr><td>${humanType[0]}</td><td>${
+                    humanType[1]
+                }</td><td>${lvalue}</td><td>${instr.dataIndex}</td><td>${
+                    instr.level
+                }</td><td>${
+                    parse_info.inputTokens[instr.level][instr.inputTokenIndex]
+                        ?.raw || ""
+                }</td></tr>`;
             }
+            this.screen.printTable(
+                [
+                    "Instr. Name",
+                    "Instr. Code",
+                    "Name/Value/Argument",
+                    "Data Index",
+                    "Level",
+                    "Token",
+                ],
+                body
+            );
 
             return Promise.resolve(true);
         },
@@ -558,13 +575,16 @@ odoo.define("terminal.functions.Core", function (require) {
                     }`;
                 }
                 if (typeof arg_info.default_value !== "undefined") {
-                    arg_info_str += ` (default is ${
-                        arg_info.type[0] === TrashConst.ARG.List
-                            ? arg_info.default_value.join(",")
-                            : arg_info.type[0] === TrashConst.ARG.Dictionary
-                            ? JSON.stringify(arg_info.default_value)
-                            : arg_info.default_value
-                    })`;
+                    if (
+                        (arg_info.type & TrashConst.ARG.List) ===
+                            TrashConst.ARG.List ||
+                        (arg_info.type & TrashConst.ARG.Dictionary) ===
+                            TrashConst.ARG.Dictionary
+                    ) {
+                        arg_info_str += JSON.stringify(arg_info.default_value);
+                    } else {
+                        arg_info_str += arg_info.default_value;
+                    }
                 }
                 arg_info_str += `<div class="terminal-info-description">${arg_info.description}</div>`;
                 arg_info_str += "<br/>";
