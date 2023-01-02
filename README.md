@@ -64,10 +64,10 @@ You can toggle terminal using one of these options:
 > 15, 8" (quotes included) or can use array [5, 15, 8]
 
 > Notice that can call commands without 'named arguments', for example:
-> `create res.partner {name: 'Hipcut', street: 'Mystery street'}`. The rule is that
-> 'unnamed arguments' fill values following the order of the command arguments
-> definition. So mix 'unnamed' with 'named' arguments can be done as long as the
-> order is maintained.
+> `create res.partner {name: 'Hipcut', street: 'Mystery street'}`. The rule is
+> that 'unnamed arguments' fill values following the order of the command
+> arguments definition. So mix 'unnamed' with 'named' arguments can be done as
+> long as the order is maintained.
 
 ## Notes
 
@@ -142,9 +142,11 @@ Example:
 
 #### + Math operations
 
-The way to do math operations is pretty similar to 'shell script' syntax: `$((<OPERATION>))`
+The way to do math operations is pretty similar to 'shell script' syntax:
+`$((<OPERATION>))`
 
 Examples:
+
 - `print $((3*2))`
 - `$prod = $(read product.product 3 -f lst_price); $prod['lst_price'] = $((5*$prod['lst_price'])); commit $prod;`
 
