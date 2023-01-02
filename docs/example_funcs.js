@@ -2,6 +2,7 @@ odoo.define("terminal.MyFuncs", function (require) {
     "use strict";
 
     const Terminal = require("terminal.Terminal").terminal;
+    const TrashConst = require("terminal.core.trash.const");
 
     Terminal.include({
         /**
@@ -15,10 +16,31 @@ odoo.define("terminal.MyFuncs", function (require) {
                 callback: this._cmdMyFunc,
                 detail: "My command explained...",
                 args: [
-                    "s::pa:parama::1::The Param A",
-                    "i::pb:paramb::1::The Param B",
-                    "s::pc:paramc::0::The Param C::DefaultValue",
-                    "i::pd:paramd::0::The Param D::-1",
+                    [
+                        TrashConst.ARG.String,
+                        ["pa", "parama"],
+                        true,
+                        "The Param A",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["pb", "paramb"],
+                        true,
+                        "The Param B",
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["pc", "paramc"],
+                        true,
+                        "The Param C",
+                        "DefaultValue",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["pd", "paramd"],
+                        true,
+                        "The Param D",
+                    ],
                 ],
                 example: "-pa foo -pb bar",
             });
@@ -28,8 +50,18 @@ odoo.define("terminal.MyFuncs", function (require) {
                 callback: this._cmdMyAsyncFunc,
                 detail: "My async command explained...",
                 args: [
-                    "s::pa:parama::1::The Param A",
-                    "i::pb:paramb::1::The Param B",
+                    [
+                        TrashConst.ARG.String,
+                        ["pa", "parama"],
+                        true,
+                        "The Param A",
+                    ],
+                    [
+                        TrashConst.ARG.Number,
+                        ["pb", "paramb"],
+                        true,
+                        "The Param B",
+                    ],
                 ],
                 example: "-pa foo -pb bar",
             });
