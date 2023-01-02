@@ -66,10 +66,15 @@ odoo.define("terminal.tests.TraSH", function (require) {
             this.assertEqual(results[0].constructor, Array);
             this.assertTrue(results[0].length > 0);
             results = await this.terminal._virtMachine.eval(
-                "$(search res.partner)['ids']"
+                "$(search res.partner -f name)['ids']"
             );
-            this.assertEqual(results[0].constructor, Array);
-            this.assertTrue(results[0].length > 0);
+            this.assertEqual(results[1].constructor, Array);
+            this.assertTrue(results[1].length > 0);
+            results = await this.terminal._virtMachine.eval(
+                "$(search res.partner -f name)['name']"
+            );
+            this.assertEqual(results[1].constructor, String);
+            this.assertTrue(results[1].length > 0);
 
             // Concat
             results = await this.terminal._virtMachine.eval(

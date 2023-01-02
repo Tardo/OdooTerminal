@@ -784,9 +784,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                             },
                             ++mlevel
                         );
-                        to_append.arguments.push(
-                            ...parsed_attribute.stack.arguments
-                        );
                         res.stack.values.push(...parsed_attribute.stack.values);
                         res.stack.names.push(...parsed_attribute.stack.names);
                         to_append.inputTokens.push(
@@ -814,8 +811,8 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                             },
                             ++mlevel
                         );
-                        to_append.arguments.push(
-                            ...parsed_runner.stack.arguments[0]
+                        res.stack.arguments.push(
+                            ...parsed_runner.stack.arguments
                         );
                         res.stack.values.push(...parsed_runner.stack.values);
                         res.stack.names.push(...parsed_runner.stack.names);
