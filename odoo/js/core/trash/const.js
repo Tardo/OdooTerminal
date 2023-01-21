@@ -6,22 +6,27 @@ odoo.define("terminal.core.trash.const", function () {
 
     const LEXER = {
         Delimiter: 1,
-        Add: 2,
+        Concat: 2,
         Variable: 3,
-        Command: 4,
-        ArgumentShort: 5,
-        ArgumentLong: 6,
-        Assignment: 7,
-        DataAttribute: 8,
-        Runner: 9,
-        Array: 10,
-        String: 11,
-        StringSimple: 12,
-        Number: 13,
-        Dictionary: 14,
-        Boolean: 15,
-        Space: 16,
-        Math: 17,
+        ArgumentShort: 4,
+        ArgumentLong: 5,
+        Assignment: 6,
+        DataAttribute: 7,
+        Runner: 8,
+        Array: 9,
+        String: 10,
+        StringSimple: 11,
+        Number: 12,
+        Dictionary: 13,
+        Boolean: 14,
+        Space: 15,
+        Math: 16,
+        Add: 17,
+        Substract: 18,
+        Multiply: 19,
+        Divide: 20,
+        Modulo: 21,
+        Pow: 22,
     };
 
     const PARSER = {
@@ -29,16 +34,21 @@ odoo.define("terminal.core.trash.const", function () {
         LOAD_GLOBAL: 2,
         LOAD_ARG: 3,
         LOAD_CONST: 4,
-        LOAD_MATH: 5,
-        STORE_NAME: 6,
-        STORE_SUBSCR: 7,
-        CALL_FUNCTION: 8,
-        CALL_FUNCTION_SILENT: 9,
-        RETURN_VALUE: 10,
-        LOAD_DATA_ATTR: 11,
-        BUILD_LIST: 12,
-        BUILD_MAP: 13,
+        STORE_NAME: 5,
+        STORE_SUBSCR: 6,
+        CALL_FUNCTION: 7,
+        CALL_FUNCTION_SILENT: 8,
+        RETURN_VALUE: 9,
+        LOAD_DATA_ATTR: 10,
+        BUILD_LIST: 11,
+        BUILD_MAP: 12,
+        CONCAT: 13,
         ADD: 14,
+        SUBSTRACT: 15,
+        MULTIPLY: 16,
+        DIVIDE: 17,
+        MODULO: 18,
+        POW: 19,
 
         getHumanType: function (type) {
             return Object.entries(this).find((item) => item[1] === type) || "";
@@ -57,7 +67,7 @@ odoo.define("terminal.core.trash.const", function () {
             const utypes = [];
             const entries = Object.entries(this);
             for (const entry of entries) {
-                if (entry[1] & (type === type)) {
+                if ((entry[1] & type) === type) {
                     utypes.push(entry[0].toUpperCase());
                 }
             }
@@ -70,6 +80,12 @@ odoo.define("terminal.core.trash.const", function () {
 
     const SYMBOLS = {
         ADD: "+",
+        SUBSTRACT: "-",
+        MULTIPLY: "*",
+        DIVIDE: "/",
+        MODULO: "%",
+        POW: "^",
+        CONCAT: "+",
         ASSIGNMENT: "=",
         ARGUMENT: "-",
         ARRAY_START: "[",
@@ -91,7 +107,18 @@ odoo.define("terminal.core.trash.const", function () {
         ESCAPE: "\\",
         MATH_START: "(",
         MATH_END: ")",
+        MATH_BLOCK_START: "(",
+        MATH_BLOCK_END: ")",
     };
+
+    const MATH_OPER_PRIORITIES = [
+        SYMBOLS.POW,
+        SYMBOLS.DIVIDE,
+        SYMBOLS.MULTIPLY,
+        SYMBOLS.MODULO,
+        SYMBOLS.SUBSTRACT,
+        SYMBOLS.ADD,
+    ];
 
     // FIXME: Inaccurate keymap
     //      '_' and '-' positions are only valid for spanish layout
@@ -133,6 +160,7 @@ odoo.define("terminal.core.trash.const", function () {
         PARSER: PARSER,
         ARG: ARG,
         SYMBOLS: SYMBOLS,
+        MATH_OPER_PRIORITIES: MATH_OPER_PRIORITIES,
         KEYMAP: KEYMAP,
     };
 });

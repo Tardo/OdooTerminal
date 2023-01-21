@@ -158,10 +158,14 @@
             isOdoo: true,
         });
 
-        if (Object.hasOwn(gOdooObj, "session_info")) {
-            gOdooInfo.isFrontend = gOdooObj.session_info.is_frontend;
-            if (gOdooObj.session_info.server_version) {
-                _setServerVersion(gOdooObj.session_info.server_version);
+        const odoo_session =
+            gOdooObj.session_info ||
+            gOdooObj.session ||
+            gOdooObj.__DEBUG__.services["web.session"];
+        if (odoo_session) {
+            gOdooInfo.isFrontend = odoo_session.is_frontend;
+            if (odoo_session.server_version) {
+                _setServerVersion(odoo_session.server_version);
             } else {
                 if (!gOdooInfo.isFrontend) {
                     // Ensure that is not front-end (portal)

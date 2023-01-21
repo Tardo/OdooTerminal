@@ -49,16 +49,10 @@ odoo.define("terminal.core.ParameterGenerator", function (require) {
             },
         },
 
-        _intIterStore: [],
-        _intIterStoreIndex: 0,
+        _intIterStore: 0,
 
         resetStores: function () {
-            this._intIterStore = [];
-            this._resetStoreIndexes();
-        },
-
-        _resetStoreIndexes: function () {
-            this._intIterStoreIndex = 0;
+            this._intIterStore = 0;
         },
 
         generateEmail: function (min, max) {
@@ -118,16 +112,9 @@ odoo.define("terminal.core.ParameterGenerator", function (require) {
         },
 
         doIntIter: function (min, step = 1) {
-            const store_index = this._intIterStoreIndex++;
-            let int_iter_store = this._intIterStore[store_index];
-            if (!int_iter_store) {
-                int_iter_store = {
-                    value: Number(min) || 1,
-                };
-                this._intIterStore[store_index] = int_iter_store;
-                return int_iter_store.value;
-            }
-            return (int_iter_store.value += Number(step));
+            const int_iter = (Number(min) || 0) + this._intIterStore;
+            this._intIterStore += Number(step);
+            return int_iter;
         },
 
         generateString: function (min, max) {

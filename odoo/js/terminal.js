@@ -9,7 +9,9 @@ odoo.define("terminal.Terminal", function (require) {
     const Widget = require("web.Widget");
     const Screen = require("terminal.core.Screen");
     const Longpolling = require("terminal.core.Longpolling");
-    const VMachine = require("terminal.core.TraSH.vmachine");
+    const VMachine = require("terminal.core.trash.vmachine");
+    const TrashConst = require("terminal.core.trash.const");
+    const TrashException = require("terminal.core.trash.exception");
     const TemplateManager = require("terminal.core.TemplateManager");
     const Storage = require("terminal.core.Storage");
     const CommandAssistant = require("terminal.core.CommandAssistant");
@@ -224,6 +226,102 @@ odoo.define("terminal.Terminal", function (require) {
             return [cmd, cmd_name];
         },
 
+        // Key Distance Comparison (Simple mode)
+        // Comparison by distance between keys.
+        //
+        // This mode of analysis limit it to qwerty layouts
+        // but can predict words with a better accuracy.
+        // Example Case:
+        //   - Two commands: horse, house
+        //   - User input: hoese
+        //
+        //   - Output using simple comparison: horse and house (both have the
+        //     same weight)
+        //   - Output using KDC: horse
+        searchSimiliarCommand: function (in_cmd) {
+            if (in_cmd.length < 3) {
+                return false;
+            }
+
+            // Only consider words with score lower than this limit
+            const SCORE_LIMIT = 50;
+            // Columns per Key and Rows per Key
+            const cpk = 10,
+                rpk = 3;
+            const max_dist = Math.sqrt(cpk + rpk);
+            const _get_key_dist = function (from, to) {
+                const _get_key_pos2d = function (key) {
+                    const i = TrashConst.KEYMAP.indexOf(key);
+                    if (i === -1) {
+                        return [cpk, rpk];
+                    }
+                    return [i / cpk, i % rpk];
+                };
+
+                const from_pos = _get_key_pos2d(from);
+                const to_pos = _get_key_pos2d(to);
+                const x = (to_pos[0] - from_pos[0]) * (to_pos[0] - from_pos[0]);
+                const y = (to_pos[1] - from_pos[1]) * (to_pos[1] - from_pos[1]);
+                return Math.sqrt(x + y);
+            };
+
+            const sanitized_in_cmd = in_cmd.toLowerCase();
+            const sorted_cmd_keys = _.keys(this._registeredCmds).sort();
+            const min_score = [0, ""];
+            const sorted_keys_len = sorted_cmd_keys.length;
+            for (let x = 0; x < sorted_keys_len; ++x) {
+                const cmd = sorted_cmd_keys[x];
+                // Analize typo's
+                const search_index = sanitized_in_cmd.search(cmd);
+                let cmd_score = 0;
+                if (search_index === -1) {
+                    // Penalize word length diff
+                    cmd_score =
+                        Math.abs(sanitized_in_cmd.length - cmd.length) / 2 +
+                        max_dist;
+                    // Analize letter key distances
+                    for (let i = 0; i < sanitized_in_cmd.length; ++i) {
+                        if (i < cmd.length) {
+                            const score = _get_key_dist(
+                                sanitized_in_cmd.charAt(i),
+                                cmd.charAt(i)
+                            );
+                            if (score === 0) {
+                                --cmd_score;
+                            } else {
+                                cmd_score += score;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                    // Using all letters?
+                    const cmd_vec = _.map(cmd, (k) => k.charCodeAt(0));
+                    const in_cmd_vec = _.map(sanitized_in_cmd, (k) =>
+                        k.charCodeAt(0)
+                    );
+                    if (_.difference(in_cmd_vec, cmd_vec).length === 0) {
+                        cmd_score -= max_dist;
+                    }
+                } else {
+                    cmd_score =
+                        Math.abs(sanitized_in_cmd.length - cmd.length) / 2;
+                }
+
+                // Search lower score
+                // if zero = perfect match (this never should happens)
+                if (min_score[1] === "" || cmd_score < min_score[0]) {
+                    min_score[0] = cmd_score;
+                    min_score[1] = cmd;
+                    if (min_score[0] === 0.0) {
+                        break;
+                    }
+                }
+            }
+
+            return min_score[0] < SCORE_LIMIT ? min_score[1] : false;
+        },
+
         execute: function (cmd_raw, store = true, silent = false) {
             return new Promise(async (resolve, reject) => {
                 await this._wakeUp();
@@ -245,7 +343,26 @@ odoo.define("terminal.Terminal", function (require) {
                         cmd_res.push(result);
                     }
                 } catch (err) {
-                    this.screen.printError(err);
+                    let err_msg = err.message;
+                    if (
+                        err.constructor === TrashException.UnknownCommandError
+                    ) {
+                        // Search similar commands
+                        const similar_cmd = this.searchSimiliarCommand(
+                            err.cmd_name
+                        );
+                        if (similar_cmd) {
+                            err_msg = TemplateManager.render(
+                                "UNKNOWN_COMMAND",
+                                {
+                                    org_cmd: err.cmd_name,
+                                    cmd: similar_cmd,
+                                    pos: [err.start, err.end],
+                                }
+                            );
+                        }
+                    }
+                    this.screen.printError(err_msg);
                     return reject(err);
                 }
 
@@ -841,13 +958,13 @@ odoo.define("terminal.Terminal", function (require) {
             }
         },
         _onCoreBeforeUnload: function (ev) {
-            if (this._jobs.length) {
+            const jobs = _.compact(this._jobs);
+            if (jobs.length) {
                 if (
-                    this._jobs.length === 1 &&
-                    (!this._jobs[0] ||
-                        ["reload", "login"].indexOf(
-                            this._jobs[0].cmdInfo.cmdName
-                        ) !== -1)
+                    jobs.length === 1 &&
+                    (!jobs[0] ||
+                        ["reload", "login"].indexOf(jobs[0].cmdInfo.cmdName) !==
+                            -1)
                 ) {
                     return;
                 }
@@ -860,7 +977,7 @@ odoo.define("terminal.Terminal", function (require) {
                 );
                 this.screen.print(
                     _.map(
-                        this._jobs,
+                        jobs,
                         (item) =>
                             `${item.cmdInfo.cmdName} <small><i>${item.cmdInfo.cmdRaw}</i></small>`
                     )

@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.TraSH.interpreter", function (require) {
+odoo.define("terminal.core.trash.interpreter", function (require) {
     "use strict";
 
     const TrashConst = require("terminal.core.trash.const");
@@ -81,12 +81,9 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
          */
         getArgumentInfoByName: function (args, arg_name) {
             for (const arg of args) {
-                const arg_info = this.getArgumentInfo(arg);
-                if (
-                    arg_info.names.short === arg_name ||
-                    arg_info.names.long === arg_name
-                ) {
-                    return arg_info;
+                const [short_name, long_name] = arg[1];
+                if (short_name === arg_name || long_name === arg_name) {
+                    return this.getArgumentInfo(arg);
                 }
             }
 
@@ -132,102 +129,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
             return null;
         },
 
-        // Key Distance Comparison (Simple mode)
-        // Comparison by distance between keys.
-        //
-        // This mode of analysis limit it to qwerty layouts
-        // but can predict words with a better accuracy.
-        // Example Case:
-        //   - Two commands: horse, house
-        //   - User input: hoese
-        //
-        //   - Output using simple comparison: horse and house (both have the
-        //     same weight)
-        //   - Output using KDC: horse
-        searchSimiliarCommand: function (in_cmd, registered_cmds) {
-            if (in_cmd.length < 3) {
-                return false;
-            }
-
-            // Only consider words with score lower than this limit
-            const SCORE_LIMIT = 50;
-            // Columns per Key and Rows per Key
-            const cpk = 10,
-                rpk = 3;
-            const max_dist = Math.sqrt(cpk + rpk);
-            const _get_key_dist = function (from, to) {
-                const _get_key_pos2d = function (key) {
-                    const i = TrashConst.KEYMAP.indexOf(key);
-                    if (i === -1) {
-                        return [cpk, rpk];
-                    }
-                    return [i / cpk, i % rpk];
-                };
-
-                const from_pos = _get_key_pos2d(from);
-                const to_pos = _get_key_pos2d(to);
-                const x = (to_pos[0] - from_pos[0]) * (to_pos[0] - from_pos[0]);
-                const y = (to_pos[1] - from_pos[1]) * (to_pos[1] - from_pos[1]);
-                return Math.sqrt(x + y);
-            };
-
-            const sanitized_in_cmd = in_cmd.toLowerCase();
-            const sorted_cmd_keys = _.keys(registered_cmds).sort();
-            const min_score = [0, ""];
-            const sorted_keys_len = sorted_cmd_keys.length;
-            for (let x = 0; x < sorted_keys_len; ++x) {
-                const cmd = sorted_cmd_keys[x];
-                // Analize typo's
-                const search_index = sanitized_in_cmd.search(cmd);
-                let cmd_score = 0;
-                if (search_index === -1) {
-                    // Penalize word length diff
-                    cmd_score =
-                        Math.abs(sanitized_in_cmd.length - cmd.length) / 2 +
-                        max_dist;
-                    // Analize letter key distances
-                    for (let i = 0; i < sanitized_in_cmd.length; ++i) {
-                        if (i < cmd.length) {
-                            const score = _get_key_dist(
-                                sanitized_in_cmd.charAt(i),
-                                cmd.charAt(i)
-                            );
-                            if (score === 0) {
-                                --cmd_score;
-                            } else {
-                                cmd_score += score;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                    // Using all letters?
-                    const cmd_vec = _.map(cmd, (k) => k.charCodeAt(0));
-                    const in_cmd_vec = _.map(sanitized_in_cmd, (k) =>
-                        k.charCodeAt(0)
-                    );
-                    if (_.difference(in_cmd_vec, cmd_vec).length === 0) {
-                        cmd_score -= max_dist;
-                    }
-                } else {
-                    cmd_score =
-                        Math.abs(sanitized_in_cmd.length - cmd.length) / 2;
-                }
-
-                // Search lower score
-                // if zero = perfect match (this never should happens)
-                if (min_score[1] === "" || cmd_score < min_score[0]) {
-                    min_score[0] = cmd_score;
-                    min_score[1] = cmd;
-                    if (min_score[0] === 0.0) {
-                        break;
-                    }
-                }
-            }
-
-            return min_score[0] < SCORE_LIMIT ? min_score[1] : false;
-        },
-
         /**
          * Split the input data into usable tokens
          * @param {String} data
@@ -236,17 +137,20 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
         tokenize: function (data, options) {
             // Remove comments
             const clean_data = data.replaceAll(this._regexComments, "");
-            const tokens = [];
+            let tokens = [];
             let value = "";
             let in_string = "";
             let in_array = 0;
             let in_dict = 0;
             let in_runner = 0;
+            let in_block = 0;
             let do_cut = false;
             let do_skip = false;
             let prev_char = "";
+            let prev_token = null;
             for (const char of clean_data) {
-                const in_data_type = in_array || in_dict || in_runner;
+                const in_data_type =
+                    in_array || in_dict || in_runner || in_block;
                 if (prev_char !== TrashConst.SYMBOLS.ESCAPE) {
                     if (
                         char === TrashConst.SYMBOLS.STRING ||
@@ -260,7 +164,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                         }
                     } else if (!in_string) {
                         if (char === TrashConst.SYMBOLS.ARRAY_START) {
-                            if (!in_array && !in_dict && !in_runner) {
+                            if (!in_data_type) {
                                 do_cut = true;
                             }
                             ++in_array;
@@ -272,7 +176,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                         } else if (
                             char === TrashConst.SYMBOLS.DICTIONARY_START
                         ) {
-                            if (!in_array && !in_dict && !in_runner) {
+                            if (!in_data_type) {
                                 do_cut = true;
                             }
                             ++in_dict;
@@ -291,6 +195,18 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                             char === TrashConst.SYMBOLS.RUNNER_END
                         ) {
                             --in_runner;
+                        } else if (
+                            char === TrashConst.SYMBOLS.MATH_BLOCK_START
+                        ) {
+                            if (!in_data_type) {
+                                do_cut = true;
+                            }
+                            ++in_block;
+                        } else if (
+                            in_block &&
+                            char === TrashConst.SYMBOLS.MATH_BLOCK_END
+                        ) {
+                            --in_block;
                         } else if (!in_data_type) {
                             if (
                                 char === TrashConst.SYMBOLS.EOC ||
@@ -298,10 +214,12 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                                 char === TrashConst.SYMBOLS.VARIABLE ||
                                 char === TrashConst.SYMBOLS.ASSIGNMENT ||
                                 char === TrashConst.SYMBOLS.ADD ||
+                                char === TrashConst.SYMBOLS.CONCAT ||
                                 prev_char === TrashConst.SYMBOLS.EOC ||
                                 prev_char === TrashConst.SYMBOLS.EOL ||
                                 prev_char === TrashConst.SYMBOLS.ASSIGNMENT ||
-                                prev_char === TrashConst.SYMBOLS.ADD
+                                prev_char === TrashConst.SYMBOLS.ADD ||
+                                prev_char === TrashConst.SYMBOLS.CONCAT
                             ) {
                                 do_cut = true;
                             } else if (
@@ -312,10 +230,23 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                             ) {
                                 do_cut = true;
                             } else if (
-                                options?.ignoreCommandMode &&
-                                (char === TrashConst.SYMBOLS.ITEM_DELIMITER ||
-                                    char ===
-                                        TrashConst.SYMBOLS.DICTIONARY_SEPARATOR)
+                                options?.math &&
+                                (char === TrashConst.SYMBOLS.SUBSTRACT ||
+                                    char === TrashConst.SYMBOLS.MULTIPLY ||
+                                    char === TrashConst.SYMBOLS.DIVIDE ||
+                                    char === TrashConst.SYMBOLS.MODULO ||
+                                    char === TrashConst.SYMBOLS.POW ||
+                                    prev_char ===
+                                        TrashConst.SYMBOLS.SUBSTRACT ||
+                                    prev_char === TrashConst.SYMBOLS.MULTIPLY ||
+                                    prev_char === TrashConst.SYMBOLS.DIVIDE ||
+                                    prev_char === TrashConst.SYMBOLS.MODULO ||
+                                    prev_char === TrashConst.SYMBOLS.POW)
+                            ) {
+                                do_cut = true;
+                            } else if (
+                                char === TrashConst.SYMBOLS.ITEM_DELIMITER ||
+                                char === TrashConst.SYMBOLS.DICTIONARY_SEPARATOR
                             ) {
                                 do_cut = true;
                                 do_skip = true;
@@ -325,7 +256,12 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
 
                     if (do_cut) {
                         if (value) {
-                            tokens.push(value);
+                            prev_token = this._lexer(
+                                value,
+                                prev_token,
+                                options
+                            );
+                            tokens.push(prev_token);
                             value = "";
                         }
                         do_cut = false;
@@ -338,143 +274,197 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 do_skip = false;
             }
             if (value) {
-                tokens.push(value);
+                tokens.push(this._lexer(value, prev_token, options));
             }
-            // Console.log("TOKENS: ", tokens);
-            return tokens;
+
+            if (options?.math) {
+                tokens = this._prioritizer(tokens);
+            }
+            const tokens_info = [];
+            const tokens_len = tokens.length;
+            let offset = 0;
+            for (let i = 0; i < tokens_len; ++i) {
+                const [token_type, token, raw] = tokens[i];
+                if (token_type === TrashConst.LEXER.Space) {
+                    continue;
+                }
+                tokens_info.push({
+                    value: token,
+                    raw: raw,
+                    type: token_type,
+                    start: offset,
+                    end: offset + raw.length,
+                    index: i,
+                });
+                offset += raw.length;
+            }
+            return tokens_info;
         },
 
         /**
          * Classify tokens
          * @param {Array} tokens
          */
-        lex: function (data, options) {
-            const tokens_info = [];
-            let offset = 0;
-            const tokens = this.tokenize(data, options);
-            let prev_token_info = null;
-            let num_word = 1;
-            tokens.forEach((token, index) => {
-                let token_san = token.trim();
-                const token_san_lower = token_san.toLocaleLowerCase();
-                let ttype = TrashConst.LEXER.String;
-                if (!token_san) {
-                    if (token === TrashConst.SYMBOLS.EOL) {
-                        num_word = 0;
-                        ttype = TrashConst.LEXER.Delimiter;
-                    } else {
-                        ttype = TrashConst.LEXER.Space;
-                    }
-                } else if (token_san[0] === TrashConst.SYMBOLS.ARGUMENT) {
-                    if (token_san[1] === TrashConst.SYMBOLS.ARGUMENT) {
-                        ttype = TrashConst.LEXER.ArgumentLong;
-                        token_san = token_san.substr(2);
-                    } else {
-                        ttype = TrashConst.LEXER.ArgumentShort;
-                        token_san = token_san.substr(1);
-                    }
-                } else if (token_san === TrashConst.SYMBOLS.EOC) {
-                    num_word = 0;
+        _lexer: function (token, prev_token, options) {
+            let token_san = token.trim();
+            const token_san_lower = token_san.toLocaleLowerCase();
+            let ttype = TrashConst.LEXER.String;
+            if (!token_san) {
+                if (token === TrashConst.SYMBOLS.EOL) {
                     ttype = TrashConst.LEXER.Delimiter;
-                } else if (token_san === TrashConst.SYMBOLS.ADD) {
-                    ttype = TrashConst.LEXER.Add;
-                } else if (token_san === TrashConst.SYMBOLS.ASSIGNMENT) {
-                    ttype = TrashConst.LEXER.Assignment;
-                } else if (
-                    token_san[0] === TrashConst.SYMBOLS.ARRAY_START &&
-                    token_san.at(-1) === TrashConst.SYMBOLS.ARRAY_END
-                ) {
-                    token_san = token_san.substr(1, token_san.length - 2);
-                    token_san = token_san.trim();
-                    if (
-                        prev_token_info &&
-                        (prev_token_info.type === TrashConst.LEXER.Variable ||
-                            prev_token_info.type ===
-                                TrashConst.LEXER.DataAttribute ||
-                            prev_token_info.type === TrashConst.LEXER.Runner)
-                    ) {
-                        ttype = TrashConst.LEXER.DataAttribute;
-                    } else {
-                        ttype = TrashConst.LEXER.Array;
-                    }
-                } else if (
-                    token_san[0] === TrashConst.SYMBOLS.DICTIONARY_START &&
-                    token_san.at(-1) === TrashConst.SYMBOLS.DICTIONARY_END
-                ) {
-                    token_san = token_san.substr(1, token_san.length - 2);
-                    token_san = token_san.trim();
-                    ttype = TrashConst.LEXER.Dictionary;
-                } else if (
-                    token_san[0] === TrashConst.SYMBOLS.VARIABLE &&
-                    token_san[1] === TrashConst.SYMBOLS.RUNNER_START &&
-                    token_san[2] === TrashConst.SYMBOLS.MATH_START &&
-                    token_san.at(-1) === TrashConst.SYMBOLS.RUNNER_END &&
-                    token_san.at(-2) === TrashConst.SYMBOLS.MATH_END
-                ) {
-                    ttype = TrashConst.LEXER.Math;
-                    token_san = token_san
-                        .substr(3, token_san.length - 5)
-                        .trim();
-                } else if (
-                    token_san[0] === TrashConst.SYMBOLS.VARIABLE &&
-                    token_san[1] === TrashConst.SYMBOLS.RUNNER_START &&
-                    token_san.at(-1) === TrashConst.SYMBOLS.RUNNER_END
-                ) {
-                    ttype = TrashConst.LEXER.Runner;
-                    token_san = token_san
-                        .substr(2, token_san.length - 3)
-                        .trim();
-                } else if (token_san[0] === TrashConst.SYMBOLS.VARIABLE) {
-                    ttype = TrashConst.LEXER.Variable;
+                } else {
+                    ttype = TrashConst.LEXER.Space;
+                }
+            } else if (
+                !options?.math &&
+                token_san[0] === TrashConst.SYMBOLS.ARGUMENT
+            ) {
+                if (token_san[1] === TrashConst.SYMBOLS.ARGUMENT) {
+                    ttype = TrashConst.LEXER.ArgumentLong;
+                    token_san = token_san.substr(2);
+                } else {
+                    ttype = TrashConst.LEXER.ArgumentShort;
                     token_san = token_san.substr(1);
-                } else if (
-                    token_san[0] === TrashConst.SYMBOLS.STRING &&
-                    token_san.at(-1) === TrashConst.SYMBOLS.STRING
-                ) {
-                    ttype = TrashConst.LEXER.String;
-                } else if (
-                    token_san[0] === TrashConst.SYMBOLS.STRING_SIMPLE &&
-                    token_san.at(-1) === TrashConst.SYMBOLS.STRING_SIMPLE
-                ) {
-                    ttype = TrashConst.LEXER.StringSimple;
-                } else if (!_.isNaN(Number(token_san))) {
-                    ttype = TrashConst.LEXER.Number;
-                } else if (
-                    token_san_lower === TrashConst.SYMBOLS.TRUE ||
-                    token_san_lower === TrashConst.SYMBOLS.FALSE
-                ) {
-                    ttype = TrashConst.LEXER.Boolean;
-                } else if (!options?.ignoreCommandMode && num_word === 1) {
-                    const can_name = this.getCanonicalCommandName(
-                        token_san,
-                        options.registeredCmds
-                    );
-                    ttype = TrashConst.LEXER.Command;
-                    token_san = can_name || token_san;
                 }
-
+            } else if (token_san === TrashConst.SYMBOLS.EOC) {
+                ttype = TrashConst.LEXER.Delimiter;
+            } else if (token_san === TrashConst.SYMBOLS.ASSIGNMENT) {
+                ttype = TrashConst.LEXER.Assignment;
+            } else if (
+                token_san[0] === TrashConst.SYMBOLS.ARRAY_START &&
+                token_san.at(-1) === TrashConst.SYMBOLS.ARRAY_END
+            ) {
+                token_san = token_san.substr(1, token_san.length - 2);
+                token_san = token_san.trim();
                 if (
-                    ttype === TrashConst.LEXER.String ||
-                    ttype === TrashConst.LEXER.StringSimple
+                    prev_token &&
+                    (prev_token[0] === TrashConst.LEXER.Variable ||
+                        prev_token[0] === TrashConst.LEXER.DataAttribute ||
+                        prev_token[0] === TrashConst.LEXER.Runner)
                 ) {
-                    token_san = this._trimQuotes(token_san);
+                    ttype = TrashConst.LEXER.DataAttribute;
+                } else {
+                    ttype = TrashConst.LEXER.Array;
                 }
-                prev_token_info = {
-                    value: token_san,
-                    raw: token,
-                    type: ttype,
-                    start: offset,
-                    end: offset + token.length,
-                    index: index,
-                };
-                tokens_info.push(prev_token_info);
-                offset += token.length;
-                if (ttype !== TrashConst.LEXER.Space) {
-                    ++num_word;
+            } else if (
+                token_san[0] === TrashConst.SYMBOLS.DICTIONARY_START &&
+                token_san.at(-1) === TrashConst.SYMBOLS.DICTIONARY_END
+            ) {
+                token_san = token_san.substr(1, token_san.length - 2);
+                token_san = token_san.trim();
+                ttype = TrashConst.LEXER.Dictionary;
+            } else if (
+                options?.math &&
+                token_san[0] === TrashConst.SYMBOLS.MATH_BLOCK_START &&
+                token_san.at(-1) === TrashConst.SYMBOLS.MATH_BLOCK_END
+            ) {
+                token_san = token_san.substr(1, token_san.length - 2);
+                token_san = token_san.trim();
+                ttype = TrashConst.LEXER.Math;
+            } else if (
+                token_san[0] === TrashConst.SYMBOLS.VARIABLE &&
+                token_san[1] === TrashConst.SYMBOLS.RUNNER_START &&
+                token_san[2] === TrashConst.SYMBOLS.MATH_START &&
+                token_san.at(-1) === TrashConst.SYMBOLS.RUNNER_END &&
+                token_san.at(-2) === TrashConst.SYMBOLS.MATH_END
+            ) {
+                ttype = TrashConst.LEXER.Math;
+                token_san = token_san.substr(3, token_san.length - 5).trim();
+            } else if (
+                token_san[0] === TrashConst.SYMBOLS.VARIABLE &&
+                token_san[1] === TrashConst.SYMBOLS.RUNNER_START &&
+                token_san.at(-1) === TrashConst.SYMBOLS.RUNNER_END
+            ) {
+                ttype = TrashConst.LEXER.Runner;
+                token_san = token_san.substr(2, token_san.length - 3).trim();
+            } else if (token_san[0] === TrashConst.SYMBOLS.VARIABLE) {
+                ttype = TrashConst.LEXER.Variable;
+                token_san = token_san.substr(1);
+            } else if (
+                token_san[0] === TrashConst.SYMBOLS.STRING &&
+                token_san.at(-1) === TrashConst.SYMBOLS.STRING
+            ) {
+                ttype = TrashConst.LEXER.String;
+            } else if (
+                token_san[0] === TrashConst.SYMBOLS.STRING_SIMPLE &&
+                token_san.at(-1) === TrashConst.SYMBOLS.STRING_SIMPLE
+            ) {
+                ttype = TrashConst.LEXER.StringSimple;
+            } else if (!_.isNaN(Number(token_san))) {
+                ttype = TrashConst.LEXER.Number;
+            } else if (
+                token_san_lower === TrashConst.SYMBOLS.TRUE ||
+                token_san_lower === TrashConst.SYMBOLS.FALSE
+            ) {
+                ttype = TrashConst.LEXER.Boolean;
+            } else if (options.math) {
+                if (token_san === TrashConst.SYMBOLS.ADD) {
+                    ttype = TrashConst.LEXER.Add;
+                } else if (token_san === TrashConst.SYMBOLS.SUBSTRACT) {
+                    ttype = TrashConst.LEXER.Substract;
+                } else if (token_san === TrashConst.SYMBOLS.MULTIPLY) {
+                    ttype = TrashConst.LEXER.Multiply;
+                } else if (token_san === TrashConst.SYMBOLS.DIVIDE) {
+                    ttype = TrashConst.LEXER.Divide;
+                } else if (token_san === TrashConst.SYMBOLS.MODULO) {
+                    ttype = TrashConst.LEXER.Modulo;
+                } else if (token_san === TrashConst.SYMBOLS.POW) {
+                    ttype = TrashConst.LEXER.Pow;
                 }
-            });
-            // Console.log("TINFO: ", tokens_info);
-            return tokens_info;
+            } else if (token_san === TrashConst.SYMBOLS.CONCAT) {
+                ttype = TrashConst.LEXER.Concat;
+            }
+
+            if (
+                ttype === TrashConst.LEXER.String ||
+                ttype === TrashConst.LEXER.StringSimple
+            ) {
+                token_san = this._trimQuotes(token_san);
+            }
+            return [ttype, token_san, token];
+        },
+
+        _prioritizer: function (tokens) {
+            tokens = _.reject(
+                tokens,
+                (item) => item[0] === TrashConst.LEXER.Space
+            );
+            if (tokens.length < 4) {
+                return tokens;
+            }
+            for (const tok_prio of TrashConst.MATH_OPER_PRIORITIES) {
+                const ntokens = [];
+                const tokens_len = tokens.length;
+                for (
+                    let token_index = 0;
+                    token_index < tokens_len;
+                    ++token_index
+                ) {
+                    const [, token_val, token_raw] = tokens[token_index];
+                    if (token_val === tok_prio) {
+                        const prev_tok = ntokens.pop() || [];
+                        const next_tok = tokens[++token_index] || [];
+                        let fstr =
+                            prev_tok[0] === TrashConst.LEXER.Math
+                                ? `(${prev_tok[2]})`
+                                : `${prev_tok[2]}`;
+                        fstr += token_val;
+                        fstr +=
+                            next_tok[0] === TrashConst.LEXER.Math
+                                ? `(${next_tok[2]})`
+                                : `${next_tok[2]}`;
+                        ntokens.push([
+                            TrashConst.LEXER.Math,
+                            fstr,
+                            `${prev_tok[2]}${token_raw}${next_tok[2]}`,
+                        ]);
+                    } else {
+                        ntokens.push(tokens[token_index]);
+                    }
+                }
+                tokens = ntokens;
+            }
+            return tokens;
         },
 
         /**
@@ -497,7 +487,7 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     values: [[]],
                     arguments: [[]],
                 },
-                inputTokens: [this.lex(data, options)],
+                inputTokens: [this.tokenize(data, options)],
             };
 
             const pushParseData = (parse_data) => {
@@ -539,11 +529,10 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                 inputTokens: [],
             };
             let last_token_index = -1;
+            let token_subindex = 0;
             for (let index = 0; index < tokens_len; ++index) {
                 const token = res.inputTokens[0][index];
-                const token_next = res.inputTokens[0][index + 1];
-                let ignore_instr_eoi =
-                    token_next?.type !== TrashConst.LEXER.Space;
+                let ignore_instr_eoi = false;
                 const to_append = {
                     instructions: [],
                     names: [],
@@ -566,29 +555,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                             );
                         }
                         break;
-                    case TrashConst.LEXER.Command:
-                        {
-                            to_append.names.push(token.value);
-                            const dindex = res.stack.names[0].length;
-                            to_append.instructions.push(
-                                new Instruction(
-                                    TrashConst.PARSER.LOAD_GLOBAL,
-                                    index,
-                                    level,
-                                    dindex
-                                )
-                            );
-                            to_append_eoc.instructions.push(
-                                new Instruction(
-                                    options?.silent
-                                        ? TrashConst.PARSER.CALL_FUNCTION_SILENT
-                                        : TrashConst.PARSER.CALL_FUNCTION,
-                                    -1,
-                                    level
-                                )
-                            );
-                        }
-                        break;
                     case TrashConst.LEXER.ArgumentLong:
                     case TrashConst.LEXER.ArgumentShort:
                         {
@@ -604,10 +570,66 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                             );
                         }
                         break;
+                    case TrashConst.LEXER.Concat:
+                        ignore_instr_eoi = true;
+                        to_append_eoi.instructions.push(
+                            new Instruction(
+                                TrashConst.PARSER.CONCAT,
+                                index,
+                                level
+                            )
+                        );
+                        break;
                     case TrashConst.LEXER.Add:
                         ignore_instr_eoi = true;
                         to_append_eoi.instructions.push(
                             new Instruction(TrashConst.PARSER.ADD, index, level)
+                        );
+                        break;
+                    case TrashConst.LEXER.Substract:
+                        ignore_instr_eoi = true;
+                        to_append_eoi.instructions.push(
+                            new Instruction(
+                                TrashConst.PARSER.SUBSTRACT,
+                                index,
+                                level
+                            )
+                        );
+                        break;
+                    case TrashConst.LEXER.Multiply:
+                        ignore_instr_eoi = true;
+                        to_append_eoi.instructions.push(
+                            new Instruction(
+                                TrashConst.PARSER.MULTIPLY,
+                                index,
+                                level
+                            )
+                        );
+                        break;
+                    case TrashConst.LEXER.Divide:
+                        ignore_instr_eoi = true;
+                        to_append_eoi.instructions.push(
+                            new Instruction(
+                                TrashConst.PARSER.DIVIDE,
+                                index,
+                                level
+                            )
+                        );
+                        break;
+                    case TrashConst.LEXER.Modulo:
+                        ignore_instr_eoi = true;
+                        to_append_eoi.instructions.push(
+                            new Instruction(
+                                TrashConst.PARSER.MODULO,
+                                index,
+                                level
+                            )
+                        );
+                        break;
+                    case TrashConst.LEXER.Pow:
+                        ignore_instr_eoi = true;
+                        to_append_eoi.instructions.push(
+                            new Instruction(TrashConst.PARSER.POW, index, level)
                         );
                         break;
                     case TrashConst.LEXER.Number:
@@ -643,16 +665,51 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     case TrashConst.LEXER.String:
                     case TrashConst.LEXER.StringSimple:
                         {
-                            to_append.values.push(token.value);
-                            const dindex = res.stack.values[0].length;
-                            to_append.instructions.push(
-                                new Instruction(
-                                    TrashConst.PARSER.LOAD_CONST,
-                                    index,
-                                    level,
-                                    dindex
-                                )
-                            );
+                            const token_raw_san = token.raw.trim();
+                            if (
+                                token_subindex === 0 &&
+                                token_raw_san[0] !==
+                                    TrashConst.SYMBOLS.STRING &&
+                                token_raw_san[0] !==
+                                    TrashConst.SYMBOLS.STRING_SIMPLE
+                            ) {
+                                const can_name = this.getCanonicalCommandName(
+                                    token.value,
+                                    options.registeredCmds
+                                );
+                                const command_name = can_name || token.value;
+                                to_append.names.push(command_name);
+                                const dindex = res.stack.names[0].length;
+                                to_append.instructions.push(
+                                    new Instruction(
+                                        TrashConst.PARSER.LOAD_GLOBAL,
+                                        index,
+                                        level,
+                                        dindex
+                                    )
+                                );
+                                to_append_eoc.instructions.push(
+                                    new Instruction(
+                                        options?.silent
+                                            ? TrashConst.PARSER
+                                                  .CALL_FUNCTION_SILENT
+                                            : TrashConst.PARSER.CALL_FUNCTION,
+                                        -1,
+                                        level
+                                    )
+                                );
+                            } else {
+                                to_append.values.push(token.value);
+                                const dindex = res.stack.values[0].length;
+                                to_append.instructions.push(
+                                    new Instruction(
+                                        TrashConst.PARSER.LOAD_CONST,
+                                        index,
+                                        level,
+                                        dindex
+                                    )
+                                );
+                            }
                         }
                         break;
                     case TrashConst.LEXER.Array:
@@ -663,7 +720,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                                     needResetStores: false,
                                     registeredCmds: options.registeredCmds,
                                     silent: true,
-                                    ignoreCommandMode: true,
                                 },
                                 ++mlevel
                             );
@@ -694,7 +750,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                                     needResetStores: false,
                                     registeredCmds: options.registeredCmds,
                                     silent: true,
-                                    ignoreCommandMode: true,
                                 },
                                 ++mlevel
                             );
@@ -780,7 +835,6 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                                 needResetStores: false,
                                 registeredCmds: options.registeredCmds,
                                 silent: true,
-                                ignoreCommandMode: true,
                             },
                             ++mlevel
                         );
@@ -827,24 +881,33 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
                     case TrashConst.LEXER.Space:
                         ignore_instr_eoi = true;
                         break;
+                    case TrashConst.LEXER.Delimiter:
+                        token_subindex = -1;
+                        break;
                     case TrashConst.LEXER.Math:
-                        to_append.values.push(token.value);
-                        const dindex = res.stack.values[0].length;
-                        to_append.instructions.push(
-                            new Instruction(
-                                TrashConst.PARSER.LOAD_MATH,
-                                index,
-                                level,
-                                dindex
-                            )
+                        const parsed_math = this.parse(
+                            token.value,
+                            {
+                                needResetStores: false,
+                                registeredCmds: options.registeredCmds,
+                                silent: true,
+                                math: true,
+                            },
+                            ++mlevel
                         );
+                        res.stack.values.push(...parsed_math.stack.values);
+                        res.stack.names.push(...parsed_math.stack.names);
+                        to_append.inputTokens.push(...parsed_math.inputTokens);
+                        to_append.instructions.push(
+                            ...parsed_math.stack.instructions
+                        );
+                        mlevel = parsed_math.maxULevel;
                         break;
                 }
 
                 pushParseData(to_append);
                 if (index === tokens_len - 1 || !ignore_instr_eoi) {
                     pushParseData(to_append_eoi);
-                    ignore_instr_eoi = false;
                 }
                 if (
                     index === tokens_len - 1 ||
@@ -855,10 +918,11 @@ odoo.define("terminal.core.TraSH.interpreter", function (require) {
 
                 if (token.type !== TrashConst.LEXER.Space) {
                     last_token_index = index;
+                    ++token_subindex;
                 }
             }
 
-            if (!options?.ignoreCommandMode || options?.forceReturn) {
+            if (!options?.math) {
                 res.stack.instructions.push(
                     new Instruction(TrashConst.PARSER.RETURN_VALUE, -1, blevel)
                 );

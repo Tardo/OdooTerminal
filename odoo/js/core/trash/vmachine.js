@@ -1,13 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-odoo.define("terminal.core.TraSH.vmachine", function (require) {
+odoo.define("terminal.core.trash.vmachine", function (require) {
     "use strict";
 
-    const MParser = require("terminal.external.mparser");
     const TrashConst = require("terminal.core.trash.const");
-    const Interpreter = require("terminal.core.TraSH.interpreter");
-    const TemplateManager = require("terminal.core.TemplateManager");
+    const Interpreter = require("terminal.core.trash.interpreter");
+    const Exceptions = require("terminal.core.trash.exception");
     const Class = require("web.Class");
 
     // Const Block = Class.extend({
@@ -50,7 +49,12 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                 if (cmd_def) {
                     const items_len = frame.values.length;
                     if (frame.args.length > items_len) {
-                        return reject(`Invalid arguments!`);
+                        return reject(
+                            new Exceptions.InvalidCommandArgumentsError(
+                                frame.cmd,
+                                frame.args
+                            )
+                        );
                     }
                     let kwargs = {};
                     const values = frame.values;
@@ -60,7 +64,10 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                             const arg_def = cmd_def.args[index];
                             if (!arg_def) {
                                 return reject(
-                                    `Unexpected '${values[index]}' value!`
+                                    new Exceptions.InvalidCommandArgumentValueError(
+                                        frame.cmd,
+                                        values[index]
+                                    )
                                 );
                             }
                             arg_name = arg_def[1][1];
@@ -86,7 +93,12 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                             )
                         );
                     } catch (err) {
-                        return reject(err);
+                        return reject(
+                            new Exceptions.InvalidCommandArgumentFormatError(
+                                err,
+                                frame.cmd
+                            )
+                        );
                     }
                 }
                 // Alias
@@ -98,40 +110,26 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
             });
         },
 
-        _checkGlobalName: function (global_name, token) {
-            if (
-                !Object.hasOwn(this._registeredCmds, global_name) &&
-                !this.getInterpreter().getAliasCommand(global_name)
-            ) {
-                // Search similar commands
-                const similar_cmd =
-                    this.getInterpreter().searchSimiliarCommand(global_name);
-                if (similar_cmd) {
-                    throw new Error(
-                        TemplateManager.render("UNKNOWN_COMMAND", {
-                            org_cmd: global_name,
-                            cmd: similar_cmd,
-                            pos: [token.start, token.end],
-                        })
-                    );
-                }
-                throw new Error(
-                    `Unknown command '${global_name}' at ${token.start}:${token.end}`
-                );
-            }
+        _checkGlobalName: function (global_name) {
+            return (
+                Object.hasOwn(this._registeredCmds, global_name) ||
+                this.getInterpreter().getAliasCommand(global_name)
+            );
         },
 
         eval: function (cmd_raw, options) {
             if (cmd_raw.constructor !== String) {
                 return Promise.reject("Invalid input!");
             }
+            options = _.defaults(options, {
+                needResetStores: true,
+            });
             return new Promise(async (resolve, reject) => {
                 const parse_info = this.interpreter.parse(cmd_raw, {
                     registeredCmds: this._registeredCmds,
                     registeredNames: this._registeredNames,
-                    needResetStores: true,
+                    needResetStores: options?.needResetStores,
                     ignoreCommandMode: options?.ignoreCommandMode,
-                    forceReturn: options?.forceReturn,
                 });
                 const stack = parse_info.stack;
                 const stack_instr_len = stack.instructions.length;
@@ -151,36 +149,40 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                     switch (instr.type) {
                         case TrashConst.PARSER.LOAD_NAME:
                             {
-                                const cmd_name =
+                                const var_name =
                                     stack.names[instr.level][instr.dataIndex];
 
                                 // Check stores
                                 const frame = last_frame || root_frame;
                                 if (
                                     last_frame &&
-                                    Object.hasOwn(last_frame.store, cmd_name)
+                                    Object.hasOwn(last_frame.store, var_name)
                                 ) {
                                     frame.values.push(
-                                        last_frame.store[cmd_name]
+                                        last_frame.store[var_name]
                                     );
                                 } else if (
-                                    Object.hasOwn(root_frame.store, cmd_name)
+                                    Object.hasOwn(root_frame.store, var_name)
                                 ) {
                                     frame.values.push(
-                                        root_frame.store[cmd_name]
+                                        root_frame.store[var_name]
                                     );
                                 } else if (
                                     Object.hasOwn(
                                         this._registeredNames,
-                                        cmd_name
+                                        var_name
                                     )
                                 ) {
                                     frame.values.push(
-                                        this._registeredNames[cmd_name]
+                                        this._registeredNames[var_name]
                                     );
                                 } else {
                                     return reject(
-                                        `Unknown name '${cmd_name}' at ${token.start}:${token.end}`
+                                        new Exceptions.UnknownNameError(
+                                            var_name,
+                                            token.start,
+                                            token.end
+                                        )
                                     );
                                 }
                             }
@@ -189,44 +191,19 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                             {
                                 const cmd_name =
                                     stack.names[instr.level][instr.dataIndex];
-                                if (
-                                    Object.hasOwn(
-                                        this._registeredCmds,
-                                        cmd_name
-                                    ) ||
-                                    this.getInterpreter().getAliasCommand(
-                                        cmd_name
-                                    )
-                                ) {
+                                if (this._checkGlobalName(cmd_name)) {
                                     last_frame = new Frame(
                                         cmd_name,
                                         last_frame
                                     );
                                     frames.push(last_frame);
                                 } else {
-                                    // Search similar commands
-                                    const similar_cmd =
-                                        this.getInterpreter().searchSimiliarCommand(
-                                            cmd_name,
-                                            this._registeredCmds
-                                        );
-                                    if (similar_cmd) {
-                                        return reject(
-                                            TemplateManager.render(
-                                                "UNKNOWN_COMMAND",
-                                                {
-                                                    org_cmd: cmd_name,
-                                                    cmd: similar_cmd,
-                                                    pos: [
-                                                        token.start,
-                                                        token.end,
-                                                    ],
-                                                }
-                                            )
-                                        );
-                                    }
                                     return reject(
-                                        `Unknown command '${cmd_name}' at ${token.start}:${token.end}`
+                                        new Exceptions.UnknownCommandError(
+                                            cmd_name,
+                                            token.start,
+                                            token.end
+                                        )
                                     );
                                 }
                             }
@@ -247,7 +224,11 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                     ];
                                 if (!last_frame) {
                                     return reject(
-                                        `Argument '${arg}' not expected at ${token.start}:${token.end}`
+                                        new Exceptions.NotExpectedCommandArgumentError(
+                                            arg,
+                                            token.start,
+                                            token.end
+                                        )
                                     );
                                 }
                                 // Flag arguments can be implicit
@@ -263,45 +244,47 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                 last_frame.args.push(arg);
                             }
                             break;
-                        case TrashConst.PARSER.LOAD_MATH:
-                            const frame = last_frame || root_frame;
-                            const value =
-                                stack.values[instr.level][instr.dataIndex];
-                            try {
-                                frame.values.push(
-                                    await MParser.parse(value).evaluate(this)
-                                );
-                            } catch (err) {
-                                frame.values.push(NaN);
+                        case TrashConst.PARSER.CONCAT:
+                            {
+                                const frame = last_frame || root_frame;
+                                const valB = frame.values.pop();
+                                const valA = frame.values.pop();
+                                frame.values.push(`${valA}${valB}`);
                             }
                             break;
                         case TrashConst.PARSER.ADD:
+                        case TrashConst.PARSER.SUBSTRACT:
+                        case TrashConst.PARSER.MULTIPLY:
+                        case TrashConst.PARSER.DIVIDE:
+                        case TrashConst.PARSER.MODULO:
+                        case TrashConst.PARSER.POW:
                             {
-                                const allowed_types = [
-                                    TrashConst.PARSER.LOAD_CONST,
-                                    TrashConst.PARSER.LOAD_NAME,
-                                    TrashConst.PARSER.RETURN_VALUE,
-                                ];
                                 const frame = last_frame || root_frame;
-                                const prev_instr_a =
-                                    stack.instructions[index - 2];
-                                const prev_instr_b =
-                                    stack.instructions[index - 1];
-                                if (
-                                    prev_instr_a &&
-                                    allowed_types.indexOf(prev_instr_a.type) ===
-                                        -1 &&
-                                    prev_instr_b &&
-                                    allowed_types.indexOf(prev_instr_b.type) ===
-                                        -1
-                                ) {
-                                    return reject(
-                                        `Token '${token.value}' not expected at ${token.start}:${token.end}`
-                                    );
-                                }
                                 const valB = frame.values.pop();
                                 const valA = frame.values.pop();
-                                frame.values.push(valA + valB);
+                                if (instr.type === TrashConst.PARSER.ADD) {
+                                    frame.values.push(valA + valB);
+                                } else if (
+                                    instr.type === TrashConst.PARSER.SUBSTRACT
+                                ) {
+                                    frame.values.push(valA - valB);
+                                } else if (
+                                    instr.type === TrashConst.PARSER.MULTIPLY
+                                ) {
+                                    frame.values.push(valA * valB);
+                                } else if (
+                                    instr.type === TrashConst.PARSER.DIVIDE
+                                ) {
+                                    frame.values.push(valA / valB);
+                                } else if (
+                                    instr.type === TrashConst.PARSER.MODULO
+                                ) {
+                                    frame.values.push(valA % valB);
+                                } else if (
+                                    instr.type === TrashConst.PARSER.POW
+                                ) {
+                                    frame.values.push(Math.pow(valA, valB));
+                                }
                             }
                             break;
                         case TrashConst.PARSER.CALL_FUNCTION_SILENT:
@@ -325,7 +308,9 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                         root_frame.values.push(ret);
                                     }
                                 } catch (err) {
-                                    return reject(err);
+                                    return reject(
+                                        new Exceptions.CallFunctionError(err)
+                                    );
                                 }
                             }
                             break;
@@ -343,10 +328,16 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                 const vvalue = frame.values.pop();
                                 if (!vname) {
                                     if (!token) {
-                                        return reject("Invalid instruction!");
+                                        return reject(
+                                            new Exceptions.InvalidInstructionError()
+                                        );
                                     }
                                     return reject(
-                                        `Invalid name '${token.value}' at ${token.start}:${token.end}`
+                                        new Exceptions.InvalidNameError(
+                                            token.value,
+                                            token.start,
+                                            token.end
+                                        )
                                     );
                                 } else if (typeof vvalue === "undefined") {
                                     const value_instr =
@@ -356,7 +347,11 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                             value_instr.inputTokenIndex
                                         ] || {};
                                     return reject(
-                                        `Invalid token '${value_token.value}' at ${value_token.start}:${value_token.end}`
+                                        new Exceptions.InvalidTokenError(
+                                            value_token.value,
+                                            value_token.start,
+                                            value_token.end
+                                        )
                                     );
                                 }
                                 frame.store[vname] = vvalue;
@@ -374,7 +369,11 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                     data[attr_name] = attr_value;
                                     frame.store[vname] = data;
                                 } catch (err) {
-                                    return reject(err);
+                                    return reject(
+                                        new Exceptions.InvalidInstructionError(
+                                            err
+                                        )
+                                    );
                                 }
                             }
                             break;
@@ -386,7 +385,9 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                 const value = frame.values[index_value];
                                 if (typeof value === "undefined") {
                                     return reject(
-                                        `Cannot read properties of undefined (reading '${attr_name}')`
+                                        new Exceptions.UndefinedValueError(
+                                            attr_name
+                                        )
                                     );
                                 }
                                 let res_value = value[attr_name];
@@ -415,7 +416,12 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                                 const frame = last_frame || root_frame;
                                 const iter_count = _.countBy(
                                     stack.instructions,
-                                    {level: instr.dataIndex}
+                                    (item) => {
+                                        return (
+                                            item.level === instr.dataIndex &&
+                                            item.dataIndex !== -1
+                                        );
+                                    }
                                 ).true;
                                 const value = [];
                                 for (let i = 0; i < iter_count; ++i) {
@@ -428,8 +434,11 @@ odoo.define("terminal.core.TraSH.vmachine", function (require) {
                             {
                                 const frame = last_frame || root_frame;
                                 const iter_count =
-                                    _.countBy(stack.instructions, {
-                                        level: instr.dataIndex,
+                                    _.countBy(stack.instructions, (item) => {
+                                        return (
+                                            item.level === instr.dataIndex &&
+                                            item.dataIndex !== -1
+                                        );
                                     }).true / 2;
                                 const value = {};
                                 for (let i = 0; i < iter_count; ++i) {

@@ -103,7 +103,7 @@ $record['name'] = 'Willy Wonka'
 $record['city'] = 'O Courel'
 commit $record
 
-$new_rec = $(create res.partner {name 'The test'})
+$new_rec = $(create res.partner {name: 'The test'})
 print $new_rec
 ```
 
@@ -137,8 +137,12 @@ Massive operations are possible using the command `repeat`. Print to screen is a
 expensive task, consider use the `--silent` argument to increase the
 performance.
 
-Example:
-`repeat -t 5000 -c "create -m res.partner -v {name: $(gen str 12 8) + ' (Test)'}" --silent`
+Examples:
+
+- Create 5000 res.partner:
+  `repeat -t 5000 -c "create -m res.partner -v {name: $(gen str 12 8) + ' (Test)'}" --silent`
+- Cancel all sale.order:
+  `$orders = $(search sale.order); repeat $orders['length'] "call sale.order action_cancel [$orders[$(gen intiter)]['id']]"`
 
 #### + Math operations
 
@@ -147,8 +151,9 @@ The way to do math operations is pretty similar to 'shell script' syntax:
 
 Examples:
 
-- `print $((3*2))`
-- `$prod = $(read product.product 3 -f lst_price); $prod['lst_price'] = $((5*$prod['lst_price'])); commit $prod;`
+- Print 3*2 result: `print $((3*2))`
+- Modify the lst_price of the 3,product.product:
+  `$prod = $(read product.product 3 -f lst_price); $prod['lst_price'] = $((5*$prod['lst_price'])); commit $prod;`
 
 ---
 

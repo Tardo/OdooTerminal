@@ -8,7 +8,6 @@ odoo.define("terminal.functions.Core", function (require) {
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
     const TrashConst = require("terminal.core.trash.const");
-    const ParameterGenerator = require("terminal.core.ParameterGenerator");
     const TemplateManager = require("terminal.core.TemplateManager");
     const Recordset = require("terminal.core.recordset");
     const time = require("web.time");
@@ -402,7 +401,8 @@ odoo.define("terminal.functions.Core", function (require) {
         },
 
         _cmdGen: function (kwargs) {
-            const parameterGenerator = new ParameterGenerator();
+            const parameterGenerator =
+                this._virtMachine.getInterpreter()._parameterGenerator;
             const type = kwargs.type.toLowerCase();
             let result = false;
             if (type === "email") {
@@ -758,7 +758,10 @@ odoo.define("terminal.functions.Core", function (require) {
                         return resolve(res);
                     }
                     return this._virtMachine
-                        .eval(kwargs.cmd, {silent: kwargs.silent})
+                        .eval(kwargs.cmd, {
+                            silent: kwargs.silent,
+                            needResetStores: false,
+                        })
                         .then((result) => res.push(result))
                         .finally(() => do_repeat(rtimes - 1));
                 };
