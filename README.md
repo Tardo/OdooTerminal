@@ -142,7 +142,7 @@ Examples:
 - Create 5000 res.partner:
   `repeat -t 5000 -c "create -m res.partner -v {name: $(gen str 12 8) + ' (Test)'}" --silent`
 - Cancel all sale.order:
-  `$orders = $(search sale.order); repeat $orders['length'] "call sale.order action_cancel [$orders[$(gen intiter)]['id']]"`
+  `$orders = $(search sale.order); repeat -t $orders['length'] -c "call sale.order action_cancel [$orders[$(gen intiter)]['id']]"`
 
 #### + Math operations
 
@@ -159,10 +159,10 @@ Examples:
 
 # Extension Permissions
 
-| Permission | Reason                                                                      |
-| ---------- | --------------------------------------------------------------------------- |
-| activeTab  | Enables support to get information about browser tabs                       |
-| storage    | Enables support to manage stored data in the browser (used for preferences) |
+| Permission | Description                                           | Reason                    |
+| ---------- | ----------------------------------------------------- | ------------------------- |
+| activeTab  | Enables support to get information about browser tabs | Used to detect Odoo pages |
+| storage    | Enables support to manage stored data in the browser  | Used for preferences      |
 
 ---
 

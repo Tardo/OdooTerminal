@@ -26,4 +26,4 @@ services:
       POSTGRES_USER: *dbuser
       POSTGRES_PASSWORD: *dbpass
       CONF_EXTRA: |
-        work_mem = 64MB
+        work_mem = 8MB

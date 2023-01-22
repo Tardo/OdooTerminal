@@ -1,9 +1,6 @@
 # Copyright  Alexandre Díaz <dev@redneboa.es>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-import os
-import os.path
 import time
-import pathlib
 import urllib.parse
 import pytest
 from python_on_whales import DockerClient

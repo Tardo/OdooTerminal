@@ -192,7 +192,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     ],
                 ],
                 example:
-                    "-t 20 -c \"create res.partner {name: 'Example Partner #$INTITER'}\"",
+                    "-t 20 -c \"create res.partner {name: 'Example Partner #'+$(gen intiter)}\"",
             });
             this.registerCommand("jobs", {
                 definition: "Display running jobs",

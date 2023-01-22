@@ -1,5 +1,12 @@
 # Changelog
 
+**9.2.0**
+
+```
+IMP: TraSH: Native math, parser and vmachine
+IMP: Terminal: History navigation
+```
+
 **9.1.1**
 
 ```

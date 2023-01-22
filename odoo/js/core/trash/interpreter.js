@@ -131,6 +131,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
 
         /**
          * Split the input data into usable tokens
+         * FIXME: This is getting a lot of complexity... need be refactored!
          * @param {String} data
          * @returns {Array}
          */
@@ -470,6 +471,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
         /**
          * Create the execution stack
          * FIXME: maybe RL?
+         * FIXME: This is getting a lot of complexity... need be refactored!
          * @param {String} data
          * @param {Boolean} need_reset_stores
          * @returns {Object}
