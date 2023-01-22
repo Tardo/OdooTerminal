@@ -129,7 +129,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                     registeredCmds: this._registeredCmds,
                     registeredNames: this._registeredNames,
                     needResetStores: options?.needResetStores,
-                    ignoreCommandMode: options?.ignoreCommandMode,
+                    isData: options?.isData,
                 });
                 const stack = parse_info.stack;
                 const stack_instr_len = stack.instructions.length;
@@ -383,6 +383,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 const attr_name = frame.values.pop();
                                 const index_value = frame.values.length - 1;
                                 const value = frame.values[index_value];
+
                                 if (typeof value === "undefined") {
                                     return reject(
                                         new Exceptions.UndefinedValueError(

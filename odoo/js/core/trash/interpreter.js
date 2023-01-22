@@ -213,12 +213,10 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 char === TrashConst.SYMBOLS.EOL ||
                                 char === TrashConst.SYMBOLS.VARIABLE ||
                                 char === TrashConst.SYMBOLS.ASSIGNMENT ||
-                                char === TrashConst.SYMBOLS.ADD ||
                                 char === TrashConst.SYMBOLS.CONCAT ||
                                 prev_char === TrashConst.SYMBOLS.EOC ||
                                 prev_char === TrashConst.SYMBOLS.EOL ||
                                 prev_char === TrashConst.SYMBOLS.ASSIGNMENT ||
-                                prev_char === TrashConst.SYMBOLS.ADD ||
                                 prev_char === TrashConst.SYMBOLS.CONCAT
                             ) {
                                 do_cut = true;
@@ -231,11 +229,13 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 do_cut = true;
                             } else if (
                                 options?.math &&
-                                (char === TrashConst.SYMBOLS.SUBSTRACT ||
+                                (char === TrashConst.SYMBOLS.ADD ||
+                                    char === TrashConst.SYMBOLS.SUBSTRACT ||
                                     char === TrashConst.SYMBOLS.MULTIPLY ||
                                     char === TrashConst.SYMBOLS.DIVIDE ||
                                     char === TrashConst.SYMBOLS.MODULO ||
                                     char === TrashConst.SYMBOLS.POW ||
+                                    prev_char === TrashConst.SYMBOLS.ADD ||
                                     prev_char ===
                                         TrashConst.SYMBOLS.SUBSTRACT ||
                                     prev_char === TrashConst.SYMBOLS.MULTIPLY ||
@@ -543,6 +543,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                 switch (token.type) {
                     case TrashConst.LEXER.Variable:
                         {
+                            ignore_instr_eoi = true;
                             to_append.names.push(token.value);
                             const dindex = res.stack.names[0].length;
                             to_append.instructions.push(
@@ -667,6 +668,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         {
                             const token_raw_san = token.raw.trim();
                             if (
+                                !options?.isData &&
                                 token_subindex === 0 &&
                                 token_raw_san[0] !==
                                     TrashConst.SYMBOLS.STRING &&
@@ -720,6 +722,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                     needResetStores: false,
                                     registeredCmds: options.registeredCmds,
                                     silent: true,
+                                    isData: true,
                                 },
                                 ++mlevel
                             );
@@ -750,6 +753,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                     needResetStores: false,
                                     registeredCmds: options.registeredCmds,
                                     silent: true,
+                                    isData: true,
                                 },
                                 ++mlevel
                             );
@@ -835,6 +839,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 needResetStores: false,
                                 registeredCmds: options.registeredCmds,
                                 silent: true,
+                                isData: true,
                             },
                             ++mlevel
                         );
@@ -922,7 +927,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                 }
             }
 
-            if (!options?.math) {
+            if (!options?.math && level === 0) {
                 res.stack.instructions.push(
                     new Instruction(TrashConst.PARSER.RETURN_VALUE, -1, blevel)
                 );
