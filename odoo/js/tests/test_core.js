@@ -71,7 +71,7 @@ odoo.define("terminal.tests.core", function (require) {
 
         test_load: async function () {
             const res = await this.terminal.execute(
-                "load -u https://cdnjs.cloudflare.com/ajax/libs/Mock.js/1.0.0/mock-min.js",
+                "load -u 'https://cdnjs.cloudflare.com/ajax/libs/Mock.js/1.0.0/mock-min.js'",
                 false,
                 true
             );
@@ -141,8 +141,8 @@ odoo.define("terminal.tests.core", function (require) {
                 false,
                 true
             );
-            this.assertTrue(Object.hasOwn(window, res[1]));
-            this.assertEqual(window[res[1]], "This is a test");
+            this.assertTrue(Object.hasOwn(window, res));
+            this.assertEqual(window[res], "This is a test");
         },
 
         test_chrono: async function () {
@@ -205,7 +205,7 @@ odoo.define("terminal.tests.core", function (require) {
                 false,
                 true
             );
-            this.assertEqual(res, 15);
+            this.assertEqual(res, 5);
             res = await this.terminal.execute(
                 "gen -t date -mi 500000000 -ma 500000000",
                 false,
