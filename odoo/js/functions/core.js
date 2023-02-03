@@ -68,7 +68,7 @@ odoo.define("terminal.functions.Core", function (require) {
                         "The URL of the asset",
                     ],
                 ],
-                example: "-u https://example.com/libs/term_extra.js",
+                example: "-u 'https://example.com/libs/term_extra.js'",
             });
             this.registerCommand("context_term", {
                 definition: "Operations over terminal context dictionary",

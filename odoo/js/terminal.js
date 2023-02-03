@@ -495,55 +495,46 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         _doSearchPrevHistory: function () {
-            if (this._searchCommandQuery) {
-                const orig_iter = this._searchHistoryIter;
-                this._searchHistoryIter = _.findLastIndex(
-                    this._inputHistory,
-                    (item, i) => {
+            const orig_iter = this._searchHistoryIter;
+            const last_str = this._inputHistory[this._searchHistoryIter];
+            this._searchHistoryIter = _.findLastIndex(
+                this._inputHistory,
+                (item, i) => {
+                    if (this._searchCommandQuery) {
                         return (
+                            item !== last_str &&
                             item.indexOf(this._searchCommandQuery) === 0 &&
-                            i <= this._searchHistoryIter - 1
+                            i < this._searchHistoryIter
                         );
                     }
-                );
-                if (this._searchHistoryIter === -1) {
-                    this._searchHistoryIter = orig_iter;
-                    return false;
+                    return item !== last_str && i < this._searchHistoryIter;
                 }
-                return this._inputHistory[this._searchHistoryIter];
-            }
-            --this._searchHistoryIter;
-            if (this._searchHistoryIter < 0) {
-                this._searchHistoryIter = 0;
-            } else if (this._searchHistoryIter >= this._inputHistory.length) {
-                this._searchHistoryIter = this._inputHistory.length - 1;
+            );
+            if (this._searchHistoryIter === -1) {
+                this._searchHistoryIter = orig_iter;
+                return false;
             }
             return this._inputHistory[this._searchHistoryIter];
         },
 
         _doSearchNextHistory: function () {
-            if (this._searchCommandQuery) {
-                this._searchHistoryIter = _.findIndex(
-                    this._inputHistory,
-                    (item, i) => {
+            const last_str = this._inputHistory[this._searchHistoryIter];
+            this._searchHistoryIter = _.findIndex(
+                this._inputHistory,
+                (item, i) => {
+                    if (this._searchCommandQuery) {
                         return (
+                            item !== last_str &&
                             item.indexOf(this._searchCommandQuery) === 0 &&
-                            i >= this._searchHistoryIter + 1
+                            i > this._searchHistoryIter
                         );
                     }
-                );
-                if (this._searchHistoryIter === -1) {
-                    this._searchHistoryIter = this._inputHistory.length;
-                    return false;
+                    return item !== last_str && i > this._searchHistoryIter;
                 }
-                return this._inputHistory[this._searchHistoryIter];
-            }
-            ++this._searchHistoryIter;
-            if (this._searchHistoryIter >= this._inputHistory.length) {
-                this._searchCommandQuery = undefined;
+            );
+            if (this._searchHistoryIter === -1) {
+                this._searchHistoryIter = this._inputHistory.length;
                 return false;
-            } else if (this._searchHistoryIter < 0) {
-                this._searchHistoryIter = 0;
             }
             return this._inputHistory[this._searchHistoryIter];
         },
@@ -883,6 +874,7 @@ odoo.define("terminal.Terminal", function (require) {
                     if (user_input) {
                         const found_hist = this._doSearchPrevHistory();
                         this.screen.updateShadowInput(found_hist || "");
+                        this._searchHistoryIter = this._inputHistory.length;
                     } else {
                         this.screen.cleanShadowInput();
                     }
