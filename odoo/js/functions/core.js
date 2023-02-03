@@ -305,7 +305,7 @@ odoo.define("terminal.functions.Core", function (require) {
             this.registerCommand("genfile", {
                 definition: "Generate a File object",
                 callback: this._cmdGenFile,
-                detail: "Open a browser file dialog and instanciates a File object with the content of the file selected",
+                detail: "Open a browser file dialog and instanciates a File object with the content of the selected file",
                 args: [
                     [
                         TrashConst.ARG.String,

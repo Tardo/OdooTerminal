@@ -16,7 +16,11 @@ odoo.define("terminal.core.compat.16.Common", function (require) {
          * @override
          */
         _busServ: function (method, ...params) {
-            return this._parent.env.services.bus_service[method](...params);
+            const bus_serv = this._parent.env.services.bus_service;
+            if (!bus_serv) {
+                throw new Error("bus service not loaded");
+            }
+            return bus_serv[method](...params);
         },
 
         /**

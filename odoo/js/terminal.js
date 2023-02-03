@@ -84,6 +84,10 @@ odoo.define("terminal.Terminal", function (require) {
                 this._longpolling = new Longpolling(this);
             } catch (err) {
                 // This happens if 'bus' module is not installed
+                console.warn(
+                    "[OdooTerminal] Can't initilize longpolling: ",
+                    err
+                );
                 this._longpolling = false;
             }
             this.screen = new Screen({
