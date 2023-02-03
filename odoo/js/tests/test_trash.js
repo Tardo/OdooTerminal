@@ -9,14 +9,16 @@ odoo.define("terminal.tests.TraSH", function (require) {
     TerminalTestSuite.include({
         test_trash: async function () {
             // Array
-            let results = await this.terminal._virtMachine.eval("[1,2, 3,4]");
+            let results = await this.terminal._virtMachine.eval(
+                "[1,    2    , 3,     4     ]"
+            );
             this.assertEqual(results[0][2], 3);
             results = await this.terminal._virtMachine.eval(
-                "['test', 'this','lalala lo,lolo']"
+                "[  'test', 'this','lalala lo,lolo']"
             );
             this.assertEqual(results[0][2], "lalala lo,lolo");
             results = await this.terminal._virtMachine.eval(
-                "[[1,2, 3,4], ['test', 'this','lalala lo,lolo', [12,3,[123,'oops', {key: 'the value'}]]]]"
+                "[[ 1, 2, 3 ,4], ['test', 'this','lalala lo,  lolo', [12,   3,    [123   ,'oops'   , {   key: 'the value'}]]]]"
             );
             this.assertEqual(results[0][1][3][2][2].key, "the value");
 
@@ -30,7 +32,7 @@ odoo.define("terminal.tests.TraSH", function (require) {
             );
             this.assertEqual(results[0].keyB, 55);
             results = await this.terminal._virtMachine.eval(
-                "{keyA: 1234, keyB: 'the value', keyC: 'the, value', keyD: {keyA: 23, keyB: [2,33,4], keyC: {keyA: 'the, value'}}}"
+                "{keyA: 1234, keyB: 'the value', keyC: 'the, value', keyD: {keyA: 23, keyB: [2,33,4], keyC: {keyA   :   'the, value'}}}"
             );
             this.assertEqual(results[0].keyD.keyC.keyA, "the, value");
 

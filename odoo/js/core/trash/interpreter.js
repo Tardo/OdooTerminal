@@ -222,6 +222,12 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             ) {
                                 do_cut = true;
                             } else if (
+                                char === TrashConst.SYMBOLS.ITEM_DELIMITER ||
+                                char === TrashConst.SYMBOLS.DICTIONARY_SEPARATOR
+                            ) {
+                                do_cut = true;
+                                do_skip = true;
+                            } else if (
                                 (prev_char !== TrashConst.SYMBOLS.SPACE &&
                                     char === TrashConst.SYMBOLS.SPACE) ||
                                 (prev_char === TrashConst.SYMBOLS.SPACE &&
@@ -245,12 +251,6 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                     prev_char === TrashConst.SYMBOLS.POW)
                             ) {
                                 do_cut = true;
-                            } else if (
-                                char === TrashConst.SYMBOLS.ITEM_DELIMITER ||
-                                char === TrashConst.SYMBOLS.DICTIONARY_SEPARATOR
-                            ) {
-                                do_cut = true;
-                                do_skip = true;
                             }
                         }
                     }
