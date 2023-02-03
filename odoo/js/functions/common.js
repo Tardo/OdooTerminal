@@ -1423,10 +1423,13 @@ odoo.define("terminal.functions.Common", function (require) {
                     const modue_infos = await this._searchModule(kwargs.module);
                     if (!_.isEmpty(modue_infos)) {
                         if (!kwargs.force) {
-                            const depends = await this.execute(
+                            let depends = await this.execute(
                                 `depends -m ${kwargs.module}`,
                                 false,
                                 true
+                            );
+                            depends = (depends || []).filter(
+                                (item) => item !== kwargs.module
                             );
                             if (!_.isEmpty(depends)) {
                                 this.screen.print(
