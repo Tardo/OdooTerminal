@@ -174,16 +174,14 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             char === TrashConst.SYMBOLS.ARRAY_END
                         ) {
                             --in_array;
-                        } else if (
-                            char === TrashConst.SYMBOLS.DICTIONARY_START
-                        ) {
+                        } else if (char === TrashConst.SYMBOLS.BLOCK_START) {
                             if (!in_data_type) {
                                 do_cut = true;
                             }
                             ++in_dict;
                         } else if (
                             in_dict &&
-                            char === TrashConst.SYMBOLS.DICTIONARY_END
+                            char === TrashConst.SYMBOLS.BLOCK_END
                         ) {
                             --in_dict;
                         } else if (
@@ -283,12 +281,14 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
             if (options?.math) {
                 tokens = this._prioritizer(tokens);
             }
+
             const tokens_info = [];
             const tokens_len = tokens.length;
-            let offset = 0;
+            let offset = options.offset || 0;
             for (let i = 0; i < tokens_len; ++i) {
                 const [token_type, token, raw] = tokens[i];
                 if (token_type === TrashConst.LEXER.Space) {
+                    offset += raw.length;
                     continue;
                 }
                 tokens_info.push({
@@ -309,6 +309,18 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
          * @param {Array} tokens
          */
         _lexer: function (token, prev_token, options) {
+            // FIXME: New level of ugly implementation here... but works :/
+            const isDict = (stoken) => {
+                const sepcount = _.countBy(stoken, (char) => char === ":").true;
+                const dtokens = this.tokenize(stoken, {isData: true});
+                let rstr = "";
+                for (const tok of dtokens) {
+                    rstr += tok.raw;
+                }
+                const rsepcount = _.countBy(rstr, (char) => char === ":").true;
+                return rsepcount !== sepcount;
+            };
+
             let token_san = token.trim();
             const token_san_lower = token_san.toLocaleLowerCase();
             let ttype = TrashConst.LEXER.String;
@@ -350,12 +362,16 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                     ttype = TrashConst.LEXER.Array;
                 }
             } else if (
-                token_san[0] === TrashConst.SYMBOLS.DICTIONARY_START &&
-                token_san.at(-1) === TrashConst.SYMBOLS.DICTIONARY_END
+                token_san[0] === TrashConst.SYMBOLS.BLOCK_START &&
+                token_san.at(-1) === TrashConst.SYMBOLS.BLOCK_END
             ) {
                 token_san = token_san.substr(1, token_san.length - 2);
                 token_san = token_san.trim();
-                ttype = TrashConst.LEXER.Dictionary;
+                if (isDict(token_san)) {
+                    ttype = TrashConst.LEXER.Dictionary;
+                } else {
+                    ttype = TrashConst.LEXER.Block;
+                }
             } else if (
                 options?.math &&
                 token_san[0] === TrashConst.SYMBOLS.MATH_BLOCK_START &&
@@ -396,8 +412,8 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
             } else if (!_.isNaN(Number(token_san))) {
                 ttype = TrashConst.LEXER.Number;
             } else if (
-                token_san_lower === TrashConst.SYMBOLS.TRUE ||
-                token_san_lower === TrashConst.SYMBOLS.FALSE
+                token_san_lower === TrashConst.KEYWORDS.TRUE ||
+                token_san_lower === TrashConst.KEYWORDS.FALSE
             ) {
                 ttype = TrashConst.LEXER.Boolean;
             } else if (options.math) {
@@ -727,6 +743,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                     registeredCmds: options.registeredCmds,
                                     silent: true,
                                     isData: true,
+                                    offset: token.start + 1,
                                 },
                                 ++mlevel
                             );
@@ -758,6 +775,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                     registeredCmds: options.registeredCmds,
                                     silent: true,
                                     isData: true,
+                                    offset: token.start + 1,
                                 },
                                 ++mlevel
                             );
@@ -844,6 +862,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 registeredCmds: options.registeredCmds,
                                 silent: true,
                                 isData: true,
+                                offset: token.start + 1,
                             },
                             ++mlevel
                         );
@@ -871,6 +890,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 needResetStores: false,
                                 registeredCmds: options.registeredCmds,
                                 silent: true,
+                                offset: token.start + 2,
                             },
                             ++mlevel
                         );
@@ -887,6 +907,42 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         );
                         mlevel = parsed_runner.maxULevel;
                         break;
+                    case TrashConst.LEXER.Block:
+                        const parsed_block = this.parse(
+                            token.value,
+                            {
+                                needResetStores: true,
+                                registeredCmds: options.registeredCmds,
+                                silent: false,
+                                offset: token.start + 1,
+                            },
+                            ++mlevel
+                        );
+                        res.stack.arguments.push(
+                            ...parsed_block.stack.arguments
+                        );
+                        res.stack.values.push(...parsed_block.stack.values);
+                        res.stack.names.push(...parsed_block.stack.names);
+                        to_append.inputTokens.push(...parsed_block.inputTokens);
+                        to_append.instructions.push(
+                            new Instruction(
+                                TrashConst.PARSER.PUSH_FRAME,
+                                index,
+                                level
+                            )
+                        );
+                        to_append.instructions.push(
+                            ...parsed_block.stack.instructions
+                        );
+                        to_append.instructions.push(
+                            new Instruction(
+                                TrashConst.PARSER.POP_FRAME,
+                                index,
+                                level
+                            )
+                        );
+                        mlevel = parsed_block.maxULevel;
+                        break;
                     case TrashConst.LEXER.Space:
                         ignore_instr_eoi = true;
                         break;
@@ -901,6 +957,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 registeredCmds: options.registeredCmds,
                                 silent: true,
                                 math: true,
+                                offset: token.start + 3,
                             },
                             ++mlevel
                         );

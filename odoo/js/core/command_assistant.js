@@ -81,8 +81,8 @@ odoo.define("terminal.core.CommandAssistant", function (require) {
             let sel_token_index = -1;
             let sel_cmd_index = -1;
             let sel_arg_index = -1;
-            const instr_count = stack.instructions.length - 1;
-            let end_i = instr_count;
+            let end_i = -1;
+            const instr_count = stack.instructions.length;
             // Found selected token and EOC/EOL
             for (let index = 0; index < instr_count; ++index) {
                 const instr = stack.instructions[index];
@@ -92,17 +92,11 @@ odoo.define("terminal.core.CommandAssistant", function (require) {
                 const token =
                     parse_info.inputTokens[instr.level][instr.inputTokenIndex];
                 if (!token) {
-                    if (
-                        sel_token_index !== -1 &&
-                        instr.type === TrashConst.PARSER.CALL_FUNCTION
-                    ) {
-                        end_i = index;
-                        break;
-                    }
                     continue;
                 }
-                if (caret_pos > token.start && caret_pos <= token.end) {
+                if (caret_pos >= token.start && caret_pos <= token.end) {
                     sel_token_index = instr.inputTokenIndex;
+                    end_i = index;
                 }
             }
             for (let cindex = end_i; cindex >= 0; --cindex) {

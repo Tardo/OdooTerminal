@@ -55,10 +55,10 @@ odoo.define("terminal.tests.TraSH", function (require) {
             results = await this.terminal._virtMachine.eval("$test");
             this.assertEqual(results[0].test, 12);
             await this.terminal._virtMachine.eval(
-                "$test['this'] = 'blablabla; and, bla'"
+                `$test['this'] = "blabla'bla; 'a'nd, bla"`
             );
             results = await this.terminal._virtMachine.eval("$test");
-            this.assertEqual(results[0].this, "blablabla; and, bla");
+            this.assertEqual(results[0].this, "blabla'bla; 'a'nd, bla");
 
             // Runners
             await this.terminal._virtMachine.eval(

@@ -27,6 +27,7 @@ odoo.define("terminal.core.trash.const", function () {
         Divide: 20,
         Modulo: 21,
         Pow: 22,
+        Block: 23,
     };
 
     const PARSER = {
@@ -49,6 +50,8 @@ odoo.define("terminal.core.trash.const", function () {
         DIVIDE: 17,
         MODULO: 18,
         POW: 19,
+        PUSH_FRAME: 20,
+        POP_FRAME: 21,
 
         getHumanType: function (type) {
             return Object.entries(this).find((item) => item[1] === type) || "";
@@ -90,8 +93,6 @@ odoo.define("terminal.core.trash.const", function () {
         ARGUMENT: "-",
         ARRAY_START: "[",
         ARRAY_END: "]",
-        DICTIONARY_START: "{",
-        DICTIONARY_END: "}",
         DICTIONARY_SEPARATOR: ":",
         ITEM_DELIMITER: ",",
         RUNNER_START: "(",
@@ -102,13 +103,18 @@ odoo.define("terminal.core.trash.const", function () {
         SPACE: " ",
         EOC: ";",
         EOL: "\n",
-        TRUE: "true",
-        FALSE: "false",
         ESCAPE: "\\",
         MATH_START: "(",
         MATH_END: ")",
         MATH_BLOCK_START: "(",
         MATH_BLOCK_END: ")",
+        BLOCK_START: "{",
+        BLOCK_END: "}",
+    };
+
+    const KEYWORDS = {
+        TRUE: "true",
+        FALSE: "false",
     };
 
     const MATH_OPER_PRIORITIES = [
@@ -160,6 +166,7 @@ odoo.define("terminal.core.trash.const", function () {
         PARSER: PARSER,
         ARG: ARG,
         SYMBOLS: SYMBOLS,
+        KEYWORDS: KEYWORDS,
         MATH_OPER_PRIORITIES: MATH_OPER_PRIORITIES,
         KEYMAP: KEYMAP,
     };

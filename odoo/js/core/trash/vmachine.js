@@ -450,6 +450,18 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 frame.values.push(value);
                             }
                             break;
+                        case TrashConst.PARSER.PUSH_FRAME:
+                            {
+                                last_frame = new Frame(undefined, last_frame);
+                                frames.push(last_frame);
+                            }
+                            break;
+                        case TrashConst.PARSER.POP_FRAME:
+                            {
+                                frames.pop();
+                                last_frame = frames.at(-1);
+                            }
+                            break;
                     }
                 }
                 return resolve(return_values);

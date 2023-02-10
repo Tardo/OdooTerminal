@@ -849,18 +849,19 @@ odoo.define("terminal.functions.Common", function (require) {
                     kwargs: {context: this._getContext()},
                 })
                 .then((result) => {
+                    let depend_names = [];
                     if (_.isEmpty(result)) {
                         this.screen.printError(
                             `The module '${kwargs.module}' isn't installed`
                         );
                     } else {
-                        const depend_names = result.warning.message
+                        depend_names = result.warning.message
                             .substr(result.warning.message.search("\n") + 1)
                             .split("\n");
                         this.screen.print(depend_names);
                         return depend_names;
                     }
-                    return result;
+                    return depend_names;
                 });
         },
 
@@ -1428,7 +1429,10 @@ odoo.define("terminal.functions.Common", function (require) {
                                 false,
                                 true
                             );
-                            depends = (depends || []).filter(
+                            if (_.isEmpty(depends)) {
+                                return resolve();
+                            }
+                            depends = depends.filter(
                                 (item) => item !== kwargs.module
                             );
                             if (!_.isEmpty(depends)) {
