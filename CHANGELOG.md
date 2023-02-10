@@ -4,7 +4,10 @@
 
 ```
 IMP: TraSH: Native math, parser and vmachine
+IMP: TraSH: Blocks
 IMP: Terminal: History navigation
+IMP: Terminal: Command Assistant
+IMP: Tests and minor changes
 ```
 
 **9.1.1**
