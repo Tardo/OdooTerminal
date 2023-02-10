@@ -8,7 +8,6 @@ odoo.define("terminal.functions.Core", function (require) {
     const Terminal = require("terminal.Terminal");
     const Utils = require("terminal.core.Utils");
     const TrashConst = require("terminal.core.trash.const");
-    const ParameterGenerator = require("terminal.core.ParameterGenerator");
     const TemplateManager = require("terminal.core.TemplateManager");
     const Recordset = require("terminal.core.recordset");
     const time = require("web.time");
@@ -69,7 +68,7 @@ odoo.define("terminal.functions.Core", function (require) {
                         "The URL of the asset",
                     ],
                 ],
-                example: "-u https://example.com/libs/term_extra.js",
+                example: "-u 'https://example.com/libs/term_extra.js'",
             });
             this.registerCommand("context_term", {
                 definition: "Operations over terminal context dictionary",
@@ -193,7 +192,7 @@ odoo.define("terminal.functions.Core", function (require) {
                     ],
                 ],
                 example:
-                    "-t 20 -c \"create res.partner {name: 'Example Partner #$INTITER'}\"",
+                    "-t 20 -c \"create res.partner {name: 'Example Partner #'+$(gen intiter)}\"",
             });
             this.registerCommand("jobs", {
                 definition: "Display running jobs",
@@ -306,7 +305,7 @@ odoo.define("terminal.functions.Core", function (require) {
             this.registerCommand("genfile", {
                 definition: "Generate a File object",
                 callback: this._cmdGenFile,
-                detail: "Open a browser file dialog and instanciates a File object with the content of the file selected",
+                detail: "Open a browser file dialog and instanciates a File object with the content of the selected file",
                 args: [
                     [
                         TrashConst.ARG.String,
@@ -402,7 +401,8 @@ odoo.define("terminal.functions.Core", function (require) {
         },
 
         _cmdGen: function (kwargs) {
-            const parameterGenerator = new ParameterGenerator();
+            const parameterGenerator =
+                this._virtMachine.getInterpreter()._parameterGenerator;
             const type = kwargs.type.toLowerCase();
             let result = false;
             if (type === "email") {
@@ -758,7 +758,10 @@ odoo.define("terminal.functions.Core", function (require) {
                         return resolve(res);
                     }
                     return this._virtMachine
-                        .eval(kwargs.cmd, {silent: kwargs.silent})
+                        .eval(kwargs.cmd, {
+                            silent: kwargs.silent,
+                            needResetStores: false,
+                        })
                         .then((result) => res.push(result))
                         .finally(() => do_repeat(rtimes - 1));
                 };

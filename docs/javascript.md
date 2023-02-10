@@ -27,7 +27,7 @@ Commands uses promises
       - String
       - Number
       - Dictionary
-      - Flag (Boolean)
+      - Flag
       - Any
       - List
 - aliases: Used to set deprecated names of the module

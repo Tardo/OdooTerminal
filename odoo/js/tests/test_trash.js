@@ -9,14 +9,16 @@ odoo.define("terminal.tests.TraSH", function (require) {
     TerminalTestSuite.include({
         test_trash: async function () {
             // Array
-            let results = await this.terminal._virtMachine.eval("[1,2, 3,4]");
+            let results = await this.terminal._virtMachine.eval(
+                "[1,    2    , 3,     4     ]"
+            );
             this.assertEqual(results[0][2], 3);
             results = await this.terminal._virtMachine.eval(
-                "['test', 'this','lalala lo,lolo']"
+                "[  'test', 'this','lalala lo,lolo']"
             );
             this.assertEqual(results[0][2], "lalala lo,lolo");
             results = await this.terminal._virtMachine.eval(
-                "[[1,2, 3,4], ['test', 'this','lalala lo,lolo', [12,3,[123,'oops', {key: 'the value'}]]]]"
+                "[[ 1, 2, 3 ,4], ['test', 'this','lalala lo,  lolo', [12,   3,    [123   ,'oops'   , {   key: 'the value'}]]]]"
             );
             this.assertEqual(results[0][1][3][2][2].key, "the value");
 
@@ -30,7 +32,7 @@ odoo.define("terminal.tests.TraSH", function (require) {
             );
             this.assertEqual(results[0].keyB, 55);
             results = await this.terminal._virtMachine.eval(
-                "{keyA: 1234, keyB: 'the value', keyC: 'the, value', keyD: {keyA: 23, keyB: [2,33,4], keyC: {keyA: 'the, value'}}}"
+                "{keyA: 1234, keyB: 'the value', keyC: 'the, value', keyD: {keyA: 23, keyB: [2,33,4], keyC: {keyA   :   'the, value'}}}"
             );
             this.assertEqual(results[0].keyD.keyC.keyA, "the, value");
 
@@ -53,10 +55,10 @@ odoo.define("terminal.tests.TraSH", function (require) {
             results = await this.terminal._virtMachine.eval("$test");
             this.assertEqual(results[0].test, 12);
             await this.terminal._virtMachine.eval(
-                "$test['this'] = 'blablabla; and, bla'"
+                `$test['this'] = "blabla'bla; 'a'nd, bla"`
             );
             results = await this.terminal._virtMachine.eval("$test");
-            this.assertEqual(results[0].this, "blablabla; and, bla");
+            this.assertEqual(results[0].this, "blabla'bla; 'a'nd, bla");
 
             // Runners
             await this.terminal._virtMachine.eval(
@@ -68,13 +70,13 @@ odoo.define("terminal.tests.TraSH", function (require) {
             results = await this.terminal._virtMachine.eval(
                 "$(search res.partner -f name)['ids']"
             );
-            this.assertEqual(results[1].constructor, Array);
-            this.assertTrue(results[1].length > 0);
+            this.assertEqual(results[0].constructor, Array);
+            this.assertTrue(results[0].length > 0);
             results = await this.terminal._virtMachine.eval(
                 "$(search res.partner -f name)['name']"
             );
-            this.assertEqual(results[1].constructor, String);
-            this.assertTrue(results[1].length > 0);
+            this.assertEqual(results[0].constructor, String);
+            this.assertTrue(results[0].length > 0);
 
             // Concat
             results = await this.terminal._virtMachine.eval(
@@ -97,6 +99,10 @@ odoo.define("terminal.tests.TraSH", function (require) {
                 "$val = $((5*2)); $((5+$val))"
             );
             this.assertEqual(results[0], 15);
+            results = await this.terminal._virtMachine.eval(
+                "$val = $((5*2)); $((5+$val-55*(45-33)))"
+            );
+            this.assertEqual(results[0], -645);
         },
     });
 });
