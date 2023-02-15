@@ -1,5 +1,11 @@
 # Changelog
 
+**9.2.1**
+
+```
+FIX: Avoid load in 'alpha', 'beta' versions (issue #99)
+```
+
 **9.2.0**
 
 ```

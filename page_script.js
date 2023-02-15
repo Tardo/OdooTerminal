@@ -14,6 +14,7 @@
     }
     window.hasRun = true;
 
+    const DEVELOPER_MODE = false;
     const COMPATIBLE_VERS = [
         "11.",
         "saas~11",
@@ -63,8 +64,16 @@
             };
         }
         const cvers = COMPATIBLE_VERS.filter(function (item) {
-            return gOdooInfo.serverVersionRaw.startsWith(item);
+            if (DEVELOPER_MODE) {
+                return gOdooInfo.serverVersionRaw.startsWith(item);
+            }
+            return (
+                gOdooInfo.serverVersionRaw.startsWith(item) &&
+                !gOdooInfo.serverVersionRaw.includes("alpha") &&
+                !gOdooInfo.serverVersionRaw.includes("beta")
+            );
         });
+
         if (cvers.length) {
             gOdooInfo.isCompatible = true;
             window.term_odooVersionRaw = gOdooInfo.serverVersionRaw;
