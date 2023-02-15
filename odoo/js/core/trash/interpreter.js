@@ -145,11 +145,19 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
             let in_dict = 0;
             let in_runner = 0;
             let in_block = 0;
+            let is_math_sign = false;
             let do_cut = false;
             let do_skip = false;
             let prev_char = "";
+            let prev_char_no_space = "";
             let prev_token = null;
-            for (const char of clean_data) {
+            const clean_data_len = clean_data.length;
+            for (
+                let char_index = 0;
+                char_index < clean_data_len;
+                ++char_index
+            ) {
+                const char = clean_data[char_index];
                 const in_data_type =
                     in_array || in_dict || in_runner || in_block;
                 if (prev_char !== TrashConst.SYMBOLS.ESCAPE) {
@@ -234,23 +242,36 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                     char !== TrashConst.SYMBOLS.SPACE)
                             ) {
                                 do_cut = true;
-                            } else if (
-                                options?.math &&
-                                (char === TrashConst.SYMBOLS.ADD ||
-                                    char === TrashConst.SYMBOLS.SUBSTRACT ||
-                                    char === TrashConst.SYMBOLS.MULTIPLY ||
-                                    char === TrashConst.SYMBOLS.DIVIDE ||
-                                    char === TrashConst.SYMBOLS.MODULO ||
-                                    char === TrashConst.SYMBOLS.POW ||
-                                    prev_char === TrashConst.SYMBOLS.ADD ||
-                                    prev_char ===
-                                        TrashConst.SYMBOLS.SUBSTRACT ||
-                                    prev_char === TrashConst.SYMBOLS.MULTIPLY ||
-                                    prev_char === TrashConst.SYMBOLS.DIVIDE ||
-                                    prev_char === TrashConst.SYMBOLS.MODULO ||
-                                    prev_char === TrashConst.SYMBOLS.POW)
-                            ) {
-                                do_cut = true;
+                            }
+                            if (options?.math) {
+                                const is_char_math_oper =
+                                    TrashConst.SYMBOLS_MATH_OPER.indexOf(
+                                        char
+                                    ) !== -1;
+                                if (char_index > 0) {
+                                    const is_prev_char_math_oper =
+                                        TrashConst.SYMBOLS_MATH_OPER.indexOf(
+                                            prev_char_no_space
+                                        ) !== -1;
+                                    if (
+                                        (is_char_math_oper &&
+                                            !is_prev_char_math_oper) ||
+                                        (!is_char_math_oper &&
+                                            is_prev_char_math_oper)
+                                    ) {
+                                        if (!is_math_sign) {
+                                            do_cut = true;
+                                        }
+                                    }
+                                    is_math_sign =
+                                        is_char_math_oper &&
+                                        is_prev_char_math_oper;
+                                    if (is_math_sign) {
+                                        do_cut = true;
+                                    }
+                                } else if (is_char_math_oper) {
+                                    is_math_sign = true;
+                                }
                             }
                         }
                     }
@@ -272,6 +293,9 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                     }
                 }
                 prev_char = char;
+                if (prev_char !== TrashConst.SYMBOLS.SPACE) {
+                    prev_char_no_space = prev_char;
+                }
                 do_skip = false;
             }
             if (value) {
@@ -416,6 +440,10 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                 token_san_lower === TrashConst.KEYWORDS.FALSE
             ) {
                 ttype = TrashConst.LEXER.Boolean;
+            } else if (token_san_lower === TrashConst.KEYWORDS.FOR) {
+                ttype = TrashConst.LEXER.ForLoop;
+            } else if (token_san_lower === TrashConst.KEYWORDS.IN) {
+                ttype = TrashConst.LEXER.In;
             } else if (options.math) {
                 if (token_san === TrashConst.SYMBOLS.ADD) {
                     ttype = TrashConst.LEXER.Add;
@@ -443,47 +471,110 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
             return [ttype, token_san, token];
         },
 
+        _getDataInstructions: function (tokens, from, inverse_search) {
+            from = from || 0;
+            const data_tokens = [];
+            const push_token = function (token) {
+                if (TrashConst.LEXERDATA.indexOf(token[0]) === -1) {
+                    return false;
+                }
+                data_tokens.push(token);
+                return true;
+            };
+            const tokens_len = tokens.length;
+            if (inverse_search) {
+                for (let token_index = from; token_index >= 0; --token_index) {
+                    if (!push_token(tokens[token_index])) {
+                        break;
+                    }
+                }
+                data_tokens.reverse();
+            } else {
+                for (
+                    let token_index = from;
+                    token_index < tokens_len;
+                    ++token_index
+                ) {
+                    if (!push_token(tokens[token_index])) {
+                        break;
+                    }
+                }
+            }
+            return data_tokens;
+        },
+
+        _tokenList2str: function (tokens) {
+            let res_str = "";
+            for (const token of tokens) {
+                res_str +=
+                    token[0] === TrashConst.LEXER.Math
+                        ? `(${token[1]})`
+                        : token[2];
+            }
+            return res_str;
+        },
+
         _prioritizer: function (tokens) {
-            tokens = _.reject(
+            let tokens_no_spaces = _.reject(
                 tokens,
                 (item) => item[0] === TrashConst.LEXER.Space
             );
-            if (tokens.length < 4) {
+            const tokens_no_spaces_no_data_attr = _.reject(
+                tokens,
+                (item, index) =>
+                    item[0] === TrashConst.LEXER.Space ||
+                    (index > 0 &&
+                        item[0] !== TrashConst.LEXER.Space &&
+                        tokens[index - 1][0] === TrashConst.LEXER.Variable)
+            );
+            if (tokens_no_spaces_no_data_attr.length < 4) {
                 return tokens;
             }
             for (const tok_prio of TrashConst.MATH_OPER_PRIORITIES) {
                 const ntokens = [];
-                const tokens_len = tokens.length;
+                const tokens_len = tokens_no_spaces.length;
                 for (
                     let token_index = 0;
                     token_index < tokens_len;
                     ++token_index
                 ) {
-                    const [, token_val, token_raw] = tokens[token_index];
-                    if (token_val === tok_prio) {
-                        const prev_tok = ntokens.pop() || [];
-                        const next_tok = tokens[++token_index] || [];
-                        let fstr =
-                            prev_tok[0] === TrashConst.LEXER.Math
-                                ? `(${prev_tok[2]})`
-                                : `${prev_tok[2]}`;
-                        fstr += token_val;
-                        fstr +=
-                            next_tok[0] === TrashConst.LEXER.Math
-                                ? `(${next_tok[2]})`
-                                : `${next_tok[2]}`;
+                    const [, token_val] = tokens_no_spaces[token_index];
+                    if (ntokens.length > 0 && token_val === tok_prio) {
+                        const prev_tokens = this._getDataInstructions(
+                            ntokens,
+                            ntokens.length - 1,
+                            true,
+                            true
+                        );
+                        const next_tokens = this._getDataInstructions(
+                            tokens_no_spaces,
+                            token_index + 1,
+                            false,
+                            true
+                        );
+                        const prev_tokens_str =
+                            this._tokenList2str(prev_tokens);
+                        const next_tokens_str =
+                            this._tokenList2str(next_tokens);
+                        for (let i = 0; i < prev_tokens.length; ++i) {
+                            ntokens.pop();
+                        }
+                        for (let i = 0; i < next_tokens.length; ++i) {
+                            ++token_index;
+                        }
+                        const fstr = `${prev_tokens_str}${token_val}${next_tokens_str}`;
                         ntokens.push([
                             TrashConst.LEXER.Math,
                             fstr,
-                            `${prev_tok[2]}${token_raw}${next_tok[2]}`,
+                            `(${fstr})`,
                         ]);
                     } else {
-                        ntokens.push(tokens[token_index]);
+                        ntokens.push(tokens_no_spaces[token_index]);
                     }
                 }
-                tokens = ntokens;
+                tokens_no_spaces = ntokens;
             }
-            return tokens;
+            return tokens_no_spaces;
         },
 
         /**
@@ -568,7 +659,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             const dindex = res.stack.names[0].length;
                             to_append.instructions.push(
                                 new Instruction(
-                                    TrashConst.PARSER.LOAD_NAME,
+                                    TrashConst.INSTRUCTION_TYPE.LOAD_NAME,
                                     index,
                                     level,
                                     dindex
@@ -583,7 +674,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             const dindex = res.stack.arguments[0].length;
                             to_append.instructions.push(
                                 new Instruction(
-                                    TrashConst.PARSER.LOAD_ARG,
+                                    TrashConst.INSTRUCTION_TYPE.LOAD_ARG,
                                     index,
                                     level,
                                     dindex
@@ -595,7 +686,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         ignore_instr_eoi = true;
                         to_append_eoi.instructions.push(
                             new Instruction(
-                                TrashConst.PARSER.CONCAT,
+                                TrashConst.INSTRUCTION_TYPE.CONCAT,
                                 index,
                                 level
                             )
@@ -604,14 +695,18 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                     case TrashConst.LEXER.Add:
                         ignore_instr_eoi = true;
                         to_append_eoi.instructions.push(
-                            new Instruction(TrashConst.PARSER.ADD, index, level)
+                            new Instruction(
+                                TrashConst.INSTRUCTION_TYPE.ADD,
+                                index,
+                                level
+                            )
                         );
                         break;
                     case TrashConst.LEXER.Substract:
                         ignore_instr_eoi = true;
                         to_append_eoi.instructions.push(
                             new Instruction(
-                                TrashConst.PARSER.SUBSTRACT,
+                                TrashConst.INSTRUCTION_TYPE.SUBSTRACT,
                                 index,
                                 level
                             )
@@ -621,7 +716,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         ignore_instr_eoi = true;
                         to_append_eoi.instructions.push(
                             new Instruction(
-                                TrashConst.PARSER.MULTIPLY,
+                                TrashConst.INSTRUCTION_TYPE.MULTIPLY,
                                 index,
                                 level
                             )
@@ -631,7 +726,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         ignore_instr_eoi = true;
                         to_append_eoi.instructions.push(
                             new Instruction(
-                                TrashConst.PARSER.DIVIDE,
+                                TrashConst.INSTRUCTION_TYPE.DIVIDE,
                                 index,
                                 level
                             )
@@ -641,7 +736,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         ignore_instr_eoi = true;
                         to_append_eoi.instructions.push(
                             new Instruction(
-                                TrashConst.PARSER.MODULO,
+                                TrashConst.INSTRUCTION_TYPE.MODULO,
                                 index,
                                 level
                             )
@@ -650,7 +745,11 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                     case TrashConst.LEXER.Pow:
                         ignore_instr_eoi = true;
                         to_append_eoi.instructions.push(
-                            new Instruction(TrashConst.PARSER.POW, index, level)
+                            new Instruction(
+                                TrashConst.INSTRUCTION_TYPE.POW,
+                                index,
+                                level
+                            )
                         );
                         break;
                     case TrashConst.LEXER.Number:
@@ -659,7 +758,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             const dindex = res.stack.values[0].length;
                             to_append.instructions.push(
                                 new Instruction(
-                                    TrashConst.PARSER.LOAD_CONST,
+                                    TrashConst.INSTRUCTION_TYPE.LOAD_CONST,
                                     index,
                                     level,
                                     dindex
@@ -675,7 +774,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             const dindex = res.stack.values[0].length;
                             to_append.instructions.push(
                                 new Instruction(
-                                    TrashConst.PARSER.LOAD_CONST,
+                                    TrashConst.INSTRUCTION_TYPE.LOAD_CONST,
                                     index,
                                     level,
                                     dindex
@@ -704,7 +803,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 const dindex = res.stack.names[0].length;
                                 to_append.instructions.push(
                                     new Instruction(
-                                        TrashConst.PARSER.LOAD_GLOBAL,
+                                        TrashConst.INSTRUCTION_TYPE.LOAD_GLOBAL,
                                         index,
                                         level,
                                         dindex
@@ -713,9 +812,10 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 to_append_eoc.instructions.push(
                                     new Instruction(
                                         options?.silent
-                                            ? TrashConst.PARSER
+                                            ? TrashConst.INSTRUCTION_TYPE
                                                   .CALL_FUNCTION_SILENT
-                                            : TrashConst.PARSER.CALL_FUNCTION,
+                                            : TrashConst.INSTRUCTION_TYPE
+                                                  .CALL_FUNCTION,
                                         -1,
                                         level
                                     )
@@ -725,7 +825,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 const dindex = res.stack.values[0].length;
                                 to_append.instructions.push(
                                     new Instruction(
-                                        TrashConst.PARSER.LOAD_CONST,
+                                        TrashConst.INSTRUCTION_TYPE.LOAD_CONST,
                                         index,
                                         level,
                                         dindex
@@ -757,7 +857,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             );
                             to_append.instructions.push(
                                 new Instruction(
-                                    TrashConst.PARSER.BUILD_LIST,
+                                    TrashConst.INSTRUCTION_TYPE.BUILD_LIST,
                                     index,
                                     level,
                                     mlevel
@@ -789,7 +889,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             );
                             to_append.instructions.push(
                                 new Instruction(
-                                    TrashConst.PARSER.BUILD_MAP,
+                                    TrashConst.INSTRUCTION_TYPE.BUILD_MAP,
                                     index,
                                     level,
                                     mlevel
@@ -804,12 +904,12 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                             if (last_instr) {
                                 if (
                                     last_instr.type ===
-                                    TrashConst.PARSER.LOAD_DATA_ATTR
+                                    TrashConst.INSTRUCTION_TYPE.LOAD_DATA_ATTR
                                 ) {
                                     res.stack.instructions.pop();
                                     to_append_eoc.instructions.push(
                                         new Instruction(
-                                            TrashConst.PARSER.STORE_SUBSCR,
+                                            TrashConst.INSTRUCTION_TYPE.STORE_SUBSCR,
                                             index,
                                             level,
                                             res.stack.names.length - 1
@@ -820,19 +920,16 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                     let dindex = -1;
                                     if (
                                         last_instr.type ===
-                                        TrashConst.PARSER.LOAD_NAME
+                                        TrashConst.INSTRUCTION_TYPE.LOAD_NAME
                                     ) {
-                                        to_append_eoc.names.push(
-                                            res.stack.names[0].pop()
-                                        );
-                                        dindex = res.stack.names[0].length;
+                                        dindex = res.stack.names[0].length - 1;
                                     } else {
                                         to_append_eoc.names.push(undefined);
-                                        dindex = res.stack.names[0].length - 1;
+                                        dindex = res.stack.names[0].length;
                                     }
                                     to_append_eoc.instructions.push(
                                         new Instruction(
-                                            TrashConst.PARSER.STORE_NAME,
+                                            TrashConst.INSTRUCTION_TYPE.STORE_NAME,
                                             last_token_index,
                                             level,
                                             dindex
@@ -844,7 +941,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                                 const dindex = res.stack.names[0].length;
                                 to_append_eoc.instructions.push(
                                     new Instruction(
-                                        TrashConst.PARSER.STORE_NAME,
+                                        TrashConst.INSTRUCTION_TYPE.STORE_NAME,
                                         last_token_index,
                                         level,
                                         dindex
@@ -876,7 +973,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         );
                         to_append.instructions.push(
                             new Instruction(
-                                TrashConst.PARSER.LOAD_DATA_ATTR,
+                                TrashConst.INSTRUCTION_TYPE.LOAD_DATA_ATTR,
                                 index,
                                 level
                             )
@@ -926,7 +1023,7 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         to_append.inputTokens.push(...parsed_block.inputTokens);
                         to_append.instructions.push(
                             new Instruction(
-                                TrashConst.PARSER.PUSH_FRAME,
+                                TrashConst.INSTRUCTION_TYPE.PUSH_FRAME,
                                 index,
                                 level
                             )
@@ -936,13 +1033,35 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
                         );
                         to_append.instructions.push(
                             new Instruction(
-                                TrashConst.PARSER.POP_FRAME,
+                                TrashConst.INSTRUCTION_TYPE.POP_FRAME,
                                 index,
                                 level
                             )
                         );
                         mlevel = parsed_block.maxULevel;
                         break;
+                    // Case TrashConst.LEXER.For: {
+                    //     for (
+                    //         const nindex = index + 1;
+                    //         nindex < tokens_len;
+                    //         ++nindex
+                    //     ) {
+                    //         ntoken = res.inputTokens[0][nindex];
+                    //         if (ntoken.type === TrashConst.LEXER.Space) {
+                    //             continue;
+                    //         }
+                    //         if (
+                    //             ntoken.type === TrashConst.LEXER.EOC ||
+                    //             ntoken.type === TrashConst.LEXER.Block
+                    //         ) {
+                    //             break;
+                    //         }
+
+                    //         //    2 GET_ITER
+                    //         //    >>    4 FOR_ITER                 6 (to 18)
+                    //         //    6 STORE_NAME               1 (aa)
+                    //     }
+                    // }
                     case TrashConst.LEXER.Space:
                         ignore_instr_eoi = true;
                         break;
@@ -990,7 +1109,11 @@ odoo.define("terminal.core.trash.interpreter", function (require) {
 
             if (!options?.math && level === 0) {
                 res.stack.instructions.push(
-                    new Instruction(TrashConst.PARSER.RETURN_VALUE, -1, blevel)
+                    new Instruction(
+                        TrashConst.INSTRUCTION_TYPE.RETURN_VALUE,
+                        -1,
+                        blevel
+                    )
                 );
             }
 

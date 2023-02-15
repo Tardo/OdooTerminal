@@ -103,6 +103,10 @@ odoo.define("terminal.tests.TraSH", function (require) {
                 "$val = $((5*2)); $((5+$val-55*(45-33)))"
             );
             this.assertEqual(results[0], -645);
+            results = await this.terminal._virtMachine.eval(
+                "$data = {numA: 4, numB:9}; $(( ($data['numA']    * $data['numB']  +    4  )  * -2     ))"
+            );
+            this.assertEqual(results[0], -80);
         },
     });
 });

@@ -111,14 +111,14 @@ odoo.define("terminal.core.CommandAssistant", function (require) {
                 }
                 if (
                     sel_arg_index === -1 &&
-                    instr.type === TrashConst.PARSER.LOAD_ARG
+                    instr.type === TrashConst.INSTRUCTION_TYPE.LOAD_ARG
                 ) {
                     sel_arg_index = instr.inputTokenIndex;
                     continue;
                 }
                 if (
                     sel_token_index !== -1 &&
-                    instr.type === TrashConst.PARSER.LOAD_GLOBAL
+                    instr.type === TrashConst.INSTRUCTION_TYPE.LOAD_GLOBAL
                 ) {
                     sel_cmd_index = instr.inputTokenIndex;
                     break;

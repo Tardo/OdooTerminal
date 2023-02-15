@@ -476,21 +476,23 @@ odoo.define("terminal.functions.Core", function (require) {
             for (const instr of stack.instructions) {
                 let lvalue = "";
                 switch (instr.type) {
-                    case TrashConst.PARSER.LOAD_NAME:
-                    case TrashConst.PARSER.LOAD_GLOBAL:
-                    case TrashConst.PARSER.STORE_NAME:
-                    case TrashConst.PARSER.STORE_SUBSCR:
+                    case TrashConst.INSTRUCTION_TYPE.LOAD_NAME:
+                    case TrashConst.INSTRUCTION_TYPE.LOAD_GLOBAL:
+                    case TrashConst.INSTRUCTION_TYPE.STORE_NAME:
+                    case TrashConst.INSTRUCTION_TYPE.STORE_SUBSCR:
                         lvalue = stack.names[instr.level][instr.dataIndex];
                         break;
-                    case TrashConst.PARSER.LOAD_CONST:
+                    case TrashConst.INSTRUCTION_TYPE.LOAD_CONST:
                         lvalue = stack.values[instr.level][instr.dataIndex];
                         break;
-                    case TrashConst.PARSER.LOAD_ARG:
+                    case TrashConst.INSTRUCTION_TYPE.LOAD_ARG:
                         lvalue = stack.arguments[instr.level][instr.dataIndex];
                         break;
                 }
 
-                const humanType = TrashConst.PARSER.getHumanType(instr.type);
+                const humanType = TrashConst.INSTRUCTION_TYPE.getHumanType(
+                    instr.type
+                );
                 body += `<tr><td>${humanType[0]}</td><td>${
                     humanType[1]
                 }</td><td>${lvalue}</td><td>${instr.dataIndex}</td><td>${

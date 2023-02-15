@@ -30,7 +30,20 @@ odoo.define("terminal.core.trash.const", function () {
         Block: 23,
     };
 
-    const PARSER = {
+    const LEXERDATA = [
+        LEXER.Variable,
+        LEXER.DataAttribute,
+        LEXER.Runner,
+        LEXER.Array,
+        LEXER.String,
+        LEXER.StringSimple,
+        LEXER.Number,
+        LEXER.Dictionary,
+        LEXER.Boolean,
+        LEXER.Math,
+    ];
+
+    const INSTRUCTION_TYPE = {
         LOAD_NAME: 1,
         LOAD_GLOBAL: 2,
         LOAD_ARG: 3,
@@ -57,6 +70,33 @@ odoo.define("terminal.core.trash.const", function () {
             return Object.entries(this).find((item) => item[1] === type) || "";
         },
     };
+
+    // Const INSTRUCTION_NEXT = {
+    //     [INSTRUCTION_TYPE.LOAD_NAME]: [INSTRUCTION_TYPE.LOAD_DATA_ATTR],
+    //     [INSTRUCTION_TYPE.LOAD_GLOBAL]: [
+    //         INSTRUCTION_TYPE.LOAD_ARG,
+    //         INSTRUCTION_TYPE.LOAD_CONST,
+    //         INSTRUCTION_TYPE.LOAD_NAME,
+    //     ],
+    //     [INSTRUCTION_TYPE.LOAD_ARG]: [
+    //         INSTRUCTION_TYPE.LOAD_CONST,
+    //         INSTRUCTION_TYPE.LOAD_NAME,
+    //     ],
+    //     [INSTRUCTION_TYPE.LOAD_CONST]: null,
+    //     [INSTRUCTION_TYPE.STORE_NAME]: [
+    //         INSTRUCTION_TYPE.LOAD_CONST,
+    //         INSTRUCTION_TYPE.STORE_SUBSCR,
+    //     ],
+    //     [INSTRUCTION_TYPE.STORE_SUBSCR]: [
+    //         INSTRUCTION_TYPE.LOAD_CONST,
+    //         INSTRUCTION_TYPE.STORE_SUBSCR,
+    //     ],
+    //     [INSTRUCTION_TYPE.CALL_FUNCTION]: null,
+    //     [INSTRUCTION_TYPE.CALL_FUNCTION_SILENT]: [
+    //         INSTRUCTION_TYPE.LOAD_CONST,
+    //         INSTRUCTION_TYPE.STORE_SUBSCR,
+    //     ],
+    // };
 
     const ARG = {
         String: 1 << 0,
@@ -112,9 +152,22 @@ odoo.define("terminal.core.trash.const", function () {
         BLOCK_END: "}",
     };
 
+    const SYMBOLS_MATH_OPER = [
+        SYMBOLS.ADD,
+        SYMBOLS.SUBSTRACT,
+        SYMBOLS.MULTIPLY,
+        SYMBOLS.DIVIDE,
+        SYMBOLS.MODULO,
+        SYMBOLS.POW,
+    ];
+
+    const SYMBOLS_MATH_SIGN = [SYMBOLS.ADD, SYMBOLS.SUBSTRACT];
+
     const KEYWORDS = {
         TRUE: "true",
         FALSE: "false",
+        FOR: "for",
+        IN: "in",
     };
 
     const MATH_OPER_PRIORITIES = [
@@ -163,9 +216,12 @@ odoo.define("terminal.core.trash.const", function () {
 
     return {
         LEXER: LEXER,
-        PARSER: PARSER,
+        LEXERDATA: LEXERDATA,
+        INSTRUCTION_TYPE: INSTRUCTION_TYPE,
         ARG: ARG,
         SYMBOLS: SYMBOLS,
+        SYMBOLS_MATH_OPER: SYMBOLS_MATH_OPER,
+        SYMBOLS_MATH_SIGN: SYMBOLS_MATH_SIGN,
         KEYWORDS: KEYWORDS,
         MATH_OPER_PRIORITIES: MATH_OPER_PRIORITIES,
         KEYMAP: KEYMAP,
