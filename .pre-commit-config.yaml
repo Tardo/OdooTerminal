@@ -38,6 +38,7 @@ repos:
         verbose: true
         args:
           - lint
+          - --firefox-preview
 ci:
   autofix_commit_msg: "[pre-commit.ci] auto fixes from pre-commit.com hooks"
   autofix_prs: true

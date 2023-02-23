@@ -1,4 +1,3 @@
-/* global browser, chrome */
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -62,8 +61,8 @@
 
     function saveOptions() {
         const data = {};
-        for (const name of window.__OdooTerminal.SETTING_NAMES) {
-            const type = window.__OdooTerminal.SETTING_TYPES[name];
+        for (const name of __OdooTerminal.SETTING_NAMES) {
+            const type = __OdooTerminal.SETTING_TYPES[name];
             if (type === "manual") {
                 continue;
             }
@@ -83,31 +82,27 @@
     }
 
     function applyInputValues() {
-        gBrowserObj.storage.sync.get(
-            window.__OdooTerminal.SETTING_NAMES,
-            (result) => {
-                const cmd_names = Object.keys(result);
-                for (const name of cmd_names) {
-                    const type = window.__OdooTerminal.SETTING_TYPES[name];
-                    if (type === "manual") {
-                        continue;
-                    }
-                    const item = document.querySelector(`#${name}`);
-                    if (type === "edit") {
-                        item.value = result[name] || "";
-                    } else if (type === "check") {
-                        item.checked = result[name] || false;
-                    } else if (type === "int") {
-                        item.value = result[name] || 0;
-                    } else if (type === "json") {
-                        item.value =
-                            JSON.stringify(result[name], null, 4) || "{}";
-                    }
+        gBrowserObj.storage.sync.get(__OdooTerminal.SETTING_NAMES, (result) => {
+            const cmd_names = Object.keys(result);
+            for (const name of cmd_names) {
+                const type = __OdooTerminal.SETTING_TYPES[name];
+                if (type === "manual") {
+                    continue;
                 }
-                shortcuts_defs = result.shortcuts || {};
-                renderShortcutTable();
+                const item = document.querySelector(`#${name}`);
+                if (type === "edit") {
+                    item.value = result[name] || "";
+                } else if (type === "check") {
+                    item.checked = result[name] || false;
+                } else if (type === "int") {
+                    item.value = result[name] || 0;
+                } else if (type === "json") {
+                    item.value = JSON.stringify(result[name], null, 4) || "{}";
+                }
             }
-        );
+            shortcuts_defs = result.shortcuts || {};
+            renderShortcutTable();
+        });
     }
 
     function onSubmitForm(e) {
@@ -116,8 +111,8 @@
     }
 
     function onKeyDownShortcut(e) {
-        const keybind = window.__OdooTerminal.process_keybind(e);
-        if (window.__OdooTerminal.IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
+        const keybind = __OdooTerminal.process_keybind(e);
+        if (__OdooTerminal.IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
             e.target.dataset.keybind = JSON.stringify(keybind);
             e.target.value = keybind.join(" + ");
         } else {
@@ -156,7 +151,7 @@
     }
 
     function onClickResetSettings() {
-        gBrowserObj.storage.sync.set(window.__OdooTerminal.SETTING_DEFAULTS);
+        gBrowserObj.storage.sync.set(__OdooTerminal.SETTING_DEFAULTS);
         applyInputValues();
     }
 

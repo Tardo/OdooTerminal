@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-window.__OdooTerminal = {
+const __OdooTerminal = {
     SETTING_TYPES: {
         init_cmds: "edit",
         term_context: "json",
@@ -20,11 +20,9 @@ window.__OdooTerminal = {
     },
     IGNORED_KEYS: ["Control", "Meta", "Shift", "Alt", "Escape"],
 };
-window.__OdooTerminal.SETTING_NAMES = Object.keys(
-    window.__OdooTerminal.SETTING_TYPES
-);
+__OdooTerminal.SETTING_NAMES = Object.keys(__OdooTerminal.SETTING_TYPES);
 
-window.__OdooTerminal.process_keybind = function (e) {
+__OdooTerminal.process_keybind = function (e) {
     "use strict";
     const keybind = [];
     if (e.altKey) {
@@ -39,7 +37,7 @@ window.__OdooTerminal.process_keybind = function (e) {
     if (e.metaKey) {
         keybind.push("Meta");
     }
-    if (window.__OdooTerminal.IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
+    if (__OdooTerminal.IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
         keybind.push(e.key === " " ? "Space" : e.key);
     }
     return keybind;

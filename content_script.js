@@ -1,4 +1,3 @@
-/* global browser, chrome */
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -10,10 +9,10 @@
     "use strict";
 
     // Flag to run the script once
-    if (window.__OdooTerminal.hasRun) {
+    if (__OdooTerminal.hasRun) {
         return;
     }
-    window.__OdooTerminal.hasRun = true;
+    __OdooTerminal.hasRun = true;
 
     // This is for cross-browser compatibility
     const gBrowserObj = typeof chrome === "undefined" ? browser : chrome;
@@ -47,7 +46,7 @@
         if (callback) {
             script_page.onload = callback;
         }
-        script_page.src = gBrowserObj.extension.getURL(script);
+        script_page.src = gBrowserObj.runtime.getURL(script);
     }
 
     /**
@@ -59,7 +58,7 @@
         link_page.setAttribute("rel", "stylesheet");
         link_page.setAttribute("type", "text/css");
         (document.head || document.documentElement).appendChild(link_page);
-        link_page.href = gBrowserObj.extension.getURL(css);
+        link_page.href = gBrowserObj.runtime.getURL(css);
     }
 
     /**
@@ -228,21 +227,19 @@
                 }
             } else if (event.data.type === "ODOO_TERM_START") {
                 // Load Init Commands
-                getStorageSync(window.__OdooTerminal.SETTING_NAMES).then(
-                    (items) => {
-                        const data = {};
-                        for (const config_name in items) {
-                            data[config_name] = items[config_name];
-                        }
-                        window.postMessage(
-                            {
-                                type: "ODOO_TERM_CONFIG",
-                                config: data,
-                            },
-                            "*"
-                        );
+                getStorageSync(__OdooTerminal.SETTING_NAMES).then((items) => {
+                    const data = {};
+                    for (const config_name in items) {
+                        data[config_name] = items[config_name];
                     }
-                );
+                    window.postMessage(
+                        {
+                            type: "ODOO_TERM_CONFIG",
+                            config: data,
+                        },
+                        "*"
+                    );
+                });
             }
         },
         false

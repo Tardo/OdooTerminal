@@ -941,7 +941,7 @@ odoo.define("terminal.Terminal", function (require) {
                     // Press Escape
                     this.doHide();
                 } else {
-                    const keybind = window.__OdooTerminal.process_keybind(ev);
+                    const keybind = __OdooTerminal.process_keybind(ev);
                     const keybind_str = JSON.stringify(keybind);
                     const keybind_cmds = this._config.shortcuts[keybind_str];
                     if (keybind_cmds) {

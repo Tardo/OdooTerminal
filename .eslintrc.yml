@@ -9,12 +9,12 @@ parserOptions:
 globals:
   _: readonly
   $: readonly
-  fuzzy: readonly
   jQuery: readonly
   moment: readonly
   odoo: readonly
-  py: readonly
-  openerp: off
+  chrome: readonly
+  browser: readonly
+  __OdooTerminal: readonly
 
 # Styling is handled by Prettier, so we only need to enable AST rules;
 # see https://github.com/OCA/maintainer-quality-tools/pull/618#issuecomment-558576890

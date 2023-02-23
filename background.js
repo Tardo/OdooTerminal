@@ -1,4 +1,3 @@
-/* global browser, chrome */
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -12,6 +11,8 @@
  */
 (function () {
     "use strict";
+
+    importScripts("globals.js");
 
     // This is for cross-browser compatibility
     const gBrowserObj = typeof chrome === "undefined" ? browser : chrome;
@@ -31,10 +32,10 @@
      * information of the page to the 'content script'
      */
     function refreshOdooInfo() {
-        gBrowserObj.browserAction.setIcon({
+        gBrowserObj.action.setIcon({
             path: "icons/terminal-disabled-32.png",
         });
-        gBrowserObj.browserAction.setBadgeText({text: ""});
+        gBrowserObj.action.setBadgeText({text: ""});
 
         // Query for active tab
         gBrowserObj.tabs.query({active: true, currentWindow: true}, (tabs) => {
@@ -56,7 +57,7 @@
         if (odoo_info.isCompatible) {
             path = "icons/terminal-32.png";
         }
-        gBrowserObj.browserAction.setIcon({path: path});
+        gBrowserObj.action.setIcon({path: path});
     }
 
     // Listen 'content script' reply with the collected information
@@ -67,27 +68,20 @@
     });
     // Listen 'installed' event to set default settings
     gBrowserObj.runtime.onInstalled.addListener(() => {
-        gBrowserObj.storage.sync.get(
-            window.__OdooTerminal.SETTING_NAMES,
-            (items) => {
-                const to_update = {};
-                for (const setting_name of window.__OdooTerminal
-                    .SETTING_NAMES) {
-                    if (
-                        typeof items[setting_name] === "undefined" &&
-                        typeof window.__OdooTerminal.SETTING_DEFAULTS[
-                            setting_name
-                        ] !== "undefined"
-                    ) {
-                        to_update[setting_name] =
-                            window.__OdooTerminal.SETTING_DEFAULTS[
-                                setting_name
-                            ];
-                    }
+        gBrowserObj.storage.sync.get(__OdooTerminal.SETTING_NAMES, (items) => {
+            const to_update = {};
+            for (const setting_name of __OdooTerminal.SETTING_NAMES) {
+                if (
+                    typeof items[setting_name] === "undefined" &&
+                    typeof __OdooTerminal.SETTING_DEFAULTS[setting_name] !==
+                        "undefined"
+                ) {
+                    to_update[setting_name] =
+                        __OdooTerminal.SETTING_DEFAULTS[setting_name];
                 }
-                gBrowserObj.storage.sync.set(to_update);
             }
-        );
+            gBrowserObj.storage.sync.set(to_update);
+        });
     });
 
     // Listen actived tab and updates to update info
@@ -95,5 +89,5 @@
     gBrowserObj.tabs.onActivated.addListener(refreshOdooInfo);
 
     // Listen the extension browser icon click event to toggle terminal visibility
-    gBrowserObj.browserAction.onClicked.addListener(onClickBrowserAction);
+    gBrowserObj.action.onClicked.addListener(onClickBrowserAction);
 })();

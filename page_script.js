@@ -62,9 +62,9 @@
                 statusLevel: foundVer[4] && Number(foundVer[4]),
             };
         }
-        const cvers = COMPATIBLE_VERS.filter(function (item) {
-            return gOdooInfo.serverVersionRaw.startsWith(item);
-        });
+        const cvers = COMPATIBLE_VERS.filter((item) =>
+            gOdooInfo.serverVersionRaw.startsWith(item)
+        );
 
         if (cvers.length) {
             gOdooInfo.isCompatible = true;
