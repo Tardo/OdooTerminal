@@ -14,7 +14,6 @@
     }
     window.hasRun = true;
 
-    const DEVELOPER_MODE = false;
     const COMPATIBLE_VERS = [
         "11.",
         "saas~11",
@@ -26,8 +25,8 @@
         "saas~14",
         "15.",
         "saas~15",
-        "16.",
-        "saas~16",
+        "16.0",
+        "saas~16.0",
     ];
     const gOdooObj = window.odoo;
     const gOdooInfo = {};
@@ -64,14 +63,7 @@
             };
         }
         const cvers = COMPATIBLE_VERS.filter(function (item) {
-            if (DEVELOPER_MODE) {
-                return gOdooInfo.serverVersionRaw.startsWith(item);
-            }
-            return (
-                gOdooInfo.serverVersionRaw.startsWith(item) &&
-                !gOdooInfo.serverVersionRaw.includes("alpha") &&
-                !gOdooInfo.serverVersionRaw.includes("beta")
-            );
+            return gOdooInfo.serverVersionRaw.startsWith(item);
         });
 
         if (cvers.length) {

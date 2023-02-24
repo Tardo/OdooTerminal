@@ -1,5 +1,11 @@
 # Changelog
 
+**9.2.2**
+
+```
+FIX: Set odoo >16.0 unsupported  (issue #99)
+```
+
 **9.2.1**
 
 ```
