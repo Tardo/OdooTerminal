@@ -28,9 +28,20 @@ odoo.define("terminal.core.trash.const", function () {
         Modulo: 21,
         Pow: 22,
         Block: 23,
+        Negative: 24,
+        Positive: 25,
     };
 
-    const LEXERDATA = [
+    const LEXER_MATH_OPER = new Set([
+        LEXER.Add,
+        LEXER.Substract,
+        LEXER.Multiply,
+        LEXER.Divide,
+        LEXER.Modulo,
+        LEXER.Pow,
+    ]);
+
+    const LEXERDATA = new Set([
         LEXER.Variable,
         LEXER.DataAttribute,
         LEXER.Runner,
@@ -41,7 +52,9 @@ odoo.define("terminal.core.trash.const", function () {
         LEXER.Dictionary,
         LEXER.Boolean,
         LEXER.Math,
-    ];
+        LEXER.Negative,
+        LEXER.Positive,
+    ]);
 
     const INSTRUCTION_TYPE = {
         LOAD_NAME: 1,
@@ -65,6 +78,8 @@ odoo.define("terminal.core.trash.const", function () {
         POW: 19,
         PUSH_FRAME: 20,
         POP_FRAME: 21,
+        UNITARY_NEGATIVE: 22,
+        UNITARY_POSITIVE: 23,
 
         getHumanType: function (type) {
             return Object.entries(this).find((item) => item[1] === type) || "";
@@ -152,14 +167,14 @@ odoo.define("terminal.core.trash.const", function () {
         BLOCK_END: "}",
     };
 
-    const SYMBOLS_MATH_OPER = [
+    const SYMBOLS_MATH_OPER = new Set([
         SYMBOLS.ADD,
         SYMBOLS.SUBSTRACT,
         SYMBOLS.MULTIPLY,
         SYMBOLS.DIVIDE,
         SYMBOLS.MODULO,
         SYMBOLS.POW,
-    ];
+    ]);
 
     const SYMBOLS_MATH_SIGN = [SYMBOLS.ADD, SYMBOLS.SUBSTRACT];
 
@@ -216,6 +231,7 @@ odoo.define("terminal.core.trash.const", function () {
 
     return {
         LEXER: LEXER,
+        LEXER_MATH_OPER: LEXER_MATH_OPER,
         LEXERDATA: LEXERDATA,
         INSTRUCTION_TYPE: INSTRUCTION_TYPE,
         ARG: ARG,

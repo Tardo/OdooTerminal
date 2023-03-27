@@ -514,7 +514,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         "The endpoint",
                     ],
                     [
-                        TrashConst.ARG.Dictionary,
+                        TrashConst.ARG.Any,
                         ["d", "data"],
                         true,
                         "The data to send",
@@ -663,7 +663,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         true,
                         "The operation",
                         "open",
-                        ["open", "close", "send"],
+                        ["open", "close", "send", "health"],
                     ],
                     [
                         TrashConst.ARG.String,
@@ -673,9 +673,9 @@ odoo.define("terminal.functions.Common", function (require) {
                     ],
                     [
                         TrashConst.ARG.Any,
-                        ["ws", "websocket"],
+                        ["wo", "websocket"],
                         false,
-                        "The websocket",
+                        "The websocket object",
                     ],
                     [TrashConst.ARG.Any, ["d", "data"], false, "The data"],
                     [
@@ -723,16 +723,23 @@ odoo.define("terminal.functions.Common", function (require) {
                     !kwargs.websocket ||
                     kwargs.websocket.constructor !== WebSocket
                 ) {
-                    return Promise.reject("Nedd a websocket to operate");
+                    return Promise.reject("Need a websocket to operate");
                 }
+                // { event_name: 'subscribe', data: { channels: allTabsChannels, last: this.lastNotificationId } }
+                const payload = JSON.stringify(kwargs.data);
+                this.screen.eprint(`Sending '${payload}'...`);
+                kwargs.websocket.send(payload);
                 return Promise.resolve();
             } else if (kwargs.operation === "close") {
                 if (
                     !kwargs.websocket ||
                     kwargs.websocket.constructor !== WebSocket
                 ) {
-                    return Promise.reject("Nedd a websocket to operate");
+                    return Promise.reject("Need a websocket to operate");
                 }
+                kwargs.websocket.close(kwargs.data);
+                return Promise.resolve();
+            } else if (kwargs.operation === "health") {
                 kwargs.websocket.close(kwargs.data);
                 return Promise.resolve();
             }
@@ -1001,49 +1008,75 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdShowDBList: function (kwargs) {
-            return rpc
-                .query({
-                    route: "/jsonrpc",
-                    params: {
-                        service: "db",
-                        method: "list",
-                        args: {},
-                    },
-                })
-                .then((databases) => {
-                    const databases_len = databases.length;
-                    if (!databases_len) {
-                        this.screen.printError("Can't get database names");
-                        return;
-                    }
-                    // Search active database
-                    let index = 0;
-                    const s_databases = [];
-                    while (index < databases_len) {
-                        const database = databases[index];
-                        if (kwargs.only_active) {
-                            if (database === session.db) {
-                                this.screen.print(
-                                    `<strong>${database}</strong> (Active Database)`
-                                );
-                                return database;
-                            }
-                        } else if (database === session.db) {
-                            s_databases.push(
-                                `<strong>${database}</strong> (Active Database)`
-                            );
-                        } else {
-                            s_databases.push(database);
-                        }
-                        ++index;
-                    }
-
+            const _onSuccess = (databases) => {
+                const databases_len = databases.length;
+                if (!databases_len) {
+                    this.screen.printError("Can't get database names");
+                    return;
+                }
+                // Search active database
+                let index = 0;
+                const s_databases = [];
+                while (index < databases_len) {
+                    const database = databases[index];
                     if (kwargs.only_active) {
-                        return false;
+                        if (database === session.db) {
+                            this.screen.eprint(database);
+                            return database;
+                        }
+                    } else if (database === session.db) {
+                        s_databases.push(
+                            `<strong>${database}</strong> (Active Database)`
+                        );
+                    } else {
+                        s_databases.push(database);
                     }
-                    this.screen.print(s_databases);
-                    return databases;
-                });
+                    ++index;
+                }
+
+                if (kwargs.only_active) {
+                    return false;
+                }
+                this.screen.print(s_databases);
+                return databases;
+            };
+            const _onError = (err) => {
+                if (!kwargs.only_active) {
+                    throw err;
+                }
+                // Heuristic way to determine the database name
+                return rpc
+                    .query({
+                        route: "/websocket/peek_notifications",
+                        params: [
+                            ["channels", []],
+                            ["last", 9999999],
+                            ["is_first_poll", true],
+                        ],
+                    })
+                    .then((result) => {
+                        if (result.channels[0]) {
+                            const dbname = result.channels[0][0];
+                            this.screen.eprint(dbname);
+                            return dbname;
+                        }
+                        return false;
+                    });
+            };
+            const queryParams = {
+                route: "/jsonrpc",
+                params: {
+                    service: "db",
+                    method: "list",
+                    args: {},
+                },
+            };
+
+            // Check if using deferred jquery or native promises
+            if ("jsonpRpc" in ajax) {
+                return rpc.query(queryParams).then(_onSuccess).fail(_onError);
+            }
+            return rpc.query(queryParams).then(_onSuccess).catch(_onError);
         },
 
         _cmdUserHasGroups: function (kwargs) {

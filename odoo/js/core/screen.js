@@ -372,11 +372,11 @@ odoo.define("terminal.core.Screen", function (require) {
                         )}]</span>`
                     );
                 }
-                this.$interactiveContainer.removeClass("d-none");
+                this.$interactiveContainer.removeClass("d-none hidden");
             } else {
                 this._question_active = undefined;
                 this.$interactiveContainer.html("");
-                this.$interactiveContainer.addClass("d-none");
+                this.$interactiveContainer.addClass("d-none hidden");
             }
         },
 
@@ -486,7 +486,7 @@ odoo.define("terminal.core.Screen", function (require) {
                         <span id="terminal-prompt-main" class='terminal-prompt' title='${username}'>${username}&nbsp;</span>
                         <span>${Utils.encodeHTML(this.PROMPT)}</span>
                     </div>
-                    <div class='terminal-prompt-container terminal-prompt-interactive d-none'></div>
+                    <div class='terminal-prompt-container terminal-prompt-interactive d-none hidden'></div>
                     <div class='rich-input'>
                         <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' spellcheck="false" autocapitalize="off" readonly='readonly'/>
                         <input type='edit' id='terminal_input' autocomplete='off' spellcheck="false" autocapitalize="off" />

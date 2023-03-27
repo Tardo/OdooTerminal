@@ -86,7 +86,6 @@
         if (!Object.hasOwn(params, "args")) {
             params.args = {};
         }
-
         $.ajax(url, {
             url: url,
             dataType: "json",
@@ -118,6 +117,12 @@
         try {
             gOdooObj.define(0, (require) => {
                 require("web.core");
+                const session = require("web.session");
+                if (session?.server_version) {
+                    _setServerVersion(session.server_version);
+                    _sendInitializeSignal();
+                    return;
+                }
                 _createServiceRpc(
                     {
                         service: "db",

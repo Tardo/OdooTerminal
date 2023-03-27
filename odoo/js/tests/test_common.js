@@ -217,7 +217,7 @@ odoo.define("terminal.tests.common", function (require) {
                 false,
                 true
             );
-            this.assertEqual(res[0]?.name, "sms");
+            this.assertEqual(res?.name, "sms");
             await Utils.asyncSleep(6000);
         },
 

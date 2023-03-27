@@ -252,6 +252,13 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 frame.values.push(`${valA}${valB}`);
                             }
                             break;
+                        case TrashConst.INSTRUCTION_TYPE.UNITARY_NEGATIVE:
+                            {
+                                const frame = last_frame || root_frame;
+                                const val = frame.values.pop();
+                                frame.values.push(val * -1);
+                            }
+                            break;
                         case TrashConst.INSTRUCTION_TYPE.ADD:
                         case TrashConst.INSTRUCTION_TYPE.SUBSTRACT:
                         case TrashConst.INSTRUCTION_TYPE.MULTIPLY:
