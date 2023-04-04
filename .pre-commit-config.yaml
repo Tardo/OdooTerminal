@@ -7,7 +7,7 @@ repos:
     hooks:
       - id: prettier
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.36.0
+    rev: v8.37.0
     hooks:
       - id: eslint
         verbose: true
