@@ -144,6 +144,25 @@ Examples:
 - Cancel all sale.order:
   `$orders = $(search sale.order); repeat -t $orders['length'] -c "call sale.order action_cancel [$orders[$(gen intiter)]['id']]"`
 
+#### + Send files
+
+Can use the command 'genfile' to create a file object that can be sent via post.
+
+Example:
+
+- `post /web/binary/upload_attachment -d {callback: '', model: 'res.partner', id: 1, ufile: $(genfile)}`
+
+#### + Websockets
+
+Can open websocket connections (Odoo 16.0+).
+
+Example:
+
+- ```
+  $webs = $(ws -o open -e /websocket)
+  ws -o send -wo $webs -d "hello"
+  ```
+
 #### + Math operations
 
 The way to do math operations is pretty similar to 'shell script' syntax:
