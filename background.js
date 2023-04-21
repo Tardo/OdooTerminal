@@ -57,6 +57,12 @@
             path = "icons/terminal-32.png";
         }
         gBrowserObj.browserAction.setIcon({path: path});
+        gBrowserObj.browserAction.setBadgeBackgroundColor({
+            color: "#71639e",
+        });
+        gBrowserObj.browserAction.setBadgeText({
+            text: odoo_info.serverVersionRaw,
+        });
     }
 
     // Listen 'content script' reply with the collected information
