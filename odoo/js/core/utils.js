@@ -135,14 +135,17 @@ odoo.define("terminal.core.Utils", function (require) {
     const getOdooVersion = () => {
         return (
             odoo.session_info?.server_version ||
-            odoo.__DEBUG__.services["@web/session"]?.session.server_version
+            odoo.__DEBUG__.services["@web/session"]?.session.server_version ||
+            __OdooTerminal.raw_server_info.serverVersionRaw
         );
     };
 
     const getOdooVersionInfo = () => {
         return (
             odoo.session_info?.server_version_info ||
-            odoo.__DEBUG__.services["@web/session"]?.session.server_version_info
+            odoo.__DEBUG__.services["@web/session"]?.session
+                .server_version_info ||
+            __OdooTerminal.odoo_server_info.raw_server_info.serverVersionInfo
         );
     };
 

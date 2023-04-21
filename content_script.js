@@ -238,6 +238,7 @@
                             {
                                 type: "ODOO_TERM_CONFIG",
                                 config: data,
+                                info: gOdooInfoObj,
                             },
                             "*"
                         );

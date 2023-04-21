@@ -17,48 +17,48 @@ odoo.define("terminal.loaders.Frontend", function (require) {
 
     const session_info = {};
 
-    Terminal.include({
-        start: function () {
-            const sup_prom = this._super.apply(this, arguments);
-            return new Promise(async (resolve, reject) => {
-                await sup_prom;
-                const uid = Utils.getUID();
-                try {
-                    const server_version = await this.execute(
-                        "rpc -o {route: '/jsonrpc', method: 'server_version', params: {service: 'db'}}",
-                        false,
-                        true
-                    );
-                    session_info.server_version = server_version;
-                    session_info.is_public_user = Utils.isPublicUser();
-                    if (Utils.getUID() === -1) {
-                        session_info.uid = -1;
-                        session_info.username = "Unregistered User";
-                    } else {
-                        session_info.uid = uid;
-                        try {
-                            const whoami = await this.execute(
-                                "whoami",
-                                false,
-                                true
-                            );
-                            session_info.username = whoami.login;
-                        } catch (err) {
-                            session_info.uid = -1;
-                            session_info.username = "Unknown User";
-                        }
-                    }
-                    this.screen.updateInputInfo(
-                        session_info.username,
-                        session_info.server_version
-                    );
-                } catch (err) {
-                    return reject(err);
-                }
-                return resolve();
-            });
-        },
-    });
+    // Terminal.include({
+    //     start: function () {
+    //         const sup_prom = this._super.apply(this, arguments);
+    //         return new Promise(async (resolve, reject) => {
+    //             await sup_prom;
+    //             const uid = Utils.getUID();
+    //             try {
+    //                 const server_version = await this.execute(
+    //                     "rpc -o {route: '/jsonrpc', method: 'server_version', params: {service: 'db'}}",
+    //                     false,
+    //                     true
+    //                 );
+    //                 session_info.server_version = server_version;
+    //                 session_info.is_public_user = Utils.isPublicUser();
+    //                 if (Utils.getUID() === -1) {
+    //                     session_info.uid = -1;
+    //                     session_info.username = "Unregistered User";
+    //                 } else {
+    //                     session_info.uid = uid;
+    //                     try {
+    //                         const whoami = await this.execute(
+    //                             "whoami",
+    //                             false,
+    //                             true
+    //                         );
+    //                         session_info.username = whoami.login;
+    //                     } catch (err) {
+    //                         session_info.uid = -1;
+    //                         session_info.username = "Unknown User";
+    //                     }
+    //                 }
+    //                 this.screen.updateInputInfo(
+    //                     session_info.username,
+    //                     session_info.server_version
+    //                 );
+    //             } catch (err) {
+    //                 return reject(err);
+    //             }
+    //             return resolve();
+    //         });
+    //     },
+    // });
 
     const origGetUsername = Utils.getUsername;
     Utils.getUsername = () => {
@@ -70,7 +70,10 @@ odoo.define("terminal.loaders.Frontend", function (require) {
         }
 
         if (!username) {
-            username = session_info.username;
+            username =
+                Utils.getUID() === -1
+                    ? "Unregistered User"
+                    : session_info.username;
         }
         return username;
     };
