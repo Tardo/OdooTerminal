@@ -639,8 +639,9 @@ odoo.define("terminal.Terminal", function (require) {
         },
 
         /* HANDLE EVENTS */
-        onLoaded: function (config) {
+        onLoaded: function (config, info) {
             this._applyConfig(config);
+            window.__OdooTerminal.raw_server_info = info;
             this._wasLoaded = true;
             if (this._config.pinned) {
                 this.doShow();
@@ -989,7 +990,7 @@ odoo.define("terminal.Terminal", function (require) {
                 return;
             }
             if (ev.data.type === "ODOO_TERM_CONFIG") {
-                this.onLoaded(ev.data.config);
+                this.onLoaded(ev.data.config, ev.data.info);
             }
         },
         // NOTE-END

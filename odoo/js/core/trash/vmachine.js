@@ -147,7 +147,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                               ]
                             : null;
                     switch (instr.type) {
-                        case TrashConst.PARSER.LOAD_NAME:
+                        case TrashConst.INSTRUCTION_TYPE.LOAD_NAME:
                             {
                                 const var_name =
                                     stack.names[instr.level][instr.dataIndex];
@@ -187,7 +187,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 }
                             }
                             break;
-                        case TrashConst.PARSER.LOAD_GLOBAL:
+                        case TrashConst.INSTRUCTION_TYPE.LOAD_GLOBAL:
                             {
                                 const cmd_name =
                                     stack.names[instr.level][instr.dataIndex];
@@ -208,7 +208,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 }
                             }
                             break;
-                        case TrashConst.PARSER.LOAD_CONST:
+                        case TrashConst.INSTRUCTION_TYPE.LOAD_CONST:
                             {
                                 const frame = last_frame || root_frame;
                                 const value =
@@ -216,7 +216,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 frame.values.push(value);
                             }
                             break;
-                        case TrashConst.PARSER.LOAD_ARG:
+                        case TrashConst.INSTRUCTION_TYPE.LOAD_ARG:
                             {
                                 const arg =
                                     stack.arguments[instr.level][
@@ -237,14 +237,14 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 if (
                                     next_instr &&
                                     next_instr.type >
-                                        TrashConst.PARSER.LOAD_CONST
+                                        TrashConst.INSTRUCTION_TYPE.LOAD_CONST
                                 ) {
                                     last_frame.values.push(true);
                                 }
                                 last_frame.args.push(arg);
                             }
                             break;
-                        case TrashConst.PARSER.CONCAT:
+                        case TrashConst.INSTRUCTION_TYPE.CONCAT:
                             {
                                 const frame = last_frame || root_frame;
                                 const valB = frame.values.pop();
@@ -252,43 +252,58 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 frame.values.push(`${valA}${valB}`);
                             }
                             break;
-                        case TrashConst.PARSER.ADD:
-                        case TrashConst.PARSER.SUBSTRACT:
-                        case TrashConst.PARSER.MULTIPLY:
-                        case TrashConst.PARSER.DIVIDE:
-                        case TrashConst.PARSER.MODULO:
-                        case TrashConst.PARSER.POW:
+                        case TrashConst.INSTRUCTION_TYPE.UNITARY_NEGATIVE:
+                            {
+                                const frame = last_frame || root_frame;
+                                const val = frame.values.pop();
+                                frame.values.push(val * -1);
+                            }
+                            break;
+                        case TrashConst.INSTRUCTION_TYPE.ADD:
+                        case TrashConst.INSTRUCTION_TYPE.SUBSTRACT:
+                        case TrashConst.INSTRUCTION_TYPE.MULTIPLY:
+                        case TrashConst.INSTRUCTION_TYPE.DIVIDE:
+                        case TrashConst.INSTRUCTION_TYPE.MODULO:
+                        case TrashConst.INSTRUCTION_TYPE.POW:
                             {
                                 const frame = last_frame || root_frame;
                                 const valB = frame.values.pop();
                                 const valA = frame.values.pop();
-                                if (instr.type === TrashConst.PARSER.ADD) {
+                                if (
+                                    instr.type ===
+                                    TrashConst.INSTRUCTION_TYPE.ADD
+                                ) {
                                     frame.values.push(valA + valB);
                                 } else if (
-                                    instr.type === TrashConst.PARSER.SUBSTRACT
+                                    instr.type ===
+                                    TrashConst.INSTRUCTION_TYPE.SUBSTRACT
                                 ) {
                                     frame.values.push(valA - valB);
                                 } else if (
-                                    instr.type === TrashConst.PARSER.MULTIPLY
+                                    instr.type ===
+                                    TrashConst.INSTRUCTION_TYPE.MULTIPLY
                                 ) {
                                     frame.values.push(valA * valB);
                                 } else if (
-                                    instr.type === TrashConst.PARSER.DIVIDE
+                                    instr.type ===
+                                    TrashConst.INSTRUCTION_TYPE.DIVIDE
                                 ) {
                                     frame.values.push(valA / valB);
                                 } else if (
-                                    instr.type === TrashConst.PARSER.MODULO
+                                    instr.type ===
+                                    TrashConst.INSTRUCTION_TYPE.MODULO
                                 ) {
                                     frame.values.push(valA % valB);
                                 } else if (
-                                    instr.type === TrashConst.PARSER.POW
+                                    instr.type ===
+                                    TrashConst.INSTRUCTION_TYPE.POW
                                 ) {
                                     frame.values.push(Math.pow(valA, valB));
                                 }
                             }
                             break;
-                        case TrashConst.PARSER.CALL_FUNCTION_SILENT:
-                        case TrashConst.PARSER.CALL_FUNCTION:
+                        case TrashConst.INSTRUCTION_TYPE.CALL_FUNCTION_SILENT:
+                        case TrashConst.INSTRUCTION_TYPE.CALL_FUNCTION:
                             {
                                 const frame = frames.pop();
                                 try {
@@ -297,7 +312,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                         frame,
                                         parse_info,
                                         instr.type ===
-                                            TrashConst.PARSER
+                                            TrashConst.INSTRUCTION_TYPE
                                                 .CALL_FUNCTION_SILENT ||
                                             options?.silent
                                     );
@@ -314,13 +329,13 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 }
                             }
                             break;
-                        case TrashConst.PARSER.RETURN_VALUE:
+                        case TrashConst.INSTRUCTION_TYPE.RETURN_VALUE:
                             {
                                 const frame = last_frame || root_frame;
                                 return_values.push(frame.values.at(-1));
                             }
                             break;
-                        case TrashConst.PARSER.STORE_NAME:
+                        case TrashConst.INSTRUCTION_TYPE.STORE_NAME:
                             {
                                 const frame = last_frame || root_frame;
                                 const vname =
@@ -357,7 +372,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 frame.store[vname] = vvalue;
                             }
                             break;
-                        case TrashConst.PARSER.STORE_SUBSCR:
+                        case TrashConst.INSTRUCTION_TYPE.STORE_SUBSCR:
                             {
                                 const frame = last_frame || root_frame;
                                 const vname =
@@ -377,7 +392,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 }
                             }
                             break;
-                        case TrashConst.PARSER.LOAD_DATA_ATTR:
+                        case TrashConst.INSTRUCTION_TYPE.LOAD_DATA_ATTR:
                             {
                                 const frame = last_frame || root_frame;
                                 const attr_name = frame.values.pop();
@@ -412,7 +427,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 frame.values[index_value] = res_value;
                             }
                             break;
-                        case TrashConst.PARSER.BUILD_LIST:
+                        case TrashConst.INSTRUCTION_TYPE.BUILD_LIST:
                             {
                                 const frame = last_frame || root_frame;
                                 const iter_count = _.countBy(
@@ -431,7 +446,7 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 frame.values.push(value.reverse());
                             }
                             break;
-                        case TrashConst.PARSER.BUILD_MAP:
+                        case TrashConst.INSTRUCTION_TYPE.BUILD_MAP:
                             {
                                 const frame = last_frame || root_frame;
                                 const iter_count =
@@ -450,13 +465,13 @@ odoo.define("terminal.core.trash.vmachine", function (require) {
                                 frame.values.push(value);
                             }
                             break;
-                        case TrashConst.PARSER.PUSH_FRAME:
+                        case TrashConst.INSTRUCTION_TYPE.PUSH_FRAME:
                             {
                                 last_frame = new Frame(undefined, last_frame);
                                 frames.push(last_frame);
                             }
                             break;
-                        case TrashConst.PARSER.POP_FRAME:
+                        case TrashConst.INSTRUCTION_TYPE.POP_FRAME:
                             {
                                 frames.pop();
                                 last_frame = frames.at(-1);

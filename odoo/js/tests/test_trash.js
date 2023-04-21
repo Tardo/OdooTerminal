@@ -18,6 +18,10 @@ odoo.define("terminal.tests.TraSH", function (require) {
             );
             this.assertEqual(results[0][2], "lalala lo,lolo");
             results = await this.terminal._virtMachine.eval(
+                "[  23,        -2,3,-345]"
+            );
+            this.assertEqual(results[0][3], -345);
+            results = await this.terminal._virtMachine.eval(
                 "[[ 1, 2, 3 ,4], ['test', 'this','lalala lo,  lolo', [12,   3,    [123   ,'oops'   , {   key: 'the value'}]]]]"
             );
             this.assertEqual(results[0][1][3][2][2].key, "the value");
@@ -27,6 +31,10 @@ odoo.define("terminal.tests.TraSH", function (require) {
                 "{keyA: 'the value', keyB: 'the, value'}"
             );
             this.assertEqual(results[0].keyB, "the, value");
+            results = await this.terminal._virtMachine.eval(
+                "{keyA: -23, keyB: 'the, value'}"
+            );
+            this.assertEqual(results[0].keyA, -23);
             results = await this.terminal._virtMachine.eval(
                 "{keyA: 1234, keyB: 55}"
             );
@@ -103,6 +111,10 @@ odoo.define("terminal.tests.TraSH", function (require) {
                 "$val = $((5*2)); $((5+$val-55*(45-33)))"
             );
             this.assertEqual(results[0], -645);
+            results = await this.terminal._virtMachine.eval(
+                "$data = {numA: 4, numB:9}; $(( ($data['numA']    * $data['numB']  +    4  )  * -2     ))"
+            );
+            this.assertEqual(results[0], -80);
         },
     });
 });

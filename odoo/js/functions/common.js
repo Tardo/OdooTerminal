@@ -186,7 +186,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Launch upgrade module process.",
                 args: [
                     [
-                        TrashConst.ARG.String,
+                        TrashConst.ARG.List | TrashConst.ARG.String,
                         ["m", "module"],
                         true,
                         "The module technical name",
@@ -200,7 +200,7 @@ odoo.define("terminal.functions.Common", function (require) {
                 detail: "Launch module installation process.",
                 args: [
                     [
-                        TrashConst.ARG.String,
+                        TrashConst.ARG.List | TrashConst.ARG.String,
                         ["m", "module"],
                         true,
                         "The module technical name",
@@ -514,7 +514,7 @@ odoo.define("terminal.functions.Common", function (require) {
                         "The endpoint",
                     ],
                     [
-                        TrashConst.ARG.Dictionary,
+                        TrashConst.ARG.Any,
                         ["d", "data"],
                         true,
                         "The data to send",
@@ -652,6 +652,98 @@ odoo.define("terminal.functions.Common", function (require) {
                 ],
                 example: "-o send -d O-CMD.NEXT",
             });
+            this.registerCommand("ws", {
+                definition: "Open a web socket",
+                callback: this._cmdWebSocket,
+                detail: "Open a web socket",
+                args: [
+                    [
+                        TrashConst.ARG.String,
+                        ["o", "operation"],
+                        true,
+                        "The operation",
+                        "open",
+                        ["open", "close", "send", "health"],
+                    ],
+                    [
+                        TrashConst.ARG.String,
+                        ["e", "endpoint"],
+                        false,
+                        "The endpoint",
+                    ],
+                    [
+                        TrashConst.ARG.Any,
+                        ["wo", "websocket"],
+                        false,
+                        "The websocket object",
+                    ],
+                    [TrashConst.ARG.Any, ["d", "data"], false, "The data"],
+                    [
+                        TrashConst.ARG.Flag,
+                        ["no-tls", "no-tls"],
+                        false,
+                        "Don't use TLS",
+                    ],
+                ],
+                example: "-o open -e /websocket",
+            });
+        },
+
+        _cmdWebSocket: function (kwargs) {
+            if (kwargs.operation === "open") {
+                if (!kwargs.endpoint) {
+                    return Promise.reject("Need an endpoint to connect");
+                }
+                const url = `ws${kwargs.no_tls ? "" : "s"}://${
+                    window.location.host
+                }${kwargs.endpoint}`;
+                const socket = new WebSocket(url);
+                socket.onopen = () => {
+                    this.screen.print(`[${url}] Connection established`);
+                    socket.send("initialized");
+                };
+                socket.onmessage = (ev) => {
+                    this.screen.print(`[${url}] ${ev.data}`);
+                };
+                socket.onclose = (ev) => {
+                    if (ev.wasClean) {
+                        this.screen.print(
+                            `[${url}] Connection closed cleanly, code=${ev.code} reason=${ev.reason}`
+                        );
+                    } else {
+                        this.screen.print(`[${url}] Connection died`);
+                    }
+                };
+                socket.onerror = () => {
+                    this.screen.eprint(`[${url}] ERROR!`);
+                };
+                return Promise.resolve(socket);
+            } else if (kwargs.operation === "send") {
+                if (
+                    !kwargs.websocket ||
+                    kwargs.websocket.constructor !== WebSocket
+                ) {
+                    return Promise.reject("Need a websocket to operate");
+                }
+                // { event_name: 'subscribe', data: { channels: allTabsChannels, last: this.lastNotificationId } }
+                const payload = JSON.stringify(kwargs.data);
+                this.screen.eprint(`Sending '${payload}'...`);
+                kwargs.websocket.send(payload);
+                return Promise.resolve();
+            } else if (kwargs.operation === "close") {
+                if (
+                    !kwargs.websocket ||
+                    kwargs.websocket.constructor !== WebSocket
+                ) {
+                    return Promise.reject("Need a websocket to operate");
+                }
+                kwargs.websocket.close(kwargs.data);
+                return Promise.resolve();
+            } else if (kwargs.operation === "health") {
+                kwargs.websocket.close(kwargs.data);
+                return Promise.resolve();
+            }
+            return Promise.reject("Invalid operation");
         },
 
         _AVAILABLE_BARCODE_COMMANDS: [
@@ -916,49 +1008,75 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdShowDBList: function (kwargs) {
-            return rpc
-                .query({
-                    route: "/jsonrpc",
-                    params: {
-                        service: "db",
-                        method: "list",
-                        args: {},
-                    },
-                })
-                .then((databases) => {
-                    const databases_len = databases.length;
-                    if (!databases_len) {
-                        this.screen.printError("Can't get database names");
-                        return;
-                    }
-                    // Search active database
-                    let index = 0;
-                    const s_databases = [];
-                    while (index < databases_len) {
-                        const database = databases[index];
-                        if (kwargs.only_active) {
-                            if (database === session.db) {
-                                this.screen.print(
-                                    `<strong>${database}</strong> (Active Database)`
-                                );
-                                return database;
-                            }
-                        } else if (database === session.db) {
-                            s_databases.push(
-                                `<strong>${database}</strong> (Active Database)`
-                            );
-                        } else {
-                            s_databases.push(database);
-                        }
-                        ++index;
-                    }
-
+            const _onSuccess = (databases) => {
+                const databases_len = databases.length;
+                if (!databases_len) {
+                    this.screen.printError("Can't get database names");
+                    return;
+                }
+                // Search active database
+                let index = 0;
+                const s_databases = [];
+                while (index < databases_len) {
+                    const database = databases[index];
                     if (kwargs.only_active) {
-                        return false;
+                        if (database === session.db) {
+                            this.screen.eprint(database);
+                            return database;
+                        }
+                    } else if (database === session.db) {
+                        s_databases.push(
+                            `<strong>${database}</strong> (Active Database)`
+                        );
+                    } else {
+                        s_databases.push(database);
                     }
-                    this.screen.print(s_databases);
-                    return databases;
-                });
+                    ++index;
+                }
+
+                if (kwargs.only_active) {
+                    return false;
+                }
+                this.screen.print(s_databases);
+                return databases;
+            };
+            const _onError = (err) => {
+                if (!kwargs.only_active) {
+                    throw err;
+                }
+                // Heuristic way to determine the database name
+                return rpc
+                    .query({
+                        route: "/websocket/peek_notifications",
+                        params: [
+                            ["channels", []],
+                            ["last", 9999999],
+                            ["is_first_poll", true],
+                        ],
+                    })
+                    .then((result) => {
+                        if (result.channels[0]) {
+                            const dbname = result.channels[0][0];
+                            this.screen.eprint(dbname);
+                            return dbname;
+                        }
+                        return false;
+                    });
+            };
+            const queryParams = {
+                route: "/jsonrpc",
+                params: {
+                    service: "db",
+                    method: "list",
+                    args: {},
+                },
+            };
+
+            // Check if using deferred jquery or native promises
+            if ("jsonpRpc" in ajax) {
+                return rpc.query(queryParams).then(_onSuccess).fail(_onError);
+            }
+            return rpc.query(queryParams).then(_onSuccess).catch(_onError);
         },
 
         _cmdUserHasGroups: function (kwargs) {
@@ -1350,70 +1468,69 @@ odoo.define("terminal.functions.Common", function (require) {
             return Promise.resolve();
         },
 
-        _searchModule: function (module_name) {
-            return rpc.query({
+        _searchModules: function (module_names) {
+            const payload = {
                 method: "search_read",
-                domain: [["name", "=", module_name]],
-                fields: ["name", "display_name"],
                 model: "ir.module.module",
                 kwargs: {context: this._getContext()},
-            });
+                fields: ["name", "display_name"],
+            };
+            if (module_names && module_names.constructor === String) {
+                payload.domain = [["name", "=", module_names]];
+            } else if (module_names.length === 1) {
+                payload.domain = [["name", "=", module_names[0]]];
+            } else {
+                payload.domain = [["name", "in", module_names]];
+            }
+            return rpc.query(payload);
         },
 
         _cmdUpgradeModule: function (kwargs) {
             return new Promise((resolve, reject) => {
-                this._searchModule(kwargs.module).then((result) => {
+                this._searchModules(kwargs.module).then((result) => {
                     if (result.length) {
                         return rpc
                             .query({
                                 method: "button_immediate_upgrade",
                                 model: "ir.module.module",
-                                args: [result[0].id],
+                                args: [_.map(result, "id")],
                             })
                             .then(
                                 () => {
                                     this.screen.print(
-                                        `'${kwargs.module}' (${result[0].display_name}) module successfully upgraded`
+                                        `'${result.length}' modules successfully upgraded`
                                     );
                                     resolve(result[0]);
                                 },
-                                () => {
-                                    reject(
-                                        `Can't upgrade '${kwargs.module}' module`
-                                    );
-                                }
+                                (res) => reject(res.message.data.message)
                             );
                     }
-                    reject(`'${kwargs.module}' module doesn't exists`);
+                    reject(`'${kwargs.module}' modules doesn't exists`);
                 });
             });
         },
 
         _cmdInstallModule: function (kwargs) {
             return new Promise((resolve, reject) => {
-                this._searchModule(kwargs.module).then((result) => {
+                this._searchModules(kwargs.module).then((result) => {
                     if (result.length) {
                         return rpc
                             .query({
                                 method: "button_immediate_install",
                                 model: "ir.module.module",
-                                args: [result[0].id],
+                                args: [_.map(result, "id")],
                             })
                             .then(
                                 () => {
                                     this.screen.print(
-                                        `'${kwargs.module}' (${result[0].display_name}) module successfully installed`
+                                        `'${result.length}' modules successfully installed`
                                     );
-                                    resolve(result[0]);
+                                    resolve(result);
                                 },
-                                () => {
-                                    reject(
-                                        `Can't install '${kwargs.module}' (${result.display_name}) module`
-                                    );
-                                }
+                                (res) => reject(res.message.data.message)
                             );
                     }
-                    return reject(`'${kwargs.module}' module doesn't exists`);
+                    return reject(`'${kwargs.module}' modules doesn't exists`);
                 });
             });
         },
@@ -1421,7 +1538,9 @@ odoo.define("terminal.functions.Common", function (require) {
         _cmdUninstallModule: function (kwargs) {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const modue_infos = await this._searchModule(kwargs.module);
+                    const modue_infos = await this._searchModules(
+                        kwargs.module
+                    );
                     if (!_.isEmpty(modue_infos)) {
                         if (!kwargs.force) {
                             let depends = await this.execute(

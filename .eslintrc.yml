@@ -7,6 +7,7 @@ parserOptions:
 
 # Globals available in Odoo that shouldn't produce errorings
 globals:
+  __OdooTerminal: writable
   _: readonly
   $: readonly
   fuzzy: readonly

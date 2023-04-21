@@ -1,6 +1,8 @@
 name: Test
 
 on:
+  schedule:
+    - cron: '0 0 * * SUN'
   push:
     branches: [master]
   pull_request:
@@ -50,11 +52,6 @@ jobs:
           chrome-version: "stable"
         if: ${{ matrix.browser == 'chrome' }}
 
-      - name: Install Compose
-        uses: KengoTODA/actions-setup-docker-compose@main
-        with:
-          version: '1.29.2'
-
       - name: Install poetry
         uses: abatilo/actions-poetry@v2
         with:
@@ -65,20 +62,18 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install
 
+      - name: Install xvfb
+        run: sudo apt-get install -y xvfb
+
       - name: Create .zip package
         run: poetry run python tools/release.py
 
+
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
         id: xtests
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        run: xvfb-run --auto-servernum poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
         continue-on-error: true
 
       - name: Retry test for ${{ matrix.instance }} (${{ matrix.browser }})
         if: steps.xtests.outcome != 'success'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        run: xvfb-run --auto-servernum poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}

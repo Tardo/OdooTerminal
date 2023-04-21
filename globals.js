@@ -16,7 +16,7 @@ window.__OdooTerminal = {
         pinned: false,
         maximized: false,
         opacity: 93,
-        shortcuts: {'["Ctrl",","]': "toggle_term"},
+        shortcuts: {},
     },
     IGNORED_KEYS: ["Control", "Meta", "Shift", "Alt", "Escape"],
 };

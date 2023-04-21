@@ -49,18 +49,28 @@
      * Helper function to sanitize the server version.
      * @param {String} ver - Odoo version
      */
-    function _setServerVersion(ver) {
+    function _setServerVersion(ver, ver_info) {
         gOdooInfo.serverVersionRaw = ver;
-        const foundVer = gOdooInfo.serverVersionRaw.match(
-            /(\d+)\.(\d+)(?:([a-z]+)(\d*))?/
-        );
-        if (foundVer && foundVer.length) {
+        gOdooInfo.serverVersionInfo = ver_info;
+        if (ver_info) {
             gOdooInfo.serverVersion = {
-                major: Number(foundVer[1]),
-                minor: Number(foundVer[2]),
-                status: foundVer[3],
-                statusLevel: foundVer[4] && Number(foundVer[4]),
+                major: ver_info[0],
+                minor: ver_info[1],
+                status: ver_info[2],
+                statusLevel: ver_info[3],
             };
+        } else {
+            const foundVer = gOdooInfo.serverVersionRaw.match(
+                /(\d+)\.(\d+)(?:([a-z]+)(\d*))?/
+            );
+            if (foundVer && foundVer.length) {
+                gOdooInfo.serverVersion = {
+                    major: Number(foundVer[1]),
+                    minor: Number(foundVer[2]),
+                    status: foundVer[3],
+                    statusLevel: foundVer[4] && Number(foundVer[4]),
+                };
+            }
         }
         const cvers = COMPATIBLE_VERS.filter(function (item) {
             return gOdooInfo.serverVersionRaw.startsWith(item);
@@ -75,65 +85,36 @@
     }
 
     /**
-     * Factory function to create RPC.
-     * @param {String} url
-     * @param {String} fct_name - Function name
-     * @param {Object} params - RPC parameters
-     * @param {Function} on_fulfilled
-     * @param {Function} on_rejected
-     */
-    function _createRpc(url, fct_name, params, on_fulfilled, on_rejected) {
-        if (!Object.hasOwn(params, "args")) {
-            params.args = {};
-        }
-
-        $.ajax(url, {
-            url: url,
-            dataType: "json",
-            type: "POST",
-            data: JSON.stringify({
-                jsonrpc: "2.0",
-                method: fct_name,
-                params: params,
-                id: Math.floor(Math.random() * 1000 * 1000 * 1000),
-            }),
-            contentType: "application/json",
-        }).then(on_fulfilled, on_rejected);
-    }
-
-    /**
-     * Factory function to create RPC (Service type).
-     * @param {Object} params - RPC parameters
-     * @param {Function} on_fulfilled
-     * @param {Function} on_rejected
-     */
-    function _createServiceRpc(params, on_fulfilled, on_rejected) {
-        _createRpc("/jsonrpc", "service", params, on_fulfilled, on_rejected);
-    }
-
-    /**
      * Request to Odoo the version.
      */
     function _forceOdooServerVersionDetection() {
         try {
             gOdooObj.define(0, (require) => {
                 require("web.core");
-                _createServiceRpc(
-                    {
-                        service: "db",
-                        method: "server_version",
+                const session = require("web.session");
+                if (session?.server_version) {
+                    _setServerVersion(session.server_version);
+                    _sendInitializeSignal();
+                    return;
+                }
+                fetch("/web/webclient/version_info", {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
                     },
-                    (rpc_response) => {
-                        const version = rpc_response.result;
-                        if (
-                            typeof version !== "undefined" &&
-                            typeof version === "string"
-                        ) {
-                            _setServerVersion(version);
-                        }
+                    body: "{}",
+                })
+                    .then((rpc_response) => {
+                        return rpc_response.json();
+                    })
+                    .then((json_data) => {
+                        _setServerVersion(
+                            json_data.result.server_version,
+                            json_data.result.server_version_info
+                        );
                         _sendInitializeSignal();
-                    }
-                );
+                    });
             });
         } catch (exception) {
             // Do nothing

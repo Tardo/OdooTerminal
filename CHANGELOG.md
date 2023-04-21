@@ -1,5 +1,18 @@
 # Changelog
 
+**9.3.0**
+
+```
+IMP: Github workflow
+IMP: Commands 'install' and 'upgrade': operate over more than one module
+IMP: Don't use jsonrpc to get the server version
+
+FIX: Math parser (now support negative numbers O_o!)
+
+ADD: Command 'ws': websockets
+ADD: Show the odoo version in the action icon
+```
+
 **9.2.2**
 
 ```

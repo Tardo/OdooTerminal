@@ -206,8 +206,8 @@ odoo.define("terminal.tests.common", function (require) {
                 false,
                 true
             );
+            this.assertEqual(res[0]?.name, "sms");
             await Utils.asyncSleep(6000);
-            this.assertEqual(res?.name, "sms");
         },
 
         test_uninstall: async function () {
@@ -217,8 +217,8 @@ odoo.define("terminal.tests.common", function (require) {
                 false,
                 true
             );
-            await Utils.asyncSleep(6000);
             this.assertEqual(res?.name, "sms");
+            await Utils.asyncSleep(6000);
         },
 
         test_action: async function () {
