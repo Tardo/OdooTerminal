@@ -25,6 +25,12 @@
     "48": "icons/terminal-48.png",
     "128": "icons/terminal-128.png"
   },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": "Ctrl+Comma",
+      "description": "Toggle Terminal"
+    }
+  },
   "manifest_version": 2,
   "name": "Odoo Terminal",
   "options_ui": {
