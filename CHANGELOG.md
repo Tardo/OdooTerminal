@@ -1,5 +1,13 @@
 # Changelog
 
+**9.3.1**
+
+```
+IMP: Start refactor to mjs
+
+FIX: Toggle terminal keybind
+```
+
 **9.3.0**
 
 ```
