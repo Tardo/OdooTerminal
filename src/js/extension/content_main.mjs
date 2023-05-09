@@ -1,14 +1,11 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import {getStorageSync, injectPageScript, injector} from "./utils.mjs";
+import {InstanceContext, getResources, updateContext} from "./context.mjs";
+
 import {ubrowser} from "./globals.mjs";
-import {injector, injectPageScript, getStorageSync} from "./utils.mjs";
 import {SETTING_NAMES} from "../common/globals.mjs";
-import {
-  InstanceContext,
-  updateContext,
-  getResources,
-} from "./context.mjs";
 
 class ExtensionContent {
   constructor() {
@@ -18,7 +15,7 @@ class ExtensionContent {
   /**
    * @param {Object} odoo_info - The collected information
    */
-  #updateInstanceContext(odoo_info={}) {
+  #updateInstanceContext(odoo_info = {}) {
     if (typeof odoo_info !== "object") {
       return;
     }
@@ -37,7 +34,7 @@ class ExtensionContent {
     if (event.data.type === "ODOO_TERM_INIT") {
       var info = event.data.instance_info;
       this.#updateInstanceContext(info);
-      setTimeout(() => this.#updateInstanceContext(info), 450)
+      setTimeout(() => this.#updateInstanceContext(info), 450);
       if (info.isCompatible) {
         injector(document, getResources());
       } else if (info.isOdoo) {

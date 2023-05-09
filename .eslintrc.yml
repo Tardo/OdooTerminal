@@ -5,9 +5,15 @@ env:
 parserOptions:
   ecmaVersion: 2022
 
+overrides:
+  - files:
+      - "**/*.mjs"
+    parserOptions:
+      sourceType: module
+
 # Globals available in Odoo that shouldn't produce errorings
 globals:
-  __OdooTerminal: writable
+  __OdooTerminal: readonly
   _: readonly
   $: readonly
   fuzzy: readonly
@@ -15,6 +21,8 @@ globals:
   moment: readonly
   odoo: readonly
   py: readonly
+  chrome: readonly
+  browser: readonly
   openerp: off
 
 # Styling is handled by Prettier, so we only need to enable AST rules;

@@ -101,7 +101,7 @@ class InstanceAnalyzer {
   #getOdooVersionByFramework() {
     return new Promise((resolve, reject) => {
       try {
-        gOdooObj.define(0, (require) => {
+        this.odoo.define(0, (require) => {
           require("web.core");
           const session = require("web.session");
           if (session?.server_version) {
@@ -146,11 +146,11 @@ class InstanceAnalyzer {
     let server_ver = null;
     try {
       server_ver = await this.#getOdooVersionByFramework();
-    } catch (exception) {
+    } catch (exc_a) {
       try {
         server_ver = await this.#getOdooVersionByNetwork();
-      } catch (exception) {
-        // do nothing
+      } catch (exc_b) {
+        // Do nothing
       }
     }
     return server_ver;

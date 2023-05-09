@@ -70,12 +70,12 @@ export function getStorageSync(key) {
  * @returns {Promise}
  */
 export function setStorageSync(values) {
-    return new Promise((resolve, reject) => {
-        ubrowser.storage.sync.set(values, (items) => {
-            if (ubrowser.runtime?.lastError) {
-                return reject(ubrowser.runtime.lastError);
-            }
-            resolve(items);
-        });
+  return new Promise((resolve, reject) => {
+    ubrowser.storage.sync.set(values, (items) => {
+      if (ubrowser.runtime?.lastError) {
+        return reject(ubrowser.runtime.lastError);
+      }
+      resolve(items);
     });
+  });
 }

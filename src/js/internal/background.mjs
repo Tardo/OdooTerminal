@@ -10,8 +10,9 @@
  * 'update_terminal_badge_info'.
  */
 
-import {SETTING_NAMES, SETTING_DEFAULTS} from "../common/globals.mjs";
-import {isFirefox, ubrowser} from "../extension/globals.mjs";
+import {ubrowser} from "../extension/globals.mjs";
+
+import {SETTING_DEFAULTS, SETTING_NAMES} from "../common/globals.mjs";
 import {getStorageSync, setStorageSync} from "../extension/utils.mjs";
 
 class ExtensionBackground {
@@ -26,7 +27,7 @@ class ExtensionBackground {
    * @param {String} text - badge text
    * @param {String} bg_color - badge background color
    */
-  #updateBrowserAction(icon, text=null, bg_color=null) {
+  #updateBrowserAction(icon, text = null, bg_color = null) {
     ubrowser.browserAction.setIcon({path: `../../img/${icon}`});
     ubrowser.browserAction.setBadgeText({
       text: text,
@@ -53,48 +54,34 @@ class ExtensionBackground {
   }
 
   #onInstalled() {
-    getStorageSync(SETTING_NAMES).then(
-        (items) => {
-            const to_update = {};
-            for (const setting_name of SETTING_NAMES) {
-                if (
-                    typeof items[setting_name] === "undefined" &&
-                    typeof SETTING_DEFAULTS[
-                        setting_name
-                    ] !== "undefined"
-                ) {
-                    to_update[setting_name] =
-                        SETTING_DEFAULTS[
-                            setting_name
-                        ];
-                }
-            }
-            setStorageSync(to_update);
+    getStorageSync(SETTING_NAMES).then((items) => {
+      const to_update = {};
+      for (const setting_name of SETTING_NAMES) {
+        if (
+          typeof items[setting_name] === "undefined" &&
+          typeof SETTING_DEFAULTS[setting_name] !== "undefined"
+        ) {
+          to_update[setting_name] = SETTING_DEFAULTS[setting_name];
         }
-    );
+      }
+      setStorageSync(to_update);
+    });
   }
 
   #onRefreshOdooInfo() {
-    // FIXME: Chrome loads the "content script" after reload the page.
-    // This cause that the event 'update_odoo_terminal_info' never gets resolved.
-    // To solve this, the terminal is in disabled state by default.
-    // This issue only affects when the extension is recently installed and the tab is changed.
-    if (!isFirefox) {
-        //this.#updateBrowserAction("terminal-disabled-32.png");
-    }
-    //this.#updateBrowserAction("terminal-disabled-32.png");
+    // Because the script may be unavailable, we always assume
+    // that the page is not compatible with the extension.
+    this.#updateBrowserAction("terminal-disabled-32.png");
     // Query for active tab
     ubrowser.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        console.log(tabs[0])
-        if (tabs.length && tabs[0].status === "loading") {
-            this.#updateBrowserAction("terminal-disabled-32.png");
-        }
-        if (tabs.length && tabs[0].status === "complete") {
-            // Request Odoo Info
-            ubrowser.tabs.sendMessage(tabs[0].id, {
-                message: "update_odoo_terminal_info",
-            });
-        }
+      if (tabs.length && tabs[0].status === "complete") {
+        // Request Odoo Info, wait 'idle' delay
+        setTimeout(() => {
+          ubrowser.tabs.sendMessage(tabs[0].id, {
+            message: "update_odoo_terminal_info",
+          });
+        }, 150);
+      }
     });
   }
 
