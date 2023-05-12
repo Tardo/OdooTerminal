@@ -28,5 +28,9 @@ export function process_keybind(e) {
 }
 
 export function isCompatibleOdooVersion(version) {
+  if (!version) {
+    // This can happens due to a malfunction of the service worker or by a modified controller
+    return false;
+  }
   return COMPATIBLE_VERSIONS.some((item) => version.startsWith(item));
 }
