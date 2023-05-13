@@ -1194,16 +1194,12 @@ odoo.define("terminal.functions.Common", function (require) {
         },
 
         _cmdShowOdooVersion: function () {
-            try {
-                const version_info = Utils.getOdooVersionInfo();
-                this.screen.print(
-                    `${version_info.slice(0, 3).join(".")} (${version_info
-                        .slice(3)
-                        .join(" ")})`
-                );
-            } catch (err) {
-                this.screen.print(window.term_odooVersionRaw);
-            }
+            const version_info = Utils.getOdooVersionInfo();
+            this.screen.print(
+                `${version_info.slice(0, 3).join(".")} (${version_info
+                    .slice(3)
+                    .join(" ")})`
+            );
             return Promise.resolve();
         },
 
