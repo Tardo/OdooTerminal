@@ -4,7 +4,8 @@
 (async () => {
     "use strict";
     const BrowserObj = typeof chrome === "undefined" ? browser : chrome;
-    await import(
-        BrowserObj.extension.getURL("src/js/extension/content_main.mjs")
+    const content_script = await import(
+        BrowserObj.extension.getURL("src/js/shared/content/content_script.mjs")
     );
+    new content_script.ExtensionContent();
 })();

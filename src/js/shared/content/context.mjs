@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ubrowser} from "./globals.mjs";
+import {ubrowser} from "../globals.mjs";
 
 export const InstanceContext = {
   isOdoo: false,

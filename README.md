@@ -6,7 +6,7 @@
 ![Chrome Add-on](https://img.shields.io/chrome-web-store/users/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
 
 <h1 align="center">
-  <img src="icons/terminal-48.png" />
+  <img src="src/img/terminal-128.png" />
   <div>Odoo Terminal - WebExtension</div>
 </h1>
 <p align="center">
@@ -80,6 +80,7 @@ You can toggle terminal using one of these options:
 - The maximum buffered screen lines is set to 750. So, you can't see more than
   749 records in the same query. This is necessary to avoid have a lot of
   nodes... One of the problems of use HTML elements to render the output :/
+- Can remap preferred key combination at chrome://extensions/shortcuts
 
 ---
 

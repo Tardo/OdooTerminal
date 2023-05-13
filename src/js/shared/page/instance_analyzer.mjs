@@ -1,7 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {isCompatibleOdooVersion} from "../common/utils.mjs";
+import {
+  isCompatibleOdooVersion,
+  sendWindowMessage,
+} from "../../common/utils.mjs";
 
 class InstanceAnalyzer {
   get odoo() {
@@ -17,13 +20,9 @@ class InstanceAnalyzer {
 
   run() {
     return this.getInfo().then((info) => {
-      window.postMessage(
-        {
-          type: "ODOO_TERM_INIT",
-          instance_info: info,
-        },
-        "*"
-      );
+      sendWindowMessage(window, "ODOO_TERM_INIT", {
+        instance_info: info,
+      });
     });
   }
 

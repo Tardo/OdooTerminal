@@ -1,13 +1,14 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {getStorageSync, injectPageScript, injector} from "./utils.mjs";
 import {InstanceContext, getResources, updateContext} from "./context.mjs";
+import {getStorageSync, injectPageScript, injector} from "../utils.mjs";
+import {ubrowser} from "../globals.mjs";
 
-import {ubrowser} from "./globals.mjs";
-import {SETTING_NAMES} from "../common/globals.mjs";
+import {SETTING_NAMES} from "../../common/globals.mjs";
+import {sendWindowMessage} from "../../common/utils.mjs";
 
-class ExtensionContent {
+export class ExtensionContent {
   constructor() {
     this.#handleEvents();
   }
@@ -46,14 +47,10 @@ class ExtensionContent {
         for (const config_name in items) {
           data[config_name] = items[config_name];
         }
-        window.postMessage(
-          {
-            type: "ODOO_TERM_CONFIG",
-            config: data,
-            info: InstanceContext,
-          },
-          "*"
-        );
+        sendWindowMessage(window, "ODOO_TERM_CONFIG", {
+          config: data,
+          info: InstanceContext,
+        });
       });
     }
   }
@@ -69,7 +66,7 @@ class ExtensionContent {
       } else {
         injectPageScript(
           document,
-          "src/js/external/instance_analyzer.mjs",
+          "src/js/shared/page/instance_analyzer.mjs",
           (ev) => {
             ev.target.parentNode.removeChild(ev.target);
           }
@@ -87,5 +84,3 @@ class ExtensionContent {
     ubrowser.runtime.onMessage.addListener(this.#onMessage.bind(this));
   }
 }
-
-export const extension_content = new ExtensionContent();

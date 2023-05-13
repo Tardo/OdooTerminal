@@ -79,3 +79,23 @@ export function setStorageSync(values) {
     });
   });
 }
+
+/**
+ * @param {Number} tab_id
+ * @param {String} message
+ */
+export function sendInternalMessage(tab_id, message) {
+  ubrowser.tabs.sendMessage(tab_id, {message: message});
+}
+
+export function getActiveTab() {
+  return new Promise((resolve, reject) => {
+    ubrowser.tabs.query({active: true, currentWindow: true}, (tabs) => {
+      if (tabs.length) {
+        resolve(tabs[0]);
+      } else {
+        reject();
+      }
+    });
+  });
+}

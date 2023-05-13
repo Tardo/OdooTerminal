@@ -10,14 +10,16 @@
  * 'update_terminal_badge_info'.
  */
 
-import {ubrowser} from "../extension/globals.mjs";
-
+import {ubrowser} from "../shared/globals.mjs";
+import {
+  getActiveTab,
+  getStorageSync,
+  sendInternalMessage,
+  setStorageSync,
+} from "../shared/utils.mjs";
 import {SETTING_DEFAULTS, SETTING_NAMES} from "../common/globals.mjs";
-import {getStorageSync, setStorageSync} from "../extension/utils.mjs";
 
 class ExtensionBackground {
-  #info_window_time = 0;
-
   constructor() {
     this.#handleEvents();
   }
@@ -68,19 +70,21 @@ class ExtensionBackground {
     });
   }
 
-  #onRefreshOdooInfo() {
+  #onRefreshOdooInfo(from_update) {
     // Because the script may be unavailable, we always assume
     // that the page is not compatible with the extension.
     this.#updateBrowserAction("terminal-disabled-32.png");
     // Query for active tab
-    ubrowser.tabs.query({active: true, currentWindow: true}, (tabs) => {
-      if (tabs.length && tabs[0].status === "complete") {
-        // Request Odoo Info, wait 'idle' delay
-        setTimeout(() => {
-          ubrowser.tabs.sendMessage(tabs[0].id, {
-            message: "update_odoo_terminal_info",
-          });
-        }, 150);
+    getActiveTab().then((tab) => {
+      if (tab.status === "complete") {
+        if (from_update) {
+          // Request Odoo Info, wait 'idle' delay
+          setTimeout(() => {
+            sendInternalMessage(tab.id, "update_odoo_terminal_info");
+          }, 150);
+        } else {
+          sendInternalMessage(tab.id, "update_odoo_terminal_info");
+        }
       }
     });
   }
@@ -89,9 +93,7 @@ class ExtensionBackground {
    * @param {Object} tab - The active tab
    */
   #onClickBrowserAction(tab) {
-    ubrowser.tabs.sendMessage(tab.id, {
-      message: "toggle_terminal",
-    });
+    sendInternalMessage(tab.id, "toggle_terminal");
   }
 
   #handleEvents() {
@@ -101,8 +103,12 @@ class ExtensionBackground {
     ubrowser.runtime.onInstalled.addListener(this.#onInstalled.bind(this));
 
     // Listen actived tab and updates to update info
-    ubrowser.tabs.onUpdated.addListener(this.#onRefreshOdooInfo.bind(this));
-    ubrowser.tabs.onActivated.addListener(this.#onRefreshOdooInfo.bind(this));
+    ubrowser.tabs.onUpdated.addListener(
+      this.#onRefreshOdooInfo.bind(this, true)
+    );
+    ubrowser.tabs.onActivated.addListener(
+      this.#onRefreshOdooInfo.bind(this, false)
+    );
 
     // Listen the extension browser icon click event to toggle terminal visibility
     ubrowser.browserAction.onClicked.addListener(
