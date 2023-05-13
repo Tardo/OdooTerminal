@@ -42,7 +42,7 @@
   },
   "permissions": ["activeTab", "storage"],
   "short_name": "Odoo Terminal",
-  "version": "9.3.1",
+  "version": "9.3.2",
   "web_accessible_resources": [
     "src/js/common/*",
     "src/js/shared/*",

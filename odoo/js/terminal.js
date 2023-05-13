@@ -21,7 +21,7 @@ odoo.define("terminal.Terminal", function (require) {
     const _lt = core._lt;
 
     const Terminal = Widget.extend({
-        VERSION: "9.3.1",
+        VERSION: "9.3.2",
 
         MODES: {
             BACKEND_NEW: 1,
