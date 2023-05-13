@@ -34,7 +34,6 @@ class ExtensionContent {
     if (event.data.type === "ODOO_TERM_INIT") {
       var info = event.data.instance_info;
       this.#updateInstanceContext(info);
-      setTimeout(() => this.#updateInstanceContext(info), 450);
       if (info.isCompatible) {
         injector(document, getResources());
       } else if (info.isOdoo) {
