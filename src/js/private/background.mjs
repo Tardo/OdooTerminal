@@ -48,8 +48,8 @@ class ExtensionBackground {
     if (request.message === "update_terminal_badge_info") {
       const context = request.context;
       const icon = context.isCompatible
-        ? "terminal-32.png"
-        : "terminal-disabled-32.png";
+        ? "terminal-16.png"
+        : "terminal-disabled-16.png";
       const color = context.isCompatible ? "#71639e" : "#878787";
       this.#updateBrowserAction(icon, context.serverVersionRaw, color);
     }
@@ -73,7 +73,7 @@ class ExtensionBackground {
   #onRefreshOdooInfo(from_update) {
     // Because the script may be unavailable, we always assume
     // that the page is not compatible with the extension.
-    this.#updateBrowserAction("terminal-disabled-32.png");
+    this.#updateBrowserAction("terminal-disabled-16.png");
     // Query for active tab
     getActiveTab().then((tab) => {
       if (tab.status === "complete") {

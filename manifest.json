@@ -3,7 +3,7 @@
     "page": "src/html/private/background.html"
   },
   "browser_action": {
-    "default_icon": "src/img/terminal-disabled-32.png",
+    "default_icon": "src/img/terminal-disabled-16.png",
     "default_title": "Odoo Terminal (CTRL + ,)"
   },
   "browser_specific_settings": {

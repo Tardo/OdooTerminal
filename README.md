@@ -203,5 +203,3 @@ Examples:
 Copyright Alexandre Díaz & contributors
 
 AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
-All content under 'icons/' has its own licenses and original authors.
