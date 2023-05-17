@@ -51,16 +51,17 @@ export function injector(doc, files) {
 }
 
 /**
- * @param {String} key
+ * @param {String/Array} keys
  * @returns {Promise}
  */
-export function getStorageSync(key) {
+export function getStorageSync(keys) {
   return new Promise((resolve, reject) => {
-    ubrowser.storage.sync.get(key, (items) => {
+    ubrowser.storage.sync.get(keys, (items) => {
       if (ubrowser.runtime?.lastError) {
-        return reject(ubrowser.runtime.lastError);
+        reject(ubrowser.runtime.lastError);
+      } else {
+        resolve(items);
       }
-      resolve(items);
     });
   });
 }
@@ -91,10 +92,10 @@ export function sendInternalMessage(tab_id, message) {
 export function getActiveTab() {
   return new Promise((resolve, reject) => {
     ubrowser.tabs.query({active: true, currentWindow: true}, (tabs) => {
-      if (tabs.length) {
-        resolve(tabs[0]);
+      if (ubrowser.runtime?.lastError || !tabs.length) {
+        reject(ubrowser.runtime?.lastError);
       } else {
-        reject();
+        resolve(tabs[0]);
       }
     });
   });

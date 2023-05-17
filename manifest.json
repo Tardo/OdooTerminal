@@ -1,6 +1,6 @@
 {
   "background": {
-    "page": "src/html/private/background.html"
+    "page": "src/html/background.html"
   },
   "browser_action": {
     "default_icon": "src/img/terminal-disabled-16.png",
@@ -35,7 +35,7 @@
   "manifest_version": 2,
   "name": "Odoo Terminal",
   "options_ui": {
-    "page": "settings/options.html",
+    "page": "src/html/options.html",
     "open_in_tab": true,
     "browser_style": true,
     "chrome_style": true
