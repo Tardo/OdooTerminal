@@ -10,14 +10,10 @@
  * 'update_terminal_badge_info'.
  */
 
-import {ubrowser} from "../shared/globals.mjs";
-import {
-  getActiveTab,
-  getStorageSync,
-  sendInternalMessage,
-  setStorageSync,
-} from "../shared/utils.mjs";
-import {SETTING_DEFAULTS, SETTING_NAMES} from "../common/globals.mjs";
+import {ubrowser} from "../shared/constants.mjs";
+import {getActiveTab, sendInternalMessage} from "../shared/tabs.mjs";
+import {getStorageSync, setStorageSync} from "../shared/storage.mjs";
+import {SETTING_DEFAULTS, SETTING_NAMES} from "../common/constants.mjs";
 
 /**
  * @param {String} icon - url to the icon

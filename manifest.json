@@ -13,7 +13,7 @@
   },
   "content_scripts": [
     {
-      "js": ["src/js/shared/content/content_script.js"],
+      "js": ["src/js/private/legacy/content_script.js"],
       "matches": ["<all_urls>"],
       "run_at": "document_idle"
     }
@@ -46,8 +46,7 @@
   "web_accessible_resources": [
     "src/js/common/*",
     "src/js/shared/*",
-    "globals.js",
-    "odoo/css/*",
-    "odoo/js/*"
+    "src/js/page/*",
+    "src/css/terminal.css"
   ]
 }

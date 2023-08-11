@@ -86,9 +86,7 @@ def create_package():
 
     zipdir('icons/')
     zipdir('settings/')
-    zipdir('odoo/')
     zipdir('src/')
-    zipf.write('globals.js')
     zipf.write('manifest.json')
     zipf.write('README.md')
 

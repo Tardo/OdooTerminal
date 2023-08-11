@@ -12,14 +12,9 @@
       <div class="optsection">
         <h4>Behaviour</h4>
         <p></p>
-        <input type="checkbox" id="pinned" name="pinned" value="pinned" />
+        <input type="checkbox" id="pinned" name="pinned" />
         <label for="pinned">Pinned</label><br />
-        <input
-          type="checkbox"
-          id="maximized"
-          name="maximized"
-          value="maximized"
-        />
+        <input type="checkbox" id="maximized" name="maximized" />
         <label for="maximized">Maximized</label><br />
         <label for="opacity">Opacity: </label>
         <input
@@ -79,6 +74,22 @@
           operations. In json format.
         </p>
         <textarea id="term_context"></textarea>
+      </div>
+
+      <div class="optsection">
+        <h4>Extension Developer Zone</h4>
+        <p></p>
+        <input type="checkbox" id="devmode_tests" name="devmode_tests" />
+        <label for="devmode_tests">Use OdooTerminalTests</label><br />
+        <input
+          type="checkbox"
+          id="devmode_ignore_comp_checks"
+          name="devmode_ignore_comp_checks"
+        />
+        <label for="devmode_ignore_comp_checks"
+          >Disable Odoo version checking (this can cause unwanted
+          exceptions!)</label
+        ><br />
       </div>
 
       <div class="btn_zone">

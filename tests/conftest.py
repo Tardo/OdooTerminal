@@ -1,9 +1,12 @@
 # Copyright  Alexandre Díaz <dev@redneboa.es>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import os
 import time
 import urllib.parse
 import pytest
 from python_on_whales import DockerClient
+
+os.environ['WDM_LOCAL'] = '1'
 
 
 def pytest_addoption(parser):

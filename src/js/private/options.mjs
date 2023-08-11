@@ -1,14 +1,14 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {getStorageSync, setStorageSync} from "../shared/utils.mjs";
+import {getStorageSync, setStorageSync} from "../shared/storage.mjs";
 import {process_keybind} from "../common/utils.mjs";
 import {
   IGNORED_KEYS,
   SETTING_DEFAULTS,
   SETTING_NAMES,
   SETTING_TYPES,
-} from "../common/globals.mjs";
+} from "../common/constants.mjs";
 
 let unique_counter = 1;
 let shortcuts_defs = {};

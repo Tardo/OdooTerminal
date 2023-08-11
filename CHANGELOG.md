@@ -1,5 +1,21 @@
 # Changelog
 
+**10.0.0**
+
+```
+IMP: Refactor to ESM
+IMP: Project structure
+IMP: Underscore is no longer used
+IMP: Support Odoo master version
+
+UPD: Use own icons
+
+FIX: Interpreter arguments
+FIX: Minor bugfixes
+
+ADD: 'Extension Developer Zone' in the extension settings
+```
+
 **9.3.1**
 
 ```
