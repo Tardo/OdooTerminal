@@ -30,7 +30,9 @@ function getTerminalObj() {
 }
 
 window.addEventListener("toggle_terminal", () => {
-  OdooTerminal.doToggle();
+  if (typeof window.__OdooTerminal !== "undefined") {
+    getTerminalObj().doToggle();
+  }
 });
 window.addEventListener(
   "message",

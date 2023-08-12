@@ -4,6 +4,7 @@
 import Screen from "./core/screen.mjs";
 import VMachine from "./trash/vmachine.mjs";
 import CommandAssistant from "./core/command_assistant.mjs";
+import {process_keybind} from "../../common/utils.mjs";
 import {UnknownCommandError} from "./trash/exception.mjs";
 import {
   renderTerminal,
@@ -126,6 +127,10 @@ export default class Terminal {
       .on("click", this.#onClickToggleScreenPin.bind(this));
     // Custom Events
     this.$el[0].addEventListener("toggle", this.doToggle.bind(this));
+
+    if (!isEmpty(this.#config.init_cmds)) {
+      this.#wakeUp();
+    }
   }
 
   get registeredCmds() {
@@ -148,20 +153,20 @@ export default class Terminal {
    * This is necessary to prevent terminal issues in Odoo EE
    */
   #initGuard() {
-    if (typeof this.#observer === "undefined") {
+    if (this.#observer === null) {
       this.#observer = new MutationObserver(this.#injectTerminal.bind(this));
       this.#observer.observe(document.body, {childList: true});
     }
   }
 
   #injectTerminal() {
-    const $terms = $("body").find(".o_terminal");
+    const $terms = $("body").children(".o_terminal");
     if ($terms.length > 1) {
       // Remove extra terminals
       $terms.filter(":not(:first-child)").remove();
-    } else if (!$terms.length) {
-      $(this.#rawTerminalTemplate).prependTo("body");
-      this.$el = $("body").find("#terminal");
+    } else if ($terms.length === 0) {
+      this.$el = $(this.#rawTerminalTemplate);
+      this.$el.prependTo("body");
     }
   }
 
@@ -572,7 +577,7 @@ export default class Terminal {
         this.onFinishCommand(job_index, is_failed, error || result);
       }
       if (is_failed) {
-        return reject(error);
+        return reject(typeof error === "object" ? "" : error);
       }
       return resolve(result);
     });
@@ -618,8 +623,6 @@ export default class Terminal {
         Object.hasOwn(result, "message")
       ) {
         this.screen.printError(result.message, true);
-      } else {
-        this.screen.printError(result, true);
       }
     }
     delete this.#jobs[job_index];
@@ -854,7 +857,7 @@ export default class Terminal {
         // Press Escape
         this.doHide();
       } else {
-        const keybind = window.__OdooTerminal.process_keybind(ev);
+        const keybind = process_keybind(ev);
         const keybind_str = JSON.stringify(keybind);
         const keybind_cmds = this.#config.shortcuts[keybind_str];
         if (keybind_cmds) {

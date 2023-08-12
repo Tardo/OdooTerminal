@@ -3,6 +3,7 @@ OdooTerminal.zip
 
 #Virtualenv
 .env/
+.wdm/
 
 # Test logs
 *.log

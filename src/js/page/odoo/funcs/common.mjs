@@ -612,9 +612,10 @@ function cmdContextOperation(kwargs) {
       kwargs.operation === "write" ||
       kwargs.operation === "delete"
     ) {
-      return Promise.reject(
+      this.screen.printError(
         "This operation is currently not supported in v15.0+"
       );
+      return Promise.resolve();
     }
   }
 
@@ -916,22 +917,43 @@ function cmdCount(kwargs) {
 }
 
 function cmdRef(kwargs) {
+  const OdooVer = getOdooVersionMajor();
   const tasks = [];
   for (const xmlid of kwargs.xmlid) {
-    tasks.push(
-      rpc
-        .query({
-          method: "xmlid_to_res_model_res_id",
-          model: "ir.model.data",
-          args: [xmlid],
-          kwargs: {context: this.getContext()},
-        })
-        .then(
-          function (active_xmlid, result) {
-            return [active_xmlid, result[0], result[1]];
-          }.bind(this, xmlid)
-        )
-    );
+    if (OdooVer < 15) {
+      tasks.push(
+        rpc
+          .query({
+            method: "xmlid_to_res_model_res_id",
+            model: "ir.model.data",
+            args: [xmlid],
+            kwargs: {context: this.getContext()},
+          })
+          .then(
+            function (active_xmlid, result) {
+              return [active_xmlid, result[0], result[1]];
+            }.bind(this, xmlid)
+          )
+      );
+    } else {
+      const xmlid_parts = xmlid.split(".");
+      const module = xmlid_parts[0];
+      const xid = xmlid_parts.slice(1).join(".");
+      tasks.push(
+        rpc
+          .query({
+            method: "check_object_reference",
+            model: "ir.model.data",
+            args: [module, xid],
+            kwargs: {context: this.getContext()},
+          })
+          .then(
+            function (active_xmlid, result) {
+              return [active_xmlid, result[0], result[1]];
+            }.bind(this, xmlid)
+          )
+      );
+    }
   }
 
   return Promise.all(tasks).then((results) => {
@@ -1009,7 +1031,7 @@ function getBarcodeInfo(barcodeService) {
     return [
       `Max. time between keys (ms): ${barcodeService.barcodeService.maxTimeBetweenKeysInMs}`,
       "Reserved barcode prefixes: O-BTN., O-CMD.",
-      `Available commands: ${this._AVAILABLE_BARCODE_COMMANDS.join(", ")}`,
+      `Available commands: ${AVAILABLE_BARCODE_COMMANDS.join(", ")}`,
     ];
   }
   return [
@@ -1025,12 +1047,14 @@ function getBarcodeInfo(barcodeService) {
 }
 function cmdBarcode(kwargs) {
   // Soft-dependency... this don't exists if barcodes module is not installed
+
   const barcodeService = getOdooService(
     "barcodes.BarcodeEvents",
     "@barcodes/barcode_service"
   );
   if (!barcodeService) {
-    return Promise.reject("The 'barcode' module is not installed/available");
+    this.screen.printError("The 'barcode' module is not installed/available");
+    return Promise.resolve();
   }
   return new Promise(async (resolve, reject) => {
     if (kwargs.operation === "info") {
@@ -1618,12 +1642,7 @@ export function registerCommonFuncs(TerminalObj) {
         "send",
         ["send", "info"],
       ],
-      [
-        ARG.List | ARG.Number | ARG.String,
-        ["d", "data"],
-        false,
-        "The data to send",
-      ],
+      [ARG.List | ARG.Any, ["d", "data"], false, "The data to send"],
       [
         ARG.Number,
         ["pd", "pressdelay"],

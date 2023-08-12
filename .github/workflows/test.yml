@@ -24,7 +24,7 @@ jobs:
           path: |
             .venv
             .cache
-            ~/.wdm
+            .wdm
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
       - name: Checkout
@@ -68,12 +68,6 @@ jobs:
       - name: Create .zip package
         run: poetry run python tools/release.py
 
-
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
         id: xtests
-        run: xvfb-run --auto-servernum poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
-        continue-on-error: true
-
-      - name: Retry test for ${{ matrix.instance }} (${{ matrix.browser }})
-        if: steps.xtests.outcome != 'success'
         run: xvfb-run --auto-servernum poetry run pytest --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}

@@ -24,7 +24,7 @@ export function renderErrorMessage(values) {
     `<span>${values.error_message}</span>` +
     "<ul>" +
     "<li name='exception_type'>" +
-    `<a class='btn btn-sm btn-secondary' data-toggle='collapse' href='#collapseExceptionType${values.error_id}' role='button' aria-expanded='false' aria-controls='collapseExceptionType${values.error_id}'>` +
+    `<a class='btn btn-sm btn-secondary' data-bs-toggle='collapse' data-toggle='collapse' href='#collapseExceptionType${values.error_id}' role='button' aria-expanded='false' aria-controls='collapseExceptionType${values.error_id}'>` +
     "Exception Type" +
     "</a>" +
     `<div class='collapse' id='collapseExceptionType${values.error_id}'>` +
@@ -32,7 +32,7 @@ export function renderErrorMessage(values) {
     "</div>" +
     "</li>" +
     "<li name='context'>" +
-    `<a class='btn btn-sm btn-secondary' data-toggle='collapse' href='#collapseContext${values.error_id}' role='button' aria-expanded='false' aria-controls='collapseContext${values.error_id}'>` +
+    `<a class='btn btn-sm btn-secondary' data-bs-toggle='collapse' data-toggle='collapse' href='#collapseContext${values.error_id}' role='button' aria-expanded='false' aria-controls='collapseContext${values.error_id}'>` +
     "Context" +
     "</a>" +
     `<div class='collapse' id='collapseContext${values.error_id}'>` +
@@ -40,7 +40,7 @@ export function renderErrorMessage(values) {
     "</div>" +
     "</li>" +
     "<li name='args'>" +
-    `<a class='btn btn-sm btn-secondary' data-toggle='collapse' href='#collapseArguments${values.error_id}' role='button' aria-expanded='false' aria-controls='collapseArguments${values.error_id}'>` +
+    `<a class='btn btn-sm btn-secondary' data-bs-toggle='collapse' data-toggle='collapse' href='#collapseArguments${values.error_id}' role='button' aria-expanded='false' aria-controls='collapseArguments${values.error_id}'>` +
     "Arguments" +
     "</a>" +
     `<div class='collapse' id='collapseArguments${values.error_id}'>` +
@@ -48,7 +48,7 @@ export function renderErrorMessage(values) {
     "</div>" +
     "</li>" +
     "<li name='debug'>" +
-    `<a class='btn btn-sm btn-secondary' data-toggle='collapse' href='#collapseDebug${values.error_id}' role='button' aria-expanded='false' aria-controls='collapseDebug${values.error_id}'>` +
+    `<a class='btn btn-sm btn-secondary' data-bs-toggle='collapse' data-toggle='collapse' href='#collapseDebug${values.error_id}' role='button' aria-expanded='false' aria-controls='collapseDebug${values.error_id}'>` +
     "Debug" +
     "</a>" +
     `<div class='collapse' id='collapseDebug${values.error_id}'>` +

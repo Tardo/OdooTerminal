@@ -1070,9 +1070,6 @@ export default class Interpreter {
   }
 
   #checkArgumentValueType(val, arg_type) {
-    if (!val) {
-      return false;
-    }
     if (arg_type === ARG.Any) {
       return true;
     }

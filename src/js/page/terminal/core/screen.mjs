@@ -262,14 +262,21 @@ export default class Screen {
   }
 
   printError(error, internal = false) {
+    if (!error) {
+      return;
+    }
     if (!internal) {
       this.#print(`[!] ${error}`, "line-br");
       return;
     }
+    const error_id = new Date().getTime();
     let error_msg = error;
-    if (typeof error === "object" && Object.hasOwn(error, "data")) {
+    if (
+      typeof error === "object" &&
+      Object.hasOwn(error, "data") &&
+      error.code === 200
+    ) {
       // It's an Odoo error report
-      const error_id = new Date().getTime();
       error_msg = renderErrorMessage({
         error_name: encodeHTML(error.data.name),
         error_message: encodeHTML(error.data.message),
@@ -286,7 +293,6 @@ export default class Screen {
       error.status !== "200"
     ) {
       // It's an Odoo/jQuery error report
-      const error_id = new Date().getTime();
       error_msg = renderErrorMessage({
         error_name: encodeHTML(error.statusText),
         error_message: encodeHTML(error.statusText),
@@ -295,6 +301,25 @@ export default class Screen {
         context: "",
         args: "",
         debug: encodeHTML(error.responseText || ""),
+      });
+      ++this.#errorCount;
+    } else if (
+      typeof error === "object" &&
+      Object.hasOwn(error, "data") &&
+      Object.hasOwn(error.data, "debug")
+    ) {
+      const debug_error = JSON.parse(error.data.debug).error;
+      error_msg = renderErrorMessage({
+        error_name: encodeHTML(debug_error.data.name),
+        error_message: encodeHTML(debug_error.data.message),
+        error_id: error_id,
+        exception_type: encodeHTML(debug_error.message),
+        context:
+          debug_error.data.context && JSON.stringify(debug_error.data.context),
+        args:
+          debug_error.data.arguments &&
+          JSON.stringify(debug_error.data.arguments),
+        debug: encodeHTML(debug_error.data.debug || ""),
       });
       ++this.#errorCount;
     }
