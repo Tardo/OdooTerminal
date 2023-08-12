@@ -10,7 +10,9 @@ IMP: Support Odoo master version
 
 UPD: Use own icons
 
-FIX: Interpreter arguments
+FIX: Interpreter default arguments
+FIX: Command 'ref' in Odoo >=15
+FIX: Error report in Odoo >= 15
 FIX: Minor bugfixes
 
 ADD: 'Extension Developer Zone' in the extension settings
