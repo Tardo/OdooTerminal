@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import TestBackend from "./test_backend.mjs";
-import TestCommon from "./test_common.mjs";
-import TestCore from "./test_core.mjs";
-import TestTrash from "./test_trash.mjs";
-import OdooTerminal from "../odoo/terminal.mjs";
-import {isEmpty} from "../terminal/core/utils.mjs";
+import TestBackend from "@tests/test_backend";
+import TestCommon from "@tests/test_common";
+import TestCore from "@tests/test_core";
+import TestTrash from "@tests/test_trash";
+import OdooTerminal from "@odoo/terminal";
+import {isEmpty} from "@terminal/core/utils";
 
 const TestSuites = [TestBackend, TestCommon, TestCore, TestTrash];
 

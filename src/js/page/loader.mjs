@@ -1,12 +1,13 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import OdooTerminal from "./odoo/terminal.mjs";
-import OdooTerminalTests from "./tests/terminal.mjs";
-import {registerCoreFuncs} from "./terminal/funcs.mjs";
-import {registerCommonFuncs} from "./odoo/funcs/common.mjs";
-import {registerBackendFuncs} from "./odoo/funcs/backend.mjs";
-import {getOdooVersion, getUsername, isBackOffice} from "./odoo/utils.mjs";
+import "@css/terminal.css";
+import OdooTerminal from "@odoo/terminal";
+import OdooTerminalTests from "@tests/terminal";
+import {registerCoreFuncs} from "@terminal/funcs";
+import {registerCommonFuncs} from "@odoo/funcs/common";
+import {registerBackendFuncs} from "@odoo/funcs/backend";
+import {getOdooVersion, getUsername, isBackOffice} from "@odoo/utils";
 
 let terminal = null;
 function getTerminalObj() {

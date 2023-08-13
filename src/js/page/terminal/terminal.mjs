@@ -1,20 +1,20 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import Screen from "./core/screen.mjs";
-import VMachine from "./trash/vmachine.mjs";
-import CommandAssistant from "./core/command_assistant.mjs";
-import {process_keybind} from "../../common/utils.mjs";
-import {UnknownCommandError} from "./trash/exception.mjs";
+import Screen from "@terminal/core/screen";
+import VMachine from "@trash/vmachine";
+import CommandAssistant from "@terminal/core/command_assistant";
+import {process_keybind} from "@common/utils";
+import {UnknownCommandError} from "@trash/exception";
 import {
   renderTerminal,
   renderUnknownCommand,
   renderWelcome,
-} from "./core/template_manager.mjs";
-import {StorageLocal, StorageSession} from "./core/storage.mjs";
-import {KEYMAP} from "./trash/constants.mjs";
-import {difference} from "./trash/utils.mjs";
-import {debounce, isEmpty} from "./core/utils.mjs";
+} from "@terminal/core/template_manager";
+import {StorageLocal, StorageSession} from "@terminal/core/storage";
+import {KEYMAP} from "@trash/constants";
+import {difference} from "@trash/utils";
+import {debounce, isEmpty} from "@terminal/core/utils";
 
 export default class Terminal {
   VERSION = "9.3.2";

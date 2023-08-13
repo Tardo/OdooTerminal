@@ -1,8 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import TerminalTestSuite from "./tests.mjs";
-import {asyncSleep} from "../terminal/core/utils.mjs";
+import TerminalTestSuite from "@tests/tests";
+import {asyncSleep} from "@terminal/core/utils";
 
 export default class TestBackend extends TerminalTestSuite {
   async test_view() {

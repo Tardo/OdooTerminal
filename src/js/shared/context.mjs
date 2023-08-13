@@ -27,7 +27,7 @@ export function updateContext(...values) {
  */
 export function getResources() {
   return {
-    css: ["src/css/terminal.css"],
-    js: ["src/js/page/loader.mjs"],
+    css: [],
+    js: ["src/dist/terminal.mjs"],
   };
 }

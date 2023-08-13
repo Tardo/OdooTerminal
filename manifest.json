@@ -46,7 +46,8 @@
   "web_accessible_resources": [
     "src/js/common/*",
     "src/js/shared/*",
-    "src/js/page/*",
+    "src/js/page/volatile/*",
+    "src/dist/*",
     "src/css/terminal.css"
   ]
 }

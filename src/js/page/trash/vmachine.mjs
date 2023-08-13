@@ -1,10 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {INSTRUCTION_TYPE} from "./constants.mjs";
-import {countBy, pluck} from "./utils.mjs";
-import * as Exceptions from "./exception.mjs";
-import Interpreter from "./interpreter.mjs";
+import {INSTRUCTION_TYPE} from "@trash/constants";
+import {countBy, pluck} from "@trash/utils";
+import * as Exceptions from "@trash/exception";
+import Interpreter from "@trash/interpreter";
 
 class Frame {
   constructor(cmd_name, prev_frame) {

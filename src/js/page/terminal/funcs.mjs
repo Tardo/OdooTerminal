@@ -1,8 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {file2File, isEmpty, save2File, uniqueId} from "./core/utils.mjs";
-import {ARG, INSTRUCTION_TYPE} from "./trash/constants.mjs";
+import {file2File, isEmpty, save2File, uniqueId} from "@terminal/core/utils";
+import {ARG, INSTRUCTION_TYPE} from "@trash/constants";
 
 function printHelpDetailed(cmd, cmd_def) {
   this.screen.eprint("NAME");

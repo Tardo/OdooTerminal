@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "create:prod": "export NODE_ENV=production && rollup -c && poetry run ./tools/release.py",
+    "create:dev": "export NODE_ENV=development && rollup -c && poetry run ./tools/release.py",
+    "tests": "poetry run ./tools/release.py && poetry run pytest",
+    "clean": "rm -r ./dist"
+  },
+  "dependencies": {
+    "@rollup/plugin-alias": "^3.1.9",
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-node-resolve": "^13.2.1",
+    "autoprefixer": "^10.4.0",
+    "cssnano": "^5.0.12",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}

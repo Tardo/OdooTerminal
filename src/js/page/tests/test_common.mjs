@@ -1,10 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import TerminalTestSuite from "./tests.mjs";
-import {asyncSleep, isEmpty, uniqueId} from "../terminal/core/utils.mjs";
-import rpc from "../odoo/rpc.mjs";
-import {getOdooVersionMajor} from "../odoo/utils.mjs";
+import TerminalTestSuite from "@tests/tests";
+import {asyncSleep, isEmpty, uniqueId} from "@terminal/core/utils";
+import rpc from "@odoo/rpc";
+import {getOdooVersionMajor} from "@odoo/utils";
 
 export default class TestCommon extends TerminalTestSuite {
   // Can't test 'lang'

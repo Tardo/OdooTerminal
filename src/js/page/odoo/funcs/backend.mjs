@@ -1,11 +1,11 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from "../rpc.mjs";
-import {ARG} from "../../terminal/trash/constants.mjs";
-import {default as OdooRoot, doAction, showEffect} from "../root.mjs";
-import {getContent, getOdooService, getOdooVersionMajor} from "../utils.mjs";
-import {file2Base64, isEmpty} from "../../terminal/core/utils.mjs";
+import rpc from "@odoo/rpc";
+import {ARG} from "@trash/constants";
+import {default as OdooRoot, doAction, showEffect} from "@odoo/root";
+import {getContent, getOdooService, getOdooVersionMajor} from "@odoo/utils";
+import {file2Base64, isEmpty} from "@terminal/core/utils";
 
 function getDialogParent() {
   const OdooVer = getOdooVersionMajor();

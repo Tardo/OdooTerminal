@@ -1,24 +1,24 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import Recordset from "../../terminal/core/recordset.mjs";
+import Recordset from "@terminal/core/recordset";
 import {
   renderMetadata,
   renderRecordCreated,
   renderWhoami,
   renderWhoamiListItem,
-} from "../../terminal/core/template_manager.mjs";
-import {ARG} from "../../terminal/trash/constants.mjs";
-import {asyncSleep, isEmpty} from "../../terminal/core/utils.mjs";
-import rpc from "../rpc.mjs";
-import {doAction} from "../root.mjs";
+} from "@terminal/core/template_manager";
+import {ARG} from "@trash/constants";
+import {asyncSleep, isEmpty} from "@terminal/core/utils";
+import rpc from "@odoo/rpc";
+import {doAction} from "@odoo/root";
 import {
   getOdooService,
   getOdooSession,
   getOdooVersionInfo,
   getOdooVersionMajor,
   getUID,
-} from "../utils.mjs";
+} from "@odoo/utils";
 
 const session = getOdooSession();
 

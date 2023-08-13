@@ -11,18 +11,22 @@ FrameBuffer)_
 Test env. uses 'docker compose v2'!
 
 ```
-apt-get install python poetry
+apt-get install python poetry npm
+npm install --global npm
+npm install --global rollup
 poetry install
+npm install
 ```
 
 #### Usage
 
 ```
-poetry run pytest --browser chromium --odoo-version 15
+npm run tests -- --browser chromium --odoo-version 16
 ```
 
-** Available browsers: firefox, chromium, chrome ** Avaiblable versions: 11, 12,
-13, 14, 15
+\*\* Available browsers: firefox, chromium, chrome
+
+\*\* Avaiblable versions: 11, 12, 13, 14, 15, 16
 
 ## Unit Tests
 
