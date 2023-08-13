@@ -1,8 +1,14 @@
 # Distribution extension package
 OdooTerminal.zip
+src/dist/
 
-#Virtualenv
+# Virtualenv
 .env/
+
+# Caches
+.wdm/
+node_modules/
+.pytest_cache/
 
 # Test logs
 *.log

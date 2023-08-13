@@ -1,5 +1,26 @@
 # Changelog
 
+**10.0.0**
+
+```
+IMP: Refactor to ESM
+IMP: Project structure
+IMP: Underscore is no longer used
+IMP: Support Odoo master version
+IMP: Use rollup
+IMP: Separate commands
+
+UPD: Use own icons
+
+FIX: Interpreter default arguments
+FIX: Command 'ref' in Odoo >=15
+FIX: Error report in Odoo >= 15
+FIX: Minor bugfixes
+FIX: Command 'read': wildcard with binary fields (issue #118)
+
+ADD: 'Extension Developer Zone' in the extension settings
+```
+
 **9.3.1**
 
 ```

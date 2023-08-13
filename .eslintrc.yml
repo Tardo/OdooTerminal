@@ -14,15 +14,14 @@ overrides:
 # Globals available in Odoo that shouldn't produce errorings
 globals:
   __OdooTerminal: readonly
-  _: readonly
+  _: off
   $: readonly
-  fuzzy: readonly
   jQuery: readonly
   moment: readonly
   odoo: readonly
-  py: readonly
   chrome: readonly
   browser: readonly
+  owl: readonly
   openerp: off
 
 # Styling is handled by Prettier, so we only need to enable AST rules;

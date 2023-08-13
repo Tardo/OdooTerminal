@@ -1,9 +1,12 @@
 # Copyright  Alexandre Díaz <dev@redneboa.es>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import os
 import time
 import urllib.parse
 import pytest
 from python_on_whales import DockerClient
+
+os.environ['WDM_LOCAL'] = '1'
 
 
 def pytest_addoption(parser):
@@ -17,9 +20,9 @@ def docker_compose(pytestconfig):
     docker.compose.build(build_args={
         'ODOO_VERSION': f'{odoo_ver}.0',
     })
+    docker.compose.up(services=['db'], detach=True)
+    docker.compose.run('odoo', command=['addons', 'init', '-w', 'base,bus,account,barcodes,sms'], remove=True)
     docker.compose.up(detach=True)
-    docker.compose.run('odoo', command=['addons', 'init', '-w', 'base,bus,sale_management,barcodes,sms'], remove=True)
-    docker.compose.restart(services=['odoo'])
     time.sleep(10)   # Wait for Odoo service
     yield docker
     docker.compose.rm(stop=True, volumes=True)

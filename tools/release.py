@@ -84,11 +84,14 @@ def create_package():
             for file in files:
                 zipf.write(os.path.join(root, file))
 
-    zipdir('icons/')
-    zipdir('settings/')
-    zipdir('odoo/')
-    zipdir('src/')
-    zipf.write('globals.js')
+    zipdir('src/html/')
+    zipdir('src/img/')
+    zipdir('src/js/common/')
+    zipdir('src/js/private/')
+    zipdir('src/js/page/volatile/')
+    zipdir('src/js/shared/')
+    zipdir('src/dist/')
+    zipf.write('src/css/options.css')
     zipf.write('manifest.json')
     zipf.write('README.md')
 
