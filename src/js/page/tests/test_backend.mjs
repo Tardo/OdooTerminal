@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import TerminalTestSuite from "@tests/tests";
+import TerminalTestSuite from "./tests";
 import {asyncSleep} from "@terminal/core/utils";
 
 export default class TestBackend extends TerminalTestSuite {
@@ -28,6 +28,14 @@ export default class TestBackend extends TerminalTestSuite {
     await asyncSleep(2000);
     this.assertTrue(
       $(".o_form_view .settings, .o_form_view > .settings").length > 0
+    );
+  }
+
+  async test_effect() {
+    await this.terminal.execute(
+      "-t rainbow_man -o {message: 'I hope everything works correctly'}",
+      false,
+      true
     );
   }
 }

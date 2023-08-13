@@ -18,7 +18,7 @@ npm install
 #### Usage
 
 ```
-npm run create:dev
+npm run build
 npm run tests -- --browser chromium --odoo-version 16
 ```
 

@@ -1,10 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {INSTRUCTION_TYPE} from "@trash/constants";
-import {countBy, pluck} from "@trash/utils";
-import * as Exceptions from "@trash/exception";
-import Interpreter from "@trash/interpreter";
+import {INSTRUCTION_TYPE} from "./constants";
+import {countBy, pluck} from "./utils";
+import * as Exceptions from "./exception";
+import Interpreter from "./interpreter";
 
 class Frame {
   constructor(cmd_name, prev_frame) {

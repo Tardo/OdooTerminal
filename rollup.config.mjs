@@ -62,5 +62,11 @@ export default {
   ],
   watch: {
     clearScreen: false,
+    include: [
+      "src/css/terminal.css",
+      "src/js/common/**",
+      "src/js/page/**",
+      "src/js/shared/**",
+    ],
   },
 };

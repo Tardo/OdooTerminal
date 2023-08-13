@@ -1,10 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import ParameterGenerator from "@odoo/parameter_generator";
-import Longpolling from "@odoo/longpolling";
+import ParameterGenerator from "./parameter_generator";
+import Longpolling from "./longpolling";
 import Terminal from "@terminal/terminal";
-import {getOdooSession} from "@odoo/utils";
+import {getOdooSession} from "./utils";
 
 export default class OdooTerminal extends Terminal {
   onBusNotification(notifications) {

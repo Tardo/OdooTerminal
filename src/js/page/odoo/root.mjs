@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {getOdooService, getOdooVersionMajor} from "@odoo/utils";
+import {getOdooService, getOdooVersionMajor} from "./utils";
 
 const OdooRoot = getOdooService("root.widget", "web.web_client");
 

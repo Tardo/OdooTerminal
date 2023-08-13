@@ -11,8 +11,8 @@ import {
   MATH_OPER_PRIORITIES,
   SYMBOLS,
   SYMBOLS_MATH_OPER,
-} from "@trash/constants";
-import {countBy, difference} from "@trash/utils";
+} from "./constants";
+import {countBy, difference} from "./utils";
 
 class Instruction {
   constructor(type, input_token_index, level, dataIndex = -1) {

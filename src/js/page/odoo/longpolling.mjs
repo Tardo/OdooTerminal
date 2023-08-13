@@ -1,8 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {default as OdooRoot, doCall} from "@odoo/root";
-import {getOdooService, getOdooVersionMajor} from "@odoo/utils";
+import {default as OdooRoot, doCall} from "./root";
+import {getOdooService, getOdooVersionMajor} from "./utils";
 
 const Bus = getOdooService("bus.bus")?.bus;
 

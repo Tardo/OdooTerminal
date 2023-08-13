@@ -1,14 +1,14 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import TestBackend from "@tests/test_backend";
-import TestCommon from "@tests/test_common";
-import TestCore from "@tests/test_core";
-import TestTrash from "@tests/test_trash";
+import TestBackend from "./test_backend";
+import TestCommon from "./test_common";
+import TestCore from "./test_core";
+import TestTrash from "./test_trash";
 import OdooTerminal from "@odoo/terminal";
 import {isEmpty} from "@terminal/core/utils";
 
-const TestSuites = [TestBackend, TestCommon, TestCore, TestTrash];
+const TestSuites = [TestTrash, TestCore, TestCommon, TestBackend];
 
 export default class OdooTerminalTests extends OdooTerminal {
   /**
@@ -52,7 +52,7 @@ export default class OdooTerminalTests extends OdooTerminal {
           names = names.filter((item) => test_names.includes(item));
         }
         if (!isEmpty(names)) {
-          this.screen.print("[info] Running tests...");
+          this.screen.print(`[info] Running '${TestClass.name}' tests...`);
           await test_suit.onStartTests(names);
           for (const name of names) {
             this.screen.print(`${name}... `, true);

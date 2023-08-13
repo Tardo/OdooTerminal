@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import TerminalTestSuite from "@tests/tests";
+import TerminalTestSuite from "./tests";
 
 export default class TestCore extends TerminalTestSuite {
   // Can't test 'exportfile' because required user interaction

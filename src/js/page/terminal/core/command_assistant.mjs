@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {INSTRUCTION_TYPE} from "@trash/constants";
-import {debounce} from "@terminal/core/utils";
+import {debounce} from "./utils";
 
 export default class CommandAssistant {
   #virtMachine = null;

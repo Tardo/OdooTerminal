@@ -1,5 +1,5 @@
 # Configuration for known file extensions
-[*.{css,js,json,md,xml,yaml,yml}]
+[*.{css,js,mjs,json,md,xml,yaml,yml}]
 charset = utf-8
 end_of_line = lf
 indent_size = 4
@@ -7,5 +7,5 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{json,yml,yaml,md}]
+[*.{json,yml,yaml,md,js,mjs}]
 indent_size = 2

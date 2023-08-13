@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import TerminalTestSuite from "@tests/tests";
+import TerminalTestSuite from "./tests";
 import {asyncSleep, isEmpty, uniqueId} from "@terminal/core/utils";
 import rpc from "@odoo/rpc";
 import {getOdooVersionMajor} from "@odoo/utils";

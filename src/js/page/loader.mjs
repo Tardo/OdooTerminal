@@ -4,9 +4,9 @@
 import "@css/terminal.css";
 import OdooTerminal from "@odoo/terminal";
 import OdooTerminalTests from "@tests/terminal";
-import {registerCoreFuncs} from "@terminal/funcs";
-import {registerCommonFuncs} from "@odoo/funcs/common";
-import {registerBackendFuncs} from "@odoo/funcs/backend";
+import registerCoreFuncs from "@terminal/commands/__all__";
+import registerCommonFuncs from "@odoo/commands/common/__all__";
+import registerBackofficeFuncs from "@odoo/commands/backoffice/__all__";
 import {getOdooVersion, getUsername, isBackOffice} from "@odoo/utils";
 
 let terminal = null;
@@ -49,7 +49,7 @@ window.addEventListener(
       const term_obj = getTerminalObj();
       if (term_obj) {
         if (isBackOffice()) {
-          registerBackendFuncs(term_obj);
+          registerBackofficeFuncs(term_obj);
         }
         term_obj.init(ev.data.config);
         const vals = {

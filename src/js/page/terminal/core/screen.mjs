@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import Recordset from "@terminal/core/recordset";
+import Recordset from "./recordset";
 import {
   renderErrorMessage,
   renderHelpCmd,
@@ -9,7 +9,7 @@ import {
   renderPromptCmdHiddenArgs,
   renderTable,
   renderTableSearchId,
-} from "@terminal/core/template_manager";
+} from "./template_manager";
 import {
   debounce,
   defer,
@@ -18,7 +18,7 @@ import {
   hsv2rgb,
   rgb2hsv,
   unique,
-} from "@terminal/core/utils";
+} from "./utils";
 
 const PROMPT = ">";
 const LINE_SELECTOR = ":scope > span .print-table tr, :scope > span";

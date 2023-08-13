@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "src/css",
+			"name": "CSS",
+		},
+		{
+			"path": "src/html",
+			"name": "HTML",
+		},
+		{
+			"path": "src/js",
+			"name": "JS",
+		},
+		{
+			"path": "tests",
+			"name": "Tests",
+		},
+		{
+			"path": "tools",
+			"name": "Tools",
+		},
+		{
+			"path": ".",
+			"name": "OdooTerminal - Root"
+		}
+	],
+	"settings": {}
+}
