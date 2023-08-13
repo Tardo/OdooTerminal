@@ -356,8 +356,13 @@ export default class Screen {
           ++index;
           continue;
         }
+        const item_val = item[field];
         columns.push(encodeHTML(field));
-        tbody += `<td>${encodeHTML(String(item[field]))}</td>`;
+        if (typeof item_val === "object" && item_val.oterm && item_val.binary) {
+          tbody += `<td><span class='btn btn-secondary o_terminal_click o_terminal_read_bin_field' data-model='${model}' data-id='${item.id}' data-field='${field}'>Try Read Field</span></td>`;
+        } else {
+          tbody += `<td>${encodeHTML(String(item_val))}</td>`;
+        }
         ++index;
       }
       tbody += "</tr>";

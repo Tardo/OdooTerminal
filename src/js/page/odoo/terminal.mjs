@@ -4,7 +4,9 @@
 import ParameterGenerator from "./parameter_generator";
 import Longpolling from "./longpolling";
 import Terminal from "@terminal/terminal";
+import {encodeHTML} from "@terminal/core/utils";
 import {getOdooSession} from "./utils";
+import rpc from "./rpc";
 
 export default class OdooTerminal extends Terminal {
   onBusNotification(notifications) {
@@ -41,5 +43,36 @@ export default class OdooTerminal extends Terminal {
       console.warn("[OdooTerminal] Can't initilize longpolling: ", err);
       this.longpolling = false;
     }
+  }
+
+  /**
+   * @override
+   */
+  onCoreClick(ev) {
+    super.onCoreClick(ev);
+    if (ev.target.classList.contains("o_terminal_read_bin_field")) {
+      this.#onTryReadBinaryField(ev.target);
+    }
+  }
+
+  #onTryReadBinaryField(target) {
+    const model = target.dataset.model;
+    const field = target.dataset.field;
+    const id = target.dataset.id;
+
+    rpc
+      .query({
+        method: "search_read",
+        domain: [["id", "=", id]],
+        fields: [field],
+        model: model,
+        kwargs: {context: this.getContext()},
+      })
+      .then((result) => {
+        target.parentNode.textContent = encodeHTML(
+          JSON.stringify(result[0][field])
+        );
+      })
+      .catch(() => (target.parentNode.textContent = "** Reading Error! **"));
   }
 }

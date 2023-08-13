@@ -113,7 +113,7 @@ export default class Terminal {
     }
 
     window.addEventListener("keydown", this.#onCoreKeyDown.bind(this));
-    window.addEventListener("click", this.#onCoreClick.bind(this));
+    window.addEventListener("click", this.onCoreClick.bind(this));
     window.addEventListener(
       "beforeunload",
       this.#onCoreBeforeUnload.bind(this),
@@ -629,9 +629,9 @@ export default class Terminal {
     this.#updateJobsInfo();
   }
 
-  #onClickTerminalCommand(ev) {
-    if (Object.hasOwn(ev.target.dataset, "cmd")) {
-      this.execute(ev.target.dataset.cmd).catch(() => {
+  #onClickTerminalCommand(target) {
+    if (Object.hasOwn(target.dataset, "cmd")) {
+      this.execute(target.dataset.cmd).catch(() => {
         // Do nothing
       });
     }
@@ -836,7 +836,7 @@ export default class Terminal {
     }
   }
 
-  #onCoreClick(ev) {
+  onCoreClick(ev) {
     // Auto-Hide
     if (
       this.$el &&
@@ -847,7 +847,7 @@ export default class Terminal {
     ) {
       this.doHide();
     } else if (ev.target.classList.contains("o_terminal_cmd")) {
-      this.#onClickTerminalCommand(ev);
+      this.#onClickTerminalCommand(ev.target);
     }
   }
   #onCoreKeyDown(ev) {
