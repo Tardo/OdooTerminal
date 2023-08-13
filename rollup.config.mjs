@@ -16,7 +16,7 @@ export default {
     sourcemap: (!is_production && "inline") || false,
     format: "iife",
     name: "terminal",
-    file: "src/dist/terminal.mjs",
+    file: "src/dist/terminal.js",
   },
   plugins: [
     alias({

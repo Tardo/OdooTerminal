@@ -40,12 +40,16 @@ export function injectPageCSS(doc, css) {
  * @param {Object} files - Files by type to inject
  */
 export function injector(doc, files) {
-  let files_len = files.css.length;
-  for (let x = 0; x < files_len; ++x) {
-    injectPageCSS(doc, files.css[x]);
+  let files_len = files?.css?.length;
+  if (files_len) {
+    for (let x = 0; x < files_len; ++x) {
+      injectPageCSS(doc, files.css[x]);
+    }
   }
-  files_len = files.js.length;
-  for (let x = 0; x < files_len; ++x) {
-    injectPageScript(doc, files.js[x]);
+  files_len = files?.js?.length;
+  if (files_len) {
+    for (let x = 0; x < files_len; ++x) {
+      injectPageScript(doc, files.js[x]);
+    }
   }
 }
