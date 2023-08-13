@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="/src/css/options.css" />
+    <script src="/src/js/private/options.mjs" type="module"></script>
+    <title>OdooTerminal Options</title>
+  </head>
+
+  <body>
+    <form>
+      <div class="optsection">
+        <h4>Behaviour</h4>
+        <p></p>
+        <input type="checkbox" id="pinned" name="pinned" />
+        <label for="pinned">Pinned</label><br />
+        <input type="checkbox" id="maximized" name="maximized" />
+        <label for="maximized">Maximized</label><br />
+        <label for="opacity">Opacity: </label>
+        <input
+          type="range"
+          id="opacity"
+          name="opacity"
+          min="0"
+          max="100"
+        /><br />
+      </div>
+
+      <div class="optsection">
+        <h4>Shortcuts</h4>
+        <p></p>
+        <table id="shorcut_table">
+          <thead>
+            <tr>
+              <th style="width: 13%">Keybind</th>
+              <th style="width: 80%">Command</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="shortcut_btn_zone">
+          <input
+            type="edit"
+            id="shortcut_keybind"
+            readonly="1"
+            name="shortcut_keybind"
+            placeholder="Keybind"
+          />
+          <input
+            type="edit"
+            id="shortcut_commands"
+            name="shortcut_commands"
+            placeholder="Command"
+          />
+          <button id="add_shortcut">Add</button>
+        </div>
+      </div>
+
+      <div class="optsection">
+        <h4>Init Commands</h4>
+        <p>
+          Run these commands when initialize the terminal (one per line).<br />Be
+          careful! changes here can cause unwanted exceptions. Note that the
+          commands will be executed on all 'odoo' pages.
+        </p>
+        <textarea id="init_cmds"></textarea>
+      </div>
+
+      <div class="optsection">
+        <h4>Terminal Context</h4>
+        <p>
+          This context will be merged with the "normal" context on terminal
+          operations. In json format.
+        </p>
+        <textarea id="term_context"></textarea>
+      </div>
+
+      <div class="optsection">
+        <h4>Extension Developer Zone</h4>
+        <p></p>
+        <input type="checkbox" id="devmode_tests" name="devmode_tests" />
+        <label for="devmode_tests">Use OdooTerminalTests</label><br />
+        <input
+          type="checkbox"
+          id="devmode_ignore_comp_checks"
+          name="devmode_ignore_comp_checks"
+        />
+        <label for="devmode_ignore_comp_checks"
+          >Disable Odoo version checking (this can cause unwanted
+          exceptions!)</label
+        ><br />
+      </div>
+
+      <div class="btn_zone">
+        <button type="button" id="reset_settings">Reset</button>
+        <button type="submit">Save</button>
+      </div>
+    </form>
+  </body>
+</html>

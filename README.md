@@ -23,7 +23,7 @@ Odoo classes. This sometimes results in certain commands having
 reduced/increased capabilities depending on the Odoo version.
 
 The terminal is fully initialized when it is first opened after loading the
-page. The time overhead for using this extension is ~345ms (async).
+page. The time overhead for using this extension is ~290ms (async).
 
 **Downloads**
 
@@ -203,5 +203,3 @@ Examples:
 Copyright Alexandre Díaz & contributors
 
 AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
-All content under 'icons/' has its own licenses and original authors.

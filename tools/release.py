@@ -56,7 +56,7 @@ def update_version(mode, create_tag=False):
         '"version": "%s"' % extension_ver)
     # abstract_terminal.js
     _file_sub(
-        'odoo/js/terminal.js',
+        'src/js/page/terminal/terminal.mjs',
         r'VERSION: "\d+\.\d+\.\d+"',
         'VERSION: "%s"' % extension_ver)
     # pyproject.toml
@@ -84,11 +84,14 @@ def create_package():
             for file in files:
                 zipf.write(os.path.join(root, file))
 
-    zipdir('icons/')
-    zipdir('settings/')
-    zipdir('odoo/')
-    zipdir('src/')
-    zipf.write('globals.js')
+    zipdir('src/html/')
+    zipdir('src/img/')
+    zipdir('src/js/common/')
+    zipdir('src/js/private/')
+    zipdir('src/js/page/volatile/')
+    zipdir('src/js/shared/')
+    zipdir('src/dist/')
+    zipf.write('src/css/options.css')
     zipf.write('manifest.json')
     zipf.write('README.md')
 
