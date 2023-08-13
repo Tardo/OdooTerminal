@@ -56,7 +56,7 @@ def update_version(mode, create_tag=False):
         '"version": "%s"' % extension_ver)
     # abstract_terminal.js
     _file_sub(
-        'odoo/js/terminal.js',
+        'src/js/page/terminal/terminal.mjs',
         r'VERSION: "\d+\.\d+\.\d+"',
         'VERSION: "%s"' % extension_ver)
     # pyproject.toml
