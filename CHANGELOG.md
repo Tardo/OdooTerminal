@@ -7,6 +7,7 @@ IMP: Refactor to ESM
 IMP: Project structure
 IMP: Underscore is no longer used
 IMP: Support Odoo master version
+IMP: Use rollup
 
 UPD: Use own icons
 

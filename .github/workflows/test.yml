@@ -26,8 +26,9 @@ jobs:
             .venv
             .cache
             .wdm
+            .npm
             node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/poetry.lock') }}
 
       - name: Checkout
         uses: actions/checkout@v3
