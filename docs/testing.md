@@ -1,8 +1,5 @@
 ## Integration Tests
 
-This tests only checks that the extension is loaded successfully on all
-compatible Odoo versions.
-
 #### Installation
 
 _For environments without a real X11 server see 'xvfb' (X11 Virtual
@@ -21,6 +18,7 @@ npm install
 #### Usage
 
 ```
+npm run create:dev
 npm run tests -- --browser chromium --odoo-version 16
 ```
 
