@@ -8,6 +8,7 @@ src/dist/
 # Caches
 .wdm/
 node_modules/
+.pytest_cache/
 
 # Test logs
 *.log
