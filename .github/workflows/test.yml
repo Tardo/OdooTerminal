@@ -62,7 +62,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: latest
+          node-version: '*'
+          check-latest: true
 
       - name: Install dependencies
         run: |
@@ -83,4 +84,4 @@ jobs:
 
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
         id: xtests
-        run: xvfb-run --auto-servernum poetry npm run tests -- --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
+        run: xvfb-run --auto-servernum npm run tests -- --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
