@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import {isEmpty} from "@terminal/core/utils";
 
-function printHelpDetailed(cmd, cmd_def) {
+async function printHelpDetailed(cmd, cmd_def) {
   this.screen.eprint("NAME");
   this.screen.print(
     `<div class="terminal-info-section">${cmd} - ${cmd_def.definition}</div>`
@@ -65,9 +65,8 @@ function cmdPrintHelp(kwargs) {
   } else if (Object.hasOwn(this.registeredCmds, kwargs.cmd)) {
     printHelpDetailed.call(this, kwargs.cmd, this.registeredCmds[kwargs.cmd]);
   } else {
-    return Promise.reject(`'${kwargs.cmd}' command doesn't exists`);
+    throw new Error(`'${kwargs.cmd}' command doesn't exists`);
   }
-  return Promise.resolve();
 }
 
 export default {

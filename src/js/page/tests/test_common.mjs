@@ -2,8 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import TerminalTestSuite from "./tests";
-import {asyncSleep, isEmpty, uniqueId} from "@terminal/core/utils";
-import rpc from "@odoo/rpc";
+import {asyncSleep, uniqueId} from "@terminal/core/utils";
 import {getOdooVersionMajor} from "@odoo/utils";
 
 export default class TestCommon extends TerminalTestSuite {
@@ -17,98 +16,33 @@ export default class TestCommon extends TerminalTestSuite {
   /**
    * @override
    */
-  onStartTests() {
-    // Get the last res.partner.industry id
-    const def = super.onStartTests(arguments);
-    return def.then(() => {
-      return rpc
-        .query({
-          method: "search_read",
-          domain: [],
-          fields: ["id"],
-          model: "res.partner.industry",
-          limit: 1,
-          orderBy: "id DESC",
-          kwargs: {context: this.terminal.getContext()},
-        })
-        .then((result) => {
-          this._last_res_id = result[0].id;
-          return result;
-        });
-    });
+  async onBeforeTest(test_name) {
+    const res = await super.onBeforeTest(arguments);
+    if (test_name === "test_context") {
+      const context = await this.terminal.execute("context", false, true);
+      this._orig_context = context;
+    }
+    return res;
   }
 
   /**
    * @override
    */
-  onEndTests() {
-    // Delete all records used in tests
-    const def = super.onEndTests(arguments);
-    return def.then(() => {
-      return rpc
-        .query({
-          method: "search_read",
-          domain: [["id", ">", this._last_res_id]],
-          fields: ["id"],
-          model: "res.partner.industry",
-          orderBy: "id DESC",
-          kwargs: {context: this.terminal.getContext()},
-        })
-        .then((result) => {
-          if (isEmpty(result)) {
-            return result;
-          }
-          const ids = result.map((item) => item.id);
-          return rpc.query({
-            method: "unlink",
-            model: "res.partner.industry",
-            args: [ids],
-            kwargs: {context: this.terminal.getContext()},
-          });
-        });
-    });
-  }
-
-  /**
-   * @override
-   */
-  onBeforeTest(test_name) {
-    const def = super.onBeforeTest(arguments);
-    return def.then(() => {
-      if (test_name === "test_context") {
-        return this.terminal.execute("context", false, true).then((context) => {
-          this._orig_context = context;
-        });
-      } else if (
-        test_name === "test_upgrade" ||
-        test_name === "test_uninstall"
-      ) {
-        return this.terminal.execute("install -m sms", false, true);
-      }
-    });
-  }
-
-  /**
-   * @override
-   */
-  onAfterTest(test_name) {
-    const def = super.onAfterTest(arguments);
-    return def.then(() => {
-      if (test_name === "test_context" || test_name === "test_context_no_arg") {
-        return this.terminal.execute(
-          `context -o set -v '${JSON.stringify(this._orig_context)}'`,
-          false,
-          true
-        );
-      } else if (test_name === "test_upgrade") {
-        return this.terminal.execute("uninstall -m sms --force", false, true);
-      }
-    });
+  async onAfterTest(test_name) {
+    const res = await super.onAfterTest(arguments);
+    if (test_name === "test_context" || test_name === "test_context_no_arg") {
+      return this.terminal.execute(
+        `context -o set -v '${JSON.stringify(this._orig_context)}'`,
+        false,
+        true
+      );
+    }
+    return res;
   }
 
   async test_create() {
     await this.terminal.execute("create -m res.partner", false, true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await asyncSleep(800);
     this.assertTrue(this.isFormOpen());
     const recordset = await this.terminal.execute(
       `create -m res.partner -v {name: '${uniqueId("This is a Test #")}'}`,
@@ -180,28 +114,28 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertNotEmpty(res);
   }
 
-  async test_upgrade() {
+  async test_install() {
     await asyncSleep(6000);
-    const res = await this.terminal.execute("upgrade -m sms", false, true);
-    this.assertEqual(res?.name, "sms");
+    const res = await this.terminal.execute("install -m account", false, true);
+    this.assertEqual(res[0]?.name, "account");
     await asyncSleep(6000);
   }
 
-  async test_install() {
+  async test_upgrade() {
     await asyncSleep(6000);
-    const res = await this.terminal.execute("install -m sms", false, true);
-    this.assertEqual(res[0]?.name, "sms");
+    const res = await this.terminal.execute("upgrade -m account", false, true);
+    this.assertEqual(res[0]?.name, "account");
     await asyncSleep(6000);
   }
 
   async test_uninstall() {
     await asyncSleep(6000);
     const res = await this.terminal.execute(
-      "uninstall -m sms --force",
+      "uninstall -m account --force",
       false,
       true
     );
-    this.assertEqual(res?.name, "sms");
+    this.assertEqual(res?.name, "account");
     await asyncSleep(6000);
   }
 
@@ -217,7 +151,7 @@ export default class TestCommon extends TerminalTestSuite {
       );
       this.assertEqual(res.id, "base.action_res_company_form");
       res = await this.terminal.execute(
-        "action -a {type: 'ir.actions.act_window', res_model: 'res.currency', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",
+        "action -a {type: 'ir.actions.act_window', res_model: 'res.partner', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",
         false,
         true
       );
@@ -230,11 +164,11 @@ export default class TestCommon extends TerminalTestSuite {
       );
       this.assertEqual(res.xml_id, "base.action_res_company_form");
       res = await this.terminal.execute(
-        "action -a {type: 'ir.actions.act_window', res_model: 'res.currency', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",
+        "action -a {type: 'ir.actions.act_window', res_model: 'res.partner', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",
         false,
         true
       );
-      this.assertEqual(res.res_model, "res.currency");
+      this.assertEqual(res.res_model, "res.partner");
       this.assertEqual(res.res_id, 1);
     }
   }
@@ -246,35 +180,35 @@ export default class TestCommon extends TerminalTestSuite {
 
   async test_caf() {
     const res = await this.terminal.execute(
-      "caf -m res.currency -f symbol -fi {required: true}",
+      "caf -m res.partner -f type -fi {searchable: true}",
       false,
       true
     );
-    this.assertNotEmpty(res.symbol);
+    this.assertNotEmpty(res.type);
     this.assertEmpty(res.id);
   }
 
   async test_cam() {
     let res = await this.terminal.execute(
-      "cam -m res.currency -o create",
+      "cam -m res.partner -o create",
       false,
       true
     );
     this.assertTrue(res);
     res = await this.terminal.execute(
-      "cam -m res.currency -o unlink",
+      "cam -m res.partner -o unlink",
       false,
       true
     );
     this.assertTrue(res);
     res = await this.terminal.execute(
-      "cam -m res.currency -o write",
+      "cam -m res.partner -o write",
       false,
       true
     );
     this.assertTrue(res);
     res = await this.terminal.execute(
-      "cam -m res.currency -o read",
+      "cam -m res.partner -o read",
       false,
       true
     );
@@ -288,12 +222,12 @@ export default class TestCommon extends TerminalTestSuite {
 
   async test_read() {
     const res = await this.terminal.execute(
-      "read -m res.currency -i 1 -f symbol",
+      "read -m res.partner -i 1 -f type",
       false,
       true
     );
     this.assertEqual(res[0]?.id, 1);
-    this.assertNotEmpty(res[0]?.symbol);
+    this.assertNotEmpty(res[0]?.type);
     this.assertEmpty(res[0]?.display_name);
   }
 
@@ -418,7 +352,7 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertNotEmpty(res);
 
     res = await this.terminal.execute("dblist --only-active", false, true);
-    this.assertTrue(typeof res === "string");
+    this.assertEqual(typeof res, "string");
   }
 
   async test_tour() {
@@ -448,17 +382,17 @@ export default class TestCommon extends TerminalTestSuite {
 
   async test_count() {
     const res = await this.terminal.execute(
-      "count -m res.currency",
+      "count -m res.partner",
       false,
       true
     );
     this.assertTrue(res > 0);
     const resb = await this.terminal.execute(
-      "count -m res.currency -d [['symbol', '=', '$']]",
+      "count -m res.partner -d [['type', '=', 'contact']]",
       false,
       true
     );
-    this.assertTrue(resb < res);
+    this.assertTrue(resb <= res);
   }
 
   async test_ref() {
@@ -493,8 +427,8 @@ export default class TestCommon extends TerminalTestSuite {
   async test_barcode() {
     let res = await this.terminal.execute("barcode -o info", false, true);
     this.assertNotEmpty(res);
-    await this.terminal.execute("view -m res.partner -i 1", false, true);
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    await this.terminal.execute("view -m res.company -i 1", false, true);
+    await asyncSleep(2500);
     res = await this.terminal.execute(
       "barcode -o send -d O-CMD.EDIT",
       false,

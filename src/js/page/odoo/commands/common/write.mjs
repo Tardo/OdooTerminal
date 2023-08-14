@@ -4,9 +4,9 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdWriteModelRecord(kwargs) {
+async function cmdWriteModelRecord(kwargs) {
   if (kwargs.value.constructor !== Object) {
-    Promise.reject("Invalid values!");
+    throw new Error("Invalid values!");
   }
   return rpc
     .query({

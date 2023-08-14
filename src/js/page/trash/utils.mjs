@@ -9,14 +9,12 @@ export function difference(list_a, list_b) {
   return list_a.filter((x) => !list_b.includes(x));
 }
 
-export function countBy(list, func) {
+export function countBy(data, func) {
   const counters = {};
-  if (!list) {
+  if (!data) {
     return counters;
   }
-  if (list.constructor.name === "String") {
-    list = list.split("");
-  }
+  const list = data.constructor.name === "String" ? data.split("") : data;
   list.forEach((item) => {
     const cat = func(item);
     if (Object.hasOwn(counters, cat)) {

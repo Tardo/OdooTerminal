@@ -1,8 +1,8 @@
 {
   "scripts": {
     "devel": "export NODE_ENV=development && rollup -c -w",
+    "tests": "export NODE_ENV=development && rollup -c && poetry run ./tools/release.py && poetry run pytest",
     "build": "export NODE_ENV=production && rollup -c && poetry run ./tools/release.py",
-    "tests": "poetry run ./tools/release.py && poetry run pytest",
     "clean": "rm -r ./src/dist"
   },
   "dependencies": {

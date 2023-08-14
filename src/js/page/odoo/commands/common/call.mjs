@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdCallModelMethod(kwargs) {
+async function cmdCallModelMethod(kwargs) {
   const pkwargs = kwargs.kwarg;
   if (typeof pkwargs.context === "undefined") {
     pkwargs.context = this.getContext();

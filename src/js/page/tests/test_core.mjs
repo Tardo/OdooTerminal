@@ -10,34 +10,27 @@ export default class TestCore extends TerminalTestSuite {
    * @override
    */
   async onBeforeTest(test_name) {
-    const def = super.onBeforeTest(arguments);
-    def.then(() => {
-      if (test_name === "test_context_term") {
-        return this.terminal
-          .execute("context_term", false, true)
-          .then((context) => {
-            this._orig_context = context;
-          });
-      }
-    });
-    return def;
+    const res = await super.onBeforeTest(arguments);
+    if (test_name === "test_context_term") {
+      const context = await this.terminal.execute("context_term", false, true);
+      this._orig_context = context;
+    }
+    return res;
   }
 
   /**
    * @override
    */
   async onAfterTest(test_name) {
-    const def = super.onAfterTest(arguments);
-    def.then(() => {
-      if (test_name === "test_context_term") {
-        return this.terminal.execute(
-          `context_term -o set -v '${JSON.stringify(this._orig_context)}'`,
-          false,
-          true
-        );
-      }
-    });
-    return def;
+    const res = super.onAfterTest(arguments);
+    if (test_name === "test_context_term") {
+      return this.terminal.execute(
+        `context_term -o set -v '${JSON.stringify(this._orig_context)}'`,
+        false,
+        true
+      );
+    }
+    return res;
   }
 
   async test_call_not_named_args() {

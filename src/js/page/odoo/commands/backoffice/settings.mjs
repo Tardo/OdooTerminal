@@ -4,8 +4,8 @@
 import {ARG} from "@trash/constants";
 import {doAction} from "@odoo/root";
 
-function cmdOpenSettings(kwargs) {
-  return doAction({
+async function cmdOpenSettings(kwargs) {
+  await doAction({
     name: "Settings",
     type: "ir.actions.act_window",
     res_model: "res.config.settings",
@@ -13,7 +13,8 @@ function cmdOpenSettings(kwargs) {
     views: [[false, "form"]],
     target: "inline",
     context: {module: kwargs.module},
-  }).then(() => this.doHide());
+  });
+  this.doHide();
 }
 
 export default {

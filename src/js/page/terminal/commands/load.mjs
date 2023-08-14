@@ -3,7 +3,7 @@
 
 import {ARG} from "@trash/constants";
 
-function cmdLoadResource(kwargs) {
+async function cmdLoadResource(kwargs) {
   const inURL = new URL(kwargs.url);
   const pathname = inURL.pathname.toLowerCase();
   if (pathname.endsWith(".js")) {
@@ -17,9 +17,8 @@ function cmdLoadResource(kwargs) {
       href: inURL.href,
     });
   } else {
-    return Promise.reject("Invalid file type");
+    throw new Error("Invalid file type");
   }
-  return Promise.resolve();
 }
 
 export default {

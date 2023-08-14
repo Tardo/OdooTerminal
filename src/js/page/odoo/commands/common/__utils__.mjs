@@ -3,7 +3,7 @@
 
 import rpc from "@odoo/rpc";
 
-export function searchModules(module_names) {
+export async function searchModules(module_names) {
   const payload = {
     method: "search_read",
     model: "ir.module.module",

@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-function cmdJobs() {
+async function cmdJobs() {
   const jobs = this.jobs.filter((item) => item);
   this.screen.print(
     jobs.map(
@@ -13,7 +13,7 @@ function cmdJobs() {
         }`
     )
   );
-  return Promise.resolve(jobs);
+  return jobs;
 }
 
 export default {

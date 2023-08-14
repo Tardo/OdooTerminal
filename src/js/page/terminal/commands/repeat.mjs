@@ -3,29 +3,27 @@
 
 import {ARG} from "@trash/constants";
 
-function cmdRepeat(kwargs) {
-  return new Promise((resolve, reject) => {
-    if (kwargs.times < 0) {
-      return reject("'Times' parameter must be positive");
+async function cmdRepeat(kwargs) {
+  if (kwargs.times < 0) {
+    throw new Error("'Times' parameter must be positive");
+  }
+  const res = [];
+  const do_repeat = (rtimes) => {
+    if (!rtimes) {
+      this.screen.print(
+        `<i>** Repeat finsihed: '${kwargs.cmd}' called ${kwargs.times} times</i>`
+      );
+      return res;
     }
-    const res = [];
-    const do_repeat = (rtimes) => {
-      if (!rtimes) {
-        this.screen.print(
-          `<i>** Repeat finsihed: '${kwargs.cmd}' called ${kwargs.times} times</i>`
-        );
-        return resolve(res);
-      }
-      return this.virtMachine
-        .eval(kwargs.cmd, {
-          silent: kwargs.silent,
-          needResetStores: false,
-        })
-        .then((result) => res.push(result))
-        .finally(() => do_repeat(rtimes - 1));
-    };
-    return do_repeat(kwargs.times);
-  });
+    return this.virtMachine
+      .eval(kwargs.cmd, {
+        silent: kwargs.silent,
+        needResetStores: false,
+      })
+      .then((result) => res.push(result))
+      .finally(() => do_repeat(rtimes - 1));
+  };
+  return do_repeat(kwargs.times);
 }
 
 export default {

@@ -4,7 +4,6 @@
 import ParameterGenerator from "./parameter_generator";
 import Longpolling from "./longpolling";
 import Terminal from "@terminal/terminal";
-import {encodeHTML} from "@terminal/core/utils";
 import {getOdooSession} from "./utils";
 import rpc from "./rpc";
 
@@ -69,9 +68,7 @@ export default class OdooTerminal extends Terminal {
         kwargs: {context: this.getContext()},
       })
       .then((result) => {
-        target.parentNode.textContent = encodeHTML(
-          JSON.stringify(result[0][field])
-        );
+        target.parentNode.textContent = JSON.stringify(result[0][field]);
       })
       .catch(() => (target.parentNode.textContent = "** Reading Error! **"));
   }

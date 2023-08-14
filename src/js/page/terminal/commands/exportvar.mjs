@@ -4,13 +4,13 @@
 import {ARG} from "@trash/constants";
 import {uniqueId} from "@terminal/core/utils";
 
-function cmdExportVar(kwargs) {
+async function cmdExportVar(kwargs) {
   const varname = uniqueId("term");
   window[varname] = kwargs.value;
   this.screen.print(
     `Command result exported! now you can use '${varname}' variable in the browser console`
   );
-  return Promise.resolve(varname);
+  return varname;
 }
 
 export default {

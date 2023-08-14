@@ -5,7 +5,7 @@ import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 import {getOdooVersionMajor} from "@odoo/utils";
 
-function cmdRef(kwargs) {
+async function cmdRef(kwargs) {
   const OdooVer = getOdooVersionMajor();
   const tasks = [];
   for (const xmlid of kwargs.xmlid) {
@@ -44,20 +44,18 @@ function cmdRef(kwargs) {
       );
     }
   }
-
-  return Promise.all(tasks).then((results) => {
-    let body = "";
-    const len = results.length;
-    for (let x = 0; x < len; ++x) {
-      const item = results[x];
-      body +=
-        `<tr><td>${item[0]}</td>` +
-        `<td>${item[1]}</td>` +
-        `<td>${item[2]}</td></tr>`;
-    }
-    this.screen.printTable(["XML ID", "Res. Model", "Res. ID"], body);
-    return results;
-  });
+  const results = await Promise.all(tasks);
+  let body = "";
+  const len = results.length;
+  for (let x = 0; x < len; ++x) {
+    const item = results[x];
+    body +=
+      `<tr><td>${item[0]}</td>` +
+      `<td>${item[1]}</td>` +
+      `<td>${item[2]}</td></tr>`;
+  }
+  this.screen.printTable(["XML ID", "Res. Model", "Res. ID"], body);
+  return results;
 }
 
 export default {

@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import {doAction} from "@odoo/root";
 
-function cmdCallAction(kwargs) {
+async function cmdCallAction(kwargs) {
   return doAction(kwargs.action, kwargs.options);
 }
 

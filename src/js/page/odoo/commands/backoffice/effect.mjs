@@ -6,9 +6,9 @@ import {showEffect} from "@odoo/root";
 import {getOdooService, getOdooVersionMajor} from "@odoo/utils";
 import {isEmpty} from "@terminal/core/utils";
 
-function cmdShowEffect(kwargs) {
+async function cmdShowEffect(kwargs) {
   if (getOdooVersionMajor() < 15) {
-    return Promise.reject("This command is only available in Odoo 15.0+");
+    throw new Error("This command is only available in Odoo 15.0+");
   }
   if (isEmpty(kwargs.type)) {
     const registry = getOdooService("@web/core/registry").registry;
@@ -17,7 +17,6 @@ function cmdShowEffect(kwargs) {
     this.screen.print(effects.getEntries().map((item) => item[0]));
   } else {
     showEffect(kwargs.type, kwargs.options);
-    return Promise.resolve();
   }
 }
 

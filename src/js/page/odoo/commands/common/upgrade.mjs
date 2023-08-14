@@ -5,31 +5,33 @@ import {searchModules} from "./__utils__";
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdUpgradeModule(kwargs) {
-  return new Promise((resolve, reject) => {
-    searchModules
-      .bind(this)(kwargs.module)
-      .then((result) => {
-        if (result.length) {
-          return rpc
-            .query({
-              method: "button_immediate_upgrade",
-              model: "ir.module.module",
-              args: [result.map((item) => item.id)],
-            })
-            .then(
-              () => {
-                this.screen.print(
-                  `'${result.length}' modules successfully upgraded`
-                );
-                resolve(result[0]);
-              },
-              (res) => reject(res.message.data.message)
-            );
-        }
-        reject(`'${kwargs.module}' modules doesn't exists`);
-      });
-  });
+async function cmdUpgradeModule(kwargs) {
+  return searchModules
+    .bind(this)(kwargs.module)
+    .then((result) => {
+      if (result.length) {
+        return rpc
+          .query({
+            method: "button_immediate_upgrade",
+            model: "ir.module.module",
+            args: [result.map((item) => item.id)],
+          })
+          .then(
+            () => {
+              this.screen.print(
+                `'${result
+                  .map((item) => item.name)
+                  .join(", ")}' modules successfully upgraded`
+              );
+              return result;
+            },
+            (res) => {
+              throw new Error(res.message.data.message);
+            }
+          );
+      }
+      throw new Error(`'${kwargs.module}' modules doesn't exists`);
+    });
 }
 
 export default {

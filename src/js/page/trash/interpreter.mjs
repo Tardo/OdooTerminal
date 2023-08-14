@@ -809,76 +809,82 @@ export default class Interpreter {
           }
           break;
         case LEXER.DataAttribute:
-          ignore_instr_eoi = true;
-          const parsed_attribute = this.parse(
-            token.value,
-            {
-              registeredCmds: options.registeredCmds,
-              silent: true,
-              isData: true,
-              offset: token.start + 1,
-            },
-            ++mlevel
-          );
-          res.stack.values.push(...parsed_attribute.stack.values);
-          res.stack.names.push(...parsed_attribute.stack.names);
-          to_append.inputTokens.push(...parsed_attribute.inputTokens);
-          to_append.instructions.push(...parsed_attribute.stack.instructions);
-          to_append.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.LOAD_DATA_ATTR, index, level)
-          );
-          const last_instr = res.stack.instructions.at(-1);
-          if (last_instr.type === INSTRUCTION_TYPE.UNITARY_NEGATIVE) {
-            const instr = res.stack.instructions.pop();
-            to_append.instructions.push(instr);
+          {
+            ignore_instr_eoi = true;
+            const parsed_attribute = this.parse(
+              token.value,
+              {
+                registeredCmds: options.registeredCmds,
+                silent: true,
+                isData: true,
+                offset: token.start + 1,
+              },
+              ++mlevel
+            );
+            res.stack.values.push(...parsed_attribute.stack.values);
+            res.stack.names.push(...parsed_attribute.stack.names);
+            to_append.inputTokens.push(...parsed_attribute.inputTokens);
+            to_append.instructions.push(...parsed_attribute.stack.instructions);
+            to_append.instructions.push(
+              new Instruction(INSTRUCTION_TYPE.LOAD_DATA_ATTR, index, level)
+            );
+            const last_instr = res.stack.instructions.at(-1);
+            if (last_instr.type === INSTRUCTION_TYPE.UNITARY_NEGATIVE) {
+              const instr = res.stack.instructions.pop();
+              to_append.instructions.push(instr);
+            }
+            mlevel = parsed_attribute.maxULevel;
           }
-          mlevel = parsed_attribute.maxULevel;
           break;
         case LEXER.Runner:
-          const parsed_runner = this.parse(
-            token.value,
-            {
-              registeredCmds: options.registeredCmds,
-              silent: true,
-              offset: token.start + 2,
-            },
-            ++mlevel
-          );
-          res.stack.arguments.push(...parsed_runner.stack.arguments);
-          res.stack.values.push(...parsed_runner.stack.values);
-          res.stack.names.push(...parsed_runner.stack.names);
-          to_append.inputTokens.push(...parsed_runner.inputTokens);
-          to_append.instructions.push(...parsed_runner.stack.instructions);
-          if (sign_cache) {
-            to_append.instructions.push(
-              new Instruction(sign_cache, index, level)
+          {
+            const parsed_runner = this.parse(
+              token.value,
+              {
+                registeredCmds: options.registeredCmds,
+                silent: true,
+                offset: token.start + 2,
+              },
+              ++mlevel
             );
-            sign_cache = null;
+            res.stack.arguments.push(...parsed_runner.stack.arguments);
+            res.stack.values.push(...parsed_runner.stack.values);
+            res.stack.names.push(...parsed_runner.stack.names);
+            to_append.inputTokens.push(...parsed_runner.inputTokens);
+            to_append.instructions.push(...parsed_runner.stack.instructions);
+            if (sign_cache) {
+              to_append.instructions.push(
+                new Instruction(sign_cache, index, level)
+              );
+              sign_cache = null;
+            }
+            mlevel = parsed_runner.maxULevel;
           }
-          mlevel = parsed_runner.maxULevel;
           break;
         case LEXER.Block:
-          const parsed_block = this.parse(
-            token.value,
-            {
-              registeredCmds: options.registeredCmds,
-              silent: false,
-              offset: token.start + 1,
-            },
-            ++mlevel
-          );
-          res.stack.arguments.push(...parsed_block.stack.arguments);
-          res.stack.values.push(...parsed_block.stack.values);
-          res.stack.names.push(...parsed_block.stack.names);
-          to_append.inputTokens.push(...parsed_block.inputTokens);
-          to_append.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.PUSH_FRAME, index, level)
-          );
-          to_append.instructions.push(...parsed_block.stack.instructions);
-          to_append.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.POP_FRAME, index, level)
-          );
-          mlevel = parsed_block.maxULevel;
+          {
+            const parsed_block = this.parse(
+              token.value,
+              {
+                registeredCmds: options.registeredCmds,
+                silent: false,
+                offset: token.start + 1,
+              },
+              ++mlevel
+            );
+            res.stack.arguments.push(...parsed_block.stack.arguments);
+            res.stack.values.push(...parsed_block.stack.values);
+            res.stack.names.push(...parsed_block.stack.names);
+            to_append.inputTokens.push(...parsed_block.inputTokens);
+            to_append.instructions.push(
+              new Instruction(INSTRUCTION_TYPE.PUSH_FRAME, index, level)
+            );
+            to_append.instructions.push(...parsed_block.stack.instructions);
+            to_append.instructions.push(
+              new Instruction(INSTRUCTION_TYPE.POP_FRAME, index, level)
+            );
+            mlevel = parsed_block.maxULevel;
+          }
           break;
         // Case LEXER.For: {
         //     for (
@@ -909,27 +915,29 @@ export default class Interpreter {
           token_subindex = -1;
           break;
         case LEXER.Math:
-          const parsed_math = this.parse(
-            token.value,
-            {
-              registeredCmds: options.registeredCmds,
-              silent: true,
-              math: true,
-              offset: token.start + 3,
-            },
-            ++mlevel
-          );
-          res.stack.values.push(...parsed_math.stack.values);
-          res.stack.names.push(...parsed_math.stack.names);
-          to_append.inputTokens.push(...parsed_math.inputTokens);
-          to_append.instructions.push(...parsed_math.stack.instructions);
-          if (sign_cache) {
-            to_append.instructions.push(
-              new Instruction(sign_cache, index, level)
+          {
+            const parsed_math = this.parse(
+              token.value,
+              {
+                registeredCmds: options.registeredCmds,
+                silent: true,
+                math: true,
+                offset: token.start + 3,
+              },
+              ++mlevel
             );
-            sign_cache = null;
+            res.stack.values.push(...parsed_math.stack.values);
+            res.stack.names.push(...parsed_math.stack.names);
+            to_append.inputTokens.push(...parsed_math.inputTokens);
+            to_append.instructions.push(...parsed_math.stack.instructions);
+            if (sign_cache) {
+              to_append.instructions.push(
+                new Instruction(sign_cache, index, level)
+              );
+              sign_cache = null;
+            }
+            mlevel = parsed_math.maxULevel;
           }
-          mlevel = parsed_math.maxULevel;
           break;
       }
 
@@ -973,77 +981,75 @@ export default class Interpreter {
    * @returns {Boolean}
    */
   validateAndFormatArguments(cmd_def, kwargs) {
-    return new Promise(async (resolve, reject) => {
-      // Map full info arguments
-      let args_infos = cmd_def.args
-        .map((x) => this.getArgumentInfo(x))
-        .map((x) => [x.names.long, x]);
-      args_infos = Object.fromEntries(args_infos);
+    // Map full info arguments
+    let args_infos = cmd_def.args
+      .map((x) => this.getArgumentInfo(x))
+      .map((x) => [x.names.long, x]);
+    args_infos = Object.fromEntries(args_infos);
 
-      // Normalize Names
-      const in_arg_names = Object.keys(kwargs);
-      let full_kwargs = {};
-      for (const arg_name of in_arg_names) {
-        const arg_info = this.getArgumentInfoByName(cmd_def.args, arg_name);
-        if (!arg_info) {
-          return reject(`The argument '${arg_name}' does not exist`);
-        }
-        full_kwargs[arg_info.names.long] = kwargs[arg_name];
+    // Normalize Names
+    const in_arg_names = Object.keys(kwargs);
+    let full_kwargs = {};
+    for (const arg_name of in_arg_names) {
+      const arg_info = this.getArgumentInfoByName(cmd_def.args, arg_name);
+      if (!arg_info) {
+        throw new Error(`The argument '${arg_name}' does not exist`);
       }
+      full_kwargs[arg_info.names.long] = kwargs[arg_name];
+    }
 
-      // Get default/required values/args
-      let default_values = [];
-      const required_args = [];
-      for (const arg_name in args_infos) {
-        const arg_def = args_infos[arg_name];
-        if (typeof arg_def.default_value !== "undefined") {
-          default_values.push([arg_name, arg_def.default_value]);
-        }
-        if (arg_def.is_required) {
-          required_args.push(arg_def.names.long);
-        }
+    // Get default/required values/args
+    let default_values = [];
+    const required_args = [];
+    for (const arg_name in args_infos) {
+      const arg_def = args_infos[arg_name];
+      if (typeof arg_def.default_value !== "undefined") {
+        default_values.push([arg_name, arg_def.default_value]);
       }
-      // Apply default values
-      default_values =
-        default_values.length === 0 ? {} : Object.fromEntries(default_values);
-      full_kwargs = Object.assign(default_values, full_kwargs);
-
-      if (Object.keys(full_kwargs).length === 0) {
-        return resolve(full_kwargs);
+      if (arg_def.is_required) {
+        required_args.push(arg_def.names.long);
       }
+    }
+    // Apply default values
+    default_values =
+      default_values.length === 0 ? {} : Object.fromEntries(default_values);
+    full_kwargs = Object.assign(default_values, full_kwargs);
 
-      // Check required
-      const full_kwargs_keys = Object.keys(full_kwargs);
-      const required_not_set = difference(required_args, full_kwargs_keys);
-      if (required_not_set.length) {
-        return reject(
-          `Required arguments not set! (${required_not_set.join(",")})`
+    if (Object.keys(full_kwargs).length === 0) {
+      return full_kwargs;
+    }
+
+    // Check required
+    const full_kwargs_keys = Object.keys(full_kwargs);
+    const required_not_set = difference(required_args, full_kwargs_keys);
+    if (required_not_set.length) {
+      throw new Error(
+        `Required arguments not set! (${required_not_set.join(",")})`
+      );
+    }
+
+    // Use full argument name
+    const arg_names = Object.keys(full_kwargs);
+    const new_kwargs = {};
+    for (const arg_name of arg_names) {
+      const arg_info = args_infos[arg_name];
+      const arg_value = this.#sanitizeArgumentValue(
+        full_kwargs[arg_name],
+        arg_info.type
+      );
+      const arg_long_name = arg_info.names.long;
+      const s_arg_long_name = arg_long_name.replaceAll("-", "_");
+      if (!this.#checkArgumentValueType(arg_value, arg_info.type)) {
+        throw new Error(
+          `Invalid argument '${arg_long_name}' value type: ${
+            arg_value?.constructor?.name
+          } is not ${ARG.getHumanType(arg_info.type)}`
         );
       }
+      new_kwargs[s_arg_long_name] = arg_value;
+    }
 
-      // Use full argument name
-      const arg_names = Object.keys(full_kwargs);
-      const new_kwargs = {};
-      for (const arg_name of arg_names) {
-        const arg_info = args_infos[arg_name];
-        const arg_value = this.#sanitizeArgumentValue(
-          full_kwargs[arg_name],
-          arg_info.type
-        );
-        const arg_long_name = arg_info.names.long;
-        const s_arg_long_name = arg_long_name.replaceAll("-", "_");
-        if (!this.#checkArgumentValueType(arg_value, arg_info.type)) {
-          return reject(
-            `Invalid argument '${arg_long_name}' value type: ${
-              arg_value?.constructor?.name
-            } is not ${ARG.getHumanType(arg_info.type)}`
-          );
-        }
-        new_kwargs[s_arg_long_name] = arg_value;
-      }
-
-      return resolve(new_kwargs);
-    });
+    return new_kwargs;
   }
 
   getAliasCommand(cmd_name) {

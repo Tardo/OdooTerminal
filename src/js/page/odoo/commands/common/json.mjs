@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdPostJSONData(kwargs) {
+async function cmdPostJSONData(kwargs) {
   return rpc
     .query({
       route: kwargs.endpoint,

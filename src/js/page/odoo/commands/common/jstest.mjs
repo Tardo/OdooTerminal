@@ -3,7 +3,7 @@
 
 import {ARG} from "@trash/constants";
 
-function cmdJSTest(kwargs) {
+async function cmdJSTest(kwargs) {
   let mod = kwargs.module || "";
   if (kwargs.module === "*") {
     mod = "";
@@ -14,7 +14,6 @@ function cmdJSTest(kwargs) {
   }
   url += `?module=${mod}`;
   window.location = url;
-  return Promise.resolve();
 }
 
 export default {

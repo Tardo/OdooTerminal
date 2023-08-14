@@ -3,7 +3,7 @@
 
 import {ARG} from "@trash/constants";
 
-function cmdGen(kwargs) {
+async function cmdGen(kwargs) {
   this.parameterGenerator.resetStores();
   const type = kwargs.type.toLowerCase();
   let result = false;
@@ -35,7 +35,7 @@ function cmdGen(kwargs) {
     result = this.parameterGenerator.generateDateTime(kwargs.min, kwargs.max);
   }
   this.screen.print(result);
-  return Promise.resolve(result);
+  return result;
 }
 
 export default {

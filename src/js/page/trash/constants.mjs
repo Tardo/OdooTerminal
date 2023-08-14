@@ -150,13 +150,13 @@ export const ARG = {
   cast: function (val, atype) {
     const cname = val.constructor.name;
     if (atype === this.String && cname !== "String") {
-      return new String(val);
+      return String(val);
     } else if (atype === this.Number && cname !== "Number") {
-      return new Number(val);
+      return Number(val);
     } else if (atype === this.Dictionary && cname !== "Object") {
-      return new Object(val);
+      return Object.fromEntries(val);
     } else if (atype === this.Flag && cname !== "Boolean") {
-      return new Boolean(val);
+      return Boolean(val);
     } else if (atype === this.List && cname !== "Array") {
       return [val];
     }

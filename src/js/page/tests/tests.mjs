@@ -81,17 +81,17 @@ export default class TerminalTestSuite {
     );
   }
 
-  onStartTests(test_names) {
-    return Promise.resolve(test_names);
+  async onStartTests(test_names) {
+    return test_names;
   }
-  onBeforeTest(test_name) {
+  async onBeforeTest(test_name) {
     this.terminal.doShow();
-    return Promise.resolve(test_name);
+    return test_name;
   }
-  onAfterTest(test_name) {
-    return Promise.resolve(test_name);
+  async onAfterTest(test_name) {
+    return test_name;
   }
-  onEndTests(test_names) {
-    return Promise.resolve(test_names);
+  async onEndTests(test_names) {
+    return test_names;
   }
 }

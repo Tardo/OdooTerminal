@@ -7,10 +7,11 @@ import {getOdooSession} from "@odoo/utils";
 
 const session = getOdooSession();
 
-function cmdShowDBList(kwargs) {
+async function cmdShowDBList(kwargs) {
   const _onSuccess = (databases) => {
     const databases_len = databases.length;
     if (!databases_len) {
+      // Soft-Error
       this.screen.printError("Can't get database names");
       return;
     }

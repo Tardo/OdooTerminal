@@ -5,14 +5,14 @@ import {ARG} from "@trash/constants";
 import Recordset from "@terminal/core/recordset";
 import rpc from "@odoo/rpc";
 
-function cmdSearchModelRecord(kwargs) {
+async function cmdSearchModelRecord(kwargs) {
   const lines_total = this.screen._max_lines - 3;
   const fields = kwargs.field[0] === "*" ? false : kwargs.field;
 
   if (kwargs.more) {
     const buff = this._buffer[this.__meta.name];
     if (!buff || !buff.data.length) {
-      return Promise.reject("There are no more results to print");
+      throw new Error("There are no more results to print");
     }
     const sresult = buff.data.slice(0, lines_total);
     buff.data = buff.data.slice(lines_total);
@@ -37,7 +37,7 @@ function cmdSearchModelRecord(kwargs) {
         return resolve(sresult);
       });
     }
-    return Promise.resolve(sresult);
+    return sresult;
   }
 
   return rpc

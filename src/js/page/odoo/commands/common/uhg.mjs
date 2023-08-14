@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdUserHasGroups(kwargs) {
+async function cmdUserHasGroups(kwargs) {
   return rpc
     .query({
       method: "user_has_groups",

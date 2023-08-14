@@ -4,12 +4,12 @@
 import {ARG} from "@trash/constants";
 import {save2File, uniqueId} from "@terminal/core/utils";
 
-function cmdExportFile(kwargs) {
+async function cmdExportFile(kwargs) {
   const filename = `${uniqueId("term")}_${new Date().getTime()}.json`;
   const data = JSON.stringify(kwargs.value, null, 4);
   save2File(filename, "text/json", data);
   this.screen.print(`Command result exported to '${filename}' file`);
-  return Promise.resolve(filename);
+  return filename;
 }
 
 export default {

@@ -3,9 +3,9 @@
 
 import rpc from "@odoo/rpc";
 
-function cmdLastSeen() {
+async function cmdLastSeen() {
   if (!this.longpolling) {
-    return Promise.reject("Can't use lastseen, 'bus' module is not installed");
+    throw new Error("Can't use lastseen, 'bus' module is not installed");
   }
   return rpc
     .query({

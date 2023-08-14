@@ -50,39 +50,37 @@ function getBarcodeInfo(barcodeService) {
   ];
 }
 
-function cmdBarcode(kwargs) {
-  // Soft-dependency... this don't exists if barcodes module is not installed
-
+async function cmdBarcode(kwargs) {
   const barcodeService = getOdooService(
     "barcodes.BarcodeEvents",
     "@barcodes/barcode_service"
   );
   if (!barcodeService) {
+    // Soft-dependency... this don't exists if barcodes module is not installed
     this.screen.printError("The 'barcode' module is not installed/available");
-    return Promise.resolve();
+    return;
   }
-  return new Promise(async (resolve, reject) => {
-    if (kwargs.operation === "info") {
-      const info = getBarcodeInfo(barcodeService);
-      this.screen.eprint(info);
-      return resolve(info);
-    } else if (kwargs.operation === "send") {
-      if (!kwargs.data) {
-        return reject("No data given!");
-      }
 
-      for (const barcode of kwargs.data) {
-        for (let i = 0, bardoce_len = barcode.length; i < bardoce_len; i++) {
-          document.body.dispatchEvent(getBarcodeEvent(barcode[i]));
-          await asyncSleep(kwargs.pressdelay);
-        }
-        await asyncSleep(kwargs.barcodedelay);
-      }
-    } else {
-      return reject("Invalid operation!");
+  if (kwargs.operation === "info") {
+    const info = getBarcodeInfo(barcodeService);
+    this.screen.eprint(info);
+    return info;
+  } else if (kwargs.operation === "send") {
+    if (!kwargs.data) {
+      throw new Error("No data given!");
     }
-    return resolve(kwargs.data);
-  });
+
+    for (const barcode of kwargs.data) {
+      for (let i = 0, bardoce_len = barcode.length; i < bardoce_len; i++) {
+        document.body.dispatchEvent(getBarcodeEvent(barcode[i]));
+        await asyncSleep(kwargs.pressdelay);
+      }
+      await asyncSleep(kwargs.barcodedelay);
+    }
+  } else {
+    throw new Error("Invalid operation!");
+  }
+  return kwargs.data;
 }
 
 export default {

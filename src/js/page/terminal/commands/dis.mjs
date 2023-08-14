@@ -3,7 +3,7 @@
 
 import {ARG, INSTRUCTION_TYPE} from "@trash/constants";
 
-function cmdDis(kwargs) {
+async function cmdDis(kwargs) {
   const parse_info = this.virtMachine.interpreter.parse(kwargs.code, {
     registeredCmds: this.registeredCmds,
   });
@@ -46,8 +46,6 @@ function cmdDis(kwargs) {
     ],
     body
   );
-
-  return Promise.resolve(true);
 }
 
 export default {

@@ -3,7 +3,7 @@
 
 import rpc from "@odoo/rpc";
 
-function cmdUpdateAppList() {
+async function cmdUpdateAppList() {
   return rpc
     .query({
       method: "update_list",

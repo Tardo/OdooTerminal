@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import {isEmpty} from "@terminal/core/utils";
 
-function cmdAlias(kwargs) {
+async function cmdAlias(kwargs) {
   const aliases = this.storageLocal.getItem("terminal_aliases") || {};
   if (!kwargs.name) {
     if (isEmpty(aliases)) {
@@ -16,9 +16,9 @@ function cmdAlias(kwargs) {
         );
       }
     }
-    return Promise.resolve(aliases);
+    return aliases;
   } else if (Object.hasOwn(this.registeredCmds, kwargs.name)) {
-    return Promise.reject("Invalid alias name");
+    throw new Error("Invalid alias name");
   }
   if (kwargs.cmd && kwargs.cmd.length) {
     aliases[kwargs.name] = kwargs.cmd;
@@ -27,12 +27,12 @@ function cmdAlias(kwargs) {
     delete aliases[kwargs.name];
     this.screen.print("Alias removed successfully");
   } else {
-    return Promise.reject("The selected alias not exists");
+    throw new Error("The selected alias not exists");
   }
   this.storageLocal.setItem("terminal_aliases", aliases, (err) =>
     this.screen.printHTML(err)
   );
-  return Promise.resolve(aliases);
+  return aliases;
 }
 
 export default {

@@ -1,9 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-function cmdReloadPage() {
+async function cmdReloadPage() {
   location.reload();
-  return Promise.resolve();
 }
 
 export default {

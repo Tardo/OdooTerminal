@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdUnlinkModelRecord(kwargs) {
+async function cmdUnlinkModelRecord(kwargs) {
   return rpc
     .query({
       method: "unlink",

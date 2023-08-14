@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdCount(kwargs) {
+async function cmdCount(kwargs) {
   return rpc
     .query({
       method: "search_count",

@@ -170,36 +170,25 @@ export default class Terminal {
     }
   }
 
-  start() {
+  async start() {
     if (!this.#wasLoaded) {
-      return Promise.reject();
+      throw new Error("Terminal not loaded");
     }
 
-    return new Promise(async (resolve, reject) => {
-      this.$runningCmdCount = this.$el.find("#terminal_running_cmd_count");
-      try {
-        this.#virtMachine = new VMachine(
-          this.#registeredCmds,
-          this.#storageLocal,
-          {
-            processCommandJob: this.#processCommandJob.bind(this),
-          }
-        );
-        this.#commandAssistant = new CommandAssistant(this.#virtMachine);
-        this.screen.start(this.$el);
-        this.screen.applyStyle("opacity", this.#config.opacity);
-        this.onStart();
-        if (!this.#hasExecInitCmds) {
-          if (this.#config.init_cmds) {
-            await this.execute(this.#config.init_cmds, false, true);
-          }
-          this.#hasExecInitCmds = true;
-        }
-      } catch (err) {
-        return reject(err);
-      }
-      return resolve();
+    this.$runningCmdCount = this.$el.find("#terminal_running_cmd_count");
+    this.#virtMachine = new VMachine(this.#registeredCmds, this.#storageLocal, {
+      processCommandJob: this.#processCommandJob.bind(this),
     });
+    this.#commandAssistant = new CommandAssistant(this.#virtMachine);
+    this.screen.start(this.$el);
+    this.screen.applyStyle("opacity", this.#config.opacity);
+    this.onStart();
+    if (!this.#hasExecInitCmds) {
+      if (this.#config.init_cmds) {
+        await this.execute(this.#config.init_cmds, false, true);
+      }
+      this.#hasExecInitCmds = true;
+    }
   }
 
   // Destroy() {
@@ -343,85 +332,73 @@ export default class Terminal {
     return min_score[0] < SCORE_LIMIT ? min_score[1] : false;
   }
 
-  execute(cmd_raw, store = true, silent = false) {
-    return new Promise(async (resolve, reject) => {
-      await this.#wakeUp();
+  async execute(cmd_raw, store = true, silent = false) {
+    await this.#wakeUp();
 
-      // Check if secured commands involved
-      if (!silent) {
-        this.screen.printCommand(cmd_raw);
+    // Check if secured commands involved
+    if (!silent) {
+      this.screen.printCommand(cmd_raw);
+    }
+    this.screen.cleanInput();
+    if (store) {
+      this.#storeUserInput(cmd_raw);
+    }
+    const cmd_res = [];
+    try {
+      const results = await this.#virtMachine.eval(cmd_raw, {
+        silent: silent,
+      });
+      for (const result of results) {
+        cmd_res.push(result);
       }
-      this.screen.cleanInput();
-      if (store) {
-        this.#storeUserInput(cmd_raw);
-      }
-      const cmd_res = [];
-      try {
-        const results = await this.#virtMachine.eval(cmd_raw, {
-          silent: silent,
-        });
-        for (const result of results) {
-          cmd_res.push(result);
+    } catch (err) {
+      let err_msg = err.message;
+      if (err.constructor === UnknownCommandError) {
+        // Search similar commands
+        const similar_cmd = this.searchSimiliarCommand(err.cmd_name);
+        if (similar_cmd) {
+          err_msg = renderUnknownCommand({
+            org_cmd: err.cmd_name,
+            cmd: similar_cmd,
+            pos: [err.start, err.end],
+          });
         }
-      } catch (err) {
-        let err_msg = err.message;
-        if (err.constructor === UnknownCommandError) {
-          // Search similar commands
-          const similar_cmd = this.searchSimiliarCommand(err.cmd_name);
-          if (similar_cmd) {
-            err_msg = renderUnknownCommand({
-              org_cmd: err.cmd_name,
-              cmd: similar_cmd,
-              pos: [err.start, err.end],
-            });
-          }
-        }
-        this.screen.printError(err_msg);
-        return reject(err);
       }
+      this.screen.printError(err_msg);
+      throw err;
+    }
 
-      if (cmd_res.length === 1) {
-        return resolve(cmd_res[0]);
-      }
-      return resolve(cmd_res);
-    });
+    if (cmd_res.length === 1) {
+      return cmd_res[0];
+    }
+    return cmd_res;
   }
 
-  #wakeUp() {
-    return new Promise((resolve, reject) => {
-      if (this.#wasLoaded) {
-        if (this.#wasStart) {
-          resolve();
-        } else {
-          this.#wasStart = true;
-          return this.start()
-            .then(() => {
-              this.screen.flush();
-              resolve();
-            })
-            .catch((err) => reject(err));
-        }
-      } else {
-        reject();
+  async #wakeUp() {
+    if (this.#wasLoaded) {
+      if (!this.#wasStart) {
+        await this.start();
+        this.#wasStart = true;
+        this.screen.flush();
       }
-    });
+    } else {
+      throw new Error("Terminal not loaded");
+    }
   }
 
   /* VISIBILIY */
-  doShow() {
+  async doShow() {
     if (!this.#wasLoaded) {
-      return Promise.resolve();
+      return;
     }
     // Only start the terminal if needed
-    return this.#wakeUp().then(() => {
-      this.$el.addClass("terminal-transition-topdown");
-      this.screen.focus();
-    });
+    await this.#wakeUp();
+    this.$el.addClass("terminal-transition-topdown");
+    this.screen.focus();
   }
 
-  doHide() {
+  async doHide() {
     this.$el.removeClass("terminal-transition-topdown");
-    return Promise.resolve();
   }
 
   doToggle() {
@@ -499,8 +476,8 @@ export default class Terminal {
     return this.#inputHistory[this.#searchHistoryIter];
   }
 
-  #fallbackExecuteCommand() {
-    return Promise.reject("Invalid command definition!");
+  async #fallbackExecuteCommand() {
+    throw new Error("Invalid command definition!");
   }
 
   #updateJobsInfo() {
@@ -543,44 +520,39 @@ export default class Terminal {
     );
   }
 
-  #processCommandJob(command_info, silent = false) {
-    return new Promise(async (resolve, reject) => {
-      const job_index = this.onStartCommand(command_info);
-      if (job_index === -1) {
-        return reject(`Unexpected error: can't initialize the job!`);
-      }
-      let result = false;
-      let error = false;
-      let is_failed = false;
-      this.__meta = {
-        name: command_info.cmdName,
-        cmdRaw: command_info.cmdRaw,
-        def: command_info.cmdDef,
-        jobIndex: job_index,
-        silent: silent,
-      };
-      this.screen.__meta = this.__meta;
-      try {
-        result =
-          (await command_info.cmdDef.callback.call(
-            this,
-            command_info.kwargs
-          )) || true;
-        delete this.__meta;
-        delete this.screen.__meta;
-      } catch (err) {
-        is_failed = true;
-        error =
-          err ||
-          "[!] Oops! Unknown error! (no detailed error message given :/)";
-      } finally {
-        this.onFinishCommand(job_index, is_failed, error || result);
-      }
-      if (is_failed) {
-        return reject(typeof error === "object" ? "" : error);
-      }
-      return resolve(result);
-    });
+  async #processCommandJob(command_info, silent = false) {
+    const job_index = this.onStartCommand(command_info);
+    if (job_index === -1) {
+      throw new Error("Unexpected error: can't initialize the job!");
+    }
+    let result = false;
+    let error = false;
+    let is_failed = false;
+    this.__meta = {
+      name: command_info.cmdName,
+      cmdRaw: command_info.cmdRaw,
+      def: command_info.cmdDef,
+      jobIndex: job_index,
+      silent: silent,
+    };
+    this.screen.__meta = this.__meta;
+    try {
+      result =
+        (await command_info.cmdDef.callback.call(this, command_info.kwargs)) ||
+        true;
+      delete this.__meta;
+      delete this.screen.__meta;
+    } catch (err) {
+      is_failed = true;
+      error =
+        err || "[!] Oops! Unknown error! (no detailed error message given :/)";
+    } finally {
+      this.onFinishCommand(job_index, is_failed, error || result);
+    }
+    if (is_failed) {
+      throw new Error(typeof error === "object" ? "" : error);
+    }
+    return result;
   }
 
   /* HANDLE EVENTS */

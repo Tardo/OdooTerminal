@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import {getOdooService} from "@odoo/utils";
 
-function cmdPostData(kwargs) {
+async function cmdPostData(kwargs) {
   if (kwargs.mode === "odoo") {
     return getOdooService("web.ajax")
       .post(kwargs.endpoint, kwargs.data)

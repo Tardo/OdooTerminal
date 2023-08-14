@@ -3,7 +3,7 @@
 
 import {ARG} from "@trash/constants";
 
-function longPollingAddChannel(name) {
+async function longPollingAddChannel(name) {
   if (typeof name === "undefined") {
     this.screen.printError("Invalid channel name.");
   } else {
@@ -23,9 +23,7 @@ function longPollingDelChannel(name) {
 
 function cmdLongpolling(kwargs) {
   if (!this.longpolling) {
-    return Promise.reject(
-      "Can't use longpolling, 'bus' module is not installed"
-    );
+    throw new Error("Can't use longpolling, 'bus' module is not installed");
   }
 
   if (typeof kwargs.operation === "undefined") {
@@ -47,9 +45,8 @@ function cmdLongpolling(kwargs) {
     this.longpolling.stopPoll();
     this.screen.print("Longpolling stopped");
   } else {
-    return Promise.reject("Invalid Operation.");
+    throw new Error("Invalid Operation.");
   }
-  return Promise.resolve();
 }
 
 export default {

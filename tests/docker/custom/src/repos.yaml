@@ -2,7 +2,8 @@
   defaults:
     depth: 1
   remotes:
+    ocb: https://github.com/OCA/OCB.git
     odoo: https://github.com/odoo/odoo.git
-  target: odoo $ODOO_VERSION
+  target: ocb $ODOO_VERSION
   merges:
-    - odoo $ODOO_VERSION
+    - ocb $ODOO_VERSION

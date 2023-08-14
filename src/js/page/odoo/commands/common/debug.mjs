@@ -3,7 +3,7 @@
 
 import {ARG} from "@trash/constants";
 
-function cmdSetDebugMode(kwargs) {
+async function cmdSetDebugMode(kwargs) {
   if (kwargs.mode === 0) {
     this.screen.print(
       "Debug mode <strong>disabled</strong>. Reloading page..."
@@ -16,13 +16,12 @@ function cmdSetDebugMode(kwargs) {
     window.location = $.param.querystring(window.location.href, "debug=1");
   } else if (kwargs.mode === 2) {
     this.screen.print(
-      "Debug mode with assets <strong>enabled</strong>. " + "Reloading page..."
+      "Debug mode with assets <strong>enabled</strong>. Reloading page..."
     );
     window.location = $.param.querystring(window.location.href, "debug=assets");
   } else {
-    return Promise.reject("Invalid debug mode");
+    throw new Error("Invalid debug mode");
   }
-  return Promise.resolve();
 }
 
 export default {

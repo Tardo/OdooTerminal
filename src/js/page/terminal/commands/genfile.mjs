@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import {file2File} from "@terminal/core/utils";
 
-function cmdGenFile(kwargs) {
+async function cmdGenFile(kwargs) {
   return file2File(kwargs.name, kwargs.options);
 }
 

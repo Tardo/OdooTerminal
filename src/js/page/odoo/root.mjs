@@ -2,23 +2,24 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {getOdooService, getOdooVersionMajor} from "./utils";
+import {asyncSleep} from "@terminal/core/utils";
 
 const OdooRoot = getOdooService("root.widget", "web.web_client");
 
 export function doAction(action, options) {
   const OdooVer = getOdooVersionMajor();
   if (OdooVer >= 15) {
-    OdooRoot.env.bus.trigger("do-action", {
-      action: action,
-      options: options,
-    });
-
-    // Simulate action completion time..
-    // FIXME: this makes me cry
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({id: action});
-      }, 450);
+    return new Promise(async (resolve, reject) => {
+      OdooRoot.env.bus.trigger("do-action", {
+        action: action,
+        options: options,
+        on_success: resolve,
+        on_fail: reject,
+      });
+      // Simulate end of the 'action'
+      // FIXME: This makes me cry
+      await asyncSleep(1800);
+      return resolve({id: action});
     });
   }
 

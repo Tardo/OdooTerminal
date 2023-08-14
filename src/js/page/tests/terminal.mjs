@@ -26,7 +26,11 @@ export default class OdooTerminalTests extends OdooTerminal {
     const test_names = (ev.detail || "").split(",").filter((item) => item);
     this.doShow().then(() => {
       this.screen.clean();
-      this.#runTests(test_names);
+      try {
+        this.#runTests(test_names);
+      } catch (err) {
+        console.error(err);
+      }
     });
   }
 
@@ -42,48 +46,45 @@ export default class OdooTerminalTests extends OdooTerminal {
     return [...names];
   }
 
-  #runTests(test_names) {
-    return new Promise(async (resolve, reject) => {
-      const errors = {};
-      for (const TestClass of TestSuites) {
-        const test_suit = new TestClass(this);
-        let names = this.#getTestMethods(test_suit);
-        if (!isEmpty(test_names)) {
-          names = names.filter((item) => test_names.includes(item));
-        }
-        if (!isEmpty(names)) {
-          this.screen.print(`[info] Running '${TestClass.name}' tests...`);
-          await test_suit.onStartTests(names);
-          for (const name of names) {
-            this.screen.print(`${name}... `, true);
-            await test_suit.onBeforeTest.call(test_suit, name);
-            try {
-              await test_suit[name].call(test_suit);
-              this.screen.print("OK");
-              // Ensure that the terminal remains open
-              this.doShow();
-            } catch (e) {
-              errors[name] = e;
-              this.screen.printError(e.stack);
-              this.screen.print("FAIL");
-            }
-            await test_suit.onAfterTest.call(test_suit, name);
+  async #runTests(test_names) {
+    const errors = {};
+    for (const TestClass of TestSuites) {
+      const test_suit = new TestClass(this);
+      let names = this.#getTestMethods(test_suit);
+      if (!isEmpty(test_names)) {
+        names = names.filter((item) => test_names.includes(item));
+      }
+      if (!isEmpty(names)) {
+        this.screen.print(`[info] Running '${TestClass.name}' tests...`);
+        await test_suit.onStartTests(names);
+        for (const name of names) {
+          this.screen.print(`${name}... `, true);
+          await test_suit.onBeforeTest(name);
+          try {
+            await test_suit[name]();
+            this.screen.print("OK");
+            // Ensure that the terminal remains open
+            this.doShow();
+          } catch (e) {
+            errors[name] = e;
+            this.screen.printError(e.stack);
+            this.screen.print("FAIL");
           }
-          await test_suit.onEndTests(names);
+          await test_suit.onAfterTest(name);
         }
+        await test_suit.onEndTests(names);
       }
-      this.screen.print("");
-      if (Object.keys(errors).length > 0) {
-        this.screen.print(
-          "ERRORS. The following test failed:",
-          false,
-          "terminal-test-fail"
-        );
-        this.screen.print(Object.keys(errors));
-        return reject(errors);
-      }
-      this.screen.print("OK. All tests passed.", false, "terminal-test-ok");
-      return resolve();
-    });
+    }
+    this.screen.print("");
+    if (Object.keys(errors).length > 0) {
+      this.screen.print(
+        "ERRORS. The following test failed:",
+        false,
+        "terminal-test-fail"
+      );
+      this.screen.print(Object.keys(errors));
+      throw new Error(errors);
+    }
+    this.screen.print("OK. All tests passed.", false, "terminal-test-ok");
   }
 }

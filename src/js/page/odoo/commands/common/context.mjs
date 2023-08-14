@@ -6,7 +6,7 @@ import {getOdooSession, getOdooVersionMajor} from "@odoo/utils";
 
 const session = getOdooSession();
 
-function cmdContextOperation(kwargs) {
+async function cmdContextOperation(kwargs) {
   const OdooVer = getOdooVersionMajor();
   if (OdooVer >= 15) {
     if (
@@ -14,10 +14,11 @@ function cmdContextOperation(kwargs) {
       kwargs.operation === "write" ||
       kwargs.operation === "delete"
     ) {
+      // Soft-Error
       this.screen.printError(
         "This operation is currently not supported in v15.0+"
       );
-      return Promise.resolve();
+      return;
     }
   }
 
@@ -29,13 +30,13 @@ function cmdContextOperation(kwargs) {
     if (Object.hasOwn(session.user_context, kwargs.value)) {
       delete session.user_context[kwargs.value];
     } else {
-      return Promise.reject(
+      throw new Error(
         "The selected key is not present in the terminal context"
       );
     }
   }
   this.screen.print(session.user_context);
-  return Promise.resolve(session.user_context);
+  return session.user_context;
 }
 
 export default {

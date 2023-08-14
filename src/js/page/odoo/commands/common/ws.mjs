@@ -3,10 +3,10 @@
 
 import {ARG} from "@trash/constants";
 
-function cmdWebSocket(kwargs) {
+async function cmdWebSocket(kwargs) {
   if (kwargs.operation === "open") {
     if (!kwargs.endpoint) {
-      return Promise.reject("Need an endpoint to connect");
+      throw new Error("Need an endpoint to connect");
     }
     const url = `ws${kwargs.no_tls ? "" : "s"}://${window.location.host}${
       kwargs.endpoint
@@ -31,27 +31,27 @@ function cmdWebSocket(kwargs) {
     socket.onerror = () => {
       this.screen.eprint(`[${url}] ERROR!`);
     };
-    return Promise.resolve(socket);
+    return socket;
   } else if (kwargs.operation === "send") {
     if (!kwargs.websocket || kwargs.websocket.constructor !== WebSocket) {
-      return Promise.reject("Need a websocket to operate");
+      throw new Error("Need a websocket to operate");
     }
     // { event_name: 'subscribe', data: { channels: allTabsChannels, last: this.lastNotificationId } }
     const payload = JSON.stringify(kwargs.data);
     this.screen.eprint(`Sending '${payload}'...`);
     kwargs.websocket.send(payload);
-    return Promise.resolve();
+    return;
   } else if (kwargs.operation === "close") {
     if (!kwargs.websocket || kwargs.websocket.constructor !== WebSocket) {
-      return Promise.reject("Need a websocket to operate");
+      throw new Error("Need a websocket to operate");
     }
     kwargs.websocket.close(kwargs.data);
-    return Promise.resolve();
+    return;
   } else if (kwargs.operation === "health") {
     kwargs.websocket.close(kwargs.data);
-    return Promise.resolve();
+    return;
   }
-  return Promise.reject("Invalid operation");
+  throw new Error("Invalid operation");
 }
 
 export default {

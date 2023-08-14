@@ -13,7 +13,8 @@ function sanitizeCmdModuleDepends(module_name) {
   }
   return module_name;
 }
-function cmdModuleDepends(kwargs) {
+
+async function cmdModuleDepends(kwargs) {
   return rpc
     .query({
       method: "onchange_module",

@@ -4,11 +4,10 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdRpc(kwargs) {
-  return rpc.query(kwargs.options).then((result) => {
-    this.screen.eprint(result);
-    return result;
-  });
+async function cmdRpc(kwargs) {
+  const result = await rpc.query(kwargs.options);
+  this.screen.eprint(result);
+  return result;
 }
 
 export default {

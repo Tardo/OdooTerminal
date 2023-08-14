@@ -3,7 +3,7 @@
 
 import {ARG} from "@trash/constants";
 
-function cmdTerminalContextOperation(kwargs) {
+async function cmdTerminalContextOperation(kwargs) {
   if (kwargs.operation === "set") {
     this.userContext = kwargs.value;
   } else if (kwargs.operation === "write") {
@@ -12,13 +12,13 @@ function cmdTerminalContextOperation(kwargs) {
     if (Object.hasOwn(this.userContext, kwargs.value)) {
       delete this.userContext[kwargs.value];
     } else {
-      return Promise.reject(
+      throw new Error(
         "The selected key is not present in the terminal context"
       );
     }
   }
   this.screen.print(this.userContext);
-  return Promise.resolve(this.userContext);
+  return this.userContext;
 }
 
 export default {

@@ -3,9 +3,9 @@
 
 import {ARG} from "@trash/constants";
 
-function cmdPrint(kwargs) {
+async function cmdPrint(kwargs) {
   this.screen.print(kwargs.msg);
-  return Promise.resolve(kwargs.msg);
+  return kwargs.msg;
 }
 
 export default {

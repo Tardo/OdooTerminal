@@ -4,7 +4,7 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 
-function cmdCheckModelAccess(kwargs) {
+async function cmdCheckModelAccess(kwargs) {
   return rpc
     .query({
       method: "check_access_rights",
@@ -27,8 +27,7 @@ function cmdCheckModelAccess(kwargs) {
 export default {
   definition: "Check model access",
   callback: cmdCheckModelAccess,
-  detail:
-    "Show access rights for the selected operation on the" + " selected model",
+  detail: "Show access rights for the selected operation on the selected model",
   args: [
     [ARG.String, ["m", "model"], true, "The model technical name"],
     [

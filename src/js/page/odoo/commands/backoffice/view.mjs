@@ -42,15 +42,14 @@ function openSelectCreateDialog(model, title, domain, on_selected) {
     multiSelect: false,
     onSelected: on_selected,
   });
-  return Promise.resolve();
 }
 
-function cmdViewModelRecord(kwargs) {
+async function cmdViewModelRecord(kwargs) {
   const context = this.getContext({
     form_view_ref: kwargs.ref || false,
   });
   if (kwargs.id) {
-    return doAction({
+    await doAction({
       type: "ir.actions.act_window",
       name: "View Record",
       res_model: kwargs.model,
@@ -58,9 +57,9 @@ function cmdViewModelRecord(kwargs) {
       views: [[false, "form"]],
       target: "current",
       context: context,
-    }).then(() => {
-      this.doHide();
     });
+    this.doHide();
+    return;
   }
   return openSelectCreateDialog(
     kwargs.model,

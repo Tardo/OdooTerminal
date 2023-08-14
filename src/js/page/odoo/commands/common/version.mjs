@@ -3,12 +3,11 @@
 
 import {getOdooVersionInfo} from "@odoo/utils";
 
-function cmdShowOdooVersion() {
+async function cmdShowOdooVersion() {
   const version_info = getOdooVersionInfo();
   this.screen.print(
     `${version_info.slice(0, 3).join(".")} (${version_info.slice(3).join(" ")})`
   );
-  return Promise.resolve();
 }
 
 export default {

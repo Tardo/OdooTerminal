@@ -6,7 +6,7 @@ import {getOdooSession} from "@odoo/utils";
 
 const session = getOdooSession();
 
-function cmdLoginAs(kwargs) {
+async function cmdLoginAs(kwargs) {
   let db = kwargs.database;
   let login = kwargs.user;
   let passwd = kwargs.password || false;
@@ -16,7 +16,7 @@ function cmdLoginAs(kwargs) {
   }
   if (db === "*") {
     if (!session.db) {
-      return Promise.reject(
+      throw new Error(
         "Unknown active database. Try using " +
           "'<span class='o_terminal_click o_terminal_cmd' " +
           "data-cmd='dblist'>dblist</span>' command."
@@ -24,19 +24,14 @@ function cmdLoginAs(kwargs) {
     }
     db = session.db;
   }
-  return new Promise(async (resolve, reject) => {
-    const res = await session._session_authenticate(db, login, passwd);
-    this.screen.updateInputInfo({username: login});
-    this.screen.print(`Successfully logged as '${login}'`);
-    if (!kwargs.no_reload) {
-      try {
-        this.execute("reload", false, true);
-      } catch (err) {
-        return reject(err);
-      }
-    }
-    return resolve(res);
-  });
+
+  const res = await session._session_authenticate(db, login, passwd);
+  this.screen.updateInputInfo({username: login});
+  this.screen.print(`Successfully logged as '${login}'`);
+  if (!kwargs.no_reload) {
+    await this.execute("reload", false, true);
+  }
+  return res;
 }
 
 export default {
