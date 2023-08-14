@@ -4,8 +4,6 @@
 import {default as OdooRoot, doCall} from "./root";
 import {getOdooService, getOdooVersionMajor} from "./utils";
 
-const Bus = getOdooService("bus.bus")?.bus;
-
 export default class Longpolling {
   #terminal = null;
 
@@ -13,7 +11,7 @@ export default class Longpolling {
     this.#terminal = terminal;
     const OdooVer = getOdooVersionMajor();
     if (OdooVer <= 11) {
-      Bus.on("notification", this, this.#onBusNotification);
+      this.#getBusService().on("notification", this, this.#onBusNotification);
     } else if (OdooVer >= 16) {
       this.#busServ(
         "addEventListener",
@@ -23,6 +21,10 @@ export default class Longpolling {
     } else {
       this.#busServ("onNotification", this, this.#onBusNotification);
     }
+  }
+
+  #getBusService() {
+    return getOdooService("bus.bus")?.bus;
   }
 
   #busServ(method, ...params) {
@@ -40,7 +42,7 @@ export default class Longpolling {
   addChannel(name) {
     const OdooVer = getOdooVersionMajor();
     if (OdooVer <= 11) {
-      return Bus.add_channel(name);
+      return this.#getBusService().add_channel(name);
     }
     return this.#busServ("addChannel", name);
   }
@@ -48,7 +50,7 @@ export default class Longpolling {
   deleteChannel(name) {
     const OdooVer = getOdooVersionMajor();
     if (OdooVer <= 11) {
-      return Bus.delete_channel(name);
+      return this.#getBusService().delete_channel(name);
     }
     return this.#busServ("deleteChannel", name);
   }
@@ -56,7 +58,7 @@ export default class Longpolling {
   startPoll() {
     const OdooVer = getOdooVersionMajor();
     if (OdooVer <= 11) {
-      return Bus.start_polling();
+      return this.#getBusService().start_polling();
     } else if (OdooVer >= 16) {
       return this.#busServ("forceUpdateChannels");
     }
@@ -66,7 +68,7 @@ export default class Longpolling {
   stopPoll() {
     const OdooVer = getOdooVersionMajor();
     if (OdooVer <= 11) {
-      return Bus.stop_polling();
+      return this.#getBusService().stop_polling();
     } else if (OdooVer >= 16) {
       return this.#busServ("stop");
     }
