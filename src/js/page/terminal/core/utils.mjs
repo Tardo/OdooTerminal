@@ -44,11 +44,10 @@ export function isEmpty(data) {
 
 // See https://en.wikipedia.org/wiki/List_of_Unicode_characters
 export function encodeHTML(text) {
-  text?.replace(
+  return text?.replaceAll(
     /[\u00A0-\u9999\u003C-\u003E\u0022-\u002F]/gim,
     (i) => `&#${i.charCodeAt(0)};`
   );
-  return text;
 }
 
 // See https://stackoverflow.com/a/7616484

@@ -144,9 +144,9 @@ export default class Screen {
     this.#$shadowInput.val(str);
     // Deferred to ensure that has updated values
     // The trick here is to jump to a new frame
-    defer(() => {
+    setTimeout(() => {
       this.#$shadowInput.scrollLeft(this.#$input.scrollLeft(), 0);
-    });
+    }, 1);
   }
 
   updateAssistantPanelOptions(options, selected_option_index) {

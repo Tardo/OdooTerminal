@@ -15,7 +15,6 @@ export function getOdooService(...service_names) {
     service_cache[service_names_set] = service;
     return service;
   }
-  service_cache[service_names_set] = null;
   return null;
 }
 
