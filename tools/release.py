@@ -57,8 +57,8 @@ def update_version(mode, create_tag=False):
     # abstract_terminal.js
     _file_sub(
         'src/js/page/terminal/terminal.mjs',
-        r'VERSION: "\d+\.\d+\.\d+"',
-        'VERSION: "%s"' % extension_ver)
+        r'VERSION\s?=\s?"\d+\.\d+\.\d+"',
+        'VERSION = "%s"' % extension_ver)
     # pyproject.toml
     _file_sub(
         'pyproject.toml',
