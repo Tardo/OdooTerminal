@@ -274,7 +274,7 @@ export default class Screen {
     if (
       typeof error === "object" &&
       Object.hasOwn(error, "data") &&
-      error.code === 200
+      Object.hasOwn(error.data, "name")
     ) {
       // It's an Odoo error report
       error_msg = renderErrorMessage({
