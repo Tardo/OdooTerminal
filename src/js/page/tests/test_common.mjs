@@ -115,28 +115,28 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_install() {
-    await asyncSleep(6000);
+    await asyncSleep(10000);
     const res = await this.terminal.execute("install -m account", false, true);
     this.assertEqual(res[0]?.name, "account");
-    await asyncSleep(6000);
+    await asyncSleep(10000);
   }
 
   async test_upgrade() {
-    await asyncSleep(6000);
+    await asyncSleep(10000);
     const res = await this.terminal.execute("upgrade -m account", false, true);
     this.assertEqual(res[0]?.name, "account");
-    await asyncSleep(6000);
+    await asyncSleep(10000);
   }
 
   async test_uninstall() {
-    await asyncSleep(6000);
+    await asyncSleep(10000);
     const res = await this.terminal.execute(
       "uninstall -m account --force",
       false,
       true
     );
     this.assertEqual(res?.name, "account");
-    await asyncSleep(6000);
+    await asyncSleep(10000);
   }
 
   async test_action() {
