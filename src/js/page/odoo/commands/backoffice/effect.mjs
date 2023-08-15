@@ -8,7 +8,9 @@ import {isEmpty} from "@terminal/core/utils";
 
 async function cmdShowEffect(kwargs) {
   if (getOdooVersionMajor() < 15) {
-    throw new Error("This command is only available in Odoo 15.0+");
+    // Soft-Error
+    this.screen.printError("This command is only available in Odoo 15.0+");
+    return;
   }
   if (isEmpty(kwargs.type)) {
     const registry = getOdooService("@web/core/registry").registry;

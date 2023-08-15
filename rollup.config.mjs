@@ -5,8 +5,8 @@ import cssnano from "cssnano";
 import postcss from "rollup-plugin-postcss";
 import {terser} from "rollup-plugin-terser";
 import alias from "@rollup/plugin-alias";
-import commonjs from "@rollup/plugin-commonjs";
 import {nodeResolve} from "@rollup/plugin-node-resolve";
+import analyze from "rollup-plugin-analyzer";
 
 const is_production = process.env.NODE_ENV === "production";
 
@@ -14,9 +14,9 @@ export default {
   input: "src/js/page/loader.mjs",
   output: {
     sourcemap: (!is_production && "inline") || false,
-    format: "iife",
+    format: "esm",
     name: "terminal",
-    file: "src/dist/terminal.js",
+    file: "src/dist/terminal.mjs",
   },
   plugins: [
     alias({
@@ -52,13 +52,13 @@ export default {
       ],
     }),
     nodeResolve(),
-    commonjs(),
 
     postcss({
       plugins: [autoprefixer(), is_production && cssnano()],
     }),
 
     is_production && terser(),
+    is_production && analyze(),
   ],
   watch: {
     clearScreen: false,

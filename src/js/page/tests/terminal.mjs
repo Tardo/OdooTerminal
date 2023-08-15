@@ -26,11 +26,7 @@ export default class OdooTerminalTests extends OdooTerminal {
     const test_names = (ev.detail || "").split(",").filter((item) => item);
     this.doShow().then(() => {
       this.screen.clean();
-      try {
-        this.#runTests(test_names);
-      } catch (err) {
-        console.error(err);
-      }
+      return this.#runTests(test_names);
     });
   }
 
@@ -77,13 +73,14 @@ export default class OdooTerminalTests extends OdooTerminal {
     }
     this.screen.print("");
     if (Object.keys(errors).length > 0) {
+      // Soft-Error
       this.screen.print(
         "ERRORS. The following test failed:",
         false,
         "terminal-test-fail"
       );
       this.screen.print(Object.keys(errors));
-      throw new Error(errors);
+      return errors;
     }
     this.screen.print("OK. All tests passed.", false, "terminal-test-ok");
   }
