@@ -1,5 +1,17 @@
 # Changelog
 
+**10.1.0**
+
+```
+UPD: commands async/await
+UPD: command 'longpolling'
+
+FIX: utils
+FIX: screen: printError
+FIX: tools/release
+FIX: tests
+```
+
 **10.0.0**
 
 ```
