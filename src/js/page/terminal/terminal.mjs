@@ -183,12 +183,6 @@ export default class Terminal {
     this.screen.start(this.$el);
     this.screen.applyStyle("opacity", this.#config.opacity);
     this.onStart();
-    if (!this.#hasExecInitCmds) {
-      if (this.#config.init_cmds) {
-        await this.execute(this.#config.init_cmds, false, true);
-      }
-      this.#hasExecInitCmds = true;
-    }
   }
 
   // Destroy() {
@@ -385,6 +379,14 @@ export default class Terminal {
         await this.start();
         this.#wasStart = true;
         this.screen.flush();
+
+        // Init commands
+        if (!this.#hasExecInitCmds) {
+          if (this.#config.init_cmds) {
+            await this.execute(this.#config.init_cmds, false, true);
+          }
+          this.#hasExecInitCmds = true;
+        }
       }
     } else {
       throw new Error("Terminal not loaded");
