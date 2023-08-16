@@ -39,9 +39,9 @@ async function cmdGen(kwargs) {
 }
 
 export default {
-  definition: "Generate numbers, strings, url's, dates, etc...",
+  definition: "Generate random values",
   callback: cmdGen,
-  detail: "Shows the bytecode generated for the input",
+  detail: "Generate numbers, strings, url's, dates, etc...",
   args: [
     [
       ARG.String,

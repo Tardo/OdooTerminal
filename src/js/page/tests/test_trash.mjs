@@ -76,6 +76,10 @@ export default class TestTrash extends TerminalTestSuite {
     );
     this.assertEqual(results[0].constructor, String);
     this.assertTrue(results[0].length > 0);
+    // Results = await this.terminal.virtMachine.eval(
+    //   "{test: $(gen -mi 1 -ma 4)}"
+    // );
+    // this.assertTrue(results[0].test.length);
 
     // Concat
     results = await this.terminal.virtMachine.eval(

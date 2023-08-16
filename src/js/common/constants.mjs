@@ -10,6 +10,7 @@ export const SETTING_TYPES = {
   shortcuts: "manual",
   devmode_tests: "check",
   devmode_ignore_comp_checks: "check",
+  devmode_console_errors: "check",
 };
 
 export const SETTING_NAMES = Object.keys(SETTING_TYPES);
@@ -23,6 +24,7 @@ export const SETTING_DEFAULTS = {
   shortcuts: {},
   devmode_tests: false,
   devmode_ignore_comp_checks: false,
+  devmode_console_errors: false,
 };
 
 export const IGNORED_KEYS = ["Control", "Meta", "Shift", "Alt", "Escape"];

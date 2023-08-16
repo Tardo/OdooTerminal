@@ -18,7 +18,6 @@ npm install
 #### Usage
 
 ```
-npm run build
 npm run tests -- --browser chromium --odoo-version 16
 ```
 
@@ -46,4 +45,3 @@ npm run tests -- --browser chromium --odoo-version 16
 - logout
 - lang
 - login
-- barcode

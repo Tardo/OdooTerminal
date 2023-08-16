@@ -80,7 +80,10 @@ export default class VMachine {
           silent
         );
       } catch (err) {
-        throw new Exceptions.InvalidCommandArgumentFormatError(err, frame.cmd);
+        throw new Exceptions.InvalidCommandArgumentFormatError(
+          err.message,
+          frame.cmd
+        );
       }
     }
     // Alias
@@ -241,7 +244,7 @@ export default class VMachine {
                 root_frame.values.push(ret);
               }
             } catch (err) {
-              throw new Exceptions.CallFunctionError(err);
+              throw new Exceptions.CallFunctionError(err.message);
             }
           }
           break;
@@ -289,7 +292,7 @@ export default class VMachine {
               data[attr_name] = attr_value;
               frame.store[vname] = data;
             } catch (err) {
-              throw new Exceptions.InvalidInstructionError(err);
+              throw new Exceptions.InvalidInstructionError(err.message);
             }
           }
           break;

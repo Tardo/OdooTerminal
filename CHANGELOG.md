@@ -1,5 +1,13 @@
 # Changelog
 
+**10.1.1**
+
+```
+IMP: Command error message
+
+FIX: Command 'gen' definition
+```
+
 **10.1.0**
 
 ```

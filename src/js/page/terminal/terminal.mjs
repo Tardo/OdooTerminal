@@ -352,7 +352,7 @@ export default class Terminal {
         cmd_res.push(result);
       }
     } catch (err) {
-      let err_msg = err.message;
+      let err_msg = null;
       if (err.constructor === UnknownCommandError) {
         // Search similar commands
         const similar_cmd = this.searchSimiliarCommand(err.cmd_name);
@@ -363,8 +363,13 @@ export default class Terminal {
             pos: [err.start, err.end],
           });
         }
+      } else if (err.message) {
+        err_msg = `${err.name}: ${err.message}`;
       }
       this.screen.printError(err_msg);
+      if (this.#config.console_errors) {
+        console.error(err);
+      }
       throw err;
     }
 
@@ -511,6 +516,7 @@ export default class Terminal {
       shortcuts: config.shortcuts,
       term_context: config.term_context || {},
       init_cmds: config.init_cmds,
+      console_errors: config.devmode_console_errors,
     });
 
     this.userContext = Object.assign(
