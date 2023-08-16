@@ -149,6 +149,10 @@ export default class Terminal {
     return this.#jobs;
   }
 
+  get config() {
+    return this.#config;
+  }
+
   /**
    * This is necessary to prevent terminal issues in Odoo EE
    */

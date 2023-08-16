@@ -7,6 +7,7 @@ IMP: Command error message
 
 FIX: Command 'gen' definition
 FIX: Init Commands (issue #123)
+FIX: Read command arguments
 ```
 
 **10.1.0**

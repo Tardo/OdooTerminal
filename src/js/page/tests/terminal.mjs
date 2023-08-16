@@ -63,8 +63,11 @@ export default class OdooTerminalTests extends OdooTerminal {
             this.doShow();
           } catch (e) {
             errors[name] = e;
-            this.screen.printError(e.stack);
             this.screen.print("FAIL");
+            this.screen.printError(e.stack);
+            if (this.config.console_errors) {
+              console.error(e);
+            }
           }
           await test_suit.onAfterTest(name);
         }

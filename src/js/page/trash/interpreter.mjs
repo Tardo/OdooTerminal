@@ -730,6 +730,7 @@ export default class Interpreter {
               },
               ++mlevel
             );
+            res.stack.arguments.push(...parsed_array.stack.arguments);
             res.stack.values.push(...parsed_array.stack.values);
             res.stack.names.push(...parsed_array.stack.names);
             to_append.inputTokens.push(...parsed_array.inputTokens);
@@ -752,6 +753,7 @@ export default class Interpreter {
               },
               ++mlevel
             );
+            res.stack.arguments.push(...parsed_dict.stack.arguments);
             res.stack.values.push(...parsed_dict.stack.values);
             res.stack.names.push(...parsed_dict.stack.names);
             to_append.inputTokens.push(...parsed_dict.inputTokens);
@@ -821,6 +823,7 @@ export default class Interpreter {
               },
               ++mlevel
             );
+            res.stack.arguments.push(...parsed_attribute.stack.arguments);
             res.stack.values.push(...parsed_attribute.stack.values);
             res.stack.names.push(...parsed_attribute.stack.names);
             to_append.inputTokens.push(...parsed_attribute.inputTokens);
@@ -843,7 +846,7 @@ export default class Interpreter {
               {
                 registeredCmds: options.registeredCmds,
                 silent: true,
-                offset: token.start + 2,
+                offset: token.start + 1,
               },
               ++mlevel
             );
@@ -926,6 +929,7 @@ export default class Interpreter {
               },
               ++mlevel
             );
+            res.stack.arguments.push(...parsed_math.stack.arguments);
             res.stack.values.push(...parsed_math.stack.values);
             res.stack.names.push(...parsed_math.stack.names);
             to_append.inputTokens.push(...parsed_math.inputTokens);

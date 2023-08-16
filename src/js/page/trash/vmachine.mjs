@@ -112,6 +112,7 @@ export default class VMachine {
     });
     const stack = parse_info.stack;
     const stack_instr_len = stack.instructions.length;
+    const stack_instr_done = [];
     const root_frame = new Frame();
     root_frame.store = this.#registeredNames;
     const frames = [];
@@ -323,7 +324,7 @@ export default class VMachine {
         case INSTRUCTION_TYPE.BUILD_LIST:
           {
             const frame = last_frame || root_frame;
-            const iter_count = countBy(stack.instructions, (item) => {
+            const iter_count = countBy(stack_instr_done, (item) => {
               return item.level === instr.dataIndex && item.dataIndex !== -1;
             }).true;
             const value = [];
@@ -337,7 +338,7 @@ export default class VMachine {
           {
             const frame = last_frame || root_frame;
             const iter_count =
-              countBy(stack.instructions, (item) => {
+              countBy(stack_instr_done, (item) => {
                 return item.level === instr.dataIndex && item.dataIndex !== -1;
               }).true / 2;
             const value = {};
@@ -358,6 +359,8 @@ export default class VMachine {
           last_frame = frames.at(-1);
           break;
       }
+
+      stack_instr_done.push(instr);
     }
     return return_values;
   }
