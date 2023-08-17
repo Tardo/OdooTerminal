@@ -17,7 +17,7 @@ import {difference} from "@trash/utils";
 import {debounce, isEmpty} from "./core/utils";
 
 export default class Terminal {
-  VERSION = "10.1.0";
+  VERSION = "10.1.1";
 
   userContext = {};
 
