@@ -1,4 +1,4 @@
-name: Test
+name: Tests
 
 on:
   schedule:
@@ -11,7 +11,7 @@ on:
 jobs:
   web-ext:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - uses: actions/cache@v3
@@ -24,38 +24,22 @@ jobs:
             node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/poetry.lock') }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Switch to current branch
         run: git checkout ${{ env.BRANCH }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install browser firefox
-        uses: browser-actions/setup-firefox@latest
-        with:
-          firefox-version: "latest"
-        if: ${{ matrix.browser == 'firefox' }}
-
-      - name: Install browser chrome
-        uses: browser-actions/setup-chrome@latest
-        with:
-          chrome-version: "stable"
-        if: ${{ matrix.browser == 'chrome' }}
-
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v2
+      - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: latest
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '*'
           check-latest: true
@@ -71,7 +55,7 @@ jobs:
           poetry install
           npm install
 
-      - name: Create .zip package
+      - name: Build dist/ files
         run: npm run build
 
       - name: Execute web-ext lint
@@ -98,38 +82,22 @@ jobs:
             node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/poetry.lock') }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Switch to current branch
         run: git checkout ${{ env.BRANCH }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install browser firefox
-        uses: browser-actions/setup-firefox@latest
-        with:
-          firefox-version: "latest"
-        if: ${{ matrix.browser == 'firefox' }}
-
-      - name: Install browser chrome
-        uses: browser-actions/setup-chrome@latest
-        with:
-          chrome-version: "stable"
-        if: ${{ matrix.browser == 'chrome' }}
-
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v2
+      - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: latest
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '*'
           check-latest: true
@@ -144,6 +112,18 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install
           npm install
+
+      - name: Install browser firefox
+        uses: browser-actions/setup-firefox@latest
+        with:
+          firefox-version: "latest"
+        if: ${{ matrix.browser == 'firefox' }}
+
+      - name: Install browser chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: "stable"
+        if: ${{ matrix.browser == 'chrome' }}
 
       - name: Install xvfb
         run: sudo apt-get install -y xvfb

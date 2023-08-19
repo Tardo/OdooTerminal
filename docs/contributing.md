@@ -26,5 +26,3 @@ pre-commit run -a
 
 If one step fails the commit will be cancelled, try do it again (surely
 pre-commit was changed some files, no problem, it's his job, add them again).
-The only step thats require manual action if fails (very rare to happen) is the
-last ('web-ext').

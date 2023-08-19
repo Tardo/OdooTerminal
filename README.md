@@ -8,7 +8,11 @@
 <h1 align="center">
   <img src="src/img/terminal-128.png" />
   <div>Odoo Terminal - WebExtension</div>
+
+[![Tests](https://github.com/Tardo/OdooTerminal/actions/workflows/tests.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/tests.yml)
+
 </h1>
+
 <p align="center">
 The BFG10k for Odoo developers
 </p>
