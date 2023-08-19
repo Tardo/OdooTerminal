@@ -4,6 +4,7 @@
 
 ```
 IMP: More modules
+IMP: Reduced loading time to ~24ms
 
 FIX: TraSH: Interpreter dictionaries
 ```
