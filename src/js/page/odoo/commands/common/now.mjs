@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {getOdooService} from "@odoo/utils";
+import getOdooService from "@odoo/utils/get_odoo_service";
 
 async function cmdNow(kwargs) {
   const time = getOdooService("web.time");

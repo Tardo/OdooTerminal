@@ -10,10 +10,10 @@
  * 'update_terminal_badge_info'.
  */
 
-import {ubrowser} from "../shared/constants.mjs";
-import {getActiveTab, sendInternalMessage} from "../shared/tabs.mjs";
-import {getStorageSync, setStorageSync} from "../shared/storage.mjs";
-import {SETTING_DEFAULTS, SETTING_NAMES} from "../common/constants.mjs";
+import {ubrowser} from "@shared/constants";
+import {getActiveTab, sendInternalMessage} from "@shared/tabs";
+import {getStorageSync, setStorageSync} from "@shared/storage";
+import {SETTING_DEFAULTS, SETTING_NAMES} from "@common/constants";
 
 /**
  * @param {String} icon - url to the icon
@@ -91,8 +91,8 @@ ubrowser.runtime.onMessage.addListener(onInternalMessage);
 ubrowser.runtime.onInstalled.addListener(onInstalled);
 
 // Listen actived tab and updates to update info
-ubrowser.tabs.onUpdated.addListener(onRefreshOdooInfo.bind(this, true));
-ubrowser.tabs.onActivated.addListener(onRefreshOdooInfo.bind(this, false));
+ubrowser.tabs.onUpdated.addListener(onRefreshOdooInfo.bind(undefined, true));
+ubrowser.tabs.onActivated.addListener(onRefreshOdooInfo.bind(undefined, false));
 
 // Listen the extension browser icon click event to toggle terminal visibility
 ubrowser.browserAction.onClicked.addListener(onClickBrowserAction);

@@ -2,7 +2,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {isEmpty} from "@terminal/core/utils";
+import {getArgumentInfo} from "@trash/argument";
+import isEmpty from "@terminal/utils/is_empty";
 
 async function printHelpDetailed(cmd, cmd_def) {
   this.screen.eprint("NAME");
@@ -20,7 +21,7 @@ async function printHelpDetailed(cmd, cmd_def) {
   const args = [];
   let arg_info_str = "";
   for (const arg of cmd_def.args) {
-    const arg_info = this.virtMachine.getInterpreter().getArgumentInfo(arg);
+    const arg_info = getArgumentInfo(arg);
     const lnames = [`-${arg_info.names.short}`, `--${arg_info.names.long}`];
     const arg_symbols = arg_info.is_required ? ["<", ">"] : ["[", "]"];
     arg_info_str += `${arg_symbols[0]}${lnames.join(", ")} [${ARG.getHumanType(

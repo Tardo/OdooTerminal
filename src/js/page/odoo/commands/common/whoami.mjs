@@ -1,12 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {
-  renderWhoami,
-  renderWhoamiListItem,
-} from "@terminal/core/template_manager";
+import renderWhoami from "@odoo/templates/whoami";
+import renderWhoamiListItem from "@odoo/templates/whoami_group_item";
 import rpc from "@odoo/rpc";
-import {getUID} from "@odoo/utils";
+import getUID from "@odoo/utils/get_uid";
 
 async function cmdShowWhoAmI() {
   const result = await rpc.query({

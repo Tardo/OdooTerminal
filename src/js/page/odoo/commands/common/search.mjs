@@ -16,7 +16,8 @@ async function cmdSearchModelRecord(kwargs) {
     }
     const sresult = buff.data.slice(0, lines_total);
     buff.data = buff.data.slice(lines_total);
-    this.screen.printRecords(buff.model, sresult);
+    const recordset = Recordset.make(kwargs.model, sresult);
+    this.screen.print(recordset);
     if (buff.data.length) {
       this.screen.printError(
         `<strong class='text-warning'>Result truncated to ${sresult.length} records!</strong> The query is too big to be displayed entirely.`
@@ -34,10 +35,10 @@ async function cmdSearchModelRecord(kwargs) {
         } catch (err) {
           return reject(err);
         }
-        return resolve(sresult);
+        return resolve(recordset);
       });
     }
-    return sresult;
+    return recordset;
   }
 
   return rpc
@@ -62,8 +63,9 @@ async function cmdSearchModelRecord(kwargs) {
         };
         sresult = sresult.slice(0, lines_total);
       }
-      this.screen.printRecords(kwargs.model, sresult);
-      this.screen.print(`Records count: ${result.length}`);
+      const recordset = Recordset.make(kwargs.model, sresult);
+      this.screen.print(recordset);
+      this.screen.print(`Records count: ${sresult.length}`);
       if (need_truncate) {
         this.screen.printError(
           `<strong class='text-warning'>Result truncated to ${sresult.length} records!</strong> The query is too big to be displayed entirely.`
@@ -83,10 +85,10 @@ async function cmdSearchModelRecord(kwargs) {
           } catch (err) {
             return reject(err);
           }
-          return resolve(Recordset.make(kwargs.model, sresult));
+          return resolve(recordset);
         });
       }
-      return Recordset.make(kwargs.model, result);
+      return recordset;
     });
 }
 

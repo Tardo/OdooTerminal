@@ -2,12 +2,13 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {save2File, uniqueId} from "@terminal/core/utils";
+import uniqueId from "@terminal/utils/unique_id";
+import save2file from "@terminal/utils/save2file";
 
 async function cmdExportFile(kwargs) {
   const filename = `${uniqueId("term")}_${new Date().getTime()}.json`;
   const data = JSON.stringify(kwargs.value, null, 4);
-  save2File(filename, "text/json", data);
+  save2file(filename, "text/json", data);
   this.screen.print(`Command result exported to '${filename}' file`);
   return filename;
 }

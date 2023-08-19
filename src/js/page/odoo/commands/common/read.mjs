@@ -44,8 +44,9 @@ async function cmdSearchModelRecordId(kwargs) {
     }
   }
 
-  this.screen.printRecords(kwargs.model, result);
-  return Recordset.make(kwargs.model, result);
+  const recordset = Recordset.make(kwargs.model, result);
+  this.screen.print(recordset);
+  return recordset;
 }
 
 export default {

@@ -2,8 +2,20 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {INSTRUCTION_TYPE} from "./constants";
-import {countBy, pluck} from "./utils";
-import * as Exceptions from "./exception";
+import {validateAndFormatArguments} from "./argument";
+import countBy from "./utils/count_by";
+import pluck from "./utils/pluck";
+import InvalidCommandArgumentsError from "./exceptions/invalid_command_arguments_error";
+import InvalidCommandArgumentValueError from "./exceptions/invalid_command_argument_value_error";
+import InvalidCommandArgumentFormatError from "./exceptions/invalid_command_argument_format_error";
+import UnknownNameError from "./exceptions/unknown_name_error";
+import UnknownCommandError from "./exceptions/unknown_command_error";
+import NotExpectedCommandArgumentError from "./exceptions/not_expected_command_argument_error";
+import CallFunctionError from "./exceptions/call_function_error";
+import InvalidInstructionError from "./exceptions/invalid_instruction_error";
+import InvalidNameError from "./exceptions/invalid_name_error";
+import InvalidTokenError from "./exceptions/invalid_token_error";
+import UndefinedValueError from "./exceptions/undefined_value_error";
 import Interpreter from "./interpreter";
 
 class Frame {
@@ -23,30 +35,56 @@ class Frame {
 export default class VMachine {
   #registeredCmds = {};
   #registeredNames = {};
+  #interpreter = null;
 
-  constructor(registered_cmds, storage_local, options) {
+  constructor(registered_cmds, options) {
     this.#registeredCmds = registered_cmds;
     this.options = options;
-    this.interpreter = new Interpreter(storage_local);
+    this.#interpreter = new Interpreter();
   }
 
   get commands() {
     return this.#registeredCmds;
   }
 
-  getInterpreter() {
-    return this.interpreter;
+  parse(data, options, level = 0) {
+    return this.#interpreter.parse(
+      data,
+      Object.assign({}, options, {
+        registeredCmds: this.#registeredCmds,
+        registeredNames: this.#registeredNames,
+      }),
+      level
+    );
   }
 
-  async #callFunction(frame, parse_info, silent) {
+  parseAliases(aliases, cmd_name, args) {
+    let alias_cmd = aliases[cmd_name];
+    if (alias_cmd) {
+      const params_len = args.length;
+      let index = 0;
+      while (index < params_len) {
+        const re = new RegExp(`\\$${Number(index) + 1}(?:\\[[^\\]]+\\])?`, "g");
+        alias_cmd = alias_cmd.replaceAll(re, args[index]);
+        ++index;
+      }
+      alias_cmd = alias_cmd.replaceAll(
+        /\$\d+(?:\[([^\]]+)\])?/g,
+        (_, group) => {
+          return group || "";
+        }
+      );
+      return alias_cmd;
+    }
+    return null;
+  }
+
+  async #callFunction(aliases, frame, parse_info, silent) {
     const cmd_def = this.#registeredCmds[frame.cmd];
     if (cmd_def) {
       const items_len = frame.values.length;
       if (frame.args.length > items_len) {
-        throw new Exceptions.InvalidCommandArgumentsError(
-          frame.cmd,
-          frame.args
-        );
+        throw new InvalidCommandArgumentsError(frame.cmd, frame.args);
       }
       let kwargs = {};
       const values = frame.values;
@@ -55,7 +93,7 @@ export default class VMachine {
         if (!arg_name) {
           const arg_def = cmd_def.args[index];
           if (!arg_def) {
-            throw new Exceptions.InvalidCommandArgumentValueError(
+            throw new InvalidCommandArgumentValueError(
               frame.cmd,
               values[index]
             );
@@ -66,10 +104,7 @@ export default class VMachine {
       }
 
       try {
-        kwargs = await this.getInterpreter().validateAndFormatArguments(
-          cmd_def,
-          kwargs
-        );
+        kwargs = await validateAndFormatArguments(cmd_def, kwargs);
         return this.options.processCommandJob(
           {
             cmdRaw: parse_info.inputRawString,
@@ -80,24 +115,21 @@ export default class VMachine {
           silent
         );
       } catch (err) {
-        throw new Exceptions.InvalidCommandArgumentFormatError(
-          err.message,
-          frame.cmd
-        );
+        throw new InvalidCommandArgumentFormatError(err.message, frame.cmd);
       }
     }
     // Alias
-    const alias_cmd = this.getInterpreter().parseAliases(
-      frame.cmd,
-      frame.values
-    );
-    return (await this.eval(alias_cmd))[0];
+    const alias_cmd = this.parseAliases(aliases, frame.cmd, frame.values);
+    return (
+      await this.eval(alias_cmd, {
+        aliases: aliases,
+      })
+    )[0];
   }
 
-  #checkGlobalName(global_name) {
+  #checkGlobalName(global_name, aliases) {
     return (
-      Object.hasOwn(this.#registeredCmds, global_name) ||
-      this.getInterpreter().getAliasCommand(global_name)
+      Object.hasOwn(this.#registeredCmds, global_name) || aliases[global_name]
     );
   }
 
@@ -105,9 +137,7 @@ export default class VMachine {
     if (cmd_raw.constructor !== String) {
       throw new Error("Invalid input!");
     }
-    const parse_info = this.interpreter.parse(cmd_raw, {
-      registeredCmds: this.#registeredCmds,
-      registeredNames: this.#registeredNames,
+    const parse_info = this.parse(cmd_raw, {
       isData: options?.isData,
     });
     const stack = parse_info.stack;
@@ -138,26 +168,18 @@ export default class VMachine {
             } else if (Object.hasOwn(this.#registeredNames, var_name)) {
               frame.values.push(this.#registeredNames[var_name]);
             } else {
-              throw new Exceptions.UnknownNameError(
-                var_name,
-                token.start,
-                token.end
-              );
+              throw new UnknownNameError(var_name, token.start, token.end);
             }
           }
           break;
         case INSTRUCTION_TYPE.LOAD_GLOBAL:
           {
             const cmd_name = stack.names[instr.level][instr.dataIndex];
-            if (this.#checkGlobalName(cmd_name)) {
+            if (this.#checkGlobalName(cmd_name, options.aliases)) {
               last_frame = new Frame(cmd_name, last_frame);
               frames.push(last_frame);
             } else {
-              throw new Exceptions.UnknownCommandError(
-                cmd_name,
-                token.start,
-                token.end
-              );
+              throw new UnknownCommandError(cmd_name, token.start, token.end);
             }
           }
           break;
@@ -172,7 +194,7 @@ export default class VMachine {
           {
             const arg = stack.arguments[instr.level][instr.dataIndex];
             if (!last_frame) {
-              throw new Exceptions.NotExpectedCommandArgumentError(
+              throw new NotExpectedCommandArgumentError(
                 arg,
                 token.start,
                 token.end
@@ -233,6 +255,7 @@ export default class VMachine {
             try {
               // Subframes are executed in silent mode
               const ret = await this.#callFunction(
+                options.aliases,
                 frame,
                 parse_info,
                 instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT ||
@@ -245,7 +268,7 @@ export default class VMachine {
                 root_frame.values.push(ret);
               }
             } catch (err) {
-              throw new Exceptions.CallFunctionError(err.message);
+              throw new CallFunctionError(err.message);
             }
           }
           break;
@@ -262,18 +285,14 @@ export default class VMachine {
             const vvalue = frame.values.pop();
             if (!vname) {
               if (!token) {
-                throw new Exceptions.InvalidInstructionError();
+                throw new InvalidInstructionError();
               }
-              throw new Exceptions.InvalidNameError(
-                token.value,
-                token.start,
-                token.end
-              );
+              throw new InvalidNameError(token.value, token.start, token.end);
             } else if (typeof vvalue === "undefined") {
               const value_instr = stack.instructions[index - 1];
               const value_token =
                 stack.inputTokens[value_instr.inputTokenIndex] || {};
-              throw new Exceptions.InvalidTokenError(
+              throw new InvalidTokenError(
                 value_token.value,
                 value_token.start,
                 value_token.end
@@ -293,7 +312,7 @@ export default class VMachine {
               data[attr_name] = attr_value;
               frame.store[vname] = data;
             } catch (err) {
-              throw new Exceptions.InvalidInstructionError(err.message);
+              throw new InvalidInstructionError(err.message);
             }
           }
           break;
@@ -305,7 +324,7 @@ export default class VMachine {
             const value = frame.values[index_value];
 
             if (typeof value === "undefined") {
-              throw new Exceptions.UndefinedValueError(attr_name);
+              throw new UndefinedValueError(attr_name);
             }
             let res_value = value[attr_name];
             if (typeof res_value === "undefined") {
@@ -337,10 +356,14 @@ export default class VMachine {
         case INSTRUCTION_TYPE.BUILD_MAP:
           {
             const frame = last_frame || root_frame;
-            const iter_count =
-              countBy(stack_instr_done, (item) => {
-                return item.level === instr.dataIndex && item.dataIndex !== -1;
-              }).true / 2;
+            // Debugger;
+            const iter_count = countBy(stack_instr_done, (item) => {
+              return (
+                item.level === instr.dataIndex &&
+                item.dataIndex !== -1 &&
+                item.type !== INSTRUCTION_TYPE.BUILD_MAP
+              );
+            }).true;
             const value = {};
             for (let i = 0; i < iter_count; ++i) {
               const val = frame.values.pop();

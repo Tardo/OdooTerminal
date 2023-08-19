@@ -3,7 +3,7 @@
 
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
-import {getOdooVersionMajor} from "@odoo/utils";
+import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
 
 async function cmdRef(kwargs) {
   const OdooVer = getOdooVersionMajor();
@@ -45,16 +45,14 @@ async function cmdRef(kwargs) {
     }
   }
   const results = await Promise.all(tasks);
-  let body = "";
+  const rows = [];
   const len = results.length;
   for (let x = 0; x < len; ++x) {
+    const row_index = rows.push([]) - 1;
     const item = results[x];
-    body +=
-      `<tr><td>${item[0]}</td>` +
-      `<td>${item[1]}</td>` +
-      `<td>${item[2]}</td></tr>`;
+    rows[row_index].push(item[0], item[1], item[2]);
   }
-  this.screen.printTable(["XML ID", "Res. Model", "Res. ID"], body);
+  this.screen.printTable(["XML ID", "Res. Model", "Res. ID"], rows);
   return results;
 }
 

@@ -1,27 +1,26 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import Recordset from "./recordset";
-import {
-  renderErrorMessage,
-  renderHelpCmd,
-  renderPromptCmd,
-  renderPromptCmdHiddenArgs,
-  renderTable,
-  renderTableSearchId,
-} from "./template_manager";
-import {
-  debounce,
-  defer,
-  encodeHTML,
-  genColorFromString,
-  hsv2rgb,
-  rgb2hsv,
-  unique,
-} from "./utils";
+import renderErrorMessage from "@terminal/templates/error_message";
+import renderHelpCmd from "@terminal/templates/help_command";
+import renderPromptCmd from "@terminal/templates/prompt_command";
+import renderPromptCmdHiddenArgs from "@terminal/templates/prompt_command_hidden_args";
+import renderLine from "@terminal/templates/screen_line";
+import renderScreen from "@terminal/templates/screen";
+import renderUserInput from "@terminal/templates/screen_user_input";
+import renderTable from "@terminal/templates/screen_table";
+import renderAssistantPanel from "@terminal/templates/screen_assistant_panel";
+import renderAssistantArgOptionItem from "@terminal/templates/screen_assistant_panel_arg_option_item";
+import renderAssistantArgOptionList from "@terminal/templates/screen_assistant_panel_arg_option_list";
+import debounce from "@terminal/utils/debounce";
+import defer from "@terminal/utils/defer";
+import encodeHTML from "@terminal/utils/encode_html";
+import genColorFromString from "@terminal/utils/gen_color_from_string";
+import hsv2rgb from "@terminal/utils/hsv2rgb";
+import rgb2hsv from "@terminal/utils/rgb2hsv";
 
-const PROMPT = ">";
-const LINE_SELECTOR = ":scope > span .print-table tr, :scope > span";
+export const PROMPT = ">";
+export const LINE_SELECTOR = ":scope > span .print-table tr, :scope > span";
 
 export default class Screen {
   #max_lines = 750;
@@ -158,16 +157,10 @@ export default class Screen {
       index = Number(index);
       const option = options[index];
       html_options.push(
-        `<li class="nav-item"><a class="nav-link ${
-          option.is_default ? "text-secondary" : ""
-        } ${option.is_required ? "text-warning" : ""} ${
-          index === selected_option_index ? "bg-info active" : ""
-        }" data-string="${option.string}" href="#">${option.name}</a></li>`
+        renderAssistantArgOptionItem(option, index, selected_option_index)
       );
     }
-    this.$assistant.html(
-      `<ul class="nav nav-pills">${html_options.join("")}</ul>`
-    );
+    this.$assistant_args.html(renderAssistantArgOptionList(html_options));
   }
 
   preventLostInputFocus(ev) {
@@ -327,47 +320,8 @@ export default class Screen {
     this.#print(error_msg, "error_message");
   }
 
-  printTable(columns, tbody) {
-    this.print(
-      renderTable({
-        thead: columns.join("</th><th>"),
-        tbody: tbody,
-      })
-    );
-  }
-
-  printRecords(model, records) {
-    let tbody = "";
-    const columns = ["id"];
-    const len = records.length;
-    for (let x = 0; x < len; ++x) {
-      const item = records[x];
-      tbody += "<tr>";
-      tbody += renderTableSearchId({
-        id: item.id,
-        model: model,
-      });
-      const keys = Object.keys(item);
-      const keys_len = keys.length;
-      let index = 0;
-      while (index < keys_len) {
-        const field = keys[index];
-        if (field === "id") {
-          ++index;
-          continue;
-        }
-        const item_val = item[field];
-        columns.push(encodeHTML(field));
-        if (typeof item_val === "object" && item_val.oterm && item_val.binary) {
-          tbody += `<td><span class='btn btn-secondary o_terminal_click o_terminal_read_bin_field' data-model='${model}' data-id='${item.id}' data-field='${field}'>Try Read Field</span></td>`;
-        } else {
-          tbody += `<td>${encodeHTML(String(item_val))}</td>`;
-        }
-        ++index;
-      }
-      tbody += "</tr>";
-    }
-    this.printTable(unique(columns), tbody);
+  printTable(columns, rows, cls) {
+    this.print(renderTable(columns, rows, cls));
   }
 
   updateInputInfo(info) {
@@ -488,36 +442,8 @@ export default class Screen {
   }
 
   /* PRIVATE */
-  #formatPrint(msg, cls) {
-    const res = [];
-    if (typeof msg === "object") {
-      if (msg.constructor === Text) {
-        res.push(`<span class='line-text ${cls}'>${msg}</span>`);
-      } else if (msg instanceof Recordset) {
-        this.printRecords(msg.model, msg);
-      } else if (msg.constructor === Array) {
-        const l = msg.length;
-        for (let x = 0; x < l; ++x) {
-          res.push(
-            `<span class='line-array ${cls}'>${this.#formatPrint(
-              msg[x]
-            )}</span>`
-          );
-        }
-      } else {
-        res.push(
-          `<span class='line-object ${cls}'>` +
-            `${this.#prettyObjectString(msg)}</span>`
-        );
-      }
-    } else {
-      res.push(`<span class='line-text ${cls}'>${msg}</span>`);
-    }
-    return res;
-  }
-
   #print(msg, cls) {
-    const formatted_msgs = this.#formatPrint(msg, cls);
+    const formatted_msgs = renderLine(msg, cls);
     for (const line of formatted_msgs) {
       this.printHTML(line);
     }
@@ -544,45 +470,21 @@ export default class Screen {
     }
   }
 
-  #prettyObjectString(obj) {
-    return encodeHTML(JSON.stringify(obj, null, 4));
-  }
-
   #createScreen() {
-    this.#$screen = $(
-      "<div class='col-sm-12 col-lg-12 col-12' id='terminal_screen' tabindex='-1' />"
-    );
+    this.#$screen = $(renderScreen());
     this.#$screen.appendTo(this.#$container);
     this.#$screen.on("keydown", this.preventLostInputFocus.bind(this));
   }
 
   #createAssistantPanel() {
-    this.$assistant = $(
-      "<div class='col-sm-12 col-lg-12 col-12' id='terminal_assistant' tabindex='-1' />"
-    );
-    this.$assistant.appendTo(this.#$container);
+    this.$assistant = $(renderAssistantPanel());
+    this.$assistant_args = this.$assistant.find("#terminal_assistant_args");
+    this.$assistant_desc = this.$assistant.find("#terminal_assistant_desc");
+    this.$assistant_args.appendTo(this.#$container);
   }
 
   #createUserInput() {
-    this.#$userInput = $(
-      `<div class='terminal-user-input'>
-                <div class='terminal-prompt-container'>
-                    <span id="terminal-prompt-main" class='terminal-prompt'></span>
-                    <span>${encodeHTML(PROMPT)}</span>
-                </div>
-                <div class='terminal-prompt-container terminal-prompt-interactive d-none hidden'></div>
-                <div class='rich-input'>
-                    <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' spellcheck="false" autocapitalize="off" readonly='readonly'/>
-                    <input type='edit' id='terminal_input' autocomplete='off' spellcheck="false" autocapitalize="off" />
-                </div>
-                <div class="terminal-prompt-container terminal-prompt-info">
-                    <span id="terminal-prompt-info-version" class='terminal-prompt-info'></span>
-                </div>
-                <div class="terminal-prompt-container terminal-prompt-host-container">
-                    <span id="terminal-prompt-info-host" class='terminal-prompt'></span>
-                </div>
-            </div>`
-    );
+    this.#$userInput = $(renderUserInput(PROMPT));
     this.#$userInput.appendTo(this.#$container);
     this.#$promptContainers = this.#$userInput.find(
       ".terminal-prompt-container"

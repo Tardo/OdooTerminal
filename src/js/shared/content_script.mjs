@@ -1,13 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {InstanceContext, getResources, updateContext} from "./context.mjs";
-import {SETTING_NAMES} from "../common/constants.mjs";
-import {sendWindowMessage} from "../common/utils.mjs";
-
-import {injectPageScript, injector} from "./injector.mjs";
-import {getStorageSync} from "./storage.mjs";
-import {ubrowser} from "./constants.mjs";
+import {InstanceContext, getResources, updateContext} from "./context";
+import {SETTING_NAMES} from "@common/constants";
+import sendWindowMessage from "@common/utils/send_window_message";
+import {injectPageScript, injector} from "./injector";
+import {getStorageSync} from "./storage";
+import {ubrowser} from "./constants";
 
 /**
  * @param {Object} odoo_info - The collected information
@@ -65,13 +64,9 @@ function onInternalMessage(request) {
     if (InstanceContext.isLoaded) {
       updateInstanceContext();
     } else {
-      injectPageScript(
-        document,
-        "src/js/page/volatile/instance_analyzer.mjs",
-        (ev) => {
-          ev.target.parentNode.removeChild(ev.target);
-        }
-      );
+      injectPageScript(document, "dist/pub/instance_analyzer.mjs", (ev) => {
+        ev.target.parentNode.removeChild(ev.target);
+      });
     }
   } else if (request.message === "toggle_terminal") {
     if (InstanceContext.isCompatible) {

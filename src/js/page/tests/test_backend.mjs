@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import TerminalTestSuite from "./tests";
-import {asyncSleep} from "@terminal/core/utils";
+import asyncSleep from "@terminal/utils/async_sleep";
 
 export default class TestBackend extends TerminalTestSuite {
   async test_settings() {

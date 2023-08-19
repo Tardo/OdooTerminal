@@ -2,7 +2,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {INSTRUCTION_TYPE} from "@trash/constants";
-import {debounce} from "./utils";
+import {getArgumentInfo, getArgumentInfoByName} from "@trash/argument";
+import debounce from "@terminal/utils/debounce";
 
 export default class CommandAssistant {
   #virtMachine = null;
@@ -23,7 +24,7 @@ export default class CommandAssistant {
   #getAvailableArguments(command_info, arg_name) {
     const arg_infos = [];
     for (const arg of command_info.args) {
-      const arg_info = this.#virtMachine.getInterpreter().getArgumentInfo(arg);
+      const arg_info = getArgumentInfo(arg);
       if (!arg_name || arg_info.names.long.startsWith(arg_name)) {
         arg_infos.push(arg_info);
       }
@@ -32,9 +33,7 @@ export default class CommandAssistant {
   }
 
   #getAvailableParameters(command_info, arg_name, arg_value) {
-    const arg_info = this.#virtMachine
-      .getInterpreter()
-      .getArgumentInfoByName(command_info.args, arg_name);
+    const arg_info = getArgumentInfoByName(command_info.args, arg_name);
 
     const res_param_infos = [];
     if (arg_info) {
@@ -118,9 +117,8 @@ export default class CommandAssistant {
       callback([]);
       return;
     }
-    const parse_info = this.#virtMachine.getInterpreter().parse(data, {
+    const parse_info = this.#virtMachine.parse(data, {
       needResetStores: false,
-      registeredCmds: this.#virtMachine.commands,
     });
     const ret = [];
     const [sel_cmd_index, sel_token_index, sel_arg_index] =

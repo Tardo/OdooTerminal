@@ -3,8 +3,9 @@
 
 import ParameterGenerator from "./parameter_generator";
 import Longpolling from "./longpolling";
+import renderWelcome from "./templates/welcome";
 import Terminal from "@terminal/terminal";
-import {getOdooSession} from "./utils";
+import getOdooSession from "./utils/get_odoo_session";
 import rpc from "./rpc";
 
 export default class OdooTerminal extends Terminal {
@@ -27,6 +28,13 @@ export default class OdooTerminal extends Terminal {
     const context = super.getContext(arguments);
     const odoo_context = getOdooSession()?.user_context || {};
     return Object.assign({}, odoo_context, context);
+  }
+
+  /**
+   * @override
+   */
+  printWelcomeMessage() {
+    this.screen.print(renderWelcome({ver: this.VERSION}));
   }
 
   /**

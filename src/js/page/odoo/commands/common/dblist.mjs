@@ -3,11 +3,10 @@
 
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
-import {getOdooSession} from "@odoo/utils";
-
-const session = getOdooSession();
+import getOdooSession from "@odoo/utils/get_odoo_session";
 
 async function cmdShowDBList(kwargs) {
+  const session = getOdooSession();
   const _onSuccess = (databases) => {
     const databases_len = databases.length;
     if (!databases_len) {

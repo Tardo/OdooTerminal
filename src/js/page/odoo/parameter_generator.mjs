@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {getOdooService} from "./utils";
+import getOdooService from "./utils/get_odoo_service";
 
 /**
  * This class is used to generate values for terminal command parameters.
@@ -22,7 +22,7 @@ export default class ParameterGenerator {
       const isVocal = (letter) => vocals.indexOf(letter) !== -1;
 
       for (;;) {
-        if (cc_count < 2 && (!last_char || isVocal(last_char))) {
+        if (cc_count % 2 !== 0 && (!last_char || isVocal(last_char))) {
           cur_char = characters.charAt(
             Math.floor(Math.random() * characters_length)
           );

@@ -1,8 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {getStorageSync, setStorageSync} from "../shared/storage.mjs";
-import {process_keybind} from "../common/utils.mjs";
+import "@css/options.css";
+import {getStorageSync, setStorageSync} from "@shared/storage";
+import processKeybind from "@common/utils/process_keybind";
 import {
   IGNORED_KEYS,
   SETTING_DEFAULTS,
@@ -113,7 +114,7 @@ function onSubmitForm(e) {
 }
 
 function onKeyDownShortcut(e) {
-  const keybind = process_keybind(e);
+  const keybind = processKeybind(e);
   if (IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
     e.target.dataset.keybind = JSON.stringify(keybind);
     e.target.value = keybind.join(" + ");

@@ -3,8 +3,9 @@
 
 import {ARG} from "@trash/constants";
 import {showEffect} from "@odoo/root";
-import {getOdooService, getOdooVersionMajor} from "@odoo/utils";
-import {isEmpty} from "@terminal/core/utils";
+import getOdooService from "@odoo/utils/get_odoo_service";
+import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
+import isEmpty from "@terminal/utils/is_empty";
 
 async function cmdShowEffect(kwargs) {
   if (getOdooVersionMajor() < 15) {

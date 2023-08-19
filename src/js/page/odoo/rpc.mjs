@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 /** This is a clone of Odoo implementation but without data transformations and adapted to new versions */
-import {getOdooService} from "./utils";
+import getOdooService from "./utils/get_odoo_service";
 
 const rpc = {
   /**

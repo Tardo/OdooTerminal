@@ -3,7 +3,8 @@
 
 import {ARG} from "@trash/constants";
 import {default as OdooRoot, doAction} from "@odoo/root";
-import {getOdooService, getOdooVersionMajor} from "@odoo/utils";
+import getOdooService from "@odoo/utils/get_odoo_service";
+import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
 
 function getDialogParent() {
   const OdooVer = getOdooVersionMajor();
@@ -14,7 +15,7 @@ function getDialogParent() {
       return standaloneAdapter({Component});
     }
   }
-  return OdooRoot;
+  return OdooRoot();
 }
 function openSelectCreateDialog(model, title, domain, on_selected) {
   const OdooVer = getOdooVersionMajor();

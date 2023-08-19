@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {isEmpty} from "@terminal/core/utils";
+import isEmpty from "@terminal/utils/is_empty";
 import rpc from "@odoo/rpc";
 
 async function cmdCheckFieldAccess(kwargs) {
@@ -43,16 +43,16 @@ async function cmdCheckFieldAccess(kwargs) {
     "translate",
     "depends",
   ];
-  let body = "";
+  const rows = [];
   const len = s_keys.length;
   for (let x = 0; x < len; ++x) {
+    const row_index = rows.push([]) - 1;
     const field = s_keys[x];
     const fieldDef = s_result[field];
-    body += "<tr>";
     if (fieldDef.required) {
-      body += `<td>* <b style='color:mediumslateblue'>${field}</b></td>`;
+      rows[row_index].push(`* <b style='color:mediumslateblue'>${field}</b>`);
     } else {
-      body += `<td>${field}</td>`;
+      rows[row_index].push(field);
     }
     const l2 = fieldParams.length;
     for (let x2 = 0; x2 < l2; ++x2) {
@@ -60,12 +60,11 @@ async function cmdCheckFieldAccess(kwargs) {
       if (typeof value === "undefined" || value === null) {
         value = "";
       }
-      body += `<td>${value}</td>`;
+      rows[row_index].push(value);
     }
-    body += "</tr>";
   }
   fieldParams.unshift("field");
-  this.screen.printTable(fieldParams, body);
+  this.screen.printTable(fieldParams, rows);
   return s_result;
 }
 

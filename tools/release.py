@@ -86,12 +86,7 @@ def create_package():
 
     zipdir('src/html/')
     zipdir('src/img/')
-    zipdir('src/js/common/')
-    zipdir('src/js/private/')
-    zipdir('src/js/page/volatile/')
-    zipdir('src/js/shared/')
-    zipdir('src/dist/')
-    zipf.write('src/css/options.css')
+    zipdir('dist/')
     zipf.write('manifest.json')
     zipf.write('README.md')
 

@@ -1,5 +1,13 @@
 # Changelog
 
+**10.2.0**
+
+```
+IMP: More modules
+
+FIX: TraSH: Interpreter dictionaries
+```
+
 **10.1.1**
 
 ```

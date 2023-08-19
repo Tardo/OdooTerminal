@@ -16,16 +16,18 @@ async function cmdLastSeen() {
       kwargs: {context: this.getContext()},
     })
     .then((result) => {
-      let body = "";
+      const rows = [];
       const len = result.length;
       for (let x = 0; x < len; ++x) {
+        const row_index = rows.push([]) - 1;
         const record = result[x];
-        body +=
-          `<tr><td>${record.user_id[1]}</td>` +
-          `<td>${record.user_id[0]}</td>` +
-          `<td>${record.last_presence}</td></tr>`;
+        rows[row_index].push(
+          record.user_id[1],
+          record.user_id[0],
+          record.last_presence
+        );
       }
-      this.screen.printTable(["User Name", "User ID", "Last Seen"], body);
+      this.screen.printTable(["User Name", "User ID", "Last Seen"], rows);
       return result;
     });
 }

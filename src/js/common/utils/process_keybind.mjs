@@ -1,13 +1,13 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {COMPATIBLE_VERSIONS, IGNORED_KEYS} from "./constants.mjs";
+import {IGNORED_KEYS} from "@common/constants.mjs";
 
 /**
  * @param {Object} e
  * @returns {Array}
  */
-export function process_keybind(e) {
+export default function (e) {
   const keybind = [];
   if (e.altKey) {
     keybind.push("Alt");
@@ -25,16 +25,4 @@ export function process_keybind(e) {
     keybind.push(e.key === " " ? "Space" : e.key);
   }
   return keybind;
-}
-
-export function isCompatibleOdooVersion(version) {
-  if (!version) {
-    // This can happens due to a service worker malfunction or by a modified controller
-    return false;
-  }
-  return COMPATIBLE_VERSIONS.some((item) => version.startsWith(item));
-}
-
-export function sendWindowMessage(target, type, data) {
-  target.postMessage(Object.assign({}, data, {type: type}));
 }

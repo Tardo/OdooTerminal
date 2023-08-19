@@ -15,11 +15,10 @@ async function cmdRepeat(kwargs) {
       );
       return res;
     }
-    return this.virtMachine
-      .eval(kwargs.cmd, {
-        silent: kwargs.silent,
-        needResetStores: false,
-      })
+    return this.eval(kwargs.cmd, {
+      silent: kwargs.silent,
+      needResetStores: false,
+    })
       .then((result) => res.push(result))
       .finally(() => do_repeat(rtimes - 1));
   };

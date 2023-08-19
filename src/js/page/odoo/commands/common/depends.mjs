@@ -2,9 +2,9 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {isEmpty} from "@terminal/core/utils";
+import isEmpty from "@terminal/utils/is_empty";
 import rpc from "@odoo/rpc";
-import {getOdooVersionMajor} from "@odoo/utils";
+import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
 
 function sanitizeCmdModuleDepends(module_name) {
   const OdooVer = getOdooVersionMajor();

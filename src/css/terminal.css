@@ -138,8 +138,11 @@
 }
 
 .o_terminal div#terminal_assistant {
-    background-color: var(--terminal-screen-assistant-background-color);
     font-size: x-small;
+}
+
+.o_terminal div#terminal_assistant > div#terminal_assistant_args {
+    background-color: var(--terminal-screen-assistant-background-color);
 }
 
 .o_terminal .terminal-user-input {

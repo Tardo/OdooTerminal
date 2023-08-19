@@ -3,7 +3,7 @@
     "devel": "export NODE_ENV=development && rollup -c -w",
     "tests": "export NODE_ENV=development && rollup -c && poetry run ./tools/release.py && poetry run pytest",
     "build": "export NODE_ENV=production && rollup -c && poetry run ./tools/release.py",
-    "clean": "rm -r ./src/dist"
+    "clean": "rm -rf ./dist"
   },
   "dependencies": {
     "@rollup/plugin-alias": "^3.1.9",

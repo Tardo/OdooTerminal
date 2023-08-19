@@ -6,7 +6,7 @@ import TestCommon from "./test_common";
 import TestCore from "./test_core";
 import TestTrash from "./test_trash";
 import OdooTerminal from "@odoo/terminal";
-import {isEmpty} from "@terminal/core/utils";
+import isEmpty from "@terminal/utils/is_empty";
 
 const TestSuites = [TestTrash, TestCore, TestCommon, TestBackend];
 

@@ -2,8 +2,9 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {asyncSleep} from "@terminal/core/utils";
-import {getOdooService, getOdooVersionMajor} from "@odoo/utils";
+import asyncSleep from "@terminal/utils/async_sleep";
+import getOdooService from "@odoo/utils/get_odoo_service";
+import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
 
 const AVAILABLE_BARCODE_COMMANDS = [
   "O-CMD.EDIT",

@@ -1,8 +1,14 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import {
+  getStorageItem,
+  removeStorageItem,
+  setStorageItem,
+} from "@terminal/core/storage/local";
 import {default as OdooRoot, doCall} from "./root";
-import {getOdooService, getOdooVersionMajor} from "./utils";
+import getOdooService from "./utils/get_odoo_service";
+import getOdooVersionMajor from "./utils/get_odoo_version_major";
 
 export default class Longpolling {
   #terminal = null;
@@ -30,7 +36,7 @@ export default class Longpolling {
   #busServ(method, ...params) {
     const OdooVer = getOdooVersionMajor();
     if (OdooVer >= 16) {
-      const bus_serv = OdooRoot?.env?.services?.bus_service;
+      const bus_serv = OdooRoot()?.env?.services?.bus_service;
       if (!bus_serv) {
         throw new Error("bus service not available");
       }
@@ -77,18 +83,16 @@ export default class Longpolling {
 
   setVerbose(status) {
     if (status) {
-      this.#terminal.storageLocal.setItem(
-        "terminal_longpolling_mode",
-        "verbose",
-        (err) => this.screen.printHTML(err)
+      setStorageItem("terminal_longpolling_mode", "verbose", (err) =>
+        this.screen.printHTML(err)
       );
     } else {
-      this.#terminal.storageLocal.removeItem("terminal_longpolling_mode");
+      removeStorageItem("terminal_longpolling_mode");
     }
   }
 
   isVerbose() {
-    return this.#terminal.storageLocal.getItem("terminal_longpolling_mode");
+    getStorageItem("terminal_longpolling_mode");
   }
 
   //

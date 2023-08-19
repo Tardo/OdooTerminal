@@ -4,12 +4,11 @@
 import {ARG, INSTRUCTION_TYPE} from "@trash/constants";
 
 async function cmdDis(kwargs) {
-  const parse_info = this.virtMachine.interpreter.parse(kwargs.code, {
-    registeredCmds: this.registeredCmds,
-  });
-  let body = "";
+  const parse_info = this.parse(kwargs.code);
+  const rows = [];
   const stack = parse_info.stack;
   for (const instr of stack.instructions) {
+    const row_index = rows.push([]) - 1;
     let lvalue = "";
     switch (instr.type) {
       case INSTRUCTION_TYPE.LOAD_NAME:
@@ -27,13 +26,13 @@ async function cmdDis(kwargs) {
     }
 
     const humanType = INSTRUCTION_TYPE.getHumanType(instr.type);
-    body += `<tr><td>${humanType[0]}</td><td>${
-      humanType[1]
-    }</td><td>${lvalue}</td><td>${instr.dataIndex}</td><td>${
-      instr.level
-    }</td><td>${
+    rows[row_index].push(
+      humanType[0],
+      lvalue,
+      instr.dataIndex,
+      instr.level,
       parse_info.inputTokens[instr.level][instr.inputTokenIndex]?.raw || ""
-    }</td></tr>`;
+    );
   }
   this.screen.printTable(
     [
@@ -44,7 +43,7 @@ async function cmdDis(kwargs) {
       "Level",
       "Token",
     ],
-    body
+    rows
   );
 }
 

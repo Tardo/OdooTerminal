@@ -2,10 +2,10 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {file2File} from "@terminal/core/utils";
+import file2file from "@terminal/utils/file2file";
 
 async function cmdGenFile(kwargs) {
-  return file2File(kwargs.name, kwargs.options);
+  return file2file(kwargs.name, kwargs.options);
 }
 
 export default {

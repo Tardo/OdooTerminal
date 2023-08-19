@@ -3,7 +3,7 @@
 
 import {ARG} from "@trash/constants";
 import Recordset from "@terminal/core/recordset";
-import {renderRecordCreated} from "@terminal/core/template_manager";
+import renderRecordCreated from "@terminal/templates/record_created";
 import rpc from "@odoo/rpc";
 import {doAction} from "@odoo/root";
 

@@ -2,7 +2,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {getOdooSession, getOdooVersionMajor} from "@odoo/utils";
+import getOdooSession from "@odoo/utils/get_odoo_session";
+import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
 
 const session = getOdooSession();
 

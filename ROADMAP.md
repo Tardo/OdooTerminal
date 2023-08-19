@@ -7,6 +7,4 @@
 - What will happen when Odoo stops supporting the "new old" api?
 - Explicity define the states for the state machine... sounds like a good idea uh?
 - Use better english... and maybe support multi-language?
-- Stop complicating my life... but it's so entertaining :/
-- To whoever is reading this... hope all is well with you!
 ```

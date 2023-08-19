@@ -2,10 +2,11 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {isEmpty} from "@terminal/core/utils";
+import {getStorageItem, setStorageItem} from "@terminal/core/storage/local";
+import isEmpty from "@terminal/utils/is_empty";
 
 async function cmdAlias(kwargs) {
-  const aliases = this.storageLocal.getItem("terminal_aliases") || {};
+  const aliases = getStorageItem("terminal_aliases") || {};
   if (!kwargs.name) {
     if (isEmpty(aliases)) {
       this.screen.print("No aliases defined.");
@@ -29,7 +30,7 @@ async function cmdAlias(kwargs) {
   } else {
     throw new Error("The selected alias not exists");
   }
-  this.storageLocal.setItem("terminal_aliases", aliases, (err) =>
+  setStorageItem("terminal_aliases", aliases, (err) =>
     this.screen.printHTML(err)
   );
   return aliases;

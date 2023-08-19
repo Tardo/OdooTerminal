@@ -1,10 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {
-  isCompatibleOdooVersion,
-  sendWindowMessage,
-} from "../../common/utils.mjs";
+import isCompatibleOdooVersion from "@common/utils/is_compatible_odoo_version";
+import sendWindowMessage from "@common/utils/send_window_message";
 
 class InstanceAnalyzer {
   get odoo() {

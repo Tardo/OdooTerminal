@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {renderMetadata} from "@terminal/core/template_manager";
+import renderMetadata from "@odoo/templates/metadata";
 import rpc from "@odoo/rpc";
 
 async function cmdMetadata(kwargs) {

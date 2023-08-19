@@ -2,9 +2,9 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import Recordset from "@terminal/core/recordset";
 import rpc from "@odoo/rpc";
-import {isEmpty} from "@terminal/core/utils";
+import Recordset from "@terminal/core/recordset";
+import isEmpty from "@terminal/utils/is_empty";
 
 async function cmdCommit(kwargs) {
   if (!Recordset.isValid(kwargs.recordset)) {

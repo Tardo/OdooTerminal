@@ -4,8 +4,9 @@
 import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 import {doAction} from "@odoo/root";
-import {getContent} from "@odoo/utils";
-import {file2Base64, isEmpty} from "@terminal/core/utils";
+import getContent from "@odoo/utils/get_content";
+import isEmpty from "@terminal/utils/is_empty";
+import file2base64 from "@terminal/utils/file2base64";
 
 async function cmdLang(kwargs) {
   const filtered_kwargs = Object.fromEntries(
@@ -98,7 +99,7 @@ async function cmdLang(kwargs) {
       );
     }
     // Get file content
-    const file64 = await file2Base64();
+    const file64 = await file2base64();
 
     // Create wizard record
     const wizard_id = await rpc.query({

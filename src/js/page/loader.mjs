@@ -7,7 +7,10 @@ import OdooTerminalTests from "@tests/terminal";
 import registerCoreFuncs from "@terminal/commands/__all__";
 import registerCommonFuncs from "@odoo/commands/common/__all__";
 import registerBackofficeFuncs from "@odoo/commands/backoffice/__all__";
-import {getOdooVersion, getUsername, isBackOffice} from "@odoo/utils";
+import getOdooVersion from "@odoo/utils/get_odoo_version";
+import getUsername from "@odoo/utils/get_username";
+import getUID from "@odoo/utils/get_uid";
+import isBackOffice from "@odoo/utils/is_backoffice";
 
 let terminal = null;
 function getTerminalObj() {
@@ -56,8 +59,9 @@ window.addEventListener(
           version: getOdooVersion(),
         };
         const username = getUsername();
-        if (username) {
-          vals.username = username;
+        const uid = getUID();
+        if (uid && uid !== -1) {
+          vals.username = username ? username : `uid: ${uid}`;
         }
         term_obj.screen.updateInputInfo(vals);
       }

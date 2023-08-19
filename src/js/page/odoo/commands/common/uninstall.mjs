@@ -3,7 +3,7 @@
 
 import {searchModules} from "./__utils__";
 import {ARG} from "@trash/constants";
-import {isEmpty} from "@terminal/core/utils";
+import isEmpty from "@terminal/utils/is_empty";
 import rpc from "@odoo/rpc";
 
 async function cmdUninstallModule(kwargs) {

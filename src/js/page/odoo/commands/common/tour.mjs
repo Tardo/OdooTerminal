@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {getOdooService} from "@odoo/utils";
+import getOdooService from "@odoo/utils/get_odoo_service";
 
 async function cmdRunTour(kwargs) {
   // Loaded in this way because 'tour' is not initialized on mobile mode.

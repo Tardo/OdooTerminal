@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {ARG} from "@trash/constants";
-import {uniqueId} from "@terminal/core/utils";
+import uniqueId from "@terminal/utils/unique_id";
 
 async function cmdExportVar(kwargs) {
   const varname = uniqueId("term");
