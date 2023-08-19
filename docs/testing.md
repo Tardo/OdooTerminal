@@ -10,7 +10,6 @@ Test env. uses 'docker compose v2'!
 ```
 apt-get install python poetry npm
 npm install --global npm
-npm install --global rollup
 poetry install
 npm install
 ```

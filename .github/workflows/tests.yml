@@ -12,7 +12,6 @@ jobs:
   web-ext:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
       - uses: actions/cache@v3
         with:
@@ -50,7 +49,6 @@ jobs:
           pip install poetry
           npm ci --cache .npm --prefer-offline
           npm install --global npm
-          npm install --global rollup web-ext
           poetry config virtualenvs.in-project true
           poetry install
           npm install
@@ -70,7 +68,6 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
       - uses: actions/cache@v3
         with:
@@ -108,7 +105,6 @@ jobs:
           pip install poetry
           npm ci --cache .npm --prefer-offline
           npm install --global npm
-          npm install --global rollup
           poetry config virtualenvs.in-project true
           poetry install
           npm install

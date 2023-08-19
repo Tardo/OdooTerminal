@@ -3,7 +3,7 @@ import path from "path";
 import autoprefixer from "autoprefixer";
 import cssnano from "cssnano";
 import postcss from "rollup-plugin-postcss";
-import {terser} from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import alias from "@rollup/plugin-alias";
 import {nodeResolve} from "@rollup/plugin-node-resolve";
 import analyze from "rollup-plugin-analyzer";
