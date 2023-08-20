@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import OdooTerminal from "@odoo/terminal";
+import isEmpty from "@terminal/utils/is_empty";
 import TestBackend from "./test_backend";
 import TestCommon from "./test_common";
 import TestCore from "./test_core";
 import TestTrash from "./test_trash";
-import OdooTerminal from "@odoo/terminal";
-import isEmpty from "@terminal/utils/is_empty";
 
 const TestSuites = [TestTrash, TestCore, TestCommon, TestBackend];
 

@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {InstanceContext, getResources, updateContext} from "./context";
 import {SETTING_NAMES} from "@common/constants";
 import sendWindowMessage from "@common/utils/send_window_message";
+import {ubrowser} from "./constants";
+import {InstanceContext, getResources, updateContext} from "./context";
 import {injectPageScript, injector} from "./injector";
 import {getStorageSync} from "./storage";
-import {ubrowser} from "./constants";
 
 /**
  * @param {Object} odoo_info - The collected information
@@ -32,7 +32,7 @@ function onWindowMessage(event) {
     return;
   }
   if (event.data.type === "ODOO_TERM_INIT") {
-    var info = event.data.instance_info;
+    const info = event.data.instance_info;
     getStorageSync(["devmode_ignore_comp_checks"]).then((items) => {
       if (items.devmode_ignore_comp_checks && info.isOdoo) {
         info.isCompatible = true;

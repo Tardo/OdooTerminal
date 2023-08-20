@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import processKeybind from "@common/utils/process_keybind";
 import "@css/options.css";
 import {getStorageSync, setStorageSync} from "@shared/storage";
-import processKeybind from "@common/utils/process_keybind";
 import {
   IGNORED_KEYS,
   SETTING_DEFAULTS,
@@ -18,7 +18,7 @@ function onClickShortcutRemove(e) {
   const row_target_id = e.target.dataset.target;
   const row = document.querySelector(`#${row_target_id}`);
   row.parentNode.removeChild(row);
-  const keybind = e.target.dataset.keybind;
+  const {keybind} = e.target.dataset;
   delete shortcuts_defs[keybind];
 }
 

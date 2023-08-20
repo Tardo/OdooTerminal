@@ -1,10 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import TerminalTestSuite from "./tests";
+import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
 import asyncSleep from "@terminal/utils/async_sleep";
 import uniqueId from "@terminal/utils/unique_id";
-import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
+import TerminalTestSuite from "./tests";
 
 export default class TestCommon extends TerminalTestSuite {
   // Can't test 'lang'

@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import ParameterGenerator from "./parameter_generator";
-import Longpolling from "./longpolling";
-import renderWelcome from "./templates/welcome";
 import Terminal from "@terminal/terminal";
-import getOdooSession from "./utils/get_odoo_session";
+import Longpolling from "./longpolling";
+import ParameterGenerator from "./parameter_generator";
 import rpc from "./rpc";
+import renderWelcome from "./templates/welcome";
+import getOdooSession from "./utils/get_odoo_session";
 
 export default class OdooTerminal extends Terminal {
   onBusNotification(notifications) {
@@ -63,9 +63,9 @@ export default class OdooTerminal extends Terminal {
   }
 
   #onTryReadBinaryField(target) {
-    const model = target.dataset.model;
-    const field = target.dataset.field;
-    const id = target.dataset.id;
+    const {model} = target.dataset;
+    const {field} = target.dataset;
+    const {id} = target.dataset;
 
     rpc
       .query({

@@ -1,22 +1,22 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import VMachine from "@trash/vmachine";
-import Screen from "./core/screen";
-import CommandAssistant from "./core/command_assistant";
-import renderTerminal from "./templates/terminal";
-import renderUnknownCommand from "./templates/unknown_command";
-import renderWelcome from "./templates/welcome";
 import processKeybind from "@common/utils/process_keybind";
+import {KEYMAP} from "@trash/constants";
 import UnknownCommandError from "@trash/exceptions/unknown_command_error";
+import difference from "@trash/utils/difference";
+import VMachine from "@trash/vmachine";
+import CommandAssistant from "./core/command_assistant";
+import Screen from "./core/screen";
+import {getStorageItem as getStorageLocalItem} from "./core/storage/local";
 import {
   getStorageItem as getStorageSessionItem,
   removeStorageItem as removeStorageSessionItem,
   setStorageItem as setStorageSessionItem,
 } from "./core/storage/session";
-import {getStorageItem as getStorageLocalItem} from "./core/storage/local";
-import {KEYMAP} from "@trash/constants";
-import difference from "@trash/utils/difference";
+import renderTerminal from "./templates/terminal";
+import renderUnknownCommand from "./templates/unknown_command";
+import renderWelcome from "./templates/welcome";
 import debounce from "./utils/debounce";
 import isEmpty from "./utils/is_empty";
 

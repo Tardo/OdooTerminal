@@ -10,10 +10,10 @@
  * 'update_terminal_badge_info'.
  */
 
-import {ubrowser} from "@shared/constants";
-import {getActiveTab, sendInternalMessage} from "@shared/tabs";
-import {getStorageSync, setStorageSync} from "@shared/storage";
 import {SETTING_DEFAULTS, SETTING_NAMES} from "@common/constants";
+import {ubrowser} from "@shared/constants";
+import {getStorageSync, setStorageSync} from "@shared/storage";
+import {getActiveTab, sendInternalMessage} from "@shared/tabs";
 
 /**
  * @param {String} icon - url to the icon
@@ -37,7 +37,7 @@ function updateBrowserAction(icon, text = null, bg_color = null) {
  */
 function onInternalMessage(request) {
   if (request.message === "update_terminal_badge_info") {
-    const context = request.context;
+    const {context} = request;
     const icon = context.isCompatible ? "terminal-16" : "terminal-disabled-16";
     const color = context.isCompatible ? "#71639e" : "#878787";
     updateBrowserAction(icon, context.serverVersionRaw, color);

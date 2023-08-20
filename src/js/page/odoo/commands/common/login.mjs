@@ -1,8 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
 import getOdooSession from "@odoo/utils/get_odoo_session";
+import {ARG} from "@trash/constants";
 
 async function cmdLoginAs(kwargs) {
   const session = getOdooSession();

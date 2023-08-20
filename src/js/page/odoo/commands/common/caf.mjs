@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
-import isEmpty from "@terminal/utils/is_empty";
 import rpc from "@odoo/rpc";
+import isEmpty from "@terminal/utils/is_empty";
+import {ARG} from "@trash/constants";
 
 async function cmdCheckFieldAccess(kwargs) {
   const fields = kwargs.field[0] === "*" ? false : kwargs.field;

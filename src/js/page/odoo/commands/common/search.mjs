@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
-import Recordset from "@terminal/core/recordset";
 import rpc from "@odoo/rpc";
+import Recordset from "@terminal/core/recordset";
+import {ARG} from "@trash/constants";
 
 async function cmdSearchModelRecord(kwargs) {
   const lines_total = this.screen._max_lines - 3;
@@ -22,21 +22,14 @@ async function cmdSearchModelRecord(kwargs) {
       this.screen.printError(
         `<strong class='text-warning'>Result truncated to ${sresult.length} records!</strong> The query is too big to be displayed entirely.`
       );
-      return new Promise(async (resolve, reject) => {
-        try {
-          const res = await this.screen.showQuestion(
-            `There are still results to print (${buff.data.length} records). Show more?`,
-            ["y", "n"],
-            "y"
-          );
-          if (res === "y") {
-            this.execute(`search -m ${buff.model} --more`, false, false);
-          }
-        } catch (err) {
-          return reject(err);
-        }
-        return resolve(recordset);
-      });
+      const res = await this.screen.showQuestion(
+        `There are still results to print (${buff.data.length} records). Show more?`,
+        ["y", "n"],
+        "y"
+      );
+      if (res === "y") {
+        this.execute(`search -m ${buff.model} --more`, false, false);
+      }
     }
     return recordset;
   }
@@ -70,23 +63,20 @@ async function cmdSearchModelRecord(kwargs) {
         this.screen.printError(
           `<strong class='text-warning'>Result truncated to ${sresult.length} records!</strong> The query is too big to be displayed entirely.`
         );
-        return new Promise(async (resolve, reject) => {
-          try {
-            const res = await this.screen.showQuestion(
-              `There are still results to print (${
-                this._buffer[this.__meta.name].data.length
-              } records). Show more?`,
-              ["y", "n"],
-              "y"
-            );
-            if (res === "y") {
+        return this.screen
+          .showQuestion(
+            `There are still results to print (${
+              this._buffer[this.__meta.name].data.length
+            } records). Show more?`,
+            ["y", "n"],
+            "y"
+          )
+          .then((quest_res) => {
+            if (quest_res === "y") {
               this.execute(`search -m ${kwargs.model} --more`, false, false);
             }
-          } catch (err) {
-            return reject(err);
-          }
-          return resolve(recordset);
-        });
+            return recordset;
+          });
       }
       return recordset;
     });

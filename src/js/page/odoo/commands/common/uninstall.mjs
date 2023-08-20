@@ -1,10 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {searchModules} from "./__utils__";
-import {ARG} from "@trash/constants";
-import isEmpty from "@terminal/utils/is_empty";
 import rpc from "@odoo/rpc";
+import isEmpty from "@terminal/utils/is_empty";
+import {ARG} from "@trash/constants";
+import {searchModules} from "./__utils__";
 
 async function cmdUninstallModule(kwargs) {
   const modue_infos = await searchModules.bind(this)(kwargs.module);

@@ -1,8 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import difference from "./utils/difference";
 import {ARG} from "./constants";
+import difference from "./utils/difference";
 
 /**
  * Resolve argument information

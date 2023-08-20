@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {INSTRUCTION_TYPE} from "@trash/constants";
-import {getArgumentInfo, getArgumentInfoByName} from "@trash/argument";
 import debounce from "@terminal/utils/debounce";
+import {getArgumentInfo, getArgumentInfoByName} from "@trash/argument";
+import {INSTRUCTION_TYPE} from "@trash/constants";
 
 export default class CommandAssistant {
   #virtMachine = null;
@@ -64,7 +64,7 @@ export default class CommandAssistant {
   }
 
   getSelectedParameterIndex(parse_info, caret_pos) {
-    const stack = parse_info.stack;
+    const {stack} = parse_info;
     if (!stack.instructions.length) {
       return [-1, -1];
     }

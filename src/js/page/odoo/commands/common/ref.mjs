@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
+import {ARG} from "@trash/constants";
 
 async function cmdRef(kwargs) {
   const OdooVer = getOdooVersionMajor();
@@ -19,9 +19,9 @@ async function cmdRef(kwargs) {
             kwargs: {context: this.getContext()},
           })
           .then(
-            function (active_xmlid, result) {
+            ((active_xmlid, result) => {
               return [active_xmlid, result[0], result[1]];
-            }.bind(this, xmlid)
+            }).bind(this, xmlid)
           )
       );
     } else {
@@ -37,9 +37,9 @@ async function cmdRef(kwargs) {
             kwargs: {context: this.getContext()},
           })
           .then(
-            function (active_xmlid, result) {
+            ((active_xmlid, result) => {
               return [active_xmlid, result[0], result[1]];
-            }.bind(this, xmlid)
+            }).bind(this, xmlid)
           )
       );
     }

@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
-import {getArgumentInfo} from "@trash/argument";
 import isEmpty from "@terminal/utils/is_empty";
+import {getArgumentInfo} from "@trash/argument";
+import {ARG} from "@trash/constants";
 
 async function printHelpDetailed(cmd, cmd_def) {
   this.screen.eprint("NAME");

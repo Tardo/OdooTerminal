@@ -1,10 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
 import {default as OdooRoot, doAction} from "@odoo/root";
 import getOdooService from "@odoo/utils/get_odoo_service";
 import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
+import {ARG} from "@trash/constants";
 
 function getDialogParent() {
   const OdooVer = getOdooVersionMajor();

@@ -15,7 +15,7 @@ const rpc = {
    * @returns {Promise<any>}
    */
   query: function (params, options) {
-    var query = this.buildQuery(params);
+    const query = this.buildQuery(params);
     const rpc_service = getOdooService("web.ajax", "@web/legacy/js/core/ajax");
     if (Object.hasOwn(rpc_service, "rpc")) {
       return rpc_service.rpc(query.route, query.params, options);
@@ -41,9 +41,9 @@ const rpc = {
    * @returns {Object} with 2 keys: route and params
    */
   buildQuery: function (options) {
-    var route = false;
-    var params = options.params || {};
-    var orderBy = false;
+    let route = false;
+    const params = options.params || {};
+    let orderBy = false;
     if (options.route) {
       route = options.route;
     } else if (options.model && options.method) {
@@ -99,7 +99,7 @@ const rpc = {
           options.expand_limit ||
           params.expand_limit ||
           params.kwargs.expand_limit;
-        var expandOrderBy =
+        const expandOrderBy =
           options.expand_orderby ||
           params.expand_orderby ||
           params.kwargs.expand_orderby;

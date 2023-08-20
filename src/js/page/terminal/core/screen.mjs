@@ -5,13 +5,13 @@ import renderErrorMessage from "@terminal/templates/error_message";
 import renderHelpCmd from "@terminal/templates/help_command";
 import renderPromptCmd from "@terminal/templates/prompt_command";
 import renderPromptCmdHiddenArgs from "@terminal/templates/prompt_command_hidden_args";
-import renderLine from "@terminal/templates/screen_line";
 import renderScreen from "@terminal/templates/screen";
-import renderUserInput from "@terminal/templates/screen_user_input";
-import renderTable from "@terminal/templates/screen_table";
 import renderAssistantPanel from "@terminal/templates/screen_assistant_panel";
 import renderAssistantArgOptionItem from "@terminal/templates/screen_assistant_panel_arg_option_item";
 import renderAssistantArgOptionList from "@terminal/templates/screen_assistant_panel_arg_option_list";
+import renderLine from "@terminal/templates/screen_line";
+import renderTable from "@terminal/templates/screen_table";
+import renderUserInput from "@terminal/templates/screen_user_input";
 import debounce from "@terminal/utils/debounce";
 import defer from "@terminal/utils/defer";
 import encodeHTML from "@terminal/utils/encode_html";
@@ -365,6 +365,7 @@ export default class Screen {
           "background-color": `rgb(${color_info.rgb[0]},${color_info.rgb[1]},${color_info.rgb[2]})`,
           color: color_info.gv < 0.5 ? "#000" : "#fff",
         });
+        // eslint-disable-next-line prefer-const
         let [h, s, v] = rgb2hsv(
           color_info.rgb[0] / 255.0,
           color_info.rgb[1] / 255.0,

@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {searchModules} from "./__utils__";
-import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
+import {ARG} from "@trash/constants";
+import {searchModules} from "./__utils__";
 
 async function cmdUpgradeModule(kwargs) {
   return searchModules

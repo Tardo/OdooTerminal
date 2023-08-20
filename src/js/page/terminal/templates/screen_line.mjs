@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import renderTable from "./screen_table";
-import renderTableCellRecord from "./screen_table_cell_record";
-import renderTableCellRecordId from "./screen_table_cell_record_id";
 import Recordset from "@terminal/core/recordset";
 import encodeHTML from "@terminal/utils/encode_html";
 import prettyObjectString from "@terminal/utils/pretty_object_string";
+import renderTable from "./screen_table";
+import renderTableCellRecord from "./screen_table_cell_record";
+import renderTableCellRecordId from "./screen_table_cell_record_id";
 
 export function renderLineText(msg, cls) {
   return `<span class='line-text ${cls}'>${msg}</span>`;

@@ -1,9 +1,10 @@
 {
   "scripts": {
+    "prepare": "husky install",
     "devel": "export NODE_ENV=development && rollup -c -w",
     "tests": "export NODE_ENV=development && rollup -c && poetry run ./tools/release.py && poetry run pytest",
-    "web-ext": "export NODE_ENV=development && rollup -c && web-ext lint --ignore-files=src/js/**",
-    "build": "export NODE_ENV=production && rollup -c && poetry run ./tools/release.py",
+    "web-ext": "export NODE_ENV=production && rollup -c && web-ext lint --ignore-files=src/js/**",
+    "build": "export NODE_ENV=production && rm -rf ./dist && rollup -c && poetry run ./tools/release.py",
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
@@ -12,6 +13,10 @@
     "@rollup/plugin-terser": "^0.4.3",
     "autoprefixer": "^10.4.15",
     "cssnano": "^6.0.1",
+    "eslint": "^8.47.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.0",
+    "prettier": "^3.0.2",
     "rollup": "^3.28.0",
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-postcss": "^4.0.2",

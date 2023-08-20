@@ -1,11 +1,11 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
+import {doAction} from "@odoo/root";
+import rpc from "@odoo/rpc";
 import Recordset from "@terminal/core/recordset";
 import renderRecordCreated from "@terminal/templates/record_created";
-import rpc from "@odoo/rpc";
-import {doAction} from "@odoo/root";
+import {ARG} from "@trash/constants";
 
 async function cmdCreateModelRecord(kwargs) {
   if (typeof kwargs.value === "undefined") {

@@ -1,8 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
 import file2file from "@terminal/utils/file2file";
+import {ARG} from "@trash/constants";
 
 async function cmdGenFile(kwargs) {
   return file2file(kwargs.name, kwargs.options);

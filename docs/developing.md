@@ -3,9 +3,8 @@
 #### Installation
 
 ```
-apt-get install python poetry npm
+apt-get install npm
 npm install --global npm
-poetry install
 npm install
 ```
 

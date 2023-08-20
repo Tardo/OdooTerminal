@@ -9,7 +9,7 @@ on:
     branches: [master]
 
 jobs:
-  web-ext:
+  validations:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -27,8 +27,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Switch to current branch
-        run: git checkout ${{ env.BRANCH }}
+      - run: git checkout ${{ env.BRANCH }}
 
       - uses: actions/setup-python@v4
         with:
@@ -43,23 +42,27 @@ jobs:
           node-version: '*'
           check-latest: true
 
-      - name: Install dependencies
-        run: |
+      - run: |
           python -m pip install --upgrade pip
-          pip install poetry
           npm ci --cache .npm --prefer-offline
           npm install --global npm
-          poetry config virtualenvs.in-project true
-          poetry install
           npm install
+
+      - name: prettier
+        run: npx prettier --check
+
+      - name: eslint
+        run: npx eslint --color
 
       - name: Build dist/ files
         run: npm run build
 
-      - name: Execute web-ext lint
-        run: web-ext lint --ignore-files=src/js/**
+      - name: web-ext
+        run: npx -c "web-ext lint --ignore-files=src/js/**"
 
   selenium:
+    name: Selenium Tests
+    needs: web-ext
     strategy:
       matrix:
         # Use only lower and higher versions

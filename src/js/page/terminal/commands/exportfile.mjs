@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
-import uniqueId from "@terminal/utils/unique_id";
 import save2file from "@terminal/utils/save2file";
+import uniqueId from "@terminal/utils/unique_id";
+import {ARG} from "@trash/constants";
 
 async function cmdExportFile(kwargs) {
   const filename = `${uniqueId("term")}_${new Date().getTime()}.json`;

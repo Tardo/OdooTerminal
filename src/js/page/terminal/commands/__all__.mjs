@@ -1,21 +1,21 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import cmdHelp from "./help";
-import cmdClear from "./clear";
-import cmdPrint from "./print";
-import cmdLoad from "./load";
-import cmdContextTerm from "./context_term";
 import cmdAlias from "./alias";
-import cmdQuit from "./quit";
-import cmdExportVar from "./exportvar";
-import cmdExportFile from "./exportfile";
 import cmdChrono from "./chrono";
-import cmdRepeat from "./repeat";
-import cmdJobs from "./jobs";
-import cmdToggleTerm from "./toggle_term";
+import cmdClear from "./clear";
+import cmdContextTerm from "./context_term";
 import cmdDis from "./dis";
+import cmdExportFile from "./exportfile";
+import cmdExportVar from "./exportvar";
 import cmdGenFile from "./genfile";
+import cmdHelp from "./help";
+import cmdJobs from "./jobs";
+import cmdLoad from "./load";
+import cmdPrint from "./print";
+import cmdQuit from "./quit";
+import cmdRepeat from "./repeat";
+import cmdToggleTerm from "./toggle_term";
 
 export default function (TerminalObj) {
   TerminalObj.registerCommand("help", cmdHelp);

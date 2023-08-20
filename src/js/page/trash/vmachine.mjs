@@ -1,22 +1,22 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {INSTRUCTION_TYPE} from "./constants";
 import {validateAndFormatArguments} from "./argument";
-import countBy from "./utils/count_by";
-import pluck from "./utils/pluck";
-import InvalidCommandArgumentsError from "./exceptions/invalid_command_arguments_error";
-import InvalidCommandArgumentValueError from "./exceptions/invalid_command_argument_value_error";
-import InvalidCommandArgumentFormatError from "./exceptions/invalid_command_argument_format_error";
-import UnknownNameError from "./exceptions/unknown_name_error";
-import UnknownCommandError from "./exceptions/unknown_command_error";
-import NotExpectedCommandArgumentError from "./exceptions/not_expected_command_argument_error";
+import {INSTRUCTION_TYPE} from "./constants";
 import CallFunctionError from "./exceptions/call_function_error";
+import InvalidCommandArgumentFormatError from "./exceptions/invalid_command_argument_format_error";
+import InvalidCommandArgumentValueError from "./exceptions/invalid_command_argument_value_error";
+import InvalidCommandArgumentsError from "./exceptions/invalid_command_arguments_error";
 import InvalidInstructionError from "./exceptions/invalid_instruction_error";
 import InvalidNameError from "./exceptions/invalid_name_error";
 import InvalidTokenError from "./exceptions/invalid_token_error";
+import NotExpectedCommandArgumentError from "./exceptions/not_expected_command_argument_error";
 import UndefinedValueError from "./exceptions/undefined_value_error";
+import UnknownCommandError from "./exceptions/unknown_command_error";
+import UnknownNameError from "./exceptions/unknown_name_error";
 import Interpreter from "./interpreter";
+import countBy from "./utils/count_by";
+import pluck from "./utils/pluck";
 
 class Frame {
   constructor(cmd_name, prev_frame) {
@@ -87,7 +87,7 @@ export default class VMachine {
         throw new InvalidCommandArgumentsError(frame.cmd, frame.args);
       }
       let kwargs = {};
-      const values = frame.values;
+      const {values} = frame;
       for (let index = items_len - 1; index >= 0; --index) {
         let arg_name = frame.args.pop();
         if (!arg_name) {
@@ -140,7 +140,7 @@ export default class VMachine {
     const parse_info = this.parse(cmd_raw, {
       isData: options?.isData,
     });
-    const stack = parse_info.stack;
+    const {stack} = parse_info;
     const stack_instr_len = stack.instructions.length;
     const stack_instr_done = [];
     const root_frame = new Frame();

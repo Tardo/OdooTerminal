@@ -1,11 +1,11 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
 import {showEffect} from "@odoo/root";
 import getOdooService from "@odoo/utils/get_odoo_service";
 import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
 import isEmpty from "@terminal/utils/is_empty";
+import {ARG} from "@trash/constants";
 
 async function cmdShowEffect(kwargs) {
   if (getOdooVersionMajor() < 15) {
@@ -14,7 +14,7 @@ async function cmdShowEffect(kwargs) {
     return;
   }
   if (isEmpty(kwargs.type)) {
-    const registry = getOdooService("@web/core/registry").registry;
+    const {registry} = getOdooService("@web/core/registry");
     const effects = registry.category("effects");
     this.screen.print("Available effects:");
     this.screen.print(effects.getEntries().map((item) => item[0]));

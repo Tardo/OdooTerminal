@@ -2,15 +2,15 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import "@css/terminal.css";
-import OdooTerminal from "@odoo/terminal";
-import OdooTerminalTests from "@tests/terminal";
-import registerCoreFuncs from "@terminal/commands/__all__";
-import registerCommonFuncs from "@odoo/commands/common/__all__";
 import registerBackofficeFuncs from "@odoo/commands/backoffice/__all__";
+import registerCommonFuncs from "@odoo/commands/common/__all__";
+import OdooTerminal from "@odoo/terminal";
 import getOdooVersion from "@odoo/utils/get_odoo_version";
-import getUsername from "@odoo/utils/get_username";
 import getUID from "@odoo/utils/get_uid";
+import getUsername from "@odoo/utils/get_username";
 import isBackOffice from "@odoo/utils/is_backoffice";
+import registerCoreFuncs from "@terminal/commands/__all__";
+import OdooTerminalTests from "@tests/terminal";
 
 let terminal = null;
 function getTerminalObj() {

@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
-import rpc from "@odoo/rpc";
 import {doAction} from "@odoo/root";
+import rpc from "@odoo/rpc";
 import getContent from "@odoo/utils/get_content";
-import isEmpty from "@terminal/utils/is_empty";
 import file2base64 from "@terminal/utils/file2base64";
+import isEmpty from "@terminal/utils/is_empty";
+import {ARG} from "@trash/constants";
 
 async function cmdLang(kwargs) {
   const filtered_kwargs = Object.fromEntries(

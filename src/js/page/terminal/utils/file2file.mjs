@@ -4,7 +4,9 @@
 import debounce from "./debounce";
 
 export default function (filename, options) {
-  options = Object.assign({}, options, {type: "application/octet-stream"});
+  const soptions = Object.assign({}, options, {
+    type: "application/octet-stream",
+  });
   const input_elm = window.document.createElement("input");
   input_elm.type = "file";
   document.body.appendChild(input_elm);
@@ -27,11 +29,9 @@ export default function (filename, options) {
       reader.onerror = reject;
       reader.onabort = reject;
       reader.onload = (readerEvent) => {
-        const blob = new Blob([readerEvent.target.result], options);
-        if (!filename) {
-          filename = input_elm.value;
-        }
-        return resolve(new File([blob], filename, options));
+        const blob = new Blob([readerEvent.target.result], soptions);
+        const sfilename = filename ? filename : input_elm.value;
+        return resolve(new File([blob], sfilename, soptions));
       };
     };
     input_elm.click();

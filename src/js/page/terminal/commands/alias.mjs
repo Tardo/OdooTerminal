@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
 import {getStorageItem, setStorageItem} from "@terminal/core/storage/local";
 import isEmpty from "@terminal/utils/is_empty";
+import {ARG} from "@trash/constants";
 
 async function cmdAlias(kwargs) {
   const aliases = getStorageItem("terminal_aliases") || {};

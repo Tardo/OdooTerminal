@@ -6,7 +6,7 @@ import {ARG, INSTRUCTION_TYPE} from "@trash/constants";
 async function cmdDis(kwargs) {
   const parse_info = this.parse(kwargs.code);
   const rows = [];
-  const stack = parse_info.stack;
+  const {stack} = parse_info;
   for (const instr of stack.instructions) {
     const row_index = rows.push([]) - 1;
     let lvalue = "";

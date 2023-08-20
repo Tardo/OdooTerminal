@@ -1,10 +1,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
 import rpc from "@odoo/rpc";
 import Recordset from "@terminal/core/recordset";
 import isEmpty from "@terminal/utils/is_empty";
+import {ARG} from "@trash/constants";
 
 async function cmdCommit(kwargs) {
   if (!Recordset.isValid(kwargs.recordset)) {

@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
-import renderMetadata from "@odoo/templates/metadata";
 import rpc from "@odoo/rpc";
+import renderMetadata from "@odoo/templates/metadata";
+import {ARG} from "@trash/constants";
 
 async function cmdMetadata(kwargs) {
   const metadata = (
