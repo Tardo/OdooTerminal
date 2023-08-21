@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG, INSTRUCTION_TYPE} from "@trash/constants";
+import {ARG, INSTRUCTION_TYPE} from '@trash/constants';
 
 async function cmdDis(kwargs) {
   const parse_info = this.parse(kwargs.code);
@@ -9,7 +9,7 @@ async function cmdDis(kwargs) {
   const {stack} = parse_info;
   for (const instr of stack.instructions) {
     const row_index = rows.push([]) - 1;
-    let lvalue = "";
+    let lvalue = '';
     switch (instr.type) {
       case INSTRUCTION_TYPE.LOAD_NAME:
       case INSTRUCTION_TYPE.LOAD_GLOBAL:
@@ -27,30 +27,33 @@ async function cmdDis(kwargs) {
 
     const humanType = INSTRUCTION_TYPE.getHumanType(instr.type);
     rows[row_index].push(
+      instr.type,
       humanType[0],
       lvalue,
       instr.dataIndex,
       instr.level,
-      parse_info.inputTokens[instr.level][instr.inputTokenIndex]?.raw || ""
+      instr.level >= 0
+        ? parse_info.inputTokens[instr.level][instr.inputTokenIndex]?.raw || ''
+        : '',
     );
   }
   this.screen.printTable(
     [
-      "Instr. Name",
-      "Instr. Code",
-      "Name/Value/Argument",
-      "Data Index",
-      "Level",
-      "Token",
+      'Instr. Name',
+      'Instr. Code',
+      'Name/Value/Argument',
+      'Data Index',
+      'Level',
+      'Token',
     ],
-    rows
+    rows,
   );
 }
 
 export default {
-  definition: "Dissasembler bytecode",
+  definition: 'Dissasembler bytecode',
   callback: cmdDis,
-  detail: "Shows the bytecode generated for the input",
-  args: [[ARG.String, ["c", "code"], true, "TraSH Code"]],
+  detail: 'Shows the bytecode generated for the input',
+  args: [[ARG.String, ['c', 'code'], true, 'TraSH Code']],
   example: "-c \"print $var[0]['key'] + ' -> ' + 1234\"",
 };

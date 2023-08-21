@@ -1,22 +1,22 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {validateAndFormatArguments} from "./argument";
-import {INSTRUCTION_TYPE} from "./constants";
-import CallFunctionError from "./exceptions/call_function_error";
-import InvalidCommandArgumentFormatError from "./exceptions/invalid_command_argument_format_error";
-import InvalidCommandArgumentValueError from "./exceptions/invalid_command_argument_value_error";
-import InvalidCommandArgumentsError from "./exceptions/invalid_command_arguments_error";
-import InvalidInstructionError from "./exceptions/invalid_instruction_error";
-import InvalidNameError from "./exceptions/invalid_name_error";
-import InvalidTokenError from "./exceptions/invalid_token_error";
-import NotExpectedCommandArgumentError from "./exceptions/not_expected_command_argument_error";
-import UndefinedValueError from "./exceptions/undefined_value_error";
-import UnknownCommandError from "./exceptions/unknown_command_error";
-import UnknownNameError from "./exceptions/unknown_name_error";
-import Interpreter from "./interpreter";
-import countBy from "./utils/count_by";
-import pluck from "./utils/pluck";
+import {validateAndFormatArguments} from './argument';
+import {INSTRUCTION_TYPE} from './constants';
+import CallFunctionError from './exceptions/call_function_error';
+import InvalidCommandArgumentFormatError from './exceptions/invalid_command_argument_format_error';
+import InvalidCommandArgumentValueError from './exceptions/invalid_command_argument_value_error';
+import InvalidCommandArgumentsError from './exceptions/invalid_command_arguments_error';
+import InvalidInstructionError from './exceptions/invalid_instruction_error';
+import InvalidNameError from './exceptions/invalid_name_error';
+import InvalidTokenError from './exceptions/invalid_token_error';
+import NotExpectedCommandArgumentError from './exceptions/not_expected_command_argument_error';
+import UndefinedValueError from './exceptions/undefined_value_error';
+import UnknownCommandError from './exceptions/unknown_command_error';
+import UnknownNameError from './exceptions/unknown_name_error';
+import Interpreter from './interpreter';
+import countBy from './utils/count_by';
+import pluck from './utils/pluck';
 
 class Frame {
   constructor(cmd_name, prev_frame) {
@@ -54,7 +54,7 @@ export default class VMachine {
         registeredCmds: this.#registeredCmds,
         registeredNames: this.#registeredNames,
       }),
-      level
+      level,
     );
   }
 
@@ -64,15 +64,15 @@ export default class VMachine {
       const params_len = args.length;
       let index = 0;
       while (index < params_len) {
-        const re = new RegExp(`\\$${Number(index) + 1}(?:\\[[^\\]]+\\])?`, "g");
+        const re = new RegExp(`\\$${Number(index) + 1}(?:\\[[^\\]]+\\])?`, 'g');
         alias_cmd = alias_cmd.replaceAll(re, args[index]);
         ++index;
       }
       alias_cmd = alias_cmd.replaceAll(
         /\$\d+(?:\[([^\]]+)\])?/g,
         (_, group) => {
-          return group || "";
-        }
+          return group || '';
+        },
       );
       return alias_cmd;
     }
@@ -95,7 +95,7 @@ export default class VMachine {
           if (!arg_def) {
             throw new InvalidCommandArgumentValueError(
               frame.cmd,
-              values[index]
+              values[index],
             );
           }
           arg_name = arg_def[1][1];
@@ -112,7 +112,7 @@ export default class VMachine {
             cmdDef: cmd_def,
             kwargs: kwargs,
           },
-          silent
+          silent,
         );
       } catch (err) {
         throw new InvalidCommandArgumentFormatError(err.message, frame.cmd);
@@ -135,7 +135,7 @@ export default class VMachine {
 
   async eval(cmd_raw, options) {
     if (cmd_raw.constructor !== String) {
-      throw new Error("Invalid input!");
+      throw new Error('Invalid input!');
     }
     const parse_info = this.parse(cmd_raw, {
       isData: options?.isData,
@@ -197,7 +197,7 @@ export default class VMachine {
               throw new NotExpectedCommandArgumentError(
                 arg,
                 token.start,
-                token.end
+                token.end,
               );
             }
             // Flag arguments can be implicit
@@ -259,7 +259,7 @@ export default class VMachine {
                 frame,
                 parse_info,
                 instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT ||
-                  options?.silent
+                  options?.silent,
               );
               last_frame = frames.at(-1);
               if (last_frame) {
@@ -288,14 +288,14 @@ export default class VMachine {
                 throw new InvalidInstructionError();
               }
               throw new InvalidNameError(token.value, token.start, token.end);
-            } else if (typeof vvalue === "undefined") {
+            } else if (typeof vvalue === 'undefined') {
               const value_instr = stack.instructions[index - 1];
               const value_token =
                 stack.inputTokens[value_instr.inputTokenIndex] || {};
               throw new InvalidTokenError(
                 value_token.value,
                 value_token.start,
-                value_token.end
+                value_token.end,
               );
             }
             frame.store[vname] = vvalue;
@@ -323,17 +323,17 @@ export default class VMachine {
             const index_value = frame.values.length - 1;
             const value = frame.values[index_value];
 
-            if (typeof value === "undefined") {
+            if (typeof value === 'undefined') {
               throw new UndefinedValueError(attr_name);
             }
             let res_value = value[attr_name];
-            if (typeof res_value === "undefined") {
+            if (typeof res_value === 'undefined') {
               if (isNaN(Number(attr_name)) && value.constructor === Array) {
                 res_value = pluck(value, attr_name);
-                if (res_value.every((item) => typeof item === "undefined")) {
+                if (res_value.every(item => typeof item === 'undefined')) {
                   res_value = undefined;
                 } else {
-                  res_value = res_value.join(",");
+                  res_value = res_value.join(',');
                 }
               }
             }
@@ -343,9 +343,7 @@ export default class VMachine {
         case INSTRUCTION_TYPE.BUILD_LIST:
           {
             const frame = last_frame || root_frame;
-            const iter_count = countBy(stack_instr_done, (item) => {
-              return item.level === instr.dataIndex && item.dataIndex !== -1;
-            }).true;
+            const iter_count = instr.dataIndex;
             const value = [];
             for (let i = 0; i < iter_count; ++i) {
               value.push(frame.values.pop());
@@ -356,14 +354,7 @@ export default class VMachine {
         case INSTRUCTION_TYPE.BUILD_MAP:
           {
             const frame = last_frame || root_frame;
-            // Debugger;
-            const iter_count = countBy(stack_instr_done, (item) => {
-              return (
-                item.level === instr.dataIndex &&
-                item.dataIndex !== -1 &&
-                item.type !== INSTRUCTION_TYPE.BUILD_MAP
-              );
-            }).true;
+            const iter_count = instr.dataIndex;
             const value = {};
             for (let i = 0; i < iter_count; ++i) {
               const val = frame.values.pop();

@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import debounce from "@terminal/utils/debounce";
-import {getArgumentInfo, getArgumentInfoByName} from "@trash/argument";
-import {INSTRUCTION_TYPE} from "@trash/constants";
+import debounce from '@terminal/utils/debounce';
+import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
+import {INSTRUCTION_TYPE} from '@trash/constants';
 
 export default class CommandAssistant {
   #virtMachine = null;
@@ -12,13 +12,13 @@ export default class CommandAssistant {
     this.#virtMachine = virtMachine;
     this.lazyGetAvailableOptions = debounce(
       this.#getAvailableOptions.bind(this),
-      175
+      175,
     );
   }
 
   #getAvailableCommandNames(name) {
     const cmd_names = Object.keys(this.#virtMachine.commands);
-    return cmd_names.filter((cmd_name) => cmd_name.startsWith(name));
+    return cmd_names.filter(cmd_name => cmd_name.startsWith(name));
   }
 
   #getAvailableArguments(command_info, arg_name) {
@@ -76,7 +76,7 @@ export default class CommandAssistant {
     // Found selected token and EOC/EOL
     for (let index = 0; index < instr_count; ++index) {
       const instr = stack.instructions[index];
-      if (instr.level > 0) {
+      if (instr.level !== 0) {
         continue;
       }
       const token = parse_info.inputTokens[instr.level][instr.inputTokenIndex];
@@ -129,7 +129,7 @@ export default class CommandAssistant {
     if (cur_token === cmd_token) {
       // Command name
       const cmd_names = this.#getAvailableCommandNames(
-        cmd_token?.value || data
+        cmd_token?.value || data,
       );
       for (const cmd_name of cmd_names) {
         ret.push({
@@ -153,7 +153,7 @@ export default class CommandAssistant {
       // Argument
       const arg_infos = this.#getAvailableArguments(
         command_info,
-        arg_token.value
+        arg_token.value,
       );
       for (const arg_info of arg_infos) {
         ret.push({
@@ -168,7 +168,7 @@ export default class CommandAssistant {
       const param_infos = this.#getAvailableParameters(
         command_info,
         arg_token.value,
-        cur_token.value
+        cur_token.value,
       );
       for (const param_info of param_infos) {
         ret.push({

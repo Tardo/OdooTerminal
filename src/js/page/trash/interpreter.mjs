@@ -10,9 +10,9 @@ import {
   MATH_OPER_PRIORITIES,
   SYMBOLS,
   SYMBOLS_MATH_OPER,
-} from "./constants";
-import Instruction from "./instruction";
-import countBy from "./utils/count_by";
+} from './constants';
+import Instruction from './instruction';
+import countBy from './utils/count_by';
 
 /**
  * This is TraSH
@@ -26,8 +26,8 @@ export default class Interpreter {
    * @param {String} separator
    * @returns {Array}
    */
-  splitAndTrim(text, separator = ",") {
-    return text.split(separator).map((item) => item.trim());
+  splitAndTrim(text, separator = ',') {
+    return text.split(separator).map(item => item.trim());
   }
 
   getCanonicalCommandName(cmd_name, registered_cmds) {
@@ -53,18 +53,18 @@ export default class Interpreter {
    */
   tokenize(data, options) {
     // Remove comments
-    const clean_data = data.replaceAll(this.#regexComments, "");
+    const clean_data = data.replaceAll(this.#regexComments, '');
     let tokens = [];
-    let value = "";
-    let in_string = "";
+    let value = '';
+    let in_string = '';
     let in_array = 0;
     let in_dict = 0;
     let in_runner = 0;
     let in_block = 0;
     let do_cut = false;
     let do_skip = false;
-    let prev_char_no_space = "";
-    let prev_char = "";
+    let prev_char_no_space = '';
+    let prev_char = '';
     let prev_token = null;
     let prev_token_no_space = null;
     const clean_data_len = clean_data.length;
@@ -74,7 +74,7 @@ export default class Interpreter {
       if (prev_char !== SYMBOLS.ESCAPE) {
         if (char === SYMBOLS.STRING || char === SYMBOLS.STRING_SIMPLE) {
           if (in_string && char === in_string) {
-            in_string = "";
+            in_string = '';
           } else if (!in_string && !in_data_type) {
             in_string = char;
             do_cut = true;
@@ -152,7 +152,7 @@ export default class Interpreter {
             if (prev_token[0] !== LEXER.Space) {
               prev_token_no_space = prev_token;
             }
-            value = "";
+            value = '';
           }
           do_cut = false;
         }
@@ -202,14 +202,14 @@ export default class Interpreter {
    */
   #lexer(token, prev_token_info, options) {
     // FIXME: New level of ugly implementation here... but works :/
-    const isDict = (stoken) => {
-      const sepcount = countBy(stoken, (char) => char === ":").true;
+    const isDict = stoken => {
+      const sepcount = countBy(stoken, char => char === ':').true;
       const dtokens = this.tokenize(stoken, {isData: true});
-      let rstr = "";
+      let rstr = '';
       for (const tok of dtokens) {
         rstr += tok.raw;
       }
-      const rsepcount = countBy(rstr, (char) => char === ":").true;
+      const rsepcount = countBy(rstr, char => char === ':').true;
       return rsepcount !== sepcount;
     };
     let token_san = token.trim();
@@ -373,7 +373,7 @@ export default class Interpreter {
   }
 
   #tokenList2str(tokens) {
-    let res_str = "";
+    let res_str = '';
     for (const token of tokens) {
       res_str += token[0] === LEXER.Math ? `(${token[1]})` : token[2];
     }
@@ -381,9 +381,9 @@ export default class Interpreter {
   }
 
   #prioritizer(tokens) {
-    let tokens_no_spaces = tokens.filter((item) => item[0] !== LEXER.Space);
-    const tokens_math_oper = tokens_no_spaces.filter((item) =>
-      LEXER_MATH_OPER.has(item[0])
+    let tokens_no_spaces = tokens.filter(item => item[0] !== LEXER.Space);
+    const tokens_math_oper = tokens_no_spaces.filter(item =>
+      LEXER_MATH_OPER.has(item[0]),
     );
     if (tokens_math_oper.length <= 1) {
       return tokens;
@@ -398,13 +398,13 @@ export default class Interpreter {
             ntokens,
             ntokens.length - 1,
             true,
-            true
+            true,
           );
           const next_tokens = this.#getDataInstructions(
             tokens_no_spaces,
             token_index + 1,
             false,
-            true
+            true,
           );
           const prev_tokens_str = this.#tokenList2str(prev_tokens);
           const next_tokens_str = this.#tokenList2str(next_tokens);
@@ -434,7 +434,6 @@ export default class Interpreter {
    * @returns {Object}
    */
   parse(data, options, level = 0) {
-    const blevel = level;
     let mlevel = level;
     const res = {
       stack: {
@@ -446,7 +445,7 @@ export default class Interpreter {
       inputTokens: [this.tokenize(data, options)],
     };
 
-    const pushParseData = (parse_data) => {
+    const pushParseData = parse_data => {
       res.stack.instructions.push(...parse_data.instructions);
       if (parse_data.arguments.length) {
         res.stack.arguments[0].push(...parse_data.arguments);
@@ -504,17 +503,11 @@ export default class Interpreter {
             to_append.names.push(token.value);
             const dindex = res.stack.names[0].length;
             to_append.instructions.push(
-              new Instruction(
-                INSTRUCTION_TYPE.LOAD_NAME,
-                index,
-                level,
-                blevel,
-                dindex
-              )
+              new Instruction(INSTRUCTION_TYPE.LOAD_NAME, index, level, dindex),
             );
             if (sign_cache) {
               to_append.instructions.push(
-                new Instruction(sign_cache, index, level, blevel)
+                new Instruction(sign_cache, index, level),
               );
               sign_cache = null;
             }
@@ -526,20 +519,14 @@ export default class Interpreter {
             to_append.arguments.push(token.value);
             const dindex = res.stack.arguments[0].length;
             to_append.instructions.push(
-              new Instruction(
-                INSTRUCTION_TYPE.LOAD_ARG,
-                index,
-                level,
-                blevel,
-                dindex
-              )
+              new Instruction(INSTRUCTION_TYPE.LOAD_ARG, index, level, dindex),
             );
           }
           break;
         case LEXER.Concat:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.CONCAT, index, level, blevel)
+            new Instruction(INSTRUCTION_TYPE.CONCAT, index, level),
           );
           break;
         case LEXER.Negative:
@@ -549,37 +536,37 @@ export default class Interpreter {
         case LEXER.Add:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.ADD, index, level, blevel)
+            new Instruction(INSTRUCTION_TYPE.ADD, index, level),
           );
           break;
         case LEXER.Substract:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.SUBSTRACT, index, level, blevel)
+            new Instruction(INSTRUCTION_TYPE.SUBSTRACT, index, level),
           );
           break;
         case LEXER.Multiply:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.MULTIPLY, index, level, blevel)
+            new Instruction(INSTRUCTION_TYPE.MULTIPLY, index, level),
           );
           break;
         case LEXER.Divide:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.DIVIDE, index, level, blevel)
+            new Instruction(INSTRUCTION_TYPE.DIVIDE, index, level),
           );
           break;
         case LEXER.Modulo:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.MODULO, index, level, blevel)
+            new Instruction(INSTRUCTION_TYPE.MODULO, index, level),
           );
           break;
         case LEXER.Pow:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(
-            new Instruction(INSTRUCTION_TYPE.POW, index, level, blevel)
+            new Instruction(INSTRUCTION_TYPE.POW, index, level),
           );
           break;
         case LEXER.Number:
@@ -591,13 +578,12 @@ export default class Interpreter {
                 INSTRUCTION_TYPE.LOAD_CONST,
                 index,
                 level,
-                blevel,
-                dindex
-              )
+                dindex,
+              ),
             );
             if (sign_cache) {
               to_append.instructions.push(
-                new Instruction(sign_cache, index, level, blevel)
+                new Instruction(sign_cache, index, level),
               );
               sign_cache = null;
             }
@@ -605,16 +591,15 @@ export default class Interpreter {
           break;
         case LEXER.Boolean:
           {
-            to_append.values.push(token.value.toLocaleLowerCase() === "true");
+            to_append.values.push(token.value.toLocaleLowerCase() === 'true');
             const dindex = res.stack.values[0].length;
             to_append.instructions.push(
               new Instruction(
                 INSTRUCTION_TYPE.LOAD_CONST,
                 index,
                 level,
-                blevel,
-                dindex
-              )
+                dindex,
+              ),
             );
           }
           break;
@@ -630,7 +615,7 @@ export default class Interpreter {
             ) {
               const can_name = this.getCanonicalCommandName(
                 token.value,
-                options.registeredCmds
+                options.registeredCmds,
               );
               const command_name = can_name || token.value;
               to_append.names.push(command_name);
@@ -640,9 +625,8 @@ export default class Interpreter {
                   INSTRUCTION_TYPE.LOAD_GLOBAL,
                   index,
                   level,
-                  blevel,
-                  dindex
-                )
+                  dindex,
+                ),
               );
               to_append_eoc.instructions.push(
                 new Instruction(
@@ -651,8 +635,7 @@ export default class Interpreter {
                     : INSTRUCTION_TYPE.CALL_FUNCTION,
                   -1,
                   level,
-                  blevel
-                )
+                ),
               );
             } else {
               to_append.values.push(token.value);
@@ -662,9 +645,8 @@ export default class Interpreter {
                   INSTRUCTION_TYPE.LOAD_CONST,
                   index,
                   level,
-                  blevel,
-                  dindex
-                )
+                  dindex,
+                ),
               );
             }
           }
@@ -679,8 +661,9 @@ export default class Interpreter {
                 isData: true,
                 offset: token.start + 1,
               },
-              ++mlevel
+              ++mlevel,
             );
+            const dindex = parsed_array.inputTokens[0].length;
             res.stack.arguments.push(...parsed_array.stack.arguments);
             res.stack.values.push(...parsed_array.stack.values);
             res.stack.names.push(...parsed_array.stack.names);
@@ -691,9 +674,8 @@ export default class Interpreter {
                 INSTRUCTION_TYPE.BUILD_LIST,
                 index,
                 level,
-                blevel,
-                mlevel
-              )
+                dindex,
+              ),
             );
             mlevel = parsed_array.maxULevel;
           }
@@ -708,21 +690,16 @@ export default class Interpreter {
                 isData: true,
                 offset: token.start + 1,
               },
-              ++mlevel
+              ++mlevel,
             );
+            const dindex = parseInt(parsed_dict.inputTokens[0].length / 2, 10);
             res.stack.arguments.push(...parsed_dict.stack.arguments);
             res.stack.values.push(...parsed_dict.stack.values);
             res.stack.names.push(...parsed_dict.stack.names);
             to_append.inputTokens.push(...parsed_dict.inputTokens);
             to_append.instructions.push(...parsed_dict.stack.instructions);
             to_append.instructions.push(
-              new Instruction(
-                INSTRUCTION_TYPE.BUILD_MAP,
-                index,
-                level,
-                blevel,
-                mlevel
-              )
+              new Instruction(INSTRUCTION_TYPE.BUILD_MAP, index, level, dindex),
             );
             mlevel = parsed_dict.maxULevel;
           }
@@ -738,9 +715,8 @@ export default class Interpreter {
                     INSTRUCTION_TYPE.STORE_SUBSCR,
                     index,
                     level,
-                    blevel,
-                    res.stack.names.length - 1
-                  )
+                    res.stack.names.length - 1,
+                  ),
                 );
               } else {
                 res.stack.instructions.pop();
@@ -756,9 +732,8 @@ export default class Interpreter {
                     INSTRUCTION_TYPE.STORE_NAME,
                     last_token_index,
                     level,
-                    blevel,
-                    dindex
-                  )
+                    dindex,
+                  ),
                 );
               }
             } else {
@@ -769,9 +744,8 @@ export default class Interpreter {
                   INSTRUCTION_TYPE.STORE_NAME,
                   last_token_index,
                   level,
-                  blevel,
-                  dindex
-                )
+                  dindex,
+                ),
               );
             }
           }
@@ -787,7 +761,7 @@ export default class Interpreter {
                 isData: true,
                 offset: token.start + 1,
               },
-              ++mlevel
+              ++mlevel,
             );
             res.stack.arguments.push(...parsed_attribute.stack.arguments);
             res.stack.values.push(...parsed_attribute.stack.values);
@@ -795,12 +769,7 @@ export default class Interpreter {
             to_append.inputTokens.push(...parsed_attribute.inputTokens);
             to_append.instructions.push(...parsed_attribute.stack.instructions);
             to_append.instructions.push(
-              new Instruction(
-                INSTRUCTION_TYPE.LOAD_DATA_ATTR,
-                index,
-                level,
-                blevel
-              )
+              new Instruction(INSTRUCTION_TYPE.LOAD_DATA_ATTR, index, level),
             );
             const last_instr = res.stack.instructions.at(-1);
             if (last_instr.type === INSTRUCTION_TYPE.UNITARY_NEGATIVE) {
@@ -819,7 +788,7 @@ export default class Interpreter {
                 silent: true,
                 offset: token.start + 1,
               },
-              ++mlevel
+              ++mlevel,
             );
             res.stack.arguments.push(...parsed_runner.stack.arguments);
             res.stack.values.push(...parsed_runner.stack.values);
@@ -828,7 +797,7 @@ export default class Interpreter {
             to_append.instructions.push(...parsed_runner.stack.instructions);
             if (sign_cache) {
               to_append.instructions.push(
-                new Instruction(sign_cache, index, level, blevel)
+                new Instruction(sign_cache, index, level),
               );
               sign_cache = null;
             }
@@ -844,18 +813,18 @@ export default class Interpreter {
                 silent: false,
                 offset: token.start + 1,
               },
-              ++mlevel
+              ++mlevel,
             );
             res.stack.arguments.push(...parsed_block.stack.arguments);
             res.stack.values.push(...parsed_block.stack.values);
             res.stack.names.push(...parsed_block.stack.names);
             to_append.inputTokens.push(...parsed_block.inputTokens);
             to_append.instructions.push(
-              new Instruction(INSTRUCTION_TYPE.PUSH_FRAME, index, level, blevel)
+              new Instruction(INSTRUCTION_TYPE.PUSH_FRAME, index, level),
             );
             to_append.instructions.push(...parsed_block.stack.instructions);
             to_append.instructions.push(
-              new Instruction(INSTRUCTION_TYPE.POP_FRAME, index, level, blevel)
+              new Instruction(INSTRUCTION_TYPE.POP_FRAME, index, level),
             );
             mlevel = parsed_block.maxULevel;
           }
@@ -898,7 +867,7 @@ export default class Interpreter {
                 math: true,
                 offset: token.start + 3,
               },
-              ++mlevel
+              ++mlevel,
             );
             res.stack.arguments.push(...parsed_math.stack.arguments);
             res.stack.values.push(...parsed_math.stack.values);
@@ -907,7 +876,7 @@ export default class Interpreter {
             to_append.instructions.push(...parsed_math.stack.instructions);
             if (sign_cache) {
               to_append.instructions.push(
-                new Instruction(sign_cache, index, level, blevel)
+                new Instruction(sign_cache, index, level),
               );
               sign_cache = null;
             }
@@ -932,7 +901,7 @@ export default class Interpreter {
 
     if (!options?.math && level === 0) {
       res.stack.instructions.push(
-        new Instruction(INSTRUCTION_TYPE.RETURN_VALUE, -1, blevel, blevel)
+        new Instruction(INSTRUCTION_TYPE.RETURN_VALUE, -1, -1),
       );
     }
 
@@ -960,7 +929,7 @@ export default class Interpreter {
     if (
       (first_char === '"' && last_char === '"') ||
       (first_char === "'" && last_char === "'") ||
-      (first_char === "`" && last_char === "`")
+      (first_char === '`' && last_char === '`')
     ) {
       return str_trim.substring(1, str_trim.length - 1);
     }
