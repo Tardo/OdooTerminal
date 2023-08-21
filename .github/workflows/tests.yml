@@ -49,7 +49,7 @@ jobs:
           npm install
 
       - name: prettier
-        run: npx prettier --check
+        run: npx prettier . --check
 
       - name: eslint
         run: npx eslint --color

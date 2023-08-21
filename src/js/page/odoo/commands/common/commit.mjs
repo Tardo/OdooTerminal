@@ -1,19 +1,19 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from "@odoo/rpc";
-import Recordset from "@terminal/core/recordset";
-import isEmpty from "@terminal/utils/is_empty";
-import {ARG} from "@trash/constants";
+import rpc from '@odoo/rpc';
+import Recordset from '@terminal/core/recordset';
+import isEmpty from '@terminal/utils/is_empty';
+import {ARG} from '@trash/constants';
 
 async function cmdCommit(kwargs) {
   if (!Recordset.isValid(kwargs.recordset)) {
-    throw new Error("Invalid recordset");
+    throw new Error('Invalid recordset');
   }
 
   const values_to_write = kwargs.recordset.toWrite();
   if (isEmpty(values_to_write)) {
-    this.screen.printError("Nothing to commit!");
+    this.screen.printError('Nothing to commit!');
     return false;
   }
   const pids = [];
@@ -21,11 +21,11 @@ async function cmdCommit(kwargs) {
   for (const [rec_id, values] of values_to_write) {
     tasks.push(
       rpc.query({
-        method: "write",
+        method: 'write',
         model: kwargs.recordset.model,
         args: [rec_id, values],
         kwargs: {context: this.getContext()},
-      })
+      }),
     );
     pids.push(rec_id);
   }
@@ -33,15 +33,15 @@ async function cmdCommit(kwargs) {
   await Promise.all(tasks);
   kwargs.recordset.persist();
   this.screen.print(
-    `Records '${pids}' of ${kwargs.recordset.model} updated successfully`
+    `Records '${pids}' of ${kwargs.recordset.model} updated successfully`,
   );
   return true;
 }
 
 export default {
-  definition: "Commit recordset changes",
+  definition: 'Commit recordset changes',
   callback: cmdCommit,
-  detail: "Write recordset changes",
-  args: [[ARG.Any, ["r", "recordset"], true, "The Recordset"]],
-  example: "-r $recordset",
+  detail: 'Write recordset changes',
+  args: [[ARG.Any, ['r', 'recordset'], true, 'The Recordset']],
+  example: '-r $recordset',
 };

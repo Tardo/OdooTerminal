@@ -6,7 +6,7 @@ async function cmdToggleTerm() {
 }
 
 export default {
-  definition: "Toggle terminal visibility",
+  definition: 'Toggle terminal visibility',
   callback: cmdToggleTerm,
-  detail: "Toggle terminal visibility",
+  detail: 'Toggle terminal visibility',
 };

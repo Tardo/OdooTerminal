@@ -3,7 +3,7 @@
 
 export default class extends Error {
   constructor(message) {
-    super(message || "Invalid instruction");
+    super(message || 'Invalid instruction');
     this.name = this.constructor.name;
   }
 }

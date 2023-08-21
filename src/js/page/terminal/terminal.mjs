@@ -1,27 +1,27 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import processKeybind from "@common/utils/process_keybind";
-import {KEYMAP} from "@trash/constants";
-import UnknownCommandError from "@trash/exceptions/unknown_command_error";
-import difference from "@trash/utils/difference";
-import VMachine from "@trash/vmachine";
-import CommandAssistant from "./core/command_assistant";
-import Screen from "./core/screen";
-import {getStorageItem as getStorageLocalItem} from "./core/storage/local";
+import processKeybind from '@common/utils/process_keybind';
+import {KEYMAP} from '@trash/constants';
+import UnknownCommandError from '@trash/exceptions/unknown_command_error';
+import difference from '@trash/utils/difference';
+import VMachine from '@trash/vmachine';
+import CommandAssistant from './core/command_assistant';
+import Screen from './core/screen';
+import {getStorageItem as getStorageLocalItem} from './core/storage/local';
 import {
   getStorageItem as getStorageSessionItem,
   removeStorageItem as removeStorageSessionItem,
   setStorageItem as setStorageSessionItem,
-} from "./core/storage/session";
-import renderTerminal from "./templates/terminal";
-import renderUnknownCommand from "./templates/unknown_command";
-import renderWelcome from "./templates/welcome";
-import debounce from "./utils/debounce";
-import isEmpty from "./utils/is_empty";
+} from './core/storage/session';
+import renderTerminal from './templates/terminal';
+import renderUnknownCommand from './templates/unknown_command';
+import renderWelcome from './templates/welcome';
+import debounce from './utils/debounce';
+import isEmpty from './utils/is_empty';
 
 export default class Terminal {
-  VERSION = "10.1.1";
+  VERSION = '10.1.1';
 
   userContext = {};
 
@@ -31,7 +31,7 @@ export default class Terminal {
   #registeredCmds = {};
 
   #inputHistory = [];
-  #searchHistoryQuery = "";
+  #searchHistoryQuery = '';
   #searchHistoryIter = 0;
 
   #hasExecInitCmds = false;
@@ -53,40 +53,40 @@ export default class Terminal {
       {
         commandTimeout: 30000,
       },
-      config
+      config,
     );
 
     this.screen = new Screen(
       {
         onSaveScreen: function (content) {
           debounce(
-            setStorageSessionItem("terminal_screen", content, (err) =>
-              this.screen.printHTML(err)
+            setStorageSessionItem('terminal_screen', content, err =>
+              this.screen.printHTML(err),
             ),
-            350
+            350,
           );
         }.bind(this),
-        onCleanScreen: () => removeStorageSessionItem("terminal_screen"),
+        onCleanScreen: () => removeStorageSessionItem('terminal_screen'),
         onInputKeyUp: this.#onInputKeyUp.bind(this),
         onInput: this.#onInput.bind(this),
       },
       {
-        username: "Unregistered User",
+        username: 'Unregistered User',
         host: window.location.host,
-      }
+      },
     );
 
     // Cached content
-    const cachedScreen = getStorageSessionItem("terminal_screen");
-    if (typeof cachedScreen === "undefined") {
+    const cachedScreen = getStorageSessionItem('terminal_screen');
+    if (typeof cachedScreen === 'undefined') {
       this.printWelcomeMessage();
-      this.screen.print("");
+      this.screen.print('');
     } else {
       this.screen.printHTML(cachedScreen);
       // RequestAnimationFrame(() => this.screen.scrollDown());
     }
-    const cachedHistory = getStorageSessionItem("terminal_history");
-    if (typeof cachedHistory !== "undefined") {
+    const cachedHistory = getStorageSessionItem('terminal_history');
+    if (typeof cachedHistory !== 'undefined') {
       this.#inputHistory = cachedHistory;
       this.#searchHistoryIter = this.#inputHistory.length;
     }
@@ -100,33 +100,33 @@ export default class Terminal {
     if (this.#config.pinned) {
       this.doShow();
       this.$el
-        .find(".terminal-screen-icon-pin")
-        .removeClass("btn-dark")
-        .addClass("btn-light");
+        .find('.terminal-screen-icon-pin')
+        .removeClass('btn-dark')
+        .addClass('btn-light');
     }
     if (this.#config.maximized) {
-      this.$el.addClass("term-maximized");
+      this.$el.addClass('term-maximized');
       this.$el
-        .find(".terminal-screen-icon-maximize")
-        .removeClass("btn-dark")
-        .addClass("btn-light");
+        .find('.terminal-screen-icon-maximize')
+        .removeClass('btn-dark')
+        .addClass('btn-light');
     }
 
-    window.addEventListener("keydown", this.#onCoreKeyDown.bind(this));
-    window.addEventListener("click", this.onCoreClick.bind(this));
+    window.addEventListener('keydown', this.#onCoreKeyDown.bind(this));
+    window.addEventListener('click', this.onCoreClick.bind(this));
     window.addEventListener(
-      "beforeunload",
+      'beforeunload',
       this.#onCoreBeforeUnload.bind(this),
-      true
+      true,
     );
     this.$el
-      .find(".terminal-screen-icon-maximize")
-      .on("click", this.#onClickToggleMaximize.bind(this));
+      .find('.terminal-screen-icon-maximize')
+      .on('click', this.#onClickToggleMaximize.bind(this));
     this.$el
-      .find(".terminal-screen-icon-pin")
-      .on("click", this.#onClickToggleScreenPin.bind(this));
+      .find('.terminal-screen-icon-pin')
+      .on('click', this.#onClickToggleScreenPin.bind(this));
     // Custom Events
-    this.$el[0].addEventListener("toggle", this.doToggle.bind(this));
+    this.$el[0].addEventListener('toggle', this.doToggle.bind(this));
 
     if (!isEmpty(this.#config.init_cmds)) {
       this.#wakeUp();
@@ -160,64 +160,64 @@ export default class Terminal {
   }
 
   #injectTerminal() {
-    const $terms = $("body").children(".o_terminal");
+    const $terms = $('body').children('.o_terminal');
     if ($terms.length > 1) {
       // Remove extra terminals
-      $terms.filter(":not(:first-child)").remove();
+      $terms.filter(':not(:first-child)').remove();
     } else if ($terms.length === 0) {
       this.$el = $(this.#rawTerminalTemplate);
-      this.$el.prependTo("body");
+      this.$el.prependTo('body');
     }
   }
 
   async start() {
     if (!this.#wasLoaded) {
-      throw new Error("Terminal not loaded");
+      throw new Error('Terminal not loaded');
     }
 
-    this.$runningCmdCount = this.$el.find("#terminal_running_cmd_count");
+    this.$runningCmdCount = this.$el.find('#terminal_running_cmd_count');
     this.#virtMachine = new VMachine(this.#registeredCmds, {
       processCommandJob: this.#processCommandJob.bind(this),
     });
     this.#commandAssistant = new CommandAssistant(this.#virtMachine);
     this.screen.start(this.$el);
-    this.screen.applyStyle("opacity", this.#config.opacity);
+    this.screen.applyStyle('opacity', this.#config.opacity);
     this.onStart();
   }
 
   // The terminal object should be never destroyed
   end() {
-    if (typeof this.#observer !== "undefined") {
+    if (typeof this.#observer !== 'undefined') {
       this.#observer.disconnect();
     }
-    window.removeEventListener("keydown", this.#onCoreKeyDown.bind(this));
-    window.removeEventListener("click", this.onCoreClick.bind(this));
+    window.removeEventListener('keydown', this.#onCoreKeyDown.bind(this));
+    window.removeEventListener('click', this.onCoreClick.bind(this));
     window.removeEventListener(
-      "beforeunload",
+      'beforeunload',
       this.#onCoreBeforeUnload.bind(this),
-      true
+      true,
     );
-    this.$el[0].removeEventListener("toggle", this.doToggle.bind(this));
+    this.$el[0].removeEventListener('toggle', this.doToggle.bind(this));
   }
 
   /* BASIC FUNCTIONS */
   cleanInputHistory() {
     this.#inputHistory = [];
-    removeStorageSessionItem("terminal_screen");
+    removeStorageSessionItem('terminal_screen');
   }
 
   registerCommand(cmd, cmd_def) {
     this.#registeredCmds[cmd] = Object.assign(
       {
-        definition: "Undefined command",
+        definition: 'Undefined command',
         callback: this.#fallbackExecuteCommand,
         detail: "This command hasn't a properly detailed information",
         args: [],
         secured: false,
         aliases: [],
-        example: "",
+        example: '',
       },
-      cmd_def
+      cmd_def,
     );
   }
 
@@ -225,7 +225,7 @@ export default class Terminal {
     if (!cmd) {
       return [false, false];
     }
-    const cmd_split = cmd.split(" ");
+    const cmd_split = cmd.split(' ');
     const cmd_name = cmd_split[0];
     if (!cmd_name) {
       return [cmd, false];
@@ -274,7 +274,7 @@ export default class Terminal {
 
     const sanitized_in_cmd = in_cmd.toLowerCase();
     const sorted_cmd_keys = Object.keys(this.#registeredCmds).sort();
-    const min_score = [0, ""];
+    const min_score = [0, ''];
     const sorted_keys_len = sorted_cmd_keys.length;
     for (let x = 0; x < sorted_keys_len; ++x) {
       const cmd = sorted_cmd_keys[x];
@@ -290,7 +290,7 @@ export default class Terminal {
           if (i < cmd.length) {
             const score = _get_key_dist(
               sanitized_in_cmd.charAt(i),
-              cmd.charAt(i)
+              cmd.charAt(i),
             );
             if (score === 0) {
               --cmd_score;
@@ -302,10 +302,8 @@ export default class Terminal {
           }
         }
         // Using all letters?
-        const cmd_vec = cmd.split("").map((k) => k.charCodeAt(0));
-        const in_cmd_vec = sanitized_in_cmd
-          .split("")
-          .map((k) => k.charCodeAt(0));
+        const cmd_vec = cmd.split('').map(k => k.charCodeAt(0));
+        const in_cmd_vec = sanitized_in_cmd.split('').map(k => k.charCodeAt(0));
         if (difference(in_cmd_vec, cmd_vec).length === 0) {
           cmd_score -= max_dist;
         }
@@ -315,7 +313,7 @@ export default class Terminal {
 
       // Search lower score
       // if zero = perfect match (this never should happens)
-      if (min_score[1] === "" || cmd_score < min_score[0]) {
+      if (min_score[1] === '' || cmd_score < min_score[0]) {
         min_score[0] = cmd_score;
         min_score[1] = cmd;
         if (min_score[0] === 0.0) {
@@ -335,8 +333,8 @@ export default class Terminal {
     return this.#virtMachine.eval(
       code,
       Object.assign({}, options, {
-        aliases: getStorageLocalItem("terminal_aliases", {}),
-      })
+        aliases: getStorageLocalItem('terminal_aliases', {}),
+      }),
     );
   }
 
@@ -403,7 +401,7 @@ export default class Terminal {
         }
       }
     } else {
-      throw new Error("Terminal not loaded");
+      throw new Error('Terminal not loaded');
     }
   }
 
@@ -414,12 +412,12 @@ export default class Terminal {
     }
     // Only start the terminal if needed
     await this.#wakeUp();
-    this.$el.addClass("terminal-transition-topdown");
+    this.$el.addClass('terminal-transition-topdown');
     this.screen.focus();
   }
 
   async doHide() {
-    this.$el.removeClass("terminal-transition-topdown");
+    this.$el.removeClass('terminal-transition-topdown');
   }
 
   doToggle() {
@@ -445,14 +443,14 @@ export default class Terminal {
       return;
     }
     this.#inputHistory.push(strInput);
-    setStorageSessionItem("terminal_history", this.#inputHistory, (err) =>
-      this.screen.printError(err, true)
+    setStorageSessionItem('terminal_history', this.#inputHistory, err =>
+      this.screen.printError(err, true),
     );
     this.#searchHistoryIter = this.#inputHistory.length;
   }
 
   #isTerminalVisible() {
-    return this.$el && parseInt(this.$el.css("top"), 10) >= 0;
+    return this.$el && parseInt(this.$el.css('top'), 10) >= 0;
   }
 
   printWelcomeMessage() {
@@ -499,7 +497,7 @@ export default class Terminal {
   }
 
   async #fallbackExecuteCommand() {
-    throw new Error("Invalid command definition!");
+    throw new Error('Invalid command definition!');
   }
 
   #updateJobsInfo() {
@@ -508,24 +506,24 @@ export default class Terminal {
     }
     const count = this.#jobs.filter(Object).length;
     if (count) {
-      const count_unhealthy = this.#jobs.filter((item) => !item.healthy).length;
+      const count_unhealthy = this.#jobs.filter(item => !item.healthy).length;
       let str_info = `Running ${count} command(s)`;
       if (count_unhealthy) {
         str_info += ` (${count_unhealthy} unhealthy)`;
       }
-      str_info += "...";
+      str_info += '...';
       this.$runningCmdCount.html(str_info).show();
     } else {
-      this.$runningCmdCount.fadeOut("fast", function () {
-        $(this).html("");
+      this.$runningCmdCount.fadeOut('fast', function () {
+        $(this).html('');
       });
     }
   }
 
   #applySettings(config) {
     Object.assign(this.#config, {
-      pinned: getStorageSessionItem("terminal_pinned", config.pinned),
-      maximized: getStorageSessionItem("screen_maximized", config.maximized),
+      pinned: getStorageSessionItem('terminal_pinned', config.pinned),
+      maximized: getStorageSessionItem('screen_maximized', config.maximized),
       opacity: config.opacity * 0.01,
       shortcuts: config.shortcuts,
       term_context: config.term_context || {},
@@ -536,7 +534,7 @@ export default class Terminal {
     this.userContext = Object.assign(
       {},
       this.#config.term_context,
-      this.userContext
+      this.userContext,
     );
   }
 
@@ -565,12 +563,12 @@ export default class Terminal {
     } catch (err) {
       is_failed = true;
       error =
-        err || "[!] Oops! Unknown error! (no detailed error message given :/)";
+        err || '[!] Oops! Unknown error! (no detailed error message given :/)';
     } finally {
       this.onFinishCommand(job_index, is_failed, error || result);
     }
     if (is_failed) {
-      throw new Error(typeof error === "object" ? "" : error);
+      throw new Error(typeof error === 'object' ? '' : error);
     }
     return result;
   }
@@ -586,8 +584,8 @@ export default class Terminal {
       healthy: true,
     };
     // Add new job on a empty space or new one
-    let index = this.#jobs.findIndex((item) => {
-      return typeof item === "undefined";
+    let index = this.#jobs.findIndex(item => {
+      return typeof item === 'undefined';
     });
     if (index === -1) {
       index = this.#jobs.push(job_info) - 1;
@@ -610,9 +608,9 @@ export default class Terminal {
     if (has_errors) {
       this.screen.printError(`Error executing '${job_info.cmdInfo.cmdName}':`);
       if (
-        typeof result === "object" &&
-        !Object.hasOwn(result, "data") &&
-        Object.hasOwn(result, "message")
+        typeof result === 'object' &&
+        !Object.hasOwn(result, 'data') &&
+        Object.hasOwn(result, 'message')
       ) {
         this.screen.printError(result.message, true);
       }
@@ -622,7 +620,7 @@ export default class Terminal {
   }
 
   #onClickTerminalCommand(target) {
-    if (Object.hasOwn(target.dataset, "cmd")) {
+    if (Object.hasOwn(target.dataset, 'cmd')) {
       this.execute(target.dataset.cmd).catch(() => {
         // Do nothing
       });
@@ -633,14 +631,14 @@ export default class Terminal {
     const $target = $(ev.currentTarget);
     this.#config.maximized = !this.#config.maximized;
     if (this.#config.maximized) {
-      this.$el.addClass("term-maximized");
-      $target.removeClass("btn-dark").addClass("btn-light");
+      this.$el.addClass('term-maximized');
+      $target.removeClass('btn-dark').addClass('btn-light');
     } else {
-      this.$el.removeClass("term-maximized");
-      $target.removeClass("btn-light").addClass("btn-dark");
+      this.$el.removeClass('term-maximized');
+      $target.removeClass('btn-light').addClass('btn-dark');
     }
-    setStorageSessionItem("screen_maximized", this.#config.maximized, (err) =>
-      this.screen.printHTML(err)
+    setStorageSessionItem('screen_maximized', this.#config.maximized, err =>
+      this.screen.printHTML(err),
     );
     this.screen.scrollDown();
     this.screen.preventLostInputFocus();
@@ -649,13 +647,13 @@ export default class Terminal {
   #onClickToggleScreenPin(ev) {
     const $target = $(ev.currentTarget);
     this.#config.pinned = !this.#config.pinned;
-    setStorageSessionItem("terminal_pinned", this.#config.pinned, (err) =>
-      this.screen.printHTML(err)
+    setStorageSessionItem('terminal_pinned', this.#config.pinned, err =>
+      this.screen.printHTML(err),
     );
     if (this.#config.pinned) {
-      $target.removeClass("btn-dark").addClass("btn-light");
+      $target.removeClass('btn-dark').addClass('btn-light');
     } else {
-      $target.removeClass("btn-light").addClass("btn-dark");
+      $target.removeClass('btn-light').addClass('btn-dark');
     }
     this.screen.preventLostInputFocus();
   }
@@ -668,7 +666,7 @@ export default class Terminal {
     this.screen.preventLostInputFocus();
   }
   #onKeyArrowUp() {
-    if (typeof this.#searchHistoryQuery === "undefined") {
+    if (typeof this.#searchHistoryQuery === 'undefined') {
       this.#searchHistoryQuery = this.screen.getUserInput();
     }
     const found_hist = this.#doSearchPrevHistory();
@@ -677,7 +675,7 @@ export default class Terminal {
     }
   }
   #onKeyArrowDown() {
-    if (typeof this.#searchHistoryQuery === "undefined") {
+    if (typeof this.#searchHistoryQuery === 'undefined') {
       this.#searchHistoryQuery = this.screen.getUserInput();
     }
     const found_hist = this.#doSearchNextHistory();
@@ -693,12 +691,12 @@ export default class Terminal {
     this.#commandAssistant.lazyGetAvailableOptions(
       user_input,
       this.screen.getInputCaretStartPos(),
-      (options) => {
+      options => {
         this.#assistantOptions = options;
         this.#selAssistanOption = -1;
         this.screen.updateAssistantPanelOptions(
           this.#assistantOptions,
-          this.#selAssistanOption
+          this.#selAssistanOption,
         );
         if (user_input && ev.target.selectionStart === user_input.length) {
           this.#searchHistoryQuery = user_input;
@@ -707,7 +705,7 @@ export default class Terminal {
           this.#searchHistoryQuery = user_input;
           this.#searchHistoryIter = this.#inputHistory.length;
         }
-      }
+      },
     );
   }
   #onKeyArrowLeft() {
@@ -715,14 +713,14 @@ export default class Terminal {
     this.#commandAssistant.lazyGetAvailableOptions(
       user_input,
       this.screen.getInputCaretStartPos(),
-      (options) => {
+      options => {
         this.#assistantOptions = options;
         this.#selAssistanOption = -1;
         this.screen.updateAssistantPanelOptions(
           this.#assistantOptions,
-          this.#selAssistanOption
+          this.#selAssistanOption,
         );
-      }
+      },
     );
   }
   #onKeyTab() {
@@ -737,7 +735,7 @@ export default class Terminal {
     const [sel_cmd_index, sel_token_index] =
       this.#commandAssistant.getSelectedParameterIndex(
         parse_info,
-        this.screen.getInputCaretStartPos()
+        this.screen.getInputCaretStartPos(),
       );
     if (sel_cmd_index === null) {
       return;
@@ -765,7 +763,7 @@ export default class Terminal {
     }
     this.screen.updateAssistantPanelOptions(
       this.#assistantOptions,
-      this.#selAssistanOption
+      this.#selAssistanOption,
     );
   }
 
@@ -775,23 +773,23 @@ export default class Terminal {
     this.#commandAssistant.lazyGetAvailableOptions(
       user_input,
       this.screen.getInputCaretStartPos(),
-      (options) => {
+      options => {
         this.#assistantOptions = options;
         this.#selAssistanOption = -1;
         this.screen.updateAssistantPanelOptions(
           this.#assistantOptions,
-          this.#selAssistanOption
+          this.#selAssistanOption,
         );
         this.#searchHistoryQuery = user_input;
         this.#searchHistoryIter = this.#inputHistory.length;
         if (user_input) {
           const found_hist = this.#doSearchPrevHistory();
-          this.screen.updateShadowInput(found_hist || "");
+          this.screen.updateShadowInput(found_hist || '');
           this.#searchHistoryIter = this.#inputHistory.length;
         } else {
           this.screen.cleanShadowInput();
         }
-      }
+      },
     );
   }
 
@@ -817,7 +815,7 @@ export default class Terminal {
     } else if (ev.keyCode === $.ui.keyCode.ENTER) {
       this.screen.responseQuestion(question_active, ev.target.value);
     } else if (ev.keyCode === $.ui.keyCode.ESCAPE) {
-      this.screen.rejectQuestion(question_active, "Operation aborted");
+      this.screen.rejectQuestion(question_active, 'Operation aborted');
       ev.preventDefault();
     }
   }
@@ -832,7 +830,7 @@ export default class Terminal {
       !this.#config.pinned
     ) {
       this.doHide();
-    } else if (ev.target.classList.contains("o_terminal_cmd")) {
+    } else if (ev.target.classList.contains('o_terminal_cmd')) {
       this.#onClickTerminalCommand(ev.target);
     }
   }
@@ -856,25 +854,25 @@ export default class Terminal {
     }
   }
   #onCoreBeforeUnload(ev) {
-    const jobs = this.#jobs.filter((item) => item);
+    const jobs = this.#jobs.filter(item => item);
     if (jobs.length) {
       if (
         jobs.length === 1 &&
         (!jobs[0] ||
-          ["reload", "login"].indexOf(jobs[0].cmdInfo.cmdName) !== -1)
+          ['reload', 'login'].indexOf(jobs[0].cmdInfo.cmdName) !== -1)
       ) {
         return;
       }
       ev.preventDefault();
-      ev.returnValue = "";
+      ev.returnValue = '';
       this.screen.print(
-        "The terminal has prevented the current tab from closing due to unfinished tasks:"
+        'The terminal has prevented the current tab from closing due to unfinished tasks:',
       );
       this.screen.print(
         jobs.map(
-          (item) =>
-            `${item.cmdInfo.cmdName} <small><i>${item.cmdInfo.cmdRaw}</i></small>`
-        )
+          item =>
+            `${item.cmdInfo.cmdName} <small><i>${item.cmdInfo.cmdRaw}</i></small>`,
+        ),
       );
       this.doShow();
     }

@@ -6,8 +6,8 @@ export default function (data, func) {
   if (!data) {
     return counters;
   }
-  const list = data.constructor.name === "String" ? data.split("") : data;
-  list.forEach((item) => {
+  const list = data.constructor.name === 'String' ? data.split('') : data;
+  list.forEach(item => {
     const cat = func(item);
     if (Object.hasOwn(counters, cat)) {
       ++counters[cat];

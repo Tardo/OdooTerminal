@@ -1,19 +1,19 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
+import {ARG} from '@trash/constants';
 
 async function cmdTerminalContextOperation(kwargs) {
-  if (kwargs.operation === "set") {
+  if (kwargs.operation === 'set') {
     this.userContext = kwargs.value;
-  } else if (kwargs.operation === "write") {
+  } else if (kwargs.operation === 'write') {
     Object.assign(this.userContext, kwargs.value);
-  } else if (kwargs.operation === "delete") {
+  } else if (kwargs.operation === 'delete') {
     if (Object.hasOwn(this.userContext, kwargs.value)) {
       delete this.userContext[kwargs.value];
     } else {
       throw new Error(
-        "The selected key is not present in the terminal context"
+        'The selected key is not present in the terminal context',
       );
     }
   }
@@ -22,21 +22,21 @@ async function cmdTerminalContextOperation(kwargs) {
 }
 
 export default {
-  definition: "Operations over terminal context dictionary",
+  definition: 'Operations over terminal context dictionary',
   callback: cmdTerminalContextOperation,
   detail:
-    "Operations over terminal context dictionary. " +
-    "This context only affects to the terminal operations.",
+    'Operations over terminal context dictionary. ' +
+    'This context only affects to the terminal operations.',
   args: [
     [
       ARG.String,
-      ["o", "operation"],
+      ['o', 'operation'],
       false,
-      "The operation to do",
-      "read",
-      ["read", "write", "set", "delete"],
+      'The operation to do',
+      'read',
+      ['read', 'write', 'set', 'delete'],
     ],
-    [ARG.Any, ["v", "value"], false, "The value"],
+    [ARG.Any, ['v', 'value'], false, 'The value'],
   ],
-  example: "-o write -v {the_example: 1}",
+  example: '-o write -v {the_example: 1}',
 };

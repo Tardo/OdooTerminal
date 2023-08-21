@@ -1,8 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import isCompatibleOdooVersion from "@common/utils/is_compatible_odoo_version";
-import sendWindowMessage from "@common/utils/send_window_message";
+import isCompatibleOdooVersion from '@common/utils/is_compatible_odoo_version';
+import sendWindowMessage from '@common/utils/send_window_message';
 
 class InstanceAnalyzer {
   get odoo() {
@@ -12,13 +12,13 @@ class InstanceAnalyzer {
     return (
       this.odoo.session_info ||
       this.odoo.session ||
-      this.odoo.__DEBUG__.services["web.session"]
+      this.odoo.__DEBUG__.services['web.session']
     );
   }
 
   run() {
-    return this.getInfo().then((info) => {
-      sendWindowMessage(window, "ODOO_TERM_INIT", {
+    return this.getInfo().then(info => {
+      sendWindowMessage(window, 'ODOO_TERM_INIT', {
         instance_info: info,
       });
     });
@@ -44,7 +44,7 @@ class InstanceAnalyzer {
       if (this.odoo_session.server_version) {
         Object.assign(
           icontext,
-          this.#sanitizeServerInfo(this.odoo_session.server_version)
+          this.#sanitizeServerInfo(this.odoo_session.server_version),
         );
         need_request_server_version = false;
       }
@@ -78,7 +78,7 @@ class InstanceAnalyzer {
       };
     } else {
       const foundVer = info.serverVersionRaw.match(
-        /(\d+)\.(\d+)(?:([a-z]+)(\d*))?/
+        /(\d+)\.(\d+)(?:([a-z]+)(\d*))?/,
       );
       if (foundVer && foundVer.length) {
         info.serverVersion = {
@@ -98,9 +98,9 @@ class InstanceAnalyzer {
   #getOdooVersionByFramework() {
     return new Promise((resolve, reject) => {
       try {
-        this.odoo.define(0, (require) => {
-          require("web.core");
-          const session = require("web.session");
+        this.odoo.define(0, require => {
+          require('web.core');
+          const session = require('web.session');
           if (session?.server_version) {
             resolve(this.#sanitizeServerInfo(session.server_version));
           } else {
@@ -117,19 +117,19 @@ class InstanceAnalyzer {
    * @returns {Promise}
    */
   async #getOdooVersionByNetwork() {
-    const response = await fetch("/web/webclient/version_info", {
-      method: "POST",
+    const response = await fetch('/web/webclient/version_info', {
+      method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
-      body: "{}",
+      body: '{}',
     });
     if (response.status === 200) {
       const json_data = await response.json();
       return this.#sanitizeServerInfo(
         json_data.result.server_version,
-        json_data.result.server_version_info
+        json_data.result.server_version_info,
       );
     }
     throw new Error(response);

@@ -1,8 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "./constants";
-import difference from "./utils/difference";
+import {ARG} from './constants';
+import difference from './utils/difference';
 
 /**
  * Resolve argument information
@@ -52,10 +52,10 @@ function sanitizeArgumentValue(val, arg_type) {
 
   // Allow declare arrays in old format
   const cname = val.constructor.name;
-  if (cname !== "Array" && (arg_type & ARG.List) === ARG.List) {
+  if (cname !== 'Array' && (arg_type & ARG.List) === ARG.List) {
     const item_type = arg_type & ~ARG.List;
-    if (cname === "String") {
-      return val.split(",").map((item) => ARG.cast(item.trim(), item_type));
+    if (cname === 'String') {
+      return val.split(',').map(item => ARG.cast(item.trim(), item_type));
     }
     return [val];
   }
@@ -98,8 +98,8 @@ function checkArgumentValueType(val, arg_type) {
 export function validateAndFormatArguments(cmd_def, kwargs) {
   // Map full info arguments
   let args_infos = cmd_def.args
-    .map((x) => getArgumentInfo(x))
-    .map((x) => [x.names.long, x]);
+    .map(x => getArgumentInfo(x))
+    .map(x => [x.names.long, x]);
   args_infos = Object.fromEntries(args_infos);
 
   // Normalize Names
@@ -118,7 +118,7 @@ export function validateAndFormatArguments(cmd_def, kwargs) {
   const required_args = [];
   for (const arg_name in args_infos) {
     const arg_def = args_infos[arg_name];
-    if (typeof arg_def.default_value !== "undefined") {
+    if (typeof arg_def.default_value !== 'undefined') {
       default_values.push([arg_name, arg_def.default_value]);
     }
     if (arg_def.is_required) {
@@ -139,7 +139,7 @@ export function validateAndFormatArguments(cmd_def, kwargs) {
   const required_not_set = difference(required_args, full_kwargs_keys);
   if (required_not_set.length) {
     throw new Error(
-      `Required arguments not set! (${required_not_set.join(",")})`
+      `Required arguments not set! (${required_not_set.join(',')})`,
     );
   }
 
@@ -150,15 +150,15 @@ export function validateAndFormatArguments(cmd_def, kwargs) {
     const arg_info = args_infos[arg_name];
     const arg_value = sanitizeArgumentValue(
       full_kwargs[arg_name],
-      arg_info.type
+      arg_info.type,
     );
     const arg_long_name = arg_info.names.long;
-    const s_arg_long_name = arg_long_name.replaceAll("-", "_");
+    const s_arg_long_name = arg_long_name.replaceAll('-', '_');
     if (!checkArgumentValueType(arg_value, arg_info.type)) {
       throw new Error(
         `Invalid argument '${arg_long_name}' value type: ${
           arg_value?.constructor?.name
-        } is not ${ARG.getHumanType(arg_info.type)}`
+        } is not ${ARG.getHumanType(arg_info.type)}`,
       );
     }
     new_kwargs[s_arg_long_name] = arg_value;

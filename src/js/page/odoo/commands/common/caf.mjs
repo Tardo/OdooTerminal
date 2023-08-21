@@ -1,14 +1,14 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from "@odoo/rpc";
-import isEmpty from "@terminal/utils/is_empty";
-import {ARG} from "@trash/constants";
+import rpc from '@odoo/rpc';
+import isEmpty from '@terminal/utils/is_empty';
+import {ARG} from '@trash/constants';
 
 async function cmdCheckFieldAccess(kwargs) {
-  const fields = kwargs.field[0] === "*" ? false : kwargs.field;
+  const fields = kwargs.field[0] === '*' ? false : kwargs.field;
   const result = await rpc.query({
-    method: "fields_get",
+    method: 'fields_get',
     model: kwargs.model,
     args: [fields],
     kwargs: {context: this.getContext()},
@@ -34,14 +34,14 @@ async function cmdCheckFieldAccess(kwargs) {
   }
   const s_keys = Object.keys(s_result).sort();
   const fieldParams = [
-    "type",
-    "string",
-    "relation",
-    "required",
-    "readonly",
-    "searchable",
-    "translate",
-    "depends",
+    'type',
+    'string',
+    'relation',
+    'required',
+    'readonly',
+    'searchable',
+    'translate',
+    'depends',
   ];
   const rows = [];
   const len = s_keys.length;
@@ -57,31 +57,31 @@ async function cmdCheckFieldAccess(kwargs) {
     const l2 = fieldParams.length;
     for (let x2 = 0; x2 < l2; ++x2) {
       let value = fieldDef[fieldParams[x2]];
-      if (typeof value === "undefined" || value === null) {
-        value = "";
+      if (typeof value === 'undefined' || value === null) {
+        value = '';
       }
       rows[row_index].push(value);
     }
   }
-  fieldParams.unshift("field");
+  fieldParams.unshift('field');
   this.screen.printTable(fieldParams, rows);
   return s_result;
 }
 
 export default {
-  definition: "Check model fields access",
+  definition: 'Check model fields access',
   callback: cmdCheckFieldAccess,
-  detail: "Show readable/writeable fields of the selected model",
+  detail: 'Show readable/writeable fields of the selected model',
   args: [
-    [ARG.String, ["m", "model"], true, "The model technical name"],
+    [ARG.String, ['m', 'model'], true, 'The model technical name'],
     [
       ARG.List | ARG.String,
-      ["f", "field"],
+      ['f', 'field'],
       false,
-      "The field names to request",
-      ["*"],
+      'The field names to request',
+      ['*'],
     ],
-    [ARG.Dictionary, ["fi", "filter"], false, "The filter to apply"],
+    [ARG.Dictionary, ['fi', 'filter'], false, 'The filter to apply'],
   ],
-  example: "-m res.partner -f name,street",
+  example: '-m res.partner -f name,street',
 };

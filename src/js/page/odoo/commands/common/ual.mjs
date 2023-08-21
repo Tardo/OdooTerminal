@@ -1,18 +1,18 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from "@odoo/rpc";
+import rpc from '@odoo/rpc';
 
 async function cmdUpdateAppList() {
   return rpc
     .query({
-      method: "update_list",
-      model: "ir.module.module",
+      method: 'update_list',
+      model: 'ir.module.module',
       kwargs: {context: this.getContext()},
     })
-    .then((result) => {
+    .then(result => {
       if (result) {
-        this.screen.print("The apps list has been updated successfully");
+        this.screen.print('The apps list has been updated successfully');
       } else {
         this.screen.printError("Can't update the apps list!");
       }
@@ -21,7 +21,7 @@ async function cmdUpdateAppList() {
 }
 
 export default {
-  definition: "Update apps list",
+  definition: 'Update apps list',
   callback: cmdUpdateAppList,
-  detail: "Update apps list",
+  detail: 'Update apps list',
 };

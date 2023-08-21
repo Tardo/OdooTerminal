@@ -3,7 +3,7 @@
 
 export default function (filename, type, data) {
   const blob = new Blob([data], {type: type});
-  const elem = window.document.createElement("a");
+  const elem = window.document.createElement('a');
   const objURL = window.URL.createObjectURL(blob);
   elem.href = objURL;
   elem.download = filename;

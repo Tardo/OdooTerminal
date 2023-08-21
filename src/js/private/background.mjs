@@ -10,10 +10,10 @@
  * 'update_terminal_badge_info'.
  */
 
-import {SETTING_DEFAULTS, SETTING_NAMES} from "@common/constants";
-import {ubrowser} from "@shared/constants";
-import {getStorageSync, setStorageSync} from "@shared/storage";
-import {getActiveTab, sendInternalMessage} from "@shared/tabs";
+import {SETTING_DEFAULTS, SETTING_NAMES} from '@common/constants';
+import {ubrowser} from '@shared/constants';
+import {getStorageSync, setStorageSync} from '@shared/storage';
+import {getActiveTab, sendInternalMessage} from '@shared/tabs';
 
 /**
  * @param {String} icon - url to the icon
@@ -36,21 +36,21 @@ function updateBrowserAction(icon, text = null, bg_color = null) {
  * @param {Object} request
  */
 function onInternalMessage(request) {
-  if (request.message === "update_terminal_badge_info") {
+  if (request.message === 'update_terminal_badge_info') {
     const {context} = request;
-    const icon = context.isCompatible ? "terminal-16" : "terminal-disabled-16";
-    const color = context.isCompatible ? "#71639e" : "#878787";
+    const icon = context.isCompatible ? 'terminal-16' : 'terminal-disabled-16';
+    const color = context.isCompatible ? '#71639e' : '#878787';
     updateBrowserAction(icon, context.serverVersionRaw, color);
   }
 }
 
 function onInstalled() {
-  getStorageSync(SETTING_NAMES).then((items) => {
+  getStorageSync(SETTING_NAMES).then(items => {
     const to_update = {};
     for (const setting_name of SETTING_NAMES) {
       if (
-        typeof items[setting_name] === "undefined" &&
-        typeof SETTING_DEFAULTS[setting_name] !== "undefined"
+        typeof items[setting_name] === 'undefined' &&
+        typeof SETTING_DEFAULTS[setting_name] !== 'undefined'
       ) {
         to_update[setting_name] = SETTING_DEFAULTS[setting_name];
       }
@@ -62,17 +62,17 @@ function onInstalled() {
 function onRefreshOdooInfo(from_update) {
   // Because the script may be unavailable, we always assume
   // that the page is not compatible with the extension.
-  updateBrowserAction("terminal-disabled-16");
+  updateBrowserAction('terminal-disabled-16');
   // Query for active tab
-  getActiveTab().then((tab) => {
-    if (tab.status === "complete") {
+  getActiveTab().then(tab => {
+    if (tab.status === 'complete') {
       if (from_update) {
         // Request Odoo Info, wait 'idle' delay
         setTimeout(() => {
-          sendInternalMessage(tab.id, "update_odoo_terminal_info");
+          sendInternalMessage(tab.id, 'update_odoo_terminal_info');
         }, 150);
       } else {
-        sendInternalMessage(tab.id, "update_odoo_terminal_info");
+        sendInternalMessage(tab.id, 'update_odoo_terminal_info');
       }
     }
   });
@@ -82,7 +82,7 @@ function onRefreshOdooInfo(from_update) {
  * @param {Object} tab - The active tab
  */
 function onClickBrowserAction(tab) {
-  sendInternalMessage(tab.id, "toggle_terminal");
+  sendInternalMessage(tab.id, 'toggle_terminal');
 }
 
 // Listen 'content script' reply with the collected information

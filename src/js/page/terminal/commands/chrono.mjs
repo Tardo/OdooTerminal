@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ARG} from "@trash/constants";
+import {ARG} from '@trash/constants';
 
 async function cmdChrono(kwargs) {
   let time_elapsed_secs = -1;
@@ -13,12 +13,12 @@ async function cmdChrono(kwargs) {
 }
 
 export default {
-  definition: "Print the time expended executing a command",
+  definition: 'Print the time expended executing a command',
   callback: cmdChrono,
   detail:
-    "Print the elapsed time in seconds to execute a command. " +
-    "<br/>Notice that this time includes the time to format the result!",
-  syntax: "<STRING: COMMAND>",
-  args: [[ARG.String, ["c", "cmd"], true, "The command to run"]],
+    'Print the elapsed time in seconds to execute a command. ' +
+    '<br/>Notice that this time includes the time to format the result!',
+  syntax: '<STRING: COMMAND>',
+  args: [[ARG.String, ['c', 'cmd'], true, 'The command to run']],
   example: "-c 'search res.partner'",
 };

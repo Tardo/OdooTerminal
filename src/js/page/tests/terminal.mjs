@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import OdooTerminal from "@odoo/terminal";
-import isEmpty from "@terminal/utils/is_empty";
-import TestBackend from "./test_backend";
-import TestCommon from "./test_common";
-import TestCore from "./test_core";
-import TestTrash from "./test_trash";
+import OdooTerminal from '@odoo/terminal';
+import isEmpty from '@terminal/utils/is_empty';
+import TestBackend from './test_backend';
+import TestCommon from './test_common';
+import TestCore from './test_core';
+import TestTrash from './test_trash';
 
 const TestSuites = [TestTrash, TestCore, TestCommon, TestBackend];
 
@@ -17,13 +17,13 @@ export default class OdooTerminalTests extends OdooTerminal {
   createTerminal() {
     super.createTerminal();
     this.$el[0].addEventListener(
-      "start_terminal_tests",
-      this.onStartTests.bind(this)
+      'start_terminal_tests',
+      this.onStartTests.bind(this),
     );
   }
 
   onStartTests(ev) {
-    const test_names = (ev.detail || "").split(",").filter((item) => item);
+    const test_names = (ev.detail || '').split(',').filter(item => item);
     this.doShow().then(() => {
       this.screen.clean();
       return this.#runTests(test_names);
@@ -35,9 +35,9 @@ export default class OdooTerminalTests extends OdooTerminal {
     do {
       Object.getOwnPropertyNames(obj)
         .filter(
-          (item) => item.startsWith("test_") && typeof obj[item] === "function"
+          item => item.startsWith('test_') && typeof obj[item] === 'function',
         )
-        .map((item) => names.add(item));
+        .map(item => names.add(item));
     } while ((obj = Object.getPrototypeOf(obj)));
     return [...names];
   }
@@ -48,7 +48,7 @@ export default class OdooTerminalTests extends OdooTerminal {
       const test_suit = new TestClass(this);
       let names = this.#getTestMethods(test_suit);
       if (!isEmpty(test_names)) {
-        names = names.filter((item) => test_names.includes(item));
+        names = names.filter(item => test_names.includes(item));
       }
       if (!isEmpty(names)) {
         this.screen.print(`[info] Running '${TestClass.name}' tests...`);
@@ -58,12 +58,12 @@ export default class OdooTerminalTests extends OdooTerminal {
           await test_suit.onBeforeTest(name);
           try {
             await test_suit[name]();
-            this.screen.print("OK");
+            this.screen.print('OK');
             // Ensure that the terminal remains open
             this.doShow();
           } catch (e) {
             errors[name] = e;
-            this.screen.print("FAIL");
+            this.screen.print('FAIL');
             this.screen.printError(e.stack);
             if (this.config.console_errors) {
               console.error(e);
@@ -74,17 +74,17 @@ export default class OdooTerminalTests extends OdooTerminal {
         await test_suit.onEndTests(names);
       }
     }
-    this.screen.print("");
+    this.screen.print('');
     if (Object.keys(errors).length > 0) {
       // Soft-Error
       this.screen.print(
-        "ERRORS. The following test failed:",
+        'ERRORS. The following test failed:',
         false,
-        "terminal-test-fail"
+        'terminal-test-fail',
       );
       this.screen.print(Object.keys(errors));
       return errors;
     }
-    this.screen.print("OK. All tests passed.", false, "terminal-test-ok");
+    this.screen.print('OK. All tests passed.', false, 'terminal-test-ok');
   }
 }

@@ -3,7 +3,7 @@
 
 export default class extends Error {
   constructor(cmd_name, args) {
-    super("Invalid command arguments");
+    super('Invalid command arguments');
     this.name = this.constructor.name;
     this.cmd_name = cmd_name;
     this.args = args;

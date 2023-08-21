@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import Terminal from "@terminal/terminal";
-import Longpolling from "./longpolling";
-import ParameterGenerator from "./parameter_generator";
-import rpc from "./rpc";
-import renderWelcome from "./templates/welcome";
-import getOdooSession from "./utils/get_odoo_session";
+import Terminal from '@terminal/terminal';
+import Longpolling from './longpolling';
+import ParameterGenerator from './parameter_generator';
+import rpc from './rpc';
+import renderWelcome from './templates/welcome';
+import getOdooSession from './utils/get_odoo_session';
 
 export default class OdooTerminal extends Terminal {
   onBusNotification(notifications) {
@@ -14,7 +14,7 @@ export default class OdooTerminal extends Terminal {
     for (let x = 0; x < l; ++x) {
       const notif = notifications[x];
       this.screen.print(
-        `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</strong>`
+        `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</strong>`,
       );
       this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
       this.screen.print(notif[1], false);
@@ -57,7 +57,7 @@ export default class OdooTerminal extends Terminal {
    */
   onCoreClick(ev) {
     super.onCoreClick(ev);
-    if (ev.target.classList.contains("o_terminal_read_bin_field")) {
+    if (ev.target.classList.contains('o_terminal_read_bin_field')) {
       this.#onTryReadBinaryField(ev.target);
     }
   }
@@ -69,15 +69,15 @@ export default class OdooTerminal extends Terminal {
 
     rpc
       .query({
-        method: "search_read",
-        domain: [["id", "=", id]],
+        method: 'search_read',
+        domain: [['id', '=', id]],
         fields: [field],
         model: model,
         kwargs: {context: this.getContext()},
       })
-      .then((result) => {
+      .then(result => {
         target.parentNode.textContent = JSON.stringify(result[0][field]);
       })
-      .catch(() => (target.parentNode.textContent = "** Reading Error! **"));
+      .catch(() => (target.parentNode.textContent = '** Reading Error! **'));
   }
 }

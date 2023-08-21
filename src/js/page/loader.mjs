@@ -1,16 +1,16 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import "@css/terminal.css";
-import registerBackofficeFuncs from "@odoo/commands/backoffice/__all__";
-import registerCommonFuncs from "@odoo/commands/common/__all__";
-import OdooTerminal from "@odoo/terminal";
-import getOdooVersion from "@odoo/utils/get_odoo_version";
-import getUID from "@odoo/utils/get_uid";
-import getUsername from "@odoo/utils/get_username";
-import isBackOffice from "@odoo/utils/is_backoffice";
-import registerCoreFuncs from "@terminal/commands/__all__";
-import OdooTerminalTests from "@tests/terminal";
+import '@css/terminal.css';
+import registerBackofficeFuncs from '@odoo/commands/backoffice/__all__';
+import registerCommonFuncs from '@odoo/commands/common/__all__';
+import OdooTerminal from '@odoo/terminal';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
+import getUID from '@odoo/utils/get_uid';
+import getUsername from '@odoo/utils/get_username';
+import isBackOffice from '@odoo/utils/is_backoffice';
+import registerCoreFuncs from '@terminal/commands/__all__';
+import OdooTerminalTests from '@tests/terminal';
 
 let terminal = null;
 function getTerminalObj() {
@@ -20,7 +20,7 @@ function getTerminalObj() {
 
   const load_tests = window.__OdooTerminal.load_tests || navigator.webdriver;
   if (load_tests) {
-    console.info("[OdooTerminal] Tests Enabled"); // eslint-disable-line no-console
+    console.info('[OdooTerminal] Tests Enabled'); // eslint-disable-line no-console
   }
   try {
     const TerminalClass = load_tests ? OdooTerminalTests : OdooTerminal;
@@ -33,18 +33,18 @@ function getTerminalObj() {
   return terminal;
 }
 
-window.addEventListener("toggle_terminal", () => {
-  if (typeof window.__OdooTerminal !== "undefined") {
+window.addEventListener('toggle_terminal', () => {
+  if (typeof window.__OdooTerminal !== 'undefined') {
     getTerminalObj().doToggle();
   }
 });
 window.addEventListener(
-  "message",
-  (ev) => {
+  'message',
+  ev => {
     if (ev.source !== window) {
       return;
     }
-    if (ev.data.type === "ODOO_TERM_CONFIG") {
+    if (ev.data.type === 'ODOO_TERM_CONFIG') {
       window.__OdooTerminal = {
         raw_server_info: ev.data.info,
         load_tests: ev.data.config.devmode_tests,
@@ -67,13 +67,13 @@ window.addEventListener(
       }
     }
   },
-  true
+  true,
 );
 // This is used to communicate to the extension that the widget
 // is initialized successfully.
 window.postMessage(
   {
-    type: "ODOO_TERM_START",
+    type: 'ODOO_TERM_START',
   },
-  "*"
+  '*',
 );

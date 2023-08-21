@@ -5,10 +5,10 @@ import {
   getStorageItem,
   removeStorageItem,
   setStorageItem,
-} from "@terminal/core/storage/local";
-import {default as OdooRoot, doCall} from "./root";
-import getOdooService from "./utils/get_odoo_service";
-import getOdooVersionMajor from "./utils/get_odoo_version_major";
+} from '@terminal/core/storage/local';
+import {default as OdooRoot, doCall} from './root';
+import getOdooService from './utils/get_odoo_service';
+import getOdooVersionMajor from './utils/get_odoo_version_major';
 
 export default class Longpolling {
   #terminal = null;
@@ -17,20 +17,20 @@ export default class Longpolling {
     this.#terminal = terminal;
     const OdooVer = getOdooVersionMajor();
     if (OdooVer <= 11) {
-      this.#getBusService().on("notification", this, this.#onBusNotification);
+      this.#getBusService().on('notification', this, this.#onBusNotification);
     } else if (OdooVer >= 16) {
       this.#busServ(
-        "addEventListener",
-        "notification",
-        this.#onBusNotification.bind(this)
+        'addEventListener',
+        'notification',
+        this.#onBusNotification.bind(this),
       );
     } else {
-      this.#busServ("onNotification", this, this.#onBusNotification);
+      this.#busServ('onNotification', this, this.#onBusNotification);
     }
   }
 
   #getBusService() {
-    return getOdooService("bus.bus")?.bus;
+    return getOdooService('bus.bus')?.bus;
   }
 
   #busServ(method, ...params) {
@@ -38,11 +38,11 @@ export default class Longpolling {
     if (OdooVer >= 16) {
       const bus_serv = OdooRoot()?.env?.services?.bus_service;
       if (!bus_serv) {
-        throw new Error("bus service not available");
+        throw new Error('bus service not available');
       }
       return bus_serv[method](...params);
     }
-    return doCall("bus_service", method, ...params);
+    return doCall('bus_service', method, ...params);
   }
 
   addChannel(name) {
@@ -50,7 +50,7 @@ export default class Longpolling {
     if (OdooVer <= 11) {
       return this.#getBusService().add_channel(name);
     }
-    return this.#busServ("addChannel", name);
+    return this.#busServ('addChannel', name);
   }
 
   deleteChannel(name) {
@@ -58,7 +58,7 @@ export default class Longpolling {
     if (OdooVer <= 11) {
       return this.#getBusService().delete_channel(name);
     }
-    return this.#busServ("deleteChannel", name);
+    return this.#busServ('deleteChannel', name);
   }
 
   startPoll() {
@@ -66,9 +66,9 @@ export default class Longpolling {
     if (OdooVer <= 11) {
       return this.#getBusService().start_polling();
     } else if (OdooVer >= 16) {
-      return this.#busServ("forceUpdateChannels");
+      return this.#busServ('forceUpdateChannels');
     }
-    return this.#busServ("startPolling");
+    return this.#busServ('startPolling');
   }
 
   stopPoll() {
@@ -76,23 +76,23 @@ export default class Longpolling {
     if (OdooVer <= 11) {
       return this.#getBusService().stop_polling();
     } else if (OdooVer >= 16) {
-      return this.#busServ("stop");
+      return this.#busServ('stop');
     }
-    return this.#busServ("stopPolling");
+    return this.#busServ('stopPolling');
   }
 
   setVerbose(status) {
     if (status) {
-      setStorageItem("terminal_longpolling_mode", "verbose", (err) =>
-        this.screen.printHTML(err)
+      setStorageItem('terminal_longpolling_mode', 'verbose', err =>
+        this.screen.printHTML(err),
       );
     } else {
-      removeStorageItem("terminal_longpolling_mode");
+      removeStorageItem('terminal_longpolling_mode');
     }
   }
 
   isVerbose() {
-    getStorageItem("terminal_longpolling_mode");
+    getStorageItem('terminal_longpolling_mode');
   }
 
   //

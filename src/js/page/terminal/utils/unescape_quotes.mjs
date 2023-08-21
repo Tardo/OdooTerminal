@@ -2,5 +2,5 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 export default function (text) {
-  return text.replaceAll(/\\(['"])/g, "$1");
+  return text.replaceAll(/\\(['"])/g, '$1');
 }

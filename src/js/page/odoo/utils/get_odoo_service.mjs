@@ -7,8 +7,8 @@ export default function (...service_names) {
   if (Object.hasOwn(service_cache, service_names_set)) {
     return service_cache[service_names_set];
   }
-  const service_name = Array.from(service_names_set).find((sname) =>
-    Object.hasOwn(odoo.__DEBUG__.services, sname)
+  const service_name = Array.from(service_names_set).find(sname =>
+    Object.hasOwn(odoo.__DEBUG__.services, sname),
   );
   if (service_name) {
     const service = odoo.__DEBUG__.services[service_name];

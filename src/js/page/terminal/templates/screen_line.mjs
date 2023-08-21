@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import Recordset from "@terminal/core/recordset";
-import encodeHTML from "@terminal/utils/encode_html";
-import prettyObjectString from "@terminal/utils/pretty_object_string";
-import renderTable from "./screen_table";
-import renderTableCellRecord from "./screen_table_cell_record";
-import renderTableCellRecordId from "./screen_table_cell_record_id";
+import Recordset from '@terminal/core/recordset';
+import encodeHTML from '@terminal/utils/encode_html';
+import prettyObjectString from '@terminal/utils/pretty_object_string';
+import renderTable from './screen_table';
+import renderTableCellRecord from './screen_table_cell_record';
+import renderTableCellRecordId from './screen_table_cell_record_id';
 
 export function renderLineText(msg, cls) {
   return `<span class='line-text ${cls}'>${msg}</span>`;
@@ -26,7 +26,7 @@ export function renderLineObject(msg, cls) {
 }
 
 export function renderLineRecordsetTable(model, records, cls) {
-  const columns = ["id"];
+  const columns = ['id'];
   const len = records.length;
   const rows = [];
   for (let x = 0; x < len; ++x) {
@@ -38,7 +38,7 @@ export function renderLineRecordsetTable(model, records, cls) {
     let index = 0;
     while (index < keys_len) {
       const field = keys[index];
-      if (field === "id") {
+      if (field === 'id') {
         ++index;
         continue;
       }
@@ -52,7 +52,7 @@ export function renderLineRecordsetTable(model, records, cls) {
 
 export default function renderLine(msg, cls) {
   const res = [];
-  if (typeof msg === "object") {
+  if (typeof msg === 'object') {
     if (msg.constructor === Text) {
       res.push(renderLineText(msg, cls));
     } else if (msg instanceof Recordset) {

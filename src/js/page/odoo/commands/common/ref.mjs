@@ -1,9 +1,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from "@odoo/rpc";
-import getOdooVersionMajor from "@odoo/utils/get_odoo_version_major";
-import {ARG} from "@trash/constants";
+import rpc from '@odoo/rpc';
+import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import {ARG} from '@trash/constants';
 
 async function cmdRef(kwargs) {
   const OdooVer = getOdooVersionMajor();
@@ -13,34 +13,34 @@ async function cmdRef(kwargs) {
       tasks.push(
         rpc
           .query({
-            method: "xmlid_to_res_model_res_id",
-            model: "ir.model.data",
+            method: 'xmlid_to_res_model_res_id',
+            model: 'ir.model.data',
             args: [xmlid],
             kwargs: {context: this.getContext()},
           })
           .then(
             ((active_xmlid, result) => {
               return [active_xmlid, result[0], result[1]];
-            }).bind(this, xmlid)
-          )
+            }).bind(this, xmlid),
+          ),
       );
     } else {
-      const xmlid_parts = xmlid.split(".");
+      const xmlid_parts = xmlid.split('.');
       const module = xmlid_parts[0];
-      const xid = xmlid_parts.slice(1).join(".");
+      const xid = xmlid_parts.slice(1).join('.');
       tasks.push(
         rpc
           .query({
-            method: "check_object_reference",
-            model: "ir.model.data",
+            method: 'check_object_reference',
+            model: 'ir.model.data',
             args: [module, xid],
             kwargs: {context: this.getContext()},
           })
           .then(
             ((active_xmlid, result) => {
               return [active_xmlid, result[0], result[1]];
-            }).bind(this, xmlid)
-          )
+            }).bind(this, xmlid),
+          ),
       );
     }
   }
@@ -52,7 +52,7 @@ async function cmdRef(kwargs) {
     const item = results[x];
     rows[row_index].push(item[0], item[1], item[2]);
   }
-  this.screen.printTable(["XML ID", "Res. Model", "Res. ID"], rows);
+  this.screen.printTable(['XML ID', 'Res. Model', 'Res. ID'], rows);
   return results;
 }
 
@@ -60,6 +60,6 @@ export default {
   definition: "Show the referenced model and id of the given xmlid's",
   callback: cmdRef,
   detail: "Show the referenced model and id of the given xmlid's",
-  args: [[ARG.List | ARG.String, ["x", "xmlid"], true, "The XML-ID"]],
-  example: "-x base.main_company,base.model_res_partner",
+  args: [[ARG.List | ARG.String, ['x', 'xmlid'], true, 'The XML-ID']],
+  example: '-x base.main_company,base.model_res_partner',
 };

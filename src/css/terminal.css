@@ -1,265 +1,265 @@
 /* Copyright  Alexandre Díaz <dev@redneboa.es> */
 /* License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). */
 :root {
-    --terminal-input-height: 25px;
-    --terminal-shadow-input-color: #4a4a4a;
-    --terminal-screen-width: 70%;
-    --terminal-screen-width-maximized: 100%;
-    --terminal-screen-background-color: black;
-    --terminal-screen-assistant-background-color: #222300;
-    --terminal-screen-text-color: lightgray;
-    --terminal-screen-font: "Lucida Console", Monaco, monospace;
-    --terminal-screen-extra-info-color: darkkhaki;
-    --terminal-screen-height: 40vh;
-    --terminal-screen-height-maximized: 100vh;
-    --terminal-title-color: rgb(124, 123, 173);
+  --terminal-input-height: 25px;
+  --terminal-shadow-input-color: #4a4a4a;
+  --terminal-screen-width: 70%;
+  --terminal-screen-width-maximized: 100%;
+  --terminal-screen-background-color: black;
+  --terminal-screen-assistant-background-color: #222300;
+  --terminal-screen-text-color: lightgray;
+  --terminal-screen-font: 'Lucida Console', Monaco, monospace;
+  --terminal-screen-extra-info-color: darkkhaki;
+  --terminal-screen-height: 40vh;
+  --terminal-screen-height-maximized: 100vh;
+  --terminal-title-color: rgb(124, 123, 173);
 }
 
 .o_terminal {
-    box-shadow: 1px 1px 10px #cecece;
-    border: 0 solid gray;
-    border-width: 1px 1px 0 1px;
-    font-family: var(--terminal-screen-font);
-    font-size: 14px;
-    left: 50%;
-    position: fixed;
-    top: -110%;
-    transform: translate(-50%, 0);
-    width: var(--terminal-screen-width);
-    z-index: 1041;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
-    transition: 200ms;
-    transition-timing-function: ease-out;
-    height: var(--terminal-screen-height);
+  box-shadow: 1px 1px 10px #cecece;
+  border: 0 solid gray;
+  border-width: 1px 1px 0 1px;
+  font-family: var(--terminal-screen-font);
+  font-size: 14px;
+  left: 50%;
+  position: fixed;
+  top: -110%;
+  transform: translate(-50%, 0);
+  width: var(--terminal-screen-width);
+  z-index: 1041;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  transition: 200ms;
+  transition-timing-function: ease-out;
+  height: var(--terminal-screen-height);
 }
 
 .o_terminal.term-maximized {
-    width: var(--terminal-screen-width-maximized);
-    height: var(--terminal-screen-height-maximized);
-    border-width: 0;
+  width: var(--terminal-screen-width-maximized);
+  height: var(--terminal-screen-height-maximized);
+  border-width: 0;
 }
 
 .o_terminal div#terminal_screen {
-    background-color: var(--terminal-screen-background-color);
-    caret-color: var(--terminal-screen-text-color);
-    color: var(--terminal-screen-text-color);
-    height: 100%;
-    opacity: 0.93;
-    overflow-y: scroll;
-    padding: 0;
-    resize: none;
-    scrollbar-color: var(--terminal-screen-text-color)
-        var(--terminal-screen-background-color);
-    white-space: pre;
+  background-color: var(--terminal-screen-background-color);
+  caret-color: var(--terminal-screen-text-color);
+  color: var(--terminal-screen-text-color);
+  height: 100%;
+  opacity: 0.93;
+  overflow-y: scroll;
+  padding: 0;
+  resize: none;
+  scrollbar-color: var(--terminal-screen-text-color)
+    var(--terminal-screen-background-color);
+  white-space: pre;
 }
 .o_terminal div#terminal_screen::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  width: 6px;
+  height: 6px;
 }
 .o_terminal div#terminal_screen::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 .o_terminal div#terminal_screen::-webkit-scrollbar-thumb {
-    background-color: var(--terminal-screen-text-color);
+  background-color: var(--terminal-screen-text-color);
 }
 
 .o_terminal div#terminal_screen hr {
-    border-color: gray;
+  border-color: gray;
 }
 
 .o_terminal div#terminal_screen .o_terminal_title {
-    color: var(--terminal-title-color);
+  color: var(--terminal-title-color);
 }
 
 .o_terminal div#terminal_screen .o_terminal_click {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 .o_terminal div#terminal_screen .o_terminal_click:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .o_terminal div#terminal_screen .error_message {
-    background-color: darkred;
-    border: 1px solid red;
-    padding: 0.3em;
-    border-radius: 3px;
-    margin: 0.3em;
-    display: block;
-    overflow: auto;
+  background-color: darkred;
+  border: 1px solid red;
+  padding: 0.3em;
+  border-radius: 3px;
+  margin: 0.3em;
+  display: block;
+  overflow: auto;
 }
 .o_terminal div#terminal_screen .error_message > div {
-    white-space: normal;
+  white-space: normal;
 }
 .o_terminal div#terminal_screen .error_message > div > ul {
-    list-style-type: disclosure-closed;
-    margin-bottom: 0;
-    margin-top: 1.3em;
-    padding-left: 2em;
+  list-style-type: disclosure-closed;
+  margin-bottom: 0;
+  margin-top: 1.3em;
+  padding-left: 2em;
 }
 .o_terminal div#terminal_screen .error_message > div > ul > li {
-    margin-bottom: 3px;
+  margin-bottom: 3px;
 }
 .o_terminal div#terminal_screen .error_message .card-body {
-    color: black;
-    border-radius: 0;
+  color: black;
+  border-radius: 0;
 }
-.o_terminal div#terminal_screen .error_message li[name="debug"] .card-body {
-    white-space: pre;
+.o_terminal div#terminal_screen .error_message li[name='debug'] .card-body {
+  white-space: pre;
 }
 .o_terminal div#terminal_screen .error_message h4 {
-    color: var(--terminal-screen-text-color);
-    margin: 0;
+  color: var(--terminal-screen-text-color);
+  margin: 0;
 }
 
 .o_terminal div#terminal_screen .line-text {
-    white-space: normal;
+  white-space: normal;
 }
 
 .o_terminal div#terminal_screen .line-text .print-table {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 .o_terminal div#terminal_screen .line-pre {
-    white-space: pre;
+  white-space: pre;
 }
 
 .o_terminal div#terminal_screen .line-br::after {
-    content: "\A";
-    white-space: pre;
+  content: '\A';
+  white-space: pre;
 }
 
 .o_terminal div#terminal_screen .line-array {
-    margin-left: 1em;
+  margin-left: 1em;
 }
 .o_terminal div#terminal_screen .line-array:before {
-    content: "- ";
+  content: '- ';
 }
 
 .o_terminal div#terminal_assistant {
-    font-size: x-small;
+  font-size: x-small;
 }
 
 .o_terminal div#terminal_assistant > div#terminal_assistant_args {
-    background-color: var(--terminal-screen-assistant-background-color);
+  background-color: var(--terminal-screen-assistant-background-color);
 }
 
 .o_terminal .terminal-user-input {
-    background-color: var(--terminal-screen-background-color);
-    border: 1px dotted #5a5a5a;
-    border-width: 1px 0 0 0;
-    color: var(--terminal-screen-text-color);
+  background-color: var(--terminal-screen-background-color);
+  border: 1px dotted #5a5a5a;
+  border-width: 1px 0 0 0;
+  color: var(--terminal-screen-text-color);
 
-    display: flex;
+  display: flex;
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt-container {
-    padding: 3px;
-    max-width: 15%;
-    display: flex;
+  padding: 3px;
+  max-width: 15%;
+  display: flex;
 }
 .o_terminal
-    .terminal-user-input
-    > .terminal-prompt-container.terminal-prompt-interactive {
-    max-width: 50%;
+  .terminal-user-input
+  > .terminal-prompt-container.terminal-prompt-interactive {
+  max-width: 50%;
 }
 .o_terminal
-    .terminal-user-input
-    > .terminal-prompt-container
-    > .terminal-prompt {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: bold;
+  .terminal-user-input
+  > .terminal-prompt-container
+  > .terminal-prompt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
 }
 
 .o_terminal
-    .terminal-user-input
-    > .terminal-prompt-info-container
-    > .terminal-prompt-info {
-    white-space: nowrap;
+  .terminal-user-input
+  > .terminal-prompt-info-container
+  > .terminal-prompt-info {
+  white-space: nowrap;
 }
 
 .o_terminal .terminal-user-input .rich-input {
-    position: relative;
-    flex: 1 1 auto;
+  position: relative;
+  flex: 1 1 auto;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input {
-    background-color: transparent;
+  background-color: transparent;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_shadow_input {
-    color: var(--terminal-shadow-input-color);
-    pointer-events: none;
+  color: var(--terminal-shadow-input-color);
+  pointer-events: none;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input,
 .o_terminal .terminal-user-input .rich-input > #terminal_shadow_input {
-    flex: 1 1 auto; /* Here to force BS4 behavior */
-    position: absolute;
-    width: 100%;
-    padding: 3px;
+  flex: 1 1 auto; /* Here to force BS4 behavior */
+  position: absolute;
+  width: 100%;
+  padding: 3px;
 }
 
 .o_terminal .terminal-user-input input {
-    background-color: var(--terminal-screen-background-color);
-    border: 0;
-    caret-color: var(--terminal-screen-text-color);
-    color: var(--terminal-screen-text-color);
-    height: var(--terminal-input-height);
+  background-color: var(--terminal-screen-background-color);
+  border: 0;
+  caret-color: var(--terminal-screen-text-color);
+  color: var(--terminal-screen-text-color);
+  height: var(--terminal-input-height);
 }
 
-.o_terminal .terminal-user-input input[type="edit"] {
-    padding: 0;
+.o_terminal .terminal-user-input input[type='edit'] {
+  padding: 0;
 }
 .o_terminal .terminal-user-input input:active,
 .o_terminal .terminal-user-input input:focus {
-    outline: none;
+  outline: none;
 }
 
 .o_terminal .print-table thead th {
-    border: 1px solid white;
-    border-width: 0 1px 1px 0;
+  border: 1px solid white;
+  border-width: 0 1px 1px 0;
 }
 .o_terminal .print-table tbody td {
-    border: 1px solid white;
-    border-width: 1px 1px 0 0;
+  border: 1px solid white;
+  border-width: 1px 1px 0 0;
 }
 .o_terminal .print-table thead th,
 .o_terminal .print-table tbody td {
-    padding: 0.3em;
+  padding: 0.3em;
 }
 .o_terminal .print-table tbody tr:hover {
-    background-color: lightgray;
-    color: black;
+  background-color: lightgray;
+  color: black;
 }
 
 .o_terminal .print-table thead th:last-child,
 .o_terminal .print-table tbody td:last-child {
-    border-right-width: 0;
+  border-right-width: 0;
 }
 
 .o_terminal .terminal-screen-info-zone {
-    margin: 1em;
-    position: absolute;
-    right: 1em;
-    top: 0;
-    z-index: 10;
+  margin: 1em;
+  position: absolute;
+  right: 1em;
+  top: 0;
+  z-index: 10;
 }
 .o_terminal .terminal-screen-info-zone .terminal-screen-running-cmds {
-    color: var(--terminal-screen-extra-info-color);
+  color: var(--terminal-screen-extra-info-color);
 }
 
 /** HELP COMMAND **/
 .o_terminal .terminal-info-section {
-    margin-left: 2em;
+  margin-left: 2em;
 }
 .o_terminal .terminal-info-section .terminal-info-description {
-    margin-left: 2em;
+  margin-left: 2em;
 }
 
 /* TRANSITIONS */
 .terminal-transition-topdown {
-    top: 0;
-    transition: 350ms;
-    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  top: 0;
+  transition: 350ms;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }

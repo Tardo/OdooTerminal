@@ -1,21 +1,21 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from "@odoo/rpc";
-import renderMetadata from "@odoo/templates/metadata";
-import {ARG} from "@trash/constants";
+import rpc from '@odoo/rpc';
+import renderMetadata from '@odoo/templates/metadata';
+import {ARG} from '@trash/constants';
 
 async function cmdMetadata(kwargs) {
   const metadata = (
     await rpc.query({
-      method: "get_metadata",
+      method: 'get_metadata',
       model: kwargs.model,
       args: [[kwargs.id]],
       kwargs: {context: this.getContext()},
     })
   )[0];
 
-  if (typeof metadata === "undefined") {
+  if (typeof metadata === 'undefined') {
     this.screen.print("Can't found any metadata for the given id");
   } else {
     this.screen.print(renderMetadata(metadata));
@@ -24,12 +24,12 @@ async function cmdMetadata(kwargs) {
 }
 
 export default {
-  definition: "View record metadata",
+  definition: 'View record metadata',
   callback: cmdMetadata,
-  detail: "View record metadata",
+  detail: 'View record metadata',
   args: [
-    [ARG.String, ["m", "model"], true, "The record model"],
-    [ARG.Number, ["i", "id"], true, "The record id"],
+    [ARG.String, ['m', 'model'], true, 'The record model'],
+    [ARG.Number, ['i', 'id'], true, 'The record id'],
   ],
-  example: "-m res.partner -i 1",
+  example: '-m res.partner -i 1',
 };

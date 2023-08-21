@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import encodeHTML from "@terminal/utils/encode_html";
+import encodeHTML from '@terminal/utils/encode_html';
 
 export default function (PROMPT) {
   return `<div class='terminal-user-input'>

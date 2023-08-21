@@ -6,7 +6,7 @@ async function cmdReloadPage() {
 }
 
 export default {
-  definition: "Reload current page",
+  definition: 'Reload current page',
   callback: cmdReloadPage,
-  detail: "Reload current page.",
+  detail: 'Reload current page.',
 };

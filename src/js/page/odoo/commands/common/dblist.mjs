@@ -1,13 +1,13 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from "@odoo/rpc";
-import getOdooSession from "@odoo/utils/get_odoo_session";
-import {ARG} from "@trash/constants";
+import rpc from '@odoo/rpc';
+import getOdooSession from '@odoo/utils/get_odoo_session';
+import {ARG} from '@trash/constants';
 
 async function cmdShowDBList(kwargs) {
   const session = getOdooSession();
-  const _onSuccess = (databases) => {
+  const _onSuccess = databases => {
     const databases_len = databases.length;
     if (!databases_len) {
       // Soft-Error
@@ -38,21 +38,21 @@ async function cmdShowDBList(kwargs) {
     this.screen.print(s_databases);
     return databases;
   };
-  const _onError = (err) => {
+  const _onError = err => {
     if (!kwargs.only_active) {
       throw err;
     }
     // Heuristic way to determine the database name
     return rpc
       .query({
-        route: "/websocket/peek_notifications",
+        route: '/websocket/peek_notifications',
         params: [
-          ["channels", []],
-          ["last", 9999999],
-          ["is_first_poll", true],
+          ['channels', []],
+          ['last', 9999999],
+          ['is_first_poll', true],
         ],
       })
-      .then((result) => {
+      .then(result => {
         if (result.channels[0]) {
           const dbname = result.channels[0][0];
           this.screen.eprint(dbname);
@@ -62,32 +62,32 @@ async function cmdShowDBList(kwargs) {
       });
   };
   const queryParams = {
-    route: "/jsonrpc",
+    route: '/jsonrpc',
     params: {
-      service: "db",
-      method: "list",
+      service: 'db',
+      method: 'list',
       args: {},
     },
   };
 
   // Check if using deferred jquery or native promises
   const prom = rpc.query(queryParams);
-  if ("catch" in prom) {
+  if ('catch' in prom) {
     return prom.then(_onSuccess).catch(_onError);
   }
   return prom.then(_onSuccess).fail(_onError);
 }
 
 export default {
-  definition: "Show database names",
+  definition: 'Show database names',
   callback: cmdShowDBList,
-  detail: "Show database names",
+  detail: 'Show database names',
   args: [
     [
       ARG.Flag,
-      ["oa", "only-active"],
+      ['oa', 'only-active'],
       false,
-      "Indicates that only print the active database name",
+      'Indicates that only print the active database name',
     ],
   ],
 };

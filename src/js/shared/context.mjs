@@ -27,6 +27,6 @@ export function updateContext(...values) {
  */
 export function getResources() {
   return {
-    js: ["dist/pub/loader.mjs"],
+    js: ['dist/pub/loader.mjs'],
   };
 }

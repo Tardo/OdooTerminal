@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ubrowser} from "./constants.mjs";
+import {ubrowser} from './constants.mjs';
 
 /**
  * Helper function to inject an script.
@@ -9,12 +9,12 @@ import {ubrowser} from "./constants.mjs";
  * @param {Function} callback - The function to call when scripts loads
  */
 export function injectPageScript(doc, script, callback) {
-  const script_page = doc.createElement("script");
-  const [script_ext] = script.split(".").slice(-1);
-  if (script_ext === "mjs") {
-    script_page.setAttribute("type", "module");
+  const script_page = doc.createElement('script');
+  const [script_ext] = script.split('.').slice(-1);
+  if (script_ext === 'mjs') {
+    script_page.setAttribute('type', 'module');
   } else {
-    script_page.setAttribute("type", "text/javascript");
+    script_page.setAttribute('type', 'text/javascript');
   }
   (doc.head || doc.documentElement).appendChild(script_page);
   if (callback) {
@@ -28,9 +28,9 @@ export function injectPageScript(doc, script, callback) {
  * @param {String} css - The URL
  */
 export function injectPageCSS(doc, css) {
-  const link_page = doc.createElement("link");
-  link_page.setAttribute("rel", "stylesheet");
-  link_page.setAttribute("type", "text/css");
+  const link_page = doc.createElement('link');
+  link_page.setAttribute('rel', 'stylesheet');
+  link_page.setAttribute('type', 'text/css');
   (doc.head || doc.documentElement).appendChild(link_page);
   link_page.href = ubrowser.extension.getURL(css);
 }

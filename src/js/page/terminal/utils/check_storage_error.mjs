@@ -8,19 +8,19 @@
  * @returns {Boolean}
  */
 export default function (err) {
-  if (err.name !== "QuotaExceededError") {
+  if (err.name !== 'QuotaExceededError') {
     return false;
   }
   return (
     "<span style='color:navajowhite'>" +
-    "<strong>WARNING:</strong> Clear the " +
+    '<strong>WARNING:</strong> Clear the ' +
     "<b class='o_terminal_click o_terminal_cmd' " +
     "data-cmd='clear screen' style='color:orange;'>screen</b> " +
-    "or/and " +
+    'or/and ' +
     "<b class='o_terminal_click o_terminal_cmd' " +
     "data-cmd='clear history' style='color:orange;'>" +
-    "history</b> " +
-    "to free storage space. Browser <u>Storage Quota Exceeded</u>" +
-    " 😭 </strong><br>"
+    'history</b> ' +
+    'to free storage space. Browser <u>Storage Quota Exceeded</u>' +
+    ' 😭 </strong><br>'
   );
 }

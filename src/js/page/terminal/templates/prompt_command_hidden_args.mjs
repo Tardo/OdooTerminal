@@ -2,5 +2,5 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 export default function (values) {
-  return `${values.prompt} ${values.cmd.split(" ")[0]} *****`;
+  return `${values.prompt} ${values.cmd.split(' ')[0]} *****`;
 }

@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 /** This is a clone of Odoo implementation but without data transformations and adapted to new versions */
-import getOdooService from "./utils/get_odoo_service";
+import getOdooService from './utils/get_odoo_service';
 
 const rpc = {
   /**
@@ -16,11 +16,11 @@ const rpc = {
    */
   query: function (params, options) {
     const query = this.buildQuery(params);
-    const rpc_service = getOdooService("web.ajax", "@web/legacy/js/core/ajax");
-    if (Object.hasOwn(rpc_service, "rpc")) {
+    const rpc_service = getOdooService('web.ajax', '@web/legacy/js/core/ajax');
+    if (Object.hasOwn(rpc_service, 'rpc')) {
       return rpc_service.rpc(query.route, query.params, options);
     }
-    return rpc_service.jsonRpc(query.route, "call", query.params, options);
+    return rpc_service.jsonRpc(query.route, 'call', query.params, options);
   },
 
   /**
@@ -47,7 +47,7 @@ const rpc = {
     if (options.route) {
       route = options.route;
     } else if (options.model && options.method) {
-      route = "/web/dataset/call_kw/" + options.model + "/" + options.method;
+      route = '/web/dataset/call_kw/' + options.model + '/' + options.method;
     }
     if (options.method) {
       params.args = options.args || [];
@@ -58,7 +58,7 @@ const rpc = {
         options.context || params.context || params.kwargs.context;
 
       // Compatibility with Odoo 12.0-
-      if (options.route === "/jsonrpc" && options.method === "server_version") {
+      if (options.route === '/jsonrpc' && options.method === 'server_version') {
         const keys_count = Object.keys(params.kwargs).length;
         if (!keys_count || (keys_count === 1 && !params.kwargs.context)) {
           delete params.kwargs;
@@ -67,8 +67,8 @@ const rpc = {
     }
 
     if (
-      options.method === "read_group" ||
-      options.method === "web_read_group"
+      options.method === 'read_group' ||
+      options.method === 'web_read_group'
     ) {
       if (!(params.args && params.args[0] !== undefined)) {
         params.kwargs.domain =
@@ -90,9 +90,9 @@ const rpc = {
       // since the Python argument to the actual function is "orderby".
       orderBy = options.orderBy || params.orderBy || params.kwargs.orderby;
       params.kwargs.orderby = orderBy;
-      params.kwargs.lazy = "lazy" in options ? options.lazy : params.lazy;
+      params.kwargs.lazy = 'lazy' in options ? options.lazy : params.lazy;
 
-      if (options.method === "web_read_group") {
+      if (options.method === 'web_read_group') {
         params.kwargs.expand =
           options.expand || params.expand || params.kwargs.expand;
         params.kwargs.expand_limit =
@@ -107,7 +107,7 @@ const rpc = {
       }
     }
 
-    if (options.method === "search_read") {
+    if (options.method === 'search_read') {
       // Call the model method
       params.kwargs.domain =
         options.domain || params.domain || params.kwargs.domain;
@@ -123,7 +123,7 @@ const rpc = {
       params.kwargs.order = orderBy;
     }
 
-    if (options.route === "/web/dataset/search_read") {
+    if (options.route === '/web/dataset/search_read') {
       // Specifically call the controller
       params.model = options.model || params.model;
       params.domain = options.domain || params.domain;

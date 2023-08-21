@@ -79,7 +79,7 @@ export const INSTRUCTION_TYPE = {
   UNITARY_POSITIVE: 23,
 
   getHumanType: function (type) {
-    return Object.entries(this).find((item) => item[1] === type) || "";
+    return Object.entries(this).find(item => item[1] === type) || '';
   },
 };
 
@@ -128,36 +128,36 @@ export const ARG = {
       }
     }
     if ((atype & this.List) === this.List) {
-      return `LIST OF ${utypes.join(" or ")}`;
+      return `LIST OF ${utypes.join(' or ')}`;
     }
-    return utypes.join(" or ");
+    return utypes.join(' or ');
   },
   getType: function (val) {
     const cname = val.constructor.name;
-    if (cname === "String") {
+    if (cname === 'String') {
       return this.String;
-    } else if (cname === "Number") {
+    } else if (cname === 'Number') {
       return this.Number;
-    } else if (cname === "Object") {
+    } else if (cname === 'Object') {
       return this.Dictionary;
-    } else if (cname === "Boolean") {
+    } else if (cname === 'Boolean') {
       return this.Flag;
-    } else if (cname === "Array") {
+    } else if (cname === 'Array') {
       return this.List;
     }
     return this.Any;
   },
   cast: function (val, atype) {
     const cname = val.constructor.name;
-    if (atype === this.String && cname !== "String") {
+    if (atype === this.String && cname !== 'String') {
       return String(val);
-    } else if (atype === this.Number && cname !== "Number") {
+    } else if (atype === this.Number && cname !== 'Number') {
       return Number(val);
-    } else if (atype === this.Dictionary && cname !== "Object") {
+    } else if (atype === this.Dictionary && cname !== 'Object') {
       return Object.fromEntries(val);
-    } else if (atype === this.Flag && cname !== "Boolean") {
+    } else if (atype === this.Flag && cname !== 'Boolean') {
       return Boolean(val);
-    } else if (atype === this.List && cname !== "Array") {
+    } else if (atype === this.List && cname !== 'Array') {
       return [val];
     }
     return val;
@@ -165,34 +165,34 @@ export const ARG = {
 };
 
 export const SYMBOLS = {
-  ADD: "+",
-  SUBSTRACT: "-",
-  MULTIPLY: "*",
-  DIVIDE: "/",
-  MODULO: "%",
-  POW: "^",
-  CONCAT: "+",
-  ASSIGNMENT: "=",
-  ARGUMENT: "-",
-  ARRAY_START: "[",
-  ARRAY_END: "]",
-  DICTIONARY_SEPARATOR: ":",
-  ITEM_DELIMITER: ",",
-  RUNNER_START: "(",
-  RUNNER_END: ")",
+  ADD: '+',
+  SUBSTRACT: '-',
+  MULTIPLY: '*',
+  DIVIDE: '/',
+  MODULO: '%',
+  POW: '^',
+  CONCAT: '+',
+  ASSIGNMENT: '=',
+  ARGUMENT: '-',
+  ARRAY_START: '[',
+  ARRAY_END: ']',
+  DICTIONARY_SEPARATOR: ':',
+  ITEM_DELIMITER: ',',
+  RUNNER_START: '(',
+  RUNNER_END: ')',
   STRING: '"',
   STRING_SIMPLE: "'",
-  VARIABLE: "$",
-  SPACE: " ",
-  EOC: ";",
-  EOL: "\n",
-  ESCAPE: "\\",
-  MATH_START: "(",
-  MATH_END: ")",
-  MATH_BLOCK_START: "(",
-  MATH_BLOCK_END: ")",
-  BLOCK_START: "{",
-  BLOCK_END: "}",
+  VARIABLE: '$',
+  SPACE: ' ',
+  EOC: ';',
+  EOL: '\n',
+  ESCAPE: '\\',
+  MATH_START: '(',
+  MATH_END: ')',
+  MATH_BLOCK_START: '(',
+  MATH_BLOCK_END: ')',
+  BLOCK_START: '{',
+  BLOCK_END: '}',
 };
 
 export const SYMBOLS_MATH_OPER = new Set([
@@ -207,10 +207,10 @@ export const SYMBOLS_MATH_OPER = new Set([
 export const SYMBOLS_MATH_SIGN = [SYMBOLS.ADD, SYMBOLS.SUBSTRACT];
 
 export const KEYWORDS = {
-  TRUE: "true",
-  FALSE: "false",
-  FOR: "for",
-  IN: "in",
+  TRUE: 'true',
+  FALSE: 'false',
+  FOR: 'for',
+  IN: 'in',
 };
 
 export const MATH_OPER_PRIORITIES = [
@@ -225,34 +225,34 @@ export const MATH_OPER_PRIORITIES = [
 // FIXME: Inaccurate keymap
 //      '_' and '-' positions are only valid for spanish layout
 export const KEYMAP = [
-  "q",
-  "w",
-  "e",
-  "r",
-  "t",
-  "y",
-  "u",
-  "i",
-  "o",
-  "p",
-  "a",
-  "s",
-  "d",
-  "f",
-  "g",
-  "h",
-  "j",
-  "k",
-  "l",
+  'q',
+  'w',
+  'e',
+  'r',
+  't',
+  'y',
+  'u',
+  'i',
+  'o',
+  'p',
+  'a',
+  's',
+  'd',
+  'f',
+  'g',
+  'h',
+  'j',
+  'k',
+  'l',
   null,
-  "z",
-  "x",
-  "c",
-  "v",
-  "b",
-  "n",
-  "m",
-  "_",
-  "-",
+  'z',
+  'x',
+  'c',
+  'v',
+  'b',
+  'n',
+  'm',
+  '_',
+  '-',
   null,
 ];

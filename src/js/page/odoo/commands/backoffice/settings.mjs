@@ -1,34 +1,34 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {doAction} from "@odoo/root";
-import {ARG} from "@trash/constants";
+import {doAction} from '@odoo/root';
+import {ARG} from '@trash/constants';
 
 async function cmdOpenSettings(kwargs) {
   await doAction({
-    name: "Settings",
-    type: "ir.actions.act_window",
-    res_model: "res.config.settings",
-    view_mode: "form",
-    views: [[false, "form"]],
-    target: "inline",
+    name: 'Settings',
+    type: 'ir.actions.act_window',
+    res_model: 'res.config.settings',
+    view_mode: 'form',
+    views: [[false, 'form']],
+    target: 'inline',
     context: {module: kwargs.module},
   });
   this.doHide();
 }
 
 export default {
-  definition: "Open settings page",
+  definition: 'Open settings page',
   callback: cmdOpenSettings,
-  detail: "Open settings page.",
+  detail: 'Open settings page.',
   args: [
     [
       ARG.String,
-      ["m", "module"],
+      ['m', 'module'],
       false,
-      "The module technical name",
-      "general_settings",
+      'The module technical name',
+      'general_settings',
     ],
   ],
-  example: "-m sale_management",
+  example: '-m sale_management',
 };

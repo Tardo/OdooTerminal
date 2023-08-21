@@ -1,19 +1,19 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import isEmpty from "@terminal/utils/is_empty";
+import isEmpty from '@terminal/utils/is_empty';
 
 const RecordHandler = {
   get(target, prop) {
     if (
-      prop === "toJSON" ||
-      prop === "toWrite" ||
-      prop === "rollback" ||
-      prop === "persist" ||
-      typeof prop === "symbol"
+      prop === 'toJSON' ||
+      prop === 'toWrite' ||
+      prop === 'rollback' ||
+      prop === 'persist' ||
+      typeof prop === 'symbol'
     ) {
       const ref = target[prop];
-      if (typeof ref === "function") {
+      if (typeof ref === 'function') {
         return ref.bind(target);
       }
       return target[prop];
@@ -76,7 +76,7 @@ class Record {
   }
 
   [Symbol.toPrimitive](hint) {
-    if (hint === "string") {
+    if (hint === 'string') {
       return JSON.stringify(this.values);
     }
   }
@@ -84,22 +84,22 @@ class Record {
 
 const RecordsetHandler = {
   get(target, prop) {
-    if (prop === "model") {
+    if (prop === 'model') {
       return target.model;
-    } else if (prop === "ids") {
+    } else if (prop === 'ids') {
       return target.ids;
-    } else if (prop === "length") {
+    } else if (prop === 'length') {
       return target.length;
     } else if (
-      prop === "toWrite" ||
-      prop === "rollback" ||
-      prop === "persist" ||
-      prop === "toJSON" ||
-      prop === "map" ||
-      typeof prop === "symbol"
+      prop === 'toWrite' ||
+      prop === 'rollback' ||
+      prop === 'persist' ||
+      prop === 'toJSON' ||
+      prop === 'map' ||
+      typeof prop === 'symbol'
     ) {
       const ref = target[prop];
-      if (typeof ref === "function") {
+      if (typeof ref === 'function') {
         return ref.bind(target);
       }
       return target[prop];
@@ -171,7 +171,7 @@ export default class Recordset {
   }
 
   map(key) {
-    return this.records.map((item) => item[key]);
+    return this.records.map(item => item[key]);
   }
 
   get length() {

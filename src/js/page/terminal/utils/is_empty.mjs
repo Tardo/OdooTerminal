@@ -4,7 +4,7 @@
 export default function (data) {
   return (
     !data ||
-    (data.constructor.name === "Object" && Object.keys(data).length === 0) ||
-    (data.constructor.name === "Array" && data.length === 0)
+    (data.constructor.name === 'Object' && Object.keys(data).length === 0) ||
+    (data.constructor.name === 'Array' && data.length === 0)
   );
 }

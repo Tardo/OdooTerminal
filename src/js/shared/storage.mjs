@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ubrowser} from "./constants.mjs";
+import {ubrowser} from './constants.mjs';
 
 /**
  * @param {String/Array} keys
@@ -9,7 +9,7 @@ import {ubrowser} from "./constants.mjs";
  */
 export function getStorageSync(keys) {
   return new Promise((resolve, reject) => {
-    ubrowser.storage.sync.get(keys, (items) => {
+    ubrowser.storage.sync.get(keys, items => {
       if (ubrowser.runtime?.lastError) {
         reject(ubrowser.runtime.lastError);
       } else {
@@ -25,7 +25,7 @@ export function getStorageSync(keys) {
  */
 export function setStorageSync(values) {
   return new Promise((resolve, reject) => {
-    ubrowser.storage.sync.set(values, (items) => {
+    ubrowser.storage.sync.set(values, items => {
       if (ubrowser.runtime?.lastError) {
         return reject(ubrowser.runtime.lastError);
       }

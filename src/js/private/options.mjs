@@ -1,15 +1,15 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import processKeybind from "@common/utils/process_keybind";
-import "@css/options.css";
-import {getStorageSync, setStorageSync} from "@shared/storage";
+import processKeybind from '@common/utils/process_keybind';
+import '@css/options.css';
+import {getStorageSync, setStorageSync} from '@shared/storage';
 import {
   IGNORED_KEYS,
   SETTING_DEFAULTS,
   SETTING_NAMES,
   SETTING_TYPES,
-} from "../common/constants.mjs";
+} from '../common/constants.mjs';
 
 let unique_counter = 1;
 let shortcuts_defs = {};
@@ -25,31 +25,31 @@ function onClickShortcutRemove(e) {
 function renderShortcutTableItem(
   elm_shortcut_table,
   shortcut_keybind,
-  shortcut_cmds
+  shortcut_cmds,
 ) {
   const row_id = `shorcut-${unique_counter++}`;
-  const tbody = elm_shortcut_table.getElementsByTagName("tbody")[0];
+  const tbody = elm_shortcut_table.getElementsByTagName('tbody')[0];
   const new_row = tbody.insertRow();
   const new_cell_keybind = new_row.insertCell(0);
   const new_cell_cmds = new_row.insertCell(1);
   const new_cell_options = new_row.insertCell(2);
-  new_row.setAttribute("id", row_id);
-  new_cell_keybind.innerText = JSON.parse(shortcut_keybind || "[]").join(" + ");
+  new_row.setAttribute('id', row_id);
+  new_cell_keybind.innerText = JSON.parse(shortcut_keybind || '[]').join(' + ');
   new_cell_cmds.innerText = shortcut_cmds;
-  const elm_link_remove = document.createElement("a");
+  const elm_link_remove = document.createElement('a');
   elm_link_remove.id = `${row_id}-remove'`;
-  elm_link_remove.innerText = "Remove";
-  elm_link_remove.href = "#";
-  elm_link_remove.classList.add("shortcut_remove");
+  elm_link_remove.innerText = 'Remove';
+  elm_link_remove.href = '#';
+  elm_link_remove.classList.add('shortcut_remove');
   elm_link_remove.dataset.target = row_id;
   elm_link_remove.dataset.keybind = shortcut_keybind;
   new_cell_options.appendChild(elm_link_remove);
-  elm_link_remove.addEventListener("click", onClickShortcutRemove, false);
+  elm_link_remove.addEventListener('click', onClickShortcutRemove, false);
 }
 
 function renderShortcutTable() {
-  const elm_shortcut_table = document.querySelector("#shorcut_table");
-  const tbody = elm_shortcut_table.getElementsByTagName("tbody")[0];
+  const elm_shortcut_table = document.querySelector('#shorcut_table');
+  const tbody = elm_shortcut_table.getElementsByTagName('tbody')[0];
   while (tbody.rows.length > 0) {
     tbody.deleteRow(0);
   }
@@ -57,7 +57,7 @@ function renderShortcutTable() {
     renderShortcutTableItem(
       elm_shortcut_table,
       shortcut_keybind,
-      shortcuts_defs[shortcut_keybind]
+      shortcuts_defs[shortcut_keybind],
     );
   }
 }
@@ -66,16 +66,16 @@ function saveOptions() {
   const data = {};
   for (const name of SETTING_NAMES) {
     const type = SETTING_TYPES[name];
-    if (type === "manual") {
+    if (type === 'manual') {
       continue;
     }
     const target = document.querySelector(`#${name}`);
-    let value = "";
-    if (type === "edit" || type === "int") {
+    let value = '';
+    if (type === 'edit' || type === 'int') {
       value = target.value;
-    } else if (type === "check") {
+    } else if (type === 'check') {
       value = target.checked;
-    } else if (type === "json") {
+    } else if (type === 'json') {
       value = JSON.parse(target.value);
     }
     data[name] = value;
@@ -85,22 +85,22 @@ function saveOptions() {
 }
 
 function applyInputValues() {
-  getStorageSync(SETTING_NAMES).then((result) => {
+  getStorageSync(SETTING_NAMES).then(result => {
     const cmd_names = Object.keys(result);
     for (const name of cmd_names) {
       const type = SETTING_TYPES[name];
-      if (type === "manual") {
+      if (type === 'manual') {
         continue;
       }
       const item = document.querySelector(`#${name}`);
-      if (type === "edit") {
-        item.value = result[name] || "";
-      } else if (type === "check") {
+      if (type === 'edit') {
+        item.value = result[name] || '';
+      } else if (type === 'check') {
         item.checked = result[name] || false;
-      } else if (type === "int") {
+      } else if (type === 'int') {
         item.value = result[name] || 0;
-      } else if (type === "json") {
-        item.value = JSON.stringify(result[name], null, 4) || "{}";
+      } else if (type === 'json') {
+        item.value = JSON.stringify(result[name], null, 4) || '{}';
       }
     }
     shortcuts_defs = result.shortcuts || {};
@@ -117,13 +117,13 @@ function onKeyDownShortcut(e) {
   const keybind = processKeybind(e);
   if (IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
     e.target.dataset.keybind = JSON.stringify(keybind);
-    e.target.value = keybind.join(" + ");
+    e.target.value = keybind.join(' + ');
   } else {
-    e.target.dataset.keybind = "";
+    e.target.dataset.keybind = '';
     if (keybind.length) {
-      e.target.value = `${keybind.join(" + ")} + `;
+      e.target.value = `${keybind.join(' + ')} + `;
     } else {
-      e.target.value = "";
+      e.target.value = '';
     }
   }
   e.preventDefault();
@@ -131,24 +131,24 @@ function onKeyDownShortcut(e) {
 
 function onKeyUpShortcut(e) {
   if (!e.target.dataset.keybind) {
-    e.target.value = "";
+    e.target.value = '';
   }
 }
 
 function onClickShortcutAdd() {
-  const elm_shortcut_keybind = document.querySelector("#shortcut_keybind");
-  const elm_shortcut_cmds = document.querySelector("#shortcut_commands");
+  const elm_shortcut_keybind = document.querySelector('#shortcut_keybind');
+  const elm_shortcut_cmds = document.querySelector('#shortcut_commands');
   if (elm_shortcut_keybind.value && elm_shortcut_cmds.value) {
-    const elm_shortcut_table = document.querySelector("#shorcut_table");
+    const elm_shortcut_table = document.querySelector('#shorcut_table');
     shortcuts_defs[elm_shortcut_keybind.dataset.keybind] =
       elm_shortcut_cmds.value;
     renderShortcutTableItem(
       elm_shortcut_table,
       elm_shortcut_keybind.dataset.keybind,
-      elm_shortcut_cmds.value
+      elm_shortcut_cmds.value,
     );
-    elm_shortcut_keybind.value = "";
-    elm_shortcut_cmds.value = "";
+    elm_shortcut_keybind.value = '';
+    elm_shortcut_cmds.value = '';
   }
 }
 
@@ -159,19 +159,19 @@ function onClickResetSettings() {
 
 function onDOMLoaded() {
   applyInputValues();
-  document.querySelector("form").addEventListener("submit", onSubmitForm);
+  document.querySelector('form').addEventListener('submit', onSubmitForm);
   document
-    .querySelector("#shortcut_keybind")
-    .addEventListener("keydown", onKeyDownShortcut);
+    .querySelector('#shortcut_keybind')
+    .addEventListener('keydown', onKeyDownShortcut);
   document
-    .querySelector("#shortcut_keybind")
-    .addEventListener("keyup", onKeyUpShortcut);
+    .querySelector('#shortcut_keybind')
+    .addEventListener('keyup', onKeyUpShortcut);
   document
-    .querySelector("#add_shortcut")
-    .addEventListener("click", onClickShortcutAdd);
+    .querySelector('#add_shortcut')
+    .addEventListener('click', onClickShortcutAdd);
   document
-    .querySelector("#reset_settings")
-    .addEventListener("click", onClickResetSettings);
+    .querySelector('#reset_settings')
+    .addEventListener('click', onClickResetSettings);
 }
 
-document.addEventListener("DOMContentLoaded", onDOMLoaded);
+document.addEventListener('DOMContentLoaded', onDOMLoaded);

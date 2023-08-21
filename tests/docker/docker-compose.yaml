@@ -1,23 +1,23 @@
-version: "3.9"
+version: '3.9'
 
 services:
   odoo:
     build:
       context: .
       args:
-        UID: "${UID:-1000}"
-        GID: "${GID:-1000}"
-        WITHOUT_DEMO: ""
+        UID: '${UID:-1000}'
+        GID: '${GID:-1000}'
+        WITHOUT_DEMO: ''
     environment:
-      EMAIL_FROM: ""
+      EMAIL_FROM: ''
       PGDATABASE: &dbname test
-      PGUSER: &dbuser "odoo"
+      PGUSER: &dbuser 'odoo'
       PGPASSWORD: &dbpass supersecretpassword
-      PROXY_MODE: "false"
-      LIST_DB: "true"
+      PROXY_MODE: 'false'
+      LIST_DB: 'true'
     tty: true
     ports:
-      - "8069:8069"
+      - '8069:8069'
 
   db:
     image: ghcr.io/tecnativa/postgres-autoconf:13-alpine

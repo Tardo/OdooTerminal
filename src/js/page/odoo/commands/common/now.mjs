@@ -1,25 +1,25 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import getOdooService from "@odoo/utils/get_odoo_service";
-import {ARG} from "@trash/constants";
+import getOdooService from '@odoo/utils/get_odoo_service';
+import {ARG} from '@trash/constants';
 
 async function cmdNow(kwargs) {
-  const time = getOdooService("web.time");
+  const time = getOdooService('web.time');
   let res = false;
-  if (kwargs.type === "full") {
+  if (kwargs.type === 'full') {
     if (kwargs.tz) {
       res = moment().format(time.getLangDatetimeFormat());
     } else {
       res = time.datetime_to_str(new Date());
     }
-  } else if (kwargs.type === "date") {
+  } else if (kwargs.type === 'date') {
     if (kwargs.tz) {
       res = moment().format(time.getLangDateFormat());
     } else {
       res = time.date_to_str(new Date());
     }
-  } else if (kwargs.type === "time") {
+  } else if (kwargs.type === 'time') {
     if (kwargs.tz) {
       res = moment().format(time.getLangTimeFormat());
     } else {
@@ -32,19 +32,19 @@ async function cmdNow(kwargs) {
 }
 
 export default {
-  definition: "Current time",
+  definition: 'Current time',
   callback: cmdNow,
-  detail: "Prints the current time",
+  detail: 'Prints the current time',
   args: [
     [
       ARG.String,
-      ["t", "type"],
+      ['t', 'type'],
       false,
-      "Date type",
-      "full",
-      ["full", "date", "time"],
+      'Date type',
+      'full',
+      ['full', 'date', 'time'],
     ],
-    [ARG.Flag, ["tz", "tz"], false, "Use timezone", false],
+    [ARG.Flag, ['tz', 'tz'], false, 'Use timezone', false],
   ],
-  example: "-t time --tz",
+  example: '-t time --tz',
 };

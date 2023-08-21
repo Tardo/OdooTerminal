@@ -1,18 +1,18 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import asyncSleep from "@terminal/utils/async_sleep";
-import getOdooService from "./utils/get_odoo_service";
-import getOdooVersionMajor from "./utils/get_odoo_version_major";
+import asyncSleep from '@terminal/utils/async_sleep';
+import getOdooService from './utils/get_odoo_service';
+import getOdooVersionMajor from './utils/get_odoo_version_major';
 
 export default function OdooRoot() {
-  return getOdooService("root.widget", "web.web_client");
+  return getOdooService('root.widget', 'web.web_client');
 }
 
 export async function doAction(action, options) {
   const OdooVer = getOdooVersionMajor();
   if (OdooVer >= 15) {
-    OdooRoot().env.bus.trigger("do-action", {
+    OdooRoot().env.bus.trigger('do-action', {
       action: action,
       options: options,
     });
@@ -23,7 +23,7 @@ export async function doAction(action, options) {
   }
 
   return new Promise((resolve, reject) => {
-    OdooRoot().trigger_up("do_action", {
+    OdooRoot().trigger_up('do_action', {
       action: action,
       options: options,
       on_success: resolve,
@@ -38,7 +38,7 @@ export function doCall(service, method) {
   let result = null;
   const trigger =
     OdooVer >= 15 ? OdooRoot().env.bus.trigger : OdooRoot().trigger_up;
-  trigger.bind(OdooRoot())("call_service", {
+  trigger.bind(OdooRoot())('call_service', {
     service: service,
     method: method,
     args: args,
@@ -55,7 +55,7 @@ export function showEffect(type, options) {
     return;
   }
   const payload = Object.assign({}, options, {type: type});
-  OdooRoot().env.bus.trigger("show-effect", payload);
+  OdooRoot().env.bus.trigger('show-effect', payload);
 }
 
 export function executeAction(payload) {
@@ -63,5 +63,5 @@ export function executeAction(payload) {
   if (OdooVer < 15) {
     return;
   }
-  OdooRoot().env.bus.trigger("execute-action", payload);
+  OdooRoot().env.bus.trigger('execute-action', payload);
 }

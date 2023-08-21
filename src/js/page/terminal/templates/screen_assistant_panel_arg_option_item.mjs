@@ -3,8 +3,8 @@
 
 export default function (option, index, selected_option_index) {
   return `<li class="nav-item"><a class="nav-link ${
-    option.is_default ? "text-secondary" : ""
-  } ${option.is_required ? "text-warning" : ""} ${
-    index === selected_option_index ? "bg-info active" : ""
+    option.is_default ? 'text-secondary' : ''
+  } ${option.is_required ? 'text-warning' : ''} ${
+    index === selected_option_index ? 'bg-info active' : ''
   }" data-string="${option.string}" href="#">${option.name}</a></li>`;
 }

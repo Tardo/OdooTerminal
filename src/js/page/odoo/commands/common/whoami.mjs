@@ -1,25 +1,25 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from "@odoo/rpc";
-import renderWhoami from "@odoo/templates/whoami";
-import renderWhoamiListItem from "@odoo/templates/whoami_group_item";
-import getUID from "@odoo/utils/get_uid";
+import rpc from '@odoo/rpc';
+import renderWhoami from '@odoo/templates/whoami';
+import renderWhoamiListItem from '@odoo/templates/whoami_group_item';
+import getUID from '@odoo/utils/get_uid';
 
 async function cmdShowWhoAmI() {
   const result = await rpc.query({
-    method: "search_read",
-    domain: [["id", "=", getUID()]],
+    method: 'search_read',
+    domain: [['id', '=', getUID()]],
     fields: [
-      "id",
-      "display_name",
-      "login",
-      "partner_id",
-      "company_id",
-      "company_ids",
-      "groups_id",
+      'id',
+      'display_name',
+      'login',
+      'partner_id',
+      'company_id',
+      'company_ids',
+      'groups_id',
     ],
-    model: "res.users",
+    model: 'res.users',
     kwargs: {context: this.getContext()},
   });
   if (!result.length) {
@@ -28,31 +28,31 @@ async function cmdShowWhoAmI() {
   const record = result[0];
   const result_tasks = await Promise.all([
     rpc.query({
-      method: "name_get",
-      model: "res.groups",
+      method: 'name_get',
+      model: 'res.groups',
       args: [record.groups_id],
       kwargs: {context: this.getContext()},
     }),
     rpc.query({
-      method: "name_get",
-      model: "res.company",
+      method: 'name_get',
+      model: 'res.company',
       args: [record.company_ids],
       kwargs: {context: this.getContext()},
     }),
   ]);
-  let groups_list = "";
+  let groups_list = '';
   for (const group of result_tasks[0]) {
     groups_list += renderWhoamiListItem({
       name: group[1],
-      model: "res.groups",
+      model: 'res.groups',
       id: group[0],
     });
   }
-  let companies_list = "";
+  let companies_list = '';
   for (const company of result_tasks[1]) {
     companies_list += renderWhoamiListItem({
       name: company[1],
-      model: "res.company",
+      model: 'res.company',
       id: company[0],
     });
   }
@@ -70,7 +70,7 @@ async function cmdShowWhoAmI() {
 }
 
 export default {
-  definition: "Know current user login",
+  definition: 'Know current user login',
   callback: cmdShowWhoAmI,
-  detail: "Shows current user login",
+  detail: 'Shows current user login',
 };

@@ -6,7 +6,7 @@ async function cmdQuit() {
 }
 
 export default {
-  definition: "Close terminal",
+  definition: 'Close terminal',
   callback: cmdQuit,
-  detail: "Close the terminal.",
+  detail: 'Close the terminal.',
 };
