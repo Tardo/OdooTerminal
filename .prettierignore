@@ -4,3 +4,4 @@ dist
 *.code-workspace
 *.lock
 *.toml
+package-lock.json
