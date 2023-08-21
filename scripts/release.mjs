@@ -21,7 +21,7 @@ function replaceFileVersion(filepath, cregex, nvalue) {
 }
 
 function update_version(mode) {
-  const extension_ver = getCurrentVersion();
+  let extension_ver = getCurrentVersion();
   if (mode === 'major') {
     extension_ver[0] = extension_ver[0] + 1;
     extension_ver[1] = 0;
