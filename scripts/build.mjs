@@ -5,6 +5,8 @@ import {execSync} from 'child_process';
 import AdmZip from 'adm-zip';
 import {rimraf} from 'rimraf';
 
+const ZIP_NAME = 'OdooTerminal';
+
 function removeDist() {
   rimraf.sync('./dist');
 }
@@ -15,7 +17,7 @@ function execRollup() {
 
 function createZipArchive() {
   const zip = new AdmZip();
-  const outputFile = 'OdooTerminal.zip';
+  const outputFile = `${ZIP_NAME}.zip`;
 
   zip.addLocalFolder('./src/html', './src/html');
   zip.addLocalFolder('./src/img', './src/img');
@@ -29,4 +31,4 @@ removeDist();
 execRollup();
 createZipArchive();
 
-console.log(`Build ${outputFile} successfully done`);
+console.log(`Build ${ZIP_NAME} successfully completed`);
