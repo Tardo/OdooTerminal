@@ -43,8 +43,8 @@ function update_version(mode) {
   // abstract_terminal.js
   replaceFileVersion(
     './src/js/page/terminal/terminal.mjs',
-    /VERSION\s?=\s?"\d+\.\d+\.\d+"/,
-    `VERSION = "${extension_ver}"`,
+    /VERSION\s?=\s?'\d+\.\d+\.\d+'/,
+    `VERSION = '${extension_ver}'`,
   );
   // pyproject.toml
   replaceFileVersion(

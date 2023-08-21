@@ -21,7 +21,7 @@ import debounce from './utils/debounce';
 import isEmpty from './utils/is_empty';
 
 export default class Terminal {
-  VERSION = '10.1.1';
+  VERSION = '10.2.0';
 
   userContext = {};
 
