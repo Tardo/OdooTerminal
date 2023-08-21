@@ -15,6 +15,17 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.eval(
       "[[ 1, 2, 3 ,4], ['test', 'this','lalala lo,  lolo', [12,   3,    [123   ,'oops'   , {   key: 'the value'}]]]]",
     );
+    this.assertEqual(results[0][0][0], 1);
+    this.assertEqual(results[0][0][1], 2);
+    this.assertEqual(results[0][0][2], 3);
+    this.assertEqual(results[0][0][3], 4);
+    this.assertEqual(results[0][1][0], 'test');
+    this.assertEqual(results[0][1][1], 'this');
+    this.assertEqual(results[0][1][2], 'lalala lo,  lolo');
+    this.assertEqual(results[0][1][3][0], 12);
+    this.assertEqual(results[0][1][3][1], 3);
+    this.assertEqual(results[0][1][3][2][0], 123);
+    this.assertEqual(results[0][1][3][2][1], 'oops');
     this.assertEqual(results[0][1][3][2][2].key, 'the value');
 
     // Dictionary
@@ -29,6 +40,13 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.eval(
       "{keyA: 1234, keyB: 'the value', keyC: 'the, value', keyD: {keyA: 23, keyB: [2,33,4], keyC: {keyA   :   'the, value'}}}",
     );
+    this.assertEqual(results[0].keyA, 1234);
+    this.assertEqual(results[0].keyB, 'the value');
+    this.assertEqual(results[0].keyC, 'the, value');
+    this.assertEqual(results[0].keyD.keyA, 23);
+    this.assertEqual(results[0].keyD.keyB[0], 2);
+    this.assertEqual(results[0].keyD.keyB[1], 33);
+    this.assertEqual(results[0].keyD.keyB[2], 4);
     this.assertEqual(results[0].keyD.keyC.keyA, 'the, value');
 
     // Global variables
