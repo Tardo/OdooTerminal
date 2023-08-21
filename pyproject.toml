@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "OdooTerminal"
+name = "OdooTerminal Tests"
 version = "10.1.1"
-description = "All the power of Odoo json-rpc in a really easy way!"
+description = "OdooTerminal Test Environment Packages"
 authors = ["Alexandre D. Díaz <dev@redneboa.es>"]
 
 [tool.poetry.dependencies]
@@ -12,7 +12,6 @@ pytest = "^7.4.0"
 selenium = "^4.11.0"
 webdriver-manager = "^4.0.0"
 python-on-whales = "^0.64.0"
-GitPython = "^3.1.32"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

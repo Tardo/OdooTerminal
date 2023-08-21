@@ -5,6 +5,7 @@
 ```
 IMP: More modules
 IMP: Reduced loading time to ~24ms
+IMP: Changed 'pre-commit' to 'husky' (no more problems with npm packages)
 
 FIX: TraSH: Interpreter dictionaries
 ```

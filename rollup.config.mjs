@@ -1,74 +1,74 @@
 /* eslint-disable */
-import alias from "@rollup/plugin-alias";
-import {nodeResolve} from "@rollup/plugin-node-resolve";
-import terser from "@rollup/plugin-terser";
-import autoprefixer from "autoprefixer";
-import cssnano from "cssnano";
-import path from "path";
-import analyze from "rollup-plugin-analyzer";
-import postcss from "rollup-plugin-postcss";
+import alias from '@rollup/plugin-alias';
+import {nodeResolve} from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
+import autoprefixer from 'autoprefixer';
+import cssnano from 'cssnano';
+import path from 'path';
+import analyze from 'rollup-plugin-analyzer';
+import postcss from 'rollup-plugin-postcss';
 
-const is_production = process.env.NODE_ENV === "production";
+const is_production = process.env.ODOO_TERMINAL_ENV === 'production';
 
 export default [
   {
-    input: "src/js/private/legacy/content_script.js",
+    input: 'src/js/private/legacy/content_script.js',
     output: {
-      sourcemap: (!is_production && "inline") || false,
-      format: "iife",
-      dir: "dist/priv",
-      entryFileNames: "[name].js",
-      chunkFileNames: "[name]-[hash].js",
+      sourcemap: (!is_production && 'inline') || false,
+      format: 'iife',
+      dir: 'dist/priv',
+      entryFileNames: '[name].js',
+      chunkFileNames: '[name]-[hash].js',
     },
     plugins: [is_production && terser(), is_production && analyze()],
     watch: {
       clearScreen: false,
-      include: ["src/js/private/legacy/content_script.js"],
+      include: ['src/js/private/legacy/content_script.js'],
     },
   },
   {
     input: [
-      "src/js/page/loader.mjs",
-      "src/js/page/volatile/instance_analyzer.mjs",
-      "src/js/shared/content_script.mjs",
+      'src/js/page/loader.mjs',
+      'src/js/page/volatile/instance_analyzer.mjs',
+      'src/js/shared/content_script.mjs',
     ],
     output: {
-      sourcemap: (!is_production && "inline") || false,
-      format: "esm",
-      dir: "dist/pub",
-      entryFileNames: "[name].mjs",
-      chunkFileNames: "[name]-[hash].mjs",
+      sourcemap: (!is_production && 'inline') || false,
+      format: 'esm',
+      dir: 'dist/pub',
+      entryFileNames: '[name].mjs',
+      chunkFileNames: '[name]-[hash].mjs',
     },
     plugins: [
       alias({
         entries: [
           {
-            find: "@common",
-            replacement: path.resolve("src/js/common"),
+            find: '@common',
+            replacement: path.resolve('src/js/common'),
           },
           {
-            find: "@shared",
-            replacement: path.resolve("src/js/shared"),
+            find: '@shared',
+            replacement: path.resolve('src/js/shared'),
           },
           {
-            find: "@odoo",
-            replacement: path.resolve("src/js/page/odoo"),
+            find: '@odoo',
+            replacement: path.resolve('src/js/page/odoo'),
           },
           {
-            find: "@terminal",
-            replacement: path.resolve("src/js/page/terminal"),
+            find: '@terminal',
+            replacement: path.resolve('src/js/page/terminal'),
           },
           {
-            find: "@trash",
-            replacement: path.resolve("src/js/page/trash"),
+            find: '@trash',
+            replacement: path.resolve('src/js/page/trash'),
           },
           {
-            find: "@tests",
-            replacement: path.resolve("src/js/page/tests"),
+            find: '@tests',
+            replacement: path.resolve('src/js/page/tests'),
           },
           {
-            find: "@css",
-            replacement: path.resolve("src/css"),
+            find: '@css',
+            replacement: path.resolve('src/css'),
           },
         ],
       }),
@@ -84,36 +84,36 @@ export default [
     watch: {
       clearScreen: false,
       include: [
-        "src/js/common/**",
-        "src/js/page/**",
-        "src/js/shared/**",
-        "src/css/**",
+        'src/js/common/**',
+        'src/js/page/**',
+        'src/js/shared/**',
+        'src/css/**',
       ],
     },
   },
   {
-    input: ["src/js/private/options.mjs", "src/js/private/background.mjs"],
+    input: ['src/js/private/options.mjs', 'src/js/private/background.mjs'],
     output: {
-      sourcemap: (!is_production && "inline") || false,
-      format: "esm",
-      dir: "dist/priv",
-      entryFileNames: "[name].mjs",
-      chunkFileNames: "[name]-[hash].mjs",
+      sourcemap: (!is_production && 'inline') || false,
+      format: 'esm',
+      dir: 'dist/priv',
+      entryFileNames: '[name].mjs',
+      chunkFileNames: '[name]-[hash].mjs',
     },
     plugins: [
       alias({
         entries: [
           {
-            find: "@common",
-            replacement: path.resolve("src/js/common"),
+            find: '@common',
+            replacement: path.resolve('src/js/common'),
           },
           {
-            find: "@shared",
-            replacement: path.resolve("src/js/shared"),
+            find: '@shared',
+            replacement: path.resolve('src/js/shared'),
           },
           {
-            find: "@css",
-            replacement: path.resolve("src/css"),
+            find: '@css',
+            replacement: path.resolve('src/css'),
           },
         ],
       }),
@@ -128,7 +128,7 @@ export default [
     ],
     watch: {
       clearScreen: false,
-      include: ["src/css/**", "src/js/private/**"],
+      include: ['src/css/**', 'src/js/private/**'],
     },
   },
 ];
