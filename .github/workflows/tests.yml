@@ -62,7 +62,7 @@ jobs:
 
   selenium:
     name: Selenium Tests
-    needs: web-ext
+    needs: validations
     strategy:
       matrix:
         # Use only lower and higher versions
