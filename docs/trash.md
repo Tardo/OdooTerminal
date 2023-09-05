@@ -1,4 +1,4 @@
-# TrasSH
+# TraSH
 
 TraSH is the pseudo-language used in the Terminal. It is necessary to circumvent
 the use of 'eval' (necessary to pass the extension store checks) and not have
