@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import callModelMulti from '@odoo/osv/call_model_multi';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 import {searchModules} from './__utils__';
@@ -34,11 +34,14 @@ async function cmdUninstallModule(kwargs) {
       }
     }
 
-    await rpc.query({
-      method: 'button_immediate_uninstall',
-      model: 'ir.module.module',
-      args: [modue_infos[0].id],
-    });
+    await callModelMulti(
+      'ir.module.module',
+      modue_infos[0].id,
+      'button_immediate_uninstall',
+      null,
+      null,
+      this.getContext(),
+    );
 
     this.screen.print(
       `'${kwargs.module}' (${modue_infos[0].display_name}) module successfully uninstalled`,
@@ -56,5 +59,5 @@ export default {
     [ARG.String, ['m', 'module'], true, 'The module technical name'],
     [ARG.Flag, ['f', 'force'], false, 'Forced mode'],
   ],
-  exmaple: '-m contacts',
+  example: '-m contacts',
 };

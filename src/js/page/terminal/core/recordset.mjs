@@ -124,7 +124,7 @@ const RecordsetHandler = {
 
 export default class Recordset {
   #model = null;
-  records = [];
+  #records = [];
 
   static isValid(obj) {
     return obj instanceof Recordset;
@@ -139,17 +139,17 @@ export default class Recordset {
     this.#model = model;
     for (const rec_vals of values) {
       const record = new Record(rec_vals);
-      this.records.push(new Proxy(record, RecordHandler));
+      this.#records.push(new Proxy(record, RecordHandler));
     }
   }
 
   toJSON() {
-    return this.records;
+    return this.#records;
   }
 
   toWrite() {
     const write_vals = [];
-    for (const rec of this.records) {
+    for (const rec of this.#records) {
       const values = rec.toWrite();
       if (!isEmpty(values)) {
         write_vals.push([rec.id, values]);
@@ -159,32 +159,36 @@ export default class Recordset {
   }
 
   rollback() {
-    for (const rec of this.records) {
+    for (const rec of this.#records) {
       rec.rollback();
     }
   }
 
   persist() {
-    for (const rec of this.records) {
+    for (const rec of this.#records) {
       rec.persist();
     }
   }
 
   map(key) {
-    return this.records.map(item => item[key]);
+    return this.#records.map(item => item[key]);
   }
 
   get length() {
-    return this.records.length;
+    return this.#records.length;
   }
 
   get model() {
     return this.#model;
   }
 
+  get records() {
+    return this.#records;
+  }
+
   get ids() {
     const id_vals = [];
-    for (const rec of this.records) {
+    for (const rec of this.#records) {
       id_vals.push(rec.id);
     }
     return id_vals;
@@ -195,7 +199,7 @@ export default class Recordset {
   }
 
   *[Symbol.iterator]() {
-    for (const rec of this.records) {
+    for (const rec of this.#records) {
       yield rec;
     }
   }

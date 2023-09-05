@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import writeRecord from '@odoo/orm/write_record';
 import Recordset from '@terminal/core/recordset';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
@@ -20,12 +20,7 @@ async function cmdCommit(kwargs) {
   const tasks = [];
   for (const [rec_id, values] of values_to_write) {
     tasks.push(
-      rpc.query({
-        method: 'write',
-        model: kwargs.recordset.model,
-        args: [rec_id, values],
-        kwargs: {context: this.getContext()},
-      }),
+      writeRecord(kwargs.recordset.model, rec_id, values, this.getContext()),
     );
     pids.push(rec_id);
   }

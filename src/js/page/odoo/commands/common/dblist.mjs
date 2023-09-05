@@ -2,6 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import rpc from '@odoo/rpc';
+import callService from '@odoo/osv/call_service';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import {ARG} from '@trash/constants';
 
@@ -61,17 +62,9 @@ async function cmdShowDBList(kwargs) {
         return false;
       });
   };
-  const queryParams = {
-    route: '/jsonrpc',
-    params: {
-      service: 'db',
-      method: 'list',
-      args: {},
-    },
-  };
 
   // Check if using deferred jquery or native promises
-  const prom = rpc.query(queryParams);
+  const prom = callService('db', 'list', {});
   if ('catch' in prom) {
     return prom.then(_onSuccess).catch(_onError);
   }

@@ -1,18 +1,20 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import callModelMulti from '@odoo/osv/call_model_multi';
 import renderMetadata from '@odoo/templates/metadata';
 import {ARG} from '@trash/constants';
 
 async function cmdMetadata(kwargs) {
   const metadata = (
-    await rpc.query({
-      method: 'get_metadata',
-      model: kwargs.model,
-      args: [[kwargs.id]],
-      kwargs: {context: this.getContext()},
-    })
+    await callModelMulti(
+      kwargs.model,
+      [kwargs.id],
+      'get_metadata',
+      null,
+      null,
+      this.getContext(),
+    )
   )[0];
 
   if (typeof metadata === 'undefined') {

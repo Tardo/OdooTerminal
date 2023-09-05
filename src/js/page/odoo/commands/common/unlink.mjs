@@ -1,21 +1,16 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import unlinkRecord from '@odoo/orm/unlink_record';
 import {ARG} from '@trash/constants';
 
 async function cmdUnlinkModelRecord(kwargs) {
-  return rpc
-    .query({
-      method: 'unlink',
-      model: kwargs.model,
-      args: [kwargs.id],
-      kwargs: {context: this.getContext()},
-    })
-    .then(result => {
+  return unlinkRecord(kwargs.model, kwargs.id, this.getContext()).then(
+    result => {
       this.screen.print(`${kwargs.model} record deleted successfully`);
       return result;
-    });
+    },
+  );
 }
 
 export default {

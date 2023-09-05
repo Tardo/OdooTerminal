@@ -62,10 +62,10 @@ You can toggle terminal using one of these options:
 | View 'res.partner' records _(only backend)_         | `view -m res.partner`                                                 |
 | View selected 'res.partner' record _(only backend)_ | `view -m res.partner -i 4`                                            |
 | Install module                                      | `install -m mymodule`                                                 |
-| Create alias                                        | `alias -n myalias -c "print My name is $1"`                           |
+| Create alias                                        | `alias -n myalias -c "print 'My name is: $1'"`                        |
 
 > Notice that a list is an string of values separated by commas. Example: "5,
-> 15, 8" (quotes included) or can use array [5, 15, 8]
+> 15, 8" (quotes included) or can use array notation [5, 15, 8]
 
 > Notice that can call commands without 'named arguments', for example:
 > `create res.partner {name: 'Hipcut', street: 'Mystery street'}`. The rule is
@@ -128,10 +128,10 @@ For example:
 - A somewhat more complex:
   `alias -n search_mod -c "search -m ir.module.module -f display_name -d [[name, =, '$1'], [state, =, '$2[installed]']]"`
 
-#### + Runners (subcommands)
+#### + Nested Calls
 
-You can execute "subcommands" to use the result in a new command call. The
-syntax of runners looks like `$(command)`.
+You can execute "commands" to use the result in a new command call. The syntax
+of 'nested calls' looks like `$(command)`.
 
 For example: `read -m res.users -i $(search -m res.users -f id)[0]['id']` or
 `read -m res.users -i $(search -m res.users -f id)['ids']`

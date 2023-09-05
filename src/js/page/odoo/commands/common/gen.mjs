@@ -3,36 +3,73 @@
 
 import {ARG} from '@trash/constants';
 
+// FIXME: I don't like the '__meta' usage here... but needed due to the
+// 'intiter' generator.
+// This generator needs mantain an store that 'conflicts' with the
+// 'repeat' command.
+// Considerations:
+//  - Repeat must mantain iterator sequence
+//  - Commands are 'async'... this means that one or more iterators can
+//    run at the same time
 async function cmdGen(kwargs) {
-  this.parameterGenerator.resetStores();
   const type = kwargs.type.toLowerCase();
   let result = false;
   if (type === 'email') {
-    result = this.parameterGenerator.generateEmail(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateEmail(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'url') {
-    result = this.parameterGenerator.generateUrl(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateUrl(kwargs.min, kwargs.max);
   } else if (type === 'float') {
-    result = this.parameterGenerator.generateFloat(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateFloat(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'int') {
-    result = this.parameterGenerator.generateInt(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateInt(kwargs.min, kwargs.max);
   } else if (type === 'intseq') {
-    result = this.parameterGenerator.generateIntSeq(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateIntSeq(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'intiter') {
-    result = this.parameterGenerator.doIntIter(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.doIntIter(kwargs.min, kwargs.max);
   } else if (type === 'str') {
-    result = this.parameterGenerator.generateString(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateString(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'tzdate') {
-    result = this.parameterGenerator.generateTzDate(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateTzDate(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'date') {
-    result = this.parameterGenerator.generateDate(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateDate(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'tztime') {
-    result = this.parameterGenerator.generateTzTime(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateTzTime(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'time') {
-    result = this.parameterGenerator.generateTime(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateTime(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'tzdatetime') {
-    result = this.parameterGenerator.generateTzDateTime(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateTzDateTime(
+      kwargs.min,
+      kwargs.max,
+    );
   } else if (type === 'datetime') {
-    result = this.parameterGenerator.generateDateTime(kwargs.min, kwargs.max);
+    result = this.__meta.parameterGenerator.generateDateTime(
+      kwargs.min,
+      kwargs.max,
+    );
   }
   this.screen.print(result);
   return result;

@@ -3,7 +3,7 @@
 
 import debounce from '@terminal/utils/debounce';
 import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
-import {INSTRUCTION_TYPE} from '@trash/constants';
+import {ARG, INSTRUCTION_TYPE} from '@trash/constants';
 
 export default class CommandAssistant {
   #virtMachine = null;
@@ -12,7 +12,7 @@ export default class CommandAssistant {
     this.#virtMachine = virtMachine;
     this.lazyGetAvailableOptions = debounce(
       this.#getAvailableOptions.bind(this),
-      175,
+      155,
     );
   }
 
@@ -45,6 +45,9 @@ export default class CommandAssistant {
               value: strict_value,
               is_required: arg_info.is_required,
               is_default: strict_value === def_value,
+              type: arg_info.type,
+              description: arg_info.description,
+              values: arg_info.strict_values,
             });
           }
         }
@@ -56,6 +59,9 @@ export default class CommandAssistant {
           value: arg_info.default_value,
           is_default: true,
           is_required: arg_info.is_required,
+          type: arg_info.type,
+          description: arg_info.description,
+          values: arg_info.strict_values,
         });
       }
     }
@@ -136,6 +142,7 @@ export default class CommandAssistant {
           name: cmd_name,
           string: cmd_name,
           is_command: true,
+          description: this.#virtMachine.commands[cmd_name].definition,
         });
       }
       callback(ret);
@@ -161,6 +168,9 @@ export default class CommandAssistant {
           string: `--${arg_info.names.long}`,
           is_argument: true,
           is_required: arg_info.is_required,
+          type: ARG.getHumanType(arg_info.type),
+          description: arg_info.description,
+          values: arg_info.strict_values,
         });
       }
     } else if (sel_token_index !== sel_cmd_index && arg_token) {
@@ -177,6 +187,9 @@ export default class CommandAssistant {
           is_paramater: true,
           is_default: param_info.is_default,
           is_required: param_info.is_required,
+          type: ARG.getHumanType(param_info.type),
+          description: param_info.description,
+          values: param_info.strict_values,
         });
       }
     }

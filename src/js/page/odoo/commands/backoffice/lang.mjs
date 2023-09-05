@@ -2,7 +2,10 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {doAction} from '@odoo/root';
-import rpc from '@odoo/rpc';
+import createRecord from '@odoo/orm/create_record';
+import searchRead from '@odoo/orm/search_read';
+import callModelMulti from '@odoo/osv/call_model_multi';
+import callModel from '@odoo/osv/call_model';
 import getContent from '@odoo/utils/get_content';
 import file2base64 from '@terminal/utils/file2base64';
 import isEmpty from '@terminal/utils/is_empty';
@@ -25,51 +28,48 @@ async function cmdLang(kwargs) {
       );
     }
     // Get module ids
-    let module_ids = await rpc.query({
-      method: 'search_read',
-      domain: [['name', 'in', kwargs.module]],
-      fields: ['id'],
-      model: 'ir.module.module',
-      kwargs: {context: this.getContext()},
-    });
+    let module_ids = await searchRead(
+      'ir.module.module',
+      [['name', 'in', kwargs.module]],
+      ['id'],
+      this.getContext(),
+    );
     module_ids = module_ids.map(item => item.id);
     if (isEmpty(module_ids)) {
       throw new Error('No modules found!');
     }
     // Create wizard record
-    const wizard_id = await rpc.query({
-      method: 'create',
-      model: 'base.language.export',
-      args: [
-        {
-          state: 'choose',
-          format: kwargs.format,
-          lang: kwargs.lang,
-          modules: [[6, false, module_ids]],
-        },
-      ],
-      kwargs: {context: this.getContext()},
-    });
+    const wizard_id = await createRecord(
+      'base.language.export',
+      {
+        state: 'choose',
+        format: kwargs.format,
+        lang: kwargs.lang,
+        modules: [[6, false, module_ids]],
+      },
+      this.getContext(),
+    );
     if (!wizard_id) {
       throw new Error("Can't create wizard record!");
     }
 
     // Get action to export
-    await rpc.query({
-      method: 'act_getfile',
-      model: 'base.language.export',
-      args: [[wizard_id]],
-      kwargs: {context: this.getContext()},
-    });
+    await callModelMulti(
+      'base.language.export',
+      [wizard_id],
+      act_getfile,
+      null,
+      null,
+      this.getContext(),
+    );
 
     // Get updated wizard record data
-    const wizard_record = await rpc.query({
-      method: 'search_read',
-      domain: [['id', '=', wizard_id]],
-      fields: false,
-      model: 'base.language.export',
-      kwargs: {context: this.getContext()},
-    });
+    const wizard_record = await searchRead(
+      'base.language.export',
+      [['id', '=', wizard_id]],
+      false,
+      this.getContext(),
+    );
 
     // Get file
     const content_def = getContent(
@@ -102,41 +102,42 @@ async function cmdLang(kwargs) {
     const file64 = await file2base64();
 
     // Create wizard record
-    const wizard_id = await rpc.query({
-      method: 'create',
-      model: 'base.language.import',
-      args: [
-        {
-          name: kwargs.name,
-          code: kwargs.lang,
-          filename: `${kwargs.lang}.${kwargs.format}`,
-          overwrite: !kwargs.no_overwrite,
-          data: file64,
-        },
-      ],
-      kwargs: {context: this.getContext()},
-    });
+    const wizard_id = await createRecord(
+      'base.language.import',
+      {
+        name: kwargs.name,
+        code: kwargs.lang,
+        filename: `${kwargs.lang}.${kwargs.format}`,
+        overwrite: !kwargs.no_overwrite,
+        data: file64,
+      },
+      this.getContext(),
+    );
     if (!wizard_id) {
       throw new Error("Can't create wizard record!");
     }
 
     // Get action to export
-    const status = await rpc.query({
-      method: 'import_lang',
-      model: 'base.language.import',
-      args: [[wizard_id]],
-      kwargs: {context: this.getContext()},
-    });
+    const status = await callModelMulti(
+      'base.language.import',
+      [wizard_id],
+      'import_lang',
+      null,
+      null,
+      this.getContext(),
+    );
     if (status) {
       this.screen.print('Language file imported successfully');
     }
     return status;
   } else if (kwargs.operation === 'list') {
-    const langs = await rpc.query({
-      method: 'get_installed',
-      model: 'res.lang',
-      kwargs: {context: this.getContext()},
-    });
+    const langs = await callModel(
+      'res.lang',
+      'get_installed',
+      null,
+      null,
+      this.getContext(),
+    );
     for (const lang of langs) {
       this.screen.print(` - ${lang[0]} (${lang[1]})`);
     }

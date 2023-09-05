@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import callModel from '@odoo/osv/call_model';
 import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
 import {ARG} from '@trash/constants';
 
@@ -11,36 +11,34 @@ async function cmdRef(kwargs) {
   for (const xmlid of kwargs.xmlid) {
     if (OdooVer < 15) {
       tasks.push(
-        rpc
-          .query({
-            method: 'xmlid_to_res_model_res_id',
-            model: 'ir.model.data',
-            args: [xmlid],
-            kwargs: {context: this.getContext()},
-          })
-          .then(
-            ((active_xmlid, result) => {
-              return [active_xmlid, result[0], result[1]];
-            }).bind(this, xmlid),
-          ),
+        callModel(
+          'ir.model.data',
+          'xmlid_to_res_model_res_id',
+          [xmlid],
+          null,
+          this.getContext(),
+        ).then(
+          ((active_xmlid, result) => {
+            return [active_xmlid, result[0], result[1]];
+          }).bind(this, xmlid),
+        ),
       );
     } else {
       const xmlid_parts = xmlid.split('.');
       const module = xmlid_parts[0];
       const xid = xmlid_parts.slice(1).join('.');
       tasks.push(
-        rpc
-          .query({
-            method: 'check_object_reference',
-            model: 'ir.model.data',
-            args: [module, xid],
-            kwargs: {context: this.getContext()},
-          })
-          .then(
-            ((active_xmlid, result) => {
-              return [active_xmlid, result[0], result[1]];
-            }).bind(this, xmlid),
-          ),
+        callModel(
+          'ir.model.data',
+          'check_object_reference',
+          [module, xid],
+          null,
+          this.getContext(),
+        ).then(
+          ((active_xmlid, result) => {
+            return [active_xmlid, result[0], result[1]];
+          }).bind(this, xmlid),
+        ),
       );
     }
   }

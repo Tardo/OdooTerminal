@@ -1,21 +1,16 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import searchCount from '@odoo/orm/search_count';
 import {ARG} from '@trash/constants';
 
 async function cmdCount(kwargs) {
-  return rpc
-    .query({
-      method: 'search_count',
-      model: kwargs.model,
-      args: [kwargs.domain],
-      kwargs: {context: this.getContext()},
-    })
-    .then(result => {
+  return searchCount(kwargs.model, kwargs.domain, this.getContext()).then(
+    result => {
       this.screen.print(`Result: ${result}`);
       return result;
-    });
+    },
+  );
 }
 
 export default {
@@ -27,5 +22,5 @@ export default {
     [ARG.String, ['m', 'model'], true, 'The model technical name'],
     [ARG.List | ARG.Any, ['d', 'domain'], false, 'The domain', []],
   ],
-  example: "res.partner ['name', '=ilike', 'A%']",
+  example: "-m res.partner -d [['name', '=ilike', 'A%']]",
 };

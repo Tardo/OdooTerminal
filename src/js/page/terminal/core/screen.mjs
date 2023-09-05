@@ -34,7 +34,6 @@ export default class Screen {
 
   #options = {};
   #buff = [];
-  #errorCount = 0;
 
   #$container = null;
   #$screen = null;
@@ -52,6 +51,10 @@ export default class Screen {
   constructor(options, inputInfo) {
     this.#options = options;
     this.updateInputInfo(inputInfo);
+  }
+
+  get maxLines() {
+    return this.#max_lines;
   }
 
   start(container) {
@@ -152,6 +155,13 @@ export default class Screen {
     if (!this.#wasStart) {
       return;
     }
+
+    if (typeof this.#question_active !== 'undefined') {
+      this.$assistant_args.html('');
+      this.$assistant_desc.html('');
+      return;
+    }
+
     const html_options = [];
     for (let index in options) {
       index = Number(index);
@@ -161,6 +171,18 @@ export default class Screen {
       );
     }
     this.$assistant_args.html(renderAssistantArgOptionList(html_options));
+
+    if (selected_option_index !== -1 || options.length === 1) {
+      const opt =
+        options[selected_option_index === -1 ? 0 : selected_option_index];
+      if (opt.is_command) {
+        this.$assistant_desc.html(opt.description);
+      } else {
+        this.$assistant_desc.html(`${opt.type}. ${opt.description}`);
+      }
+    } else {
+      this.$assistant_desc.html('');
+    }
   }
 
   preventLostInputFocus(ev) {
@@ -223,7 +245,7 @@ export default class Screen {
     );
   }
 
-  printHTML(html) {
+  #printHTML(html) {
     this.#buff.push(html);
     this.flush();
   }
@@ -279,7 +301,6 @@ export default class Screen {
         args: error.data.arguments && JSON.stringify(error.data.arguments),
         debug: error.data.debug && encodeHTML(error.data.debug),
       });
-      ++this.#errorCount;
     } else if (
       typeof error === 'object' &&
       Object.hasOwn(error, 'status') &&
@@ -295,7 +316,6 @@ export default class Screen {
         args: '',
         debug: encodeHTML(error.responseText || ''),
       });
-      ++this.#errorCount;
     } else if (
       typeof error === 'object' &&
       Object.hasOwn(error, 'data') &&
@@ -314,7 +334,6 @@ export default class Screen {
           JSON.stringify(debug_error.data.arguments),
         debug: encodeHTML(debug_error.data.debug || ''),
       });
-      ++this.#errorCount;
     }
 
     this.#print(error_msg, 'error_message');
@@ -448,7 +467,7 @@ export default class Screen {
   #print(msg, cls) {
     const formatted_msgs = renderLine(msg, cls);
     for (const line of formatted_msgs) {
-      this.printHTML(line);
+      this.#printHTML(line);
     }
   }
 
@@ -483,7 +502,7 @@ export default class Screen {
     this.$assistant = $(renderAssistantPanel());
     this.$assistant_args = this.$assistant.find('#terminal_assistant_args');
     this.$assistant_desc = this.$assistant.find('#terminal_assistant_desc');
-    this.$assistant_args.appendTo(this.#$container);
+    this.$assistant.appendTo(this.#$container);
   }
 
   #createUserInput() {
@@ -519,13 +538,12 @@ export default class Screen {
       this.#question_active.values.length
     ) {
       const cur_value = ev.target.value;
-      const future_value = `${cur_value}${String.fromCharCode(
+      const next_value = `${cur_value}${String.fromCharCode(
         ev.keyCode,
       )}`.toLowerCase();
       const is_invalid =
-        this.#question_active.values.filter(item =>
-          item.startsWith(future_value),
-        ).length === 0;
+        this.#question_active.values.filter(item => item.startsWith(next_value))
+          .length === 0;
       if (is_invalid) {
         ev.preventDefault();
       }

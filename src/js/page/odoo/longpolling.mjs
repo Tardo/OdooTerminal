@@ -84,7 +84,7 @@ export default class Longpolling {
   setVerbose(status) {
     if (status) {
       setStorageItem('terminal_longpolling_mode', 'verbose', err =>
-        this.screen.printHTML(err),
+        this.screen.print(err),
       );
     } else {
       removeStorageItem('terminal_longpolling_mode');

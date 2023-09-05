@@ -17,7 +17,7 @@ npm install
 #### Usage
 
 ```
-npm run tests -- --browser chromium --odoo-version 16
+npm run dev:tests -- --browser chromium --odoo-version 16
 ```
 
 \*\* Available browsers: firefox, chromium, chrome
@@ -44,3 +44,5 @@ npm run tests -- --browser chromium --odoo-version 16
 - logout
 - lang
 - login
+- copy
+- paste

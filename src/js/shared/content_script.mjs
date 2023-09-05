@@ -2,11 +2,11 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {SETTING_NAMES} from '@common/constants';
-import sendWindowMessage from '@common/utils/send_window_message';
+import postMessage from '@common/utils/post_message';
 import {ubrowser} from './constants';
 import {InstanceContext, getResources, updateContext} from './context';
 import {injectPageScript, injector} from './injector';
-import {getStorageSync} from './storage';
+import {getStorageSync, setStorageSync} from './storage';
 
 /**
  * @param {Object} odoo_info - The collected information
@@ -47,9 +47,25 @@ function onWindowMessage(event) {
   } else if (event.data.type === 'ODOO_TERM_START') {
     // Load Init Commands
     getStorageSync(SETTING_NAMES).then(items => {
-      sendWindowMessage(window, 'ODOO_TERM_CONFIG', {
+      postMessage('ODOO_TERM_CONFIG', {
         config: {...items},
         info: InstanceContext,
+      });
+    });
+  } else if (event.data.type === 'ODOO_TERM_COPY') {
+    // User by 'copy' command
+    setStorageSync({
+      terminal_copy_data: event.data.values,
+    }).then(() => {
+      postMessage('ODOO_TERM_COPY_DONE', {
+        values: event.data.values,
+      });
+    });
+  } else if (event.data.type === 'ODOO_TERM_PASTE') {
+    // User by 'paste' command
+    getStorageSync(['terminal_copy_data']).then(items => {
+      postMessage('ODOO_TERM_PASTE_DONE', {
+        values: items.terminal_copy_data,
       });
     });
   }

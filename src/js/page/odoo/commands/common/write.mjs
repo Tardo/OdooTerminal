@@ -1,24 +1,22 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import writeRecord from '@odoo/orm/write_record';
 import {ARG} from '@trash/constants';
 
 async function cmdWriteModelRecord(kwargs) {
   if (kwargs.value.constructor !== Object) {
     throw new Error('Invalid values!');
   }
-  return rpc
-    .query({
-      method: 'write',
-      model: kwargs.model,
-      args: [kwargs.id, kwargs.value],
-      kwargs: {context: this.getContext()},
-    })
-    .then(result => {
-      this.screen.print(`${kwargs.model} record updated successfully`);
-      return result;
-    });
+  return writeRecord(
+    kwargs.model,
+    kwargs.id,
+    kwargs.value,
+    this.getContext(),
+  ).then(result => {
+    this.screen.print(`${kwargs.model} record updated successfully`);
+    return result;
+  });
 }
 
 export default {

@@ -1,7 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import callModel from '@odoo/osv/call_model';
+import searchRead from '@odoo/orm/search_read';
 import Recordset from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
 
@@ -10,13 +11,14 @@ async function cmdSearchModelRecordId(kwargs) {
   const bin_fields = [];
 
   // Due to possible problems with binary fields it is necessary to filter them out
-  if (!fields) {
-    const fieldDefs = await rpc.query({
-      method: 'fields_get',
-      model: kwargs.model,
-      args: [fields],
-      kwargs: {context: this.getContext()},
-    });
+  if (!fields && !kwargs.read_binary) {
+    const fieldDefs = await callModel(
+      kwargs.model,
+      'fields_get',
+      [fields],
+      null,
+      this.getContext(),
+    );
 
     fields = [];
     Object.entries(fieldDefs).forEach(item => {
@@ -28,13 +30,12 @@ async function cmdSearchModelRecordId(kwargs) {
     });
   }
 
-  const result = await rpc.query({
-    method: 'search_read',
-    domain: [['id', 'in', kwargs.id]],
-    fields: fields,
-    model: kwargs.model,
-    kwargs: {context: this.getContext()},
-  });
+  const result = await searchRead(
+    kwargs.model,
+    [['id', 'in', kwargs.id]],
+    fields,
+    this.getContext(),
+  );
 
   if (bin_fields.length !== 0) {
     for (const item of result) {
@@ -63,6 +64,7 @@ export default {
       "The fields to request<br/>Can use '*' to show all fields",
       ['display_name'],
     ],
+    [ARG.Flag, ['rb', 'read-binary'], false, "Don't filter binary fields"],
   ],
   example: '-m res.partner -i 10,4,2 -f name,street',
 };

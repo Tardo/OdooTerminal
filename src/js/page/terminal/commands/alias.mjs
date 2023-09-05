@@ -12,7 +12,7 @@ async function cmdAlias(kwargs) {
       this.screen.print('No aliases defined.');
     } else {
       for (const alias_name in aliases) {
-        this.screen.printHTML(
+        this.screen.print(
           ` - ${alias_name}  <small class="text-muted"><i>${aliases[alias_name]}</i></small>`,
         );
       }
@@ -30,9 +30,7 @@ async function cmdAlias(kwargs) {
   } else {
     throw new Error('The selected alias not exists');
   }
-  setStorageItem('terminal_aliases', aliases, err =>
-    this.screen.printHTML(err),
-  );
+  setStorageItem('terminal_aliases', aliases, err => this.screen.print(err));
   return aliases;
 }
 

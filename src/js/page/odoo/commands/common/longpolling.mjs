@@ -64,5 +64,5 @@ export default {
     ],
     [ARG.String, ['p', 'param'], false, 'The parameter'],
   ],
-  example: 'add_channel example_channel',
+  example: '-o add_channel -p example_channel',
 };

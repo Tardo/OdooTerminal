@@ -1,5 +1,23 @@
 # Changelog
 
+**10.3.0**
+
+```
+IMP: Command 'create': Now can create more than one record
+IMP: Messages from/to 'extension private-shared' side
+IMP: Command Assistant: Show descriptions
+IMP: Docs: Developing
+
+UPD: Drop python usage
+
+FIX: Command 'gen': reset stores
+FIX: Command Assistant
+FIX: Input: History & Navigation
+
+ADD: Command 'copy': Copy values to paste them into other instances
+ADD: Command 'paste': Copy terminal values throught differente
+```
+
 **10.2.0**
 
 ```

@@ -1,11 +1,14 @@
 {
   "scripts": {
     "prepare": "husky install",
-    "devel": "export ODOO_TERMINAL_ENV=development && rollup -c -w",
-    "tests": "export ODOO_TERMINAL_ENV=development && node scripts/build.mjs && poetry run pytest",
-    "build": "export ODOO_TERMINAL_ENV=production && node scripts/build.mjs",
     "release": "node scripts/release.mjs",
-    "clean": "rm -rf ./dist"
+    "clean": "rm -rf ./dist",
+    "dev:watch": "export ODOO_TERMINAL_ENV=development && rollup -c -w",
+    "dev:tests": "export ODOO_TERMINAL_ENV=development && node scripts/build.mjs && poetry run pytest",
+    "prod:build": "export ODOO_TERMINAL_ENV=production && node scripts/build.mjs",
+    "start:firefox": "export ODOO_TERMINAL_ENV=development && node scripts/build.mjs && web-ext run --verbose -t firefox-desktop",
+    "start:chromium": "export ODOO_TERMINAL_ENV=development && node scripts/build.mjs && web-ext run --verbose -t chromium",
+    "start:chrome": "export ODOO_TERMINAL_ENV=development && node scripts/build.mjs && web-ext run --verbose -t chromium --chromium-binary $(which chrome)"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^5.0.0",

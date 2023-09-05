@@ -32,7 +32,7 @@ export default class Terminal {
 
   #inputHistory = [];
   #searchHistoryQuery = '';
-  #searchHistoryIter = 0;
+  #searchHistoryIter = -1;
 
   #hasExecInitCmds = false;
 
@@ -43,6 +43,8 @@ export default class Terminal {
   #commandAssistant = null;
   #assistantOptions = {};
   #selAssistanOption = -1;
+
+  #messageListeners = {};
 
   #wasStart = false;
   #wasLoaded = false;
@@ -61,7 +63,7 @@ export default class Terminal {
         onSaveScreen: function (content) {
           debounce(
             setStorageSessionItem('terminal_screen', content, err =>
-              this.screen.printHTML(err),
+              this.screen.print(err),
             ),
             350,
           );
@@ -82,7 +84,7 @@ export default class Terminal {
       this.printWelcomeMessage();
       this.screen.print('');
     } else {
-      this.screen.printHTML(cachedScreen);
+      this.screen.print(cachedScreen);
       // RequestAnimationFrame(() => this.screen.scrollDown());
     }
     const cachedHistory = getStorageSessionItem('terminal_history');
@@ -112,6 +114,7 @@ export default class Terminal {
         .addClass('btn-light');
     }
 
+    window.addEventListener('message', this.#onWindowMessage.bind(this), false);
     window.addEventListener('keydown', this.#onCoreKeyDown.bind(this));
     window.addEventListener('click', this.onCoreClick.bind(this));
     window.addEventListener(
@@ -147,6 +150,10 @@ export default class Terminal {
 
   get config() {
     return this.#config;
+  }
+
+  get messageListeners() {
+    return this.#messageListeners;
   }
 
   /**
@@ -358,7 +365,7 @@ export default class Terminal {
         cmd_res.push(result);
       }
     } catch (err) {
-      let err_msg = null;
+      let err_msg = `${err.name}: ${err.message}`;
       if (err.constructor === UnknownCommandError) {
         // Search similar commands
         const similar_cmd = this.searchSimiliarCommand(err.cmd_name);
@@ -369,8 +376,6 @@ export default class Terminal {
             pos: [err.start, err.end],
           });
         }
-      } else if (err.message) {
-        err_msg = `${err.name}: ${err.message}`;
       }
       this.screen.printError(err_msg);
       if (this.#config.console_errors) {
@@ -490,7 +495,7 @@ export default class Terminal {
       return item !== last_str && i > this.#searchHistoryIter;
     });
     if (this.#searchHistoryIter === -1) {
-      this.#searchHistoryIter = this.#inputHistory.length;
+      this.#searchHistoryIter = this.#inputHistory.length - 1;
       return false;
     }
     return this.#inputHistory[this.#searchHistoryIter];
@@ -538,6 +543,16 @@ export default class Terminal {
     );
   }
 
+  getCommandJobMeta(command_info, job_index, silent = false) {
+    return {
+      name: command_info.cmdName,
+      cmdRaw: command_info.cmdRaw,
+      def: command_info.cmdDef,
+      jobIndex: job_index,
+      silent: silent,
+    };
+  }
+
   async #processCommandJob(command_info, silent = false) {
     const job_index = this.onStartCommand(command_info);
     if (job_index === -1) {
@@ -546,13 +561,7 @@ export default class Terminal {
     let result = false;
     let error = false;
     let is_failed = false;
-    this.__meta = {
-      name: command_info.cmdName,
-      cmdRaw: command_info.cmdRaw,
-      def: command_info.cmdDef,
-      jobIndex: job_index,
-      silent: silent,
-    };
+    this.__meta = this.getCommandJobMeta(command_info, job_index, silent);
     this.screen.__meta = this.__meta;
     try {
       result =
@@ -619,6 +628,38 @@ export default class Terminal {
     this.#updateJobsInfo();
   }
 
+  addMessageListener(type, callback) {
+    if (!Object.hasOwn(this.#messageListeners, type)) {
+      Object.assign(this.#messageListeners, {[type]: []});
+    }
+    if (
+      this.#messageListeners[type].filter(item => item.name === callback.name)
+        .length === 0
+    ) {
+      this.#messageListeners[type].push(callback);
+    }
+  }
+  removeMessageListener(type, callback) {
+    if (!callback) {
+      delete this.#messageListeners[type];
+    } else {
+      this.#messageListeners[type] = this.#messageListeners[type].filter(
+        item => item.name !== callback.name,
+      );
+    }
+  }
+  #onWindowMessage(ev) {
+    // We only accept messages from ourselves
+    if (ev.source !== window) {
+      return;
+    }
+    if (Object.hasOwn(this.messageListeners, ev.data.type)) {
+      this.messageListeners[ev.data.type].forEach(callback =>
+        callback.bind(this)(ev.data),
+      );
+    }
+  }
+
   #onClickTerminalCommand(target) {
     if (Object.hasOwn(target.dataset, 'cmd')) {
       this.execute(target.dataset.cmd).catch(() => {
@@ -638,7 +679,7 @@ export default class Terminal {
       $target.removeClass('btn-light').addClass('btn-dark');
     }
     setStorageSessionItem('screen_maximized', this.#config.maximized, err =>
-      this.screen.printHTML(err),
+      this.screen.print(err),
     );
     this.screen.scrollDown();
     this.screen.preventLostInputFocus();
@@ -648,7 +689,7 @@ export default class Terminal {
     const $target = $(ev.currentTarget);
     this.#config.pinned = !this.#config.pinned;
     setStorageSessionItem('terminal_pinned', this.#config.pinned, err =>
-      this.screen.printHTML(err),
+      this.screen.print(err),
     );
     if (this.#config.pinned) {
       $target.removeClass('btn-dark').addClass('btn-light');
@@ -687,7 +728,16 @@ export default class Terminal {
     }
   }
   #onKeyArrowRight(ev) {
-    const user_input = this.screen.getUserInput();
+    let user_input = this.screen.getUserInput();
+    if (user_input && ev.target.selectionStart === user_input.length) {
+      this.#searchHistoryQuery = user_input;
+      this.#searchHistoryIter = this.#inputHistory.length - 1;
+      this.#onKeyArrowUp();
+      this.#searchHistoryQuery = user_input;
+      this.#searchHistoryIter = this.#inputHistory.length - 1;
+    }
+    user_input = this.screen.getUserInput();
+
     this.#commandAssistant.lazyGetAvailableOptions(
       user_input,
       this.screen.getInputCaretStartPos(),
@@ -698,13 +748,6 @@ export default class Terminal {
           this.#assistantOptions,
           this.#selAssistanOption,
         );
-        if (user_input && ev.target.selectionStart === user_input.length) {
-          this.#searchHistoryQuery = user_input;
-          this.#searchHistoryIter = this.#inputHistory.length;
-          this.#onKeyArrowUp();
-          this.#searchHistoryQuery = user_input;
-          this.#searchHistoryIter = this.#inputHistory.length;
-        }
       },
     );
   }
@@ -780,17 +823,17 @@ export default class Terminal {
           this.#assistantOptions,
           this.#selAssistanOption,
         );
-        this.#searchHistoryQuery = user_input;
-        this.#searchHistoryIter = this.#inputHistory.length;
-        if (user_input) {
-          const found_hist = this.#doSearchPrevHistory();
-          this.screen.updateShadowInput(found_hist || '');
-          this.#searchHistoryIter = this.#inputHistory.length;
-        } else {
-          this.screen.cleanShadowInput();
-        }
       },
     );
+    this.#searchHistoryQuery = user_input;
+    this.#searchHistoryIter = this.#inputHistory.length - 1;
+    if (user_input) {
+      const found_hist = this.#doSearchPrevHistory();
+      this.screen.updateShadowInput(found_hist || '');
+      this.#searchHistoryIter = this.#inputHistory.length - 1;
+    } else {
+      this.screen.cleanShadowInput();
+    }
   }
 
   #onInputKeyUp(ev) {
@@ -809,7 +852,7 @@ export default class Terminal {
       } else if (ev.keyCode === $.ui.keyCode.TAB) {
         this.#onKeyTab(ev);
       } else {
-        this.#searchHistoryIter = this.#inputHistory.length;
+        this.#searchHistoryIter = this.#inputHistory.length - 1;
         this.#searchHistoryQuery = undefined;
       }
     } else if (ev.keyCode === $.ui.keyCode.ENTER) {

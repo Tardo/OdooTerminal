@@ -1,16 +1,17 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import searchRead from '@odoo/orm/search_read';
+import callModelMulti from '@odoo/osv/call_model_multi';
 import renderWhoami from '@odoo/templates/whoami';
 import renderWhoamiListItem from '@odoo/templates/whoami_group_item';
 import getUID from '@odoo/utils/get_uid';
 
 async function cmdShowWhoAmI() {
-  const result = await rpc.query({
-    method: 'search_read',
-    domain: [['id', '=', getUID()]],
-    fields: [
+  const result = await searchRead(
+    'res.users',
+    [['id', '=', getUID()]],
+    [
       'id',
       'display_name',
       'login',
@@ -19,26 +20,29 @@ async function cmdShowWhoAmI() {
       'company_ids',
       'groups_id',
     ],
-    model: 'res.users',
-    kwargs: {context: this.getContext()},
-  });
+    this.getContext(),
+  );
   if (!result.length) {
     throw new Error("Oops! can't get the login :/");
   }
   const record = result[0];
   const result_tasks = await Promise.all([
-    rpc.query({
-      method: 'name_get',
-      model: 'res.groups',
-      args: [record.groups_id],
-      kwargs: {context: this.getContext()},
-    }),
-    rpc.query({
-      method: 'name_get',
-      model: 'res.company',
-      args: [record.company_ids],
-      kwargs: {context: this.getContext()},
-    }),
+    callModelMulti(
+      'res.groups',
+      record.groups_id,
+      'name_get',
+      null,
+      null,
+      this.getContext(),
+    ),
+    callModelMulti(
+      'res.company',
+      record.company_ids,
+      'name_get',
+      null,
+      null,
+      this.getContext(),
+    ),
   ]);
   let groups_list = '';
   for (const group of result_tasks[0]) {

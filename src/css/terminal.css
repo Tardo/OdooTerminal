@@ -6,7 +6,9 @@
   --terminal-screen-width: 70%;
   --terminal-screen-width-maximized: 100%;
   --terminal-screen-background-color: black;
-  --terminal-screen-assistant-background-color: #222300;
+  --terminal-screen-assistant-bottom-pos: 27px;
+  --terminal-screen-assistant-args-background-color: lightgray;
+  --terminal-screen-assistant-desc-background-color: #c1c1c1;
   --terminal-screen-text-color: lightgray;
   --terminal-screen-font: 'Lucida Console', Monaco, monospace;
   --terminal-screen-extra-info-color: darkkhaki;
@@ -139,10 +141,17 @@
 
 .o_terminal div#terminal_assistant {
   font-size: x-small;
+  position: absolute;
+  bottom: var(--terminal-screen-assistant-bottom-pos);
+  z-index: 10;
 }
 
-.o_terminal div#terminal_assistant > div#terminal_assistant_args {
-  background-color: var(--terminal-screen-assistant-background-color);
+.o_terminal div#terminal_assistant > .row > div#terminal_assistant_args {
+  background-color: var(--terminal-screen-assistant-args-background-color);
+}
+
+.o_terminal div#terminal_assistant > .row > div#terminal_assistant_desc {
+  background-color: var(--terminal-screen-assistant-desc-background-color);
 }
 
 .o_terminal .terminal-user-input {
@@ -150,7 +159,6 @@
   border: 1px dotted #5a5a5a;
   border-width: 1px 0 0 0;
   color: var(--terminal-screen-text-color);
-
   display: flex;
 }
 

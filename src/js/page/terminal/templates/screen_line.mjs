@@ -22,7 +22,7 @@ export function renderLineArray(msg, cls) {
 }
 
 export function renderLineObject(msg, cls) {
-  return `<span class='line-object ${cls}'> ${prettyObjectString(msg)}</span>`;
+  return `<span class='line-object ${cls}'>${prettyObjectString(msg)}</span>`;
 }
 
 export function renderLineRecordsetTable(model, records, cls) {

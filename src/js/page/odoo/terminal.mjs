@@ -3,8 +3,8 @@
 
 import Terminal from '@terminal/terminal';
 import Longpolling from './longpolling';
+import searchRead from './orm/search_read';
 import ParameterGenerator from './parameter_generator';
-import rpc from './rpc';
 import renderWelcome from './templates/welcome';
 import getOdooSession from './utils/get_odoo_session';
 
@@ -42,7 +42,6 @@ export default class OdooTerminal extends Terminal {
    */
   onStart() {
     super.onStart();
-    this.parameterGenerator = new ParameterGenerator();
     try {
       this.longpolling = new Longpolling(this);
     } catch (err) {
@@ -50,6 +49,15 @@ export default class OdooTerminal extends Terminal {
       console.warn("[OdooTerminal] Can't initilize longpolling: ", err);
       this.longpolling = false;
     }
+  }
+
+  getCommandJobMeta(command_info, job_index, silent = false) {
+    const meta = super.getCommandJobMeta(command_info, job_index, silent);
+    Object.assign(meta, {
+      parameterGenerator: new ParameterGenerator(),
+    });
+    console.log(meta);
+    return meta;
   }
 
   /**
@@ -67,14 +75,7 @@ export default class OdooTerminal extends Terminal {
     const {field} = target.dataset;
     const {id} = target.dataset;
 
-    rpc
-      .query({
-        method: 'search_read',
-        domain: [['id', '=', id]],
-        fields: [field],
-        model: model,
-        kwargs: {context: this.getContext()},
-      })
+    searchRead(model, [['id', '=', id]], [field], this.getContext())
       .then(result => {
         target.parentNode.textContent = JSON.stringify(result[0][field]);
       })

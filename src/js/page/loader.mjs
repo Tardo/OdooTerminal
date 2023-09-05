@@ -2,6 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import '@css/terminal.css';
+import postMessage from '@common/utils/post_message';
 import registerBackofficeFuncs from '@odoo/commands/backoffice/__all__';
 import registerCommonFuncs from '@odoo/commands/common/__all__';
 import OdooTerminal from '@odoo/terminal';
@@ -71,9 +72,4 @@ window.addEventListener(
 );
 // This is used to communicate to the extension that the widget
 // is initialized successfully.
-window.postMessage(
-  {
-    type: 'ODOO_TERM_START',
-  },
-  '*',
-);
+postMessage('ODOO_TERM_START');

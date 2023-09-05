@@ -13,7 +13,7 @@
 import {SETTING_DEFAULTS, SETTING_NAMES} from '@common/constants';
 import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
-import {getActiveTab, sendInternalMessage} from '@shared/tabs';
+import {sendInternalMessage} from '@shared/tabs';
 
 /**
  * @param {String} icon - url to the icon
@@ -35,12 +35,20 @@ function updateBrowserAction(icon, text = null, bg_color = null) {
 /**
  * @param {Object} request
  */
-function onInternalMessage(request) {
+function onInternalMessage(request, sender) {
   if (request.message === 'update_terminal_badge_info') {
     const {context} = request;
-    const icon = context.isCompatible ? 'terminal-16' : 'terminal-disabled-16';
-    const color = context.isCompatible ? '#71639e' : '#878787';
-    updateBrowserAction(icon, context.serverVersionRaw, color);
+    if (context.isCompatible) {
+      ubrowser.browserAction.enable(sender.tab.id);
+      updateBrowserAction('terminal-16', context.serverVersionRaw, '#71639e');
+    } else {
+      ubrowser.browserAction.disable(sender.tab.id);
+      updateBrowserAction(
+        'terminal-disabled-16',
+        context.serverVersionRaw,
+        '#878787',
+      );
+    }
   }
 }
 
@@ -59,23 +67,21 @@ function onInstalled() {
   });
 }
 
-function onRefreshOdooInfo(from_update) {
+function onTabUpdated(tab_id, change_info) {
+  if (change_info.status === 'complete') {
+    // Request Odoo Info, wait 'idle' delay
+    setTimeout(() => {
+      sendInternalMessage(tab_id, 'update_odoo_terminal_info');
+    }, 150);
+  }
+}
+
+function onTabActivated(active_info) {
   // Because the script may be unavailable, we always assume
   // that the page is not compatible with the extension.
+  ubrowser.browserAction.disable(active_info.tabId);
   updateBrowserAction('terminal-disabled-16');
-  // Query for active tab
-  getActiveTab().then(tab => {
-    if (tab.status === 'complete') {
-      if (from_update) {
-        // Request Odoo Info, wait 'idle' delay
-        setTimeout(() => {
-          sendInternalMessage(tab.id, 'update_odoo_terminal_info');
-        }, 150);
-      } else {
-        sendInternalMessage(tab.id, 'update_odoo_terminal_info');
-      }
-    }
-  });
+  sendInternalMessage(active_info.tabId, 'update_odoo_terminal_info');
 }
 
 /**
@@ -91,8 +97,8 @@ ubrowser.runtime.onMessage.addListener(onInternalMessage);
 ubrowser.runtime.onInstalled.addListener(onInstalled);
 
 // Listen actived tab and updates to update info
-ubrowser.tabs.onUpdated.addListener(onRefreshOdooInfo.bind(undefined, true));
-ubrowser.tabs.onActivated.addListener(onRefreshOdooInfo.bind(undefined, false));
+ubrowser.tabs.onUpdated.addListener(onTabUpdated);
+ubrowser.tabs.onActivated.addListener(onTabActivated);
 
 // Listen the extension browser icon click event to toggle terminal visibility
 ubrowser.browserAction.onClicked.addListener(onClickBrowserAction);

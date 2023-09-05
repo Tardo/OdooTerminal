@@ -1,27 +1,26 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import callModel from '@odoo/osv/call_model';
 import {ARG} from '@trash/constants';
 
 async function cmdCheckModelAccess(kwargs) {
-  return rpc
-    .query({
-      method: 'check_access_rights',
-      model: kwargs.model,
-      args: [kwargs.operation, false],
-      kwargs: {context: this.getContext()},
-    })
-    .then(result => {
-      if (result) {
-        this.screen.print(
-          `You have access rights for '${kwargs.operation}' on ${kwargs.model}`,
-        );
-      } else {
-        this.screen.print(`You can't '${kwargs.operation}' on ${kwargs.model}`);
-      }
-      return result;
-    });
+  return callModel(
+    kwargs.model,
+    'check_access_rights',
+    [kwargs.operation, false],
+    null,
+    this.getContext(),
+  ).then(result => {
+    if (result) {
+      this.screen.print(
+        `You have access rights for '${kwargs.operation}' on ${kwargs.model}`,
+      );
+    } else {
+      this.screen.print(`You can't '${kwargs.operation}' on ${kwargs.model}`);
+    }
+    return result;
+  });
 }
 
 export default {

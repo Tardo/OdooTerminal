@@ -2,9 +2,9 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {doAction} from '@odoo/root';
-import rpc from '@odoo/rpc';
+import createRecord from '@odoo/orm/create_record';
 import Recordset from '@terminal/core/recordset';
-import renderRecordCreated from '@terminal/templates/record_created';
+import renderRecordCreated from '@odoo/templates/record_created';
 import {ARG} from '@trash/constants';
 
 async function cmdCreateModelRecord(kwargs) {
@@ -19,21 +19,23 @@ async function cmdCreateModelRecord(kwargs) {
     return;
   }
 
-  const result = await rpc.query({
-    method: 'create',
-    model: kwargs.model,
-    args: [kwargs.value],
-    kwargs: {context: this.getContext()},
-  });
+  const results = await createRecord(
+    kwargs.model,
+    kwargs.value,
+    this.getContext(),
+  );
   this.screen.print(
     renderRecordCreated({
       model: kwargs.model,
-      new_id: result,
+      new_ids: results,
     }),
   );
-  return Recordset.make(kwargs.model, [
-    Object.assign({}, kwargs.value, {id: result}),
-  ]);
+
+  const records = [];
+  kwargs.value.forEach((item, index) => {
+    records.push(Object.assign({}, item, {id: results[index]}));
+  });
+  return Recordset.make(kwargs.model, records);
 }
 
 export default {
@@ -42,7 +44,7 @@ export default {
   detail: 'Open new model record in form view or directly.',
   args: [
     [ARG.String, ['m', 'model'], true, 'The model technical name'],
-    [ARG.Dictionary, ['v', 'value'], false, 'The values to write'],
+    [ARG.List | ARG.Dictionary, ['v', 'value'], false, 'The values to write'],
   ],
   example: "-m res.partner -v {name: 'Poldoore'}",
 };

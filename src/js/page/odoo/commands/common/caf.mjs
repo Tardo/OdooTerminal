@@ -1,18 +1,19 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import callModel from '@odoo/osv/call_model';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 
 async function cmdCheckFieldAccess(kwargs) {
   const fields = kwargs.field[0] === '*' ? false : kwargs.field;
-  const result = await rpc.query({
-    method: 'fields_get',
-    model: kwargs.model,
-    args: [fields],
-    kwargs: {context: this.getContext()},
-  });
+  const result = await callModel(
+    kwargs.model,
+    'fields_get',
+    [fields],
+    null,
+    this.getContext(),
+  );
 
   let s_result = null;
   const keys = Object.keys(result);

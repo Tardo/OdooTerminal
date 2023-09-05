@@ -1,21 +1,20 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import callModel from '@odoo/osv/call_model';
 import {ARG} from '@trash/constants';
 
 async function cmdUserHasGroups(kwargs) {
-  return rpc
-    .query({
-      method: 'user_has_groups',
-      model: 'res.users',
-      args: [kwargs.group.join(',')],
-      kwargs: {context: this.getContext()},
-    })
-    .then(result => {
-      this.screen.print(result);
-      return result;
-    });
+  return callModel(
+    'res.users',
+    'user_has_groups',
+    [kwargs.group.join(',')],
+    null,
+    this.getContext(),
+  ).then(result => {
+    this.screen.print(result);
+    return result;
+  });
 }
 
 export default {

@@ -15,7 +15,6 @@ import UndefinedValueError from './exceptions/undefined_value_error';
 import UnknownCommandError from './exceptions/unknown_command_error';
 import UnknownNameError from './exceptions/unknown_name_error';
 import Interpreter from './interpreter';
-import countBy from './utils/count_by';
 import pluck from './utils/pluck';
 
 class Frame {
