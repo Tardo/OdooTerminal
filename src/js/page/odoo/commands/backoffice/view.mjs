@@ -4,19 +4,20 @@
 import {default as OdooRoot, doAction} from '@odoo/root';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOwlVersionMajor from '@odoo/utils/get_owl_version_major';
 import {ARG} from '@trash/constants';
 
 function getDialogParent() {
   const OdooVer = getOdooVersionMajor();
-  if (OdooVer >= 15) {
+  const OwlVer = getOwlVersionMajor();
+  if (OdooVer >= 15 && OwlVer === 2) {
     const {Component} = owl;
     const {standaloneAdapter} = getOdooService('web.OwlCompatibility');
-    if (owl.__info__.version.split('.')[0] === '2') {
-      return standaloneAdapter({Component});
-    }
+    return standaloneAdapter({Component});
   }
   return OdooRoot();
 }
+
 function openSelectCreateDialog(model, title, domain, on_selected) {
   const OdooVer = getOdooVersionMajor();
   if (OdooVer < 16) {

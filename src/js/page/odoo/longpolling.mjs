@@ -92,7 +92,7 @@ export default class Longpolling {
   }
 
   isVerbose() {
-    getStorageItem('terminal_longpolling_mode');
+    return getStorageItem('terminal_longpolling_mode') === 'verbose';
   }
 
   //

@@ -106,7 +106,7 @@ const RecordsetHandler = {
     }
 
     if (
-      prop.constructor === String &&
+      prop.constructor.name === 'String' &&
       isNaN(Number(prop)) &&
       target.records.length === 1
     ) {

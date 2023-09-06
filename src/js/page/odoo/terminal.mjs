@@ -16,8 +16,12 @@ export default class OdooTerminal extends Terminal {
       this.screen.print(
         `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</strong>`,
       );
-      this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
-      this.screen.print(notif[1], false);
+      if (notif.constructor.name === 'Object') {
+        this.screen.print(notif, false);
+      } else {
+        this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
+        this.screen.print(notif[1], false);
+      }
     }
   }
 

@@ -5,8 +5,18 @@ import asyncSleep from '@terminal/utils/async_sleep';
 import getOdooService from './utils/get_odoo_service';
 import getOdooVersionMajor from './utils/get_odoo_version_major';
 
+const defSymbol = Symbol.for('default');
 export default function OdooRoot() {
-  return getOdooService('root.widget', 'web.web_client');
+  let root = getOdooService('root.widget', 'web.web_client');
+  if (root) {
+    return root;
+  }
+  root = getOdooService('@web/legacy/js/env');
+  if (root) {
+    return {
+      env: root[defSymbol],
+    };
+  }
 }
 
 export async function doAction(action, options) {

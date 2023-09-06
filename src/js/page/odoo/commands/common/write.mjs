@@ -5,9 +5,6 @@ import writeRecord from '@odoo/orm/write_record';
 import {ARG} from '@trash/constants';
 
 async function cmdWriteModelRecord(kwargs) {
-  if (kwargs.value.constructor !== Object) {
-    throw new Error('Invalid values!');
-  }
   return writeRecord(
     kwargs.model,
     kwargs.id,

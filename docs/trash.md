@@ -9,7 +9,7 @@ least it seems to work and meet expectations.
 ## Components
 
 - Interpreter: Compile input string into pseudo-bytecode
-- virtual machine: Runs the pseudo-bytecode
+- VMachine: Runs the pseudo-bytecode
 
 ## All its async! (but no...)
 

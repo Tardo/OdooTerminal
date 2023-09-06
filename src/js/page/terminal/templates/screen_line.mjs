@@ -57,7 +57,7 @@ export default function renderLine(msg, cls) {
       res.push(renderLineText(msg, cls));
     } else if (msg instanceof Recordset) {
       res.push(renderLineRecordsetTable(msg.model, msg, cls));
-    } else if (msg.constructor === Array) {
+    } else if (msg.constructor.name === 'Array') {
       res.push(...renderLineArray(msg, cls));
     } else {
       res.push(renderLineObject(msg, cls));
