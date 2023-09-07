@@ -5,3 +5,4 @@ dist
 *.lock
 *.toml
 package-lock.json
+*.py

@@ -3,9 +3,9 @@
 
 import getOdooVersionInfo from '@odoo/utils/get_odoo_version_info';
 
-async function cmdShowOdooVersion() {
+async function cmdShowOdooVersion(kwargs, screen) {
   const version_info = getOdooVersionInfo();
-  this.screen.print(
+  screen.print(
     `${version_info.slice(0, 3).join('.')} (${version_info
       .slice(3)
       .join(' ')})`,

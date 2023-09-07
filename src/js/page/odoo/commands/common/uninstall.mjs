@@ -6,7 +6,7 @@ import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 import {searchModules} from './__utils__';
 
-async function cmdUninstallModule(kwargs) {
+async function cmdUninstallModule(kwargs, screen) {
   const modue_infos = await searchModules.bind(this)(kwargs.module);
   if (!isEmpty(modue_infos)) {
     if (!kwargs.force) {
@@ -20,15 +20,15 @@ async function cmdUninstallModule(kwargs) {
       }
       depends = depends.filter(item => item !== kwargs.module);
       if (!isEmpty(depends)) {
-        this.screen.print('This operation will remove these modules too:');
-        this.screen.print(depends);
-        const res = await this.screen.showQuestion(
+        screen.print('This operation will remove these modules too:');
+        screen.print(depends);
+        const res = await screen.showQuestion(
           'Do you want to continue?',
           ['y', 'n'],
           'n',
         );
         if (res?.toLowerCase() !== 'y') {
-          this.screen.printError('Operation cancelled');
+          screen.printError('Operation cancelled');
           return false;
         }
       }
@@ -43,7 +43,7 @@ async function cmdUninstallModule(kwargs) {
       this.getContext(),
     );
 
-    this.screen.print(
+    screen.print(
       `'${kwargs.module}' (${modue_infos[0].display_name}) module successfully uninstalled`,
     );
     return modue_infos[0];

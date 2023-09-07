@@ -5,7 +5,7 @@ import callModelMulti from '@odoo/osv/call_model_multi';
 import renderMetadata from '@odoo/templates/metadata';
 import {ARG} from '@trash/constants';
 
-async function cmdMetadata(kwargs) {
+async function cmdMetadata(kwargs, screen) {
   const metadata = (
     await callModelMulti(
       kwargs.model,
@@ -18,9 +18,9 @@ async function cmdMetadata(kwargs) {
   )[0];
 
   if (typeof metadata === 'undefined') {
-    this.screen.print("Can't found any metadata for the given id");
+    screen.print("Can't found any metadata for the given id");
   } else {
-    this.screen.print(renderMetadata(metadata));
+    screen.print(renderMetadata(metadata));
   }
   return metadata;
 }

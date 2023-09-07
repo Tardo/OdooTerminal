@@ -22,6 +22,36 @@ import rgb2hsv from '@terminal/utils/rgb2hsv';
 export const PROMPT = '>';
 export const LINE_SELECTOR = ':scope > span .print-table tr, :scope > span';
 
+const ALLOWED_FUNCS = [
+  'eprint',
+  'print',
+  'printError',
+  'printTable',
+  'updateInputInfo',
+  'showQuestion',
+];
+
+const ALLOWED_SILENT_FUNCS = ['updateInputInfo'];
+
+const dummyCall = () => {
+  // Do nothing
+};
+
+export const ScreenCommandHandler = {
+  silent: false,
+
+  get(target, prop) {
+    const ref = target[prop];
+    if (typeof ref === 'function' && ALLOWED_FUNCS.includes(prop)) {
+      if (this.silent && !ALLOWED_SILENT_FUNCS.includes(prop)) {
+        return dummyCall;
+      }
+      return ref.bind(target);
+    }
+    return target[prop];
+  },
+};
+
 export default class Screen {
   #max_lines = 750;
   #max_buff_lines = 100;
@@ -251,9 +281,6 @@ export default class Screen {
   }
 
   print(msg, enl, cls) {
-    if (this.__meta?.silent) {
-      return;
-    }
     let scls = cls || '';
     if (!enl) {
       scls = `line-br ${scls}`;

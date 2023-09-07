@@ -3,11 +3,11 @@
 
 import {ARG} from '@trash/constants';
 
-async function cmdClear(kwargs) {
+async function cmdClear(kwargs, screen) {
   if (kwargs.section === 'history') {
     this.cleanInputHistory();
   } else {
-    this.screen.clean();
+    screen.clean();
   }
 }
 

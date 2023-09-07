@@ -5,14 +5,14 @@ import {getStorageItem, setStorageItem} from '@terminal/core/storage/local';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 
-async function cmdAlias(kwargs) {
+async function cmdAlias(kwargs, screen) {
   const aliases = getStorageItem('terminal_aliases') || {};
   if (!kwargs.name) {
     if (isEmpty(aliases)) {
-      this.screen.print('No aliases defined.');
+      screen.print('No aliases defined.');
     } else {
       for (const alias_name in aliases) {
-        this.screen.print(
+        screen.print(
           ` - ${alias_name}  <small class="text-muted"><i>${aliases[alias_name]}</i></small>`,
         );
       }
@@ -23,14 +23,14 @@ async function cmdAlias(kwargs) {
   }
   if (kwargs.cmd && kwargs.cmd.length) {
     aliases[kwargs.name] = kwargs.cmd;
-    this.screen.print('Alias created successfully');
+    screen.print('Alias created successfully');
   } else if (Object.hasOwn(aliases, kwargs.name)) {
     delete aliases[kwargs.name];
-    this.screen.print('Alias removed successfully');
+    screen.print('Alias removed successfully');
   } else {
     throw new Error('The selected alias not exists');
   }
-  setStorageItem('terminal_aliases', aliases, err => this.screen.print(err));
+  setStorageItem('terminal_aliases', aliases, err => screen.print(err));
   return aliases;
 }
 

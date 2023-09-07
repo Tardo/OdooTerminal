@@ -3,7 +3,7 @@
 
 import {ARG, INSTRUCTION_TYPE} from '@trash/constants';
 
-async function cmdDis(kwargs) {
+async function cmdDis(kwargs, screen) {
   const parse_info = this.parse(kwargs.code);
   const rows = [];
   const {stack} = parse_info;
@@ -37,7 +37,7 @@ async function cmdDis(kwargs) {
         : '',
     );
   }
-  this.screen.printTable(
+  screen.printTable(
     [
       'Instr. Name',
       'Instr. Code',

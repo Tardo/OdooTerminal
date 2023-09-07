@@ -18,6 +18,8 @@
     "autoprefixer": "^10.4.15",
     "cssnano": "^6.0.1",
     "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.0",
     "minimist": "^1.2.8",
@@ -28,5 +30,109 @@
     "rollup-plugin-postcss": "^4.0.2",
     "simple-git": "^3.19.1",
     "web-ext": "^7.6.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "web-ext lint --ignore-files=src/js/**"
+    }
+  },
+  "lint-staged": {
+    "*": [
+      "prettier --write"
+    ],
+    "*.{mjs,js}": [
+      "eslint --color --fix"
+    ]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "quoteProps": "as-needed",
+    "jsxSingleQuote": false,
+    "trailingComma": "all",
+    "bracketSpacing": false,
+    "bracketSameLine": false,
+    "arrowParens": "avoid",
+    "requirePragma": false,
+    "proseWrap": "always",
+    "htmlWhitespaceSensitivity": "css",
+    "vueIndentScriptAndStyle": false,
+    "endOfLine": "lf",
+    "embeddedLanguageFormatting": "auto",
+    "singleAttributePerLine": false
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "webextensions": true,
+      "jquery": true,
+      "es6": true,
+      "es2024": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:prettier/recommended"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.mjs"
+        ],
+        "parserOptions": {
+          "sourceType": "module"
+        }
+      }
+    ],
+    "globals": {
+      "__OdooTerminal": "readonly",
+      "_": "off",
+      "moment": "readonly",
+      "odoo": "readonly",
+      "owl": "readonly",
+      "openerp": "off"
+    },
+    "rules": {
+      "eqeqeq": "error",
+      "no-empty-function": "error",
+      "no-eval": "error",
+      "no-implicit-coercion": "error",
+      "no-implicit-globals": "error",
+      "no-implied-eval": "error",
+      "no-return-assign": "error",
+      "no-undef-init": "error",
+      "no-shadow": "error",
+      "no-script-url": "error",
+      "no-unneeded-ternary": "error",
+      "no-unused-expressions": "error",
+      "no-labels": "error",
+      "no-useless-call": "error",
+      "no-useless-computed-key": "error",
+      "no-useless-concat": "error",
+      "no-useless-constructor": "error",
+      "no-useless-rename": "error",
+      "no-useless-return": "error",
+      "no-void": "error",
+      "no-console": [
+        "error",
+        {
+          "allow": [
+            "warn",
+            "error"
+          ]
+        }
+      ],
+      "prefer-const": "error",
+      "prefer-numeric-literals": "error",
+      "prefer-object-has-own": "error",
+      "spaced-comment": "error",
+      "radix": "error",
+      "prefer-arrow-callback": "warn",
+      "no-var": "warn",
+      "no-extra-bind": "warn",
+      "no-lone-blocks": "warn"
+    }
   }
 }

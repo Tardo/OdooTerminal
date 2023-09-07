@@ -5,7 +5,7 @@ import callModel from '@odoo/osv/call_model';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 
-async function cmdCheckFieldAccess(kwargs) {
+async function cmdCheckFieldAccess(kwargs, screen) {
   const fields = kwargs.field[0] === '*' ? false : kwargs.field;
   const result = await callModel(
     kwargs.model,
@@ -65,7 +65,7 @@ async function cmdCheckFieldAccess(kwargs) {
     }
   }
   fieldParams.unshift('field');
-  this.screen.printTable(fieldParams, rows);
+  screen.printTable(fieldParams, rows);
   return s_result;
 }
 

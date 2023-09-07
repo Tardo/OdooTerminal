@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import rpcQuery from '@odoo/rpc';
 import isEmpty from '@terminal/utils/is_empty';
 
 export default function (model, method, args, kwargs, context, extra_options) {
@@ -11,7 +11,7 @@ export default function (model, method, args, kwargs, context, extra_options) {
     },
     kwargs,
   );
-  return rpc.query(
+  return rpcQuery(
     Object.assign(
       {
         method: method,

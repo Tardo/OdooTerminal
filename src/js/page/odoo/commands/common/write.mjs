@@ -4,14 +4,14 @@
 import writeRecord from '@odoo/orm/write_record';
 import {ARG} from '@trash/constants';
 
-async function cmdWriteModelRecord(kwargs) {
+async function cmdWriteModelRecord(kwargs, screen) {
   return writeRecord(
     kwargs.model,
     kwargs.id,
     kwargs.value,
     this.getContext(),
   ).then(result => {
-    this.screen.print(`${kwargs.model} record updated successfully`);
+    screen.print(`${kwargs.model} record updated successfully`);
     return result;
   });
 }

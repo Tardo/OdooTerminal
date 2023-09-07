@@ -4,10 +4,10 @@
 import searchCount from '@odoo/orm/search_count';
 import {ARG} from '@trash/constants';
 
-async function cmdCount(kwargs) {
+async function cmdCount(kwargs, screen) {
   return searchCount(kwargs.model, kwargs.domain, this.getContext()).then(
     result => {
-      this.screen.print(`Result: ${result}`);
+      screen.print(`Result: ${result}`);
       return result;
     },
   );

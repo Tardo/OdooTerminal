@@ -4,10 +4,10 @@
 import unlinkRecord from '@odoo/orm/unlink_record';
 import {ARG} from '@trash/constants';
 
-async function cmdUnlinkModelRecord(kwargs) {
+async function cmdUnlinkModelRecord(kwargs, screen) {
   return unlinkRecord(kwargs.model, kwargs.id, this.getContext()).then(
     result => {
-      this.screen.print(`${kwargs.model} record deleted successfully`);
+      screen.print(`${kwargs.model} record deleted successfully`);
       return result;
     },
   );

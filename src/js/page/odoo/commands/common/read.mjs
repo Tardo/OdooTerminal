@@ -6,7 +6,7 @@ import searchRead from '@odoo/orm/search_read';
 import Recordset from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
 
-async function cmdSearchModelRecordId(kwargs) {
+async function cmdSearchModelRecordId(kwargs, screen) {
   let fields = kwargs.field[0] === '*' ? false : kwargs.field;
   const bin_fields = [];
 
@@ -46,7 +46,7 @@ async function cmdSearchModelRecordId(kwargs) {
   }
 
   const recordset = Recordset.make(kwargs.model, result);
-  this.screen.print(recordset);
+  screen.print(recordset);
   return recordset;
 }
 

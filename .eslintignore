@@ -7,3 +7,4 @@ dist
 *.lock
 *.toml
 package-lock.json
+scripts/

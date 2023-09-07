@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {doAction} from '@odoo/root';
+import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
 import searchRead from '@odoo/orm/search_read';
 import callModelMulti from '@odoo/osv/call_model_multi';
@@ -11,7 +11,7 @@ import file2base64 from '@terminal/utils/file2base64';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 
-async function cmdLang(kwargs) {
+async function cmdLang(kwargs, screen) {
   const filtered_kwargs = Object.fromEntries(
     Object.entries(kwargs).filter(
       ([key]) => key !== 'operation' || key !== 'format',
@@ -57,7 +57,7 @@ async function cmdLang(kwargs) {
     await callModelMulti(
       'base.language.export',
       [wizard_id],
-      act_getfile,
+      'act_getfile',
       null,
       null,
       this.getContext(),
@@ -127,7 +127,7 @@ async function cmdLang(kwargs) {
       this.getContext(),
     );
     if (status) {
-      this.screen.print('Language file imported successfully');
+      screen.print('Language file imported successfully');
     }
     return status;
   } else if (kwargs.operation === 'list') {
@@ -139,7 +139,7 @@ async function cmdLang(kwargs) {
       this.getContext(),
     );
     for (const lang of langs) {
-      this.screen.print(` - ${lang[0]} (${lang[1]})`);
+      screen.print(` - ${lang[0]} (${lang[1]})`);
     }
     return langs;
   }

@@ -5,7 +5,7 @@ import callModelMulti from '@odoo/osv/call_model_multi';
 import {ARG} from '@trash/constants';
 import {searchModules} from './__utils__';
 
-async function cmdUpgradeModule(kwargs) {
+async function cmdUpgradeModule(kwargs, screen) {
   return searchModules
     .bind(this)(kwargs.module)
     .then(result => {
@@ -19,7 +19,7 @@ async function cmdUpgradeModule(kwargs) {
           this.getContext(),
         ).then(
           () => {
-            this.screen.print(
+            screen.print(
               `'${result
                 .map(item => item.name)
                 .join(', ')}' modules successfully upgraded`,

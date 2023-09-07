@@ -7,7 +7,7 @@ import renderWhoami from '@odoo/templates/whoami';
 import renderWhoamiListItem from '@odoo/templates/whoami_group_item';
 import getUID from '@odoo/utils/get_uid';
 
-async function cmdShowWhoAmI() {
+async function cmdShowWhoAmI(kwargs, screen) {
   const result = await searchRead(
     'res.users',
     [['id', '=', getUID()]],
@@ -69,7 +69,7 @@ async function cmdShowWhoAmI() {
     companies: companies_list,
     groups: groups_list,
   };
-  this.screen.print(renderWhoami(template_values));
+  screen.print(renderWhoami(template_values));
   return template_values;
 }
 

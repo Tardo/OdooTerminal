@@ -3,10 +3,10 @@
 
 import getOdooSession from '@odoo/utils/get_odoo_session';
 
-async function cmdLogOut() {
+async function cmdLogOut(kwargs, screen) {
   const res = await getOdooSession().session_logout();
-  this.screen.updateInputInfo({username: 'Public User'});
-  this.screen.print('Logged out');
+  screen.updateInputInfo({username: 'Public User'});
+  screen.print('Logged out');
   await this.execute('reload', false, true);
   return res;
 }

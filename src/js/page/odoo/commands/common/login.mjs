@@ -4,7 +4,7 @@
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import {ARG} from '@trash/constants';
 
-async function cmdLoginAs(kwargs) {
+async function cmdLoginAs(kwargs, screen) {
   const session = getOdooSession();
   let db = kwargs.database;
   let login = kwargs.user;
@@ -25,8 +25,8 @@ async function cmdLoginAs(kwargs) {
   }
 
   const res = await session._session_authenticate(db, login, passwd);
-  this.screen.updateInputInfo({username: login});
-  this.screen.print(`Successfully logged as '${login}'`);
+  screen.updateInputInfo({username: login});
+  screen.print(`Successfully logged as '${login}'`);
   if (!kwargs.no_reload) {
     await this.execute('reload', false, true);
   }

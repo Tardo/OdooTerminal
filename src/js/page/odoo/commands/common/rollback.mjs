@@ -4,13 +4,13 @@
 import Recordset from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
 
-async function cmdRollback(kwargs) {
+async function cmdRollback(kwargs, screen) {
   if (!Recordset.isValid(kwargs.recordset)) {
     throw new Error(`Invalid recordset`);
   }
 
   kwargs.recordset.rollback();
-  this.screen.print(`Recordset changes undone`);
+  screen.print(`Recordset changes undone`);
 }
 
 export default {

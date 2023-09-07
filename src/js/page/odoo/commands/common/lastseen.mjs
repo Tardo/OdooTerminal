@@ -3,7 +3,7 @@
 
 import searchRead from '@odoo/orm/search_read';
 
-async function cmdLastSeen() {
+async function cmdLastSeen(kwargs, screen) {
   if (!this.longpolling) {
     throw new Error("Can't use lastseen, 'bus' module is not installed");
   }
@@ -27,7 +27,7 @@ async function cmdLastSeen() {
         record.last_presence,
       );
     }
-    this.screen.printTable(['User Name', 'User ID', 'Last Seen'], rows);
+    screen.printTable(['User Name', 'User ID', 'Last Seen'], rows);
     return result;
   });
 }

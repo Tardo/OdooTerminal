@@ -3,7 +3,7 @@
 
 import callModel from '@odoo/osv/call_model';
 
-async function cmdUpdateAppList() {
+async function cmdUpdateAppList(kwargs, screen) {
   return callModel(
     'ir.module.module',
     'update_list',
@@ -12,9 +12,9 @@ async function cmdUpdateAppList() {
     this.getContext(),
   ).then(result => {
     if (result) {
-      this.screen.print('The apps list has been updated successfully');
+      screen.print('The apps list has been updated successfully');
     } else {
-      this.screen.printError("Can't update the apps list!");
+      screen.printError("Can't update the apps list!");
     }
     return result;
   });

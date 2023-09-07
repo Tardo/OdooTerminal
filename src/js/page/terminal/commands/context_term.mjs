@@ -3,7 +3,7 @@
 
 import {ARG} from '@trash/constants';
 
-async function cmdTerminalContextOperation(kwargs) {
+async function cmdTerminalContextOperation(kwargs, screen) {
   if (kwargs.operation === 'set') {
     this.userContext = kwargs.value;
   } else if (kwargs.operation === 'write') {
@@ -17,7 +17,7 @@ async function cmdTerminalContextOperation(kwargs) {
       );
     }
   }
-  this.screen.print(this.userContext);
+  screen.print(this.userContext);
   return this.userContext;
 }
 

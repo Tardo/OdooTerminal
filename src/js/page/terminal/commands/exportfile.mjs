@@ -5,11 +5,11 @@ import save2file from '@terminal/utils/save2file';
 import uniqueId from '@terminal/utils/unique_id';
 import {ARG} from '@trash/constants';
 
-async function cmdExportFile(kwargs) {
+async function cmdExportFile(kwargs, screen) {
   const filename = `${uniqueId('term')}_${new Date().getTime()}.json`;
   const data = JSON.stringify(kwargs.value, null, 4);
   save2file(filename, 'text/json', data);
-  this.screen.print(`Command result exported to '${filename}' file`);
+  screen.print(`Command result exported to '${filename}' file`);
   return filename;
 }
 

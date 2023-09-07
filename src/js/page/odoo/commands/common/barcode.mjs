@@ -51,20 +51,20 @@ function getBarcodeInfo(barcodeService) {
   ];
 }
 
-async function cmdBarcode(kwargs) {
+async function cmdBarcode(kwargs, screen) {
   const barcodeService = getOdooService(
     'barcodes.BarcodeEvents',
     '@barcodes/barcode_service',
   );
   if (!barcodeService) {
     // Soft-dependency... this don't exists if barcodes module is not installed
-    this.screen.printError("The 'barcode' module is not installed/available");
+    screen.printError("The 'barcode' module is not installed/available");
     return;
   }
 
   if (kwargs.operation === 'info') {
     const info = getBarcodeInfo(barcodeService);
-    this.screen.eprint(info);
+    screen.eprint(info);
     return info;
   } else if (kwargs.operation === 'send') {
     if (!kwargs.data) {

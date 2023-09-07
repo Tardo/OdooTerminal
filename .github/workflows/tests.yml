@@ -52,7 +52,7 @@ jobs:
         run: npx prettier . --check
 
       - name: eslint
-        run: npx eslint --color
+        run: npx eslint --color .
 
       - name: Build dist/ files
         run: npm run prod:build

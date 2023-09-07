@@ -7,7 +7,6 @@ import getOdooService from './utils/get_odoo_service';
  * This class is used to generate values for terminal command parameters.
  */
 export default class ParameterGenerator {
-  #intIterStore = 0;
   #rndLetter = {
     [Symbol.iterator]: function* () {
       const characters = 'bcdfghjklmnpqrstvwxyz ';
@@ -43,10 +42,6 @@ export default class ParameterGenerator {
       }
     },
   };
-
-  resetStores() {
-    this.#intIterStore = 0;
-  }
 
   generateEmail(min, max) {
     if (typeof min === 'undefined') {
@@ -98,12 +93,6 @@ export default class ParameterGenerator {
       numbers.push(i);
     }
     return numbers;
-  }
-
-  doIntIter(min, step = 1) {
-    const int_iter = (Number(min) || 0) + this.#intIterStore;
-    this.#intIterStore += Number(step);
-    return int_iter;
   }
 
   generateString(min, max) {

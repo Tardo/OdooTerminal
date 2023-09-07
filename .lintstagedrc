@@ -1,4 +1,0 @@
-{
-  "*": ["prettier --write"],
-  "*.mjs,*.js": ["eslint --color --fix"]
-}

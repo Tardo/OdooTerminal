@@ -6,14 +6,14 @@ import Recordset from '@terminal/core/recordset';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 
-async function cmdCommit(kwargs) {
+async function cmdCommit(kwargs, screen) {
   if (!Recordset.isValid(kwargs.recordset)) {
     throw new Error('Invalid recordset');
   }
 
   const values_to_write = kwargs.recordset.toWrite();
   if (isEmpty(values_to_write)) {
-    this.screen.printError('Nothing to commit!');
+    screen.printError('Nothing to commit!');
     return false;
   }
   const pids = [];
@@ -27,7 +27,7 @@ async function cmdCommit(kwargs) {
 
   await Promise.all(tasks);
   kwargs.recordset.persist();
-  this.screen.print(
+  screen.print(
     `Records '${pids}' of ${kwargs.recordset.model} updated successfully`,
   );
   return true;

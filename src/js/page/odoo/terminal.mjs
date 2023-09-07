@@ -46,6 +46,7 @@ export default class OdooTerminal extends Terminal {
    */
   onStart() {
     super.onStart();
+    this.parameterGenerator = new ParameterGenerator();
     try {
       this.longpolling = new Longpolling(this);
     } catch (err) {
@@ -53,15 +54,6 @@ export default class OdooTerminal extends Terminal {
       console.warn("[OdooTerminal] Can't initilize longpolling: ", err);
       this.longpolling = false;
     }
-  }
-
-  getCommandJobMeta(command_info, job_index, silent = false) {
-    const meta = super.getCommandJobMeta(command_info, job_index, silent);
-    Object.assign(meta, {
-      parameterGenerator: new ParameterGenerator(),
-    });
-    console.log(meta);
-    return meta;
   }
 
   /**

@@ -6,24 +6,25 @@ import getFieldsInfo from '@odoo/orm/get_fields_info';
 import {default as Recordset} from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
 
-async function cmdSearchModelRecord(kwargs) {
-  const lines_total = this.screen.maxLines - 3;
+const search_buffer = {};
+async function cmdSearchModelRecord(kwargs, screen, meta) {
+  const lines_total = screen.maxLines - 3;
   let fields = kwargs.field[0] === '*' ? false : kwargs.field;
 
   if (kwargs.more) {
-    const buff = this._buffer[this.__meta.name];
+    const buff = search_buffer[meta.name];
     if (!buff || !buff.data.length) {
       throw new Error('There are no more results to print');
     }
     const sresult = buff.data.slice(0, lines_total);
     buff.data = buff.data.slice(lines_total);
     const recordset = Recordset.make(kwargs.model, sresult);
-    this.screen.print(recordset);
+    screen.print(recordset);
     if (buff.data.length) {
-      this.screen.printError(
+      screen.printError(
         `<strong class='text-warning'>Result truncated to ${sresult.length} records!</strong> The query is too big to be displayed entirely.`,
       );
-      const res = await this.screen.showQuestion(
+      const res = await screen.showQuestion(
         `There are still results to print (${buff.data.length} records). Show more?`,
         ['y', 'n'],
         'y',
@@ -75,26 +76,26 @@ async function cmdSearchModelRecord(kwargs) {
   }
 
   const need_truncate =
-    !this.__meta.silent && !kwargs.all && result.length > lines_total;
+    !meta.silent && !kwargs.all && result.length > lines_total;
   let sresult = result;
   if (need_truncate) {
-    this._buffer[this.__meta.name] = {
+    search_buffer[meta.name] = {
       model: kwargs.model,
       data: sresult.slice(lines_total),
     };
     sresult = sresult.slice(0, lines_total);
   }
   const recordset = Recordset.make(kwargs.model, sresult);
-  this.screen.print(recordset);
-  this.screen.print(`Records count: ${sresult.length}`);
+  screen.print(recordset);
+  screen.print(`Records count: ${sresult.length}`);
   if (need_truncate) {
-    this.screen.printError(
+    screen.printError(
       `<strong class='text-warning'>Result truncated to ${sresult.length} records!</strong> The query is too big to be displayed entirely.`,
     );
-    return this.screen
+    return screen
       .showQuestion(
         `There are still results to print (${
-          this._buffer[this.__meta.name].data.length
+          search_buffer[meta.name].data.length
         } records). Show more?`,
         ['y', 'n'],
         'y',

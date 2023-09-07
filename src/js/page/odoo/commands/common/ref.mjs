@@ -5,7 +5,7 @@ import callModel from '@odoo/osv/call_model';
 import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
 import {ARG} from '@trash/constants';
 
-async function cmdRef(kwargs) {
+async function cmdRef(kwargs, screen) {
   const OdooVer = getOdooVersionMajor();
   const tasks = [];
   for (const xmlid of kwargs.xmlid) {
@@ -50,7 +50,7 @@ async function cmdRef(kwargs) {
     const item = results[x];
     rows[row_index].push(item[0], item[1], item[2]);
   }
-  this.screen.printTable(['XML ID', 'Res. Model', 'Res. ID'], rows);
+  screen.printTable(['XML ID', 'Res. Model', 'Res. ID'], rows);
   return results;
 }
 

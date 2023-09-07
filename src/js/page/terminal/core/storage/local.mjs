@@ -4,7 +4,6 @@
 import checkStorageError from '@terminal/utils/check_storage_error';
 
 export function getStorageItem(item, def_value) {
-  debugger;
   const res = localStorage.getItem(item);
   if (res === null) {
     return def_value;

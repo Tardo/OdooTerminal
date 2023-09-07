@@ -7,7 +7,7 @@ import {ARG} from '@trash/constants';
 
 const session = getOdooSession();
 
-async function cmdContextOperation(kwargs) {
+async function cmdContextOperation(kwargs, screen) {
   const OdooVer = getOdooVersionMajor();
   if (OdooVer >= 15) {
     if (
@@ -16,9 +16,7 @@ async function cmdContextOperation(kwargs) {
       kwargs.operation === 'delete'
     ) {
       // Soft-Error
-      this.screen.printError(
-        'This operation is currently not supported in v15.0+',
-      );
+      screen.printError('This operation is currently not supported in v15.0+');
       return;
     }
   }
@@ -36,7 +34,7 @@ async function cmdContextOperation(kwargs) {
       );
     }
   }
-  this.screen.print(session.user_context);
+  screen.print(session.user_context);
   return session.user_context;
 }
 

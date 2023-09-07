@@ -1,12 +1,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import rpcQuery from '@odoo/rpc';
 import {ARG} from '@trash/constants';
 
-async function cmdRpc(kwargs) {
-  const result = await rpc.query(kwargs.options);
-  this.screen.eprint(result);
+async function cmdRpc(kwargs, screen) {
+  const result = await rpcQuery(kwargs.options);
+  screen.eprint(result);
   return result;
 }
 

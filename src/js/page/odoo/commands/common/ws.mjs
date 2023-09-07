@@ -13,23 +13,23 @@ async function cmdWebSocket(kwargs) {
     }`;
     const socket = new WebSocket(url);
     socket.onopen = () => {
-      this.screen.print(`[${url}] Connection established`);
+      screen.print(`[${url}] Connection established`);
       socket.send('initialized');
     };
     socket.onmessage = ev => {
-      this.screen.print(`[${url}] ${ev.data}`);
+      screen.print(`[${url}] ${ev.data}`);
     };
     socket.onclose = ev => {
       if (ev.wasClean) {
-        this.screen.print(
+        screen.print(
           `[${url}] Connection closed cleanly, code=${ev.code} reason=${ev.reason}`,
         );
       } else {
-        this.screen.print(`[${url}] Connection died`);
+        screen.print(`[${url}] Connection died`);
       }
     };
     socket.onerror = () => {
-      this.screen.eprint(`[${url}] ERROR!`);
+      screen.eprint(`[${url}] ERROR!`);
     };
     return socket;
   } else if (kwargs.operation === 'send') {
@@ -38,7 +38,7 @@ async function cmdWebSocket(kwargs) {
     }
     // { event_name: 'subscribe', data: { channels: allTabsChannels, last: this.lastNotificationId } }
     const payload = JSON.stringify(kwargs.data);
-    this.screen.eprint(`Sending '${payload}'...`);
+    screen.eprint(`Sending '${payload}'...`);
     kwargs.websocket.send(payload);
     return;
   } else if (kwargs.operation === 'close') {

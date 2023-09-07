@@ -1,23 +1,23 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {showEffect} from '@odoo/root';
+import showEffect from '@odoo/base/show_effect';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 
-async function cmdShowEffect(kwargs) {
+async function cmdShowEffect(kwargs, screen) {
   if (getOdooVersionMajor() < 15) {
     // Soft-Error
-    this.screen.printError('This command is only available in Odoo 15.0+');
+    screen.printError('This command is only available in Odoo 15.0+');
     return;
   }
   if (isEmpty(kwargs.type)) {
     const {registry} = getOdooService('@web/core/registry');
     const effects = registry.category('effects');
-    this.screen.print('Available effects:');
-    this.screen.print(effects.getEntries().map(item => item[0]));
+    screen.print('Available effects:');
+    screen.print(effects.getEntries().map(item => item[0]));
   } else {
     showEffect(kwargs.type, kwargs.options);
   }

@@ -5,17 +5,17 @@ import {ARG} from '@trash/constants';
 import postMessage from '@common/utils/post_message';
 import Recordset from '@terminal/core/recordset.mjs';
 
-function onMessageCopyDone(resolve, data) {
+function onMessageCopyDone(resolve, screen, data) {
   // This is necessary due to 'bound' function usage
   this.removeMessageListener(
     'ODOO_TERM_COPY_DONE',
     onMessageCopyDone.bind(this, resolve),
   );
-  this.screen.print('Data copied!');
+  screen.print('Data copied!');
   resolve(data.values);
 }
 
-function cmdCopy(kwargs) {
+function cmdCopy(kwargs, screen) {
   return new Promise(resolve => {
     const vals = {
       type: 'var',
@@ -30,7 +30,7 @@ function cmdCopy(kwargs) {
     }
     this.addMessageListener(
       'ODOO_TERM_COPY_DONE',
-      onMessageCopyDone.bind(this, resolve),
+      onMessageCopyDone.bind(this, resolve, screen),
     );
     postMessage({
       type: 'ODOO_TERM_COPY',

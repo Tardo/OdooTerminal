@@ -3,19 +3,17 @@
 
 import {ARG} from '@trash/constants';
 
-async function cmdSetDebugMode(kwargs) {
+async function cmdSetDebugMode(kwargs, screen) {
   if (kwargs.mode === 0) {
-    this.screen.print(
-      'Debug mode <strong>disabled</strong>. Reloading page...',
-    );
+    screen.print('Debug mode <strong>disabled</strong>. Reloading page...');
     const qs = $.deparam.querystring();
     delete qs.debug;
     window.location.search = '?' + $.param(qs);
   } else if (kwargs.mode === 1) {
-    this.screen.print('Debug mode <strong>enabled</strong>. Reloading page...');
+    screen.print('Debug mode <strong>enabled</strong>. Reloading page...');
     window.location = $.param.querystring(window.location.href, 'debug=1');
   } else if (kwargs.mode === 2) {
-    this.screen.print(
+    screen.print(
       'Debug mode with assets <strong>enabled</strong>. Reloading page...',
     );
     window.location = $.param.querystring(window.location.href, 'debug=assets');

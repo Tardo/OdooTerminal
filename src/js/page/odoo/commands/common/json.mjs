@@ -1,19 +1,17 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import rpcQuery from '@odoo/rpc';
 import {ARG} from '@trash/constants';
 
-async function cmdPostJSONData(kwargs) {
-  return rpc
-    .query({
-      route: kwargs.endpoint,
-      params: kwargs.data,
-    })
-    .then(result => {
-      this.screen.eprint(result, false, 'line-pre');
-      return result;
-    });
+async function cmdPostJSONData(kwargs, screen) {
+  return rpcQuery({
+    route: kwargs.endpoint,
+    params: kwargs.data,
+  }).then(result => {
+    screen.eprint(result, false, 'line-pre');
+    return result;
+  });
 }
 
 export default {

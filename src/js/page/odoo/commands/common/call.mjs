@@ -1,25 +1,23 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import rpcQuery from '@odoo/rpc';
 import {ARG} from '@trash/constants';
 
-async function cmdCallModelMethod(kwargs) {
+async function cmdCallModelMethod(kwargs, screen) {
   const pkwargs = kwargs.kwarg;
   if (typeof pkwargs.context === 'undefined') {
     pkwargs.context = this.getContext();
   }
-  return rpc
-    .query({
-      method: kwargs.call,
-      model: kwargs.model,
-      args: kwargs.argument,
-      kwargs: pkwargs,
-    })
-    .then(result => {
-      this.screen.eprint(result, false, 'line-pre');
-      return result;
-    });
+  return rpcQuery({
+    method: kwargs.call,
+    model: kwargs.model,
+    args: kwargs.argument,
+    kwargs: pkwargs,
+  }).then(result => {
+    screen.eprint(result, false, 'line-pre');
+    return result;
+  });
 }
 
 export default {

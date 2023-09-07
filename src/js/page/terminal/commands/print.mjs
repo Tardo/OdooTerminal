@@ -3,8 +3,8 @@
 
 import {ARG} from '@trash/constants';
 
-async function cmdPrint(kwargs) {
-  this.screen.print(kwargs.msg);
+async function cmdPrint(kwargs, screen) {
+  screen.print(kwargs.msg);
   return kwargs.msg;
 }
 

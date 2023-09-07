@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {doAction} from '@odoo/root';
+import doAction from '@odoo/base/do_action';
 import {ARG} from '@trash/constants';
 
 async function cmdCallAction(kwargs) {

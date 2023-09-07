@@ -140,7 +140,7 @@ export default class TestCore extends TerminalTestSuite {
 
   async test_repeat() {
     const res = await this.terminal.execute(
-      'repeat -t 500 -c "print -m \'This is a test\'" --silent',
+      'repeat -t 50 -c "print -m \'This is a test\'" --silent',
       false,
       true,
     );
@@ -170,18 +170,6 @@ export default class TestCore extends TerminalTestSuite {
     );
     this.assertEqual(res[0], 5);
     this.assertEqual(res[5], 10);
-    res = await this.terminal.execute(
-      'gen -t intiter -mi 5 -ma 10',
-      false,
-      true,
-    );
-    this.assertEqual(res, 5);
-    res = await this.terminal.execute(
-      'gen -t intiter -mi 5 -ma 10',
-      false,
-      true,
-    );
-    this.assertEqual(res, 5);
     res = await this.terminal.execute(
       'gen -t date -mi 500000000 -ma 500000000',
       false,

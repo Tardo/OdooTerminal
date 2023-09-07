@@ -4,17 +4,17 @@
 import getOdooService from '@odoo/utils/get_odoo_service';
 import {ARG} from '@trash/constants';
 
-async function cmdPostData(kwargs) {
+async function cmdPostData(kwargs, screen) {
   if (kwargs.mode === 'odoo') {
     return getOdooService('web.ajax')
       .post(kwargs.endpoint, kwargs.data)
       .then(result => {
-        this.screen.eprint(result, false, 'line-pre');
+        screen.eprint(result, false, 'line-pre');
         return result;
       });
   }
   return $.post(kwargs.endpoint, kwargs.data, result => {
-    this.screen.eprint(result, false, 'line-pre');
+    screen.eprint(result, false, 'line-pre');
     return result;
   });
 }

@@ -43,13 +43,13 @@ npm run dev:watch
 
 - Chromium:
   ```sh
-  npm run chromium
+  npm run start:chromium
   ```
 - Chrome:
   ```sh
-  npm run chrome
+  npm run start:chrome
   ```
 - Firefox:
   ```sh
-  npm run firefox
+  npm run start:firefox
   ```

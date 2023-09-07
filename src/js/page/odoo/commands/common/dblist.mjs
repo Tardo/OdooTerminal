@@ -1,18 +1,18 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import rpc from '@odoo/rpc';
+import rpcQuery from '@odoo/rpc';
 import callService from '@odoo/osv/call_service';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import {ARG} from '@trash/constants';
 
-async function cmdShowDBList(kwargs) {
+async function cmdShowDBList(kwargs, screen) {
   const session = getOdooSession();
   const _onSuccess = databases => {
     const databases_len = databases.length;
     if (!databases_len) {
       // Soft-Error
-      this.screen.printError("Can't get database names");
+      screen.printError("Can't get database names");
       return;
     }
     // Search active database
@@ -22,7 +22,7 @@ async function cmdShowDBList(kwargs) {
       const database = databases[index];
       if (kwargs.only_active) {
         if (database === session.db) {
-          this.screen.eprint(database);
+          screen.eprint(database);
           return database;
         }
       } else if (database === session.db) {
@@ -36,7 +36,7 @@ async function cmdShowDBList(kwargs) {
     if (kwargs.only_active) {
       return false;
     }
-    this.screen.print(s_databases);
+    screen.print(s_databases);
     return databases;
   };
   const _onError = err => {
@@ -44,23 +44,21 @@ async function cmdShowDBList(kwargs) {
       throw err;
     }
     // Heuristic way to determine the database name
-    return rpc
-      .query({
-        route: '/websocket/peek_notifications',
-        params: [
-          ['channels', []],
-          ['last', 9999999],
-          ['is_first_poll', true],
-        ],
-      })
-      .then(result => {
-        if (result.channels[0]) {
-          const dbname = result.channels[0][0];
-          this.screen.eprint(dbname);
-          return dbname;
-        }
-        return false;
-      });
+    return rpcQuery({
+      route: '/websocket/peek_notifications',
+      params: [
+        ['channels', []],
+        ['last', 9999999],
+        ['is_first_poll', true],
+      ],
+    }).then(result => {
+      if (result.channels[0]) {
+        const dbname = result.channels[0][0];
+        screen.eprint(dbname);
+        return dbname;
+      }
+      return false;
+    });
   };
 
   // Check if using deferred jquery or native promises

@@ -3,12 +3,12 @@
 
 import {ARG} from '@trash/constants';
 
-async function cmdChrono(kwargs) {
+async function cmdChrono(kwargs, screen) {
   let time_elapsed_secs = -1;
   const start_time = new Date();
   await this.execute(kwargs.cmd, false);
   time_elapsed_secs = (new Date() - start_time) / 1000.0;
-  this.screen.print(`Time elapsed: '${time_elapsed_secs}' seconds`);
+  screen.print(`Time elapsed: '${time_elapsed_secs}' seconds`);
   return time_elapsed_secs;
 }
 

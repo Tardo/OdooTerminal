@@ -123,9 +123,7 @@ export default class CommandAssistant {
       callback([]);
       return;
     }
-    const parse_info = this.#virtMachine.parse(data, {
-      needResetStores: false,
-    });
+    const parse_info = this.#virtMachine.parse(data);
     const ret = [];
     const [sel_cmd_index, sel_token_index, sel_arg_index] =
       this.getSelectedParameterIndex(parse_info, caret_pos);

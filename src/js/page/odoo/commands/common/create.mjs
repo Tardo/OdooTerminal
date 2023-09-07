@@ -1,13 +1,13 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {doAction} from '@odoo/root';
+import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
 import Recordset from '@terminal/core/recordset';
 import renderRecordCreated from '@odoo/templates/record_created';
 import {ARG} from '@trash/constants';
 
-async function cmdCreateModelRecord(kwargs) {
+async function cmdCreateModelRecord(kwargs, screen) {
   if (typeof kwargs.value === 'undefined') {
     await doAction({
       type: 'ir.actions.act_window',
@@ -24,7 +24,7 @@ async function cmdCreateModelRecord(kwargs) {
     kwargs.value,
     this.getContext(),
   );
-  this.screen.print(
+  screen.print(
     renderRecordCreated({
       model: kwargs.model,
       new_ids: results,

@@ -3,47 +3,41 @@
 
 import {ARG} from '@trash/constants';
 
-async function longPollingAddChannel(name) {
-  if (typeof name === 'undefined') {
-    this.screen.printError('Invalid channel name.');
-  } else {
-    this.longpolling.addChannel(name);
-    this.screen.print(`Joined the '${name}' channel.`);
-  }
-}
-
-function longPollingDelChannel(name) {
-  if (typeof name === 'undefined') {
-    this.screen.printError('Invalid channel name.');
-  } else {
-    this.longpolling.deleteChannel(name);
-    this.screen.print(`Leave the '${name}' channel.`);
-  }
-}
-
-function cmdLongpolling(kwargs) {
+function cmdLongpolling(kwargs, screen) {
   if (!this.longpolling) {
     throw new Error("Can't use longpolling, 'bus' module is not installed");
   }
 
   if (typeof kwargs.operation === 'undefined') {
-    this.screen.print(this.longpolling.isVerbose() || 'off');
+    screen.print(this.longpolling.isVerbose() || 'off');
   } else if (kwargs.operation === 'verbose') {
     this.longpolling.setVerbose(true);
-    this.screen.print('Now long-polling is in verbose mode.');
+    screen.print('Now long-polling is in verbose mode.');
   } else if (kwargs.operation === 'off') {
     this.longpolling.setVerbose(false);
-    this.screen.print('Now long-polling verbose mode is disabled');
-  } else if (kwargs.operation === 'add_channel') {
-    longPollingAddChannel(kwargs.param);
-  } else if (kwargs.operation === 'del_channel') {
-    longPollingDelChannel(kwargs.param);
+    screen.print('Now long-polling verbose mode is disabled');
+  } else if (
+    kwargs.operation === 'add_channel' ||
+    kwargs.operation === 'del_channel'
+  ) {
+    const channel_name = kwargs.param;
+    if (typeof channel_name === 'undefined') {
+      screen.printError('Invalid channel name.');
+    } else {
+      if (kwargs.operation === 'add_channel') {
+        this.longpolling.addChannel(channel_name);
+        screen.print(`Joined the '${channel_name}' channel.`);
+      } else if (kwargs.operation === 'del_channel') {
+        this.longpolling.deleteChannel(channel_name);
+        screen.print(`Leave the '${channel_name}' channel.`);
+      }
+    }
   } else if (kwargs.operation === 'start') {
     this.longpolling.startPoll();
-    this.screen.print('Longpolling started');
+    screen.print('Longpolling started');
   } else if (kwargs.operation === 'stop') {
     this.longpolling.stopPoll();
-    this.screen.print('Longpolling stopped');
+    screen.print('Longpolling stopped');
   } else {
     throw new Error('Invalid Operation.');
   }

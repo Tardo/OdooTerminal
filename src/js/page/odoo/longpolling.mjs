@@ -6,7 +6,8 @@ import {
   removeStorageItem,
   setStorageItem,
 } from '@terminal/core/storage/local';
-import {default as OdooRoot, doCall} from './root';
+import getOdooEnv from './base/get_odoo_env';
+import doCall from './base/do_call';
 import getOdooService from './utils/get_odoo_service';
 import getOdooVersionMajor from './utils/get_odoo_version_major';
 
@@ -36,7 +37,7 @@ export default class Longpolling {
   #busServ(method, ...params) {
     const OdooVer = getOdooVersionMajor();
     if (OdooVer >= 16) {
-      const bus_serv = OdooRoot()?.env?.services?.bus_service;
+      const bus_serv = getOdooEnv()?.services?.bus_service;
       if (!bus_serv) {
         throw new Error('bus service not available');
       }

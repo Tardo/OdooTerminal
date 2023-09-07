@@ -4,10 +4,10 @@
 import uniqueId from '@terminal/utils/unique_id';
 import {ARG} from '@trash/constants';
 
-async function cmdExportVar(kwargs) {
+async function cmdExportVar(kwargs, screen) {
   const varname = uniqueId('term');
   window[varname] = kwargs.value;
-  this.screen.print(
+  screen.print(
     `Command result exported! now you can use '${varname}' variable in the browser console`,
   );
   return varname;

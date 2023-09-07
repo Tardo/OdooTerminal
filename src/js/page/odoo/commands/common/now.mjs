@@ -4,7 +4,7 @@
 import getOdooService from '@odoo/utils/get_odoo_service';
 import {ARG} from '@trash/constants';
 
-async function cmdNow(kwargs) {
+async function cmdNow(kwargs, screen) {
   const time = getOdooService('web.time');
   let res = false;
   if (kwargs.type === 'full') {
@@ -27,7 +27,7 @@ async function cmdNow(kwargs) {
     }
   }
 
-  this.screen.print(res);
+  screen.print(res);
   return res;
 }
 

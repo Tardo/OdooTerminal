@@ -14,7 +14,7 @@ function sanitizeCmdModuleDepends(module_name) {
   return module_name;
 }
 
-async function cmdModuleDepends(kwargs) {
+async function cmdModuleDepends(kwargs, screen) {
   return callModel(
     'res.config.settings',
     'onchange_module',
@@ -24,12 +24,12 @@ async function cmdModuleDepends(kwargs) {
   ).then(result => {
     let depend_names = [];
     if (isEmpty(result)) {
-      this.screen.printError(`The module '${kwargs.module}' isn't installed`);
+      screen.printError(`The module '${kwargs.module}' isn't installed`);
     } else {
       depend_names = result.warning.message
         .substr(result.warning.message.search('\n') + 1)
         .split('\n');
-      this.screen.print(depend_names);
+      screen.print(depend_names);
       return depend_names;
     }
     return depend_names;

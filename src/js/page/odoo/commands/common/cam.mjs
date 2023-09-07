@@ -4,7 +4,7 @@
 import callModel from '@odoo/osv/call_model';
 import {ARG} from '@trash/constants';
 
-async function cmdCheckModelAccess(kwargs) {
+async function cmdCheckModelAccess(kwargs, screen) {
   return callModel(
     kwargs.model,
     'check_access_rights',
@@ -13,11 +13,11 @@ async function cmdCheckModelAccess(kwargs) {
     this.getContext(),
   ).then(result => {
     if (result) {
-      this.screen.print(
+      screen.print(
         `You have access rights for '${kwargs.operation}' on ${kwargs.model}`,
       );
     } else {
-      this.screen.print(`You can't '${kwargs.operation}' on ${kwargs.model}`);
+      screen.print(`You can't '${kwargs.operation}' on ${kwargs.model}`);
     }
     return result;
   });

@@ -4,7 +4,7 @@
 import getOdooService from '@odoo/utils/get_odoo_service';
 import {ARG} from '@trash/constants';
 
-async function cmdRunTour(kwargs) {
+async function cmdRunTour(kwargs, screen) {
   // Loaded in this way because 'tour' is not initialized on mobile mode.
   const tour = getOdooService('web_tour.tour');
   if (!tour) {
@@ -16,12 +16,12 @@ async function cmdRunTour(kwargs) {
       throw new Error("The given tour doesn't exists!");
     }
     tour.run(kwargs.name);
-    this.screen.print('Running tour...');
+    screen.print('Running tour...');
   } else if (tour_names.length) {
-    this.screen.print(tour_names);
+    screen.print(tour_names);
     return tour_names;
   } else {
-    this.screen.print('The tour list is empty');
+    screen.print('The tour list is empty');
   }
 }
 

@@ -7,7 +7,7 @@ import UnknownCommandError from '@trash/exceptions/unknown_command_error';
 import difference from '@trash/utils/difference';
 import VMachine from '@trash/vmachine';
 import CommandAssistant from './core/command_assistant';
-import Screen from './core/screen';
+import {default as Screen, ScreenCommandHandler} from './core/screen';
 import {getStorageItem as getStorageLocalItem} from './core/storage/local';
 import {
   getStorageItem as getStorageSessionItem,
@@ -32,7 +32,7 @@ export default class Terminal {
 
   #inputHistory = [];
   #searchHistoryQuery = '';
-  #searchHistoryIter = -1;
+  #searchHistoryIter = 0;
 
   #hasExecInitCmds = false;
 
@@ -218,6 +218,7 @@ export default class Terminal {
       {
         definition: 'Undefined command',
         callback: this.#fallbackExecuteCommand,
+        services: [],
         detail: "This command hasn't a properly detailed information",
         args: [],
         secured: false,
@@ -470,10 +471,10 @@ export default class Terminal {
         return (
           item !== last_str &&
           item.indexOf(this.#searchHistoryQuery) === 0 &&
-          i < this.#searchHistoryIter
+          i <= this.#searchHistoryIter
         );
       }
-      return item !== last_str && i < this.#searchHistoryIter;
+      return i < this.#searchHistoryIter;
     });
     if (this.#searchHistoryIter === -1) {
       this.#searchHistoryIter = orig_iter;
@@ -489,13 +490,13 @@ export default class Terminal {
         return (
           item !== last_str &&
           item.indexOf(this.#searchHistoryQuery) === 0 &&
-          i > this.#searchHistoryIter
+          i >= this.#searchHistoryIter
         );
       }
-      return item !== last_str && i > this.#searchHistoryIter;
+      return i > this.#searchHistoryIter;
     });
     if (this.#searchHistoryIter === -1) {
-      this.#searchHistoryIter = this.#inputHistory.length - 1;
+      this.#searchHistoryIter = this.#inputHistory.length;
       return false;
     }
     return this.#inputHistory[this.#searchHistoryIter];
@@ -561,14 +562,19 @@ export default class Terminal {
     let result = false;
     let error = false;
     let is_failed = false;
-    this.__meta = this.getCommandJobMeta(command_info, job_index, silent);
-    this.screen.__meta = this.__meta;
+    const meta = this.getCommandJobMeta(command_info, job_index, silent);
     try {
+      const cmdScreen = new Proxy(
+        this.screen,
+        Object.assign({}, ScreenCommandHandler, {silent: silent}),
+      );
       result =
-        (await command_info.cmdDef.callback.call(this, command_info.kwargs)) ||
-        true;
-      delete this.__meta;
-      delete this.screen.__meta;
+        (await command_info.cmdDef.callback.call(
+          this,
+          command_info.kwargs,
+          cmdScreen,
+          meta,
+        )) || true;
     } catch (err) {
       is_failed = true;
       error =
@@ -731,10 +737,10 @@ export default class Terminal {
     let user_input = this.screen.getUserInput();
     if (user_input && ev.target.selectionStart === user_input.length) {
       this.#searchHistoryQuery = user_input;
-      this.#searchHistoryIter = this.#inputHistory.length - 1;
+      this.#searchHistoryIter = this.#inputHistory.length;
       this.#onKeyArrowUp();
       this.#searchHistoryQuery = user_input;
-      this.#searchHistoryIter = this.#inputHistory.length - 1;
+      this.#searchHistoryIter = this.#inputHistory.length;
     }
     user_input = this.screen.getUserInput();
 
@@ -772,9 +778,7 @@ export default class Terminal {
       return;
     }
 
-    const parse_info = this.parse(user_input, {
-      needResetStores: false,
-    });
+    const parse_info = this.parse(user_input);
     const [sel_cmd_index, sel_token_index] =
       this.#commandAssistant.getSelectedParameterIndex(
         parse_info,
@@ -826,11 +830,11 @@ export default class Terminal {
       },
     );
     this.#searchHistoryQuery = user_input;
-    this.#searchHistoryIter = this.#inputHistory.length - 1;
+    this.#searchHistoryIter = this.#inputHistory.length;
     if (user_input) {
       const found_hist = this.#doSearchPrevHistory();
       this.screen.updateShadowInput(found_hist || '');
-      this.#searchHistoryIter = this.#inputHistory.length - 1;
+      this.#searchHistoryIter = this.#inputHistory.length;
     } else {
       this.screen.cleanShadowInput();
     }
@@ -852,7 +856,7 @@ export default class Terminal {
       } else if (ev.keyCode === $.ui.keyCode.TAB) {
         this.#onKeyTab(ev);
       } else {
-        this.#searchHistoryIter = this.#inputHistory.length - 1;
+        this.#searchHistoryIter = this.#inputHistory.length;
         this.#searchHistoryQuery = undefined;
       }
     } else if (ev.keyCode === $.ui.keyCode.ENTER) {

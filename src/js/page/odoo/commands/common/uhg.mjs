@@ -4,7 +4,7 @@
 import callModel from '@odoo/osv/call_model';
 import {ARG} from '@trash/constants';
 
-async function cmdUserHasGroups(kwargs) {
+async function cmdUserHasGroups(kwargs, screen) {
   return callModel(
     'res.users',
     'user_has_groups',
@@ -12,7 +12,7 @@ async function cmdUserHasGroups(kwargs) {
     null,
     this.getContext(),
   ).then(result => {
-    this.screen.print(result);
+    screen.print(result);
     return result;
   });
 }
