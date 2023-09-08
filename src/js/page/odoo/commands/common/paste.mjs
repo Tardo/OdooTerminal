@@ -63,7 +63,7 @@ function onMessagePasteDone(
   // This is necessary due to 'bound' function usage
   this.removeMessageListener(
     'ODOO_TERM_PASTE_DONE',
-    onMessagePasteDone.bind(this, resolve, reject, merge),
+    onMessagePasteDone.bind(this, screen, resolve, reject, merge),
   );
   const msg_vals = vals.values;
   if (isEmpty(msg_vals) || isEmpty(msg_vals.data)) {
@@ -98,13 +98,16 @@ function onMessagePasteDone(
       })
       .then(res => {
         return resolve(res);
+      })
+      .catch(err => {
+        return reject(err);
       });
+  } else {
+    return resolve(data_parsed);
   }
-
-  return resolve(data_parsed);
 }
 
-function cmdPaste(kwargs) {
+function cmdPaste(kwargs, screen) {
   return new Promise((resolve, reject) => {
     this.addMessageListener(
       'ODOO_TERM_PASTE_DONE',

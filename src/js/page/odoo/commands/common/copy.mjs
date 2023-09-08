@@ -32,10 +32,8 @@ function cmdCopy(kwargs, screen) {
       'ODOO_TERM_COPY_DONE',
       onMessageCopyDone.bind(this, resolve, screen),
     );
-    postMessage({
-      type: 'ODOO_TERM_COPY',
+    postMessage('ODOO_TERM_COPY', {
       values: vals,
-      rid: new Date().getTime(), // FIXME: Not the best way to define an ID, but simple.
     });
   });
 }
