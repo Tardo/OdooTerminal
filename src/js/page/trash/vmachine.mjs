@@ -3,7 +3,6 @@
 
 import {validateAndFormatArguments} from './argument';
 import {INSTRUCTION_TYPE} from './constants';
-import CallFunctionError from './exceptions/call_function_error';
 import InvalidCommandArgumentFormatError from './exceptions/invalid_command_argument_format_error';
 import InvalidCommandArgumentValueError from './exceptions/invalid_command_argument_value_error';
 import InvalidCommandArgumentsError from './exceptions/invalid_command_arguments_error';
@@ -104,26 +103,26 @@ export default class VMachine {
 
       try {
         kwargs = await validateAndFormatArguments(cmd_def, kwargs);
-        return this.options.processCommandJob(
-          {
-            cmdRaw: parse_info.inputRawString,
-            cmdName: frame.cmd,
-            cmdDef: cmd_def,
-            kwargs: kwargs,
-          },
-          silent,
-        );
       } catch (err) {
         throw new InvalidCommandArgumentFormatError(err.message, frame.cmd);
       }
+
+      return await this.options.processCommandJob(
+        {
+          cmdRaw: parse_info.inputRawString,
+          cmdName: frame.cmd,
+          cmdDef: cmd_def,
+          kwargs: kwargs,
+        },
+        silent,
+      );
     }
     // Alias
     const alias_cmd = this.parseAliases(aliases, frame.cmd, frame.values);
-    return (
-      await this.eval(alias_cmd, {
-        aliases: aliases,
-      })
-    )[0];
+    const ret_val = await this.eval(alias_cmd, {
+      aliases: aliases,
+    });
+    return ret_val[0];
   }
 
   #checkGlobalName(global_name, aliases) {
@@ -251,23 +250,19 @@ export default class VMachine {
         case INSTRUCTION_TYPE.CALL_FUNCTION:
           {
             const frame = frames.pop();
-            try {
-              // Subframes are executed in silent mode
-              const ret = await this.#callFunction(
-                options.aliases,
-                frame,
-                parse_info,
-                instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT ||
-                  options?.silent,
-              );
-              last_frame = frames.at(-1);
-              if (last_frame) {
-                last_frame.values.push(ret);
-              } else {
-                root_frame.values.push(ret);
-              }
-            } catch (err) {
-              throw new CallFunctionError(err.message);
+            // Subframes are executed in silent mode
+            const ret = await this.#callFunction(
+              options.aliases,
+              frame,
+              parse_info,
+              instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT ||
+                options?.silent,
+            );
+            last_frame = frames.at(-1);
+            if (last_frame) {
+              last_frame.values.push(ret);
+            } else {
+              root_frame.values.push(ret);
             }
           }
           break;

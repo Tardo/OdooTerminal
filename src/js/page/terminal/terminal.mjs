@@ -19,6 +19,7 @@ import renderUnknownCommand from './templates/unknown_command';
 import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
 import isEmpty from './utils/is_empty';
+import ProcessJobError from './exceptions/process_job_error';
 
 export default class Terminal {
   VERSION = '10.2.0';
@@ -366,7 +367,8 @@ export default class Terminal {
         cmd_res.push(result);
       }
     } catch (err) {
-      let err_msg = `${err.name}: ${err.message}`;
+      this.screen.printError(`${err.name}: ${err.message}`);
+      let err_msg = err.data;
       if (err.constructor === UnknownCommandError) {
         // Search similar commands
         const similar_cmd = this.searchSimiliarCommand(err.cmd_name);
@@ -378,7 +380,7 @@ export default class Terminal {
           });
         }
       }
-      this.screen.printError(err_msg);
+      this.screen.printError(err_msg, true);
       if (this.#config.console_errors) {
         console.error(err);
       }
@@ -578,12 +580,13 @@ export default class Terminal {
     } catch (err) {
       is_failed = true;
       error =
-        err || '[!] Oops! Unknown error! (no detailed error message given :/)';
+        err?.message ||
+        '[!] Oops! Unknown error! (no detailed error message given :/)';
     } finally {
       this.onFinishCommand(job_index, is_failed, error || result);
     }
     if (is_failed) {
-      throw new Error(typeof error === 'object' ? '' : error);
+      throw new ProcessJobError(command_info.cmdName, error);
     }
     return result;
   }
@@ -617,19 +620,9 @@ export default class Terminal {
     this.#jobs[job_index].healthy = false;
     this.#updateJobsInfo();
   }
-  onFinishCommand(job_index, has_errors, result) {
+  onFinishCommand(job_index) {
     const job_info = this.#jobs[job_index];
     clearTimeout(job_info.timeout);
-    if (has_errors) {
-      this.screen.printError(`Error executing '${job_info.cmdInfo.cmdName}':`);
-      if (
-        typeof result === 'object' &&
-        !Object.hasOwn(result, 'data') &&
-        Object.hasOwn(result, 'message')
-      ) {
-        this.screen.printError(result.message, true);
-      }
-    }
     delete this.#jobs[job_index];
     this.#updateJobsInfo();
   }
