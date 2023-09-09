@@ -42,6 +42,7 @@ class TestExtension:
             browser = webdriver.Firefox(service=service, options=options)
             browser.install_addon(str(pathlib.Path('./OdooTerminal.zip').absolute()), temporary=True)
         time.sleep(5)   # Wait for browser up
+        # browser.set_script_timeout(9999)
         yield browser
         browser.quit()
 

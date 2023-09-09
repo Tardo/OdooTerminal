@@ -10,9 +10,10 @@ class InstanceAnalyzer {
   }
   get odoo_session() {
     return (
-      this.odoo.session_info ||
-      this.odoo.session ||
-      this.odoo.__DEBUG__.services['web.session']
+      this.odoo?.session_info ||
+      this.odoo?.session ||
+      this.odoo?.__DEBUG__?.services['web.session'] ||
+      this.odoo?.loader?.modules.get('@web/session')?.session
     );
   }
 

@@ -219,7 +219,6 @@ export default class Terminal {
       {
         definition: 'Undefined command',
         callback: this.#fallbackExecuteCommand,
-        services: [],
         detail: "This command hasn't a properly detailed information",
         args: [],
         secured: false,

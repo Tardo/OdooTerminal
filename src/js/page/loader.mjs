@@ -21,7 +21,7 @@ function getTerminalObj() {
 
   const load_tests = window.__OdooTerminal.load_tests || navigator.webdriver;
   if (load_tests) {
-    console.info('[OdooTerminal] Tests Enabled'); // eslint-disable-line no-console
+    console.info('[OdooTerminal] Tests Enabled');
   }
   try {
     const TerminalClass = load_tests ? OdooTerminalTests : OdooTerminal;
@@ -71,5 +71,5 @@ window.addEventListener(
   true,
 );
 // This is used to communicate to the extension that the widget
-// is initialized successfully.
+// was initialized successfully.
 postMessage('ODOO_TERM_START');

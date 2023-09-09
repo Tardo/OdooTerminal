@@ -38,7 +38,6 @@ async function cmdGen(kwargs, screen) {
 export default {
   definition: 'Generate random values',
   callback: cmdGen,
-  services: ['parameterGenerator'],
   detail: "Generate numbers, strings, url's, dates, etc...",
   args: [
     [
