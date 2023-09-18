@@ -6,8 +6,8 @@ import {
   removeStorageItem,
   setStorageItem,
 } from '@terminal/core/storage/local';
-import getOdooEnv from './base/get_odoo_env';
 import doCall from './base/do_call';
+import getOdooEnv from './utils/get_odoo_env';
 import getOdooService from './utils/get_odoo_service';
 import getOdooVersionMajor from './utils/get_odoo_version_major';
 

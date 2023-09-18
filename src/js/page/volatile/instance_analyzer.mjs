@@ -13,7 +13,7 @@ class InstanceAnalyzer {
       this.odoo?.session_info ||
       this.odoo?.session ||
       this.odoo?.__DEBUG__?.services['web.session'] ||
-      this.odoo?.loader?.modules.get('@web/session')?.session
+      this.odoo?.loader?.modules?.get('@web/session')?.session
     );
   }
 

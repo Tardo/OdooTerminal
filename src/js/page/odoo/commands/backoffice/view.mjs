@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import doAction from '@odoo/base/do_action';
-import getParentAdapter from '@odoo/base/get_parent_adapter';
+import getParentAdapter from '@odoo/utils/get_parent_adapter';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
 import {ARG} from '@trash/constants';

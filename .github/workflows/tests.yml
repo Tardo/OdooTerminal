@@ -65,10 +65,10 @@ jobs:
     needs: validations
     strategy:
       matrix:
-        # Use only lower and higher versions
-        instance: [11.0, 16.0]
+        # Use only lower and active versions
+        instance: [11.0, 14.0, 15.0, 16.0]
         browser: [chrome, firefox]
-      fail-fast: false
+      fail-fast: true
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
