@@ -14,16 +14,16 @@ export default class TestBackend extends TerminalTestSuite {
   }
 
   async test_view() {
-    await this.terminal.execute('view -m res.partner', false, true);
+    await this.terminal.execute('view -m res.company', false, true);
     await asyncSleep(2500);
     const $modal = this.getModalOpen();
     this.assertTrue(this.isModalType($modal, 'list'));
     this.closeModal($modal);
-    await this.terminal.execute('view -m res.partner -i 1', false, true);
+    await this.terminal.execute('view -m res.company -i 1', false, true);
     await asyncSleep(2500);
     this.assertTrue(this.isFormOpen());
     await this.terminal.execute(
-      'view -m res.partner -i 1 -r base.view_partner_simple_form',
+      'view -m res.company -i 1 -r base.base_onboarding_company_form',
       false,
       true,
     );

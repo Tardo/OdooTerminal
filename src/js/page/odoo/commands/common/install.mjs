@@ -27,7 +27,10 @@ async function cmdInstallModule(kwargs, screen) {
             return result;
           },
           res => {
-            throw new Error(res.message.data.message);
+            throw new Error(
+              res?.message?.data?.message ||
+                'Unexpected error. Module not installed',
+            );
           },
         );
       }

@@ -1,5 +1,14 @@
 # Changelog
 
+**10.3.1**
+
+```
+UPD: Add tests for 14.0 and 15.0
+UPD: Project structure
+
+FIX: Work on Odoo 14.0 (issue #125)
+```
+
 **10.3.0**
 
 ```

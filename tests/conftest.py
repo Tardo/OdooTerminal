@@ -21,7 +21,7 @@ def docker_compose(pytestconfig):
         'ODOO_VERSION': f'{odoo_ver}.0',
     })
     docker.compose.up(services=['db'], detach=True)
-    docker.compose.run('odoo', command=['addons', 'init', '-w', 'base,bus,barcodes'], remove=True)
+    docker.compose.run('odoo', command=['addons', 'init', '-w', 'base,bus,barcodes,mail'], remove=True)
     docker.compose.up(detach=True)
     time.sleep(10)   # Wait for Odoo service
     yield docker

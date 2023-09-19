@@ -42,7 +42,7 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_create() {
-    await this.terminal.execute('create -m res.partner', false, true);
+    await this.terminal.execute('create -m res.company', false, true);
     await asyncSleep(800);
     this.assertTrue(this.isFormOpen());
     const recordset = await this.terminal.execute(
@@ -117,26 +117,26 @@ export default class TestCommon extends TerminalTestSuite {
 
   async test_install() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute('install -m account', false, true);
-    this.assertEqual(res[0]?.name, 'account');
+    const res = await this.terminal.execute('install -m uom', false, true);
+    this.assertEqual(res[0]?.name, 'uom');
     await asyncSleep(10000);
   }
 
   async test_upgrade() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute('upgrade -m account', false, true);
-    this.assertEqual(res[0]?.name, 'account');
+    const res = await this.terminal.execute('upgrade -m uom', false, true);
+    this.assertEqual(res[0]?.name, 'uom');
     await asyncSleep(10000);
   }
 
   async test_uninstall() {
     await asyncSleep(10000);
     const res = await this.terminal.execute(
-      'uninstall -m account --force',
+      'uninstall -m uom --force',
       false,
       true,
     );
-    this.assertEqual(res?.name, 'account');
+    this.assertEqual(res?.name, 'uom');
     await asyncSleep(10000);
   }
 
