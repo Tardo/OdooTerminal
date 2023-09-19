@@ -117,26 +117,34 @@ export default class TestCommon extends TerminalTestSuite {
 
   async test_install() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute('install -m uom', false, true);
-    this.assertEqual(res[0]?.name, 'uom');
+    const res = await this.terminal.execute(
+      'install -m transifex',
+      false,
+      true,
+    );
+    this.assertEqual(res[0]?.name, 'transifex');
     await asyncSleep(10000);
   }
 
   async test_upgrade() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute('upgrade -m uom', false, true);
-    this.assertEqual(res[0]?.name, 'uom');
+    const res = await this.terminal.execute(
+      'upgrade -m transifex',
+      false,
+      true,
+    );
+    this.assertEqual(res[0]?.name, 'transifex');
     await asyncSleep(10000);
   }
 
   async test_uninstall() {
     await asyncSleep(10000);
     const res = await this.terminal.execute(
-      'uninstall -m uom --force',
+      'uninstall -m transifex --force',
       false,
       true,
     );
-    this.assertEqual(res?.name, 'uom');
+    this.assertEqual(res?.name, 'transifex');
     await asyncSleep(10000);
   }
 
@@ -144,7 +152,7 @@ export default class TestCommon extends TerminalTestSuite {
     let res = await this.terminal.execute('action -a 5', false, true);
     this.assertEqual(res.id, 5);
     const OdooVer = getOdooVersionMajor();
-    if (OdooVer >= 15) {
+    if (OdooVer >= 14) {
       res = await this.terminal.execute(
         'action -a base.action_res_company_form',
         false,
