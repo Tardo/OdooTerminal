@@ -9,15 +9,19 @@ import getOdooRoot from './get_odoo_root';
 
 export default function () {
   const OdooVer = getOdooVersionMajor();
-  if (OdooVer === 14) {
-    return getOdooRoot();
-  } else if (OdooVer >= 15) {
+  if (OdooVer >= 15) {
     const OwlVer = getOwlVersionMajor();
-    if (OwlVer === 2) {
+    if (OwlVer === 1) {
+      const {Component} = owl;
+      const {ComponentAdapter} = getOdooService('web.OwlCompatibility');
+      return new ComponentAdapter(null, {Component});
+    } else if (OwlVer === 2) {
       const {Component} = owl;
       const {standaloneAdapter} = getOdooService('web.OwlCompatibility');
       return standaloneAdapter({Component});
     }
+  } else if (OdooVer >= 14) {
+    return getOdooRoot();
   }
   return getOdooEnv();
 }

@@ -36,7 +36,7 @@ export default class Longpolling {
 
   #busServ(method, ...params) {
     const OdooVer = getOdooVersionMajor();
-    if (OdooVer >= 16) {
+    if (OdooVer >= 14) {
       const bus_serv = getOdooEnv()?.services?.bus_service;
       if (!bus_serv) {
         throw new Error('bus service not available');

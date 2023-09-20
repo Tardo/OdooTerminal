@@ -9,5 +9,9 @@ export default function () {
     'web.web_client',
     '@web/legacy/js/env',
   );
+  // This is necessary for master branch, public pages.
+  if (!root || root.constructor.name === 'Promise') {
+    return odoo?.__WOWL_DEBUG__?.root;
+  }
   return root;
 }
