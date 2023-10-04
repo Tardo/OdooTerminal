@@ -22,7 +22,7 @@ import isEmpty from './utils/is_empty';
 import ProcessJobError from './exceptions/process_job_error';
 
 export default class Terminal {
-  VERSION = '10.3.1';
+  VERSION = '10.3.2';
 
   userContext = {};
 
