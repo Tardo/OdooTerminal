@@ -29,6 +29,7 @@ const ALLOWED_FUNCS = [
   'printTable',
   'updateInputInfo',
   'showQuestion',
+  'clean',
 ];
 
 const ALLOWED_SILENT_FUNCS = ['updateInputInfo'];
