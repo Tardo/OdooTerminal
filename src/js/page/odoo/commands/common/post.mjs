@@ -6,12 +6,21 @@ import {ARG} from '@trash/constants';
 
 async function cmdPostData(kwargs, screen) {
   if (kwargs.mode === 'odoo') {
-    return getOdooService('web.ajax')
-      .post(kwargs.endpoint, kwargs.data)
-      .then(result => {
+    const ajax = getOdooService('web.ajax');
+    if (ajax) {
+      return ajax.post(kwargs.endpoint, kwargs.data).then(result => {
         screen.eprint(result, false, 'line-pre');
         return result;
       });
+    }
+    return $.post(
+      kwargs.endpoint,
+      Object.assign({}, kwargs.data, {csrf_token: odoo.csrf_token}),
+      result => {
+        screen.eprint(result, false, 'line-pre');
+        return result;
+      },
+    );
   }
   return $.post(kwargs.endpoint, kwargs.data, result => {
     screen.eprint(result, false, 'line-pre');

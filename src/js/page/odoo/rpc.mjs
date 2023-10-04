@@ -128,9 +128,15 @@ function buildQuery(options) {
  */
 export default function doQuery(params, options) {
   const query = buildQuery(params);
-  const rpc_service = getOdooService('web.ajax', '@web/legacy/js/core/ajax');
+  const rpc_service = getOdooService(
+    'web.ajax',
+    '@web/legacy/js/core/ajax',
+    '@web/core/network/rpc_service',
+  );
   if (Object.hasOwn(rpc_service, 'rpc')) {
     return rpc_service.rpc(query.route, query.params, options);
+  } else if (Object.hasOwn(rpc_service, 'jsonrpc')) {
+    return rpc_service.jsonrpc(query.route, query.params, options);
   }
   return rpc_service.jsonRpc(query.route, 'call', query.params, options);
 }
