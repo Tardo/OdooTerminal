@@ -4,7 +4,7 @@
 export default class extends Error {
   constructor(vname, start, end) {
     super(`Invalid name '${vname}' at ${start}:${end}`);
-    this.name = this.constructor.name;
+    this.name = 'InvalidNameError';
     this.vname = vname;
     this.start = start;
     this.end = end;

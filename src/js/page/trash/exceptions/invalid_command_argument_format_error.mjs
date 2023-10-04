@@ -4,7 +4,7 @@
 export default class extends Error {
   constructor(message, cmd_name) {
     super(message);
-    this.name = this.constructor.name;
+    this.name = 'InvalidCommandArgumentFormatError';
     this.cmd_name = cmd_name;
   }
 }

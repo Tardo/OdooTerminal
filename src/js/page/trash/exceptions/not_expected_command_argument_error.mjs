@@ -4,7 +4,7 @@
 export default class extends Error {
   constructor(arg_name, start, end) {
     super(`Argument '${arg_name}' not expected at ${start}:${end}`);
-    this.name = this.constructor.name;
+    this.name = 'NotExpectedCommandArgumentError';
     this.arg_name = arg_name;
     this.start = start;
     this.end = end;

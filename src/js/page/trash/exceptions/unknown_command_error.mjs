@@ -4,7 +4,7 @@
 export default class extends Error {
   constructor(cmd_name, start, end) {
     super(`Unknown Command '${cmd_name}' at ${start}:${end}`);
-    this.name = this.constructor.name;
+    this.name = 'UnknownCommandError';
     this.cmd_name = cmd_name;
     this.start = start;
     this.end = end;

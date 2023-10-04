@@ -4,7 +4,7 @@
 export default class extends Error {
   constructor(cmd_name, arg_value) {
     super(`Unexpected '${arg_value}' value!`);
-    this.name = this.constructor.name;
+    this.name = 'InvalidCommandArgumentValueError';
     this.cmd_name = cmd_name;
     this.arg_value = arg_value;
   }

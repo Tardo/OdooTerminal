@@ -4,7 +4,7 @@
 export default class extends Error {
   constructor(vname) {
     super(`Cannot read properties of undefined (reading '${vname}')`);
-    this.name = this.constructor.name;
+    this.name = 'UndefinedValueError';
     this.vname = vname;
   }
 }

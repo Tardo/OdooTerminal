@@ -1,5 +1,14 @@
 # Changelog
 
+**10.3.2**
+
+```
+FIX: rpc in master branch
+FIX: Command 'post' in master branch
+FIX: Command 'clear' (issue #126)
+FIX: Error names in minified bundle
+```
+
 **10.3.1**
 
 ```

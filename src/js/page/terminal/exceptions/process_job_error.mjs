@@ -4,7 +4,7 @@
 export default class extends Error {
   constructor(cmd_name, error_data) {
     super(`Error executing '${cmd_name}'`);
-    this.name = this.constructor.name;
+    this.name = 'ProcessJobError';
     this.data = error_data;
   }
 }
