@@ -27,8 +27,8 @@ async function cmdDis(kwargs, screen) {
 
     const humanType = INSTRUCTION_TYPE.getHumanType(instr.type);
     rows[row_index].push(
-      instr.type,
       humanType[0],
+      instr.type,
       lvalue,
       instr.dataIndex,
       instr.level,

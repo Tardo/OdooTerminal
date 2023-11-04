@@ -19,7 +19,7 @@ function getTerminalObj() {
     return terminal;
   }
 
-  const load_tests = window.__OdooTerminal.load_tests || navigator.webdriver;
+  const load_tests = window.__OdooTerminal?.load_tests || navigator.webdriver;
   if (load_tests) {
     console.info('[OdooTerminal] Tests Enabled');
   }

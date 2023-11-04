@@ -6,6 +6,6 @@ import getOdooSession from './get_odoo_session';
 export default function () {
   return (
     getOdooSession()?.server_version ||
-    __OdooTerminal.raw_server_info.serverVersionRaw
+    window.__OdooTerminal?.raw_server_info.serverVersionRaw
   );
 }

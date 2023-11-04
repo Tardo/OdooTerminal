@@ -19,6 +19,7 @@ import renderUnknownCommand from './templates/unknown_command';
 import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
 import isEmpty from './utils/is_empty';
+import keyCode from './utils/keycode';
 import ProcessJobError from './exceptions/process_job_error';
 
 export default class Terminal {
@@ -835,25 +836,25 @@ export default class Terminal {
   #onInputKeyUp(ev) {
     const question_active = this.screen.getQuestionActive();
     if (isEmpty(question_active)) {
-      if (ev.keyCode === $.ui.keyCode.ENTER) {
+      if (ev.keyCode === keyCode.ENTER) {
         this.#onKeyEnter(ev);
-      } else if (ev.keyCode === $.ui.keyCode.UP) {
+      } else if (ev.keyCode === keyCode.UP) {
         this.#onKeyArrowUp(ev);
-      } else if (ev.keyCode === $.ui.keyCode.DOWN) {
+      } else if (ev.keyCode === keyCode.DOWN) {
         this.#onKeyArrowDown(ev);
-      } else if (ev.keyCode === $.ui.keyCode.RIGHT) {
+      } else if (ev.keyCode === keyCode.RIGHT) {
         this.#onKeyArrowRight(ev);
-      } else if (ev.keyCode === $.ui.keyCode.LEFT) {
+      } else if (ev.keyCode === keyCode.LEFT) {
         this.#onKeyArrowLeft(ev);
-      } else if (ev.keyCode === $.ui.keyCode.TAB) {
+      } else if (ev.keyCode === keyCode.TAB) {
         this.#onKeyTab(ev);
       } else {
         this.#searchHistoryIter = this.#inputHistory.length;
         this.#searchHistoryQuery = undefined;
       }
-    } else if (ev.keyCode === $.ui.keyCode.ENTER) {
+    } else if (ev.keyCode === keyCode.ENTER) {
       this.screen.responseQuestion(question_active, ev.target.value);
-    } else if (ev.keyCode === $.ui.keyCode.ESCAPE) {
+    } else if (ev.keyCode === keyCode.ESCAPE) {
       this.screen.rejectQuestion(question_active, 'Operation aborted');
       ev.preventDefault();
     }

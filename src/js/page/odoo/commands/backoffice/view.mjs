@@ -65,7 +65,7 @@ async function cmdViewModelRecord(kwargs) {
         views: [[false, 'form']],
         target: 'current',
         context: context,
-      });
+      }).then(() => this.doHide());
     },
   );
 }

@@ -3,11 +3,14 @@
 
 import asyncSleep from '@terminal/utils/async_sleep';
 import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooRoot from '@odoo/utils/get_odoo_root';
 import doTrigger from './do_trigger';
 
 export default async function (action, options) {
   const OdooVer = getOdooVersionMajor();
-  if (OdooVer >= 14) {
+  if (OdooVer >= 17) {
+    return getOdooRoot().actionService.doAction(action, options);
+  } else if (OdooVer >= 14) {
     doTrigger('do-action', {action, options});
     // Simulate end of the 'action'
     // FIXME: This makes me cry
