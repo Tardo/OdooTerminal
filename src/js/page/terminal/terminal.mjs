@@ -45,6 +45,7 @@ export default class Terminal {
 
   #commandAssistant = null;
   #assistantOptions = {};
+  #assistantOptionsTotalCount = 0;
   #selAssistanOption = -1;
 
   #messageListeners = {};
@@ -609,12 +610,15 @@ export default class Terminal {
           this.screen.getInputCaretStartPos(),
         );
       })
-      .then(options => {
+      .then(result => {
+        const [options, total_count] = result;
         this.#selAssistanOption = -1;
         this.#assistantOptions = options;
+        this.#assistantOptionsTotalCount = total_count;
         this.screen.updateAssistantPanelOptions(
           this.#assistantOptions,
           this.#selAssistanOption,
+          this.#assistantOptionsTotalCount,
         );
       });
   }
@@ -800,6 +804,7 @@ export default class Terminal {
     this.screen.updateAssistantPanelOptions(
       this.#assistantOptions,
       this.#selAssistanOption,
+      this.#assistantOptionsTotalCount,
     );
   }
 

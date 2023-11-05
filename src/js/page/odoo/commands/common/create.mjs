@@ -3,7 +3,7 @@
 
 import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
-import searchRead from '@odoo/orm/search_read';
+import cachedSearchRead from '@odoo/utils/cached_search_read';
 import Recordset from '@terminal/core/recordset';
 import renderRecordCreated from '@odoo/templates/record_created';
 import {ARG} from '@trash/constants';
@@ -39,22 +39,19 @@ async function cmdCreateModelRecord(kwargs, screen) {
   return Recordset.make(kwargs.model, records);
 }
 
-let cache = [];
-async function getOptions(arg_name, arg_info, arg_value) {
+function getOptions(arg_name) {
   if (arg_name === 'model') {
-    if (!arg_value) {
-      const records = await searchRead(
-        'ir.model',
-        [],
-        ['model'],
-        this.getContext(),
-      );
-      cache = records.map(item => item.model);
-      return cache;
-    }
-    return cache.filter(item => item.startsWith(arg_value));
+    return cachedSearchRead(
+      'options_ir.model_active',
+      'ir.model',
+      [],
+      ['model'],
+      this.getContext({active_test: true}),
+      null,
+      item => item.model,
+    );
   }
-  return [];
+  return Promise.resolve([]);
 }
 
 export default {

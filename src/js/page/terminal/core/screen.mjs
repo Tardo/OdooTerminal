@@ -137,7 +137,7 @@ export default class Screen {
     }
     this.#$input.val('');
     this.cleanShadowInput();
-    this.updateAssistantPanelOptions([], -1);
+    this.updateAssistantPanelOptions([], -1, 0);
   }
 
   cleanShadowInput() {
@@ -182,13 +182,18 @@ export default class Screen {
     }, 1);
   }
 
-  updateAssistantPanelOptions(options, selected_option_index) {
+  updateAssistantPanelOptions(
+    options,
+    selected_option_index,
+    total_options_count,
+  ) {
     if (!this.#wasStart) {
       return;
     }
 
     if (typeof this.#question_active !== 'undefined') {
       this.$assistant_args.html('');
+      this.$assistant_args_info.html('');
       this.$assistant_desc.html('');
       return;
     }
@@ -202,6 +207,13 @@ export default class Screen {
       );
     }
     this.$assistant_args.html(renderAssistantArgOptionList(html_options));
+    if (total_options_count === 0) {
+      this.$assistant_args_info.html('');
+    } else {
+      this.$assistant_args_info.text(
+        `${options.length} of ${total_options_count}`,
+      );
+    }
 
     if (selected_option_index !== -1 || options.length === 1) {
       const opt =
@@ -548,6 +560,9 @@ export default class Screen {
   #createAssistantPanel() {
     this.$assistant = $(renderAssistantPanel());
     this.$assistant_args = this.$assistant.find('#terminal_assistant_args');
+    this.$assistant_args_info = this.$assistant.find(
+      '#terminal_assistant_args_info',
+    );
     this.$assistant_desc = this.$assistant.find('#terminal_assistant_desc');
     this.$assistant.appendTo(this.#$container);
   }

@@ -9,5 +9,6 @@ export default function () {
     <div class='row'>
       <div class='col-sm-12 col-lg-12 col-12 p-0' style='padding:0' id='terminal_assistant_args' tabindex='-1'></div>
     </div>
+    <span class='px-2 text-white' id='terminal_assistant_args_info' tabindex='-1'></span>
   </div>`;
 }

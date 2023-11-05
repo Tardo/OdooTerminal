@@ -73,15 +73,11 @@ function cmdPrintHelp(kwargs, screen) {
   }
 }
 
-async function getOptions(arg_name, arg_info, arg_value) {
+function getOptions(arg_name) {
   if (arg_name === 'cmd') {
-    const command_names = Object.keys(this.virtMachine.commands);
-    if (arg_value) {
-      return command_names.filter(item => item.startsWith(arg_value));
-    }
-    return command_names;
+    return Promise.resolve(Object.keys(this.virtMachine.commands));
   }
-  return [];
+  return Promise.resolve([]);
 }
 
 export default {

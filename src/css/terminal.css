@@ -154,6 +154,14 @@
   background-color: var(--terminal-screen-assistant-desc-background-color);
 }
 
+.o_terminal div#terminal_assistant > span#terminal_assistant_args_info {
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  border-radius: 2px 2px 0 0;
+  background-color: #878787;
+}
+
 .o_terminal .terminal-user-input {
   background-color: var(--terminal-screen-background-color);
   border: 1px dotted #5a5a5a;
@@ -256,6 +264,8 @@
 .o_terminal .terminal-screen-info-zone .terminal-screen-running-cmds {
   color: var(--terminal-screen-extra-info-color);
 }
+
+/** COMMAND ASSISTANT **/
 
 /** HELP COMMAND **/
 .o_terminal .terminal-info-section {

@@ -29,14 +29,16 @@ export default class CommandAssistant {
         arg_infos.push(arg_info);
       }
     }
-    return arg_infos;
+    return [arg_infos, command_info.args.length];
   }
 
   #getAvailableParameters(command_info, arg_name, arg_value) {
     const arg_info = getArgumentInfoByName(command_info.args, arg_name);
     const res_param_infos = [];
+    let total_count = 0;
     if (arg_info) {
       if (arg_info.strict_values) {
+        total_count = arg_info.strict_values.length;
         const def_value = arg_info.default_value;
         for (const strict_value of arg_info.strict_values) {
           if (!arg_value || String(strict_value).startsWith(arg_value)) {
@@ -54,6 +56,7 @@ export default class CommandAssistant {
         arg_info.default_value &&
         String(arg_info.default_value).startsWith(arg_value)
       ) {
+        total_count = 1;
         res_param_infos.push({
           value: arg_info.default_value,
           is_default: true,
@@ -65,7 +68,15 @@ export default class CommandAssistant {
       }
     }
 
-    return res_param_infos;
+    return [res_param_infos, total_count];
+  }
+
+  #filterParameterOptions(values, filter_by) {
+    let res = values || [];
+    if (filter_by) {
+      res = values.filter(item => item.startsWith(filter_by));
+    }
+    return res.slice(0, MAX_OPTIONS);
   }
 
   async #getAvailableDynamicParameters(command_info, arg_name, arg_value) {
@@ -73,15 +84,12 @@ export default class CommandAssistant {
     if (!arg_info) {
       return [];
     }
-    let options =
-      (await command_info.options.bind(this.#parent)(
-        arg_info.names.long,
-        arg_info,
-        arg_value,
-      )) || [];
-    options = options.slice(0, MAX_OPTIONS);
+    const options =
+      (await command_info.options.bind(this.#parent)(arg_info.names.long)) ||
+      [];
+    const options_filtered = this.#filterParameterOptions(options, arg_value);
     const ret = [];
-    for (const option of options) {
+    for (const option of options_filtered) {
       ret.push({
         value: option,
         is_default: false,
@@ -91,7 +99,7 @@ export default class CommandAssistant {
         values: options,
       });
     }
-    return ret;
+    return [ret, options.length];
   }
 
   getSelectedParameterIndex(parse_info, caret_pos) {
@@ -186,12 +194,12 @@ export default class CommandAssistant {
   }
 
   async getAvailableOptions(data, caret_pos) {
-    const ret = [];
     const input_info = this.getInputInfo(data, caret_pos);
     if (isEmpty(input_info)) {
-      return [];
+      return [[], 0];
     }
     if (input_info.index.cmd === input_info.index.current) {
+      const ret = [];
       // Command name
       const cmd_names = this.#getAvailableCommandNames(
         input_info.token.cmd || data,
@@ -204,19 +212,20 @@ export default class CommandAssistant {
           description: this.#virtMachine.commands[cmd_name].definition,
         });
       }
-      return ret;
+      return [ret, Object.keys(this.#virtMachine.commands).length];
     }
 
     const command_info = input_info.token.cmd
       ? this.#virtMachine.commands[input_info.token.cmd]
       : undefined;
     if (!command_info) {
-      return [];
+      return [[], 0];
     }
 
     if (input_info.index.current === input_info.index.arg) {
+      const ret = [];
       // Argument
-      const arg_infos = this.#getAvailableArguments(
+      const [arg_infos, total_count] = this.#getAvailableArguments(
         command_info,
         input_info.token.arg,
       );
@@ -231,19 +240,21 @@ export default class CommandAssistant {
           values: arg_info.strict_values,
         });
       }
+      return [ret, total_count];
     } else if (
       input_info.index.current !== input_info.index.cmd &&
       input_info.index.current - 1 === input_info.index.arg &&
       input_info.token.arg
     ) {
+      const ret = [];
       // Parameter
-      let param_infos = this.#getAvailableParameters(
+      let [param_infos, total_count] = this.#getAvailableParameters(
         command_info,
         input_info.token.arg,
         input_info.token.current,
       );
       if (isEmpty(param_infos)) {
-        param_infos = await this.#getAvailableDynamicParameters(
+        [param_infos, total_count] = await this.#getAvailableDynamicParameters(
           command_info,
           input_info.token.arg,
           input_info.token.current,
@@ -261,8 +272,9 @@ export default class CommandAssistant {
           values: param_info.strict_values,
         });
       }
+      return [ret, total_count];
     }
 
-    return ret;
+    return [[], 0];
   }
 }

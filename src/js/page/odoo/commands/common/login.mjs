@@ -2,8 +2,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooSession from '@odoo/utils/get_odoo_session';
-import callService from '@odoo/osv/call_service';
-import searchRead from '@odoo/orm/search_read';
+import cachedCallService from '@odoo/utils/cached_call_service';
+import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
 
 async function cmdLoginAs(kwargs, screen) {
@@ -35,32 +35,21 @@ async function cmdLoginAs(kwargs, screen) {
   return res;
 }
 
-const cache = {
-  databases: [],
-  users: [],
-};
-async function getOptions(arg_name, arg_info, arg_value) {
+function getOptions(arg_name) {
   if (arg_name === 'database') {
-    if (!arg_value) {
-      const records = await callService('db', 'list', {});
-      cache.databases = records;
-      return cache.databases;
-    }
-    return cache.databases.filter(item => item.startsWith(arg_value));
+    return cachedCallService('options_db_list', 'db', 'list', {});
   } else if (arg_name === 'user') {
-    if (!arg_value) {
-      const records = await searchRead(
-        'res.users',
-        [['active', '=', true]],
-        ['login'],
-        this.getContext(),
-      );
-      cache.users = records.map(item => item.login);
-      return cache.users;
-    }
-    return cache.users.filter(item => item.startsWith(arg_value));
+    return cachedSearchRead(
+      'options_res.users_active',
+      'res.users',
+      [],
+      ['login'],
+      this.getContext({active_test: true}),
+      null,
+      item => item.name,
+    );
   }
-  return [];
+  return Promise.resolve([]);
 }
 
 export default {

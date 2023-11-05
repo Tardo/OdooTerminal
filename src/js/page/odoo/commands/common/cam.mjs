@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import callModel from '@odoo/osv/call_model';
-import searchRead from '@odoo/orm/search_read';
+import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
 
 async function cmdCheckModelAccess(kwargs, screen) {
@@ -24,22 +24,19 @@ async function cmdCheckModelAccess(kwargs, screen) {
   });
 }
 
-let cache = [];
-async function getOptions(arg_name, arg_info, arg_value) {
+function getOptions(arg_name) {
   if (arg_name === 'model') {
-    if (!arg_value) {
-      const records = await searchRead(
-        'ir.model',
-        [],
-        ['model'],
-        this.getContext(),
-      );
-      cache = records.map(item => item.model);
-      return cache;
-    }
-    return cache.filter(item => item.startsWith(arg_value));
+    return cachedSearchRead(
+      'options_ir.model_active',
+      'ir.model',
+      [],
+      ['model'],
+      this.getContext({active_test: true}),
+      null,
+      item => item.model,
+    );
   }
-  return [];
+  return Promise.resolve([]);
 }
 
 export default {

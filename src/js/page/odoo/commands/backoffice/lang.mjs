@@ -7,6 +7,7 @@ import searchRead from '@odoo/orm/search_read';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import callModel from '@odoo/osv/call_model';
 import getContent from '@odoo/utils/get_content';
+import cachedSearchRead from '@odoo/utils/cached_search_read';
 import file2base64 from '@terminal/utils/file2base64';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
@@ -146,37 +147,29 @@ async function cmdLang(kwargs, screen) {
   throw new Error('Invalid operation!');
 }
 
-const cache = {
-  modules: [],
-  langs: [],
-};
-async function getOptions(arg_name, arg_info, arg_value) {
+function getOptions(arg_name) {
   if (arg_name === 'module') {
-    if (!arg_value) {
-      const records = await searchRead(
-        'ir.module.module',
-        [],
-        ['name'],
-        this.getContext(),
-      );
-      cache.modules = records.map(item => item.name);
-      return cache.modules;
-    }
-    return cache.modules.filter(item => item.startsWith(arg_value));
+    return cachedSearchRead(
+      'options_ir.module.module_active',
+      'ir.module.module',
+      [],
+      ['name'],
+      this.getContext({active_test: true}),
+      null,
+      item => item.name,
+    );
   } else if (arg_name === 'lang') {
-    if (!arg_value) {
-      const records = await searchRead(
-        'res.lang',
-        [['active', '=', true]],
-        ['code'],
-        this.getContext(),
-      );
-      cache.langs = records.map(item => item.code);
-      return cache.langs;
-    }
-    return cache.langs.filter(item => item.startsWith(arg_value));
+    return cachedSearchRead(
+      'options_res.lang_active',
+      'res.lang',
+      [],
+      ['code'],
+      this.getContext({active_test: true}),
+      null,
+      item => item.code,
+    );
   }
-  return [];
+  return Promise.resolve([]);
 }
 
 export default {

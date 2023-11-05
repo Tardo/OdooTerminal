@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import callModelMulti from '@odoo/osv/call_model_multi';
-import searchRead from '@odoo/orm/search_read';
+import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
 import {searchModules} from './__utils__';
 
@@ -39,22 +39,19 @@ async function cmdInstallModule(kwargs, screen) {
     });
 }
 
-let cache = [];
-async function getOptions(arg_name, arg_info, arg_value) {
+function getOptions(arg_name) {
   if (arg_name === 'module') {
-    if (!arg_value) {
-      const records = await searchRead(
-        'ir.module.module',
-        [],
-        ['name'],
-        this.getContext(),
-      );
-      cache = records.map(item => item.name);
-      return cache;
-    }
-    return cache.filter(item => item.startsWith(arg_value));
+    return cachedSearchRead(
+      'options_ir.module.module',
+      'ir.module.module',
+      [],
+      ['name'],
+      this.getContext(),
+      null,
+      item => item.name,
+    );
   }
-  return [];
+  return Promise.resolve([]);
 }
 
 export default {
