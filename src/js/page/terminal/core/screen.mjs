@@ -491,6 +491,25 @@ export default class Screen {
     this.#$screen.css(name, value);
   }
 
+  replaceUserInputToken(input_str, cur_token, str) {
+    let res_str = null;
+    if (cur_token) {
+      res_str = `${input_str.substr(0, cur_token.start)}${str}`;
+    } else {
+      res_str = `${input_str}${str}`;
+    }
+    const n_caret_pos = res_str.length;
+    if (cur_token) {
+      res_str += input_str.substr(cur_token.end);
+    }
+    if (res_str) {
+      this.updateInput(res_str);
+    }
+    if (n_caret_pos !== -1) {
+      this.setInputCaretPos(n_caret_pos);
+    }
+  }
+
   /* PRIVATE */
   #print(msg, cls) {
     const formatted_msgs = renderLine(msg, cls);

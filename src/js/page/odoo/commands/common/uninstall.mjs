@@ -2,6 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import callModelMulti from '@odoo/osv/call_model_multi';
+import searchRead from '@odoo/orm/search_read';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 import {searchModules} from './__utils__';
@@ -51,9 +52,28 @@ async function cmdUninstallModule(kwargs, screen) {
   throw new Error(`'${kwargs.module}' module doesn't exists`);
 }
 
+let cache = [];
+async function getOptions(arg_name, arg_info, arg_value) {
+  if (arg_name === 'module') {
+    if (!arg_value) {
+      const records = await searchRead(
+        'ir.module.module',
+        [],
+        ['name'],
+        this.getContext(),
+      );
+      cache = records.map(item => item.name);
+      return cache;
+    }
+    return cache.filter(item => item.startsWith(arg_value));
+  }
+  return [];
+}
+
 export default {
   definition: 'Uninstall a module',
   callback: cmdUninstallModule,
+  options: getOptions,
   detail: 'Launch module deletion process.',
   args: [
     [ARG.String, ['m', 'module'], true, 'The module technical name'],

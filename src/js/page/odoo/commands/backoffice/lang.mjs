@@ -146,9 +146,43 @@ async function cmdLang(kwargs, screen) {
   throw new Error('Invalid operation!');
 }
 
+const cache = {
+  modules: [],
+  langs: [],
+};
+async function getOptions(arg_name, arg_info, arg_value) {
+  if (arg_name === 'module') {
+    if (!arg_value) {
+      const records = await searchRead(
+        'ir.module.module',
+        [],
+        ['name'],
+        this.getContext(),
+      );
+      cache.modules = records.map(item => item.name);
+      return cache.modules;
+    }
+    return cache.modules.filter(item => item.startsWith(arg_value));
+  } else if (arg_name === 'lang') {
+    if (!arg_value) {
+      const records = await searchRead(
+        'res.lang',
+        [['active', '=', true]],
+        ['code'],
+        this.getContext(),
+      );
+      cache.langs = records.map(item => item.code);
+      return cache.langs;
+    }
+    return cache.langs.filter(item => item.startsWith(arg_value));
+  }
+  return [];
+}
+
 export default {
   definition: 'Operations over translations',
   callback: cmdLang,
+  options: getOptions,
   detail: 'Operations over translations.',
   args: [
     [

@@ -21,6 +21,7 @@ import debounce from './utils/debounce';
 import isEmpty from './utils/is_empty';
 import keyCode from './utils/keycode';
 import ProcessJobError from './exceptions/process_job_error';
+import {Mutex} from 'async-mutex';
 
 export default class Terminal {
   VERSION = '10.3.2';
@@ -50,6 +51,8 @@ export default class Terminal {
 
   #wasStart = false;
   #wasLoaded = false;
+
+  #mutexAvailableOptions = new Mutex();
 
   constructor(config) {
     Object.assign(
@@ -188,7 +191,7 @@ export default class Terminal {
     this.#virtMachine = new VMachine(this.#registeredCmds, {
       processCommandJob: this.#processCommandJob.bind(this),
     });
-    this.#commandAssistant = new CommandAssistant(this.#virtMachine);
+    this.#commandAssistant = new CommandAssistant(this);
     this.screen.start(this.$el);
     this.screen.applyStyle('opacity', this.#config.opacity);
     this.onStart();
@@ -220,6 +223,7 @@ export default class Terminal {
       {
         definition: 'Undefined command',
         callback: this.#fallbackExecuteCommand,
+        options: this.#fallbackCommandOptions,
         detail: "This command hasn't a properly detailed information",
         args: [],
         secured: false,
@@ -508,6 +512,10 @@ export default class Terminal {
     throw new Error('Invalid command definition!');
   }
 
+  #fallbackCommandOptions() {
+    return [];
+  }
+
   #updateJobsInfo() {
     if (!this.#wasStart) {
       return;
@@ -589,6 +597,26 @@ export default class Terminal {
       throw new ProcessJobError(command_info.cmdName, error);
     }
     return result;
+  }
+
+  updateAssistantoptions() {
+    this.#mutexAvailableOptions.cancel();
+    this.#mutexAvailableOptions
+      .runExclusive(async () => {
+        const user_input = this.screen.getUserInput();
+        return await this.#commandAssistant.getAvailableOptions(
+          user_input,
+          this.screen.getInputCaretStartPos(),
+        );
+      })
+      .then(options => {
+        this.#selAssistanOption = -1;
+        this.#assistantOptions = options;
+        this.screen.updateAssistantPanelOptions(
+          this.#assistantOptions,
+          this.#selAssistanOption,
+        );
+      });
   }
 
   /* HANDLE EVENTS */
@@ -727,7 +755,7 @@ export default class Terminal {
     }
   }
   #onKeyArrowRight(ev) {
-    let user_input = this.screen.getUserInput();
+    const user_input = this.screen.getUserInput();
     if (user_input && ev.target.selectionStart === user_input.length) {
       this.#searchHistoryQuery = user_input;
       this.#searchHistoryIter = this.#inputHistory.length;
@@ -735,35 +763,10 @@ export default class Terminal {
       this.#searchHistoryQuery = user_input;
       this.#searchHistoryIter = this.#inputHistory.length;
     }
-    user_input = this.screen.getUserInput();
-
-    this.#commandAssistant.lazyGetAvailableOptions(
-      user_input,
-      this.screen.getInputCaretStartPos(),
-      options => {
-        this.#assistantOptions = options;
-        this.#selAssistanOption = -1;
-        this.screen.updateAssistantPanelOptions(
-          this.#assistantOptions,
-          this.#selAssistanOption,
-        );
-      },
-    );
+    this.updateAssistantoptions();
   }
   #onKeyArrowLeft() {
-    const user_input = this.screen.getUserInput();
-    this.#commandAssistant.lazyGetAvailableOptions(
-      user_input,
-      this.screen.getInputCaretStartPos(),
-      options => {
-        this.#assistantOptions = options;
-        this.#selAssistanOption = -1;
-        this.screen.updateAssistantPanelOptions(
-          this.#assistantOptions,
-          this.#selAssistanOption,
-        );
-      },
-    );
+    this.updateAssistantoptions();
   }
   #onKeyTab() {
     const user_input = this.screen.getUserInput();
@@ -789,18 +792,11 @@ export default class Terminal {
     if (isEmpty(option)) {
       return;
     }
-
-    let res_str = `${parse_info.inputRawString.substr(0, cur_token.start)}${
-      option.string
-    }`;
-    const n_caret_pos = res_str.length;
-    res_str += parse_info.inputRawString.substr(cur_token.end);
-    if (!isEmpty(res_str)) {
-      this.screen.updateInput(res_str);
-    }
-    if (n_caret_pos !== -1) {
-      this.screen.setInputCaretPos(n_caret_pos);
-    }
+    this.screen.replaceUserInputToken(
+      parse_info.inputRawString,
+      cur_token,
+      option.string,
+    );
     this.screen.updateAssistantPanelOptions(
       this.#assistantOptions,
       this.#selAssistanOption,
@@ -809,19 +805,8 @@ export default class Terminal {
 
   #onInput() {
     // Fish-like feature
+    this.updateAssistantoptions();
     const user_input = this.screen.getUserInput();
-    this.#commandAssistant.lazyGetAvailableOptions(
-      user_input,
-      this.screen.getInputCaretStartPos(),
-      options => {
-        this.#assistantOptions = options;
-        this.#selAssistanOption = -1;
-        this.screen.updateAssistantPanelOptions(
-          this.#assistantOptions,
-          this.#selAssistanOption,
-        );
-      },
-    );
     this.#searchHistoryQuery = user_input;
     this.#searchHistoryIter = this.#inputHistory.length;
     if (user_input) {

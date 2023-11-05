@@ -2,6 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import callModel from '@odoo/osv/call_model';
+import searchRead from '@odoo/orm/search_read';
 import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
@@ -36,9 +37,28 @@ async function cmdModuleDepends(kwargs, screen) {
   });
 }
 
+let cache = [];
+async function getOptions(arg_name, arg_info, arg_value) {
+  if (arg_name === 'module') {
+    if (!arg_value) {
+      const records = await searchRead(
+        'ir.module.module',
+        [],
+        ['name'],
+        this.getContext(),
+      );
+      cache = records.map(item => item.name);
+      return cache;
+    }
+    return cache.filter(item => item.startsWith(arg_value));
+  }
+  return [];
+}
+
 export default {
   definition: 'Know modules that depends on the given module',
   callback: cmdModuleDepends,
+  options: getOptions,
   detail: 'Show a list of the modules that depends on the given module',
   args: [[ARG.String, ['m', 'module'], false, 'The module technical name']],
   example: '-m base',

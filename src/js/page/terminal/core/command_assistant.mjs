@@ -1,19 +1,19 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import debounce from '@terminal/utils/debounce';
+import isEmpty from '@terminal/utils/is_empty';
 import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
 import {ARG, INSTRUCTION_TYPE} from '@trash/constants';
 
+const MAX_OPTIONS = 35;
+
 export default class CommandAssistant {
   #virtMachine = null;
+  #parent = null;
 
-  constructor(virtMachine) {
-    this.#virtMachine = virtMachine;
-    this.lazyGetAvailableOptions = debounce(
-      this.#getAvailableOptions.bind(this),
-      155,
-    );
+  constructor(parent) {
+    this.#parent = parent;
+    this.#virtMachine = parent.virtMachine;
   }
 
   #getAvailableCommandNames(name) {
@@ -34,7 +34,6 @@ export default class CommandAssistant {
 
   #getAvailableParameters(command_info, arg_name, arg_value) {
     const arg_info = getArgumentInfoByName(command_info.args, arg_name);
-
     const res_param_infos = [];
     if (arg_info) {
       if (arg_info.strict_values) {
@@ -69,6 +68,32 @@ export default class CommandAssistant {
     return res_param_infos;
   }
 
+  async #getAvailableDynamicParameters(command_info, arg_name, arg_value) {
+    const arg_info = getArgumentInfoByName(command_info.args, arg_name);
+    if (!arg_info) {
+      return [];
+    }
+    let options =
+      (await command_info.options.bind(this.#parent)(
+        arg_info.names.long,
+        arg_info,
+        arg_value,
+      )) || [];
+    options = options.slice(0, MAX_OPTIONS);
+    const ret = [];
+    for (const option of options) {
+      ret.push({
+        value: option,
+        is_default: false,
+        is_required: false,
+        type: arg_info.type,
+        description: arg_info.description,
+        values: options,
+      });
+    }
+    return ret;
+  }
+
   getSelectedParameterIndex(parse_info, caret_pos) {
     const {stack} = parse_info;
     if (!stack.instructions.length) {
@@ -94,6 +119,22 @@ export default class CommandAssistant {
         end_i = index;
       }
     }
+
+    // If no token, force last anchor info
+    if (end_i === -1) {
+      const pend = instr_count - 3;
+      if (pend >= 0) {
+        const instr = stack.instructions[pend];
+        if (
+          instr.type === INSTRUCTION_TYPE.LOAD_ARG ||
+          instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL
+        ) {
+          sel_token_index = -1;
+          end_i = pend;
+        }
+      }
+    }
+
     for (let cindex = end_i; cindex >= 0; --cindex) {
       const instr = stack.instructions[cindex];
       if (instr.level > 0) {
@@ -107,10 +148,7 @@ export default class CommandAssistant {
         sel_arg_index = instr.inputTokenIndex;
         continue;
       }
-      if (
-        sel_token_index !== -1 &&
-        instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL
-      ) {
+      if (instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL) {
         sel_cmd_index = instr.inputTokenIndex;
         break;
       }
@@ -118,22 +156,45 @@ export default class CommandAssistant {
     return [sel_cmd_index, sel_token_index, sel_arg_index];
   }
 
-  #getAvailableOptions(data, caret_pos, callback) {
+  getInputInfo(data, caret_pos) {
     if (!data) {
-      callback([]);
-      return;
+      return {};
     }
     const parse_info = this.#virtMachine.parse(data);
-    const ret = [];
     const [sel_cmd_index, sel_token_index, sel_arg_index] =
       this.getSelectedParameterIndex(parse_info, caret_pos);
-    const cmd_token = parse_info.inputTokens[0][sel_cmd_index];
-    const cur_token = parse_info.inputTokens[0][sel_token_index];
-    const arg_token = parse_info.inputTokens[0][sel_arg_index];
-    if (cur_token === cmd_token) {
+    let sel_token_index_san = sel_token_index;
+    // If not current, force last arg
+    if (sel_token_index_san === -1) {
+      const token_prev_index = parse_info.inputTokens[0].length - 1;
+      if (sel_cmd_index !== token_prev_index) {
+        sel_token_index_san = sel_arg_index + 1;
+      }
+    }
+    return {
+      index: {
+        cmd: sel_cmd_index,
+        current: sel_token_index_san,
+        arg: sel_arg_index,
+      },
+      token: {
+        cmd: parse_info.inputTokens[0][sel_cmd_index]?.value,
+        current: parse_info.inputTokens[0][sel_token_index_san]?.value,
+        arg: parse_info.inputTokens[0][sel_arg_index]?.value,
+      },
+    };
+  }
+
+  async getAvailableOptions(data, caret_pos) {
+    const ret = [];
+    const input_info = this.getInputInfo(data, caret_pos);
+    if (isEmpty(input_info)) {
+      return [];
+    }
+    if (input_info.index.cmd === input_info.index.current) {
       // Command name
       const cmd_names = this.#getAvailableCommandNames(
-        cmd_token?.value || data,
+        input_info.token.cmd || data,
       );
       for (const cmd_name of cmd_names) {
         ret.push({
@@ -143,22 +204,21 @@ export default class CommandAssistant {
           description: this.#virtMachine.commands[cmd_name].definition,
         });
       }
-      callback(ret);
-      return;
+      return ret;
     }
 
-    const command_info = cmd_token
-      ? this.#virtMachine.commands[cmd_token.value]
+    const command_info = input_info.token.cmd
+      ? this.#virtMachine.commands[input_info.token.cmd]
       : undefined;
-    if (!command_info || cur_token === -1) {
-      callback([]);
-      return;
+    if (!command_info) {
+      return [];
     }
-    if (sel_token_index === sel_arg_index) {
+
+    if (input_info.index.current === input_info.index.arg) {
       // Argument
       const arg_infos = this.#getAvailableArguments(
         command_info,
-        arg_token.value,
+        input_info.token.arg,
       );
       for (const arg_info of arg_infos) {
         ret.push({
@@ -171,13 +231,24 @@ export default class CommandAssistant {
           values: arg_info.strict_values,
         });
       }
-    } else if (sel_token_index !== sel_cmd_index && arg_token) {
+    } else if (
+      input_info.index.current !== input_info.index.cmd &&
+      input_info.index.current - 1 === input_info.index.arg &&
+      input_info.token.arg
+    ) {
       // Parameter
-      const param_infos = this.#getAvailableParameters(
+      let param_infos = this.#getAvailableParameters(
         command_info,
-        arg_token.value,
-        cur_token.value,
+        input_info.token.arg,
+        input_info.token.current,
       );
+      if (isEmpty(param_infos)) {
+        param_infos = await this.#getAvailableDynamicParameters(
+          command_info,
+          input_info.token.arg,
+          input_info.token.current,
+        );
+      }
       for (const param_info of param_infos) {
         ret.push({
           name: param_info.value,
@@ -192,6 +263,6 @@ export default class CommandAssistant {
       }
     }
 
-    callback(ret);
+    return ret;
   }
 }

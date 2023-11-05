@@ -50,9 +50,28 @@ async function cmdSearchModelRecordId(kwargs, screen) {
   return recordset;
 }
 
+let cache = [];
+async function getOptions(arg_name, arg_info, arg_value) {
+  if (arg_name === 'model') {
+    if (!arg_value) {
+      const records = await searchRead(
+        'ir.model',
+        [],
+        ['model'],
+        this.getContext(),
+      );
+      cache = records.map(item => item.model);
+      return cache;
+    }
+    return cache.filter(item => item.startsWith(arg_value));
+  }
+  return [];
+}
+
 export default {
   definition: 'Search model record',
   callback: cmdSearchModelRecordId,
+  options: getOptions,
   detail: 'Launch orm search query.',
   args: [
     [ARG.String, ['m', 'model'], true, 'The model technical name'],

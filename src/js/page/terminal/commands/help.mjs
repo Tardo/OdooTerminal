@@ -73,9 +73,21 @@ function cmdPrintHelp(kwargs, screen) {
   }
 }
 
+async function getOptions(arg_name, arg_info, arg_value) {
+  if (arg_name === 'cmd') {
+    const command_names = Object.keys(this.virtMachine.commands);
+    if (arg_value) {
+      return command_names.filter(item => item.startsWith(arg_value));
+    }
+    return command_names;
+  }
+  return [];
+}
+
 export default {
   definition: 'Print this help or command detailed info',
   callback: cmdPrintHelp,
+  options: getOptions,
   detail:
     'Show commands and a quick definition.<br/>- ' +
     '<> ~> Required Parameter<br/>- [] ~> Optional Parameter',

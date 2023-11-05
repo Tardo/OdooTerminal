@@ -2,6 +2,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooSession from '@odoo/utils/get_odoo_session';
+import callService from '@odoo/osv/call_service';
+import searchRead from '@odoo/orm/search_read';
 import {ARG} from '@trash/constants';
 
 async function cmdLoginAs(kwargs, screen) {
@@ -33,9 +35,38 @@ async function cmdLoginAs(kwargs, screen) {
   return res;
 }
 
+const cache = {
+  databases: [],
+  users: [],
+};
+async function getOptions(arg_name, arg_info, arg_value) {
+  if (arg_name === 'database') {
+    if (!arg_value) {
+      const records = await callService('db', 'list', {});
+      cache.databases = records;
+      return cache.databases;
+    }
+    return cache.databases.filter(item => item.startsWith(arg_value));
+  } else if (arg_name === 'user') {
+    if (!arg_value) {
+      const records = await searchRead(
+        'res.users',
+        [['active', '=', true]],
+        ['login'],
+        this.getContext(),
+      );
+      cache.users = records.map(item => item.login);
+      return cache.users;
+    }
+    return cache.users.filter(item => item.startsWith(arg_value));
+  }
+  return [];
+}
+
 export default {
   definition: 'Login as...',
   callback: cmdLoginAs,
+  options: getOptions,
   detail: 'Login as selected user.',
   args: [
     [
