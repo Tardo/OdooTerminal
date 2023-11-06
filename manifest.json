@@ -42,6 +42,6 @@
   },
   "permissions": ["activeTab", "storage"],
   "short_name": "Odoo Terminal",
-  "version": "10.3.2",
+  "version": "10.4.0",
   "web_accessible_resources": ["dist/pub/**"]
 }
