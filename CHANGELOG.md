@@ -1,5 +1,13 @@
 # Changelog
 
+**10.4.0**
+
+```
+IMP: Command assistant
+
+ADD: Dynamic command argument options (issue #127)
+```
+
 **10.3.2**
 
 ```

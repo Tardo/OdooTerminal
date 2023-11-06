@@ -207,7 +207,7 @@ export default class Screen {
       );
     }
     this.$assistant_args.html(renderAssistantArgOptionList(html_options));
-    if (total_options_count === 0) {
+    if (total_options_count <= 0) {
       this.$assistant_args_info.html('');
     } else {
       this.$assistant_args_info.text(

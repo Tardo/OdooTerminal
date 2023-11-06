@@ -71,7 +71,7 @@ function saveOptions() {
     }
     const target = document.querySelector(`#${name}`);
     let value = '';
-    if (type === 'edit' || type === 'int') {
+    if (type === 'edit' || type === 'int' || type === 'option') {
       value = target.value;
     } else if (type === 'check') {
       value = target.checked;
@@ -101,6 +101,8 @@ function applyInputValues() {
         item.value = result[name] || 0;
       } else if (type === 'json') {
         item.value = JSON.stringify(result[name], null, 4) || '{}';
+      } else if (type === 'option') {
+        item.value = result[name] || null;
       }
     }
     shortcuts_defs = result.shortcuts || {};

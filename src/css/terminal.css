@@ -143,6 +143,7 @@
   font-size: x-small;
   position: absolute;
   bottom: var(--terminal-screen-assistant-bottom-pos);
+  pointer-events: none;
   z-index: 10;
 }
 

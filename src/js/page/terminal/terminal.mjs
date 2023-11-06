@@ -23,6 +23,8 @@ import keyCode from './utils/keycode';
 import ProcessJobError from './exceptions/process_job_error';
 import {Mutex} from 'async-mutex';
 
+export const MAX_COMMAND_ASSISTANT_OPTIONS = 35;
+
 export default class Terminal {
   VERSION = '10.3.2';
 
@@ -546,6 +548,10 @@ export default class Terminal {
       term_context: config.term_context || {},
       init_cmds: config.init_cmds,
       console_errors: config.devmode_console_errors,
+      cmd_assistant_dyn_options_disabled:
+        config.cmd_assistant_dyn_options_disabled,
+      cmd_assistant_match_mode: config.cmd_assistant_match_mode,
+      cmd_assistant_max_results: config.cmd_assistant_max_results,
     });
 
     this.userContext = Object.assign(
@@ -610,11 +616,13 @@ export default class Terminal {
           this.screen.getInputCaretStartPos(),
         );
       })
-      .then(result => {
-        const [options, total_count] = result;
+      .then(options => {
         this.#selAssistanOption = -1;
-        this.#assistantOptions = options;
-        this.#assistantOptionsTotalCount = total_count;
+        this.#assistantOptions = options.slice(
+          0,
+          this.#config.cmd_assistant_max_results,
+        );
+        this.#assistantOptionsTotalCount = options.length;
         this.screen.updateAssistantPanelOptions(
           this.#assistantOptions,
           this.#selAssistanOption,
@@ -772,12 +780,11 @@ export default class Terminal {
   #onKeyArrowLeft() {
     this.updateAssistantoptions();
   }
-  #onKeyTab() {
+  #onKeyTab(ev) {
     const user_input = this.screen.getUserInput();
     if (isEmpty(user_input)) {
       return;
     }
-
     const parse_info = this.parse(user_input);
     const [sel_cmd_index, sel_token_index] =
       this.#commandAssistant.getSelectedParameterIndex(
@@ -788,9 +795,15 @@ export default class Terminal {
       return;
     }
     const cur_token = parse_info.inputTokens[0][sel_token_index];
-    ++this.#selAssistanOption;
+    if (ev.shiftKey) {
+      --this.#selAssistanOption;
+    } else {
+      ++this.#selAssistanOption;
+    }
     if (this.#selAssistanOption >= this.#assistantOptions.length) {
       this.#selAssistanOption = 0;
+    } else if (this.#selAssistanOption < 0) {
+      this.#selAssistanOption = this.#assistantOptions.length - 1;
     }
     const option = this.#assistantOptions[this.#selAssistanOption];
     if (isEmpty(option)) {

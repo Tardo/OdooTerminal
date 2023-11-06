@@ -57,6 +57,34 @@
       </div>
 
       <div class="optsection">
+        <h4>Command Assistant</h4>
+        <p></p>
+        <input
+          type="checkbox"
+          id="cmd_assistant_dyn_options_disabled"
+          name="cmd_assistant_dyn_options_disabled"
+        />
+        <label for="cmd_assistant_dyn_options_disabled"
+          >Disable dynamic options</label
+        ><br />
+        <label for="cmd_assistant_match_mode">Match mode:</label>
+        <select id="cmd_assistant_match_mode" name="cmd_assistant_match_mode">
+          <option value="startsWith">startsWith</option>
+          <option value="includes">includes</option>
+        </select>
+        <br />
+        <label for="cmd_assistant_max_results">Max. results:</label>
+        <input
+          type="number"
+          id="cmd_assistant_max_results"
+          name="cmd_assistant_max_results"
+          min="1"
+          max="50"
+        />
+        <br />
+      </div>
+
+      <div class="optsection">
         <h4>Init Commands</h4>
         <p>
           Run these commands when initialize the terminal (one per line).<br />Be
