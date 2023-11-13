@@ -24,42 +24,52 @@ export default class TerminalTestSuite {
 
   assertTrue(val, msg = '') {
     if (!val) {
-      throw new TerminalTestValidationError(msg);
+      throw new TerminalTestValidationError(msg || `'${val}' must be true`);
     }
   }
   assertFalse(val, msg = '') {
     if (val) {
-      throw new TerminalTestValidationError(msg);
+      throw new TerminalTestValidationError(msg || `'${val}' must be false`);
     }
   }
   assertEqual(valA, valB, msg = '') {
     if (valA !== valB) {
-      throw new TerminalTestValidationError(msg);
+      throw new TerminalTestValidationError(
+        msg || `'${valA}' must be equal to '${valB}'`,
+      );
     }
   }
   assertNotEqual(valA, valB, msg = '') {
     if (valA === valB) {
-      throw new TerminalTestValidationError(msg);
+      throw new TerminalTestValidationError(
+        msg || `'${valA}' must not be equal to '${valB}'`,
+      );
     }
   }
   assertIn(obj, key, msg = '') {
     if (!Object.hasOwn(obj, key)) {
-      throw new TerminalTestValidationError(msg);
+      throw new TerminalTestValidationError(
+        msg || `'${key}' must be in '${obj}'`,
+      );
     }
   }
   assertNotIn(obj, key, msg = '') {
     if (Object.hasOwn(obj, key)) {
-      throw new TerminalTestValidationError(msg);
+      throw new TerminalTestValidationError(
+        msg || `'${key}' must not be in '${obj}'`,
+      );
     }
   }
   assertEmpty(val, msg = '') {
     if (!isEmpty(val)) {
-      throw new TerminalTestValidationError(msg);
+      throw new TerminalTestValidationError(msg || `'${val}' must be empty`);
     }
   }
   assertNotEmpty(val, msg = '') {
     if (isEmpty(val)) {
-      throw new TerminalTestValidationError(msg);
+      throw new TerminalTestValidationError(
+        msg || `'${val}' must not be empty`,
+      );
     }
   }
 

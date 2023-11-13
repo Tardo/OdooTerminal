@@ -115,8 +115,22 @@ export default class TestTrash extends TerminalTestSuite {
     );
     this.assertEqual(results[0], -645);
     results = await this.terminal.eval(
-      "$data = {numA: 4, numB:9}; $(( ($data['numA']    * $data['numB']  +    4  )  * -2     ))",
+      "$data = {numA: 4, numB:9, numC: [23,2]}; $(( ($data['numA']    * $data['numB'] + $data['numC'][1] +    4  )  * -2     ))",
     );
-    this.assertEqual(results[0], -80);
+    this.assertEqual(results[0], -84);
+
+    // Mix
+    results = await this.terminal.eval(
+      "$data = {numA: 4, numB:9}; ['te'+ 'st' + '!', $data['numA'], 42]",
+    );
+    this.assertEqual(results[0][0], 'test!');
+    this.assertEqual(results[0][1], 4);
+    this.assertEqual(results[0][2], 42);
+    results = await this.terminal.eval(
+      "$data = {numA: 4, numB:9}; {'key' + 'A' + '001' + 'K' + 'Z': $data['numA'], $(print 'Test Runner') + '_o': 'Val:' + $data['numB'] + '-E', 'key' + $data['numB']: 42}",
+    );
+    this.assertEqual(results[0].keyA001KZ, 4);
+    this.assertEqual(results[0]['Test Runner_o'], 'Val:9-E');
+    this.assertEqual(results[0].key9, 42);
   }
 }
