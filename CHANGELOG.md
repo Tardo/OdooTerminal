@@ -1,5 +1,14 @@
 # Changelog
 
+**10.4.1**
+
+```
+IMP: Tests messages
+
+FIX: Trash: Interpreter (issue #128)
+FIX: User input: key up (prev. history)
+```
+
 **10.4.0**
 
 ```

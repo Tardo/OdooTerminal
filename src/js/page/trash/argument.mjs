@@ -136,7 +136,9 @@ export function validateAndFormatArguments(cmd_def, kwargs) {
 
   // Check required
   const full_kwargs_keys = Object.keys(full_kwargs);
-  const required_not_set = difference(required_args, full_kwargs_keys);
+  const required_not_set = difference(required_args, full_kwargs_keys).map(
+    item => `--${item}`,
+  );
   if (required_not_set.length) {
     throw new Error(
       `Required arguments not set! (${required_not_set.join(',')})`,

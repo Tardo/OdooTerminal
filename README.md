@@ -147,7 +147,7 @@ Examples:
 - Create 5000 res.partner:
   `repeat -t 5000 -c "create -m res.partner -v {name: $(gen str 12 8) + ' (Test)'}" --silent`
 - Cancel all sale.order:
-  `$orders = $(search sale.order); repeat -t $orders['length'] -c "call sale.order action_cancel [$orders[$(gen intiter)]['id']]"`
+  `$orders = $(search sale.order); repeat -t $orders['length'] -c "call sale.order action_cancel [$orders[$repeat_index]['id']]"`
 
 #### + Send files
 

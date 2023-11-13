@@ -29,18 +29,17 @@ export const LEXER = {
   Positive: 25,
 };
 
-export const LEXER_MATH_OPER = new Set([
+export const LEXER_MATH_OPER = [
   LEXER.Add,
   LEXER.Substract,
   LEXER.Multiply,
   LEXER.Divide,
   LEXER.Modulo,
   LEXER.Pow,
-]);
+];
 
-export const LEXERDATA = new Set([
+export const LEXERDATA = [
   LEXER.Variable,
-  LEXER.DataAttribute,
   LEXER.Runner,
   LEXER.Array,
   LEXER.String,
@@ -49,6 +48,10 @@ export const LEXERDATA = new Set([
   LEXER.Dictionary,
   LEXER.Boolean,
   LEXER.Math,
+];
+
+export const LEXERDATA_EXTENDED = LEXERDATA.concat([
+  LEXER.DataAttribute,
   LEXER.Negative,
   LEXER.Positive,
 ]);
@@ -195,14 +198,14 @@ export const SYMBOLS = {
   BLOCK_END: '}',
 };
 
-export const SYMBOLS_MATH_OPER = new Set([
+export const SYMBOLS_MATH_OPER = [
   SYMBOLS.ADD,
   SYMBOLS.SUBSTRACT,
   SYMBOLS.MULTIPLY,
   SYMBOLS.DIVIDE,
   SYMBOLS.MODULO,
   SYMBOLS.POW,
-]);
+];
 
 export const SYMBOLS_MATH_SIGN = [SYMBOLS.ADD, SYMBOLS.SUBSTRACT];
 

@@ -6,6 +6,7 @@ import {
   KEYWORDS,
   LEXER,
   LEXERDATA,
+  LEXERDATA_EXTENDED,
   LEXER_MATH_OPER,
   MATH_OPER_PRIORITIES,
   SYMBOLS,
@@ -112,10 +113,11 @@ export default class Interpreter {
             if (
               options.isData &&
               (char === SYMBOLS.ITEM_DELIMITER ||
-                char === SYMBOLS.DICTIONARY_SEPARATOR)
+                char === SYMBOLS.DICTIONARY_SEPARATOR ||
+                prev_char === SYMBOLS.ITEM_DELIMITER ||
+                prev_char === SYMBOLS.DICTIONARY_SEPARATOR)
             ) {
               do_cut = true;
-              do_skip = true;
             } else if (
               char === SYMBOLS.EOC ||
               char === SYMBOLS.EOL ||
@@ -136,8 +138,8 @@ export default class Interpreter {
             }
             if (options?.math) {
               if (
-                SYMBOLS_MATH_OPER.has(char) ||
-                SYMBOLS_MATH_OPER.has(prev_char_no_space)
+                SYMBOLS_MATH_OPER.includes(char) ||
+                SYMBOLS_MATH_OPER.includes(prev_char_no_space)
               ) {
                 do_cut = true;
               }
@@ -207,7 +209,9 @@ export default class Interpreter {
       const dtokens = this.tokenize(stoken, {isData: true});
       let rstr = '';
       for (const tok of dtokens) {
-        rstr += tok.raw;
+        if (tok.type !== LEXER.Delimiter) {
+          rstr += tok.raw;
+        }
       }
       const rsepcount = countBy(rstr, char => char === ':').true;
       return rsepcount !== sepcount;
@@ -233,7 +237,11 @@ export default class Interpreter {
         ttype = LEXER.ArgumentShort;
         token_san = token_san.substr(1);
       }
-    } else if (token_san === SYMBOLS.EOC) {
+    } else if (
+      token_san === SYMBOLS.EOC ||
+      token_san === SYMBOLS.DICTIONARY_SEPARATOR ||
+      token_san === SYMBOLS.ITEM_DELIMITER
+    ) {
       ttype = LEXER.Delimiter;
     } else if (token_san === SYMBOLS.ASSIGNMENT) {
       ttype = LEXER.Assignment;
@@ -314,13 +322,13 @@ export default class Interpreter {
       ttype = LEXER.In;
     } else if (options.math) {
       if (token_san === SYMBOLS.ADD) {
-        if (!prev_token_info || LEXER_MATH_OPER.has(prev_token_info[0])) {
+        if (!prev_token_info || LEXER_MATH_OPER.includes(prev_token_info[0])) {
           ttype = LEXER.Positive;
         } else {
           ttype = LEXER.Add;
         }
       } else if (token_san === SYMBOLS.SUBSTRACT) {
-        if (!prev_token_info || LEXER_MATH_OPER.has(prev_token_info[0])) {
+        if (!prev_token_info || LEXER_MATH_OPER.includes(prev_token_info[0])) {
           ttype = LEXER.Negative;
         } else {
           ttype = LEXER.Substract;
@@ -348,7 +356,7 @@ export default class Interpreter {
     from = from || 0;
     const data_tokens = [];
     const push_token = function (token) {
-      if (!LEXERDATA.has(token[0])) {
+      if (!LEXERDATA_EXTENDED.includes(token[0])) {
         return false;
       }
       data_tokens.push(token);
@@ -383,7 +391,7 @@ export default class Interpreter {
   #prioritizer(tokens) {
     let tokens_no_spaces = tokens.filter(item => item[0] !== LEXER.Space);
     const tokens_math_oper = tokens_no_spaces.filter(item =>
-      LEXER_MATH_OPER.has(item[0]),
+      LEXER_MATH_OPER.includes(item[0]),
     );
     if (tokens_math_oper.length <= 1) {
       return tokens;
@@ -490,6 +498,7 @@ export default class Interpreter {
       arguments: [],
       inputTokens: [],
     };
+    let num_concats = 0;
     let sign_cache = null;
     let last_token_index = -1;
     let token_subindex = 0;
@@ -528,6 +537,7 @@ export default class Interpreter {
           to_append_eoi.instructions.push(
             new Instruction(INSTRUCTION_TYPE.CONCAT, index, level),
           );
+          ++num_concats;
           break;
         case LEXER.Negative:
           sign_cache = INSTRUCTION_TYPE.UNITARY_NEGATIVE;
@@ -663,7 +673,10 @@ export default class Interpreter {
               },
               ++mlevel,
             );
-            const dindex = parsed_array.inputTokens[0].length;
+            const dindex =
+              parsed_array.inputTokens[0].filter(item =>
+                LEXERDATA.includes(item.type),
+              ).length - parsed_array.unions;
             res.stack.arguments.push(...parsed_array.stack.arguments);
             res.stack.values.push(...parsed_array.stack.values);
             res.stack.names.push(...parsed_array.stack.names);
@@ -692,7 +705,11 @@ export default class Interpreter {
               },
               ++mlevel,
             );
-            const dindex = parseInt(parsed_dict.inputTokens[0].length / 2, 10);
+            let dindex =
+              parsed_dict.inputTokens[0].filter(item =>
+                LEXERDATA.includes(item.type),
+              ).length - parsed_dict.unions;
+            dindex = parseInt(dindex / 2, 10);
             res.stack.arguments.push(...parsed_dict.stack.arguments);
             res.stack.values.push(...parsed_dict.stack.values);
             res.stack.names.push(...parsed_dict.stack.names);
@@ -886,7 +903,11 @@ export default class Interpreter {
       }
 
       pushParseData(to_append);
-      if (index === tokens_len - 1 || !ignore_instr_eoi) {
+      if (
+        index === tokens_len - 1 ||
+        !ignore_instr_eoi ||
+        token.type === LEXER.Delimiter
+      ) {
         pushParseData(to_append_eoi);
       }
       if (index === tokens_len - 1 || token.type === LEXER.Delimiter) {
@@ -908,6 +929,7 @@ export default class Interpreter {
     return {
       inputRawString: data,
       inputTokens: res.inputTokens,
+      unions: num_concats,
       stack: {
         instructions: res.stack.instructions,
         names: res.stack.names,
