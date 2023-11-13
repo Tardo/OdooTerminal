@@ -743,6 +743,7 @@ export default class Terminal {
       // Do nothing
     });
     this.#searchHistoryQuery = undefined;
+    this.#searchHistoryIter = this.#inputHistory.length;
     this.screen.preventLostInputFocus();
   }
   #onKeyArrowUp() {
