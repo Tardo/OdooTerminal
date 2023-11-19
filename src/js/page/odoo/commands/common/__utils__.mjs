@@ -5,7 +5,7 @@ import searchRead from '@odoo/orm/search_read';
 
 export async function searchModules(module_names) {
   let domain = null;
-  if (module_names?.constructor.name === 'String') {
+  if (module_names?.constructor === String) {
     domain = [['name', '=', module_names]];
   } else if (module_names?.length === 1) {
     domain = [['name', '=', module_names[0]]];

@@ -10,7 +10,7 @@ export default function () {
     '@web/legacy/js/env',
   );
   // This is necessary for master branch, public pages.
-  if (!root || root.constructor.name === 'Promise') {
+  if (!root || root.constructor === Promise) {
     return odoo?.__WOWL_DEBUG__?.root;
   }
   return root;

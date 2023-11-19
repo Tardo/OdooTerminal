@@ -132,7 +132,7 @@ export default class VMachine {
   }
 
   async eval(cmd_raw, options) {
-    if (cmd_raw?.constructor.name !== 'String') {
+    if (cmd_raw?.constructor !== String) {
       throw new Error('Invalid input!');
     }
     const parse_info = this.parse(cmd_raw, {

@@ -136,31 +136,31 @@ export const ARG = {
     return utypes.join(' or ');
   },
   getType: function (val) {
-    const cname = val.constructor.name;
-    if (cname === 'String') {
+    const val_constructor = val.constructor;
+    if (val_constructor === String) {
       return this.String;
-    } else if (cname === 'Number') {
+    } else if (val_constructor === Number) {
       return this.Number;
-    } else if (cname === 'Object') {
+    } else if (val_constructor === Object) {
       return this.Dictionary;
-    } else if (cname === 'Boolean') {
+    } else if (val_constructor === Boolean) {
       return this.Flag;
-    } else if (cname === 'Array') {
+    } else if (val_constructor === Array) {
       return this.List;
     }
     return this.Any;
   },
   cast: function (val, atype) {
-    const cname = val.constructor.name;
-    if (atype === this.String && cname !== 'String') {
+    const val_constructor = val.constructor;
+    if (atype === this.String && val_constructor !== String) {
       return String(val);
-    } else if (atype === this.Number && cname !== 'Number') {
+    } else if (atype === this.Number && val_constructor !== Number) {
       return Number(val);
-    } else if (atype === this.Dictionary && cname !== 'Object') {
+    } else if (atype === this.Dictionary && val_constructor !== Object) {
       return Object.fromEntries(val);
-    } else if (atype === this.Flag && cname !== 'Boolean') {
+    } else if (atype === this.Flag && val_constructor !== Boolean) {
       return Boolean(val);
-    } else if (atype === this.List && cname !== 'Array') {
+    } else if (atype === this.List && val_constructor !== Array) {
       return [val];
     }
     return val;

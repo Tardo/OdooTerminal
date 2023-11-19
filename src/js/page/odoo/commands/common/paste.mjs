@@ -44,7 +44,7 @@ async function mergeModelRecords(model, data) {
   }
   const results = await Promise.all(tasks);
   results.forEach((item, index) => {
-    if (item.constructor.name === 'Number' && !records_vals[index].id) {
+    if (item.constructor === Number && !records_vals[index].id) {
       records_vals[index].id = item;
     }
   });

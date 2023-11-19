@@ -51,10 +51,10 @@ function sanitizeArgumentValue(val, arg_type) {
   }
 
   // Allow declare arrays in old format
-  const cname = val.constructor.name;
-  if (cname !== 'Array' && (arg_type & ARG.List) === ARG.List) {
+  const val_constructor = val.constructor;
+  if (val_constructor !== Array && (arg_type & ARG.List) === ARG.List) {
     const item_type = arg_type & ~ARG.List;
-    if (cname === 'String') {
+    if (val_constructor === String) {
       return val.split(',').map(item => ARG.cast(item.trim(), item_type));
     }
     return [val];
