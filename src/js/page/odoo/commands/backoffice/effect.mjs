@@ -3,12 +3,13 @@
 
 import showEffect from '@odoo/base/show_effect';
 import getOdooService from '@odoo/utils/get_odoo_service';
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 
 async function cmdShowEffect(kwargs, screen) {
-  if (getOdooVersionMajor() < 15) {
+  const OdooVerMajor = getOdooVersion('major');
+  if (OdooVerMajor < 15) {
     // Soft-Error
     screen.printError('This command is only available in Odoo 15.0+');
     return;

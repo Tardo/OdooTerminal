@@ -9,17 +9,17 @@ import {
 import doCall from './base/do_call';
 import getOdooEnv from './utils/get_odoo_env';
 import getOdooService from './utils/get_odoo_service';
-import getOdooVersionMajor from './utils/get_odoo_version_major';
+import getOdooVersion from './utils/get_odoo_version';
 
 export default class Longpolling {
   #terminal = null;
 
   constructor(terminal) {
     this.#terminal = terminal;
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer <= 11) {
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor <= 11) {
       this.#getBusService().on('notification', this, this.#onBusNotification);
-    } else if (OdooVer >= 16) {
+    } else if (OdooVerMajor >= 16) {
       this.#busServ(
         'addEventListener',
         'notification',
@@ -35,8 +35,8 @@ export default class Longpolling {
   }
 
   #busServ(method, ...params) {
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer >= 14) {
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor >= 14) {
       const bus_serv = getOdooEnv()?.services?.bus_service;
       if (!bus_serv) {
         throw new Error('bus service not available');
@@ -47,36 +47,36 @@ export default class Longpolling {
   }
 
   addChannel(name) {
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer <= 11) {
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor <= 11) {
       return this.#getBusService().add_channel(name);
     }
     return this.#busServ('addChannel', name);
   }
 
   deleteChannel(name) {
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer <= 11) {
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor <= 11) {
       return this.#getBusService().delete_channel(name);
     }
     return this.#busServ('deleteChannel', name);
   }
 
   startPoll() {
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer <= 11) {
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor <= 11) {
       return this.#getBusService().start_polling();
-    } else if (OdooVer >= 16) {
+    } else if (OdooVerMajor >= 16) {
       return this.#busServ('forceUpdateChannels');
     }
     return this.#busServ('startPolling');
   }
 
   stopPoll() {
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer <= 11) {
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor <= 11) {
       return this.#getBusService().stop_polling();
-    } else if (OdooVer >= 16) {
+    } else if (OdooVerMajor >= 16) {
       return this.#busServ('stop');
     }
     return this.#busServ('stopPolling');
@@ -98,8 +98,8 @@ export default class Longpolling {
 
   //
   #getNotificationsData(data) {
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer >= 16) {
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor >= 16) {
       return data.detail;
     }
     return data;

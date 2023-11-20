@@ -5,7 +5,7 @@ import doAction from '@odoo/base/do_action';
 import {ARG} from '@trash/constants';
 
 async function cmdCallAction(kwargs) {
-  return doAction(kwargs.action, kwargs.options);
+  return await doAction(kwargs.action, kwargs.options);
 }
 
 export default {

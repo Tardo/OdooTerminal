@@ -1,11 +1,17 @@
 # Changelog
 
+**10.4.2**
+
+```
+IMP: Browse action icon badge (issue #129)
+```
+
 **10.4.1**
 
 ```
 IMP: Tests messages
 
-FIX: Trash: Interpreter (issue #128)
+FIX: TraSH: Interpreter (issue #128)
 FIX: User input: key up (prev. history)
 ```
 

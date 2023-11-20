@@ -14,9 +14,10 @@ const ODOO_OBJ = window.odoo;
  * @returns {Object}
  */
 function sanitizeServerInfo(ver, ver_info) {
-  const info = {};
-  info.serverVersionRaw = ver;
-  info.serverVersionInfo = ver_info;
+  const info = {
+    serverVersionRaw: ver,
+    serverVersionInfo: ver_info,
+  };
   if (ver_info) {
     info.serverVersion = {
       major: ver_info[0],
@@ -84,6 +85,7 @@ if (ODOO_OBJ) {
   icontext.isOdoo = true;
   Object.assign(icontext, await getInstanceVersion());
   icontext.isCompatible = isCompatibleOdooVersion(icontext.serverVersionRaw);
+  icontext.isSaas = icontext.serverVersionRaw.startsWith('saas~');
 }
 postMessage('ODOO_TERM_INIT', {
   instance_info: icontext,

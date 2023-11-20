@@ -1,7 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import asyncSleep from '@terminal/utils/async_sleep';
 import uniqueId from '@terminal/utils/unique_id';
 import TerminalTestSuite from './tests';
@@ -149,16 +149,24 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_action() {
+    const OdooVerMajor = getOdooVersion('major');
     let res = await this.terminal.execute('action -a 5', false, true);
-    this.assertEqual(res.id, 5);
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer >= 14) {
+    if (OdooVerMajor >= 17) {
+      this.assertTrue(res);
+    } else {
+      this.assertEqual(res.id, 5);
+    }
+    if (OdooVerMajor >= 14) {
       res = await this.terminal.execute(
         'action -a base.action_res_company_form',
         false,
         true,
       );
-      this.assertEqual(res.id, 'base.action_res_company_form');
+      if (OdooVerMajor >= 17) {
+        this.assertTrue(res);
+      } else {
+        this.assertEqual(res.id, 'base.action_res_company_form');
+      }
       res = await this.terminal.execute(
         "action -a {type: 'ir.actions.act_window', res_model: 'res.partner', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",
         false,
@@ -171,14 +179,22 @@ export default class TestCommon extends TerminalTestSuite {
         false,
         true,
       );
-      this.assertEqual(res.xml_id, 'base.action_res_company_form');
+      if (OdooVerMajor >= 17) {
+        this.assertTrue(res);
+      } else {
+        this.assertEqual(res.xml_id, 'base.action_res_company_form');
+      }
       res = await this.terminal.execute(
         "action -a {type: 'ir.actions.act_window', res_model: 'res.partner', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",
         false,
         true,
       );
-      this.assertEqual(res.res_model, 'res.partner');
-      this.assertEqual(res.res_id, 1);
+      if (OdooVerMajor >= 17) {
+        this.assertTrue(res);
+      } else {
+        this.assertEqual(res.res_model, 'res.partner');
+        this.assertEqual(res.res_id, 1);
+      }
     }
   }
 
@@ -246,8 +262,8 @@ export default class TestCommon extends TerminalTestSuite {
     res = await this.terminal.execute('context -o read', false, true);
     this.assertIn(res, 'uid');
     // At the moment operations with the context are not possible in legacy mode
-    const OdooVer = getOdooVersionMajor();
-    if (OdooVer < 15) {
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor < 15) {
       res = await this.terminal.execute(
         "context -o write -v {test_key: 'test_value'}",
         false,

@@ -2,14 +2,14 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooEnv from '@odoo/utils/get_odoo_env';
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 
 export default function (event_name, event_options) {
-  const OdooVer = getOdooVersionMajor();
+  const OdooVerMajor = getOdooVersion('major');
   const OdooEnv = getOdooEnv();
   let trigger = null;
   let context = null;
-  if (OdooVer >= 14) {
+  if (OdooVerMajor >= 14) {
     trigger = OdooEnv.bus.trigger;
     context = OdooEnv.bus;
   } else {

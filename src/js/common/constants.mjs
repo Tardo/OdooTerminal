@@ -46,6 +46,8 @@ export const COMPATIBLE_VERSIONS = [
   'saas~14',
   '15.',
   'saas~15',
-  '16.0',
-  'saas~16.0',
+  '16.',
+  'saas~16',
+  '17.0',
+  'saas~17.0',
 ];

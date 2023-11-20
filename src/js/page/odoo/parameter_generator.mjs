@@ -2,6 +2,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooService from './utils/get_odoo_service';
+import getOdooVersion from './utils/get_odoo_version';
+import getUserTZ from './utils/get_user_tz';
 
 /**
  * This class is used to generate values for terminal command parameters.
@@ -116,6 +118,12 @@ export default class ParameterGenerator {
     if (typeof min === 'undefined') {
       return false;
     }
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor >= 17) {
+      return getOdooService('@web/core/l10n/dates').formatDate(
+        luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}).setZone(getUserTZ()),
+      );
+    }
     const rdate = this.generateInt(min, max);
     return moment(new Date(rdate)).format(
       getOdooService('web.time').getLangDateFormat(),
@@ -126,13 +134,54 @@ export default class ParameterGenerator {
     if (typeof min === 'undefined') {
       return false;
     }
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor >= 17) {
+      return getOdooService('@web/core/l10n/dates').serializeDate(
+        luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}),
+      );
+    }
     const rdate = this.generateInt(min, max);
     return getOdooService('web.time').date_to_str(new Date(rdate));
+  }
+
+  generateTzDateTime(min, max) {
+    if (typeof min === 'undefined') {
+      return false;
+    }
+    const rdate = this.generateInt(min, max);
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor >= 17) {
+      return getOdooService('@web/core/l10n/dates').formatDateTime(
+        luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}).setZone(getUserTZ()),
+      );
+    }
+    return moment(new Date(rdate)).format(
+      getOdooService('web.time').getLangDatetimeFormat(),
+    );
+  }
+
+  generateDateTime(min, max) {
+    if (typeof min === 'undefined') {
+      return false;
+    }
+    const rdate = this.generateInt(min, max);
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor >= 17) {
+      return getOdooService('@web/core/l10n/dates').serializeDateTime(
+        luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}),
+      );
+    }
+    return getOdooService('web.time').datetime_to_str(new Date(rdate));
   }
 
   generateTzTime(min, max) {
     if (typeof min === 'undefined') {
       return false;
+    }
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor >= 17) {
+      const dt = this.generateTzDateTime(min, max);
+      return dt.split(' ')[1];
     }
     const rdate = this.generateInt(min, max);
     return moment(new Date(rdate)).format(
@@ -144,25 +193,12 @@ export default class ParameterGenerator {
     if (typeof min === 'undefined') {
       return false;
     }
+    const OdooVerMajor = getOdooVersion('major');
+    if (OdooVerMajor >= 17) {
+      const dt = this.generateDateTime(min, max);
+      return dt.split(' ')[1];
+    }
     const rdate = this.generateInt(min, max);
     return getOdooService('web.time').time_to_str(new Date(rdate));
-  }
-
-  generateTzDateTime(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
-    const rdate = this.generateInt(min, max);
-    return moment(new Date(rdate)).format(
-      getOdooService('web.time').getLangDatetimeFormat(),
-    );
-  }
-
-  generateDateTime(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
-    const rdate = this.generateInt(min, max);
-    return getOdooService('web.time').datetime_to_str(new Date(rdate));
   }
 }

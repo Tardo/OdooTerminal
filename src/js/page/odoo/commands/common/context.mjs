@@ -2,14 +2,14 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooSession from '@odoo/utils/get_odoo_session';
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@trash/constants';
 
 const session = getOdooSession();
 
 async function cmdContextOperation(kwargs, screen) {
-  const OdooVer = getOdooVersionMajor();
-  if (OdooVer >= 15) {
+  const OdooVerMajor = getOdooVersion('major');
+  if (OdooVerMajor >= 15) {
     if (
       kwargs.operation === 'set' ||
       kwargs.operation === 'write' ||

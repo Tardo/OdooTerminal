@@ -2,7 +2,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooService from '@odoo/utils/get_odoo_service';
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import asyncSleep from '@terminal/utils/async_sleep';
 import {ARG} from '@trash/constants';
 
@@ -17,8 +17,8 @@ const AVAILABLE_BARCODE_COMMANDS = [
 ];
 
 function getBarcodeEvent(data) {
-  const OdooVer = getOdooVersionMajor();
-  if (OdooVer >= 16) {
+  const OdooVerMajor = getOdooVersion('major');
+  if (OdooVerMajor >= 16) {
     return new KeyboardEvent('keydown', {
       key: data,
     });
@@ -31,8 +31,8 @@ function getBarcodeEvent(data) {
 }
 
 function getBarcodeInfo(barcodeService) {
-  const OdooVer = getOdooVersionMajor();
-  if (OdooVer >= 16) {
+  const OdooVerMajor = getOdooVersion('major');
+  if (OdooVerMajor >= 16) {
     return [
       `Max. time between keys (ms): ${barcodeService.barcodeService.maxTimeBetweenKeysInMs}`,
       'Reserved barcode prefixes: O-BTN., O-CMD.',

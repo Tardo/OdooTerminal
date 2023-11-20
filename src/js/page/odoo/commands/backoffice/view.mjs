@@ -4,13 +4,13 @@
 import doAction from '@odoo/base/do_action';
 import getParentAdapter from '@odoo/utils/get_parent_adapter';
 import getOdooService from '@odoo/utils/get_odoo_service';
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
 
 function openSelectCreateDialog(model, title, domain, on_selected) {
-  const OdooVer = getOdooVersionMajor();
-  if (OdooVer < 16) {
+  const OdooVerMajor = getOdooVersion('major');
+  if (OdooVerMajor < 16) {
     const dialogs = getOdooService('web.view_dialogs');
     const dialog = new dialogs.SelectCreateDialog(getParentAdapter(), {
       res_model: model,

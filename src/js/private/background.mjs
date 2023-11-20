@@ -38,16 +38,17 @@ function updateBrowserAction(icon, text = null, bg_color = null) {
 function onInternalMessage(request, sender) {
   if (request.message === 'update_terminal_badge_info') {
     const {context} = request;
+    const ver_clean = context.serverVersionRaw?.replace('saas~', '');
     if (context.isCompatible) {
       ubrowser.browserAction.enable(sender.tab.id);
-      updateBrowserAction('terminal-16', context.serverVersionRaw, '#71639e');
+      updateBrowserAction(
+        'terminal-16',
+        ver_clean,
+        context.isSaas ? '#9e7163' : '#71639e',
+      );
     } else {
       ubrowser.browserAction.disable(sender.tab.id);
-      updateBrowserAction(
-        'terminal-disabled-16',
-        context.serverVersionRaw,
-        '#878787',
-      );
+      updateBrowserAction('terminal-disabled-16', ver_clean, '#878787');
     }
   }
 }

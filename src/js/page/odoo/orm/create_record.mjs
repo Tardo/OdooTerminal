@@ -2,11 +2,11 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import callModel from '@odoo/osv/call_model';
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 
 export default function (model, records, context) {
-  const OdooVer = getOdooVersionMajor();
-  if (OdooVer < 13) {
+  const OdooVerMajor = getOdooVersion('major');
+  if (OdooVerMajor < 13) {
     const proms = records.map(record =>
       callModel(model, 'create', [record], null, context),
     );

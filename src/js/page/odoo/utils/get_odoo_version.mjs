@@ -5,20 +5,20 @@ import getOdooSession from './get_odoo_session';
 import isEmpty from '@terminal/utils/is_empty';
 
 const cache = {};
-export default function () {
-  if (!isEmpty(cache)) {
-    return cache;
+export default function (type = 'raw') {
+  if (isEmpty(cache)) {
+    const raw =
+      getOdooSession()?.server_version ||
+      window.__OdooTerminal?.raw_server_info.serverVersionRaw;
+    if (!raw) {
+      return;
+    }
+    const raw_split = raw.replace('saas~', '').split('.');
+    Object.assign(cache, {
+      raw: raw,
+      major: Number(raw_split[0]),
+      minor: Number(raw_split[1]),
+    });
   }
-  const raw =
-    getOdooSession()?.server_version ||
-    window.__OdooTerminal?.raw_server_info.serverVersionRaw;
-  const is_sass = raw.contains('saas~');
-  const raw_split = raw.replace('sass~', '').split('.');
-  Object.assign(cache, {
-    raw: raw,
-    major: raw_split[0],
-    minor: raw_split[1],
-    is_saas: is_sass,
-  });
-  return cache;
+  return cache[type];
 }

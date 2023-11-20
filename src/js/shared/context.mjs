@@ -7,6 +7,7 @@ export const InstanceContext = {
   serverVersionRaw: null,
   isCompatible: false,
   isBackOffice: false,
+  isSaas: false,
   serverVersion: {
     major: 0,
     minor: 0,

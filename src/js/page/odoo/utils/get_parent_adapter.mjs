@@ -2,14 +2,14 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooEnv from '@odoo/utils/get_odoo_env';
-import getOdooVersionMajor from './get_odoo_version_major';
+import getOdooVersion from './get_odoo_version';
 import getOwlVersionMajor from './get_owl_version_major';
 import getOdooService from './get_odoo_service';
 import getOdooRoot from './get_odoo_root';
 
 export default function () {
-  const OdooVer = getOdooVersionMajor();
-  if (OdooVer >= 15) {
+  const OdooVerMajor = getOdooVersion('major');
+  if (OdooVerMajor >= 15) {
     const OwlVer = getOwlVersionMajor();
     if (OwlVer === 1) {
       const {Component} = owl;
@@ -20,7 +20,7 @@ export default function () {
       const {standaloneAdapter} = getOdooService('web.OwlCompatibility');
       return standaloneAdapter({Component});
     }
-  } else if (OdooVer >= 14) {
+  } else if (OdooVerMajor >= 14) {
     return getOdooRoot();
   }
   return getOdooEnv();

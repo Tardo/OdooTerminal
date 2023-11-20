@@ -2,14 +2,14 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import callModel from '@odoo/osv/call_model';
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@trash/constants';
 
 async function cmdRef(kwargs, screen) {
-  const OdooVer = getOdooVersionMajor();
+  const OdooVerMajor = getOdooVersion('major');
   const tasks = [];
   for (const xmlid of kwargs.xmlid) {
-    if (OdooVer < 15) {
+    if (OdooVerMajor < 15) {
       tasks.push(
         callModel(
           'ir.model.data',

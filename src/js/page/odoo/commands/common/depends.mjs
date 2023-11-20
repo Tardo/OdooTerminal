@@ -3,13 +3,13 @@
 
 import callModel from '@odoo/osv/call_model';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
-import getOdooVersionMajor from '@odoo/utils/get_odoo_version_major';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import isEmpty from '@terminal/utils/is_empty';
 import {ARG} from '@trash/constants';
 
 function sanitizeCmdModuleDepends(module_name) {
-  const OdooVer = getOdooVersionMajor();
-  if (OdooVer >= 16) {
+  const OdooVerMajor = getOdooVersion('major');
+  if (OdooVerMajor >= 16) {
     return `_______${module_name}`;
   }
   return module_name;

@@ -5,14 +5,13 @@ import getOdooSession from './get_odoo_session';
 
 let isBackoffice = null;
 export default function () {
-  if (isBackoffice !== null) {
-    return isBackoffice;
-  }
-  if (typeof getOdooSession()?.is_frontend !== 'undefined') {
-    isBackoffice = !getOdooSession().is_frontend;
-  } else {
-    isBackoffice =
-      document.querySelector("head script[src*='assets_frontend']") === null;
+  if (isBackoffice === null) {
+    if (typeof getOdooSession()?.is_frontend !== 'undefined') {
+      isBackoffice = !getOdooSession().is_frontend;
+    } else {
+      isBackoffice =
+        document.querySelector("head script[src*='assets_frontend']") === null;
+    }
   }
   return isBackoffice;
 }

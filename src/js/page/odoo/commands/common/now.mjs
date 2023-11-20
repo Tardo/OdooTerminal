@@ -1,29 +1,58 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import getOdooService from '@odoo/utils/get_odoo_service';
+import getUserTZ from '@odoo/utils/get_user_tz';
 import {ARG} from '@trash/constants';
 
 async function cmdNow(kwargs, screen) {
-  const time = getOdooService('web.time');
+  const time = getOdooService('web.time', '@web/core/l10n/dates');
+  const OdooVerMajor = getOdooVersion('major');
   let res = false;
   if (kwargs.type === 'full') {
-    if (kwargs.tz) {
-      res = moment().format(time.getLangDatetimeFormat());
+    if (OdooVerMajor >= 17) {
+      if (kwargs.tz) {
+        res = time.formatDateTime(luxon.DateTime.local().setZone(getUserTZ()));
+      } else {
+        res = time.serializeDateTime(luxon.DateTime.local());
+      }
     } else {
-      res = time.datetime_to_str(new Date());
+      if (kwargs.tz) {
+        res = moment().format(time.getLangDatetimeFormat());
+      } else {
+        res = time.datetime_to_str(new Date());
+      }
     }
   } else if (kwargs.type === 'date') {
-    if (kwargs.tz) {
-      res = moment().format(time.getLangDateFormat());
+    if (OdooVerMajor >= 17) {
+      if (kwargs.tz) {
+        res = time.formatDate(luxon.DateTime.local().setZone(getUserTZ()));
+      } else {
+        res = time.serializeDate(luxon.DateTime.local());
+      }
     } else {
-      res = time.date_to_str(new Date());
+      if (kwargs.tz) {
+        res = moment().format(time.getLangDateFormat());
+      } else {
+        res = time.date_to_str(new Date());
+      }
     }
   } else if (kwargs.type === 'time') {
-    if (kwargs.tz) {
-      res = moment().format(time.getLangTimeFormat());
+    if (OdooVerMajor >= 17) {
+      if (kwargs.tz) {
+        res = time
+          .formatDateTime(luxon.DateTime.local().setZone(getUserTZ()))
+          .split(' ')[1];
+      } else {
+        res = time.serializeDateTime(luxon.DateTime.local()).split(' ')[1];
+      }
     } else {
-      res = time.time_to_str(new Date());
+      if (kwargs.tz) {
+        res = moment().format(time.getLangTimeFormat());
+      } else {
+        res = time.time_to_str(new Date());
+      }
     }
   }
 

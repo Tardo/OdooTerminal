@@ -93,6 +93,7 @@
       "moment": "readonly",
       "odoo": "readonly",
       "owl": "readonly",
+      "luxon": "readonly",
       "openerp": "off"
     },
     "rules": {
