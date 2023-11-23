@@ -26,7 +26,7 @@ import {Mutex} from 'async-mutex';
 export const MAX_COMMAND_ASSISTANT_OPTIONS = 35;
 
 export default class Terminal {
-  VERSION = '10.4.1';
+  VERSION = '10.4.2';
 
   userContext = {};
 

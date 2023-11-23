@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "OdooTerminal Tests"
-version = "10.4.1"
+version = "10.4.2"
 description = "OdooTerminal Test Environment Packages"
 authors = ["Alexandre D. Díaz <dev@redneboa.es>"]
 
