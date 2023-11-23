@@ -4,6 +4,7 @@
 
 ```
 IMP: Browse action icon badge (issue #129)
+IMP: Enable Odoo >16.0 support for all (issue #130)
 ```
 
 **10.4.1**

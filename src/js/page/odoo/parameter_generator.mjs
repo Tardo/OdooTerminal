@@ -119,12 +119,12 @@ export default class ParameterGenerator {
       return false;
     }
     const OdooVerMajor = getOdooVersion('major');
+    const rdate = this.generateInt(min, max);
     if (OdooVerMajor >= 17) {
       return getOdooService('@web/core/l10n/dates').formatDate(
         luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}).setZone(getUserTZ()),
       );
     }
-    const rdate = this.generateInt(min, max);
     return moment(new Date(rdate)).format(
       getOdooService('web.time').getLangDateFormat(),
     );
@@ -135,12 +135,12 @@ export default class ParameterGenerator {
       return false;
     }
     const OdooVerMajor = getOdooVersion('major');
+    const rdate = this.generateInt(min, max);
     if (OdooVerMajor >= 17) {
       return getOdooService('@web/core/l10n/dates').serializeDate(
         luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}),
       );
     }
-    const rdate = this.generateInt(min, max);
     return getOdooService('web.time').date_to_str(new Date(rdate));
   }
 
@@ -179,11 +179,11 @@ export default class ParameterGenerator {
       return false;
     }
     const OdooVerMajor = getOdooVersion('major');
+    const rdate = this.generateInt(min, max);
     if (OdooVerMajor >= 17) {
       const dt = this.generateTzDateTime(min, max);
       return dt.split(' ')[1];
     }
-    const rdate = this.generateInt(min, max);
     return moment(new Date(rdate)).format(
       getOdooService('web.time').getLangTimeFormat(),
     );
@@ -194,11 +194,11 @@ export default class ParameterGenerator {
       return false;
     }
     const OdooVerMajor = getOdooVersion('major');
+    const rdate = this.generateInt(min, max);
     if (OdooVerMajor >= 17) {
       const dt = this.generateDateTime(min, max);
       return dt.split(' ')[1];
     }
-    const rdate = this.generateInt(min, max);
     return getOdooService('web.time').time_to_str(new Date(rdate));
   }
 }
