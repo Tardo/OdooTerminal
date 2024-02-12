@@ -1,6 +1,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-
+import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 
 async function cmdChrono(kwargs, screen) {
@@ -8,7 +8,13 @@ async function cmdChrono(kwargs, screen) {
   const start_time = new Date();
   await this.execute(kwargs.cmd, false);
   time_elapsed_secs = (new Date() - start_time) / 1000.0;
-  screen.print(`Time elapsed: '${time_elapsed_secs}' seconds`);
+  screen.print(
+    i18n.t(
+      'cmdChronoTimeElapsed',
+      "Time elapsed: '{{time_elapsed_secs}}' seconds",
+      {time_elapsed_secs},
+    ),
+  );
   return time_elapsed_secs;
 }
 

@@ -3,6 +3,7 @@
 
 import processKeybind from '@common/utils/process_keybind';
 import '@css/options.css';
+import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
 import {
   IGNORED_KEYS,
@@ -16,7 +17,7 @@ let shortcuts_defs = {};
 
 function onClickShortcutRemove(e) {
   const row_target_id = e.target.dataset.target;
-  const row = document.querySelector(`#${row_target_id}`);
+  const row = document.getElementById(row_target_id);
   row.parentNode.removeChild(row);
   const {keybind} = e.target.dataset;
   delete shortcuts_defs[keybind];
@@ -48,7 +49,7 @@ function renderShortcutTableItem(
 }
 
 function renderShortcutTable() {
-  const elm_shortcut_table = document.querySelector('#shorcut_table');
+  const elm_shortcut_table = document.getElementById('shorcut_table');
   const tbody = elm_shortcut_table.getElementsByTagName('tbody')[0];
   while (tbody.rows.length > 0) {
     tbody.deleteRow(0);
@@ -69,7 +70,7 @@ function saveOptions() {
     if (type === 'manual') {
       continue;
     }
-    const target = document.querySelector(`#${name}`);
+    const target = document.getElementById(name);
     let value = '';
     if (type === 'edit' || type === 'int' || type === 'option') {
       value = target.value;
@@ -92,7 +93,7 @@ function applyInputValues() {
       if (type === 'manual') {
         continue;
       }
-      const item = document.querySelector(`#${name}`);
+      const item = document.getElementById(name);
       if (type === 'edit') {
         item.value = result[name] || '';
       } else if (type === 'check') {
@@ -138,10 +139,10 @@ function onKeyUpShortcut(e) {
 }
 
 function onClickShortcutAdd() {
-  const elm_shortcut_keybind = document.querySelector('#shortcut_keybind');
-  const elm_shortcut_cmds = document.querySelector('#shortcut_commands');
+  const elm_shortcut_keybind = document.getElementById('shortcut_keybind');
+  const elm_shortcut_cmds = document.getElementById('shortcut_commands');
   if (elm_shortcut_keybind.value && elm_shortcut_cmds.value) {
-    const elm_shortcut_table = document.querySelector('#shorcut_table');
+    const elm_shortcut_table = document.getElementById('shorcut_table');
     shortcuts_defs[elm_shortcut_keybind.dataset.keybind] =
       elm_shortcut_cmds.value;
     renderShortcutTableItem(
@@ -159,21 +160,83 @@ function onClickResetSettings() {
   applyInputValues();
 }
 
+function i18n() {
+  document.title = ubrowser.i18n.getMessage('optionsTitle');
+
+  document.getElementById('title_behaviour').innerText =
+    ubrowser.i18n.getMessage('optionsTitleBehaviour');
+  document.querySelector("label[for='pinned']").innerText =
+    ubrowser.i18n.getMessage('optionsTitleBehaviourPinned');
+  document.querySelector("label[for='maximized']").innerText =
+    ubrowser.i18n.getMessage('optionsTitleBehaviourMaximized');
+  document.querySelector("label[for='opacity']").innerText =
+    ubrowser.i18n.getMessage('optionsTitleBehaviourOpacity');
+
+  document.getElementById('title_shortcuts').innerText =
+    ubrowser.i18n.getMessage('optionsTitleShortcuts');
+  document.getElementById('column_shortcuts_keybin').innerText =
+    ubrowser.i18n.getMessage('optionsTitleShortcutsKeybind');
+  document.getElementById('column_shortcuts_command').innerText =
+    ubrowser.i18n.getMessage('optionsTitleShortcutsCommand');
+  document.getElementById('add_shortcut').innerText = ubrowser.i18n.getMessage(
+    'optionsTitleShortcutsAdd',
+  );
+
+  document.getElementById('title_command_assistant').innerText =
+    ubrowser.i18n.getMessage('optionsTitleCommandAssistant');
+  document.querySelector(
+    "label[for='cmd_assistant_dyn_options_disabled']",
+  ).innerText = ubrowser.i18n.getMessage(
+    'optionsTitleCommandAssistantDynOptionsDisabled',
+  );
+  document.querySelector("label[for='cmd_assistant_match_mode']").innerText =
+    ubrowser.i18n.getMessage('optionsTitleCommandAssistantMatchMode');
+  document.querySelector("label[for='cmd_assistant_max_results']").innerText =
+    ubrowser.i18n.getMessage('optionsTitleCommandAssistantMaxResults');
+
+  document.getElementById('title_init_commands').innerText =
+    ubrowser.i18n.getMessage('optionsTitleInitCommands');
+  document.getElementById('desc_init_commands').innerText =
+    ubrowser.i18n.getMessage('optionsTitleInitCommandsDescription');
+
+  document.getElementById('title_terminal_context').innerText =
+    ubrowser.i18n.getMessage('optionsTitleTerminalContext');
+  document.getElementById('desc_terminal_context').innerText =
+    ubrowser.i18n.getMessage('optionsTitleTerminalContextDescription');
+
+  document.getElementById('title_developer_zone').innerText =
+    ubrowser.i18n.getMessage('optionsTitleDeveloperZone');
+  document.querySelector("label[for='devmode_tests']").innerText =
+    ubrowser.i18n.getMessage('optionsTitleDeveloperZoneModeTests');
+  document.querySelector("label[for='devmode_ignore_comp_checks']").innerText =
+    ubrowser.i18n.getMessage('optionsTitleDeveloperZoneModeIgnoreCompChecks');
+  document.querySelector("label[for='devmode_console_errors']").innerText =
+    ubrowser.i18n.getMessage('optionsTitleDeveloperZoneModeConsoleErrors');
+
+  document.getElementById('reset_settings').innerText =
+    ubrowser.i18n.getMessage('optionsReset');
+  document.getElementById('save_settings').innerText =
+    ubrowser.i18n.getMessage('optionsSave');
+}
+
 function onDOMLoaded() {
   applyInputValues();
-  document.querySelector('form').addEventListener('submit', onSubmitForm);
   document
-    .querySelector('#shortcut_keybind')
+    .getElementById('form_options')
+    .addEventListener('submit', onSubmitForm);
+  document
+    .getElementById('shortcut_keybind')
     .addEventListener('keydown', onKeyDownShortcut);
   document
-    .querySelector('#shortcut_keybind')
+    .getElementById('shortcut_keybind')
     .addEventListener('keyup', onKeyUpShortcut);
   document
-    .querySelector('#add_shortcut')
+    .getElementById('add_shortcut')
     .addEventListener('click', onClickShortcutAdd);
   document
-    .querySelector('#reset_settings')
+    .getElementById('reset_settings')
     .addEventListener('click', onClickResetSettings);
+  i18n();
 }
 
 document.addEventListener('DOMContentLoaded', onDOMLoaded);

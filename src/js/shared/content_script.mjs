@@ -50,6 +50,7 @@ function onWindowMessage(event) {
       postMessage('ODOO_TERM_CONFIG', {
         config: {...items},
         info: InstanceContext,
+        langpath: ubrowser.extension.getURL('_locales/{{lng}}/{{ns}}.json'),
       });
     });
   } else if (event.data.type === 'ODOO_TERM_COPY') {

@@ -27,6 +27,8 @@ export const LEXER = {
   Block: 23,
   Negative: 24,
   Positive: 25,
+  For: 26,
+  In: 27,
 };
 
 export const LEXER_MATH_OPER = [
@@ -80,6 +82,8 @@ export const INSTRUCTION_TYPE = {
   POP_FRAME: 21,
   UNITARY_NEGATIVE: 22,
   UNITARY_POSITIVE: 23,
+  GET_ITER: 24,
+  FOR_ITER: 25,
 
   getHumanType: function (type) {
     return Object.entries(this).find(item => item[1] === type) || '';

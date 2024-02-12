@@ -1,0 +1,13 @@
+{
+  "cmdAliasArgCmd": "The command to run",
+  "cmdAliasArgName": "The name of the alias",
+  "cmdAliasCreated": "Alias created successfully",
+  "cmdAliasDefinition": "Create aliases",
+  "cmdAliasDetail": "Define aliases to run commands easy. <br><b>WARNING:</b> This command uses 'local storage' to persist the data even if you close the browser. This data can be easy accessed by other computer usedrs. Don't use sensible data if you are using a shared computer.<br><br>Can use positional parameters ($1,$2,$3,$N...)",
+  "cmdAliasExample": "-n myalias -c \"print 'Hello, $1!'\"",
+  "cmdAliasInvalidAliasName": "Invalid alias name",
+  "cmdAliasNotDefined": "No aliases defined.",
+  "cmdAliasNotExists": "The selected alias not exists",
+  "cmdAliasRemoved": "Alias removed successfully",
+  "cmdChronoTimeElapsed": "Time elapsed: '{{time_elapsed_secs}}' seconds"
+}

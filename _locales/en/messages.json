@@ -1,0 +1,84 @@
+{
+  "extensionName": {
+    "message": "Odoo Terminal"
+  },
+
+  "extensionDescription": {
+    "message": "Terminal-like to send json-rpc requests and use tools for Odoo developers"
+  },
+
+  "optionsTitle": {
+    "message": "OdooTerminal Options"
+  },
+  "optionsTitleBehaviour": {
+    "message": "Behaviour"
+  },
+  "optionsTitleBehaviourPinned": {
+    "message": "Pinned"
+  },
+  "optionsTitleBehaviourMaximized": {
+    "message": "Maximized"
+  },
+  "optionsTitleBehaviourOpacity": {
+    "message": "Opacity:"
+  },
+  "optionsTitleShortcuts": {
+    "message": "Shortcuts"
+  },
+  "optionsTitleShortcutsKeybind": {
+    "message": "Keybind"
+  },
+  "optionsTitleShortcutsCommand": {
+    "message": "Command"
+  },
+  "optionsTitleShortcutsAdd": {
+    "message": "Add"
+  },
+  "optionsTitleCommandAssistant": {
+    "message": "Command Assistant"
+  },
+  "optionsTitleCommandAssistantDynOptionsDisabled": {
+    "message": "Disable dynamic options"
+  },
+  "optionsTitleCommandAssistantMatchMode": {
+    "message": "Match mode:"
+  },
+  "optionsTitleCommandAssistantMaxResults": {
+    "message": "Max. results:"
+  },
+  "optionsTitleInitCommands": {
+    "message": "Init Commands"
+  },
+  "optionsTitleInitCommandsDescription": {
+    "message": "Run these commands when initialize the terminal (one per line). Be careful! changes here can cause unwanted exceptions. Note that the commands will be executed on all 'odoo' pages."
+  },
+  "optionsTitleTerminalContext": {
+    "message": "Terminal Context"
+  },
+  "optionsTitleTerminalContextDescription": {
+    "message": "This context will be merged with the 'normal' context on terminal operations. In json format."
+  },
+  "optionsTitleDeveloperZone": {
+    "message": "Extension Developer Zone"
+  },
+  "optionsTitleDeveloperZoneModeTests": {
+    "message": "Use $terminaltests$",
+    "placeholders": {
+      "terminaltests": {
+        "content": "OdooTerminalTests"
+      }
+    }
+  },
+  "optionsTitleDeveloperZoneModeIgnoreCompChecks": {
+    "message": "Disable Odoo version checking (this can cause unwanted exceptions!)"
+  },
+  "optionsTitleDeveloperZoneModeConsoleErrors": {
+    "message": "Show errors in the browser console"
+  },
+  "optionsReset": {
+    "message": "Reset"
+  },
+  "optionsSave": {
+    "message": "Save"
+  }
+}

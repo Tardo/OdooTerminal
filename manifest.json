@@ -18,7 +18,7 @@
       "run_at": "document_idle"
     }
   ],
-  "description": "Terminal-like to send json-rpc requests and use tools for Odoo developers",
+  "description": "__MSG_extensionDescription__",
   "icons": {
     "16": "src/img/terminal-16.png",
     "32": "src/img/terminal-32.png",
@@ -33,7 +33,8 @@
     }
   },
   "manifest_version": 2,
-  "name": "Odoo Terminal",
+  "default_locale": "en",
+  "name": "__MSG_extensionName__",
   "options_ui": {
     "page": "src/html/options.html",
     "open_in_tab": true,
@@ -41,7 +42,7 @@
     "chrome_style": true
   },
   "permissions": ["activeTab", "storage"],
-  "short_name": "Odoo Terminal",
+  "short_name": "__MSG_extensionName__",
   "version": "10.4.2",
-  "web_accessible_resources": ["dist/pub/**"]
+  "web_accessible_resources": ["dist/pub/**", "_locales/**/translation.json"]
 }

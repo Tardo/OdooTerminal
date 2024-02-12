@@ -1,8 +1,10 @@
 {
+  "type": "module",
   "scripts": {
     "prepare": "husky install",
     "release": "node scripts/release.mjs",
     "clean": "rm -rf ./dist",
+    "dev:babel": "export ODOO_TERMINAL_ENV=development && babel --quiet 'src/**/*.{js,mjs}'",
     "dev:watch": "export ODOO_TERMINAL_ENV=development && rollup -c -w",
     "dev:tests": "export ODOO_TERMINAL_ENV=development && node scripts/build.mjs && poetry run pytest",
     "prod:build": "export ODOO_TERMINAL_ENV=production && node scripts/build.mjs",
@@ -11,17 +13,30 @@
     "start:chrome": "export ODOO_TERMINAL_ENV=development && node scripts/build.mjs && web-ext run --verbose -t chromium --chromium-binary $(which chrome)"
   },
   "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.23.9",
+    "@babel/preset-flow": "^7.23.3",
     "@rollup/plugin-alias": "^5.0.1",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-eslint": "^9.0.5",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "adm-zip": "^0.5.10",
     "async-mutex": "^0.4.0",
     "autoprefixer": "^10.4.16",
+    "babel-plugin-i18next-extract": "^0.10.0",
     "cssnano": "^6.0.1",
-    "eslint": "^8.53.0",
+    "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-ft-flow": "^3.0.4-alpha-0",
+    "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "flow-bin": "^0.228.0",
+    "hermes-eslint": "^0.19.1",
     "husky": "^8.0.3",
+    "i18next": "^23.8.2",
+    "i18next-http-backend": "^2.4.3",
     "lint-staged": "^15.0.2",
     "minimist": "^1.2.8",
     "prettier": "^3.0.3",
@@ -46,6 +61,28 @@
       "eslint --color --fix"
     ]
   },
+  "babel": {
+    "targets": {
+      "esmodules": true
+    },
+    "presets": [
+      "@babel/preset-flow"
+    ],
+    "plugins": [
+      [
+        "i18next-extract",
+        {
+          "locales": [
+            "en",
+            "es"
+          ],
+          "discardOldKeys": true,
+          "outputPath": "_locales/{{locale}}/{{ns}}.json",
+          "useI18nextDefaultValue": true
+        }
+      ]
+    ]
+  },
   "prettier": {
     "printWidth": 80,
     "tabWidth": 2,
@@ -66,6 +103,8 @@
     "singleAttributePerLine": false
   },
   "eslintConfig": {
+    "root": true,
+    "parser": "hermes-eslint",
     "env": {
       "browser": true,
       "webextensions": true,
@@ -73,9 +112,14 @@
       "es6": true,
       "es2024": true
     },
+    "plugins": [
+      "ft-flow"
+    ],
     "extends": [
       "eslint:recommended",
-      "plugin:prettier/recommended"
+      "plugin:ft-flow/recommended",
+      "plugin:prettier/recommended",
+      "plugin:json/recommended"
     ],
     "overrides": [
       {
@@ -101,7 +145,7 @@
       "no-empty-function": "error",
       "no-eval": "error",
       "no-implicit-coercion": "error",
-      "no-implicit-globals": "error",
+      "no-implicit-globals": "off",
       "no-implied-eval": "error",
       "no-return-assign": "error",
       "no-undef-init": "error",
@@ -118,7 +162,7 @@
       "no-useless-return": "error",
       "no-void": "error",
       "no-console": [
-        "error",
+        "warn",
         {
           "allow": [
             "info",

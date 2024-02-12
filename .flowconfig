@@ -1,0 +1,17 @@
+[ignore]
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+module.name_mapper='^@common' -> '<PROJECT_ROOT>/src/js/common'
+module.name_mapper='^@shared' -> '<PROJECT_ROOT>/src/js/shared'
+module.name_mapper='^@odoo' -> '<PROJECT_ROOT>/src/js/page/odoo'
+module.name_mapper='^@terminal' -> '<PROJECT_ROOT>/src/js/page/terminal'
+module.name_mapper='^@trash' -> '<PROJECT_ROOT>/src/js/page/trash'
+module.name_mapper='^@tests' -> '<PROJECT_ROOT>/src/js/page/tests'
+
+[strict]

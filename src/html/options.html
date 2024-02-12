@@ -7,15 +7,15 @@
   </head>
 
   <body>
-    <form>
+    <form id="form_options">
       <div class="optsection">
-        <h4>Behaviour</h4>
+        <h4 id="title_behaviour">Behaviour</h4>
         <p></p>
         <input type="checkbox" id="pinned" name="pinned" />
         <label for="pinned">Pinned</label><br />
         <input type="checkbox" id="maximized" name="maximized" />
         <label for="maximized">Maximized</label><br />
-        <label for="opacity">Opacity: </label>
+        <label for="opacity">Opacity:</label>
         <input
           type="range"
           id="opacity"
@@ -26,13 +26,13 @@
       </div>
 
       <div class="optsection">
-        <h4>Shortcuts</h4>
+        <h4 id="title_shortcuts">Shortcuts</h4>
         <p></p>
         <table id="shorcut_table">
           <thead>
             <tr>
-              <th style="width: 13%">Keybind</th>
-              <th style="width: 80%">Command</th>
+              <th style="width: 13%" id="column_shortcuts_keybin">Keybind</th>
+              <th style="width: 80%" id="column_shortcuts_command">Command</th>
               <th></th>
             </tr>
           </thead>
@@ -57,7 +57,7 @@
       </div>
 
       <div class="optsection">
-        <h4>Command Assistant</h4>
+        <h4 id="title_command_assistant">Command Assistant</h4>
         <p></p>
         <input
           type="checkbox"
@@ -85,9 +85,9 @@
       </div>
 
       <div class="optsection">
-        <h4>Init Commands</h4>
-        <p>
-          Run these commands when initialize the terminal (one per line).<br />Be
+        <h4 id="title_init_commands">Init Commands</h4>
+        <p id="desc_init_commands">
+          Run these commands when initialize the terminal (one per line). Be
           careful! changes here can cause unwanted exceptions. Note that the
           commands will be executed on all 'odoo' pages.
         </p>
@@ -95,8 +95,8 @@
       </div>
 
       <div class="optsection">
-        <h4>Terminal Context</h4>
-        <p>
+        <h4 id="title_terminal_context">Terminal Context</h4>
+        <p id="desc_terminal_context">
           This context will be merged with the "normal" context on terminal
           operations. In json format.
         </p>
@@ -104,7 +104,7 @@
       </div>
 
       <div class="optsection">
-        <h4>Extension Developer Zone</h4>
+        <h4 id="title_developer_zone">Extension Developer Zone</h4>
         <p></p>
         <input type="checkbox" id="devmode_tests" name="devmode_tests" />
         <label for="devmode_tests">Use OdooTerminalTests</label><br />
@@ -129,7 +129,7 @@
 
       <div class="btn_zone">
         <button type="button" id="reset_settings">Reset</button>
-        <button type="submit">Save</button>
+        <button type="submit" id="save_settings">Save</button>
       </div>
     </form>
   </body>

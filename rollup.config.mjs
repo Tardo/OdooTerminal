@@ -2,12 +2,14 @@
 import alias from '@rollup/plugin-alias';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
+import {babel} from '@rollup/plugin-babel';
+import eslint from '@rollup/plugin-eslint';
+import commonjs from '@rollup/plugin-commonjs';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 import path from 'path';
 import analyze from 'rollup-plugin-analyzer';
 import postcss from 'rollup-plugin-postcss';
-
 const is_production = process.env.ODOO_TERMINAL_ENV === 'production';
 
 export default [
@@ -70,12 +72,29 @@ export default [
             find: '@css',
             replacement: path.resolve('src/css'),
           },
+          {
+            find: '@i18n',
+            replacement: path.resolve('_locales/'),
+          },
         ],
       }),
-      nodeResolve(),
+
+      nodeResolve({
+        browser: true,
+      }),
+      commonjs(),
+
+      babel({
+        babelHelpers: 'bundled',
+      }),
 
       postcss({
         plugins: [autoprefixer(), is_production && cssnano()],
+      }),
+
+      eslint({
+        fix: true,
+        exclude: ['node_modules/**', '**.css'],
       }),
 
       is_production && terser(),
@@ -87,7 +106,8 @@ export default [
         'src/js/common/**',
         'src/js/page/**',
         'src/js/shared/**',
-        'src/css/**',
+        'src/css/terminal.css',
+        '_locales/**/translation.json',
       ],
     },
   },
@@ -128,7 +148,7 @@ export default [
     ],
     watch: {
       clearScreen: false,
-      include: ['src/css/**', 'src/js/private/**'],
+      include: ['src/css/options.css', 'src/js/private/**'],
     },
   },
 ];

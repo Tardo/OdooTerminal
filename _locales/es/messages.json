@@ -1,0 +1,84 @@
+{
+  "extensionName": {
+    "message": "Odoo Terminal"
+  },
+
+  "extensionDescription": {
+    "message": "Algo parecido a un terminal para enviar peticiones json-rpc y utilizar herramientas para desarrolladores de Odoo"
+  },
+
+  "optionsTitle": {
+    "message": "OdooTerminal Opciones"
+  },
+  "optionsTitleBehaviour": {
+    "message": "Comportamiendo"
+  },
+  "optionsTitleBehaviourPinned": {
+    "message": "Fijado"
+  },
+  "optionsTitleBehaviourMaximized": {
+    "message": "Maximizado"
+  },
+  "optionsTitleBehaviourOpacity": {
+    "message": "Opacidad:"
+  },
+  "optionsTitleShortcuts": {
+    "message": "Atajos"
+  },
+  "optionsTitleShortcutsKeybind": {
+    "message": "Combinación de teclas"
+  },
+  "optionsTitleShortcutsCommand": {
+    "message": "Comando"
+  },
+  "optionsTitleShortcutsAdd": {
+    "message": "Añadir"
+  },
+  "optionsTitleCommandAssistant": {
+    "message": "Asistente de comandos"
+  },
+  "optionsTitleCommandAssistantDynOptionsDisabled": {
+    "message": "Desactivar opciones dinámicas"
+  },
+  "optionsTitleCommandAssistantMatchMode": {
+    "message": "Método de comprobación:"
+  },
+  "optionsTitleCommandAssistantMaxResults": {
+    "message": "Máx. resultados:"
+  },
+  "optionsTitleInitCommands": {
+    "message": "Comandos iniciales"
+  },
+  "optionsTitleInitCommandsDescription": {
+    "message": "Ejecutar estos comandos al inicializar el terminal (uno por línea). Tenga cuidado! los cambios aquí pueden causar excepciones no deseadas. Ten en cuenta que los comandos se ejecutarán en todas las páginas de 'odoo'."
+  },
+  "optionsTitleTerminalContext": {
+    "message": "Contexto del terminal"
+  },
+  "optionsTitleTerminalContextDescription": {
+    "message": "Este contexto se fusionará con el contexto 'normal' en las operaciones del terminal. En formato JSON."
+  },
+  "optionsTitleDeveloperZone": {
+    "message": "Zona de desarrollador de la extensión"
+  },
+  "optionsTitleDeveloperZoneModeTests": {
+    "message": "Usar $terminaltests$",
+    "placeholders": {
+      "terminaltests": {
+        "content": "OdooTerminalTests"
+      }
+    }
+  },
+  "optionsTitleDeveloperZoneModeIgnoreCompChecks": {
+    "message": "Desactivar la comprobación de la versión de Odoo (¡puede causar problemas!)"
+  },
+  "optionsTitleDeveloperZoneModeConsoleErrors": {
+    "message": "Mostrar errores en la consola del navegador"
+  },
+  "optionsReset": {
+    "message": "Reestablecer"
+  },
+  "optionsSave": {
+    "message": "Guardar"
+  }
+}

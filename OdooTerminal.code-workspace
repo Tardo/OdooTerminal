@@ -21,9 +21,15 @@
 			"name": "Scripts",
 		},
 		{
+			"path": "_locales",
+			"name": "i18n",
+		},
+		{
 			"path": ".",
 			"name": "OdooTerminal - Root"
 		}
 	],
-	"settings": {}
+	"settings": {
+    "javascript.validate.enable": false
+  }
 }
