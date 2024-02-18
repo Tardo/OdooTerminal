@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import cachedCallService from '@odoo/utils/cached_call_service';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
@@ -18,9 +19,12 @@ async function cmdLoginAs(kwargs, screen) {
   if (db === '*') {
     if (!session.db) {
       throw new Error(
-        'Unknown active database. Try using ' +
-          "'<span class='o_terminal_click o_terminal_cmd' " +
-          "data-cmd='dblist'>dblist</span>' command.",
+        i18n.t(
+          'cmdLogin.error.unknownDB',
+          'Unknown active database. Try using ' +
+            "'<span class='o_terminal_click o_terminal_cmd' " +
+            "data-cmd='dblist'>dblist</span>' command.",
+        ),
       );
     }
     db = session.db;
@@ -28,7 +32,11 @@ async function cmdLoginAs(kwargs, screen) {
 
   const res = await session._session_authenticate(db, login, passwd);
   screen.updateInputInfo({username: login});
-  screen.print(`Successfully logged as '${login}'`);
+  screen.print(
+    i18n.t('cmdLogin.result.success', "Successfully logged as '{{login}}'", {
+      login,
+    }),
+  );
   if (!kwargs.no_reload) {
     await this.execute('reload', false, true);
   }
@@ -53,25 +61,41 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Login as...',
+  definition: i18n.t('cmdLogin.definition', 'Login as...'),
   callback: cmdLoginAs,
   options: getOptions,
-  detail: 'Login as selected user.',
+  detail: i18n.t('cmdLogin.detail', 'Login as selected user.'),
   args: [
     [
       ARG.String,
       ['d', 'database'],
       true,
-      "The database<br/>Can be '*' to use current database",
+      i18n.t(
+        'cmdLogin.args.database',
+        "The database<br/>Can be '*' to use current database",
+      ),
     ],
     [
       ARG.String,
       ['u', 'user'],
       true,
-      "The login<br/>Can be optionally preceded by the '#' character and it will be used for password too",
+      i18n.t(
+        'cmdLogin.args.user',
+        "The login<br/>Can be optionally preceded by the '#' character and it will be used for password too",
+      ),
     ],
-    [ARG.String, ['p', 'password'], false, 'The password'],
-    [ARG.Flag, ['nr', 'no-reload'], false, 'No reload'],
+    [
+      ARG.String,
+      ['p', 'password'],
+      false,
+      i18n.t('cmdLogin.args.password', 'The password'),
+    ],
+    [
+      ARG.Flag,
+      ['nr', 'no-reload'],
+      false,
+      i18n.t('cmdLogin.args.noReload', 'No reload'),
+    ],
   ],
   secured: true,
   example: '-d devel -u #admin',

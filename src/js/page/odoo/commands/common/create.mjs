@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
@@ -55,13 +56,26 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Create new record',
+  definition: i18n.t('cmdCreate.definition', 'Create new record'),
   callback: cmdCreateModelRecord,
   options: getOptions,
-  detail: 'Open new model record in form view or directly.',
+  detail: i18n.t(
+    'cmdCreate.detail',
+    'Open new model record in form view or directly.',
+  ),
   args: [
-    [ARG.String, ['m', 'model'], true, 'The model technical name'],
-    [ARG.List | ARG.Dictionary, ['v', 'value'], false, 'The values to write'],
+    [
+      ARG.String,
+      ['m', 'model'],
+      true,
+      i18n.t('cmdCreate.args.model', 'The model technical name'),
+    ],
+    [
+      ARG.List | ARG.Dictionary,
+      ['v', 'value'],
+      false,
+      i18n.t('cmdCreate.args.value', 'The values to write'),
+    ],
   ],
   example: "-m res.partner -v {name: 'Poldoore'}",
 };

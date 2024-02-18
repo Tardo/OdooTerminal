@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import renderErrorMessage from '@terminal/templates/error_message';
 import renderHelpCmd from '@terminal/templates/help_command';
 import renderPromptCmd from '@terminal/templates/prompt_command';
@@ -351,7 +352,10 @@ export default class Screen {
         error_name: encodeHTML(error.statusText),
         error_message: encodeHTML(error.statusText),
         error_id: error_id,
-        exception_type: 'Invalid HTTP Request',
+        exception_type: i18n.t(
+          'terminal.error.invalidHTTPRequest',
+          'Invalid HTTP Request',
+        ),
         context: '',
         args: '',
         debug: encodeHTML(error.responseText || ''),

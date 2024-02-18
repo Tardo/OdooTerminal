@@ -1,13 +1,756 @@
 {
-  "cmdAliasArgCmd": "The command to run",
-  "cmdAliasArgName": "The name of the alias",
-  "cmdAliasCreated": "Alias created successfully",
-  "cmdAliasDefinition": "Create aliases",
-  "cmdAliasDetail": "Define aliases to run commands easy. <br><b>WARNING:</b> This command uses 'local storage' to persist the data even if you close the browser. This data can be easy accessed by other computer usedrs. Don't use sensible data if you are using a shared computer.<br><br>Can use positional parameters ($1,$2,$3,$N...)",
-  "cmdAliasExample": "-n myalias -c \"print 'Hello, $1!'\"",
-  "cmdAliasInvalidAliasName": "Invalid alias name",
-  "cmdAliasNotDefined": "No aliases defined.",
-  "cmdAliasNotExists": "The selected alias not exists",
-  "cmdAliasRemoved": "Alias removed successfully",
-  "cmdChronoTimeElapsed": "Time elapsed: '{{time_elapsed_secs}}' seconds"
+  "cmdAction": {
+    "args": {
+      "action": "The action to launch<br/>Can be an string, number or object",
+      "options": "The extra options to use"
+    },
+    "definition": "Call action"
+  },
+  "cmdAlias": {
+    "args": {
+      "cmd": "The command to run",
+      "name": "The name of the alias"
+    },
+    "created": "Alias created successfully",
+    "definition": "Create aliases",
+    "detail": "Define aliases to run commands easy. <br><b>WARNING:</b> This command uses 'local storage' to persist the data even if you close the browser. This data can be easy accessed by other computer usedrs. Don't use sensible data if you are using a shared computer.<br><br>Can use positional parameters ($1,$2,$3,$N...)",
+    "example": "-n myalias -c \"print 'Hello, $1!'\"",
+    "invalidAliasName": "Invalid alias name",
+    "notDefined": "No aliases defined.",
+    "notExists": "The selected alias not exists",
+    "removed": "Alias removed successfully"
+  },
+  "cmdBarcode": {
+    "args": {
+      "barcodeDelay": "The delay between barcodes reads (in ms)",
+      "data": "The data to send",
+      "operation": "The operation",
+      "pressDelay": "The delay between presskey events (in ms)"
+    },
+    "definition": "Operations over barcode",
+    "detail": "See information and send barcode strings",
+    "error": {
+      "invalidOperation": "Invalid operation!",
+      "moudeNotAvailable": "The 'barcode' module is not installed/available",
+      "noData": "No data given!"
+    },
+    "result": {
+      "acceptScan": "Currently accepting barcode scanning? {{isAcceptingScan}}",
+      "availableCommands": "Available commands: {{availableCommands}}",
+      "maxTimeBetweenKeysInMs": "Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}",
+      "reservedPrefixes": "Reserved barcode prefixes: {{prefixes}}"
+    }
+  },
+  "cmdCaf": {
+    "args": {
+      "field": "The field names to request",
+      "filter": "The filter to apply",
+      "model": "The model technical name"
+    },
+    "definition": "Check model fields access",
+    "detail": "Show readable/writeable fields of the selected model"
+  },
+  "cmdCall": {
+    "args": {
+      "argument": "The arguments list",
+      "call": "The method name to call",
+      "kwarg": "The arguments dictionary",
+      "model": "The model technical name"
+    },
+    "definition": "Call model method",
+    "detail": "Call model method. Remember: Methods with @api.model decorator doesn't need the id."
+  },
+  "cmdCam": {
+    "args": {
+      "model": "The model technical name",
+      "operation": "The operation to do"
+    },
+    "definition": "Check model access",
+    "detail": "Show access rights for the selected operation on the selected model",
+    "result": {
+      "haveAccessRights": "You have access rights for '{{operation}}' on {{model}}",
+      "notAccessRights": "You can't '{{operation}}' on {{model}}"
+    }
+  },
+  "cmdChrono": {
+    "args": {
+      "cmd": "The command to run"
+    },
+    "definition": "Print the time expended executing a command",
+    "detail": "Print the elapsed time in seconds to execute a command. <br/>Notice that this time includes the time to format the result!",
+    "result": {
+      "timeElapsed": "Time elapsed: '{{time_elapsed_secs}}' seconds"
+    }
+  },
+  "cmdClear": {
+    "args": {
+      "section": "The section to clear<br/>- screen: Clean the screen<br/>- history: Clean the command history"
+    },
+    "definition": "Clean terminal section",
+    "detail": "Clean the selected section"
+  },
+  "cmdCommit": {
+    "args": {
+      "recordset": "The Recordset"
+    },
+    "definition": "Commit recordset changes",
+    "detail": "Write recordset changes",
+    "error": {
+      "invalidRecordset": "Invalid recordset",
+      "noCommit": "Nothing to commit!",
+      "success": "Records '{{pids}}' of {{model}} updated successfully"
+    }
+  },
+  "cmdContext": {
+    "args": {
+      "operation": "The operation to do",
+      "value": "The values"
+    },
+    "definition": "Operations over session context dictionary",
+    "detail": "Operations over session context dictionary.",
+    "error": {
+      "keyNotPresent": "The selected key is not present in the terminal context",
+      "operationNotSupported": "This operation is currently not supported in v15.0+"
+    }
+  },
+  "cmdContextTerm": {
+    "args": {
+      "operation": "The operation to do",
+      "value": "The value"
+    },
+    "definition": "Operations over terminal context dictionary",
+    "detail": "Operations over terminal context dictionary. This context only affects to the terminal operations.",
+    "error": {
+      "notPresent": "The selected key is not present in the terminal context"
+    }
+  },
+  "cmdCopy": {
+    "args": {
+      "data": "The data",
+      "type": "The type of data"
+    },
+    "definition": "Copy data to paste them into other instances",
+    "detail": "Copy model records or variables",
+    "result": {
+      "dateCopied": "Data copied!"
+    }
+  },
+  "cmdCount": {
+    "args": {
+      "domain": "The domain",
+      "model": "The model technical name"
+    },
+    "definition": "Gets number of records from the given model in the selected domain",
+    "detail": "Gets number of records from the given model in the selected domain",
+    "result": "Result: {{result}}"
+  },
+  "cmdCreate": {
+    "args": {
+      "model": "The model technical name",
+      "value": "The values to write"
+    },
+    "definition": "Create new record",
+    "detail": "Open new model record in form view or directly."
+  },
+  "cmdDBList": {
+    "args": {
+      "onlyActive": "Indicates that only print the active database name"
+    },
+    "definition": "Show database names",
+    "detail": "Show database names",
+    "result": {
+      "activeDatabase": "<strong>{{database}}</strong> (Active Database)"
+    }
+  },
+  "cmdDebug": {
+    "args": {
+      "mode": "The mode<br>- 0: Disabled<br>- 1: Enabled<br>- 2: Enabled with Assets"
+    },
+    "definition": "Set debug mode",
+    "detail": "Set debug mode",
+    "error": {
+      "invalidDebugMode": "Invalid debug mode"
+    },
+    "result": {
+      "disabled": "Debug mode <strong>disabled</strong>",
+      "enabled": "Debug mode <strong>enabled</strong>",
+      "enabledAssets": "Debug mode with assets <strong>enabled</strong>",
+      "reload": "Reloading page..."
+    }
+  },
+  "cmdDepends": {
+    "args": {
+      "module": "The module technical name"
+    },
+    "definition": "Know modules that depends on the given module",
+    "detail": "Show a list of the modules that depends on the given module",
+    "error": {
+      "notInstalled": "The module '{{module}}' isn't installed"
+    }
+  },
+  "cmdDis": {
+    "args": {
+      "code": "TraSH Code"
+    },
+    "definition": "Dissasembler bytecode",
+    "detail": "Shows the bytecode generated for the input",
+    "table": {
+      "dataIndex": "Data Index",
+      "instrCode": "Instr. Code",
+      "instrName": "Instr. Name",
+      "level": "Level",
+      "token": "Token",
+      "value": "Name/Value/Argument"
+    }
+  },
+  "cmdEffect": {
+    "args": {
+      "options": "The extra options to use",
+      "type": "The type of the effect"
+    },
+    "definition": "Show effect",
+    "detail": "Show effect"
+  },
+  "cmdExportFile": {
+    "args": {
+      "value": "The value to export"
+    },
+    "definition": "Exports the command result to a text/json file",
+    "detail": "Exports the command result to a text/json file.",
+    "resultExported": "Command result exported to '{{filename}}' file"
+  },
+  "cmdExportVar": {
+    "args": {
+      "value": "The value to export"
+    },
+    "definition": "Exports the command result to a browser console variable",
+    "detail": "Exports the command result to a browser console variable.",
+    "resultExported": "Command result exported! now you can use '{{varname}}' variable in the browser console"
+  },
+  "cmdGen": {
+    "args": {
+      "max": "Max. value",
+      "min": "Min. value",
+      "type": "Generator type"
+    },
+    "definition": "Generate random values",
+    "detail": "Generate numbers, strings, url's, dates, etc..."
+  },
+  "cmdGenFile": {
+    "args": {
+      "name": "The File object file name",
+      "options": "The File object options"
+    },
+    "definition": "Generate a File object",
+    "detail": "Open a browser file dialog and instanciates a File object with the content of the selected file"
+  },
+  "cmdHelp": {
+    "args": {
+      "cmd": "The command to consult"
+    },
+    "definition": "Print this help or command detailed info",
+    "detail": "Show commands and a quick definition.<br/>- <> ~> Required Parameter<br/>- [] ~> Optional Parameter",
+    "error": {
+      "commandNotExist": "'{{cmd}}' command doesn't exist"
+    },
+    "result": {
+      "arguments": "ARGUMENTS",
+      "description": "DESCRIPTION",
+      "example": "EXAMPLE",
+      "name": "NAME"
+    }
+  },
+  "cmdInstall": {
+    "args": {
+      "module": "The module technical name"
+    },
+    "definition": "Install a module",
+    "detail": "Launch module installation process.",
+    "error": {
+      "moduleNotExist": "'{{module}}' modules doesn't exist",
+      "moduleNotInstalled": "Unexpected error. Modules not installed"
+    },
+    "result": {
+      "success": "{{modules}} modules successfully installed"
+    }
+  },
+  "cmdJSTest": {
+    "args": {
+      "device": "The device to test",
+      "module": "The module technical name"
+    },
+    "definition": "Launch JS Tests",
+    "detail": "Runs js tests in desktop or mobile mode for the selected module."
+  },
+  "cmdJobs": {
+    "definition": "Display running jobs",
+    "detail": "Display running jobs",
+    "result": {
+      "timeout": "This job is taking a long time"
+    }
+  },
+  "cmdJson": {
+    "args": {
+      "data": "The data to send",
+      "endpoint": "The endpoint"
+    },
+    "definition": "Send POST JSON",
+    "detail": "Sends HTTP POST 'application/json' request"
+  },
+  "cmdLang": {
+    "args": {
+      "format": "The format to use",
+      "lang": "The language<br/>Can use '__new__' for new language (empty translation template)",
+      "module": "The technical module name",
+      "name": "The language name",
+      "noOverwrite": "Flag to indicate don't overwrite current translations",
+      "operation": "The operation"
+    },
+    "definition": "Operations over translations",
+    "detail": "Operations over translations.",
+    "error": {
+      "exportInvalidArguments": "'export' operation needs the following arguments: --lang, --format, --module",
+      "importInvalidArguments": "'import' operation needs the following arguments: --name, --lang, --format, --module",
+      "invalidOperation": "Invalid operation!",
+      "noModulesFound": "No modules found!",
+      "noWizard": "Can't create wizard record!"
+    },
+    "result": {
+      "success": "Language file imported successfully"
+    }
+  },
+  "cmdLastSeen": {
+    "definition": "Know user presence",
+    "detail": "Show users last seen",
+    "error": {
+      "notAvailable": "Can't use lastseen, 'bus' module is not installed"
+    },
+    "table": {
+      "lastSeen": "Last Seen",
+      "userID": "User ID",
+      "userName": "User Name"
+    }
+  },
+  "cmdLoad": {
+    "args": {
+      "url": "The URL of the asset"
+    },
+    "definition": "Load external resource",
+    "detail": "Load external source (javascript & css)",
+    "error": {
+      "invalidFileType": "Invalid file type"
+    }
+  },
+  "cmdLogin": {
+    "args": {
+      "database": "The database<br/>Can be '*' to use current database",
+      "noReload": "No reload",
+      "password": "The password",
+      "user": "The login<br/>Can be optionally preceded by the '#' character and it will be used for password too"
+    },
+    "definition": "Login as...",
+    "detail": "Login as selected user.",
+    "error": {
+      "unknownDB": "Unknown active database. Try using '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>' command."
+    },
+    "result": {
+      "success": "Successfully logged as '{{login}}'"
+    }
+  },
+  "cmdLogout": {
+    "definition": "Log out",
+    "detail": "Session log out",
+    "result": {
+      "success": "Logged out"
+    }
+  },
+  "cmdLongpolling": {
+    "args": {
+      "operation": "The operation to do<br>- verbose > Print incoming notificacions<br>- off > Stop verbose mode<br>- add_channel > Add a channel to listen<br>- del_channel > Delete a listening channel<br>- start > Start client longpolling service<br> - stop > Stop client longpolling service",
+      "param": "The parameter"
+    },
+    "definition": "Long-Polling operations",
+    "detail": "Operations over long-polling.",
+    "error": {
+      "invalidChannel": "Invalid channel name",
+      "invalidOperation": "Invalid Operation.",
+      "notAvailable": "Can't use longpolling, 'bus' module is not installed"
+    },
+    "result": {
+      "join": "Joined the '{{channel_name}}' channel",
+      "leave": "Leave the '{{channel_name}}' channel",
+      "start": "Longpolling started",
+      "stop": "Longpolling stopped",
+      "verboseDisabled": "Now long-polling verbose mode is disabled",
+      "verboseEnabled": "Now long-polling is in verbose mode"
+    }
+  },
+  "cmdMetadata": {
+    "args": {
+      "id": "The record id",
+      "model": "The record model"
+    },
+    "definition": "View record metadata",
+    "detail": "View record metadata",
+    "error": {
+      "notFound": "Can't found any metadata for the given id"
+    }
+  },
+  "cmdNow": {
+    "args": {
+      "type": "Date type",
+      "tz": "Use timezone"
+    },
+    "definition": "Current time",
+    "detail": "Prints the current time"
+  },
+  "cmdPaste": {
+    "args": {
+      "merge": "Try to merge data (if the type is 'model')",
+      "yes": "Don't show questions"
+    },
+    "definition": "Pastes copied data",
+    "detail": "Paste model records or variables",
+    "error": {
+      "invalidData": "Invalid data to paste! No model defined",
+      "noData": "No data to copy!"
+    },
+    "question": {
+      "continue": "This will modify the '{{model}}' model. Continue?"
+    }
+  },
+  "cmdPost": {
+    "args": {
+      "data": "The data",
+      "endpoit": "The endpoint",
+      "mode": "The mode"
+    },
+    "definition": "Send POST request",
+    "detail": "Send POST request to selected endpoint"
+  },
+  "cmdPrint": {
+    "args": {
+      "msg": "The message to print"
+    },
+    "definition": "Print a message",
+    "detail": "Eval parameters and print the result."
+  },
+  "cmdRead": {
+    "args": {
+      "field": "The fields to request<br/>Can use '*' to show all fields",
+      "id": "The record id's",
+      "model": "The model technical name",
+      "readBinary": "Don't filter binary fields"
+    },
+    "definition": "Search model record",
+    "detail": "Launch orm search query."
+  },
+  "cmdRef": {
+    "args": {
+      "xmlid": "The XML-ID"
+    },
+    "definition": "Show the referenced model and id of the given xmlid's",
+    "detail": "Show the referenced model and id of the given xmlid's",
+    "table": {
+      "resID": "Res. ID",
+      "resModel": "Res. Model",
+      "xmlID": "XML ID"
+    }
+  },
+  "cmdReload": {
+    "definition": "Reload current page",
+    "detail": "Reload current page."
+  },
+  "cmdRepeat": {
+    "arg": {
+      "cmd": "The command to run",
+      "times": "Times to run"
+    },
+    "args": {
+      "silent": "Used to don't print command output"
+    },
+    "definition": "Repeat a command N times",
+    "detail": "Repeat a command N times.\nCan use '$repeat_index' to get the iterator index.",
+    "error": {
+      "mustBePositive": "<i>** Repeat finsihed: '{{cmd}}' called {{times}} times</i>"
+    }
+  },
+  "cmdRollback": {
+    "args": {
+      "recordset": "The Recordset"
+    },
+    "definition": "Revert recordset changes",
+    "detail": "Undo recordset changes",
+    "error": {
+      "invalidRecordset": "Invalid recordset"
+    },
+    "result": {
+      "success": "Recordset changes undone"
+    }
+  },
+  "cmdRpc": {
+    "args": {
+      "options": "The rpc query options"
+    },
+    "definition": "Execute raw rpc",
+    "detail": "Execute raw rpc"
+  },
+  "cmdSearch": {
+    "args": {
+      "all": "Show all records (not truncated)",
+      "domain": "The domain",
+      "field": "The field names to request<br/>Can use '*' to show all fields of the model",
+      "limit": "The limit of records to request",
+      "model": "The model technical name",
+      "more": "Flag to indicate that show more results",
+      "offset": "The offset (from)<br/>Can be zero (no limit)",
+      "order": "The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
+      "readBinary": "Don't filter binary fields"
+    },
+    "definition": "Search model record/s",
+    "detail": "Launch orm search query",
+    "error": {
+      "noMoreResults": "There are no more results to print",
+      "resultTruncated": "<strong class='text-warning'>Result truncated to {{len}} records!</strong> The query is too big to be displayed entirely."
+    },
+    "question": {
+      "showMore": "There are still results to print ({{len}} records). Show more?"
+    }
+  },
+  "cmdSettings": {
+    "args": {
+      "module": "The module technical name"
+    },
+    "definition": "Open settings page",
+    "detail": "Open settings page."
+  },
+  "cmdToggleTerm": {
+    "definition": "Toggle terminal visibility",
+    "detail": "Toggle terminal visibility"
+  },
+  "cmdTour": {
+    "args": {
+      "clear": "Clear the state tour",
+      "name": "The tour technical name",
+      "onlyActive": "Filter only active"
+    },
+    "definition": "Launch Tour",
+    "detail": "Runs the selected tour. If no tour given, prints all available tours.",
+    "error": {
+      "notAccesible": "tour not accesible! Can't use it in this moment.",
+      "notAvailable": "This is not available on Odoo <17.0",
+      "notExist": "The given tour doesn't exist!"
+    },
+    "result": {
+      "clean": "Tour '{{name}}' clean",
+      "empty": "The tour list is empty",
+      "running": "Running tour..."
+    }
+  },
+  "cmdUal": {
+    "definition": "Update apps list",
+    "detail": "Update apps list",
+    "error": {
+      "noUpdate": "Can't update the apps list!"
+    },
+    "result": {
+      "success": "The apps list has been updated successfully"
+    }
+  },
+  "cmdUhg": {
+    "args": {
+      "group": "The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'"
+    },
+    "definition": "Check if user is in the selected groups",
+    "detail": "Check if user is in the selected groups."
+  },
+  "cmdUninstall": {
+    "args": {
+      "force": "Forced mode",
+      "module": "The module technical name"
+    },
+    "definition": "Uninstall a module",
+    "detail": "Launch module deletion process.",
+    "error": {
+      "canceled": "Operation cancelled",
+      "notExist": "'{{module}}' module doesn't exists"
+    },
+    "question": {
+      "continue": "Do you want to continue?"
+    },
+    "result": {
+      "success": "'{{module}}' ({{name}}) module successfully uninstalled",
+      "willRemoved": "This operation will remove these modules too:"
+    }
+  },
+  "cmdUnlink": {
+    "args": {
+      "id": "The record id's",
+      "model": "The model technical name"
+    },
+    "definition": "Unlink record",
+    "detail": "Delete a record.",
+    "result": {
+      "success": "{{model}} record deleted successfully"
+    }
+  },
+  "cmdUpgrade": {
+    "args": {
+      "module": "The module technical name"
+    },
+    "definition": "Upgrade a module",
+    "detail": "Launch upgrade module process.",
+    "error": {
+      "notExist": "'{{module}}' modules doesn't exist",
+      "notUpgraded": "Unexpected error. Module not upgraded"
+    },
+    "result": {
+      "sucess": "'{{modules}}' modules successfully upgraded"
+    }
+  },
+  "cmdVersion": {
+    "definition": "Know Odoo version",
+    "detail": "Shows Odoo version"
+  },
+  "cmdView": {
+    "args": {
+      "id": "The record id",
+      "model": "The model technical name",
+      "ref": "The view reference name"
+    },
+    "definition": "View model record/s",
+    "detail": "Open model record in form view or records in list view.",
+    "result": {
+      "selectRecord": "Select a record",
+      "viewRecord": "View Record"
+    }
+  },
+  "cmdWhoami": {
+    "definition": "Know current user login",
+    "detail": "Shows current user login",
+    "error": {
+      "noLogin": "Oops! can't get the login :/"
+    }
+  },
+  "cmdWrite": {
+    "args": {
+      "id": "The record id's",
+      "model": "The model technical name",
+      "value": "The values to write"
+    },
+    "definition": "Update record values",
+    "detail": "Update record values.",
+    "result": {
+      "success": "{{model}} record updated successfully"
+    }
+  },
+  "cmdWs": {
+    "args": {
+      "data": "The data",
+      "endpoint": "The endpoint",
+      "noTls": "Don't use TLS",
+      "operation": "The operation",
+      "websocket": "The websocket object"
+    },
+    "definition": "Open a web socket",
+    "detail": "Open a web socket",
+    "error": {
+      "invalidOperation": "Invalid operation",
+      "noEndpoint": "Need an endpoint to connect",
+      "noWebsocket": "Need a websocket to operate"
+    },
+    "result": {
+      "connectionClosed": "[{{url}}] Connection closed cleanly, code={{code}} reason={{reason}}",
+      "connectionDied": "[{{url}}] Connection died",
+      "connectionError": "Need a websocket to operate",
+      "connectionEstablished": "[{{url}}] Connection established"
+    }
+  },
+  "loader": {
+    "cantInitTerm": "Can't initilize terminal",
+    "testsEnabled": "Tests Enabled"
+  },
+  "odoo": {
+    "longpolling": {
+      "error": {
+        "init": "Can't initilize longpolling: ",
+        "read": "** Reading Error! **"
+      },
+      "new": "New Longpolling Notification:"
+    },
+    "templates": {
+      "metadata": {
+        "createDate": "Create Date",
+        "createUID": "Create UID",
+        "noUpdate": "No Update",
+        "writeDate": "Write Date",
+        "writeUID": "Write UID",
+        "xmlID": "XML-ID"
+      },
+      "recordCreated": {
+        "sucess": "{{model}} record(s) created successfully: {{links}}"
+      },
+      "whoami": {
+        "activeCompany": "Active Company",
+        "inCompanies": "In Companies",
+        "inGroups": "In Groups",
+        "login": "Login",
+        "partner": "Partner",
+        "user": "User"
+      }
+    }
+  },
+  "terminal": {
+    "close": {
+      "prevented": "The terminal has prevented the current tab from closing due to unfinished tasks:"
+    },
+    "cmd": {
+      "default": {
+        "definition": "Undefined command",
+        "detail": "This command hasn't a properly detailed information"
+      },
+      "error": {
+        "invalidDefinition": "Invalid command definition!"
+      }
+    },
+    "error": {
+      "invalidHTTPRequest": "Invalid HTTP Request",
+      "notInitJob": "Unexpected error: can't initialize the job!",
+      "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
+    },
+    "exception": {
+      "ProcessJobError": "Error executing '{{cmd_name}}'"
+    },
+    "info": {
+      "job": {
+        "running": "Running {{count}} command(s)",
+        "unhealthy": " ({{count_unhealthy}} unhealthy)"
+      }
+    },
+    "notLoaded": "Terminal not loaded",
+    "question": {
+      "aborted": "Operation aborted"
+    },
+    "templates": {
+      "unknownCommand": "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?"
+    }
+  },
+  "trash": {
+    "argument": {
+      "invalid": "Invalid argument '{{arg_long_name}}' value type: {{value_type}} is not {{arg_type}}",
+      "noExist": "The argument '${arg_name}' does not exist",
+      "requiredNotSet": "Required arguments not set! ({{required_not_set}})"
+    },
+    "exception": {
+      "invalidCommandArgumentsError": "Invalid command arguments",
+      "invalidCommandArugmentValueError": "Unexpected '{{arg_value}}' value!",
+      "invalidInstructionError": "Invalid instruction",
+      "invalidNameError": "Invalid name '{{vname}}' at {{start}}:{{end}}",
+      "invalidTokenError": "Invalid token '{{vname}}' at {{start}}:{{end}}",
+      "notExpectedCommandArgumentError": "Argument '{{arg_name}}' not expected at {{start}}:{{end}}",
+      "undefinedValueError": "Cannot read properties of undefined (reading '{{vname}}')",
+      "unknownCommandError": "Unknown Command '{{cmd_name}}' at {{start}}:{{end}}",
+      "unknownNameError": "Unknown name '{{vname}}' at {{start}}:{{end}}"
+    }
+  }
 }

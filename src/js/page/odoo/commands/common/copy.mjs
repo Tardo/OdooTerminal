@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import postMessage from '@common/utils/post_message';
 import Recordset from '@terminal/core/recordset.mjs';
@@ -11,7 +12,7 @@ function onMessageCopyDone(resolve, screen, data) {
     'ODOO_TERM_COPY_DONE',
     onMessageCopyDone.bind(this, resolve),
   );
-  screen.print('Data copied!');
+  screen.print(i18n.t('cmdCopy.result.dateCopied', 'Data copied!'));
   resolve(data.values);
 }
 
@@ -39,16 +40,19 @@ function cmdCopy(kwargs, screen) {
 }
 
 export default {
-  definition: 'Copy data to paste them into other instances',
+  definition: i18n.t(
+    'cmdCopy.definition',
+    'Copy data to paste them into other instances',
+  ),
   callback: cmdCopy,
-  detail: 'Copy model records or variables',
+  detail: i18n.t('cmdCopy.detail', 'Copy model records or variables'),
   args: [
-    [ARG.Any, ['d', 'data'], true, 'The data'],
+    [ARG.Any, ['d', 'data'], true, i18n.t('cmdCopy.args.data', 'The data')],
     [
       ARG.String,
       ['t', 'type'],
       false,
-      'The type of data',
+      i18n.t('cmdCopy.args.type', 'The type of data'),
       'auto',
       ['auto', 'var'],
     ],

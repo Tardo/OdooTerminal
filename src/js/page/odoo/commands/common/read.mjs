@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import searchRead from '@odoo/orm/search_read';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
@@ -67,21 +68,39 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Search model record',
+  definition: i18n.t('cmdRead.definition', 'Search model record'),
   callback: cmdSearchModelRecordId,
   options: getOptions,
-  detail: 'Launch orm search query.',
+  detail: i18n.t('cmdRead.detail', 'Launch orm search query.'),
   args: [
-    [ARG.String, ['m', 'model'], true, 'The model technical name'],
-    [ARG.List | ARG.Number, ['i', 'id'], true, "The record id's"],
+    [
+      ARG.String,
+      ['m', 'model'],
+      true,
+      i18n.t('cmdRead.args.model', 'The model technical name'),
+    ],
+    [
+      ARG.List | ARG.Number,
+      ['i', 'id'],
+      true,
+      i18n.t('cmdRead.args.id', "The record id's"),
+    ],
     [
       ARG.List | ARG.String,
       ['f', 'field'],
       false,
-      "The fields to request<br/>Can use '*' to show all fields",
+      i18n.t(
+        'cmdRead.args.field',
+        "The fields to request<br/>Can use '*' to show all fields",
+      ),
       ['display_name'],
     ],
-    [ARG.Flag, ['rb', 'read-binary'], false, "Don't filter binary fields"],
+    [
+      ARG.Flag,
+      ['rb', 'read-binary'],
+      false,
+      i18n.t('cmdRead.args.readBinary', "Don't filter binary fields"),
+    ],
   ],
   example: '-m res.partner -i 10,4,2 -f name,street',
 };

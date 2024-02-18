@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import isEmpty from '@terminal/utils/is_empty';
@@ -21,15 +22,22 @@ async function cmdUninstallModule(kwargs, screen) {
       }
       depends = depends.filter(item => item !== kwargs.module);
       if (!isEmpty(depends)) {
-        screen.print('This operation will remove these modules too:');
+        screen.print(
+          i18n.t(
+            'cmdUninstall.result.willRemoved',
+            'This operation will remove these modules too:',
+          ),
+        );
         screen.print(depends);
         const res = await screen.showQuestion(
-          'Do you want to continue?',
+          i18n.t('cmdUninstall.question.continue', 'Do you want to continue?'),
           ['y', 'n'],
           'n',
         );
         if (res?.toLowerCase() !== 'y') {
-          screen.printError('Operation cancelled');
+          screen.printError(
+            i18n.t('cmdUninstall.error.canceled', 'Operation cancelled'),
+          );
           return false;
         }
       }
@@ -45,11 +53,26 @@ async function cmdUninstallModule(kwargs, screen) {
     );
 
     screen.print(
-      `'${kwargs.module}' (${modue_infos[0].display_name}) module successfully uninstalled`,
+      i18n.t(
+        'cmdUninstall.result.success',
+        "'{{module}}' ({{name}}) module successfully uninstalled",
+        {
+          module: kwargs.module,
+          name: modue_infos[0].display_name,
+        },
+      ),
     );
     return modue_infos[0];
   }
-  throw new Error(`'${kwargs.module}' module doesn't exists`);
+  throw new Error(
+    i18n.t(
+      'cmdUninstall.error.notExist',
+      "'{{module}}' module doesn't exists",
+      {
+        module: kwargs.module,
+      },
+    ),
+  );
 }
 
 function getOptions(arg_name) {
@@ -68,13 +91,23 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Uninstall a module',
+  definition: i18n.t('cmdUninstall.definition', 'Uninstall a module'),
   callback: cmdUninstallModule,
   options: getOptions,
-  detail: 'Launch module deletion process.',
+  detail: i18n.t('cmdUninstall.detail', 'Launch module deletion process.'),
   args: [
-    [ARG.String, ['m', 'module'], true, 'The module technical name'],
-    [ARG.Flag, ['f', 'force'], false, 'Forced mode'],
+    [
+      ARG.String,
+      ['m', 'module'],
+      true,
+      i18n.t('cmdUninstall.args.module', 'The module technical name'),
+    ],
+    [
+      ARG.Flag,
+      ['f', 'force'],
+      false,
+      i18n.t('cmdUninstall.args.force', 'Forced mode'),
+    ],
   ],
   example: '-m contacts',
 };

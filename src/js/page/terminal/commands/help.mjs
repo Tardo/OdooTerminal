@@ -1,21 +1,22 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import isEmpty from '@terminal/utils/is_empty';
 import {getArgumentInfo} from '@trash/argument';
 import {ARG} from '@trash/constants';
 
 async function printHelpDetailed(screen, cmd, cmd_def) {
-  screen.eprint('NAME');
+  screen.eprint(i18n.t('cmdHelp.result.name', 'NAME'));
   screen.print(
     `<div class="terminal-info-section">${cmd} - ${cmd_def.definition}</div>`,
   );
   screen.print(' ');
-  screen.eprint('DESCRIPTION');
+  screen.eprint(i18n.t('cmdHelp.result.description', 'DESCRIPTION'));
   screen.print(`<div class="terminal-info-section">${cmd_def.detail}</div>`);
   // Create arguments text
   screen.print(' ');
-  screen.eprint('ARGUMENTS');
+  screen.eprint(i18n.t('cmdHelp.result.arguments', 'ARGUMENTS'));
   const args = [];
   let arg_info_str = '';
   for (const arg of cmd_def.args) {
@@ -46,7 +47,7 @@ async function printHelpDetailed(screen, cmd, cmd_def) {
   screen.print(`<div class="terminal-info-section">${arg_info_str}</div>`);
   screen.print(args);
   if (cmd_def.example) {
-    screen.eprint('EXAMPLE');
+    screen.eprint(i18n.t('cmdHelp.result.example', 'EXAMPLE'));
     screen.print(
       `<div class="terminal-info-section">${cmd} ${cmd_def.example}</div>`,
     );
@@ -69,7 +70,13 @@ function cmdPrintHelp(kwargs, screen) {
       this.registeredCmds[kwargs.cmd],
     );
   } else {
-    throw new Error(`'${kwargs.cmd}' command doesn't exists`);
+    throw new Error(
+      i18n.t(
+        'cmdHelp.error.commandNotExist',
+        "'{{cmd}}' command doesn't exist",
+        {cmd: kwargs.cmd},
+      ),
+    );
   }
 }
 
@@ -81,12 +88,23 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Print this help or command detailed info',
+  definition: i18n.t(
+    'cmdHelp.definition',
+    'Print this help or command detailed info',
+  ),
   callback: cmdPrintHelp,
   options: getOptions,
-  detail:
-    'Show commands and a quick definition.<br/>- ' +
-    '<> ~> Required Parameter<br/>- [] ~> Optional Parameter',
-  args: [[ARG.String, ['c', 'cmd'], false, 'The command to consult']],
+  detail: i18n.t(
+    'cmdHelp.detail',
+    'Show commands and a quick definition.<br/>- <> ~> Required Parameter<br/>- [] ~> Optional Parameter',
+  ),
+  args: [
+    [
+      ARG.String,
+      ['c', 'cmd'],
+      false,
+      i18n.t('cmdHelp.args.cmd', 'The command to consult'),
+    ],
+  ],
   example: '-c search',
 };

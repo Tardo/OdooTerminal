@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import isEmpty from '@terminal/utils/is_empty';
@@ -86,20 +87,33 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Check model fields access',
+  definition: i18n.t('cmdCaf.definition', 'Check model fields access'),
   callback: cmdCheckFieldAccess,
   options: getOptions,
-  detail: 'Show readable/writeable fields of the selected model',
+  detail: i18n.t(
+    'cmdCaf.detail',
+    'Show readable/writeable fields of the selected model',
+  ),
   args: [
-    [ARG.String, ['m', 'model'], true, 'The model technical name'],
+    [
+      ARG.String,
+      ['m', 'model'],
+      true,
+      i18n.t('cmdCaf.args.model', 'The model technical name'),
+    ],
     [
       ARG.List | ARG.String,
       ['f', 'field'],
       false,
-      'The field names to request',
+      i18n.t('cmdCaf.args.field', 'The field names to request'),
       ['*'],
     ],
-    [ARG.Dictionary, ['fi', 'filter'], false, 'The filter to apply'],
+    [
+      ARG.Dictionary,
+      ['fi', 'filter'],
+      false,
+      i18n.t('cmdCaf.args.filter', 'The filter to apply'),
+    ],
   ],
   example: '-m res.partner -f name,street',
 };

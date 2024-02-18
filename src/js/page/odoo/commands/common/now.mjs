@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getUserTZ from '@odoo/utils/get_user_tz';
@@ -61,19 +62,25 @@ async function cmdNow(kwargs, screen) {
 }
 
 export default {
-  definition: 'Current time',
+  definition: i18n.t('cmdNow.definition', 'Current time'),
   callback: cmdNow,
-  detail: 'Prints the current time',
+  detail: i18n.t('cmdNow.detail', 'Prints the current time'),
   args: [
     [
       ARG.String,
       ['t', 'type'],
       false,
-      'Date type',
+      i18n.t('cmdNow.args.type', 'Date type'),
       'full',
       ['full', 'date', 'time'],
     ],
-    [ARG.Flag, ['tz', 'tz'], false, 'Use timezone', false],
+    [
+      ARG.Flag,
+      ['tz', 'tz'],
+      false,
+      i18n.t('cmdNow.args.tz', 'Use timezone'),
+      false,
+    ],
   ],
   example: '-t time --tz',
 };

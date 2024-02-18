@@ -1,6 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
+import logger from '@common/logger';
 import Terminal from '@terminal/terminal';
 import Longpolling from './longpolling';
 import searchRead from './orm/search_read';
@@ -14,7 +16,7 @@ export default class OdooTerminal extends Terminal {
     for (let x = 0; x < l; ++x) {
       const notif = notifications[x];
       this.screen.print(
-        `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] New Longpolling Notification:</strong>`,
+        `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] ${i18n.t('odoo.longpolling.new', 'New Longpolling Notification:')}</strong>`,
       );
       if (notif.constructor === Object) {
         this.screen.print(notif, false);
@@ -51,7 +53,11 @@ export default class OdooTerminal extends Terminal {
       this.longpolling = new Longpolling(this);
     } catch (err) {
       // This happens if 'bus' module is not installed
-      console.warn("[OdooTerminal] Can't initilize longpolling: ", err);
+      logger.warn(
+        'odoo',
+        i18n.t('odoo.longpolling.error.init', "Can't initilize longpolling: "),
+        err,
+      );
       this.longpolling = false;
     }
   }
@@ -75,6 +81,12 @@ export default class OdooTerminal extends Terminal {
       .then(result => {
         target.parentNode.textContent = JSON.stringify(result[0][field]);
       })
-      .catch(() => (target.parentNode.textContent = '** Reading Error! **'));
+      .catch(
+        () =>
+          (target.parentNode.textContent = i18n.t(
+            'odoo.longpolling.error.read',
+            '** Reading Error! **',
+          )),
+      );
   }
 }

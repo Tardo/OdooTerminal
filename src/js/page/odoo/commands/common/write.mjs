@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import writeRecord from '@odoo/orm/write_record';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
@@ -12,7 +13,15 @@ async function cmdWriteModelRecord(kwargs, screen) {
     kwargs.value,
     this.getContext(),
   ).then(result => {
-    screen.print(`${kwargs.model} record updated successfully`);
+    screen.print(
+      i18n.t(
+        'cmdWrite.result.success',
+        '{{model}} record updated successfully',
+        {
+          model: kwargs.model,
+        },
+      ),
+    );
     return result;
   });
 }
@@ -33,14 +42,29 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Update record values',
+  definition: i18n.t('cmdWrite.definition', 'Update record values'),
   callback: cmdWriteModelRecord,
   options: getOptions,
-  detail: 'Update record values.',
+  detail: i18n.t('cmdWrite.detail', 'Update record values.'),
   args: [
-    [ARG.String, ['m', 'model'], true, 'The model technical name'],
-    [ARG.List | ARG.Number, ['i', 'id'], true, "The record id's"],
-    [ARG.Dictionary, ['v', 'value'], true, 'The values to write'],
+    [
+      ARG.String,
+      ['m', 'model'],
+      true,
+      i18n.t('cmdWrite.args.model', 'The model technical name'),
+    ],
+    [
+      ARG.List | ARG.Number,
+      ['i', 'id'],
+      true,
+      i18n.t('cmdWrite.args.id', "The record id's"),
+    ],
+    [
+      ARG.Dictionary,
+      ['v', 'value'],
+      true,
+      i18n.t('cmdWrite.args.value', 'The values to write'),
+    ],
   ],
   example: "-m res.partner -i 10,4,2 -v {street: 'Diagon Alley'}",
 };

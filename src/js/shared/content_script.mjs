@@ -40,7 +40,7 @@ function onWindowMessage(event) {
       } else if (info.isCompatible) {
         injector(document, getResources());
       } else if (info.isOdoo) {
-        console.warn('[OdooTerminal] Incompatible server version!');
+        console.warn('Incompatible server version!');
       }
       updateInstanceContext(info);
     });

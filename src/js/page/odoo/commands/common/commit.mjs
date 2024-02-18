@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import writeRecord from '@odoo/orm/write_record';
 import Recordset from '@terminal/core/recordset';
 import isEmpty from '@terminal/utils/is_empty';
@@ -8,12 +9,14 @@ import {ARG} from '@trash/constants';
 
 async function cmdCommit(kwargs, screen) {
   if (!Recordset.isValid(kwargs.recordset)) {
-    throw new Error('Invalid recordset');
+    throw new Error(
+      i18n.t('cmdCommit.error.invalidRecordset', 'Invalid recordset'),
+    );
   }
 
   const values_to_write = kwargs.recordset.toWrite();
   if (isEmpty(values_to_write)) {
-    screen.printError('Nothing to commit!');
+    screen.printError(i18n.t('cmdCommit.error.noCommit', 'Nothing to commit!'));
     return false;
   }
   const pids = [];
@@ -28,15 +31,29 @@ async function cmdCommit(kwargs, screen) {
   await Promise.all(tasks);
   kwargs.recordset.persist();
   screen.print(
-    `Records '${pids}' of ${kwargs.recordset.model} updated successfully`,
+    i18n.t(
+      'cmdCommit.error.success',
+      "Records '{{pids}}' of {{model}} updated successfully",
+      {
+        pids,
+        model: kwargs.recordset.model,
+      },
+    ),
   );
   return true;
 }
 
 export default {
-  definition: 'Commit recordset changes',
+  definition: i18n.t('cmdCommit.definition', 'Commit recordset changes'),
   callback: cmdCommit,
-  detail: 'Write recordset changes',
-  args: [[ARG.Any, ['r', 'recordset'], true, 'The Recordset']],
+  detail: i18n.t('cmdCommit.detail', 'Write recordset changes'),
+  args: [
+    [
+      ARG.Any,
+      ['r', 'recordset'],
+      true,
+      i18n.t('cmdCommit.args.recordset', 'The Recordset'),
+    ],
+  ],
   example: '-r $recordset',
 };

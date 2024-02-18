@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 
 async function cmdLoadResource(kwargs) {
@@ -17,14 +18,23 @@ async function cmdLoadResource(kwargs) {
       href: inURL.href,
     });
   } else {
-    throw new Error('Invalid file type');
+    throw new Error(
+      i18n.t('cmdLoad.error.invalidFileType', 'Invalid file type'),
+    );
   }
 }
 
 export default {
-  definition: 'Load external resource',
+  definition: i18n.t('cmdLoad.definition', 'Load external resource'),
   callback: cmdLoadResource,
-  detail: 'Load external source (javascript & css)',
-  args: [[ARG.String, ['u', 'url'], true, 'The URL of the asset']],
+  detail: i18n.t('cmdLoad.detail', 'Load external source (javascript & css)'),
+  args: [
+    [
+      ARG.String,
+      ['u', 'url'],
+      true,
+      i18n.t('cmdLoad.args.url', 'The URL of the asset'),
+    ],
+  ],
   example: "-u 'https://example.com/libs/term_extra.js'",
 };

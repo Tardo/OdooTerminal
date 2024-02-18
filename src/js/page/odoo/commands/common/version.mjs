@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import getOdooVersionInfo from '@odoo/utils/get_odoo_version_info';
 
 async function cmdShowOdooVersion(kwargs, screen) {
@@ -13,7 +14,7 @@ async function cmdShowOdooVersion(kwargs, screen) {
 }
 
 export default {
-  definition: 'Know Odoo version',
+  definition: i18n.t('cmdVersion.definition', 'Know Odoo version'),
   callback: cmdShowOdooVersion,
-  detail: 'Shows Odoo version',
+  detail: i18n.t('cmdVersion.detail', 'Shows Odoo version'),
 };

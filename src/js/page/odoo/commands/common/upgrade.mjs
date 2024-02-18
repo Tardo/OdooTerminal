@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
@@ -21,21 +22,36 @@ async function cmdUpgradeModule(kwargs, screen) {
         ).then(
           () => {
             screen.print(
-              `'${result
-                .map(item => item.name)
-                .join(', ')}' modules successfully upgraded`,
+              i18n.t(
+                'cmdUpgrade.result.sucess',
+                "'{{modules}}' modules successfully upgraded",
+                {
+                  modules: result.map(item => item.name).join(', '),
+                },
+              ),
             );
             return result;
           },
           res => {
             throw new Error(
               res?.message?.data?.message ||
-                'Unexpected error. Module not upgraded',
+                i18n.t(
+                  'cmdUpgrade.error.notUpgraded',
+                  'Unexpected error. Module not upgraded',
+                ),
             );
           },
         );
       }
-      throw new Error(`'${kwargs.module}' modules doesn't exists`);
+      throw new Error(
+        i18n.t(
+          'cmdUpgrade.error.notExist',
+          "'{{module}}' modules doesn't exist",
+          {
+            module: kwargs.module,
+          },
+        ),
+      );
     });
 }
 
@@ -55,12 +71,17 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Upgrade a module',
+  definition: i18n.t('cmdUpgrade.definition', 'Upgrade a module'),
   callback: cmdUpgradeModule,
   options: getOptions,
-  detail: 'Launch upgrade module process.',
+  detail: i18n.t('cmdUpgrade.detail', 'Launch upgrade module process.'),
   args: [
-    [ARG.List | ARG.String, ['m', 'module'], true, 'The module technical name'],
+    [
+      ARG.List | ARG.String,
+      ['m', 'module'],
+      true,
+      i18n.t('cmdUpgrade.args.module', 'The module technical name'),
+    ],
   ],
   example: '-m contacts',
 };

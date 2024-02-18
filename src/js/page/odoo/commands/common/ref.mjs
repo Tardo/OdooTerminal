@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@trash/constants';
@@ -50,14 +51,34 @@ async function cmdRef(kwargs, screen) {
     const item = results[x];
     rows[row_index].push(item[0], item[1], item[2]);
   }
-  screen.printTable(['XML ID', 'Res. Model', 'Res. ID'], rows);
+  screen.printTable(
+    [
+      i18n.t('cmdRef.table.xmlID', 'XML ID'),
+      i18n.t('cmdRef.table.resModel', 'Res. Model'),
+      i18n.t('cmdRef.table.resID', 'Res. ID'),
+    ],
+    rows,
+  );
   return results;
 }
 
 export default {
-  definition: "Show the referenced model and id of the given xmlid's",
+  definition: i18n.t(
+    'cmdRef.definition',
+    "Show the referenced model and id of the given xmlid's",
+  ),
   callback: cmdRef,
-  detail: "Show the referenced model and id of the given xmlid's",
-  args: [[ARG.List | ARG.String, ['x', 'xmlid'], true, 'The XML-ID']],
+  detail: i18n.t(
+    'cmdRef.detail',
+    "Show the referenced model and id of the given xmlid's",
+  ),
+  args: [
+    [
+      ARG.List | ARG.String,
+      ['x', 'xmlid'],
+      true,
+      i18n.t('cmdRef.args.xmlid', 'The XML-ID'),
+    ],
+  ],
   example: '-x base.main_company,base.model_res_partner',
 };

@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import {ARG} from './constants';
 import difference from './utils/difference';
 
@@ -108,7 +109,13 @@ export function validateAndFormatArguments(cmd_def, kwargs) {
   for (const arg_name of in_arg_names) {
     const arg_info = getArgumentInfoByName(cmd_def.args, arg_name);
     if (!arg_info) {
-      throw new Error(`The argument '${arg_name}' does not exist`);
+      throw new Error(
+        i18n.t(
+          'trash.argument.noExist',
+          "The argument '${arg_name}' does not exist",
+          {arg_name},
+        ),
+      );
     }
     full_kwargs[arg_info.names.long] = kwargs[arg_name];
   }
@@ -141,7 +148,11 @@ export function validateAndFormatArguments(cmd_def, kwargs) {
   );
   if (required_not_set.length) {
     throw new Error(
-      `Required arguments not set! (${required_not_set.join(',')})`,
+      i18n.t(
+        'trash.argument.requiredNotSet',
+        'Required arguments not set! ({{required_not_set}})',
+        {required_not_set: required_not_set.join(',')},
+      ),
     );
   }
 
@@ -158,9 +169,15 @@ export function validateAndFormatArguments(cmd_def, kwargs) {
     const s_arg_long_name = arg_long_name.replaceAll('-', '_');
     if (!checkArgumentValueType(arg_value, arg_info.type)) {
       throw new Error(
-        `Invalid argument '${arg_long_name}' value type: ${
-          arg_value?.constructor?.name
-        } is not ${ARG.getHumanType(arg_info.type)}`,
+        i18n.t(
+          'trash.argument.invalid',
+          "Invalid argument '{{arg_long_name}}' value type: {{value_type}} is not {{arg_type}}",
+          {
+            arg_long_name,
+            value_type: arg_value?.constructor?.name,
+            arg_type: ARG.getHumanType(arg_info.type),
+          },
+        ),
       );
     }
     new_kwargs[s_arg_long_name] = arg_value;

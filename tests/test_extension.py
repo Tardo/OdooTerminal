@@ -76,7 +76,7 @@ class TestExtension:
             raise Exception('Ooops! Invalid login :/')
 
     def _open_terminal(self, browser):
-        elem = self._wait_for_element_located(browser, 'terminal', delay=2)
+        elem = self._wait_for_element_located(browser, 'terminal')
         assert elem
         browser.execute_script("document.querySelector('.o_terminal')"
                                     + ".dispatchEvent(new Event('toggle'));")

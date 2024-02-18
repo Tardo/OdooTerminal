@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import asyncSleep from '@terminal/utils/async_sleep';
@@ -34,20 +35,61 @@ function getBarcodeInfo(barcodeService) {
   const OdooVerMajor = getOdooVersion('major');
   if (OdooVerMajor >= 16) {
     return [
-      `Max. time between keys (ms): ${barcodeService.barcodeService.maxTimeBetweenKeysInMs}`,
-      'Reserved barcode prefixes: O-BTN., O-CMD.',
-      `Available commands: ${AVAILABLE_BARCODE_COMMANDS.join(', ')}`,
+      i18n.t(
+        'cmdBarcode.result.maxTimeBetweenKeysInMs',
+        'Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}',
+        {
+          maxTimeBetweenKeysInMs:
+            barcodeService.barcodeService.maxTimeBetweenKeysInMs,
+        },
+      ),
+      i18n.t(
+        'cmdBarcode.result.reservedPrefixes',
+        'Reserved barcode prefixes: {{prefixes}}',
+        {
+          prefixes: 'O-BTN., O-CMD.',
+        },
+      ),
+      i18n.t(
+        'cmdBarcode.result.availableCommands',
+        'Available commands: {{availableCommands}}',
+        {
+          availableCommands: AVAILABLE_BARCODE_COMMANDS.join(', '),
+        },
+      ),
     ];
   }
   return [
-    `Max. time between keys (ms): ${barcodeService.BarcodeEvents.max_time_between_keys_in_ms}`,
-    `Reserved barcode prefixes: ${barcodeService.ReservedBarcodePrefixes.join(
-      ', ',
-    )}`,
-    `Available commands: ${AVAILABLE_BARCODE_COMMANDS.join(', ')}`,
-    `Currently accepting barcode scanning? ${
-      barcodeService.BarcodeEvents.$barcodeInput.length > 0 ? 'Yes' : 'No'
-    }`,
+    i18n.t(
+      'cmdBarcode.result.maxTimeBetweenKeysInMs',
+      'Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}',
+      {
+        maxTimeBetweenKeysInMs:
+          barcodeService.BarcodeEvents.max_time_between_keys_in_ms,
+      },
+    ),
+    i18n.t(
+      'cmdBarcode.result.reservedPrefixes',
+      'Reserved barcode prefixes: {{prefixes}}',
+      {
+        prefixes: arcodeService.ReservedBarcodePrefixes.join(', '),
+      },
+    ),
+    i18n.t(
+      'cmdBarcode.result.availableCommands',
+      'Available commands: {{availableCommands}}',
+      {
+        availableCommands: AVAILABLE_BARCODE_COMMANDS.join(', '),
+      },
+    ),
+    i18n.t(
+      'cmdBarcode.result.acceptScan',
+      'Currently accepting barcode scanning? {{isAcceptingScan}}',
+      {
+        isAcceptingScan:
+          barcodeService.BarcodeEvents.$barcodeInput.length > 0 ? 'Yes' : 'No',
+      },
+    ),
   ];
 }
 
@@ -58,7 +100,12 @@ async function cmdBarcode(kwargs, screen) {
   );
   if (!barcodeService) {
     // Soft-dependency... this don't exists if barcodes module is not installed
-    screen.printError("The 'barcode' module is not installed/available");
+    screen.printError(
+      i18n.t(
+        'cmdBarcode.error.moudeNotAvailable',
+        "The 'barcode' module is not installed/available",
+      ),
+    );
     return;
   }
 
@@ -68,7 +115,7 @@ async function cmdBarcode(kwargs, screen) {
     return info;
   } else if (kwargs.operation === 'send') {
     if (!kwargs.data) {
-      throw new Error('No data given!');
+      throw new Error(i18n.t('cmdBarcode.error.noData', 'No data given!'));
     }
 
     for (const barcode of kwargs.data) {
@@ -79,37 +126,53 @@ async function cmdBarcode(kwargs, screen) {
       await asyncSleep(kwargs.barcodedelay);
     }
   } else {
-    throw new Error('Invalid operation!');
+    throw new Error(
+      i18n.t('cmdBarcode.error.invalidOperation', 'Invalid operation!'),
+    );
   }
   return kwargs.data;
 }
 
 export default {
-  definition: 'Operations over barcode',
+  definition: i18n.t('cmdBarcode.definition', 'Operations over barcode'),
   callback: cmdBarcode,
-  detail: 'See information and send barcode strings',
+  detail: i18n.t(
+    'cmdBarcode.detail',
+    'See information and send barcode strings',
+  ),
   args: [
     [
       ARG.String,
       ['o', 'operation'],
       false,
-      'The operation',
+      i18n.t('cmdBarcode.args.operation', 'The operation'),
       'send',
       ['send', 'info'],
     ],
-    [ARG.List | ARG.Any, ['d', 'data'], false, 'The data to send'],
+    [
+      ARG.List | ARG.Any,
+      ['d', 'data'],
+      false,
+      i18n.t('cmdBarcode.args.data', 'The data to send'),
+    ],
     [
       ARG.Number,
       ['pd', 'pressdelay'],
       false,
-      'The delay between presskey events (in ms)',
+      i18n.t(
+        'cmdBarcode.args.pressDelay',
+        'The delay between presskey events (in ms)',
+      ),
       3,
     ],
     [
       ARG.Number,
       ['bd', 'barcodedelay'],
       false,
-      'The delay between barcodes reads (in ms)',
+      i18n.t(
+        'cmdBarcode.args.barcodeDelay',
+        'The delay between barcodes reads (in ms)',
+      ),
       150,
     ],
   ],

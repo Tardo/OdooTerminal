@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
@@ -34,16 +35,22 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Check if user is in the selected groups',
+  definition: i18n.t(
+    'cmdUhg.definition',
+    'Check if user is in the selected groups',
+  ),
   callback: cmdUserHasGroups,
   options: getOptions,
-  detail: 'Check if user is in the selected groups.',
+  detail: i18n.t('cmdUhg.detail', 'Check if user is in the selected groups.'),
   args: [
     [
       ARG.List | ARG.String,
       ['g', 'group'],
       true,
-      "The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'",
+      i18n.t(
+        'cmdUhg.args.group',
+        "The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'",
+      ),
     ],
   ],
   example: '-g base.group_user',

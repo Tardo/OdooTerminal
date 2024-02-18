@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import postMessage from '@common/utils/post_message';
 import searchCount from '@odoo/orm/search_count';
@@ -67,7 +68,7 @@ function onMessagePasteDone(
   );
   const msg_vals = vals.values;
   if (isEmpty(msg_vals) || isEmpty(msg_vals.data)) {
-    screen.print('No data to copy!');
+    screen.printError(i18n.t('cmdPaste.error.noData', 'No data to copy!'));
     return resolve();
   }
 
@@ -75,14 +76,23 @@ function onMessagePasteDone(
   const data_parsed = JSON.parse(data);
   if (type === 'model') {
     if (!model) {
-      return reject('Invalid data to paste! No model defined');
+      return reject(
+        i18n.t(
+          'cmdPaste.error.invalidData',
+          'Invalid data to paste! No model defined',
+        ),
+      );
     }
     let prom = null;
     if (no_questions) {
       prom = Promise.resolve('y');
     } else {
       prom = screen.showQuestion(
-        `This will modify the '${model}' model. Continue?`,
+        i18n.t(
+          'cmdPaste.question.continue',
+          "This will modify the '{{model}}' model. Continue?",
+          {model},
+        ),
         ['y', 'n'],
         'y',
       );
@@ -125,18 +135,27 @@ function cmdPaste(kwargs, screen) {
 }
 
 export default {
-  definition: 'Pastes copied data',
+  definition: i18n.t('cmdPaste.definition', 'Pastes copied data'),
   callback: cmdPaste,
-  detail: 'Paste model records or variables',
+  detail: i18n.t('cmdPaste.detail', 'Paste model records or variables'),
   args: [
     [
       ARG.Flag,
       ['m', 'merge'],
       false,
-      "Try to merge data (if the type is 'model')",
+      i18n.t(
+        'cmdPaste.args.merge',
+        "Try to merge data (if the type is 'model')",
+      ),
       false,
     ],
-    [ARG.Flag, ['y', 'yes'], false, "Don't show questions", false],
+    [
+      ARG.Flag,
+      ['y', 'yes'],
+      false,
+      i18n.t('cmdPaste.args.yes', "Don't show questions"),
+      false,
+    ],
   ],
   example: '--merge',
 };

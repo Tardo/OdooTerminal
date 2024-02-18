@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@trash/constants';
@@ -16,7 +17,12 @@ async function cmdContextOperation(kwargs, screen) {
       kwargs.operation === 'delete'
     ) {
       // Soft-Error
-      screen.printError('This operation is currently not supported in v15.0+');
+      screen.printError(
+        i18n.t(
+          'cmdContext.error.operationNotSupported',
+          'This operation is currently not supported in v15.0+',
+        ),
+      );
       return;
     }
   }
@@ -30,7 +36,10 @@ async function cmdContextOperation(kwargs, screen) {
       delete session.user_context[kwargs.value];
     } else {
       throw new Error(
-        'The selected key is not present in the terminal context',
+        i18n.t(
+          'cmdContext.error.keyNotPresent',
+          'The selected key is not present in the terminal context',
+        ),
       );
     }
   }
@@ -39,19 +48,30 @@ async function cmdContextOperation(kwargs, screen) {
 }
 
 export default {
-  definition: 'Operations over session context dictionary',
+  definition: i18n.t(
+    'cmdContext.definition',
+    'Operations over session context dictionary',
+  ),
   callback: cmdContextOperation,
-  detail: 'Operations over session context dictionary.',
+  detail: i18n.t(
+    'cmdContext.detail',
+    'Operations over session context dictionary.',
+  ),
   args: [
     [
       ARG.String,
       ['o', 'operation'],
       false,
-      'The operation to do',
+      i18n.t('cmdContext.args.operation', 'The operation to do'),
       'read',
       ['read', 'write', 'set', 'delete'],
     ],
-    [ARG.Any, ['v', 'value'], false, 'The values'],
+    [
+      ARG.Any,
+      ['v', 'value'],
+      false,
+      i18n.t('cmdContext.args.value', 'The values'),
+    ],
   ],
   example: '-o write -v {the_example: 1}',
 };

@@ -1,19 +1,28 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 
 async function cmdWebSocket(kwargs) {
   if (kwargs.operation === 'open') {
     if (!kwargs.endpoint) {
-      throw new Error('Need an endpoint to connect');
+      throw new Error(
+        i18n.t('cmdWs.error.noEndpoint', 'Need an endpoint to connect'),
+      );
     }
     const url = `ws${kwargs.no_tls ? '' : 's'}://${window.location.host}${
       kwargs.endpoint
     }`;
     const socket = new WebSocket(url);
     socket.onopen = () => {
-      screen.print(`[${url}] Connection established`);
+      screen.print(
+        i18n.t(
+          'cmdWs.result.connectionEstablished',
+          '[{{url}}] Connection established',
+          {url},
+        ),
+      );
       socket.send('initialized');
     };
     socket.onmessage = ev => {
@@ -22,19 +31,35 @@ async function cmdWebSocket(kwargs) {
     socket.onclose = ev => {
       if (ev.wasClean) {
         screen.print(
-          `[${url}] Connection closed cleanly, code=${ev.code} reason=${ev.reason}`,
+          i18n.t(
+            'cmdWs.result.connectionClosed',
+            '[{{url}}] Connection closed cleanly, code={{code}} reason={{reason}}',
+            {
+              url,
+              code: ev.code,
+              reason: ev.reason,
+            },
+          ),
         );
       } else {
-        screen.print(`[${url}] Connection died`);
+        screen.print(
+          i18n.t('cmdWs.result.connectionDied', '[{{url}}] Connection died', {
+            url,
+          }),
+        );
       }
     };
     socket.onerror = () => {
-      screen.eprint(`[${url}] ERROR!`);
+      screen.eprint(
+        i18n.t('cmdWs.result.connectionError', '[{{url}}] ERROR!', {url}),
+      );
     };
     return socket;
   } else if (kwargs.operation === 'send') {
     if (!kwargs.websocket || kwargs.websocket.constructor !== WebSocket) {
-      throw new Error('Need a websocket to operate');
+      throw new Error(
+        i18n.t('cmdWs.result.connectionError', 'Need a websocket to operate'),
+      );
     }
     // { event_name: 'subscribe', data: { channels: allTabsChannels, last: this.lastNotificationId } }
     const payload = JSON.stringify(kwargs.data);
@@ -43,7 +68,9 @@ async function cmdWebSocket(kwargs) {
     return;
   } else if (kwargs.operation === 'close') {
     if (!kwargs.websocket || kwargs.websocket.constructor !== WebSocket) {
-      throw new Error('Need a websocket to operate');
+      throw new Error(
+        i18n.t('cmdWs.error.noWebsocket', 'Need a websocket to operate'),
+      );
     }
     kwargs.websocket.close(kwargs.data);
     return;
@@ -51,26 +78,41 @@ async function cmdWebSocket(kwargs) {
     kwargs.websocket.close(kwargs.data);
     return;
   }
-  throw new Error('Invalid operation');
+  throw new Error(i18n.t('cmdWs.error.invalidOperation', 'Invalid operation'));
 }
 
 export default {
-  definition: 'Open a web socket',
+  definition: i18n.t('cmdWs.definition', 'Open a web socket'),
   callback: cmdWebSocket,
-  detail: 'Open a web socket',
+  detail: i18n.t('cmdWs.detail', 'Open a web socket'),
   args: [
     [
       ARG.String,
       ['o', 'operation'],
       true,
-      'The operation',
+      i18n.t('cmdWs.args.operation', 'The operation'),
       'open',
       ['open', 'close', 'send', 'health'],
     ],
-    [ARG.String, ['e', 'endpoint'], false, 'The endpoint'],
-    [ARG.Any, ['wo', 'websocket'], false, 'The websocket object'],
-    [ARG.Any, ['d', 'data'], false, 'The data'],
-    [ARG.Flag, ['no-tls', 'no-tls'], false, "Don't use TLS"],
+    [
+      ARG.String,
+      ['e', 'endpoint'],
+      false,
+      i18n.t('cmdWs.args.endpoint', 'The endpoint'),
+    ],
+    [
+      ARG.Any,
+      ['wo', 'websocket'],
+      false,
+      i18n.t('cmdWs.args.websocket', 'The websocket object'),
+    ],
+    [ARG.Any, ['d', 'data'], false, i18n.t('cmdWs.args.data', 'The data')],
+    [
+      ARG.Flag,
+      ['no-tls', 'no-tls'],
+      false,
+      i18n.t('cmdWs.args.noTls', "Don't use TLS"),
+    ],
   ],
   example: '-o open -e /websocket',
 };

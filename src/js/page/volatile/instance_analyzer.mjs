@@ -87,8 +87,13 @@ if (ODOO_OBJ) {
     Object.assign(icontext, ver);
     icontext.isCompatible = isCompatibleOdooVersion(icontext.serverVersionRaw);
     icontext.isSaas = icontext.serverVersionRaw.startsWith('saas~');
+
+    postMessage('ODOO_TERM_INIT', {
+      instance_info: icontext,
+    });
+  });
+} else {
+  postMessage('ODOO_TERM_INIT', {
+    instance_info: icontext,
   });
 }
-postMessage('ODOO_TERM_INIT', {
-  instance_info: icontext,
-});

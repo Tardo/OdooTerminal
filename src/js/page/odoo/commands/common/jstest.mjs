@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 
@@ -33,17 +34,25 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Launch JS Tests',
+  definition: i18n.t('cmdJSTest.definition', 'Launch JS Tests'),
   callback: cmdJSTest,
   options: getOptions,
-  detail: 'Runs js tests in desktop or mobile mode for the selected module.',
+  detail: i18n.t(
+    'cmdJSTest.detail',
+    'Runs js tests in desktop or mobile mode for the selected module.',
+  ),
   args: [
-    [ARG.String, ['m', 'module'], false, 'The module technical name'],
+    [
+      ARG.String,
+      ['m', 'module'],
+      false,
+      i18n.t('cmdJSTest.args.module', 'The module technical name'),
+    ],
     [
       ARG.String,
       ['d', 'device'],
       false,
-      'The device to test',
+      i18n.t('cmdJSTest.args.device', 'The device to test'),
       'desktop',
       ['desktop', 'mobile'],
     ],

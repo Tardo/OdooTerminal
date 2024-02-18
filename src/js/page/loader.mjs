@@ -5,6 +5,7 @@ import '@css/terminal.css';
 import i18n from 'i18next';
 import HttpApi from 'i18next-http-backend';
 import postMessage from '@common/utils/post_message';
+import logger from '@common/logger';
 import registerBackofficeFuncs from '@odoo/commands/backoffice/__all__';
 import registerCommonFuncs from '@odoo/commands/common/__all__';
 import OdooTerminal from '@odoo/terminal';
@@ -23,7 +24,7 @@ function getTerminalObj() {
 
   const load_tests = window.__OdooTerminal?.load_tests || navigator.webdriver;
   if (load_tests) {
-    console.info('[OdooTerminal] Tests Enabled');
+    logger.info('loader', i18n.t('loader.testsEnabled', 'Tests Enabled'));
   }
   try {
     const TerminalClass = load_tests ? OdooTerminalTests : OdooTerminal;
@@ -31,7 +32,11 @@ function getTerminalObj() {
     registerCoreFuncs(terminal);
     registerCommonFuncs(terminal);
   } catch (err) {
-    console.warn("[OdooTerminal] Can't initilize terminal", err);
+    logger.warn(
+      'loader',
+      i18n.t('loader.cantInitTerm', "Can't initilize terminal"),
+      err,
+    );
   }
   return terminal;
 }

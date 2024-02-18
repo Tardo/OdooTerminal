@@ -10,7 +10,7 @@ async function cmdAlias(kwargs, screen) {
   const aliases = getStorageItem('terminal_aliases') || {};
   if (!kwargs.name) {
     if (isEmpty(aliases)) {
-      screen.print(i18n.t('cmdAliasNotDefined', 'No aliases defined.'));
+      screen.print(i18n.t('cmdAlias.notDefined', 'No aliases defined.'));
     } else {
       for (const alias_name in aliases) {
         screen.print(
@@ -20,17 +20,17 @@ async function cmdAlias(kwargs, screen) {
     }
     return aliases;
   } else if (Object.hasOwn(this.registeredCmds, kwargs.name)) {
-    throw new Error(i18n.t('cmdAliasInvalidAliasName', 'Invalid alias name'));
+    throw new Error(i18n.t('cmdAlias.invalidAliasName', 'Invalid alias name'));
   }
   if (kwargs.cmd && kwargs.cmd.length) {
     aliases[kwargs.name] = kwargs.cmd;
-    screen.print(i18n.t('cmdAliasCreated', 'Alias created successfully'));
+    screen.print(i18n.t('cmdAlias.created', 'Alias created successfully'));
   } else if (Object.hasOwn(aliases, kwargs.name)) {
     delete aliases[kwargs.name];
-    screen.print(i18n.t('cmdAliasRemoved', 'Alias removed successfully'));
+    screen.print(i18n.t('cmdAlias.removed', 'Alias removed successfully'));
   } else {
     throw new Error(
-      i18n.t('cmdAliasNotExists', 'The selected alias not exists'),
+      i18n.t('cmdAlias.notExists', 'The selected alias not exists'),
     );
   }
   setStorageItem('terminal_aliases', aliases, err => screen.print(err));
@@ -38,10 +38,10 @@ async function cmdAlias(kwargs, screen) {
 }
 
 export default {
-  definition: i18n.t('cmdAliasDefinition', 'Create aliases'),
+  definition: i18n.t('cmdAlias.definition', 'Create aliases'),
   callback: cmdAlias,
   detail: i18n.t(
-    'cmdAliasDetail',
+    'cmdAlias.detail',
     'Define aliases to run commands easy. ' +
       "<br><b>WARNING:</b> This command uses 'local storage' " +
       'to persist the data even if you close the browser. ' +
@@ -55,14 +55,14 @@ export default {
       ARG.String,
       ['n', 'name'],
       false,
-      i18n.t('cmdAliasArgName', 'The name of the alias'),
+      i18n.t('cmdAlias.args.name', 'The name of the alias'),
     ],
     [
       ARG.String,
       ['c', 'cmd'],
       false,
-      i18n.t('cmdAliasArgCmd', 'The command to run'),
+      i18n.t('cmdAlias.args.cmd', 'The command to run'),
     ],
   ],
-  example: i18n.t('cmdAliasExample', '-n myalias -c "print \'Hello, $1!\'"'),
+  example: i18n.t('cmdAlias.example', '-n myalias -c "print \'Hello, $1!\'"'),
 };

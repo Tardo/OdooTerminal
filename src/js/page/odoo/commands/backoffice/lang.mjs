@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
 import searchRead from '@odoo/orm/search_read';
@@ -25,7 +26,10 @@ async function cmdLang(kwargs, screen) {
     }
     if (!kwargs.lang || !kwargs.format || isEmpty(kwargs.module)) {
       throw new Error(
-        "'export' operation needs the following arguments: --lang, --format, --module",
+        i18n.t(
+          'cmdLang.error.exportInvalidArguments',
+          "'export' operation needs the following arguments: --lang, --format, --module",
+        ),
       );
     }
     // Get module ids
@@ -37,7 +41,9 @@ async function cmdLang(kwargs, screen) {
     );
     module_ids = module_ids.map(item => item.id);
     if (isEmpty(module_ids)) {
-      throw new Error('No modules found!');
+      throw new Error(
+        i18n.t('cmdLang.error.noModulesFound', 'No modules found!'),
+      );
     }
     // Create wizard record
     const wizard_id = await createRecord(
@@ -51,7 +57,9 @@ async function cmdLang(kwargs, screen) {
       this.getContext(),
     );
     if (!wizard_id) {
-      throw new Error("Can't create wizard record!");
+      throw new Error(
+        i18n.t('cmdLang.error.noWizard', "Can't create wizard record!"),
+      );
     }
 
     // Get action to export
@@ -96,7 +104,10 @@ async function cmdLang(kwargs, screen) {
       isEmpty(kwargs.module)
     ) {
       throw new Error(
-        "'import' operation needs the following arguments: --name, --lang, --format, --module",
+        i18n.t(
+          'cmdLang.error.importInvalidArguments',
+          "'import' operation needs the following arguments: --name, --lang, --format, --module",
+        ),
       );
     }
     // Get file content
@@ -115,7 +126,9 @@ async function cmdLang(kwargs, screen) {
       this.getContext(),
     );
     if (!wizard_id) {
-      throw new Error("Can't create wizard record!");
+      throw new Error(
+        i18n.t('cmdLang.error.noWizard', "Can't create wizard record!"),
+      );
     }
 
     // Get action to export
@@ -128,7 +141,9 @@ async function cmdLang(kwargs, screen) {
       this.getContext(),
     );
     if (status) {
-      screen.print('Language file imported successfully');
+      screen.print(
+        i18n.t('cmdLang.result.success', 'Language file imported successfully'),
+      );
     }
     return status;
   } else if (kwargs.operation === 'list') {
@@ -144,7 +159,9 @@ async function cmdLang(kwargs, screen) {
     }
     return langs;
   }
-  throw new Error('Invalid operation!');
+  throw new Error(
+    i18n.t('cmdLang.error.invalidOperation', 'Invalid operation!'),
+  );
 }
 
 function getOptions(arg_name) {
@@ -173,16 +190,16 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Operations over translations',
+  definition: i18n.t('cmdLang.definition', 'Operations over translations'),
   callback: cmdLang,
   options: getOptions,
-  detail: 'Operations over translations.',
+  detail: i18n.t('cmdLang.detail', 'Operations over translations.'),
   args: [
     [
       ARG.String,
       ['o', 'operation'],
       true,
-      'The operation',
+      i18n.t('cmdLang.args.operation', 'The operation'),
       'export',
       ['export', 'import', 'list'],
     ],
@@ -190,28 +207,39 @@ export default {
       ARG.String,
       ['l', 'lang'],
       false,
-      "The language<br/>Can use '__new__' for new language (empty translation template)",
+      i18n.t(
+        'cmdLang.args.lang',
+        "The language<br/>Can use '__new__' for new language (empty translation template)",
+      ),
     ],
     [
       ARG.List | ARG.String,
       ['m', 'module'],
       false,
-      'The technical module name',
+      i18n.t('cmdLang.args.module', 'The technical module name'),
     ],
     [
       ARG.String,
       ['f', 'format'],
       false,
-      'The format to use',
+      i18n.t('cmdLang.args.format', 'The format to use'),
       'po',
       ['po', 'csv'],
     ],
-    [ARG.String, ['n', 'name'], false, 'The language name'],
+    [
+      ARG.String,
+      ['n', 'name'],
+      false,
+      i18n.t('cmdLang.args.name', 'The language name'),
+    ],
     [
       ARG.Flag,
       ['no', 'no-overwrite'],
       false,
-      'Flag to indicate dont overwrite current translations',
+      i18n.t(
+        'cmdLang.args.noOverwrite',
+        "Flag to indicate don't overwrite current translations",
+      ),
     ],
   ],
   example: '-o export -l en_US -m mail',

@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import renderMetadata from '@odoo/templates/metadata';
@@ -19,7 +20,12 @@ async function cmdMetadata(kwargs, screen) {
   )[0];
 
   if (typeof metadata === 'undefined') {
-    screen.print("Can't found any metadata for the given id");
+    screen.printError(
+      i18n.t(
+        'cmdMetadata.error.notFound',
+        "Can't found any metadata for the given id",
+      ),
+    );
   } else {
     screen.print(renderMetadata(metadata));
   }
@@ -42,13 +48,23 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'View record metadata',
+  definition: i18n.t('cmdMetadata.definition', 'View record metadata'),
   callback: cmdMetadata,
   options: getOptions,
-  detail: 'View record metadata',
+  detail: i18n.t('cmdMetadata.detail', 'View record metadata'),
   args: [
-    [ARG.String, ['m', 'model'], true, 'The record model'],
-    [ARG.Number, ['i', 'id'], true, 'The record id'],
+    [
+      ARG.String,
+      ['m', 'model'],
+      true,
+      i18n.t('cmdMetadata.args.model', 'The record model'),
+    ],
+    [
+      ARG.Number,
+      ['i', 'id'],
+      true,
+      i18n.t('cmdMetadata.args.id', 'The record id'),
+    ],
   ],
   example: '-m res.partner -i 1',
 };

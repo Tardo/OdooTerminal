@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import getParentAdapter from '@odoo/utils/get_parent_adapter';
 import getOdooService from '@odoo/utils/get_odoo_service';
@@ -43,7 +44,7 @@ async function cmdViewModelRecord(kwargs) {
   if (kwargs.id) {
     await doAction({
       type: 'ir.actions.act_window',
-      name: 'View Record',
+      name: i18n.t('cmdView.result.viewRecord', 'View Record'),
       res_model: kwargs.model,
       res_id: kwargs.id,
       views: [[false, 'form']],
@@ -55,12 +56,12 @@ async function cmdViewModelRecord(kwargs) {
   }
   return openSelectCreateDialog(
     kwargs.model,
-    'Select a record',
+    i18n.t('cmdView.result.selectRecord', 'Select a record'),
     [],
     records => {
       doAction({
         type: 'ir.actions.act_window',
-        name: 'View Record',
+        name: i18n.t('cmdView.result.viewRecord', 'View Record'),
         res_model: kwargs.model,
         res_id: records[0].id || records[0],
         views: [[false, 'form']],
@@ -87,14 +88,32 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'View model record/s',
+  definition: i18n.t('cmdView.definition', 'View model record/s'),
   callback: cmdViewModelRecord,
   options: getOptions,
-  detail: 'Open model record in form view or records in list view.',
+  detail: i18n.t(
+    'cmdView.detail',
+    'Open model record in form view or records in list view.',
+  ),
   args: [
-    [ARG.String, ['m', 'model'], true, 'The model technical name'],
-    [ARG.Number, ['i', 'id'], false, 'The record id'],
-    [ARG.String, ['r', 'ref'], false, 'The view reference name'],
+    [
+      ARG.String,
+      ['m', 'model'],
+      true,
+      i18n.t('cmdView.args.model', 'The model technical name'),
+    ],
+    [
+      ARG.Number,
+      ['i', 'id'],
+      false,
+      i18n.t('cmdView.args.id', 'The record id'),
+    ],
+    [
+      ARG.String,
+      ['r', 'ref'],
+      false,
+      i18n.t('cmdView.args.ref', 'The view reference name'),
+    ],
   ],
   example: '-m res.partner -i 10 -r base.view_partner_simple_form',
 };

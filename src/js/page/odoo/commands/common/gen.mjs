@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 
 async function cmdGen(kwargs, screen) {
@@ -36,15 +37,18 @@ async function cmdGen(kwargs, screen) {
 }
 
 export default {
-  definition: 'Generate random values',
+  definition: i18n.t('cmdGen.definition', 'Generate random values'),
   callback: cmdGen,
-  detail: "Generate numbers, strings, url's, dates, etc...",
+  detail: i18n.t(
+    'cmdGen.detail',
+    "Generate numbers, strings, url's, dates, etc...",
+  ),
   args: [
     [
       ARG.String,
       ['t', 'type'],
       true,
-      'Generator type',
+      i18n.t('cmdGen.args.type', 'Generator type'),
       'str',
       [
         'str',
@@ -61,8 +65,14 @@ export default {
         'url',
       ],
     ],
-    [ARG.Number, ['mi', 'min'], false, 'Min. value', 1],
-    [ARG.Number, ['ma', 'max'], false, 'Max. value'],
+    [
+      ARG.Number,
+      ['mi', 'min'],
+      false,
+      i18n.t('cmdGen.args.min', 'Min. value'),
+      1,
+    ],
+    [ARG.Number, ['ma', 'max'], false, i18n.t('cmdGen.args.max', 'Max. value')],
   ],
   example: '-t str -mi 2 -ma 4',
 };

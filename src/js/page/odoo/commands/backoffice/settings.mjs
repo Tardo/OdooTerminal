@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
@@ -34,16 +35,16 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Open settings page',
+  definition: i18n.t('cmdSettings.definition', 'Open settings page'),
   callback: cmdOpenSettings,
   options: getOptions,
-  detail: 'Open settings page.',
+  detail: i18n.t('cmdSettings.detail', 'Open settings page.'),
   args: [
     [
       ARG.String,
       ['m', 'module'],
       false,
-      'The module technical name',
+      i18n.t('cmdSettings.args.module', 'The module technical name'),
       'general_settings',
     ],
   ],

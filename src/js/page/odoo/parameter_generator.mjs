@@ -27,10 +27,10 @@ export default class ParameterGenerator {
           cur_char = characters.charAt(
             Math.floor(Math.random() * characters_length),
           );
-          ++cc_count;
+          cc_count = 0;
         } else {
           cur_char = vocals.charAt(Math.floor(Math.random() * vocals_length));
-          cc_count = 0;
+          ++cc_count;
         }
 
         if (count === 0 || last_char === ' ') {

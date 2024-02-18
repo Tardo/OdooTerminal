@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
@@ -25,7 +26,15 @@ async function cmdModuleDepends(kwargs, screen) {
   ).then(result => {
     let depend_names = [];
     if (isEmpty(result)) {
-      screen.printError(`The module '${kwargs.module}' isn't installed`);
+      screen.printError(
+        i18n.t(
+          'cmdDepends.error.notInstalled',
+          "The module '{{module}}' isn't installed",
+        ),
+        {
+          module: kwargs.module,
+        },
+      );
     } else {
       depend_names = result.warning.message
         .substr(result.warning.message.search('\n') + 1)
@@ -53,10 +62,23 @@ function getOptions(arg_name) {
 }
 
 export default {
-  definition: 'Know modules that depends on the given module',
+  definition: i18n.t(
+    'cmdDepends.definition',
+    'Know modules that depends on the given module',
+  ),
   callback: cmdModuleDepends,
   options: getOptions,
-  detail: 'Show a list of the modules that depends on the given module',
-  args: [[ARG.String, ['m', 'module'], false, 'The module technical name']],
+  detail: i18n.t(
+    'cmdDepends.detail',
+    'Show a list of the modules that depends on the given module',
+  ),
+  args: [
+    [
+      ARG.String,
+      ['m', 'module'],
+      false,
+      i18n.t('cmdDepends.args.module', 'The module technical name'),
+    ],
+  ],
   example: '-m base',
 };

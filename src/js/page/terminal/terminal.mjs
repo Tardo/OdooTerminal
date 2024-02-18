@@ -1,6 +1,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
+import logger from '@common/logger';
 import processKeybind from '@common/utils/process_keybind';
 import {KEYMAP} from '@trash/constants';
 import UnknownCommandError from '@trash/exceptions/unknown_command_error';
@@ -224,10 +226,16 @@ export default class Terminal {
   registerCommand(cmd, cmd_def) {
     this.#registeredCmds[cmd] = Object.assign(
       {
-        definition: 'Undefined command',
+        definition: i18n.t(
+          'terminal.cmd.default.definition',
+          'Undefined command',
+        ),
         callback: this.#fallbackExecuteCommand,
         options: this.#fallbackCommandOptions,
-        detail: "This command hasn't a properly detailed information",
+        detail: i18n.t(
+          'terminal.cmd.default.detail',
+          "This command hasn't a properly detailed information",
+        ),
         args: [],
         secured: false,
         aliases: [],
@@ -389,7 +397,7 @@ export default class Terminal {
       }
       this.screen.printError(err_msg, true);
       if (this.#config.console_errors) {
-        console.error(err);
+        logger.error('core', err);
       }
       throw err;
     }
@@ -416,7 +424,7 @@ export default class Terminal {
         }
       }
     } else {
-      throw new Error('Terminal not loaded');
+      throw new Error(i18n.t('terminal.notLoaded', 'Terminal not loaded'));
     }
   }
 
@@ -512,7 +520,12 @@ export default class Terminal {
   }
 
   async #fallbackExecuteCommand() {
-    throw new Error('Invalid command definition!');
+    throw new Error(
+      i18n.t(
+        'terminal.cmd.error.invalidDefinition',
+        'Invalid command definition!',
+      ),
+    );
   }
 
   #fallbackCommandOptions() {
@@ -526,9 +539,17 @@ export default class Terminal {
     const count = this.#jobs.filter(Object).length;
     if (count) {
       const count_unhealthy = this.#jobs.filter(item => !item.healthy).length;
-      let str_info = `Running ${count} command(s)`;
+      let str_info = i18n.t(
+        'terminal.info.job.running',
+        'Running {{count}} command(s)',
+        {count},
+      );
       if (count_unhealthy) {
-        str_info += ` (${count_unhealthy} unhealthy)`;
+        str_info += i18n.t(
+          'terminal.info.job.unhealthy',
+          ' ({{count_unhealthy}} unhealthy)',
+          {count: count_unhealthy},
+        );
       }
       str_info += '...';
       this.$runningCmdCount.html(str_info).show();
@@ -574,7 +595,12 @@ export default class Terminal {
   async #processCommandJob(command_info, silent = false) {
     const job_index = this.onStartCommand(command_info);
     if (job_index === -1) {
-      throw new Error("Unexpected error: can't initialize the job!");
+      throw new Error(
+        i18n.t(
+          'terminal.error.notInitJob',
+          "Unexpected error: can't initialize the job!",
+        ),
+      );
     }
     let result = false;
     let error = false;
@@ -596,7 +622,10 @@ export default class Terminal {
       is_failed = true;
       error =
         err?.message ||
-        '[!] Oops! Unknown error! (no detailed error message given :/)';
+        i18n.t(
+          'terminal.error.unknown',
+          '[!] Oops! Unknown error! (no detailed error message given :/)',
+        );
     } finally {
       this.onFinishCommand(job_index, is_failed, error || result);
     }
@@ -859,7 +888,10 @@ export default class Terminal {
     } else if (ev.keyCode === keyCode.ENTER) {
       this.screen.responseQuestion(question_active, ev.target.value);
     } else if (ev.keyCode === keyCode.ESCAPE) {
-      this.screen.rejectQuestion(question_active, 'Operation aborted');
+      this.screen.rejectQuestion(
+        question_active,
+        i18n.t('terminal.question.aborted', 'Operation aborted'),
+      );
       ev.preventDefault();
     }
   }
@@ -910,7 +942,10 @@ export default class Terminal {
       ev.preventDefault();
       ev.returnValue = '';
       this.screen.print(
-        'The terminal has prevented the current tab from closing due to unfinished tasks:',
+        i18n.t(
+          'terminal.close.prevented',
+          'The terminal has prevented the current tab from closing due to unfinished tasks:',
+        ),
       );
       this.screen.print(
         jobs.map(

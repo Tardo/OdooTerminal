@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import rpcQuery from '@odoo/rpc';
 import callService from '@odoo/osv/call_service';
 import getOdooSession from '@odoo/utils/get_odoo_session';
@@ -26,7 +27,13 @@ async function cmdShowDBList(kwargs, screen) {
           return database;
         }
       } else if (database === session.db) {
-        s_databases.push(`<strong>${database}</strong> (Active Database)`);
+        s_databases.push(
+          i18n.t(
+            'cmdDBList.result.activeDatabase',
+            '<strong>{{database}}</strong> (Active Database)',
+            {database},
+          ),
+        );
       } else {
         s_databases.push(database);
       }
@@ -70,15 +77,18 @@ async function cmdShowDBList(kwargs, screen) {
 }
 
 export default {
-  definition: 'Show database names',
+  definition: i18n.t('cmdDBList.definition', 'Show database names'),
   callback: cmdShowDBList,
-  detail: 'Show database names',
+  detail: i18n.t('cmdDBList.detail', 'Show database names'),
   args: [
     [
       ARG.Flag,
       ['oa', 'only-active'],
       false,
-      'Indicates that only print the active database name',
+      i18n.t(
+        'cmdDBList.args.onlyActive',
+        'Indicates that only print the active database name',
+      ),
     ],
   ],
 };

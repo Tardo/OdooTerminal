@@ -1,11 +1,17 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import searchRead from '@odoo/orm/search_read';
 
 async function cmdLastSeen(kwargs, screen) {
   if (!this.longpolling) {
-    throw new Error("Can't use lastseen, 'bus' module is not installed");
+    throw new Error(
+      i18n.t(
+        'cmdLastSeen.error.notAvailable',
+        "Can't use lastseen, 'bus' module is not installed",
+      ),
+    );
   }
   return searchRead(
     'bus.presence',
@@ -27,13 +33,20 @@ async function cmdLastSeen(kwargs, screen) {
         record.last_presence,
       );
     }
-    screen.printTable(['User Name', 'User ID', 'Last Seen'], rows);
+    screen.printTable(
+      [
+        i18n.t('cmdLastSeen.table.userName', 'User Name'),
+        i18n.t('cmdLastSeen.table.userID', 'User ID'),
+        i18n.t('cmdLastSeen.table.lastSeen', 'Last Seen'),
+      ],
+      rows,
+    );
     return result;
   });
 }
 
 export default {
-  definition: 'Know user presence',
+  definition: i18n.t('cmdLastSeen.definition', 'Know user presence'),
   callback: cmdLastSeen,
-  detail: 'Show users last seen',
+  detail: i18n.t('cmdLastSeen.detail', 'Show users last seen'),
 };

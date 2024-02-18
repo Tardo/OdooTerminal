@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import searchRead from '@odoo/orm/search_read';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import renderWhoami from '@odoo/templates/whoami';
@@ -23,7 +24,9 @@ async function cmdShowWhoAmI(kwargs, screen) {
     this.getContext(),
   );
   if (!result.length) {
-    throw new Error("Oops! can't get the login :/");
+    throw new Error(
+      i18n.t('cmdWhoami.error.noLogin', "Oops! can't get the login :/"),
+    );
   }
   const record = result[0];
   const result_tasks = await Promise.all([
@@ -74,7 +77,7 @@ async function cmdShowWhoAmI(kwargs, screen) {
 }
 
 export default {
-  definition: 'Know current user login',
+  definition: i18n.t('cmdWhoami.definition', 'Know current user login'),
   callback: cmdShowWhoAmI,
-  detail: 'Shows current user login',
+  detail: i18n.t('cmdWhoami.detail', 'Shows current user login'),
 };

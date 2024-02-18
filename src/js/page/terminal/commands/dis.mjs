@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import {ARG, INSTRUCTION_TYPE} from '@trash/constants';
 
 async function cmdDis(kwargs, screen) {
@@ -39,21 +40,23 @@ async function cmdDis(kwargs, screen) {
   }
   screen.printTable(
     [
-      'Instr. Name',
-      'Instr. Code',
-      'Name/Value/Argument',
-      'Data Index',
-      'Level',
-      'Token',
+      i18n.t('cmdDis.table.instrName', 'Instr. Name'),
+      i18n.t('cmdDis.table.instrCode', 'Instr. Code'),
+      i18n.t('cmdDis.table.value', 'Name/Value/Argument'),
+      i18n.t('cmdDis.table.dataIndex', 'Data Index'),
+      i18n.t('cmdDis.table.level', 'Level'),
+      i18n.t('cmdDis.table.token', 'Token'),
     ],
     rows,
   );
 }
 
 export default {
-  definition: 'Dissasembler bytecode',
+  definition: i18n.t('cmdDis.definition', 'Dissasembler bytecode'),
   callback: cmdDis,
-  detail: 'Shows the bytecode generated for the input',
-  args: [[ARG.String, ['c', 'code'], true, 'TraSH Code']],
+  detail: i18n.t('cmdDis.detail', 'Shows the bytecode generated for the input'),
+  args: [
+    [ARG.String, ['c', 'code'], true, i18n.t('cmdDis.args.code', 'TraSH Code')],
+  ],
   example: "-c \"print $var[0]['key'] + ' -> ' + 1234\"",
 };

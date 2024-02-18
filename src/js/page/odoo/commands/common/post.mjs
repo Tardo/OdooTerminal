@@ -1,6 +1,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import i18n from 'i18next';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import {ARG} from '@trash/constants';
 
@@ -29,13 +30,25 @@ async function cmdPostData(kwargs, screen) {
 }
 
 export default {
-  definition: 'Send POST request',
+  definition: i18n.t('cmdPost.definition', 'Send POST request'),
   callback: cmdPostData,
-  detail: 'Send POST request to selected endpoint',
+  detail: i18n.t('cmdPost.detail', 'Send POST request to selected endpoint'),
   args: [
-    [ARG.String, ['e', 'endpoint'], true, 'The endpoint'],
-    [ARG.Any, ['d', 'data'], true, 'The data'],
-    [ARG.String, ['m', 'mode'], false, 'The mode', 'odoo', ['odoo', 'raw']],
+    [
+      ARG.String,
+      ['e', 'endpoint'],
+      true,
+      i18n.t('cmdPost.args.endpoit', 'The endpoint'),
+    ],
+    [ARG.Any, ['d', 'data'], true, i18n.t('cmdPost.args.data', 'The data')],
+    [
+      ARG.String,
+      ['m', 'mode'],
+      false,
+      i18n.t('cmdPost.args.mode', 'The mode'),
+      'odoo',
+      ['odoo', 'raw'],
+    ],
   ],
   example: '-e /web/endpoint -d {the_example: 42}',
 };
