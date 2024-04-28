@@ -1,12 +1,16 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type Terminal from '@odoo/terminal';
 
-async function cmdGen(kwargs, screen) {
+async function cmdGen(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const type = kwargs.type.toLowerCase();
-  let result = false;
+  let result: mixed = false;
   if (type === 'email') {
     result = this.parameterGenerator.generateEmail(kwargs.min, kwargs.max);
   } else if (type === 'url') {
@@ -32,47 +36,27 @@ async function cmdGen(kwargs, screen) {
   } else if (type === 'datetime') {
     result = this.parameterGenerator.generateDateTime(kwargs.min, kwargs.max);
   }
-  screen.print(result);
+  ctx.screen.print(result);
   return result;
 }
 
-export default {
-  definition: i18n.t('cmdGen.definition', 'Generate random values'),
-  callback: cmdGen,
-  detail: i18n.t(
-    'cmdGen.detail',
-    "Generate numbers, strings, url's, dates, etc...",
-  ),
-  args: [
-    [
-      ARG.String,
-      ['t', 'type'],
-      true,
-      i18n.t('cmdGen.args.type', 'Generator type'),
-      'str',
+export default function (): Partial<CMDDef> {
+  return {
+    definition: i18n.t('cmdGen.definition', 'Generate random values'),
+    callback: cmdGen,
+    detail: i18n.t('cmdGen.detail', "Generate numbers, strings, url's, dates, etc..."),
+    args: [
       [
+        ARG.String,
+        ['t', 'type'],
+        true,
+        i18n.t('cmdGen.args.type', 'Generator type'),
         'str',
-        'float',
-        'int',
-        'intseq',
-        'date',
-        'tzdate',
-        'time',
-        'tztime',
-        'datetime',
-        'tzdatetime',
-        'email',
-        'url',
+        ['str', 'float', 'int', 'intseq', 'date', 'tzdate', 'time', 'tztime', 'datetime', 'tzdatetime', 'email', 'url'],
       ],
+      [ARG.Number, ['mi', 'min'], false, i18n.t('cmdGen.args.min', 'Min. value'), 1],
+      [ARG.Number, ['ma', 'max'], false, i18n.t('cmdGen.args.max', 'Max. value')],
     ],
-    [
-      ARG.Number,
-      ['mi', 'min'],
-      false,
-      i18n.t('cmdGen.args.min', 'Min. value'),
-      1,
-    ],
-    [ARG.Number, ['ma', 'max'], false, i18n.t('cmdGen.args.max', 'Max. value')],
-  ],
-  example: '-t str -mi 2 -ma 4',
-};
+    example: '-t str -mi 2 -ma 4',
+  };
+}

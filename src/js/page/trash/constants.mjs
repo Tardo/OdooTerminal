@@ -1,3 +1,4 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -31,14 +32,7 @@ export const LEXER = {
   In: 27,
 };
 
-export const LEXER_MATH_OPER = [
-  LEXER.Add,
-  LEXER.Substract,
-  LEXER.Multiply,
-  LEXER.Divide,
-  LEXER.Modulo,
-  LEXER.Pow,
-];
+export const LEXER_MATH_OPER = [LEXER.Add, LEXER.Substract, LEXER.Multiply, LEXER.Divide, LEXER.Modulo, LEXER.Pow];
 
 export const LEXERDATA = [
   LEXER.Variable,
@@ -52,7 +46,7 @@ export const LEXERDATA = [
   LEXER.Math,
 ];
 
-export const LEXERDATA_EXTENDED = LEXERDATA.concat([
+export const LEXERDATA_EXTENDED: Array<number> = LEXERDATA.concat([
   LEXER.DataAttribute,
   LEXER.Negative,
   LEXER.Positive,
@@ -85,8 +79,9 @@ export const INSTRUCTION_TYPE = {
   GET_ITER: 24,
   FOR_ITER: 25,
 
-  getHumanType: function (type) {
-    return Object.entries(this).find(item => item[1] === type) || '';
+  getHumanType: function (type: number): string {
+    const res = Object.entries(INSTRUCTION_TYPE).find(item => item[1] === type);
+    return res ? res[0] : '';
   },
 };
 
@@ -117,7 +112,12 @@ export const INSTRUCTION_TYPE = {
 //     ],
 // };
 
-export const ARG = {
+export const ARG: {
+  +[string]: number,
+  getHumanType: (atype: number) => string,
+  getType: (val: mixed) => number,
+  cast: (val: mixed, atype: number) => mixed,
+} = {
   String: 1 << 0,
   Number: 1 << 1,
   Dictionary: 1 << 2,
@@ -125,47 +125,48 @@ export const ARG = {
   Any: 1 << 4,
   List: 1 << 5,
 
-  getHumanType: function (atype) {
+  getHumanType: function (atype: number): string {
     const nmix_type = atype & ~ARG.List;
     const utypes = [];
-    const entries = Object.entries(this);
+    const entries = Object.entries(ARG);
     for (const entry of entries) {
-      if ((entry[1] & nmix_type) === nmix_type) {
+      if (typeof entry[1] === 'number' && (entry[1] & nmix_type) === nmix_type) {
         utypes.push(entry[0].toUpperCase());
       }
     }
-    if ((atype & this.List) === this.List) {
+    if ((atype & ARG.List) === ARG.List) {
       return `LIST OF ${utypes.join(' or ')}`;
     }
     return utypes.join(' or ');
   },
-  getType: function (val) {
-    const val_constructor = val.constructor;
-    if (val_constructor === String) {
-      return this.String;
-    } else if (val_constructor === Number) {
-      return this.Number;
-    } else if (val_constructor === Object) {
-      return this.Dictionary;
-    } else if (val_constructor === Boolean) {
-      return this.Flag;
-    } else if (val_constructor === Array) {
-      return this.List;
+  getType: function (val: mixed): number {
+    const val_typeof = typeof val;
+    if (val_typeof === 'string') {
+      return ARG.String;
+    } else if (val_typeof === 'number') {
+      return ARG.Number;
+    } else if (val_typeof === 'boolean') {
+      return ARG.Flag;
+    } else if (val instanceof Array) {
+      return ARG.List;
+    } else if (val_typeof === 'object') {
+      return ARG.Dictionary;
     }
-    return this.Any;
+    return ARG.Any;
   },
-  cast: function (val, atype) {
-    const val_constructor = val.constructor;
-    if (atype === this.String && val_constructor !== String) {
+  cast: function (val: mixed, atype: number): mixed {
+    const val_typeof = typeof val;
+    if (atype === ARG.String && val_typeof !== 'string') {
       return String(val);
-    } else if (atype === this.Number && val_constructor !== Number) {
+    } else if (atype === ARG.Number && val_typeof !== 'number') {
       return Number(val);
-    } else if (atype === this.Dictionary && val_constructor !== Object) {
-      return Object.fromEntries(val);
-    } else if (atype === this.Flag && val_constructor !== Boolean) {
+    } else if (atype === ARG.Flag && val_typeof !== 'boolean') {
       return Boolean(val);
-    } else if (atype === this.List && val_constructor !== Array) {
+    } else if (atype === ARG.List && !(val_typeof instanceof Array)) {
       return [val];
+    } else if (atype === ARG.Dictionary && val_typeof !== 'object') {
+      // $FlowIgnore
+      return Object.fromEntries((val: Array<[mixed, mixed]>));
     }
     return val;
   },

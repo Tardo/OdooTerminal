@@ -1,4 +1,6 @@
 {
+  "No": "",
+  "Yes": "",
   "cmdAction": {
     "args": {
       "action": "The action to launch<br/>Can be an string, number or object",
@@ -333,13 +335,11 @@
   },
   "cmdLoad": {
     "args": {
+      "type": "The type of the asset",
       "url": "The URL of the asset"
     },
     "definition": "Load external resource",
-    "detail": "Load external source (javascript & css)",
-    "error": {
-      "invalidFileType": "Invalid file type"
-    }
+    "detail": "Load external source (javascript & css)"
   },
   "cmdLogin": {
     "args": {
@@ -432,8 +432,8 @@
     "args": {
       "msg": "The message to print"
     },
-    "definition": "Print a message",
-    "detail": "Eval parameters and print the result."
+    "definition": "Close terminal",
+    "detail": "Close the terminal."
   },
   "cmdRead": {
     "args": {
@@ -747,10 +747,15 @@
       "invalidInstructionError": "Invalid instruction",
       "invalidNameError": "Invalid name '{{vname}}' at {{start}}:{{end}}",
       "invalidTokenError": "Invalid token '{{vname}}' at {{start}}:{{end}}",
+      "invalidValueError": "Invalid value '{{value}}'",
       "notExpectedCommandArgumentError": "Argument '{{arg_name}}' not expected at {{start}}:{{end}}",
-      "undefinedValueError": "Cannot read properties of undefined (reading '{{vname}}')",
       "unknownCommandError": "Unknown Command '{{cmd_name}}' at {{start}}:{{end}}",
       "unknownNameError": "Unknown name '{{vname}}' at {{start}}:{{end}}"
+    }
+  },
+  "utilInjectResource": {
+    "error": {
+      "invalidType": "Invalid resource type"
     }
   }
 }

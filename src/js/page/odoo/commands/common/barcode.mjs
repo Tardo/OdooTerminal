@@ -1,11 +1,14 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import i18n from 'i18next';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import asyncSleep from '@terminal/utils/async_sleep';
 import {ARG} from '@trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
 const AVAILABLE_BARCODE_COMMANDS = [
   'O-CMD.EDIT',
@@ -17,9 +20,9 @@ const AVAILABLE_BARCODE_COMMANDS = [
   'O-CMD.PAGER-LAST',
 ];
 
-function getBarcodeEvent(data) {
+function getBarcodeEvent(data: string) {
   const OdooVerMajor = getOdooVersion('major');
-  if (OdooVerMajor >= 16) {
+  if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 16) {
     return new KeyboardEvent('keydown', {
       key: data,
     });
@@ -31,87 +34,51 @@ function getBarcodeEvent(data) {
   });
 }
 
-function getBarcodeInfo(barcodeService) {
+// $FlowFixMe
+function getBarcodeInfo(barcodeService: Object) {
   const OdooVerMajor = getOdooVersion('major');
-  if (OdooVerMajor >= 16) {
+  if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 16) {
     return [
-      i18n.t(
-        'cmdBarcode.result.maxTimeBetweenKeysInMs',
-        'Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}',
-        {
-          maxTimeBetweenKeysInMs:
-            barcodeService.barcodeService.maxTimeBetweenKeysInMs,
-        },
-      ),
-      i18n.t(
-        'cmdBarcode.result.reservedPrefixes',
-        'Reserved barcode prefixes: {{prefixes}}',
-        {
-          prefixes: 'O-BTN., O-CMD.',
-        },
-      ),
-      i18n.t(
-        'cmdBarcode.result.availableCommands',
-        'Available commands: {{availableCommands}}',
-        {
-          availableCommands: AVAILABLE_BARCODE_COMMANDS.join(', '),
-        },
-      ),
+      i18n.t('cmdBarcode.result.maxTimeBetweenKeysInMs', 'Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}', {
+        maxTimeBetweenKeysInMs: barcodeService.barcodeService.maxTimeBetweenKeysInMs,
+      }),
+      i18n.t('cmdBarcode.result.reservedPrefixes', 'Reserved barcode prefixes: {{prefixes}}', {
+        prefixes: 'O-BTN., O-CMD.',
+      }),
+      i18n.t('cmdBarcode.result.availableCommands', 'Available commands: {{availableCommands}}', {
+        availableCommands: AVAILABLE_BARCODE_COMMANDS.join(', '),
+      }),
     ];
   }
   return [
-    i18n.t(
-      'cmdBarcode.result.maxTimeBetweenKeysInMs',
-      'Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}',
-      {
-        maxTimeBetweenKeysInMs:
-          barcodeService.BarcodeEvents.max_time_between_keys_in_ms,
-      },
-    ),
-    i18n.t(
-      'cmdBarcode.result.reservedPrefixes',
-      'Reserved barcode prefixes: {{prefixes}}',
-      {
-        prefixes: arcodeService.ReservedBarcodePrefixes.join(', '),
-      },
-    ),
-    i18n.t(
-      'cmdBarcode.result.availableCommands',
-      'Available commands: {{availableCommands}}',
-      {
-        availableCommands: AVAILABLE_BARCODE_COMMANDS.join(', '),
-      },
-    ),
-    i18n.t(
-      'cmdBarcode.result.acceptScan',
-      'Currently accepting barcode scanning? {{isAcceptingScan}}',
-      {
-        isAcceptingScan:
-          barcodeService.BarcodeEvents.$barcodeInput.length > 0 ? 'Yes' : 'No',
-      },
-    ),
+    i18n.t('cmdBarcode.result.maxTimeBetweenKeysInMs', 'Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}', {
+      maxTimeBetweenKeysInMs: barcodeService.BarcodeEvents.max_time_between_keys_in_ms,
+    }),
+    i18n.t('cmdBarcode.result.reservedPrefixes', 'Reserved barcode prefixes: {{prefixes}}', {
+      prefixes: barcodeService.ReservedBarcodePrefixes.join(', '),
+    }),
+    i18n.t('cmdBarcode.result.availableCommands', 'Available commands: {{availableCommands}}', {
+      availableCommands: AVAILABLE_BARCODE_COMMANDS.join(', '),
+    }),
+    i18n.t('cmdBarcode.result.acceptScan', 'Currently accepting barcode scanning? {{isAcceptingScan}}', {
+      isAcceptingScan: barcodeService.BarcodeEvents.$barcodeInput.length > 0 ? 'Yes' : 'No',
+    }),
   ];
 }
 
-async function cmdBarcode(kwargs, screen) {
-  const barcodeService = getOdooService(
-    'barcodes.BarcodeEvents',
-    '@barcodes/barcode_service',
-  );
+async function cmdBarcode(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
+  const barcodeService = getOdooService('barcodes.BarcodeEvents', '@barcodes/barcode_service');
   if (!barcodeService) {
     // Soft-dependency... this don't exists if barcodes module is not installed
-    screen.printError(
-      i18n.t(
-        'cmdBarcode.error.moudeNotAvailable',
-        "The 'barcode' module is not installed/available",
-      ),
+    ctx.screen.printError(
+      i18n.t('cmdBarcode.error.moudeNotAvailable', "The 'barcode' module is not installed/available"),
     );
     return;
   }
 
   if (kwargs.operation === 'info') {
     const info = getBarcodeInfo(barcodeService);
-    screen.eprint(info);
+    ctx.screen.eprint(info);
     return info;
   } else if (kwargs.operation === 'send') {
     if (!kwargs.data) {
@@ -120,61 +87,47 @@ async function cmdBarcode(kwargs, screen) {
 
     for (const barcode of kwargs.data) {
       for (let i = 0, bardoce_len = barcode.length; i < bardoce_len; i++) {
-        document.body.dispatchEvent(getBarcodeEvent(barcode[i]));
+        document.body?.dispatchEvent(getBarcodeEvent(barcode[i]));
         await asyncSleep(kwargs.pressdelay);
       }
       await asyncSleep(kwargs.barcodedelay);
     }
   } else {
-    throw new Error(
-      i18n.t('cmdBarcode.error.invalidOperation', 'Invalid operation!'),
-    );
+    throw new Error(i18n.t('cmdBarcode.error.invalidOperation', 'Invalid operation!'));
   }
   return kwargs.data;
 }
 
-export default {
-  definition: i18n.t('cmdBarcode.definition', 'Operations over barcode'),
-  callback: cmdBarcode,
-  detail: i18n.t(
-    'cmdBarcode.detail',
-    'See information and send barcode strings',
-  ),
-  args: [
-    [
-      ARG.String,
-      ['o', 'operation'],
-      false,
-      i18n.t('cmdBarcode.args.operation', 'The operation'),
-      'send',
-      ['send', 'info'],
+export default function (): Partial<CMDDef> {
+  return {
+    definition: i18n.t('cmdBarcode.definition', 'Operations over barcode'),
+    callback: cmdBarcode,
+    detail: i18n.t('cmdBarcode.detail', 'See information and send barcode strings'),
+    args: [
+      [
+        ARG.String,
+        ['o', 'operation'],
+        false,
+        i18n.t('cmdBarcode.args.operation', 'The operation'),
+        'send',
+        ['send', 'info'],
+      ],
+      [ARG.List | ARG.Any, ['d', 'data'], false, i18n.t('cmdBarcode.args.data', 'The data to send')],
+      [
+        ARG.Number,
+        ['pd', 'pressdelay'],
+        false,
+        i18n.t('cmdBarcode.args.pressDelay', 'The delay between presskey events (in ms)'),
+        3,
+      ],
+      [
+        ARG.Number,
+        ['bd', 'barcodedelay'],
+        false,
+        i18n.t('cmdBarcode.args.barcodeDelay', 'The delay between barcodes reads (in ms)'),
+        150,
+      ],
     ],
-    [
-      ARG.List | ARG.Any,
-      ['d', 'data'],
-      false,
-      i18n.t('cmdBarcode.args.data', 'The data to send'),
-    ],
-    [
-      ARG.Number,
-      ['pd', 'pressdelay'],
-      false,
-      i18n.t(
-        'cmdBarcode.args.pressDelay',
-        'The delay between presskey events (in ms)',
-      ),
-      3,
-    ],
-    [
-      ARG.Number,
-      ['bd', 'barcodedelay'],
-      false,
-      i18n.t(
-        'cmdBarcode.args.barcodeDelay',
-        'The delay between barcodes reads (in ms)',
-      ),
-      150,
-    ],
-  ],
-  example: '-o send -d O-CMD.NEXT',
-};
+    example: '-o send -d O-CMD.NEXT',
+  };
+}

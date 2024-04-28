@@ -1,8 +1,9 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 // See https://stackoverflow.com/a/7616484
-export default function (text) {
+export default function (text: string): number {
   let hash = 0;
   const len = text.length;
   for (let i = 0; i < len; ++i) {

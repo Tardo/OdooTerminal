@@ -1,9 +1,10 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {COMPATIBLE_VERSIONS} from '@common/constants.mjs';
 
-export default function (version) {
+export default function (version: string): boolean {
   if (!version) {
     // This can happens due to a service worker malfunction or by a modified controller
     return false;

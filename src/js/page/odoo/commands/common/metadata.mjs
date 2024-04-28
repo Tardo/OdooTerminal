@@ -1,38 +1,48 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import renderMetadata from '@odoo/templates/metadata';
 import {ARG} from '@trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type Terminal from '@odoo/terminal';
 
-async function cmdMetadata(kwargs, screen) {
+type MetadataInfo = {
+  create_uid: number,
+  create_date: string,
+  write_uid: number,
+  write_date: string,
+  noupdate: boolean,
+  xmlid: string,
+};
+
+async function cmdMetadata(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const metadata = (
-    await callModelMulti(
-      kwargs.model,
-      [kwargs.id],
-      'get_metadata',
-      null,
-      null,
-      this.getContext(),
-    )
+    await callModelMulti<MetadataInfo>(kwargs.model, [kwargs.id], 'get_metadata', null, null, this.getContext())
   )[0];
 
   if (typeof metadata === 'undefined') {
-    screen.printError(
-      i18n.t(
-        'cmdMetadata.error.notFound',
-        "Can't found any metadata for the given id",
+    ctx.screen.printError(i18n.t('cmdMetadata.error.notFound', "Can't found any metadata for the given id"));
+  } else {
+    ctx.screen.print(
+      renderMetadata(
+        metadata.create_uid,
+        metadata.create_date,
+        metadata.write_uid,
+        metadata.write_date,
+        metadata.noupdate,
+        metadata.xmlid,
       ),
     );
-  } else {
-    screen.print(renderMetadata(metadata));
   }
   return metadata;
 }
 
-function getOptions(arg_name) {
+function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
@@ -40,31 +50,22 @@ function getOptions(arg_name) {
       [],
       ['model'],
       this.getContext({active_test: true}),
-      null,
       item => item.model,
     );
   }
   return Promise.resolve([]);
 }
 
-export default {
-  definition: i18n.t('cmdMetadata.definition', 'View record metadata'),
-  callback: cmdMetadata,
-  options: getOptions,
-  detail: i18n.t('cmdMetadata.detail', 'View record metadata'),
-  args: [
-    [
-      ARG.String,
-      ['m', 'model'],
-      true,
-      i18n.t('cmdMetadata.args.model', 'The record model'),
+export default function (): Partial<CMDDef> {
+  return {
+    definition: i18n.t('cmdMetadata.definition', 'View record metadata'),
+    callback: cmdMetadata,
+    options: getOptions,
+    detail: i18n.t('cmdMetadata.detail', 'View record metadata'),
+    args: [
+      [ARG.String, ['m', 'model'], true, i18n.t('cmdMetadata.args.model', 'The record model')],
+      [ARG.Number, ['i', 'id'], true, i18n.t('cmdMetadata.args.id', 'The record id')],
     ],
-    [
-      ARG.Number,
-      ['i', 'id'],
-      true,
-      i18n.t('cmdMetadata.args.id', 'The record id'),
-    ],
-  ],
-  example: '-m res.partner -i 1',
-};
+    example: '-m res.partner -i 1',
+  };
+}

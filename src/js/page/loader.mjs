@@ -1,8 +1,12 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import '@css/terminal.css';
+// $FlowIgnore
 import i18n from 'i18next';
+// $FlowIgnore
 import HttpApi from 'i18next-http-backend';
 import postMessage from '@common/utils/post_message';
 import logger from '@common/logger';
@@ -15,13 +19,22 @@ import getUsername from '@odoo/utils/get_username';
 import isBackOffice from '@odoo/utils/is_backoffice';
 import registerCoreFuncs from '@terminal/commands/__all__';
 import OdooTerminalTests from '@tests/terminal';
+import type {TerminalOptions} from '@terminal/terminal';
+import type {InputInfo} from '@terminal/core/screen';
 
-let terminal = null;
-function getTerminalObj() {
+export type LoaderConfig = {
+  config: {[string]: mixed},
+  info: {[string]: mixed},
+  langpath: string,
+};
+
+let terminal;
+function getTerminalObj(): OdooTerminal | void {
   if (terminal) {
     return terminal;
   }
 
+  // $FlowIgnore: 'webdriver' is used by selenium
   const load_tests = window.__OdooTerminal?.load_tests || navigator.webdriver;
   if (load_tests) {
     logger.info('loader', i18n.t('loader.testsEnabled', 'Tests Enabled'));
@@ -29,31 +42,31 @@ function getTerminalObj() {
   try {
     const TerminalClass = load_tests ? OdooTerminalTests : OdooTerminal;
     terminal = new TerminalClass();
-    registerCoreFuncs(terminal);
-    registerCommonFuncs(terminal);
   } catch (err) {
-    logger.warn(
-      'loader',
-      i18n.t('loader.cantInitTerm', "Can't initilize terminal"),
-      err,
-    );
+    logger.warn('loader', i18n.t('loader.cantInitTerm', "Can't initilize terminal"), err);
   }
   return terminal;
 }
 
-function initTerminal(config, info) {
+function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   window.__OdooTerminal = {
     raw_server_info: info,
     load_tests: config.devmode_tests,
   };
   const term_obj = getTerminalObj();
   if (term_obj) {
+    registerCoreFuncs(term_obj);
+    registerCommonFuncs(term_obj);
     if (isBackOffice()) {
       registerBackofficeFuncs(term_obj);
     }
     term_obj.init(config);
-    const vals = {
-      version: getOdooVersion(),
+    let odoo_ver = getOdooVersion();
+    if (typeof odoo_ver !== 'string') {
+      odoo_ver = 'unknown';
+    }
+    const vals: Partial<InputInfo> = {
+      version: odoo_ver,
     };
     const username = getUsername();
     const uid = getUID();
@@ -64,7 +77,7 @@ function initTerminal(config, info) {
   }
 }
 
-function initTranslations(langpath) {
+function initTranslations(langpath: string) {
   return i18n.use(HttpApi).init({
     lng: navigator.language.replace('-', '_'),
     fallbackLng: 'en',
@@ -79,19 +92,20 @@ function initTranslations(langpath) {
 
 function onToggleTerminal() {
   if (typeof window.__OdooTerminal !== 'undefined') {
-    getTerminalObj().doToggle();
+    getTerminalObj()?.doToggle();
   }
 }
 
-function onWindowMessage(ev) {
+function onWindowMessage(ev: MessageEvent) {
   if (ev.source !== window) {
     return;
   }
 
-  if (ev.data.type === 'ODOO_TERM_CONFIG') {
-    initTranslations(ev.data.langpath).then(() =>
-      initTerminal(ev.data.config, ev.data.info),
-    );
+  if (ev.data !== null && typeof ev.data === 'object') {
+    if (ev.data.type === 'ODOO_TERM_CONFIG') {
+      // $FlowFixMe
+      initTranslations(ev.data.langpath).then(() => initTerminal(ev.data.config, ev.data.info));
+    }
   }
 }
 
@@ -99,4 +113,4 @@ window.addEventListener('toggle_terminal', onToggleTerminal);
 window.addEventListener('message', onWindowMessage, true);
 // This is used to communicate to the extension that the widget
 // was initialized successfully.
-postMessage('ODOO_TERM_START');
+postMessage('ODOO_TERM_START', {});

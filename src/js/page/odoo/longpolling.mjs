@@ -1,42 +1,47 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {
-  getStorageItem,
-  removeStorageItem,
-  setStorageItem,
-} from '@terminal/core/storage/local';
+import {getStorageItem, removeStorageItem, setStorageItem} from '@terminal/core/storage/local';
 import doCall from './base/do_call';
 import getOdooEnv from './utils/get_odoo_env';
 import getOdooService from './utils/get_odoo_service';
 import getOdooVersion from './utils/get_odoo_version';
+import type OdooTerminal from '@odoo/terminal';
 
 export default class Longpolling {
-  #terminal = null;
+  #terminal: OdooTerminal;
 
-  constructor(terminal) {
+  constructor(terminal: OdooTerminal) {
     this.#terminal = terminal;
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor <= 11) {
-      this.#getBusService().on('notification', this, this.#onBusNotification);
-    } else if (OdooVerMajor >= 16) {
-      this.#busServ(
-        'addEventListener',
-        'notification',
-        this.#onBusNotification.bind(this),
+    let has_listener = false;
+    if (typeof OdooVerMajor === 'number') {
+      if (OdooVerMajor <= 11) {
+        // $FlowFixMe
+        this.#getBusService().on('notification', this, this.#onBusNotification.bind(this));
+        has_listener = true;
+      } else if (OdooVerMajor >= 16) {
+        // $FlowFixMe
+        this.#busServ('addEventListener', 'notification', this.#onBusNotification.bind(this));
+        has_listener = true;
+      }
+    }
+    if (!has_listener) {
+      this.#busServ('onNotification', this, (data: $ReadOnlyArray<OdooLongpollingItem>) =>
+        this.#onBusNotification(data),
       );
-    } else {
-      this.#busServ('onNotification', this, this.#onBusNotification);
     }
   }
 
-  #getBusService() {
+  // $FlowFixMe
+  #getBusService(): Object {
     return getOdooService('bus.bus')?.bus;
   }
 
-  #busServ(method, ...params) {
+  #busServ(method: string, ...params: $ReadOnlyArray<mixed>): mixed {
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor >= 14) {
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 14) {
       const bus_serv = getOdooEnv()?.services?.bus_service;
       if (!bus_serv) {
         throw new Error('bus service not available');
@@ -46,65 +51,68 @@ export default class Longpolling {
     return doCall('bus_service', method, ...params);
   }
 
-  addChannel(name) {
+  addChannel(name: string): mixed {
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor <= 11) {
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor <= 11) {
       return this.#getBusService().add_channel(name);
     }
     return this.#busServ('addChannel', name);
   }
 
-  deleteChannel(name) {
+  deleteChannel(name: string): mixed {
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor <= 11) {
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor <= 11) {
       return this.#getBusService().delete_channel(name);
     }
     return this.#busServ('deleteChannel', name);
   }
 
-  startPoll() {
+  startPoll(): mixed {
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor <= 11) {
-      return this.#getBusService().start_polling();
-    } else if (OdooVerMajor >= 16) {
-      return this.#busServ('forceUpdateChannels');
+    if (typeof OdooVerMajor === 'number') {
+      if (OdooVerMajor <= 11) {
+        return this.#getBusService().start_polling();
+      } else if (OdooVerMajor >= 16) {
+        return this.#busServ('forceUpdateChannels');
+      }
     }
     return this.#busServ('startPolling');
   }
 
-  stopPoll() {
+  stopPoll(): mixed {
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor <= 11) {
-      return this.#getBusService().stop_polling();
-    } else if (OdooVerMajor >= 16) {
-      return this.#busServ('stop');
+    if (typeof OdooVerMajor === 'number') {
+      if (OdooVerMajor <= 11) {
+        return this.#getBusService().stop_polling();
+      } else if (OdooVerMajor >= 16) {
+        return this.#busServ('stop');
+      }
     }
     return this.#busServ('stopPolling');
   }
 
-  setVerbose(status) {
+  setVerbose(status: boolean) {
     if (status) {
-      setStorageItem('terminal_longpolling_mode', 'verbose', err =>
-        this.screen.print(err),
-      );
+      setStorageItem('terminal_longpolling_mode', 'verbose', err => this.#terminal.screen.print(err));
     } else {
       removeStorageItem('terminal_longpolling_mode');
     }
   }
 
-  isVerbose() {
+  isVerbose(): boolean {
     return getStorageItem('terminal_longpolling_mode') === 'verbose';
   }
 
   //
-  #getNotificationsData(data) {
+  // $FlowFixMe
+  #getNotificationsData(data: Object): $ReadOnlyArray<OdooLongpollingItem> {
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor >= 16) {
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 16) {
       return data.detail;
     }
     return data;
   }
-  #onBusNotification(data) {
+  #onBusNotification(data: $ReadOnlyArray<OdooLongpollingItem>) {
     if (this.isVerbose()) {
       this.#terminal.onBusNotification(this.#getNotificationsData(data));
     }

@@ -1,7 +1,10 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-export default function (r, g, b) {
+export type HSV = [number, number, number];
+
+export default function (r: number, g: number, b: number): HSV {
   const h_min = Math.min(Math.min(r, g), b);
   const h_max = Math.max(Math.max(r, g), b);
 

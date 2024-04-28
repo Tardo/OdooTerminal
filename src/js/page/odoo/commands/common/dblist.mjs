@@ -1,19 +1,23 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import i18n from 'i18next';
 import rpcQuery from '@odoo/rpc';
 import callService from '@odoo/osv/call_service';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import {ARG} from '@trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type Terminal from '@odoo/terminal';
 
-async function cmdShowDBList(kwargs, screen) {
+async function cmdShowDBList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const session = getOdooSession();
-  const _onSuccess = databases => {
+  const _onSuccess = (databases: $ReadOnlyArray<string>) => {
     const databases_len = databases.length;
     if (!databases_len) {
       // Soft-Error
-      screen.printError("Can't get database names");
+      ctx.screen.printError("Can't get database names");
       return;
     }
     // Search active database
@@ -23,16 +27,12 @@ async function cmdShowDBList(kwargs, screen) {
       const database = databases[index];
       if (kwargs.only_active) {
         if (database === session.db) {
-          screen.eprint(database);
+          ctx.screen.eprint(database);
           return database;
         }
       } else if (database === session.db) {
         s_databases.push(
-          i18n.t(
-            'cmdDBList.result.activeDatabase',
-            '<strong>{{database}}</strong> (Active Database)',
-            {database},
-          ),
+          i18n.t('cmdDBList.result.activeDatabase', '<strong>{{database}}</strong> (Active Database)', {database}),
         );
       } else {
         s_databases.push(database);
@@ -43,15 +43,15 @@ async function cmdShowDBList(kwargs, screen) {
     if (kwargs.only_active) {
       return false;
     }
-    screen.print(s_databases);
+    ctx.screen.print(s_databases);
     return databases;
   };
-  const _onError = err => {
+  const _onError = (err: Error) => {
     if (!kwargs.only_active) {
       throw err;
     }
     // Heuristic way to determine the database name
-    return rpcQuery({
+    return rpcQuery<{[string]: mixed}>({
       route: '/websocket/peek_notifications',
       params: [
         ['channels', []],
@@ -59,9 +59,9 @@ async function cmdShowDBList(kwargs, screen) {
         ['is_first_poll', true],
       ],
     }).then(result => {
-      if (result.channels[0]) {
+      if (result.channels instanceof Array && result.channels[0]) {
         const dbname = result.channels[0][0];
-        screen.eprint(dbname);
+        ctx.screen.eprint(dbname);
         return dbname;
       }
       return false;
@@ -69,26 +69,27 @@ async function cmdShowDBList(kwargs, screen) {
   };
 
   // Check if using deferred jquery or native promises
+  // $FlowFixMe
   const prom = callService('db', 'list', {});
   if ('catch' in prom) {
     return prom.then(_onSuccess).catch(_onError);
   }
+  // $FlowIgnore
   return prom.then(_onSuccess).fail(_onError);
 }
 
-export default {
-  definition: i18n.t('cmdDBList.definition', 'Show database names'),
-  callback: cmdShowDBList,
-  detail: i18n.t('cmdDBList.detail', 'Show database names'),
-  args: [
-    [
-      ARG.Flag,
-      ['oa', 'only-active'],
-      false,
-      i18n.t(
-        'cmdDBList.args.onlyActive',
-        'Indicates that only print the active database name',
-      ),
+export default function (): Partial<CMDDef> {
+  return {
+    definition: i18n.t('cmdDBList.definition', 'Show database names'),
+    callback: cmdShowDBList,
+    detail: i18n.t('cmdDBList.detail', 'Show database names'),
+    args: [
+      [
+        ARG.Flag,
+        ['oa', 'only-active'],
+        false,
+        i18n.t('cmdDBList.args.onlyActive', 'Indicates that only print the active database name'),
+      ],
     ],
-  ],
-};
+  };
+}

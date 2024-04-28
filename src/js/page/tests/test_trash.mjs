@@ -1,3 +1,4 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -29,9 +30,7 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results[0][1][3][2][2].key, 'the value');
 
     // Dictionary
-    results = await this.terminal.eval(
-      "{keyA: 'the value', keyB: 'the, value'}",
-    );
+    results = await this.terminal.eval("{keyA: 'the value', keyB: 'the, value'}");
     this.assertEqual(results[0].keyB, 'the, value');
     results = await this.terminal.eval("{keyA: -23, keyB: 'the, value'}");
     this.assertEqual(results[0].keyA, -23);
@@ -77,28 +76,22 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.eval("$(search res.partner -f name)['ids']");
     this.assertEqual(results[0].constructor, Array);
     this.assertTrue(results[0].length > 0);
-    results = await this.terminal.eval(
-      "$(search res.partner -f name)[0]['name']",
-    );
+    results = await this.terminal.eval("$(search res.partner -f name)[0]['name']");
     this.assertEqual(results[0].constructor, String);
     this.assertTrue(results[0].length > 0);
     results = await this.terminal.eval('{test: $(gen -mi 1 -ma 4)}');
-    this.assertTrue(results[0].test.length);
+    this.assertTrue(results[0].test.length > 0);
     results = await this.terminal.eval(
       '{fulano: $(gen -mi 2 -ma 4), mengano: $(gen -mi 4 -ma 7), zutano: { perengano: $(gen -t int -mi 7 -ma 10) }}',
     );
-    this.assertTrue(results[0].fulano.length);
-    this.assertTrue(results[0].mengano.length);
+    this.assertTrue(results[0].fulano.length > 0);
+    this.assertTrue(results[0].mengano.length > 0);
     this.assertTrue(results[0].zutano.perengano > 6);
 
     // Concat
-    results = await this.terminal.eval(
-      "$a = 'blabla'; $b = 1234;$a+'---' + $b;",
-    );
+    results = await this.terminal.eval("$a = 'blabla'; $b = 1234;$a+'---' + $b;");
     this.assertEqual(results[0], 'blabla---1234');
-    results = await this.terminal.eval(
-      "$a = 'blabla'\n $b = 1234\n$a+'---' + $b;",
-    );
+    results = await this.terminal.eval("$a = 'blabla'\n $b = 1234\n$a+'---' + $b;");
     this.assertEqual(results[0], 'blabla---1234');
     results = await this.terminal.eval(
       "$a = [{test: 124, this: 'lelele lololo'}]; $b = [54,42]; $a[0]['this'] + '---' + $b[1];",
@@ -110,9 +103,7 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results[0], 20);
     results = await this.terminal.eval('$val = $((5*2)); $((5+$val))');
     this.assertEqual(results[0], 15);
-    results = await this.terminal.eval(
-      '$val = $((5*2)); $((5+$val-55*(45-33)))',
-    );
+    results = await this.terminal.eval('$val = $((5*2)); $((5+$val-55*(45-33)))');
     this.assertEqual(results[0], -645);
     results = await this.terminal.eval(
       "$data = {numA: 4, numB:9, numC: [23,2]}; $(( ($data['numA']    * $data['numB'] + $data['numC'][1] +    4  )  * -2     ))",
@@ -120,9 +111,7 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results[0], -84);
 
     // Mix
-    results = await this.terminal.eval(
-      "$data = {numA: 4, numB:9}; ['te'+ 'st' + '!', $data['numA'], 42]",
-    );
+    results = await this.terminal.eval("$data = {numA: 4, numB:9}; ['te'+ 'st' + '!', $data['numA'], 42]");
     this.assertEqual(results[0][0], 'test!');
     this.assertEqual(results[0][1], 4);
     this.assertEqual(results[0][2], 42);

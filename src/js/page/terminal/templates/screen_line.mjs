@@ -1,3 +1,4 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -7,42 +8,47 @@ import prettyObjectString from '@terminal/utils/pretty_object_string';
 import renderTable from './screen_table';
 import renderTableCellRecord from './screen_table_cell_record';
 import renderTableCellRecordId from './screen_table_cell_record_id';
+import type {Record} from '@terminal/core/recordset';
 
-export function renderLineText(msg, cls) {
-  return `<span class='line-text ${cls}'>${msg}</span>`;
+export function renderLineText(msg: string, cls?: string): string {
+  return `<span class='line-text ${cls || ''}'>${msg}</span>`;
 }
 
-export function renderLineArray(msg, cls) {
+export function renderLineArray(msg: Array<mixed>, cls?: string): Array<string> {
   const res = [];
   const l = msg.length;
   for (let x = 0; x < l; ++x) {
-    res.push(`<span class='line-array ${cls}'>${renderLine(msg[x])}</span>`); // eslint-disable-line no-use-before-define
+    res.push(`<span class='line-array ${cls || ''}'>${renderLine(msg[x])[0]}</span>`); // eslint-disable-line no-use-before-define
   }
   return res;
 }
 
-export function renderLineObject(msg, cls) {
-  return `<span class='line-object ${cls}'>${prettyObjectString(msg)}</span>`;
+// $FlowFixMe
+export function renderLineObject(msg: Object, cls?: string): string {
+  return `<span class='line-object ${cls || ''}'>${prettyObjectString(msg)}</span>`;
 }
 
-export function renderLineRecordsetTable(model, records, cls) {
+export function renderLineRecordsetTable(model: string, records: Recordset, cls?: string): string {
   const columns = ['id'];
   const len = records.length;
   const rows = [];
   for (let x = 0; x < len; ++x) {
     const row_index = rows.push([]) - 1;
-    const item = records[x];
+    // $FlowFixMe
+    const item: Record = records[x];
+    // $FlowFixMe
     rows[row_index].push(renderTableCellRecordId(model, item.id));
     const keys = Object.keys(item);
     const keys_len = keys.length;
     let index = 0;
     while (index < keys_len) {
-      const field = keys[index];
+      const field: string = keys[index];
       if (field === 'id') {
         ++index;
         continue;
       }
       columns.push(encodeHTML(field));
+      // $FlowFixMe
       rows[row_index].push(renderTableCellRecord(model, field, item));
       ++index;
     }
@@ -50,19 +56,19 @@ export function renderLineRecordsetTable(model, records, cls) {
   return renderTable(columns, rows, cls);
 }
 
-export default function renderLine(msg, cls) {
+export default function renderLine(msg: mixed, cls?: string): Array<string> {
   const res = [];
   if (typeof msg === 'object') {
-    if (msg.constructor === Text) {
+    if (msg instanceof Text) {
       res.push(renderLineText(msg, cls));
     } else if (msg instanceof Recordset) {
       res.push(renderLineRecordsetTable(msg.model, msg, cls));
-    } else if (msg.constructor === Array) {
+    } else if (msg instanceof Array) {
       res.push(...renderLineArray(msg, cls));
     } else {
       res.push(renderLineObject(msg, cls));
     }
-  } else {
+  } else if (typeof msg === 'string') {
     res.push(renderLineText(msg, cls));
   }
   return res;

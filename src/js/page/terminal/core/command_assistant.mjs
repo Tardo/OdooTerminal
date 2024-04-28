@@ -1,25 +1,56 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import isEmpty from '@terminal/utils/is_empty';
+import isEmpty from '@trash/utils/is_empty';
 import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
-import {ARG, INSTRUCTION_TYPE} from '@trash/constants';
+import {INSTRUCTION_TYPE} from '@trash/constants';
+import type VMachine from '@trash/vmachine';
+import type {CMDDef, ArgInfo, ParseInfo} from '@trash/interpreter';
+import type Terminal from '@terminal/terminal';
+
+export type CMDAssistantOption = {
+  name?: string,
+  string?: string,
+  value?: mixed,
+  is_required: boolean,
+  is_default: boolean,
+  is_command: boolean,
+  is_argument: boolean,
+  is_paramater: boolean,
+  type: number,
+  description: string,
+  values?: $ReadOnlyArray<number | string>,
+};
+
+export type CMDAssistantInputInfo = {
+  index: {
+    cmd: number,
+    current: number,
+    arg: number,
+  },
+  token: {
+    cmd: string,
+    current: string,
+    arg: string,
+  },
+};
 
 export default class CommandAssistant {
-  #virtMachine = null;
-  #parent = null;
+  #virtMachine: VMachine;
+  #parent: Terminal;
 
-  constructor(parent) {
+  constructor(parent: Terminal) {
     this.#parent = parent;
     this.#virtMachine = parent.virtMachine;
   }
 
-  #getAvailableCommandNames(name) {
-    const cmd_names = Object.keys(this.#virtMachine.commands);
+  #getAvailableCommandNames(name: string): Array<string> {
+    const cmd_names = Object.keys(this.#virtMachine.registeredCmds);
     return cmd_names.filter(cmd_name => cmd_name.startsWith(name));
   }
 
-  #getAvailableArguments(command_info, arg_name) {
+  #getAvailableArguments(command_info: CMDDef, arg_name: string): Array<ArgInfo> {
     const arg_infos = [];
     for (const arg of command_info.args) {
       const arg_info = getArgumentInfo(arg);
@@ -30,9 +61,9 @@ export default class CommandAssistant {
     return arg_infos;
   }
 
-  #getAvailableParameters(command_info, arg_name, arg_value) {
+  #getAvailableParameters(command_info: CMDDef, arg_name: string, arg_value: string): Array<CMDAssistantOption> {
     const arg_info = getArgumentInfoByName(command_info.args, arg_name);
-    const res_param_infos = [];
+    const res_param_infos: Array<CMDAssistantOption> = [];
     if (arg_info) {
       if (arg_info.strict_values) {
         const def_value = arg_info.default_value;
@@ -42,6 +73,9 @@ export default class CommandAssistant {
               value: strict_value,
               is_required: arg_info.is_required,
               is_default: strict_value === def_value,
+              is_command: false,
+              is_argument: false,
+              is_paramater: false,
               type: arg_info.type,
               description: arg_info.description,
               values: arg_info.strict_values,
@@ -49,13 +83,16 @@ export default class CommandAssistant {
           }
         }
       } else if (
-        arg_info.default_value &&
+        typeof arg_info.default_value !== 'undefined' &&
         String(arg_info.default_value).startsWith(arg_value)
       ) {
         res_param_infos.push({
           value: arg_info.default_value,
           is_default: true,
           is_required: arg_info.is_required,
+          is_command: false,
+          is_argument: false,
+          is_paramater: false,
           type: arg_info.type,
           description: arg_info.description,
           values: arg_info.strict_values,
@@ -66,10 +103,14 @@ export default class CommandAssistant {
     return res_param_infos;
   }
 
-  #filterParameterOptions(values, filter_by) {
+  #filterParameterOptions(
+    values: $ReadOnlyArray<string>,
+    filter_by: string,
+    filter_mode: string,
+  ): $ReadOnlyArray<string> {
     let res = values || [];
     if (filter_by) {
-      if (this.#parent.config.cmd_assistant_match_mode === 'includes') {
+      if (filter_mode === 'includes') {
         res = values.filter(item => item.includes(filter_by));
       } else {
         res = values.filter(item => item.startsWith(filter_by));
@@ -78,21 +119,27 @@ export default class CommandAssistant {
     return res;
   }
 
-  async #getAvailableDynamicParameters(command_info, arg_name, arg_value) {
+  async #getAvailableDynamicParameters(
+    command_info: CMDDef,
+    arg_name: string,
+    arg_value: string,
+    filter_mode: string,
+  ): Promise<Array<CMDAssistantOption>> {
     const arg_info = getArgumentInfoByName(command_info.args, arg_name);
     if (!arg_info) {
       return [];
     }
-    const options =
-      (await command_info.options.bind(this.#parent)(arg_info.names.long)) ||
-      [];
-    const options_filtered = this.#filterParameterOptions(options, arg_value);
-    const ret = [];
+    const options: $ReadOnlyArray<string> = (await command_info.options.bind(this.#parent)(arg_info.names.long)) || [];
+    const options_filtered = this.#filterParameterOptions(options, arg_value, filter_mode);
+    const ret: Array<CMDAssistantOption> = [];
     for (const option of options_filtered) {
       ret.push({
         value: option,
         is_default: false,
         is_required: false,
+        is_command: false,
+        is_argument: false,
+        is_paramater: false,
         type: arg_info.type,
         description: arg_info.description,
         values: options,
@@ -101,10 +148,10 @@ export default class CommandAssistant {
     return ret;
   }
 
-  getSelectedParameterIndex(parse_info, caret_pos) {
+  getSelectedParameterIndex(parse_info: ParseInfo, caret_pos: number): [number, number, number] {
     const {stack} = parse_info;
     if (!stack.instructions.length) {
-      return [-1, -1];
+      return [-1, -1, -1];
     }
     let sel_token_index = -1;
     let sel_cmd_index = -1;
@@ -132,10 +179,7 @@ export default class CommandAssistant {
       const pend = instr_count - 3;
       if (pend >= 0) {
         const instr = stack.instructions[pend];
-        if (
-          instr.type === INSTRUCTION_TYPE.LOAD_ARG ||
-          instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL
-        ) {
+        if (instr.type === INSTRUCTION_TYPE.LOAD_ARG || instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL) {
           sel_token_index = -1;
           end_i = pend;
         }
@@ -163,13 +207,9 @@ export default class CommandAssistant {
     return [sel_cmd_index, sel_token_index, sel_arg_index];
   }
 
-  getInputInfo(data, caret_pos) {
-    if (!data) {
-      return {};
-    }
+  getInputInfo(data: string, caret_pos: number): CMDAssistantInputInfo {
     const parse_info = this.#virtMachine.parse(data);
-    const [sel_cmd_index, sel_token_index, sel_arg_index] =
-      this.getSelectedParameterIndex(parse_info, caret_pos);
+    const [sel_cmd_index, sel_token_index, sel_arg_index] = this.getSelectedParameterIndex(parse_info, caret_pos);
     let sel_token_index_san = sel_token_index;
     // If not current, force last arg
     if (sel_token_index_san === -1) {
@@ -192,48 +232,56 @@ export default class CommandAssistant {
     };
   }
 
-  async getAvailableOptions(data, caret_pos) {
-    const ret = [];
+  async getAvailableOptions(
+    data: string,
+    caret_pos: number,
+    filter_mode: string,
+    dyn_opts: boolean,
+  ): Promise<Array<CMDAssistantOption>> {
+    const ret: Array<CMDAssistantOption> = [];
     const input_info = this.getInputInfo(data, caret_pos);
     if (isEmpty(input_info)) {
       return ret;
     }
     if (input_info.index.cmd === input_info.index.current) {
       // Command name
-      const cmd_names = this.#getAvailableCommandNames(
-        input_info.token.cmd || data,
-      );
+      const cmd_names = this.#getAvailableCommandNames(input_info.token.cmd || data);
       for (const cmd_name of cmd_names) {
         ret.push({
           name: cmd_name,
+          is_default: false,
+          is_required: false,
+          is_argument: false,
+          is_paramater: false,
+          values: [],
+          value: undefined,
+          type: -1,
           string: cmd_name,
           is_command: true,
-          description: this.#virtMachine.commands[cmd_name].definition,
+          description: this.#virtMachine.registeredCmds[cmd_name].definition,
         });
       }
       return ret;
     }
 
-    const command_info = input_info.token.cmd
-      ? this.#virtMachine.commands[input_info.token.cmd]
-      : undefined;
+    const command_info = input_info.token.cmd ? this.#virtMachine.registeredCmds[input_info.token.cmd] : undefined;
     if (!command_info) {
       return [];
     }
 
     if (input_info.index.current === input_info.index.arg) {
       // Argument
-      const arg_infos = this.#getAvailableArguments(
-        command_info,
-        input_info.token.arg,
-      );
+      const arg_infos = this.#getAvailableArguments(command_info, input_info.token.arg);
       for (const arg_info of arg_infos) {
         ret.push({
           name: `-${arg_info.names.short}, --${arg_info.names.long}`,
           string: `--${arg_info.names.long}`,
+          is_default: false,
           is_argument: true,
+          is_paramater: false,
           is_required: arg_info.is_required,
-          type: ARG.getHumanType(arg_info.type),
+          is_command: false,
+          type: arg_info.type,
           description: arg_info.description,
           values: arg_info.strict_values,
         });
@@ -244,31 +292,28 @@ export default class CommandAssistant {
       input_info.token.arg
     ) {
       // Parameter
-      let param_infos = this.#getAvailableParameters(
-        command_info,
-        input_info.token.arg,
-        input_info.token.current,
-      );
-      if (
-        !this.#parent.config.cmd_assistant_dyn_options_disabled &&
-        isEmpty(param_infos)
-      ) {
+      let param_infos = this.#getAvailableParameters(command_info, input_info.token.arg, input_info.token.current);
+      if (!dyn_opts && isEmpty(param_infos)) {
         param_infos = await this.#getAvailableDynamicParameters(
           command_info,
           input_info.token.arg,
           input_info.token.current,
+          filter_mode,
         );
       }
       for (const param_info of param_infos) {
+        const value_str = new String(param_info.value).toString();
         ret.push({
-          name: param_info.value,
-          string: param_info.value,
+          name: value_str,
+          string: value_str,
           is_paramater: true,
           is_default: param_info.is_default,
           is_required: param_info.is_required,
-          type: ARG.getHumanType(param_info.type),
+          is_command: false,
+          is_argument: false,
+          type: param_info.type,
           description: param_info.description,
-          values: param_info.strict_values,
+          values: param_info.values,
         });
       }
     }

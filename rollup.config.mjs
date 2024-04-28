@@ -22,7 +22,24 @@ export default [
       entryFileNames: '[name].js',
       chunkFileNames: '[name]-[hash].js',
     },
-    plugins: [is_production && terser(), is_production && analyze()],
+    plugins: [
+      nodeResolve({
+        browser: true,
+      }),
+      commonjs(),
+
+      babel({
+        babelHelpers: 'bundled',
+      }),
+
+      eslint({
+        fix: true,
+        exclude: ['node_modules/**', '**.css'],
+      }),
+
+      is_production && terser(),
+      is_production && analyze(),
+    ],
     watch: {
       clearScreen: false,
       include: ['src/js/private/legacy/content_script.js'],
@@ -137,10 +154,21 @@ export default [
           },
         ],
       }),
-      nodeResolve(),
+      nodeResolve({
+        browser: true,
+      }),
+      commonjs(),
+
+      babel({
+        babelHelpers: 'bundled',
+      }),
 
       postcss({
         plugins: [autoprefixer(), is_production && cssnano()],
+      }),
+      eslint({
+        fix: true,
+        exclude: ['node_modules/**', '**.css'],
       }),
 
       is_production && terser(),

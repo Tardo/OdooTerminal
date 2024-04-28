@@ -48,8 +48,8 @@ jobs:
           npm install --global npm
           npm install
 
-      - name: prettier
-        run: npx prettier . --check
+      - name: flowjs
+        run: npx flow check
 
       - name: eslint
         run: npx eslint --color .

@@ -1,6 +1,13 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).\
 
-export const isFirefox = typeof chrome === 'undefined';
+// $FlowFixMe
+declare var chrome: Object;
+// $FlowFixMe
+declare var browser: Object;
 
-export const ubrowser = isFirefox ? browser : chrome;
+export const isFirefox: boolean = typeof chrome === 'undefined';
+
+// $FlowFixMe
+export const ubrowser: Object = isFirefox ? browser : chrome;

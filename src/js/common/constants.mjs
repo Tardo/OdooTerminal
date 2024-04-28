@@ -1,7 +1,23 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-export const SETTING_TYPES = {
+type SettingType = 'edit' | 'json' | 'check' | 'manual' | 'option' | 'int';
+
+export const SETTING_TYPES: {
+  init_cmds: SettingType,
+  term_context: SettingType,
+  pinned: SettingType,
+  maximized: SettingType,
+  opacity: SettingType,
+  shortcuts: SettingType,
+  devmode_tests: SettingType,
+  devmode_ignore_comp_checks: SettingType,
+  devmode_console_errors: SettingType,
+  cmd_assistant_dyn_options_disabled: SettingType,
+  cmd_assistant_match_mode: SettingType,
+  cmd_assistant_max_results: SettingType,
+} = {
   init_cmds: 'edit',
   term_context: 'json',
   pinned: 'check',
@@ -16,9 +32,24 @@ export const SETTING_TYPES = {
   cmd_assistant_max_results: 'int',
 };
 
-export const SETTING_NAMES = Object.keys(SETTING_TYPES);
+export const SETTING_NAMES: Array<string> = Array.from(Object.keys(SETTING_TYPES));
 
-export const SETTING_DEFAULTS = {
+export type ExtensionSettings = {
+  init_cmds: string,
+  term_context: {[string]: mixed},
+  pinned: boolean,
+  maximized: boolean,
+  opacity: number,
+  shortcuts: {[string]: string},
+  devmode_tests: boolean,
+  devmode_ignore_comp_checks: boolean,
+  devmode_console_errors: boolean,
+  cmd_assistant_dyn_options_disabled: boolean,
+  cmd_assistant_match_mode: 'includes' | 'startsWith',
+  cmd_assistant_max_results: number,
+};
+
+export const SETTING_DEFAULTS: ExtensionSettings = {
   init_cmds: '',
   term_context: {active_test: false},
   pinned: false,
@@ -33,9 +64,9 @@ export const SETTING_DEFAULTS = {
   cmd_assistant_max_results: 35,
 };
 
-export const IGNORED_KEYS = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];
+export const IGNORED_KEYS: Array<string> = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];
 
-export const COMPATIBLE_VERSIONS = [
+export const COMPATIBLE_VERSIONS: Array<string> = [
   '11.',
   'saas~11',
   '12.',

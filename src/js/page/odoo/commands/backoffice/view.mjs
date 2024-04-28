@@ -1,6 +1,8 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import getParentAdapter from '@odoo/utils/get_parent_adapter';
@@ -8,10 +10,20 @@ import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import cachedSearchRead from '@odoo/utils/cached_search_read';
 import {ARG} from '@trash/constants';
+import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
+import type Terminal from '@terminal/terminal';
 
-function openSelectCreateDialog(model, title, domain, on_selected) {
+// $FlowFixMe
+export type CMDViewOnSelectedCallback = (records: $ReadOnlyArray<Object>) => mixed;
+
+function openSelectCreateDialog(
+  model: string,
+  title: string,
+  domain: $ReadOnlyArray<OdooDomainTuple>,
+  on_selected: CMDViewOnSelectedCallback,
+) {
   const OdooVerMajor = getOdooVersion('major');
-  if (OdooVerMajor < 16) {
+  if (typeof OdooVerMajor === 'number' && OdooVerMajor < 16) {
     const dialogs = getOdooService('web.view_dialogs');
     const dialog = new dialogs.SelectCreateDialog(getParentAdapter(), {
       res_model: model,
@@ -25,9 +37,7 @@ function openSelectCreateDialog(model, title, domain, on_selected) {
   }
 
   const {Component} = owl;
-  const {SelectCreateDialog} = getOdooService(
-    '@web/views/view_dialogs/select_create_dialog',
-  );
+  const {SelectCreateDialog} = getOdooService('@web/views/view_dialogs/select_create_dialog');
   Component.env.services.dialog.add(SelectCreateDialog, {
     resModel: model,
     domain: domain,
@@ -37,7 +47,7 @@ function openSelectCreateDialog(model, title, domain, on_selected) {
   });
 }
 
-async function cmdViewModelRecord(kwargs) {
+async function cmdViewModelRecord(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
   const context = this.getContext({
     form_view_ref: kwargs.ref || false,
   });
@@ -54,25 +64,20 @@ async function cmdViewModelRecord(kwargs) {
     this.doHide();
     return;
   }
-  return openSelectCreateDialog(
-    kwargs.model,
-    i18n.t('cmdView.result.selectRecord', 'Select a record'),
-    [],
-    records => {
-      doAction({
-        type: 'ir.actions.act_window',
-        name: i18n.t('cmdView.result.viewRecord', 'View Record'),
-        res_model: kwargs.model,
-        res_id: records[0].id || records[0],
-        views: [[false, 'form']],
-        target: 'current',
-        context: context,
-      }).then(() => this.doHide());
-    },
-  );
+  return openSelectCreateDialog(kwargs.model, i18n.t('cmdView.result.selectRecord', 'Select a record'), [], records => {
+    doAction({
+      type: 'ir.actions.act_window',
+      name: i18n.t('cmdView.result.viewRecord', 'View Record'),
+      res_model: kwargs.model,
+      res_id: records[0].id || records[0],
+      views: [[false, 'form']],
+      target: 'current',
+      context: context,
+    }).then(() => this.doHide());
+  });
 }
 
-function getOptions(arg_name) {
+function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
@@ -80,40 +85,23 @@ function getOptions(arg_name) {
       [],
       ['model'],
       this.getContext({active_test: true}),
-      null,
       item => item.model,
     );
   }
   return Promise.resolve([]);
 }
 
-export default {
-  definition: i18n.t('cmdView.definition', 'View model record/s'),
-  callback: cmdViewModelRecord,
-  options: getOptions,
-  detail: i18n.t(
-    'cmdView.detail',
-    'Open model record in form view or records in list view.',
-  ),
-  args: [
-    [
-      ARG.String,
-      ['m', 'model'],
-      true,
-      i18n.t('cmdView.args.model', 'The model technical name'),
+export default function (): Partial<CMDDef> {
+  return {
+    definition: i18n.t('cmdView.definition', 'View model record/s'),
+    callback: cmdViewModelRecord,
+    options: getOptions,
+    detail: i18n.t('cmdView.detail', 'Open model record in form view or records in list view.'),
+    args: [
+      [ARG.String, ['m', 'model'], true, i18n.t('cmdView.args.model', 'The model technical name')],
+      [ARG.Number, ['i', 'id'], false, i18n.t('cmdView.args.id', 'The record id')],
+      [ARG.String, ['r', 'ref'], false, i18n.t('cmdView.args.ref', 'The view reference name')],
     ],
-    [
-      ARG.Number,
-      ['i', 'id'],
-      false,
-      i18n.t('cmdView.args.id', 'The record id'),
-    ],
-    [
-      ARG.String,
-      ['r', 'ref'],
-      false,
-      i18n.t('cmdView.args.ref', 'The view reference name'),
-    ],
-  ],
-  example: '-m res.partner -i 10 -r base.view_partner_simple_form',
-};
+    example: '-m res.partner -i 10 -r base.view_partner_simple_form',
+  };
+}

@@ -1,15 +1,14 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 /**
  * Return a friendly error exception
- *
- * @param {Exception} err
- * @returns {Boolean}
  */
-export default function (err) {
+// $FlowFixMe[unclear-type]
+export default function (err: Object): string {
   if (err.name !== 'QuotaExceededError') {
-    return false;
+    return '';
   }
   return (
     "<span style='color:navajowhite'>" +

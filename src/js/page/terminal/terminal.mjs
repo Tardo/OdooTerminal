@@ -1,12 +1,16 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import i18n from 'i18next';
 import logger from '@common/logger';
 import processKeybind from '@common/utils/process_keybind';
+import {SETTING_DEFAULTS} from '@common/constants';
 import {KEYMAP} from '@trash/constants';
 import UnknownCommandError from '@trash/exceptions/unknown_command_error';
 import difference from '@trash/utils/difference';
+import isEmpty from '@trash/utils/is_empty';
 import VMachine from '@trash/vmachine';
 import CommandAssistant from './core/command_assistant';
 import {default as Screen, ScreenCommandHandler} from './core/screen';
@@ -20,67 +24,94 @@ import renderTerminal from './templates/terminal';
 import renderUnknownCommand from './templates/unknown_command';
 import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
-import isEmpty from './utils/is_empty';
 import keyCode from './utils/keycode';
 import ProcessJobError from './exceptions/process_job_error';
+// $FlowIgnore
 import {Mutex} from 'async-mutex';
+import type {ExtensionSettings} from '@common/constants';
+import type {CMDDef, ParserOptions, ParseInfo} from '@trash/interpreter';
+import type {EvalOptions, ProcessCommandJobOptions} from '@trash/vmachine';
+import type {CMDAssistantOption} from './core/command_assistant';
 
-export const MAX_COMMAND_ASSISTANT_OPTIONS = 35;
+export type TerminalOptions = {
+  commandTimeout: number,
+  ...ExtensionSettings,
+};
+
+export type JobInfo = {
+  cmdInfo: ProcessCommandJobOptions,
+  healthy: boolean,
+  timeout?: TimeoutID,
+};
+
+export type JobMetaInfo = {
+  name: string,
+  cmdRaw: string,
+  def: CMDDef,
+  jobIndex: number,
+  silent: boolean,
+};
+
+//
+export type MessageListenerCallback = (data: {[string]: mixed}) => Promise<mixed>;
 
 export default class Terminal {
   VERSION = '10.4.2';
 
-  userContext = {};
+  userContext: {[string]: mixed} = {};
 
-  #config = {};
-  #rawTerminalTemplate = renderTerminal();
+  screen: Screen;
+  // $FlowFixMe
+  $el: Object;
+  // $FlowFixMe
+  $runningCmdCount: Object;
 
-  #registeredCmds = {};
+  registeredCmds: {[string]: CMDDef} = {};
+  virtMachine: VMachine;
 
-  #inputHistory = [];
-  #searchHistoryQuery = '';
+  #config: TerminalOptions = {...SETTING_DEFAULTS, commandTimeout: 30000};
+  #jobs: Array<JobInfo> = [];
+
+  #rawTerminalTemplate: string = renderTerminal();
+
+  #inputHistory: Array<string> = [];
+  #searchHistoryQuery: string = '';
   #searchHistoryIter = 0;
 
   #hasExecInitCmds = false;
 
-  #jobs = [];
-  #observer = null;
-  #virtMachine = null;
+  #observer: MutationObserver;
 
-  #commandAssistant = null;
-  #assistantOptions = {};
+  #commandAssistant: CommandAssistant;
+  #assistantOptions: Array<CMDAssistantOption>;
   #assistantOptionsTotalCount = 0;
-  #selAssistanOption = -1;
-
-  #messageListeners = {};
+  #selAssistanOption: number = -1;
 
   #wasStart = false;
   #wasLoaded = false;
 
-  #mutexAvailableOptions = new Mutex();
+  #messageListeners: {[string]: Array<MessageListenerCallback>} = {};
 
-  constructor(config) {
-    Object.assign(
-      this.#config,
-      {
-        commandTimeout: 30000,
-      },
-      config,
-    );
+  // $FlowFixMe
+  #mutexAvailableOptions: Object = new Mutex();
 
+  constructor() {
     this.screen = new Screen(
       {
-        onSaveScreen: function (content) {
-          debounce(
-            setStorageSessionItem('terminal_screen', content, err =>
-              this.screen.print(err),
-            ),
-            350,
-          );
+        onSaveScreen: function (this: Terminal, content: string) {
+          debounce(() => {
+            setStorageSessionItem('terminal_screen', content, err => this.screen.print(err));
+          }, 350);
         }.bind(this),
-        onCleanScreen: () => removeStorageSessionItem('terminal_screen'),
-        onInputKeyUp: this.#onInputKeyUp.bind(this),
-        onInput: this.#onInput.bind(this),
+        onCleanScreen: () => {
+          removeStorageSessionItem('terminal_screen');
+        },
+        onInputKeyUp: ev => {
+          this.#onInputKeyUp(ev);
+        },
+        onInput: () => {
+          this.#onInput();
+        },
       },
       {
         username: 'Unregistered User',
@@ -106,39 +137,32 @@ export default class Terminal {
     this.createTerminal();
   }
 
-  init(settings) {
+  init(settings: TerminalOptions) {
     this.#applySettings(settings);
     this.#wasLoaded = true;
     if (this.#config.pinned) {
       this.doShow();
-      this.$el
-        .find('.terminal-screen-icon-pin')
-        .removeClass('btn-dark')
-        .addClass('btn-light');
+      this.$el.find('.terminal-screen-icon-pin').removeClass('btn-dark').addClass('btn-light');
     }
     if (this.#config.maximized) {
       this.$el.addClass('term-maximized');
-      this.$el
-        .find('.terminal-screen-icon-maximize')
-        .removeClass('btn-dark')
-        .addClass('btn-light');
+      this.$el.find('.terminal-screen-icon-maximize').removeClass('btn-dark').addClass('btn-light');
     }
 
+    // $FlowFixMe
     window.addEventListener('message', this.#onWindowMessage.bind(this), false);
+    // $FlowFixMe
     window.addEventListener('keydown', this.#onCoreKeyDown.bind(this));
+    // $FlowFixMe
     window.addEventListener('click', this.onCoreClick.bind(this));
-    window.addEventListener(
-      'beforeunload',
-      this.#onCoreBeforeUnload.bind(this),
-      true,
-    );
-    this.$el
-      .find('.terminal-screen-icon-maximize')
-      .on('click', this.#onClickToggleMaximize.bind(this));
-    this.$el
-      .find('.terminal-screen-icon-pin')
-      .on('click', this.#onClickToggleScreenPin.bind(this));
+    // $FlowFixMe
+    window.addEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
+    // $FlowFixMe
+    this.$el.find('.terminal-screen-icon-maximize').on('click', this.#onClickToggleMaximize.bind(this));
+    // $FlowFixMe
+    this.$el.find('.terminal-screen-icon-pin').on('click', this.#onClickToggleScreenPin.bind(this));
     // Custom Events
+    // $FlowFixMe
     this.$el[0].addEventListener('toggle', this.doToggle.bind(this));
 
     if (!isEmpty(this.#config.init_cmds)) {
@@ -146,37 +170,21 @@ export default class Terminal {
     }
   }
 
-  get registeredCmds() {
-    return this.#registeredCmds;
-  }
-
-  get virtMachine() {
-    return this.#virtMachine;
-  }
-
-  get jobs() {
-    return this.#jobs;
-  }
-
-  get config() {
-    return this.#config;
-  }
-
-  get messageListeners() {
-    return this.#messageListeners;
-  }
-
   /**
    * This is necessary to prevent terminal issues in Odoo EE
    */
   #initGuard() {
-    if (this.#observer === null) {
-      this.#observer = new MutationObserver(this.#injectTerminal.bind(this));
-      this.#observer.observe(document.body, {childList: true});
+    if (this.#observer === null && document.body) {
+      const target = document.body;
+      this.#observer = new MutationObserver(() => {
+        this.#injectTerminal();
+      });
+      this.#observer.observe(target, {childList: true});
     }
   }
 
   #injectTerminal() {
+    // $FlowFixMe
     const $terms = $('body').children('.o_terminal');
     if ($terms.length > 1) {
       // Remove extra terminals
@@ -187,18 +195,19 @@ export default class Terminal {
     }
   }
 
-  async start() {
+  start(): void {
     if (!this.#wasLoaded) {
       throw new Error('Terminal not loaded');
     }
 
     this.$runningCmdCount = this.$el.find('#terminal_running_cmd_count');
-    this.#virtMachine = new VMachine(this.#registeredCmds, {
-      processCommandJob: this.#processCommandJob.bind(this),
+    this.virtMachine = new VMachine(this.registeredCmds, {
+      processCommandJob: (cmdInfo, silent) => this.#processCommandJob(cmdInfo, silent),
+      silent: false,
     });
     this.#commandAssistant = new CommandAssistant(this);
     this.screen.start(this.$el);
-    this.screen.applyStyle('opacity', this.#config.opacity);
+    this.screen.applyStyle('opacity', new String(this.#config.opacity).toString());
     this.onStart();
   }
 
@@ -207,52 +216,52 @@ export default class Terminal {
     if (typeof this.#observer !== 'undefined') {
       this.#observer.disconnect();
     }
+    // $FlowFixMe
     window.removeEventListener('keydown', this.#onCoreKeyDown.bind(this));
+    // $FlowFixMe
     window.removeEventListener('click', this.onCoreClick.bind(this));
-    window.removeEventListener(
-      'beforeunload',
-      this.#onCoreBeforeUnload.bind(this),
-      true,
-    );
+    // $FlowFixMe
+    window.removeEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
+    // $FlowFixMe
     this.$el[0].removeEventListener('toggle', this.doToggle.bind(this));
   }
 
   /* BASIC FUNCTIONS */
+  getActiveJobs(): $ReadOnlyArray<JobInfo> {
+    return this.#jobs.filter(item => item);
+  }
+
   cleanInputHistory() {
     this.#inputHistory = [];
     removeStorageSessionItem('terminal_screen');
   }
 
-  registerCommand(cmd, cmd_def) {
-    this.#registeredCmds[cmd] = Object.assign(
-      {
-        definition: i18n.t(
-          'terminal.cmd.default.definition',
-          'Undefined command',
-        ),
-        callback: this.#fallbackExecuteCommand,
-        options: this.#fallbackCommandOptions,
-        detail: i18n.t(
-          'terminal.cmd.default.detail',
-          "This command hasn't a properly detailed information",
-        ),
-        args: [],
-        secured: false,
-        aliases: [],
-        example: '',
+  registerCommand(cmd: string, cmd_def: Partial<CMDDef>) {
+    this.registeredCmds[cmd] = {
+      definition: i18n.t('terminal.cmd.default.definition', 'Undefined command'),
+      callback: () => {
+        return this.#fallbackExecuteCommand();
       },
-      cmd_def,
-    );
+      options: () => {
+        return this.#fallbackCommandOptions();
+      },
+      detail: i18n.t('terminal.cmd.default.detail', "This command hasn't a properly detailed information"),
+      args: [],
+      secured: false,
+      aliases: [],
+      example: '',
+      ...cmd_def,
+    };
   }
 
-  validateCommand(cmd) {
+  validateCommand(cmd: string): [?string, ?string] {
     if (!cmd) {
-      return [false, false];
+      return [undefined, undefined];
     }
     const cmd_split = cmd.split(' ');
     const cmd_name = cmd_split[0];
     if (!cmd_name) {
-      return [cmd, false];
+      return [cmd, undefined];
     }
     return [cmd, cmd_name];
   }
@@ -269,9 +278,9 @@ export default class Terminal {
   //   - Output using simple comparison: horse and house (both have the
   //     same weight)
   //   - Output using KDC: horse
-  searchSimiliarCommand(in_cmd) {
+  searchSimiliarCommand(in_cmd: string): string | void {
     if (in_cmd.length < 3) {
-      return false;
+      return undefined;
     }
 
     // Only consider words with score lower than this limit
@@ -280,8 +289,8 @@ export default class Terminal {
     const cpk = 10,
       rpk = 3;
     const max_dist = Math.sqrt(cpk + rpk);
-    const _get_key_dist = function (from, to) {
-      const _get_key_pos2d = function (key) {
+    const _get_key_dist = function (from: string, to: string) {
+      const _get_key_pos2d = function (key: string) {
         const i = KEYMAP.indexOf(key);
         if (i === -1) {
           return [cpk, rpk];
@@ -297,7 +306,7 @@ export default class Terminal {
     };
 
     const sanitized_in_cmd = in_cmd.toLowerCase();
-    const sorted_cmd_keys = Object.keys(this.#registeredCmds).sort();
+    const sorted_cmd_keys = Object.keys(this.registeredCmds).sort();
     const min_score = [0, ''];
     const sorted_keys_len = sorted_cmd_keys.length;
     for (let x = 0; x < sorted_keys_len; ++x) {
@@ -307,15 +316,11 @@ export default class Terminal {
       let cmd_score = 0;
       if (search_index === -1) {
         // Penalize word length diff
-        cmd_score =
-          Math.abs(sanitized_in_cmd.length - cmd.length) / 2 + max_dist;
+        cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length) / 2 + max_dist;
         // Analize letter key distances
         for (let i = 0; i < sanitized_in_cmd.length; ++i) {
           if (i < cmd.length) {
-            const score = _get_key_dist(
-              sanitized_in_cmd.charAt(i),
-              cmd.charAt(i),
-            );
+            const score = _get_key_dist(sanitized_in_cmd.charAt(i), cmd.charAt(i));
             if (score === 0) {
               --cmd_score;
             } else {
@@ -346,23 +351,21 @@ export default class Terminal {
       }
     }
 
-    return min_score[0] < SCORE_LIMIT ? min_score[1] : false;
+    return min_score[0] < SCORE_LIMIT ? min_score[1] : undefined;
   }
 
-  parse(data, options, level = 0) {
-    return this.#virtMachine.parse(data, options, level);
+  parse(data: string, options?: ParserOptions, level?: number = 0): ParseInfo {
+    return this.virtMachine.parse(data, options, level);
   }
 
-  eval(code, options) {
-    return this.#virtMachine.eval(
-      code,
-      Object.assign({}, options, {
-        aliases: getStorageLocalItem('terminal_aliases', {}),
-      }),
-    );
+  eval(code: string, options?: Partial<EvalOptions>): Promise<Array<mixed>> {
+    return this.virtMachine.eval(code, {
+      ...options,
+      aliases: getStorageLocalItem('terminal_aliases', {}),
+    });
   }
 
-  async execute(code, store = true, silent = false) {
+  async execute(code: string, store: boolean = true, silent: boolean = false): Promise<Array<mixed> | mixed> {
     await this.#wakeUp();
 
     // Check if secured commands involved
@@ -387,16 +390,12 @@ export default class Terminal {
       if (err.constructor === UnknownCommandError) {
         // Search similar commands
         const similar_cmd = this.searchSimiliarCommand(err.cmd_name);
-        if (similar_cmd) {
-          err_msg = renderUnknownCommand({
-            org_cmd: err.cmd_name,
-            cmd: similar_cmd,
-            pos: [err.start, err.end],
-          });
+        if (typeof similar_cmd !== 'undefined') {
+          err_msg = renderUnknownCommand(err.cmd_name, [err.start, err.end], similar_cmd);
         }
       }
       this.screen.printError(err_msg, true);
-      if (this.#config.console_errors) {
+      if (this.#config.devmode_console_errors) {
         logger.error('core', err);
       }
       throw err;
@@ -408,7 +407,7 @@ export default class Terminal {
     return cmd_res;
   }
 
-  async #wakeUp() {
+  async #wakeUp(): Promise<> {
     if (this.#wasLoaded) {
       if (!this.#wasStart) {
         await this.start();
@@ -443,7 +442,7 @@ export default class Terminal {
     this.$el.removeClass('terminal-transition-topdown');
   }
 
-  doToggle() {
+  doToggle(): Promise<> {
     if (this.#isTerminalVisible()) {
       return this.doHide();
     }
@@ -456,79 +455,64 @@ export default class Terminal {
     this.#initGuard();
   }
 
-  getContext(extra_context) {
+  getContext(extra_context: ?{[string]: mixed}): {[string]: mixed} {
     return Object.assign({}, this.userContext, extra_context);
   }
 
   /* PRIVATE METHODS*/
-  #storeUserInput(strInput) {
+  #storeUserInput(strInput: string) {
     if (this.#inputHistory.at(-1) === strInput) {
       return;
     }
     this.#inputHistory.push(strInput);
-    setStorageSessionItem('terminal_history', this.#inputHistory, err =>
-      this.screen.printError(err, true),
-    );
+    setStorageSessionItem('terminal_history', this.#inputHistory, err => this.screen.printError(err, true));
     this.#searchHistoryIter = this.#inputHistory.length;
   }
 
-  #isTerminalVisible() {
+  #isTerminalVisible(): boolean {
     return this.$el && parseInt(this.$el.css('top'), 10) >= 0;
   }
 
   printWelcomeMessage() {
-    this.screen.print(renderWelcome({ver: this.VERSION}));
+    this.screen.print(renderWelcome(this.VERSION));
   }
 
-  #doSearchPrevHistory() {
+  #doSearchPrevHistory(): string | void {
     const orig_iter = this.#searchHistoryIter;
     const last_str = this.#inputHistory[this.#searchHistoryIter];
     this.#searchHistoryIter = this.#inputHistory.findLastIndex((item, i) => {
       if (this.#searchHistoryQuery) {
-        return (
-          item !== last_str &&
-          item.indexOf(this.#searchHistoryQuery) === 0 &&
-          i <= this.#searchHistoryIter
-        );
+        return item !== last_str && item.indexOf(this.#searchHistoryQuery) === 0 && i <= this.#searchHistoryIter;
       }
       return i < this.#searchHistoryIter;
     });
     if (this.#searchHistoryIter === -1) {
       this.#searchHistoryIter = orig_iter;
-      return false;
+      return undefined;
     }
     return this.#inputHistory[this.#searchHistoryIter];
   }
 
-  #doSearchNextHistory() {
+  #doSearchNextHistory(): string | void {
     const last_str = this.#inputHistory[this.#searchHistoryIter];
     this.#searchHistoryIter = this.#inputHistory.findIndex((item, i) => {
       if (this.#searchHistoryQuery) {
-        return (
-          item !== last_str &&
-          item.indexOf(this.#searchHistoryQuery) === 0 &&
-          i >= this.#searchHistoryIter
-        );
+        return item !== last_str && item.indexOf(this.#searchHistoryQuery) === 0 && i >= this.#searchHistoryIter;
       }
       return i > this.#searchHistoryIter;
     });
     if (this.#searchHistoryIter === -1) {
       this.#searchHistoryIter = this.#inputHistory.length;
-      return false;
+      return undefined;
     }
     return this.#inputHistory[this.#searchHistoryIter];
   }
 
-  async #fallbackExecuteCommand() {
-    throw new Error(
-      i18n.t(
-        'terminal.cmd.error.invalidDefinition',
-        'Invalid command definition!',
-      ),
-    );
+  async #fallbackExecuteCommand(): Promise<> {
+    throw new Error(i18n.t('terminal.cmd.error.invalidDefinition', 'Invalid command definition!'));
   }
 
-  #fallbackCommandOptions() {
+  async #fallbackCommandOptions(): Promise<$ReadOnlyArray<string>> {
     return [];
   }
 
@@ -539,28 +523,21 @@ export default class Terminal {
     const count = this.#jobs.filter(Object).length;
     if (count) {
       const count_unhealthy = this.#jobs.filter(item => !item.healthy).length;
-      let str_info = i18n.t(
-        'terminal.info.job.running',
-        'Running {{count}} command(s)',
-        {count},
-      );
+      let str_info = i18n.t('terminal.info.job.running', 'Running {{count}} command(s)', {count});
       if (count_unhealthy) {
-        str_info += i18n.t(
-          'terminal.info.job.unhealthy',
-          ' ({{count_unhealthy}} unhealthy)',
-          {count: count_unhealthy},
-        );
+        str_info += i18n.t('terminal.info.job.unhealthy', ' ({{count_unhealthy}} unhealthy)', {count: count_unhealthy});
       }
       str_info += '...';
       this.$runningCmdCount.html(str_info).show();
     } else {
-      this.$runningCmdCount.fadeOut('fast', function () {
+      this.$runningCmdCount.fadeOut('fast', function (this: HTMLElement) {
+        // $FlowFixMe
         $(this).html('');
       });
     }
   }
 
-  #applySettings(config) {
+  #applySettings(config: TerminalOptions) {
     Object.assign(this.#config, {
       pinned: getStorageSessionItem('terminal_pinned', config.pinned),
       maximized: getStorageSessionItem('screen_maximized', config.maximized),
@@ -568,21 +545,16 @@ export default class Terminal {
       shortcuts: config.shortcuts,
       term_context: config.term_context || {},
       init_cmds: config.init_cmds,
-      console_errors: config.devmode_console_errors,
-      cmd_assistant_dyn_options_disabled:
-        config.cmd_assistant_dyn_options_disabled,
+      devmode_console_errors: config.devmode_console_errors,
+      cmd_assistant_dyn_options_disabled: config.cmd_assistant_dyn_options_disabled,
       cmd_assistant_match_mode: config.cmd_assistant_match_mode,
       cmd_assistant_max_results: config.cmd_assistant_max_results,
     });
 
-    this.userContext = Object.assign(
-      {},
-      this.#config.term_context,
-      this.userContext,
-    );
+    this.userContext = Object.assign({}, this.#config.term_context, this.userContext);
   }
 
-  getCommandJobMeta(command_info, job_index, silent = false) {
+  getCommandJobMeta(command_info: ProcessCommandJobOptions, job_index: number, silent: boolean = false): JobMetaInfo {
     return {
       name: command_info.cmdName,
       cmdRaw: command_info.cmdRaw,
@@ -592,42 +564,28 @@ export default class Terminal {
     };
   }
 
-  async #processCommandJob(command_info, silent = false) {
+  async #processCommandJob(command_info: ProcessCommandJobOptions, silent: boolean = false): Promise<mixed> {
     const job_index = this.onStartCommand(command_info);
     if (job_index === -1) {
-      throw new Error(
-        i18n.t(
-          'terminal.error.notInitJob',
-          "Unexpected error: can't initialize the job!",
-        ),
-      );
+      throw new Error(i18n.t('terminal.error.notInitJob', "Unexpected error: can't initialize the job!"));
     }
-    let result = false;
-    let error = false;
+    let result: mixed;
+    let error = '';
     let is_failed = false;
     const meta = this.getCommandJobMeta(command_info, job_index, silent);
     try {
-      const cmdScreen = new Proxy(
-        this.screen,
-        Object.assign({}, ScreenCommandHandler, {silent: silent}),
-      );
-      result =
-        (await command_info.cmdDef.callback.call(
-          this,
-          command_info.kwargs,
-          cmdScreen,
-          meta,
-        )) || true;
+      const call_ctx = {
+        screen: new Proxy(this.screen, {...ScreenCommandHandler, silent: silent}),
+        meta: meta,
+      };
+      result = (await command_info.cmdDef.callback.call(this, command_info.kwargs, call_ctx)) || undefined;
     } catch (err) {
       is_failed = true;
       error =
         err?.message ||
-        i18n.t(
-          'terminal.error.unknown',
-          '[!] Oops! Unknown error! (no detailed error message given :/)',
-        );
+        i18n.t('terminal.error.unknown', '[!] Oops! Unknown error! (no detailed error message given :/)');
     } finally {
-      this.onFinishCommand(job_index, is_failed, error || result);
+      this.onFinishCommand(job_index);
     }
     if (is_failed) {
       throw new ProcessJobError(command_info.cmdName, error);
@@ -640,17 +598,19 @@ export default class Terminal {
     this.#mutexAvailableOptions
       .runExclusive(async () => {
         const user_input = this.screen.getUserInput();
+        if (typeof user_input === 'undefined') {
+          return [];
+        }
         return await this.#commandAssistant.getAvailableOptions(
           user_input,
           this.screen.getInputCaretStartPos(),
+          this.#config.cmd_assistant_match_mode,
+          this.#config.cmd_assistant_dyn_options_disabled,
         );
       })
       .then(options => {
         this.#selAssistanOption = -1;
-        this.#assistantOptions = options.slice(
-          0,
-          this.#config.cmd_assistant_max_results,
-        );
+        this.#assistantOptions = options.slice(0, this.#config.cmd_assistant_max_results);
         this.#assistantOptionsTotalCount = options.length;
         this.screen.updateAssistantPanelOptions(
           this.#assistantOptions,
@@ -665,8 +625,8 @@ export default class Terminal {
     // Override me
   }
 
-  onStartCommand(command_info) {
-    const job_info = {
+  onStartCommand(command_info: ProcessCommandJobOptions): number {
+    const job_info: JobInfo = {
       cmdInfo: command_info,
       healthy: true,
     };
@@ -685,50 +645,45 @@ export default class Terminal {
     this.#updateJobsInfo();
     return index;
   }
-  onTimeoutCommand(job_index) {
+  onTimeoutCommand(job_index: number) {
     this.#jobs[job_index].healthy = false;
     this.#updateJobsInfo();
   }
-  onFinishCommand(job_index) {
+  onFinishCommand(job_index: number) {
     const job_info = this.#jobs[job_index];
     clearTimeout(job_info.timeout);
     delete this.#jobs[job_index];
     this.#updateJobsInfo();
   }
 
-  addMessageListener(type, callback) {
+  addMessageListener(type: string, callback: MessageListenerCallback) {
     if (!Object.hasOwn(this.#messageListeners, type)) {
       Object.assign(this.#messageListeners, {[type]: []});
     }
-    if (
-      this.#messageListeners[type].filter(item => item.name === callback.name)
-        .length === 0
-    ) {
+    if (this.#messageListeners[type].filter(item => item.name === callback.name).length === 0) {
       this.#messageListeners[type].push(callback);
     }
   }
-  removeMessageListener(type, callback) {
+  removeMessageListener(type: string, callback: MessageListenerCallback) {
     if (!callback) {
       delete this.#messageListeners[type];
     } else {
-      this.#messageListeners[type] = this.#messageListeners[type].filter(
-        item => item.name !== callback.name,
-      );
+      this.#messageListeners[type] = this.#messageListeners[type].filter(item => item.name !== callback.name);
     }
   }
-  #onWindowMessage(ev) {
+  #onWindowMessage(ev: MessageEvent) {
     // We only accept messages from ourselves
     if (ev.source !== window) {
       return;
     }
-    if (Object.hasOwn(this.messageListeners, ev.data.type)) {
-      this.messageListeners[ev.data.type].forEach(callback =>
-        callback.bind(this)(ev.data),
-      );
+    // $FlowFixMe
+    const ev_data: Object = {...event.data};
+    if (Object.hasOwn(this.#messageListeners, ev_data.type)) {
+      this.#messageListeners[ev_data.type].forEach((callback: MessageListenerCallback) => callback.bind(this)(ev_data));
     }
   }
 
-  #onClickTerminalCommand(target) {
+  #onClickTerminalCommand(target: HTMLElement) {
     if (Object.hasOwn(target.dataset, 'cmd')) {
       this.execute(target.dataset.cmd).catch(() => {
         // Do nothing
@@ -736,7 +691,8 @@ export default class Terminal {
     }
   }
 
-  #onClickToggleMaximize(ev) {
+  #onClickToggleMaximize(ev: MouseEvent) {
+    // $FlowFixMe
     const $target = $(ev.currentTarget);
     this.#config.maximized = !this.#config.maximized;
     if (this.#config.maximized) {
@@ -746,19 +702,16 @@ export default class Terminal {
       this.$el.removeClass('term-maximized');
       $target.removeClass('btn-light').addClass('btn-dark');
     }
-    setStorageSessionItem('screen_maximized', this.#config.maximized, err =>
-      this.screen.print(err),
-    );
+    setStorageSessionItem('screen_maximized', this.#config.maximized, err => this.screen.print(err));
     this.screen.scrollDown();
     this.screen.preventLostInputFocus();
   }
 
-  #onClickToggleScreenPin(ev) {
+  #onClickToggleScreenPin(ev: MouseEvent) {
+    // $FlowFixMe
     const $target = $(ev.currentTarget);
     this.#config.pinned = !this.#config.pinned;
-    setStorageSessionItem('terminal_pinned', this.#config.pinned, err =>
-      this.screen.print(err),
-    );
+    setStorageSessionItem('terminal_pinned', this.#config.pinned, err => this.screen.print(err));
     if (this.#config.pinned) {
       $target.removeClass('btn-dark').addClass('btn-light');
     } else {
@@ -771,7 +724,7 @@ export default class Terminal {
     this.execute(this.screen.getUserInput()).catch(() => {
       // Do nothing
     });
-    this.#searchHistoryQuery = undefined;
+    this.#searchHistoryQuery = '';
     this.#searchHistoryIter = this.#inputHistory.length;
     this.screen.preventLostInputFocus();
   }
@@ -780,7 +733,7 @@ export default class Terminal {
       this.#searchHistoryQuery = this.screen.getUserInput();
     }
     const found_hist = this.#doSearchPrevHistory();
-    if (found_hist) {
+    if (found_hist !== null && typeof found_hist !== 'undefined' && found_hist !== '') {
       this.screen.updateInput(found_hist);
     }
   }
@@ -789,16 +742,16 @@ export default class Terminal {
       this.#searchHistoryQuery = this.screen.getUserInput();
     }
     const found_hist = this.#doSearchNextHistory();
-    if (found_hist) {
+    if (found_hist !== null && typeof found_hist !== 'undefined' && found_hist !== '') {
       this.screen.updateInput(found_hist);
     } else {
-      this.#searchHistoryQuery = undefined;
+      this.#searchHistoryQuery = '';
       this.screen.cleanInput();
     }
   }
-  #onKeyArrowRight(ev) {
+  #onKeyArrowRight(ev: KeyboardEvent) {
     const user_input = this.screen.getUserInput();
-    if (user_input && ev.target.selectionStart === user_input.length) {
+    if (user_input && ev.target instanceof HTMLInputElement && ev.target.selectionStart === user_input.length) {
       this.#searchHistoryQuery = user_input;
       this.#searchHistoryIter = this.#inputHistory.length;
       this.#onKeyArrowUp();
@@ -810,17 +763,16 @@ export default class Terminal {
   #onKeyArrowLeft() {
     this.updateAssistantoptions();
   }
-  #onKeyTab(ev) {
+  #onKeyTab(ev: KeyboardEvent) {
     const user_input = this.screen.getUserInput();
     if (isEmpty(user_input)) {
       return;
     }
     const parse_info = this.parse(user_input);
-    const [sel_cmd_index, sel_token_index] =
-      this.#commandAssistant.getSelectedParameterIndex(
-        parse_info,
-        this.screen.getInputCaretStartPos(),
-      );
+    const [sel_cmd_index, sel_token_index] = this.#commandAssistant.getSelectedParameterIndex(
+      parse_info,
+      this.screen.getInputCaretStartPos(),
+    );
     if (sel_cmd_index === null) {
       return;
     }
@@ -836,14 +788,12 @@ export default class Terminal {
       this.#selAssistanOption = this.#assistantOptions.length - 1;
     }
     const option = this.#assistantOptions[this.#selAssistanOption];
-    if (isEmpty(option)) {
+    if (typeof option === 'undefined') {
       return;
     }
-    this.screen.replaceUserInputToken(
-      parse_info.inputRawString,
-      cur_token,
-      option.string,
-    );
+    if (typeof option.string !== 'undefined') {
+      this.screen.replaceUserInputToken(parse_info.inputRawString, cur_token, option.string);
+    }
     this.screen.updateAssistantPanelOptions(
       this.#assistantOptions,
       this.#selAssistanOption,
@@ -866,37 +816,34 @@ export default class Terminal {
     }
   }
 
-  #onInputKeyUp(ev) {
+  #onInputKeyUp(ev: KeyboardEvent) {
     const question_active = this.screen.getQuestionActive();
-    if (isEmpty(question_active)) {
+    if (typeof question_active === 'undefined') {
       if (ev.keyCode === keyCode.ENTER) {
-        this.#onKeyEnter(ev);
+        this.#onKeyEnter();
       } else if (ev.keyCode === keyCode.UP) {
-        this.#onKeyArrowUp(ev);
+        this.#onKeyArrowUp();
       } else if (ev.keyCode === keyCode.DOWN) {
-        this.#onKeyArrowDown(ev);
+        this.#onKeyArrowDown();
       } else if (ev.keyCode === keyCode.RIGHT) {
         this.#onKeyArrowRight(ev);
       } else if (ev.keyCode === keyCode.LEFT) {
-        this.#onKeyArrowLeft(ev);
+        this.#onKeyArrowLeft();
       } else if (ev.keyCode === keyCode.TAB) {
         this.#onKeyTab(ev);
       } else {
         this.#searchHistoryIter = this.#inputHistory.length;
-        this.#searchHistoryQuery = undefined;
+        this.#searchHistoryQuery = '';
       }
     } else if (ev.keyCode === keyCode.ENTER) {
-      this.screen.responseQuestion(question_active, ev.target.value);
+      this.screen.responseQuestion(question_active, ev.target instanceof HTMLInputElement ? ev.target.value : '');
     } else if (ev.keyCode === keyCode.ESCAPE) {
-      this.screen.rejectQuestion(
-        question_active,
-        i18n.t('terminal.question.aborted', 'Operation aborted'),
-      );
+      this.screen.rejectQuestion(question_active, i18n.t('terminal.question.aborted', 'Operation aborted'));
       ev.preventDefault();
     }
   }
 
-  onCoreClick(ev) {
+  onCoreClick(ev: MouseEvent) {
     // Auto-Hide
     if (
       this.$el &&
@@ -906,11 +853,12 @@ export default class Terminal {
       !this.#config.pinned
     ) {
       this.doHide();
-    } else if (ev.target.classList.contains('o_terminal_cmd')) {
+    } else if (ev.target instanceof HTMLElement && ev.target.classList.contains('o_terminal_cmd')) {
+      // $FlowFixMe
       this.#onClickTerminalCommand(ev.target);
     }
   }
-  #onCoreKeyDown(ev) {
+  #onCoreKeyDown(this: Terminal, ev: KeyboardEvent) {
     // Don't crash when press keys!
     try {
       if (ev.keyCode === 27 && isEmpty(this.screen.getQuestionActive())) {
@@ -929,14 +877,10 @@ export default class Terminal {
       // Do nothing
     }
   }
-  #onCoreBeforeUnload(ev) {
+  #onCoreBeforeUnload(ev: BeforeUnloadEvent) {
     const jobs = this.#jobs.filter(item => item);
     if (jobs.length) {
-      if (
-        jobs.length === 1 &&
-        (!jobs[0] ||
-          ['reload', 'login'].indexOf(jobs[0].cmdInfo.cmdName) !== -1)
-      ) {
+      if (jobs.length === 1 && (!jobs[0] || ['reload', 'login'].indexOf(jobs[0].cmdInfo.cmdName) !== -1)) {
         return;
       }
       ev.preventDefault();
@@ -947,12 +891,7 @@ export default class Terminal {
           'The terminal has prevented the current tab from closing due to unfinished tasks:',
         ),
       );
-      this.screen.print(
-        jobs.map(
-          item =>
-            `${item.cmdInfo.cmdName} <small><i>${item.cmdInfo.cmdRaw}</i></small>`,
-        ),
-      );
+      this.screen.print(jobs.map(item => `${item.cmdInfo.cmdName} <small><i>${item.cmdInfo.cmdRaw}</i></small>`));
       this.doShow();
     }
   }

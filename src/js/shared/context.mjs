@@ -1,33 +1,30 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-export const InstanceContext = {
-  isOdoo: false,
-  isLoaded: false,
-  serverVersionRaw: null,
-  isCompatible: false,
-  isBackOffice: false,
-  isSaas: false,
-  serverVersion: {
-    major: 0,
-    minor: 0,
+export type Context = {
+  isOdoo: boolean,
+  isLoaded: boolean,
+  isCompatible: boolean,
+  isBackOffice: boolean,
+  isSaas: boolean,
+  serverVersion?: {
+    raw: string,
+    major: number,
+    minor: number,
+    status: string,
+    statusLevel: number,
   },
 };
 
-/**
- * Update the instance context and update the action badge
- * @param  {...any} values
- */
-export function updateContext(...values) {
-  Object.assign(InstanceContext, ...values);
-}
+export const InstanceContext: Context = {
+  isOdoo: false,
+  isLoaded: false,
+  isCompatible: false,
+  isBackOffice: false,
+  isSaas: false,
+};
 
-/**
- * Get necessary resources to initialize the terminal
- * @returns {Array}
- */
-export function getResources() {
-  return {
-    js: ['dist/pub/loader.mjs'],
-  };
+export function updateContext(...values: Array<{...}>) {
+  Object.assign(InstanceContext, ...values);
 }

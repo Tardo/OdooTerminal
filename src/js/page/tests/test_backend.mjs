@@ -1,3 +1,4 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -8,9 +9,8 @@ export default class TestBackend extends TerminalTestSuite {
   async test_settings() {
     await this.terminal.execute('settings', false, true);
     await asyncSleep(2000);
-    this.assertTrue(
-      $('.o_form_view .settings, .o_form_view > .settings').length > 0,
-    );
+    // $FlowFixMe
+    this.assertTrue($('.o_form_view .settings, .o_form_view > .settings').length > 0);
   }
 
   async test_view() {
@@ -22,20 +22,12 @@ export default class TestBackend extends TerminalTestSuite {
     await this.terminal.execute('view -m res.company -i 1', false, true);
     await asyncSleep(2500);
     this.assertTrue(this.isFormOpen());
-    await this.terminal.execute(
-      'view -m res.company -i 1 -r base.base_onboarding_company_form',
-      false,
-      true,
-    );
+    await this.terminal.execute('view -m res.company -i 1 -r base.base_onboarding_company_form', false, true);
     await asyncSleep(2500);
     this.assertTrue(this.isFormOpen());
   }
 
   async test_effect() {
-    await this.terminal.execute(
-      "effect -t rainbow_man -o {message: 'I hope everything works correctly'}",
-      false,
-      true,
-    );
+    await this.terminal.execute("effect -t rainbow_man -o {message: 'I hope everything works correctly'}", false, true);
   }
 }

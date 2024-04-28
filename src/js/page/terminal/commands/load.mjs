@@ -1,40 +1,27 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
+import injectResource from '@terminal/utils/inject_resource';
+import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
+import type Terminal from '@terminal/terminal';
 
-async function cmdLoadResource(kwargs) {
-  const inURL = new URL(kwargs.url);
-  const pathname = inURL.pathname.toLowerCase();
-  if (pathname.endsWith('.js')) {
-    return new Promise((resolve, reject) => {
-      $.getScript(inURL.href).done(resolve).fail(reject);
-    });
-  } else if (pathname.endsWith('.css')) {
-    $('<link>').appendTo('head').attr({
-      type: 'text/css',
-      rel: 'stylesheet',
-      href: inURL.href,
-    });
-  } else {
-    throw new Error(
-      i18n.t('cmdLoad.error.invalidFileType', 'Invalid file type'),
-    );
-  }
+async function cmdLoadResource(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
+  return injectResource(new URL(kwargs.url), kwargs.type);
 }
 
-export default {
-  definition: i18n.t('cmdLoad.definition', 'Load external resource'),
-  callback: cmdLoadResource,
-  detail: i18n.t('cmdLoad.detail', 'Load external source (javascript & css)'),
-  args: [
-    [
-      ARG.String,
-      ['u', 'url'],
-      true,
-      i18n.t('cmdLoad.args.url', 'The URL of the asset'),
+export default function (): Partial<CMDDef> {
+  return {
+    definition: i18n.t('cmdLoad.definition', 'Load external resource'),
+    callback: cmdLoadResource,
+    detail: i18n.t('cmdLoad.detail', 'Load external source (javascript & css)'),
+    args: [
+      [ARG.String, ['u', 'url'], true, i18n.t('cmdLoad.args.url', 'The URL of the asset')],
+      [ARG.String, ['t', 'type'], false, i18n.t('cmdLoad.args.type', 'The type of the asset')],
     ],
-  ],
-  example: "-u 'https://example.com/libs/term_extra.js'",
-};
+    example: "-u 'https://example.com/libs/term_extra.js'",
+  };
+}

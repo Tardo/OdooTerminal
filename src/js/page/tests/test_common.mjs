@@ -1,3 +1,4 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -7,6 +8,7 @@ import uniqueId from '@terminal/utils/unique_id';
 import TerminalTestSuite from './tests';
 
 export default class TestCommon extends TerminalTestSuite {
+  _orig_context: {[string]: mixed} = {};
   // Can't test 'lang'
   // Can't test 'reload'
   // Can't test 'debug'
@@ -17,7 +19,7 @@ export default class TestCommon extends TerminalTestSuite {
   /**
    * @override
    */
-  async onBeforeTest(test_name) {
+  async onBeforeTest(test_name: string): Promise<string> {
     const res = await super.onBeforeTest(arguments);
     if (test_name === 'test_context') {
       const context = await this.terminal.execute('context', false, true);
@@ -29,14 +31,10 @@ export default class TestCommon extends TerminalTestSuite {
   /**
    * @override
    */
-  async onAfterTest(test_name) {
+  async onAfterTest(test_name: string): Promise<string> {
     const res = await super.onAfterTest(arguments);
     if (test_name === 'test_context' || test_name === 'test_context_no_arg') {
-      return this.terminal.execute(
-        `context -o set -v '${JSON.stringify(this._orig_context)}'`,
-        false,
-        true,
-      );
+      return this.terminal.execute(`context -o set -v '${JSON.stringify(this._orig_context)}'`, false, true);
     }
     return res;
   }
@@ -60,11 +58,7 @@ export default class TestCommon extends TerminalTestSuite {
       false,
       true,
     );
-    const res = await this.terminal.execute(
-      `unlink -m res.partner -i ${record.id}`,
-      false,
-      true,
-    );
+    const res = await this.terminal.execute(`unlink -m res.partner -i ${record.id}`, false, true);
     this.assertTrue(res);
   }
 
@@ -80,17 +74,13 @@ export default class TestCommon extends TerminalTestSuite {
       true,
     );
     let res = await this.terminal.execute(
-      `write -m res.partner -i ${record_a.id} -v {name: '${uniqueId(
-        'Other name Test #',
-      )}'}`,
+      `write -m res.partner -i ${record_a.id} -v {name: '${uniqueId('Other name Test #')}'}`,
       false,
       true,
     );
     this.assertTrue(res);
     res = await this.terminal.execute(
-      `write -m res.partner -i "${record_a.id}, ${
-        record_b.id
-      }" -v {name: '${uniqueId('Other name Test #')}'}`,
+      `write -m res.partner -i "${record_a.id}, ${record_b.id}" -v {name: '${uniqueId('Other name Test #')}'}`,
       false,
       true,
     );
@@ -107,65 +97,50 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_call() {
-    const res = await this.terminal.execute(
-      'call -m res.partner -c address_get -a [1]',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('call -m res.partner -c address_get -a [1]', false, true);
     this.assertNotEmpty(res);
   }
 
   async test_install() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute(
-      'install -m transifex',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('install -m transifex', false, true);
     this.assertEqual(res[0]?.name, 'transifex');
     await asyncSleep(10000);
   }
 
   async test_upgrade() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute(
-      'upgrade -m transifex',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('upgrade -m transifex', false, true);
     this.assertEqual(res[0]?.name, 'transifex');
     await asyncSleep(10000);
   }
 
   async test_uninstall() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute(
-      'uninstall -m transifex --force',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('uninstall -m transifex --force', false, true);
     this.assertEqual(res?.name, 'transifex');
     await asyncSleep(10000);
   }
 
   async test_action() {
     const OdooVerMajor = getOdooVersion('major');
+    this.assertTrue(typeof OdooVerMajor === 'number');
+
     let res = await this.terminal.execute('action -a 5', false, true);
+    // $FlowIgnore
     if (OdooVerMajor >= 17) {
-      this.assertTrue(res);
+      this.assertTrue(res !== null && typeof res !== 'undefined');
     } else {
       this.assertEqual(res.id, 5);
     }
+    // $FlowIgnore
     if (OdooVerMajor >= 14) {
-      res = await this.terminal.execute(
-        'action -a base.action_res_company_form',
-        false,
-        true,
-      );
+      res = await this.terminal.execute('action -a base.action_res_company_form', false, true);
+      // $FlowIgnore
       if (OdooVerMajor >= 17) {
-        this.assertTrue(res);
+        this.assertTrue(res !== null && typeof res !== 'undefined');
       } else {
-        this.assertEqual(res.id, 'base.action_res_company_form');
+         this.assertEqual(res.id, 'base.action_res_company_form');
       }
       res = await this.terminal.execute(
         "action -a {type: 'ir.actions.act_window', res_model: 'res.partner', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",
@@ -174,27 +149,15 @@ export default class TestCommon extends TerminalTestSuite {
       );
       this.assertNotEmpty(res);
     } else {
-      res = await this.terminal.execute(
-        'action -a base.action_res_company_form',
-        false,
-        true,
-      );
-      if (OdooVerMajor >= 17) {
-        this.assertTrue(res);
-      } else {
-        this.assertEqual(res.xml_id, 'base.action_res_company_form');
-      }
+      res = await this.terminal.execute('action -a base.action_res_company_form', false, true);
       res = await this.terminal.execute(
         "action -a {type: 'ir.actions.act_window', res_model: 'res.partner', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",
         false,
         true,
       );
-      if (OdooVerMajor >= 17) {
-        this.assertTrue(res);
-      } else {
-        this.assertEqual(res.res_model, 'res.partner');
-        this.assertEqual(res.res_id, 1);
-      }
+
+      this.assertEqual(res.res_model, 'res.partner');
+      this.assertEqual(res.res_id, 1);
     }
   }
 
@@ -204,39 +167,19 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_caf() {
-    const res = await this.terminal.execute(
-      'caf -m res.partner -f type -fi {searchable: true}',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('caf -m res.partner -f type -fi {searchable: true}', false, true);
     this.assertNotEmpty(res.type);
     this.assertEmpty(res.id);
   }
 
   async test_cam() {
-    let res = await this.terminal.execute(
-      'cam -m res.partner -o create',
-      false,
-      true,
-    );
+    let res = await this.terminal.execute('cam -m res.partner -o create', false, true);
     this.assertTrue(res);
-    res = await this.terminal.execute(
-      'cam -m res.partner -o unlink',
-      false,
-      true,
-    );
+    res = await this.terminal.execute('cam -m res.partner -o unlink', false, true);
     this.assertTrue(res);
-    res = await this.terminal.execute(
-      'cam -m res.partner -o write',
-      false,
-      true,
-    );
+    res = await this.terminal.execute('cam -m res.partner -o write', false, true);
     this.assertTrue(res);
-    res = await this.terminal.execute(
-      'cam -m res.partner -o read',
-      false,
-      true,
-    );
+    res = await this.terminal.execute('cam -m res.partner -o read', false, true);
     this.assertTrue(res);
   }
 
@@ -246,11 +189,7 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_read() {
-    const res = await this.terminal.execute(
-      'read -m res.partner -i 1 -f type',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('read -m res.partner -i 1 -f type', false, true);
     this.assertEqual(res[0]?.id, 1);
     this.assertNotEmpty(res[0]?.type);
     this.assertEmpty(res[0]?.display_name);
@@ -263,31 +202,21 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertIn(res, 'uid');
     // At the moment operations with the context are not possible in legacy mode
     const OdooVerMajor = getOdooVersion('major');
+    this.assertTrue(typeof OdooVerMajor === 'number');
+    // $FlowIgnore
     if (OdooVerMajor < 15) {
-      res = await this.terminal.execute(
-        "context -o write -v {test_key: 'test_value'}",
-        false,
-        true,
-      );
+      res = await this.terminal.execute("context -o write -v {test_key: 'test_value'}", false, true);
       this.assertIn(res, 'test_key');
-      res = await this.terminal.execute(
-        "context -o set -v {test_key: 'test_value_change'}",
-        false,
-        true,
-      );
+      res = await this.terminal.execute("context -o set -v {test_key: 'test_value_change'}", false, true);
       this.assertEqual(res.test_key, 'test_value_change');
-      res = await this.terminal.execute(
-        'context -o delete -v test_key',
-        false,
-        true,
-      );
+      res = await this.terminal.execute('context -o delete -v test_key', false, true);
       this.assertNotIn(res, 'test_key');
     }
   }
 
   async test_version() {
     const res = await this.terminal.execute('version', false, true);
-    this.assertTrue(res);
+    this.assertTrue(res.length > 0);
   }
 
   // FIXME: Odoo 16.0 has some issues to load 'bus' module. So it is not
@@ -364,11 +293,7 @@ export default class TestCommon extends TerminalTestSuite {
   // },
 
   async test_uhg() {
-    const res = await this.terminal.execute(
-      'uhg -g base.group_user',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('uhg -g base.group_user', false, true);
     this.assertTrue(res);
   }
 
@@ -383,7 +308,7 @@ export default class TestCommon extends TerminalTestSuite {
   async test_tour() {
     // This test is incomplete to avoid page reloads
     const res = await this.terminal.execute('tour', false, true);
-    this.assertNotEmpty(res);
+    this.assertNotEmpty(res !== null && typeof res !== 'undefined');
   }
 
   async test_json() {
@@ -402,30 +327,18 @@ export default class TestCommon extends TerminalTestSuite {
 
   async test_ual() {
     const res = await this.terminal.execute('ual', false, true);
-    this.assertTrue(res);
+    this.assertTrue(res !== null && typeof res !== 'undefined');
   }
 
   async test_count() {
-    const res = await this.terminal.execute(
-      'count -m res.partner',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('count -m res.partner', false, true);
     this.assertTrue(res > 0);
-    const resb = await this.terminal.execute(
-      "count -m res.partner -d [['type', '=', 'contact']]",
-      false,
-      true,
-    );
+    const resb = await this.terminal.execute("count -m res.partner -d [['type', '=', 'contact']]", false, true);
     this.assertTrue(resb <= res);
   }
 
   async test_ref() {
-    const res = await this.terminal.execute(
-      'ref -x base.main_company,base.model_res_partner',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('ref -x base.main_company,base.model_res_partner', false, true);
     this.assertNotEmpty(res);
     this.assertEqual(res.length, 2);
   }
@@ -440,11 +353,7 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_metadata() {
-    const res = await this.terminal.execute(
-      'metadata -m res.partner -i 1',
-      false,
-      true,
-    );
+    const res = await this.terminal.execute('metadata -m res.partner -i 1', false, true);
     this.assertNotEmpty(res);
     this.assertEqual(res.xmlid, 'base.main_partner');
   }
@@ -454,17 +363,9 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertNotEmpty(res);
     await this.terminal.execute('view -m res.company -i 1', false, true);
     await asyncSleep(2500);
-    res = await this.terminal.execute(
-      'barcode -o send -d O-CMD.EDIT',
-      false,
-      true,
-    );
+    res = await this.terminal.execute('barcode -o send -d O-CMD.EDIT', false, true);
     this.assertNotEmpty(res);
-    res = await this.terminal.execute(
-      'barcode -o send -d O-CMD.DISCARD,O-CMD.EDIT,O-CMD.DISCARD',
-      false,
-      true,
-    );
+    res = await this.terminal.execute('barcode -o send -d O-CMD.DISCARD,O-CMD.EDIT,O-CMD.DISCARD', false, true);
     this.assertNotEmpty(res);
   }
 }

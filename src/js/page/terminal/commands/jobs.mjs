@@ -1,11 +1,15 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
 import i18n from 'i18next';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type Terminal from '@terminal/terminal';
 
-async function cmdJobs(kwargs, screen) {
-  const jobs = this.jobs.filter(item => item);
-  screen.print(
+async function cmdJobs(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+  const jobs = this.getActiveJobs();
+  ctx.screen.print(
     jobs.map(
       item =>
         `${item.cmdInfo.cmdName} <small><i>${item.cmdInfo.cmdRaw}</i></small> ${
@@ -18,8 +22,10 @@ async function cmdJobs(kwargs, screen) {
   return jobs;
 }
 
-export default {
-  definition: i18n.t('cmdJobs.definition', 'Display running jobs'),
-  callback: cmdJobs,
-  detail: i18n.t('cmdJobs.detail', 'Display running jobs'),
-};
+export default function (): Partial<CMDDef> {
+  return {
+    definition: i18n.t('cmdJobs.definition', 'Display running jobs'),
+    callback: cmdJobs,
+    detail: i18n.t('cmdJobs.detail', 'Display running jobs'),
+  };
+}

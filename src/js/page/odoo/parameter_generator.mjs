@@ -1,3 +1,4 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
@@ -9,6 +10,7 @@ import getUserTZ from './utils/get_user_tz';
  * This class is used to generate values for terminal command parameters.
  */
 export default class ParameterGenerator {
+  // $FlowFixMe
   #rndLetter = {
     [Symbol.iterator]: function* () {
       const characters = 'bcdfghjklmnpqrstvwxyz ';
@@ -20,13 +22,11 @@ export default class ParameterGenerator {
       let count = 0;
       let cc_count = 0;
 
-      const isVocal = letter => vocals.indexOf(letter) !== -1;
+      const isVocal = (letter: string) => vocals.indexOf(letter) !== -1;
 
       for (;;) {
         if (cc_count % 2 !== 0 && (!last_char || isVocal(last_char))) {
-          cur_char = characters.charAt(
-            Math.floor(Math.random() * characters_length),
-          );
+          cur_char = characters.charAt(Math.floor(Math.random() * characters_length));
           cc_count = 0;
         } else {
           cur_char = vocals.charAt(Math.floor(Math.random() * vocals_length));
@@ -45,49 +45,32 @@ export default class ParameterGenerator {
     },
   };
 
-  generateEmail(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  generateEmail(min: number, max: ?number): string {
     const email_name = this.generateString(min, max);
     const email_domain_a = this.generateString(min, max);
     const email_domain_b = this.generateString(2, 3);
-    return `${email_name}@${email_domain_a}.${email_domain_b}`
-      .replaceAll(' ', '')
-      .toLowerCase();
+    return `${email_name}@${email_domain_a}.${email_domain_b}`.replaceAll(' ', '').toLowerCase();
   }
 
-  generateUrl(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  generateUrl(min: number, max: ?number): string {
     const url = this.generateString(min, max);
     const ext = this.generateString(2, 3);
     return `https://www.${url}.${ext}`.replaceAll(' ', '').toLowerCase();
   }
 
-  generateFloat(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  generateFloat(min: number, max: ?number): number {
     const min_s = typeof max === 'undefined' ? 0 : Number(min);
     const max_s = typeof max === 'undefined' ? Number(min) : Number(max);
     return Number((Math.random() * (max_s - min_s + 1.0) + min_s).toFixed(2));
   }
 
-  generateInt(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  generateInt(min: number, max: ?number): number {
     const min_s = typeof max === 'undefined' ? 0 : Number(min);
     const max_s = typeof max === 'undefined' ? Number(min) : Number(max);
     return Math.floor(Math.random() * (max_s - min_s + 1) + min_s);
   }
 
-  generateIntSeq(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  generateIntSeq(min: number, max: ?number): $ReadOnlyArray<number> {
     const min_s = typeof max === 'undefined' ? 0 : Number(min);
     const max_s = typeof max === 'undefined' ? Number(min) : Number(max);
     const numbers = [];
@@ -97,10 +80,7 @@ export default class ParameterGenerator {
     return numbers;
   }
 
-  generateString(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  generateString(min: number, max: ?number): string {
     const rlen = this.generateInt(min, max);
     let result = '';
     let index = 0;
@@ -114,88 +94,73 @@ export default class ParameterGenerator {
     return result;
   }
 
-  generateTzDate(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  // $FlowFixMe
+  generateTzDate(min: number, max: ?number): Object {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
-    if (OdooVerMajor >= 17) {
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
       return getOdooService('@web/core/l10n/dates').formatDate(
+        // $FlowFixMe
         luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}).setZone(getUserTZ()),
       );
     }
-    return moment(new Date(rdate)).format(
-      getOdooService('web.time').getLangDateFormat(),
-    );
+    // $FlowFixMe
+    return moment(new Date(rdate)).format(getOdooService('web.time').getLangDateFormat());
   }
 
-  generateDate(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  // $FlowFixMe
+  generateDate(min: number, max: ?number): Object {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
-    if (OdooVerMajor >= 17) {
-      return getOdooService('@web/core/l10n/dates').serializeDate(
-        luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}),
-      );
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
+      // $FlowFixMe
+      return getOdooService('@web/core/l10n/dates').serializeDate(luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}));
     }
     return getOdooService('web.time').date_to_str(new Date(rdate));
   }
 
-  generateTzDateTime(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  // $FlowFixMe
+  generateTzDateTime(min: number, max: ?number): Object {
     const rdate = this.generateInt(min, max);
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor >= 17) {
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
       return getOdooService('@web/core/l10n/dates').formatDateTime(
+        // $FlowFixMe
         luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}).setZone(getUserTZ()),
       );
     }
-    return moment(new Date(rdate)).format(
-      getOdooService('web.time').getLangDatetimeFormat(),
-    );
+    // $FlowFixMe
+    return moment(new Date(rdate)).format(getOdooService('web.time').getLangDatetimeFormat());
   }
 
-  generateDateTime(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  // $FlowFixMe
+  generateDateTime(min: number, max: ?number): Object {
     const rdate = this.generateInt(min, max);
     const OdooVerMajor = getOdooVersion('major');
-    if (OdooVerMajor >= 17) {
-      return getOdooService('@web/core/l10n/dates').serializeDateTime(
-        luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}),
-      );
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
+      // $FlowFixMe
+      return getOdooService('@web/core/l10n/dates').serializeDateTime(luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}));
     }
     return getOdooService('web.time').datetime_to_str(new Date(rdate));
   }
 
-  generateTzTime(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  // $FlowFixMe
+  generateTzTime(min: number, max: ?number): Object {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
-    if (OdooVerMajor >= 17) {
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
       const dt = this.generateTzDateTime(min, max);
       return dt.split(' ')[1];
     }
-    return moment(new Date(rdate)).format(
-      getOdooService('web.time').getLangTimeFormat(),
-    );
+    // $FlowFixMe
+    return moment(new Date(rdate)).format(getOdooService('web.time').getLangTimeFormat());
   }
 
-  generateTime(min, max) {
-    if (typeof min === 'undefined') {
-      return false;
-    }
+  // $FlowFixMe
+  generateTime(min: number, max: ?number): Object {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
-    if (OdooVerMajor >= 17) {
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
       const dt = this.generateDateTime(min, max);
       return dt.split(' ')[1];
     }

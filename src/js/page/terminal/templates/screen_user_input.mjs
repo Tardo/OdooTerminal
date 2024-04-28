@@ -1,9 +1,10 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import encodeHTML from '@terminal/utils/encode_html';
 
-export default function (PROMPT) {
+export default function (PROMPT: string): string {
   return `<div class='terminal-user-input'>
     <div class='terminal-prompt-container'>
       <span id="terminal-prompt-main" class='terminal-prompt'></span>

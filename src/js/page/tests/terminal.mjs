@@ -1,8 +1,9 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import OdooTerminal from '@odoo/terminal';
-import isEmpty from '@terminal/utils/is_empty';
+import isEmpty from '@trash/utils/is_empty';
 import TestBackend from './test_backend';
 import TestCommon from './test_common';
 import TestCore from './test_core';
@@ -16,13 +17,11 @@ export default class OdooTerminalTests extends OdooTerminal {
    */
   createTerminal() {
     super.createTerminal();
-    this.$el[0].addEventListener(
-      'start_terminal_tests',
-      this.onStartTests.bind(this),
-    );
+    // $FlowFixMe
+    this.$el[0].addEventListener('start_terminal_tests', this.onStartTests.bind(this));
   }
 
-  onStartTests(ev) {
+  onStartTests(ev: CustomEvent) {
     const test_names = (ev.detail || '').split(',').filter(item => item);
     this.doShow().then(() => {
       this.screen.clean();
@@ -30,19 +29,19 @@ export default class OdooTerminalTests extends OdooTerminal {
     });
   }
 
-  #getTestMethods(obj) {
-    const names = new Set();
+  // $FlowFixMe
+  #getTestMethods(obj: Object) {
+    const names = new Set<string>();
+    let it_obj = obj;
     do {
-      Object.getOwnPropertyNames(obj)
-        .filter(
-          item => item.startsWith('test_') && typeof obj[item] === 'function',
-        )
+      Object.getOwnPropertyNames(it_obj)
+        .filter(item => item.startsWith('test_') && typeof obj[item] === 'function')
         .map(item => names.add(item));
-    } while ((obj = Object.getPrototypeOf(obj)));
+    } while ((it_obj = Object.getPrototypeOf(it_obj)));
     return [...names];
   }
 
-  async #runTests(test_names) {
+  async #runTests(test_names: $ReadOnlyArray<String>): Promise<{[string]: mixed} | void> {
     const errors = {};
     for (const TestClass of TestSuites) {
       const test_suit = new TestClass(this);
@@ -65,9 +64,7 @@ export default class OdooTerminalTests extends OdooTerminal {
             errors[name] = e;
             this.screen.print('FAIL');
             this.screen.printError(e.stack);
-            if (this.config.console_errors) {
-              console.error(e);
-            }
+            console.error(e);
           }
           await test_suit.onAfterTest(name);
         }
@@ -77,11 +74,7 @@ export default class OdooTerminalTests extends OdooTerminal {
     this.screen.print('');
     if (Object.keys(errors).length > 0) {
       // Soft-Error
-      this.screen.print(
-        'ERRORS. The following test failed:',
-        false,
-        'terminal-test-fail',
-      );
+      this.screen.print('ERRORS. The following test failed:', false, 'terminal-test-fail');
       this.screen.print(Object.keys(errors));
       return errors;
     }

@@ -1,17 +1,18 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import rpcQuery from '@odoo/rpc';
 
-export default function (
-  model,
-  ids,
-  method,
-  args,
-  kwargs,
-  context,
-  extra_options,
-) {
+export default function <T>(
+  model: string,
+  ids: $ReadOnlyArray<number>,
+  method: string,
+  args: ?$ReadOnlyArray<mixed>,
+  kwargs: ?{[string]: mixed},
+  context: ?{[string]: mixed},
+  extra_options: ?{[string]: mixed},
+): Promise<$ReadOnlyArray<T>> {
   const skwargs = Object.assign(
     {
       context: context,
@@ -19,7 +20,7 @@ export default function (
     kwargs,
   );
   const sargs = [ids, ...(args || [])];
-  return rpcQuery(
+  return rpcQuery<$ReadOnlyArray<T>>(
     Object.assign(
       {
         method: method,

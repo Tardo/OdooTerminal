@@ -1,19 +1,28 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import callService from '@odoo/osv/call_service';
 
-const cache = {};
+export type CachedCallServiceOptions = {
+  force?: boolean,
+};
+
+export type MapCallback = (item: mixed) => mixed;
+
+// $FlowFixMe
+const cache: {[string]: Object} = {};
 export default async function (
-  cache_name,
-  service,
-  method,
-  args,
-  options,
-  map_func,
-) {
-  if (options?.force || typeof cache[cache_name] === 'undefined') {
-    let values = [];
+  cache_name: string,
+  service: string,
+  method: string,
+  args: $ReadOnlyArray<mixed>,
+  options?: CachedCallServiceOptions,
+  map_func?: MapCallback,
+  // $FlowFixMe
+): Object {
+  if (options?.force === true || typeof cache[cache_name] === 'undefined') {
+    let values: Array<mixed> = [];
     try {
       values = await callService(service, method, args);
     } catch (e) {

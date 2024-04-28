@@ -1,29 +1,39 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import checkStorageError from '@terminal/utils/check_storage_error';
 
-export function getStorageItem(item, def_value) {
+export type LocalStorageSetItemError = (error: string) => void;
+
+export function getStorageItem<T>(item: string, def_value: T): T {
   const res = localStorage.getItem(item);
-  if (res === null) {
+  if (typeof res === 'undefined' || res === null) {
     return def_value;
   }
   return JSON.parse(res);
 }
 
-export function setStorageItem(item, value, on_error = false) {
+export function setStorageItem(item: string, value: mixed, on_error?: LocalStorageSetItemError): boolean {
   try {
-    return localStorage.setItem(item, JSON.stringify(value));
+    // $FlowIgnore
+    localStorage.setItem(item, JSON.stringify(value));
   } catch (err) {
     const err_check = checkStorageError(err);
     if (on_error && err_check) {
       on_error(err_check);
     }
+    return false;
   }
 
-  return false;
+  return true;
 }
 
-export function removeStorageItem(item) {
-  return localStorage.removeItem(item) || undefined;
+export function removeStorageItem(item: string): boolean {
+  try {
+    localStorage.removeItem(item);
+  } catch (err) {
+    return false;
+  }
+  return true;
 }

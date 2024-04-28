@@ -1,13 +1,10 @@
+// @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import {IGNORED_KEYS} from '@common/constants.mjs';
 
-/**
- * @param {Object} e
- * @returns {Array}
- */
-export default function (e) {
+export default function (e: KeyboardEvent): Array<string> {
   const keybind = [];
   if (e.altKey) {
     keybind.push('Alt');
