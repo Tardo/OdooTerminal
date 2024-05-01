@@ -7,30 +7,35 @@ import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
+function updateLocationSearch(data: {[string]: string | number}) {
+  const search = Object.fromEntries(
+    window.location.search
+      .substr(1)
+      .split('&')
+      .map(item => item.split('=')),
+  );
+  Object.assign(search, data);
+  window.location.search = Object.entries(search)
+    .map(item => item.join('='))
+    .join('&');
+}
+
 async function cmdSetDebugMode(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  let location = '';
-  let location_search = false;
+  let sdebug;
   if (kwargs.mode === 0) {
     ctx.screen.print(i18n.t('cmdDebug.result.disabled', 'Debug mode <strong>disabled</strong>'));
-    const qs = $.deparam.querystring();
-    delete qs.debug;
-    location_search = true;
-    location = `?${$.param(qs)}`;
+    sdebug = '';
   } else if (kwargs.mode === 1) {
     ctx.screen.print(i18n.t('cmdDebug.result.enabled', 'Debug mode <strong>enabled</strong>'));
-    location = $.param.querystring(window.location.href, 'debug=1');
+    sdebug = '1';
   } else if (kwargs.mode === 2) {
     ctx.screen.print(i18n.t('cmdDebug.result.enabledAssets', 'Debug mode with assets <strong>enabled</strong>'));
-    location = $.param.querystring(window.location.href, 'debug=assets');
+    sdebug = 'assets';
   }
 
-  if (location) {
+  if (typeof sdebug !== 'undefined') {
     ctx.screen.print(i18n.t('cmdDebug.result.reload', 'Reloading page...'));
-    if (location_search) {
-      window.location.search = location;
-    } else {
-      window.location = location;
-    }
+    updateLocationSearch({debug: sdebug});
   } else {
     throw new Error(i18n.t('cmdDebug.error.invalidDebugMode', 'Invalid debug mode'));
   }
