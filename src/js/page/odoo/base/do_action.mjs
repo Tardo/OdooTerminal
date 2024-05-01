@@ -12,13 +12,14 @@ export default async function (action: string | number | {[string]: mixed}, opti
   if (typeof OdooVerMajor === 'number') {
     if (OdooVerMajor >= 17) {
       await getOdooRoot().actionService.doAction(action, options);
+      return {id: action};
     } else if (OdooVerMajor >= 14) {
       doTrigger('do-action', {action, options});
       // Simulate end of the 'action'
       // FIXME: This makes me cry
       await asyncSleep(1800);
+      return {id: action};
     }
-    return {id: action};
   }
 
   return await new Promise((resolve, reject) => {
