@@ -68,7 +68,7 @@ jobs:
         # Use only lower and active versions
         instance: [11.0, 15.0, 16.0, 17.0]
         browser: [chrome, firefox]
-      fail-fast: true
+      fail-fast: false
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
