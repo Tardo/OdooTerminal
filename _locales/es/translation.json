@@ -432,8 +432,8 @@
     "args": {
       "msg": "The message to print"
     },
-    "definition": "Close terminal",
-    "detail": "Close the terminal."
+    "definition": "Print a message",
+    "detail": "Eval parameters and print the result."
   },
   "cmdRead": {
     "args": {
