@@ -197,7 +197,7 @@ export default class Terminal {
 
   start(): void {
     if (!this.#wasLoaded) {
-      throw new Error('Terminal not loaded');
+      throw new Error(i18n.t('terminal.error.notLoaded', 'Terminal not loaded'));
     }
 
     this.$runningCmdCount = this.$el.find('#terminal_running_cmd_count');

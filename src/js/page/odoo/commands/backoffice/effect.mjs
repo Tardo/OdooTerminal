@@ -16,13 +16,15 @@ async function cmdShowEffect(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor < 15) {
     // Soft-Error
-    ctx.screen.printError('This command is only available in Odoo 15.0+');
+    ctx.screen.printError(
+      i18n.t('cmdEffect.error.incompatibleOdooVersion', 'This command is only available in Odoo 15.0+'),
+    );
     return;
   }
   if (isEmpty(kwargs.type)) {
     const {registry} = getOdooService('@web/core/registry');
     const effects = registry.category('effects');
-    ctx.screen.print('Available effects:');
+    ctx.screen.print(i18n.t('cmdEffect.result.availableEffects', 'Available effects:'));
     ctx.screen.print(effects.getEntries().map(item => item[0]));
   } else {
     showEffect(kwargs.type, kwargs.options);

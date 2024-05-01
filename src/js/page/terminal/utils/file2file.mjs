@@ -2,6 +2,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
+import i18n from 'i18next';
 import debounce from './debounce';
 
 export default function <T>(this: T, filename: string, options: {[string]: mixed}): Promise<> {
@@ -14,7 +16,7 @@ export default function <T>(this: T, filename: string, options: {[string]: mixed
   // $FlowFixMe
   const onBodyFocus = (reject: Function) => {
     if (!input_elm.value.length) {
-      return reject('Aborted by user. No file given...');
+      return reject(i18n.t('file2file.aborted', 'Aborted by user. No file given...'));
     }
   };
 

@@ -44,7 +44,7 @@ export default class Longpolling {
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 14) {
       const bus_serv = getOdooEnv()?.services?.bus_service;
       if (!bus_serv) {
-        throw new Error('bus service not available');
+        throw new Error(i18n.t('longpolling.error.notAvailable', 'bus service not available'));
       }
       return bus_serv[method](...params);
     }

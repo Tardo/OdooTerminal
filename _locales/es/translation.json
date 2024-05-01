@@ -1,6 +1,10 @@
 {
   "No": "",
   "Yes": "",
+  "checkStorageError": {
+    "message": "",
+    "warning": ""
+  },
   "cmdAction": {
     "args": {
       "action": "The action to launch<br/>Can be an string, number or object",
@@ -160,6 +164,9 @@
     },
     "definition": "Show database names",
     "detail": "Show database names",
+    "error": {
+      "noDBNames": ""
+    },
     "result": {
       "activeDatabase": "<strong>{{database}}</strong> (Active Database)"
     }
@@ -211,7 +218,13 @@
       "type": "The type of the effect"
     },
     "definition": "Show effect",
-    "detail": "Show effect"
+    "detail": "Show effect",
+    "error": {
+      "incompatibleOdooVersion": ""
+    },
+    "result": {
+      "availableEffects": ""
+    }
   },
   "cmdExportFile": {
     "args": {
@@ -666,9 +679,20 @@
       "connectionEstablished": "[{{url}}] Connection established"
     }
   },
+  "file2base64": {
+    "aborted": ""
+  },
+  "file2file": {
+    "aborted": ""
+  },
   "loader": {
     "cantInitTerm": "Can't initilize terminal",
     "testsEnabled": "Tests Enabled"
+  },
+  "longpolling": {
+    "error": {
+      "notAvailable": ""
+    }
   },
   "odoo": {
     "longpolling": {
@@ -716,6 +740,7 @@
     "error": {
       "invalidHTTPRequest": "Invalid HTTP Request",
       "notInitJob": "Unexpected error: can't initialize the job!",
+      "notLoaded": "",
       "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
     },
     "exception": {

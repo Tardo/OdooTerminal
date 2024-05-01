@@ -17,7 +17,7 @@ async function cmdShowDBList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
     const databases_len = databases.length;
     if (!databases_len) {
       // Soft-Error
-      ctx.screen.printError("Can't get database names");
+      ctx.screen.printError(i18n.t('cmdDBList.error.noDBNames', "Can't get database names"));
       return;
     }
     // Search active database
