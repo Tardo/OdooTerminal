@@ -7,7 +7,7 @@ import i18n from 'i18next';
 import type {CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdToggleTerm(this: Terminal): Promise<mixed> {
+async function cmdToggleTerm(this: Terminal): Promise<> {
   return this.doToggle();
 }
 

@@ -10,7 +10,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdAlias(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+async function cmdAlias(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<{[string]: string}> {
   const aliases = getStorageItem('terminal_aliases', {});
   if (!kwargs.name) {
     if (isEmpty(aliases)) {

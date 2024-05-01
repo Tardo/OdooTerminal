@@ -34,17 +34,21 @@ async function mergeModelRecords(this: Terminal, model: string, data: $ReadOnlyA
   });
   const tasks = [];
   for (const vals of records_vals) {
+    // $FlowFixMe
     const num_recs = await searchCount(model, [['id', '=', vals.id]], this.getContext());
 
     if (num_recs === 0) {
       delete vals.id;
+      // $FlowFixMe
       tasks.push(createRecord(model, vals, this.getContext()));
     } else {
+      // $FlowFixMe
       tasks.push(writeRecord(model, vals.id, vals, this.getContext()));
     }
   }
   const results = await Promise.all(tasks);
   results.forEach((item, index) => {
+    // $FlowFixMe
     if (item.constructor === Number && !records_vals[index].id) {
       records_vals[index].id = item;
     }
@@ -56,7 +60,9 @@ async function mergeModelRecords(this: Terminal, model: string, data: $ReadOnlyA
 function onMessagePasteDone(
   this: Terminal,
   ctx: CMDCallbackContext,
+  // $FlowFixMe
   resolve: Object,
+  // $FlowFixMe
   reject: Object,
   merge: boolean,
   no_questions: boolean,
@@ -68,11 +74,13 @@ function onMessagePasteDone(
     onMessagePasteDone.bind(this, ctx.screen, resolve, reject, merge, no_questions, vals),
   );
   const msg_vals = vals.values;
+  // $FlowFixMe
   if (isEmpty(msg_vals) || isEmpty(msg_vals.data)) {
     ctx.screen.printError(i18n.t('cmdPaste.error.noData', 'No data to copy!'));
     return resolve();
   }
 
+  // $FlowFixMe
   const {type, data, model} = vals.values;
   const data_parsed = JSON.parse(data);
   if (type === 'model') {

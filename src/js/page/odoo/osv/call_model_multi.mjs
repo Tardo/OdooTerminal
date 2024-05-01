@@ -12,7 +12,7 @@ export default function <T>(
   kwargs: ?{[string]: mixed},
   context: ?{[string]: mixed},
   extra_options: ?{[string]: mixed},
-): Promise<$ReadOnlyArray<T>> {
+): Promise<T> {
   const skwargs = Object.assign(
     {
       context: context,
@@ -20,7 +20,7 @@ export default function <T>(
     kwargs,
   );
   const sargs = [ids, ...(args || [])];
-  return rpcQuery<$ReadOnlyArray<T>>(
+  return rpcQuery<T>(
     Object.assign(
       {
         method: method,

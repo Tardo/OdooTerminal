@@ -10,7 +10,7 @@ import type Terminal from '@terminal/terminal';
 
 type RowInfo = [string, number, string, number, number, string];
 
-async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<Array<RowInfo>> {
   const parse_info = this.parse(kwargs.code);
   const rows: Array<RowInfo> = [];
   const {stack} = parse_info;
@@ -56,6 +56,8 @@ async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
     ],
     rows,
   );
+
+  return rows;
 }
 
 export default function (): Partial<CMDDef> {

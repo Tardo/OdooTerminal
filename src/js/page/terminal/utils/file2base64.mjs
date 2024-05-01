@@ -20,12 +20,14 @@ export default function <T>(this: T): Promise<> {
     input_elm.onchange = e => {
       const file = e.target.files[0];
       const reader = new FileReader();
-      reader.readAsDataURL(file);
+      reader.readAsArrayBuffer(file);
 
       reader.onerror = reject;
       reader.onabort = reject;
-      // $FlowFixMe
-      reader.onload = readerEvent => resolve(readerEvent.target.result);
+      reader.onload = readerEvent => {
+        // $FlowFixMe
+        resolve(btoa(String.fromCharCode(...new Uint8Array(readerEvent.target.result))));
+      };
     };
     input_elm.click();
   }).finally(() => {

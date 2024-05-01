@@ -8,7 +8,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdChrono(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+async function cmdChrono(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<number> {
   let time_elapsed_secs = -1;
   const start_time = new Date().getTime();
   await this.execute(kwargs.cmd, false);

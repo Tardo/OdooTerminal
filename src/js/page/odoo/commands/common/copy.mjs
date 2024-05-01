@@ -10,9 +10,9 @@ import Recordset from '@terminal/core/recordset.mjs';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
-// $FlowFixMe
 function onMessageCopyDone(
   this: Terminal,
+  // $FlowFixMe
   resolve: Object,
   ctx: CMDCallbackContext,
   data: {[string]: mixed},

@@ -55,6 +55,9 @@
     }
   },
   "lint-staged": {
+    "*": [
+      "prettier --write"
+    ],
     "*.{mjs,js}": [
       "eslint --color --fix --parser hermes-eslint"
     ]

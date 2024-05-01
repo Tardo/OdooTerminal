@@ -13,12 +13,14 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  let fields = kwargs.field[0] === '*' ? false : kwargs.field;
+  const search_all_fields = kwargs.field[0] === '*';
+  let fields = kwargs.field;
   const bin_fields = [];
 
   // Due to possible problems with binary fields it is necessary to filter them out
-  if (!fields && !kwargs.read_binary) {
-    const fieldDefs = await callModel<{[string]: {[string]: string | number}}>(
+  if (search_all_fields && !kwargs.read_binary) {
+    // $FlowFixMe
+    const fieldDefs = await callModel<{[string]: Object}>(
       kwargs.model,
       'fields_get',
       [fields],

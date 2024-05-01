@@ -4,6 +4,13 @@
 
 import callModel from '@odoo/osv/call_model';
 
-export default function (model: string, fields: $ReadOnlyArray<string>, context: {...}): Promise<> {
-  return callModel(model, 'fields_get', [fields], null, context);
+// $FlowFixMe
+export default function (
+  model: string,
+  fields: $ReadOnlyArray<string> | false,
+  context: {...},
+  // $FlowFixMe
+): Promise<{[string]: Object}> {
+  // $FlowFixMe
+  return callModel<{[string]: Object}>(model, 'fields_get', [fields], null, context);
 }

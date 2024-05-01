@@ -8,7 +8,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdClear(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+async function cmdClear(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<void> {
   if (kwargs.section === 'history') {
     this.cleanInputHistory();
   } else {

@@ -57,7 +57,7 @@ export default class TestCommon extends TerminalTestSuite {
       `create -m res.partner -v {name: '${uniqueId('This is a Test #')}'}`,
       false,
       true,
-    );
+    )[0];
     const res = await this.terminal.execute(`unlink -m res.partner -i ${record.id}`, false, true);
     this.assertTrue(res);
   }
@@ -140,7 +140,7 @@ export default class TestCommon extends TerminalTestSuite {
       if (OdooVerMajor >= 17) {
         this.assertTrue(res !== null && typeof res !== 'undefined');
       } else {
-         this.assertEqual(res.id, 'base.action_res_company_form');
+        this.assertEqual(res.id, 'base.action_res_company_form');
       }
       res = await this.terminal.execute(
         "action -a {type: 'ir.actions.act_window', res_model: 'res.partner', view_type: 'form', view_mode: 'form', views: [[false, 'form']], target: 'current', res_id: 1}",

@@ -16,20 +16,21 @@ async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
   const modue_infos = await searchModules.bind(this)(kwargs.module);
   if (!isEmpty(modue_infos)) {
     if (!kwargs.force) {
-      let depends: $ReadOnlyArray<string> = await this.execute(`depends -m ${kwargs.module}`, false, true);
-      if (isEmpty(depends)) {
+      const res: $ReadOnlyArray<mixed> = await this.execute(`depends -m ${kwargs.module}`, false, true);
+      if (isEmpty(res)) {
         return;
       }
-      depends = depends.filter(item => item !== kwargs.module);
+      // $FlowFixMe
+      const depends: $ReadOnlyArray<string> = res.filter(item => item !== kwargs.module);
       if (!isEmpty(depends)) {
         ctx.screen.print(i18n.t('cmdUninstall.result.willRemoved', 'This operation will remove these modules too:'));
         ctx.screen.print(depends);
-        const res = await ctx.screen.showQuestion(
+        const res_quest = await ctx.screen.showQuestion(
           i18n.t('cmdUninstall.question.continue', 'Do you want to continue?'),
           ['y', 'n'],
           'n',
         );
-        if (res?.toLowerCase() !== 'y') {
+        if (res_quest?.toLowerCase() !== 'y') {
           ctx.screen.printError(i18n.t('cmdUninstall.error.canceled', 'Operation cancelled'));
           return false;
         }
@@ -60,7 +61,7 @@ async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
   );
 }
 
-function getOptions(arg_name) {
+function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'module') {
     return cachedSearchRead(
       'options_ir.module.module_active',
@@ -68,7 +69,6 @@ function getOptions(arg_name) {
       [],
       ['name'],
       this.getContext({active_test: true}),
-      null,
       item => item.name,
     );
   }

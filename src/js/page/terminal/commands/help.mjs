@@ -55,7 +55,7 @@ async function printHelpDetailed(screen: Screen, cmd: string, cmd_def: CMDDef) {
   }
 }
 
-async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
+async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<void> {
   if (typeof kwargs.cmd === 'undefined') {
     const sorted_cmd_keys = Object.keys(this.registeredCmds).sort();
     const sorted_keys_len = sorted_cmd_keys.length;

@@ -10,7 +10,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdOpenSettings(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
+async function cmdOpenSettings(this: Terminal, kwargs: CMDCallbackArgs): Promise<void> {
   await doAction({
     name: 'Settings',
     type: 'ir.actions.act_window',

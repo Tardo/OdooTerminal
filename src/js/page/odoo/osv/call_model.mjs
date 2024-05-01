@@ -5,7 +5,7 @@
 import rpcQuery from '@odoo/rpc';
 import type {BuildQueryOptions} from '@odoo/rpc';
 
-export default function <T>(
+export default async function <T>(
   model: string,
   method: string,
   args: ?$ReadOnlyArray<mixed>,
@@ -25,5 +25,5 @@ export default function <T>(
     args: args || [],
     kwargs: skwargs,
   };
-  return rpcQuery<T>(Object.assign(options, extra_options));
+  return await rpcQuery<T>(Object.assign(options, extra_options));
 }

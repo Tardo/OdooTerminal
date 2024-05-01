@@ -21,6 +21,7 @@ async function cmdRef(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
   for (const xmlid of kwargs.xmlid) {
     if (typeof OdooVerMajor === 'number' && OdooVerMajor < 15) {
       tasks.push(
+        // $FlowFixMe
         callModel<ReferenceInfo>('ir.model.data', 'xmlid_to_res_model_res_id', [xmlid], null, this.getContext()).then(
           ((active_xmlid: string, result: [number, string]) => {
             return [active_xmlid, result[0], result[1]];
@@ -38,6 +39,7 @@ async function cmdRef(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
           [module, xid],
           null,
           this.getContext(),
+          // $FlowFixMe
         ).then(
           ((active_xmlid: string, result: [number, string]) => {
             return [active_xmlid, result[0], result[1]];

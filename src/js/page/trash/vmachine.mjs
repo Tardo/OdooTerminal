@@ -93,7 +93,12 @@ export default class VMachine {
     return undefined;
   }
 
-  async #callFunction(aliases: {[string]: string}, frame: Frame, parse_info: ParseInfo, silent: boolean): mixed {
+  async #callFunction(
+    aliases: {[string]: string},
+    frame: Frame,
+    parse_info: ParseInfo,
+    silent: boolean,
+  ): Promise<mixed> {
     if (typeof frame.cmd !== 'undefined') {
       const frame_cmd = frame.cmd;
       if (this.registeredCmds[frame_cmd]) {
@@ -137,10 +142,10 @@ export default class VMachine {
       // $FlowFixMe
       const alias_cmd = this.parseAliases(aliases, frame_cmd, frame.values);
       if (typeof alias_cmd !== 'undefined') {
-        const ret_val = await this.eval(alias_cmd, {
+        const res = await this.eval(alias_cmd, {
           aliases: aliases,
         });
-        return ret_val[0];
+        return res[0];
       }
     }
   }
@@ -152,7 +157,7 @@ export default class VMachine {
     return Object.hasOwn(this.registeredCmds, global_name) || !isFalsy(aliases[global_name]);
   }
 
-  async eval(cmd_raw: string, options?: Partial<EvalOptions>): Promise<Array<mixed>> {
+  async eval(cmd_raw: string, options?: Partial<EvalOptions>): Promise<$ReadOnlyArray<mixed>> {
     if (cmd_raw?.constructor !== String) {
       throw new Error('Invalid input!');
     }
@@ -175,11 +180,14 @@ export default class VMachine {
     let last_frame = root_frame;
     for (let index = 0; index < stack_instr_len; ++index) {
       const instr = stack.instructions[index];
-      const token = instr.inputTokenIndex >= 0 ? parse_info.inputTokens[instr.level][instr.inputTokenIndex] : {
-        value: '',
-        start: -1,
-        end: -1,
-      };
+      const token =
+        instr.inputTokenIndex >= 0
+          ? parse_info.inputTokens[instr.level][instr.inputTokenIndex]
+          : {
+              value: '',
+              start: -1,
+              end: -1,
+            };
       switch (instr.type) {
         case INSTRUCTION_TYPE.LOAD_NAME:
           {

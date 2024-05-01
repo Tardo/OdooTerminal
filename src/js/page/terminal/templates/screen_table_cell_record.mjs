@@ -8,7 +8,7 @@ export default function (model: string, field: string, item: {[string]: string |
   const item_val = item[field];
   if (
     item_val !== null &&
-    typeof item_val === 'undefined' &&
+    typeof item_val !== 'undefined' &&
     typeof item_val === 'object' &&
     item_val.oterm &&
     item_val.binary

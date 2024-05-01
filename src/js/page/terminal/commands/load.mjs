@@ -9,7 +9,7 @@ import injectResource from '@terminal/utils/inject_resource';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdLoadResource(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
+async function cmdLoadResource(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
   return injectResource(new URL(kwargs.url), kwargs.type);
 }
 

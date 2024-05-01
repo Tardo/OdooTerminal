@@ -12,7 +12,7 @@ async function cmdTerminalContextOperation(
   this: Terminal,
   kwargs: CMDCallbackArgs,
   ctx: CMDCallbackContext,
-): Promise<mixed> {
+): Promise<{[string]: mixed}> {
   if (kwargs.operation === 'set') {
     this.userContext = kwargs.value;
   } else if (kwargs.operation === 'write') {

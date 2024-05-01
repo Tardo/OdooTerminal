@@ -9,7 +9,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdGenFile(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
+async function cmdGenFile(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
   return file2file(kwargs.name, kwargs.options);
 }
 

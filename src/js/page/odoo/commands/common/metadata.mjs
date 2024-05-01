@@ -22,7 +22,14 @@ type MetadataInfo = {
 
 async function cmdMetadata(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const metadata = (
-    await callModelMulti<MetadataInfo>(kwargs.model, [kwargs.id], 'get_metadata', null, null, this.getContext())
+    await callModelMulti<$ReadOnlyArray<MetadataInfo>>(
+      kwargs.model,
+      [kwargs.id],
+      'get_metadata',
+      null,
+      null,
+      this.getContext(),
+    )
   )[0];
 
   if (typeof metadata === 'undefined') {

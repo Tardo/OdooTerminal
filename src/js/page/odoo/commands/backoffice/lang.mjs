@@ -116,7 +116,7 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
     }
 
     // Get action to export
-    const status: boolean = await callModelMulti(
+    const status: boolean = await callModelMulti<boolean>(
       'base.language.import',
       [wizard_id],
       'import_lang',

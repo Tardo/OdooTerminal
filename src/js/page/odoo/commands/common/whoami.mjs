@@ -24,8 +24,22 @@ async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
   }
   const record = result[0];
   const result_tasks = await Promise.all([
-    callModelMulti<[number, string]>('res.groups', record.groups_id, 'name_get', null, null, this.getContext()),
-    callModelMulti<[number, string]>('res.company', record.company_ids, 'name_get', null, null, this.getContext()),
+    callModelMulti<$ReadOnlyArray<[number, string]>>(
+      'res.groups',
+      record.groups_id,
+      'name_get',
+      null,
+      null,
+      this.getContext(),
+    ),
+    callModelMulti<$ReadOnlyArray<[number, string]>>(
+      'res.company',
+      record.company_ids,
+      'name_get',
+      null,
+      null,
+      this.getContext(),
+    ),
   ]);
   const groups_list = [];
   for (const group of result_tasks[0]) {

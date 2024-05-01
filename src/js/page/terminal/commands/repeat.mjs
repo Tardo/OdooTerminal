@@ -8,7 +8,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdRepeat(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+async function cmdRepeat(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<> {
   if (kwargs.times < 0) {
     throw new Error(i18n.t('cmdRepeat.error.mustBePositive', "'Times' parameter must be positive"));
   }

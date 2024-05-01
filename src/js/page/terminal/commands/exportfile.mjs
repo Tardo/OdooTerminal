@@ -10,7 +10,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<string> {
   const filename = `${uniqueId('term')}_${new Date().getTime()}.json`;
   const data = JSON.stringify(kwargs.value, null, 4);
   save2file(filename, 'text/json', data);

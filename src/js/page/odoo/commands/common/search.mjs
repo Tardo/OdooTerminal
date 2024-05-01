@@ -15,7 +15,8 @@ import type Terminal from '@odoo/terminal';
 const search_buffer = {};
 async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const lines_total = ctx.screen.maxLines - 3;
-  let fields = kwargs.field[0] === '*' ? false : kwargs.field;
+  const search_all_fields = kwargs.field[0] === '*';
+  let fields = kwargs.field;
 
   if (kwargs.more) {
     const buff = search_buffer[ctx.meta.name];
@@ -52,8 +53,8 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
 
   // Due to possible problems with binary fields it is necessary to filter them out
   const bin_fields = [];
-  if (!fields && !kwargs.read_binary) {
-    const fieldDefs = await getFieldsInfo(kwargs.model, fields, this.getContext());
+  if (search_all_fields && !kwargs.read_binary) {
+    const fieldDefs = await getFieldsInfo(kwargs.model, false, this.getContext());
 
     fields = [];
     Object.entries(fieldDefs).forEach(item => {
@@ -160,7 +161,10 @@ export default function (): Partial<CMDDef> {
         ARG.String,
         ['o', 'order'],
         false,
-        i18n.t('cmdSearch.args.order', "The order<br/>A list of orders separated by comma (Example: 'age DESC, email')"),
+        i18n.t(
+          'cmdSearch.args.order',
+          "The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
+        ),
       ],
       [ARG.Flag, ['more', 'more'], false, i18n.t('cmdSearch.args.more', 'Flag to indicate that show more results')],
       [ARG.Flag, ['all', 'all'], false, i18n.t('cmdSearch.args.all', 'Show all records (not truncated)')],

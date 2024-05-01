@@ -358,14 +358,14 @@ export default class Terminal {
     return this.virtMachine.parse(data, options, level);
   }
 
-  eval(code: string, options?: Partial<EvalOptions>): Promise<Array<mixed>> {
+  eval(code: string, options?: Partial<EvalOptions>): Promise<$ReadOnlyArray<mixed>> {
     return this.virtMachine.eval(code, {
       ...options,
       aliases: getStorageLocalItem('terminal_aliases', {}),
     });
   }
 
-  async execute(code: string, store: boolean = true, silent: boolean = false): Promise<Array<mixed> | mixed> {
+  async execute(code: string, store: boolean = true, silent: boolean = false): Promise<$ReadOnlyArray<mixed>> {
     await this.#wakeUp();
 
     // Check if secured commands involved
@@ -376,7 +376,7 @@ export default class Terminal {
     if (store) {
       this.#storeUserInput(code);
     }
-    const cmd_res = [];
+    const cmd_res: Array<mixed> = [];
     try {
       const results = await this.eval(code, {
         silent: silent,
@@ -399,10 +399,6 @@ export default class Terminal {
         logger.error('core', err);
       }
       throw err;
-    }
-
-    if (cmd_res.length === 1) {
-      return cmd_res[0];
     }
     return cmd_res;
   }
@@ -578,7 +574,7 @@ export default class Terminal {
         screen: new Proxy(this.screen, {...ScreenCommandHandler, silent: silent}),
         meta: meta,
       };
-      result = (await command_info.cmdDef.callback.call(this, command_info.kwargs, call_ctx)) || undefined;
+      result = await command_info.cmdDef.callback.call(this, command_info.kwargs, call_ctx);
     } catch (err) {
       is_failed = true;
       error =

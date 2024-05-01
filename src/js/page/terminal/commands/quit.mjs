@@ -7,7 +7,7 @@ import i18n from 'i18next';
 import type {CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdQuit(this: Terminal): Promise<mixed> {
+async function cmdQuit(this: Terminal): Promise<> {
   this.doHide();
 }
 
