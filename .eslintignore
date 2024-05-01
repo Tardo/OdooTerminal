@@ -8,3 +8,4 @@ dist
 *.toml
 package-lock.json
 scripts/
+src/js/flow-typed/
