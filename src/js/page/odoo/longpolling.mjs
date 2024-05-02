@@ -2,6 +2,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
+import i18n from 'i18next';
 import {getStorageItem, removeStorageItem, setStorageItem} from '@terminal/core/storage/local';
 import doCall from './base/do_call';
 import getOdooEnv from './utils/get_odoo_env';

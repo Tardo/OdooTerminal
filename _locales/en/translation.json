@@ -699,6 +699,9 @@
   "file2file": {
     "aborted": "Aborted by user. No file given..."
   },
+  "getOdooEnvService": {
+    "error": "Service '{{service_name}}' not available"
+  },
   "loader": {
     "cantInitTerm": "Can't initilize terminal",
     "testsEnabled": "Tests Enabled"
