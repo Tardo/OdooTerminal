@@ -5,6 +5,11 @@
     "message": "",
     "warning": ""
   },
+  "cmdARes": {
+    "error": {
+      "notInstalled": "The module '{{module}}' isn't installed"
+    }
+  },
   "cmdAction": {
     "args": {
       "action": "The action to launch<br/>Can be an string, number or object",
@@ -189,7 +194,9 @@
   },
   "cmdDepends": {
     "args": {
-      "module": "The module technical name"
+      "key": "The key",
+      "module": "The module technical name",
+      "section": "The URL section"
     },
     "definition": "Know modules that depends on the given module",
     "detail": "Show a list of the modules that depends on the given module",
@@ -558,6 +565,13 @@
       "clean": "Tour '{{name}}' clean",
       "empty": "The tour list is empty",
       "running": "Running tour..."
+    }
+  },
+  "cmdURL": {
+    "definition": "Get URL parameters",
+    "detail": "Get URL parameters",
+    "error": {
+      "notKey": "A key has not been provided"
     }
   },
   "cmdUal": {

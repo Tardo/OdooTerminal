@@ -370,4 +370,11 @@ export default class TestCommon extends TerminalTestSuite {
     res = (await this.terminal.execute('barcode -o send -d O-CMD.DISCARD,O-CMD.EDIT,O-CMD.DISCARD', false, true))[0];
     this.assertNotEmpty(res);
   }
+
+  async test_url() {
+    let res = (await this.terminal.execute('url', false, true))[0];
+    this.assertNotEmpty(res);
+    res = (await this.terminal.execute('url -s hash -k menu_id', false, true))[0];
+    this.assertNotEmpty(res);
+  }
 }

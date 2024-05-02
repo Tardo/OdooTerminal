@@ -42,6 +42,7 @@ import cmdVersion from './version';
 import cmdWhoami from './whoami';
 import cmdWrite from './write';
 import cmdWS from './ws';
+import cmdURL from './url';
 import type Terminal from '@terminal/terminal';
 
 export default function (TerminalObj: Terminal) {
@@ -85,4 +86,5 @@ export default function (TerminalObj: Terminal) {
   TerminalObj.registerCommand('commit', cmdCommit());
   TerminalObj.registerCommand('rollback', cmdRollback());
   TerminalObj.registerCommand('now', cmdNow());
+  TerminalObj.registerCommand('url', cmdURL());
 }
