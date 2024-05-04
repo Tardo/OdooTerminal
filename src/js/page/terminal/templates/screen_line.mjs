@@ -68,8 +68,8 @@ export default function renderLine(msg: mixed, cls?: string): Array<string> {
     } else {
       res.push(renderLineObject(msg, cls));
     }
-  } else if (typeof msg === 'string') {
-    res.push(renderLineText(msg, cls));
+  } else {
+    res.push(renderLineText(new String(msg).toString(), cls));
   }
   return res;
 }
