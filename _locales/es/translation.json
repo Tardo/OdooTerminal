@@ -5,11 +5,6 @@
     "message": "",
     "warning": ""
   },
-  "cmdARes": {
-    "error": {
-      "notInstalled": "The module '{{module}}' isn't installed"
-    }
-  },
   "cmdAction": {
     "args": {
       "action": "The action to launch<br/>Can be an string, number or object",
@@ -729,7 +724,7 @@
         "xmlID": "XML-ID"
       },
       "recordCreated": {
-        "sucess": "{{model}} record(s) created successfully: {{links}}"
+        "sucess": "{{model}} record(s) created successfully: {{- links}}"
       },
       "whoami": {
         "activeCompany": "Active Company",
