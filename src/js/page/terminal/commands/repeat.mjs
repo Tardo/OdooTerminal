@@ -25,7 +25,10 @@ async function cmdRepeat(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallba
     }
     this.eval(`$repeat_index=${kwargs.times - rtimes}`, {silent: true});
     return this.eval(kwargs.cmd, {silent: kwargs.silent})
-      .then(result => res.push(result))
+      .then(result => {
+        res.push(result[0]);
+        return res;
+      })
       .finally(() => do_repeat(rtimes - 1));
   };
   return do_repeat(kwargs.times);
