@@ -44,6 +44,7 @@ export const LEXER = {
   Elif: 38,
   Else: 39,
   Silent: 40,
+  VariableCall: 41,
 };
 
 export const LEXER_MATH_OPER = [
@@ -65,6 +66,7 @@ export const LEXER_MATH_OPER = [
 
 export const LEXERDATA = [
   LEXER.Variable,
+  LEXER.VariableCall,
   LEXER.Array,
   LEXER.String,
   LEXER.StringSimple,
@@ -119,6 +121,7 @@ export const INSTRUCTION_TYPE = {
   JUMP_IF_FALSE: 35,
   JUMP_IF_TRUE: 36,
   JUMP_BACKWARD: 37,
+  LOAD_NAME_CALLEABLE: 38,
 
   getHumanType: function (type: number): string {
     const res = Object.entries(INSTRUCTION_TYPE).find(item => item[1] === type);

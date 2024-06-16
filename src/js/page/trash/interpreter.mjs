@@ -358,6 +358,9 @@ export default class Interpreter {
       token_san = token_san.substr(1, token_san.length - 2);
       token_san = token_san.trim();
       ttype = LEXER.LogicBlock;
+    } else if (token_san[0] === SYMBOLS.VARIABLE && token_san[1] === SYMBOLS.VARIABLE) {
+      ttype = LEXER.VariableCall;
+      token_san = token_san.substr(2);
     } else if (token_san[0] === SYMBOLS.VARIABLE) {
       ttype = LEXER.Variable;
       token_san = token_san.substr(1);
@@ -500,7 +503,7 @@ export default class Interpreter {
     let active_value = token_active.raw.trim();
     if (active_value.startsWith(SYMBOLS.FUNCTION_ARGS_START)) {
       fun_args = token_active.value.split(',')
-        .map(item => ([ARG.Any, [item, item], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+        .map(item => ([ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
     } else {
       fun_name = active_value;
       // Args
@@ -705,6 +708,25 @@ export default class Interpreter {
               to_append.instructions.push(new Instruction(sign_cache, index, level));
               sign_cache = null;
             }
+          }
+          break;
+        case LEXER.VariableCall:
+          if (isFalsy(options?.isData)) {
+            to_append.names.push(token.value);
+            const dindex = res.stack.names[0].length;
+            to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_NAME_CALLEABLE, index, level, dindex));
+            const ninstr = new Instruction(
+              !isFalsy(options?.silent) || silent ? INSTRUCTION_TYPE.CALL_FUNCTION_SILENT : INSTRUCTION_TYPE.CALL_FUNCTION,
+              -1,
+              level,
+            );
+            if (token_subindex === 0) {
+              to_append_eoc.instructions.push(ninstr);
+            } else {
+              to_append.instructions.push(ninstr);
+            }
+          } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
+            throw new InvalidTokenError(token.value, token.start, token.end);
           }
           break;
         case LEXER.ArgumentLong:

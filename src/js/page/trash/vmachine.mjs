@@ -16,6 +16,7 @@ import InvalidNameError from './exceptions/invalid_name_error';
 import InvalidTokenError from './exceptions/invalid_token_error';
 import InvalidValueError from './exceptions/invalid_value_error';
 import NotExpectedCommandArgumentError from './exceptions/not_expected_command_argument_error';
+import NotCalleableNameError from './exceptions/not_calleable_name_error';
 import UnknownCommandError from './exceptions/unknown_command_error';
 import UnknownNameError from './exceptions/unknown_name_error';
 import InvalidCommandDefintionError from './exceptions/invalid_command_definition_error';
@@ -86,58 +87,46 @@ export default class VMachine {
     return [];
   }
 
-
-  async #callFunction(
-    opts: EvalOptions,
-    frame: Frame,
-    parse_info: ParseInfo,
-    silent: boolean,
-  ): Promise<mixed> {
-    if (typeof frame.cmd !== 'undefined') {
-      const frame_cmd = frame.cmd;
-      const cmd_def = this.#registeredCmds[frame_cmd];
-      if (typeof cmd_def !== 'undefined') {
-        const items_len = frame.values.length;
-        if (frame.args.length > items_len) {
-          throw new InvalidCommandArgumentsError(frame_cmd, frame.args);
-        }
-        let kwargs: {[string]: mixed} = {};
-        const {values} = frame;
-        for (let index = items_len - 1; index >= 0; --index) {
-          let arg_name = frame.args.pop();
-          if (!arg_name) {
-            const arg_def = cmd_def.args[index];
-            if (!arg_def) {
-              throw new InvalidCommandArgumentValueError(frame_cmd, values[index]);
-            }
-            arg_name = arg_def[1][1];
-          }
-          kwargs[arg_name] = values[index];
-        }
-
-        try {
-          kwargs = await validateAndFormatArguments(cmd_def, kwargs);
-        } catch (err) {
-          throw new InvalidCommandArgumentFormatError(err.message, frame_cmd);
-        }
-
-        if (cmd_def.is_function) {
-          if (typeof cmd_def.callback_internal === 'undefined') {
-            throw new InvalidCommandDefintionError();
-          }
-          return await cmd_def.callback_internal(this, kwargs, frame, opts);
-        }
-        return await this.options.processCommandJob(
-          {
-            cmdRaw: parse_info.inputRawString,
-            cmdName: frame_cmd,
-            cmdDef: cmd_def,
-            kwargs: kwargs,
-          },
-          silent,
-        );
-      }
+  async #invokeFunction(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef, parse_info: ParseInfo, silent: boolean): Promise<mixed> {
+    const items_len = frame.values.length;
+    if (frame.args.length > items_len) {
+      throw new InvalidCommandArgumentsError(name, frame.args);
     }
+    let kwargs: {[string]: mixed} = {};
+    const {values} = frame;
+    for (let index = items_len - 1; index >= 0; --index) {
+      let arg_name = frame.args.pop();
+      if (!arg_name) {
+        const arg_def = cmd_def.args[index];
+        if (!arg_def) {
+          throw new InvalidCommandArgumentValueError(name, values[index]);
+        }
+        arg_name = arg_def[1][1];
+      }
+      kwargs[arg_name] = values[index];
+    }
+
+    try {
+      kwargs = await validateAndFormatArguments(cmd_def, kwargs);
+    } catch (err) {
+      throw new InvalidCommandArgumentFormatError(err.message, name);
+    }
+
+    if (cmd_def.is_function) {
+      if (typeof cmd_def.callback_internal === 'undefined') {
+        throw new InvalidCommandDefintionError();
+      }
+      return await cmd_def.callback_internal(this, kwargs, frame, opts);
+    }
+    return await this.options.processCommandJob(
+      {
+        cmdRaw: parse_info.inputRawString,
+        cmdName: name,
+        cmdDef: cmd_def,
+        kwargs: kwargs,
+      },
+      silent,
+    );
   }
 
   async execute(parse_info: ParseInfo, opts: EvalOptions, aframe?: Frame): Promise<mixed> {
@@ -163,16 +152,27 @@ export default class VMachine {
               end: -1,
             };
       switch (instr.type) {
+        case INSTRUCTION_TYPE.LOAD_NAME_CALLEABLE:
         case INSTRUCTION_TYPE.LOAD_NAME:
           {
             const var_name = stack.names[instr.level][instr.dataIndex] || '';
+            if (instr.type === INSTRUCTION_TYPE.LOAD_NAME_CALLEABLE) {
+              last_frame = new Frame('__anon__', last_frame);
+              frames.push(last_frame);
+            }
             // Check stores
-            if (last_frame && Object.hasOwn(last_frame.store, var_name)) {
-              const val = last_frame.store[var_name];
-              last_frame.values.push(val);
-            } else if (Object.hasOwn(this.#registeredNames, var_name)) {
-              last_frame.values.push(this.#registeredNames[var_name]);
-            } else {
+            let cur_frame: Frame | void = last_frame;
+            let val_found = false;
+            while (typeof cur_frame !== 'undefined') {
+              if (Object.hasOwn(cur_frame.store, var_name)) {
+                const val = cur_frame.store[var_name];
+                last_frame.values.push(val);
+                val_found = true;
+                break;
+              }
+              cur_frame = cur_frame.prevFrame;
+            }
+            if (!val_found) {
               throw new UnknownNameError(var_name, token.start, token.end);
             }
           }
@@ -181,9 +181,9 @@ export default class VMachine {
           {
             const cmd_name = stack.names[instr.level][instr.dataIndex];
             if (cmd_name === null || typeof cmd_name === 'undefined') {
-              return [false];
+              throw new UnknownNameError(i18n.t('<InvalidName>'), token.start, token.end)
             }
-            if (Object.hasOwn(this.#registeredCmds, cmd_name) || !isFalsy(opts.aliases[cmd_name])) {
+            if (typeof cmd_name !== 'undefined' && Object.hasOwn(this.#registeredCmds, cmd_name) || !isFalsy(opts.aliases[cmd_name])) {
               last_frame = new Frame(cmd_name, last_frame);
               frames.push(last_frame);
             } else {
@@ -330,14 +330,40 @@ export default class VMachine {
           {
             const frame = frames.pop();
             // Subframes are executed in silent mode
-            const ret = await this.#callFunction(
-              opts,
-              frame,
-              parse_info,
-              instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
-            );
-            last_frame = frames.at(-1) || root_frame;
-            last_frame.values.push(ret);
+            if (typeof frame.cmd !== 'undefined') {
+              const frame_cmd = frame.cmd;
+              let cmd_def = this.#registeredCmds[frame_cmd];
+              if (typeof cmd_def === 'undefined') {
+                // $FlowFixMe
+                cmd_def = frame.values.shift();
+                if (typeof cmd_def !== 'object') {
+                  throw new NotCalleableNameError();
+                }
+                // Subframes are executed in silent mode
+                const ret = await this.#invokeFunction(
+                  opts,
+                  frame,
+                  frame_cmd,
+                  // $FlowFixMe
+                  cmd_def,
+                  parse_info,
+                  instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
+                );
+                last_frame = frames.at(-1) || root_frame;
+                last_frame.values.push(ret);
+              } else {
+                const ret = await this.#invokeFunction(
+                  opts,
+                  frame,
+                  frame_cmd,
+                  cmd_def,
+                  parse_info,
+                  instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
+                );
+                last_frame = frames.at(-1) || root_frame;
+                last_frame.values.push(ret);
+              }
+            }
           }
           break;
         case INSTRUCTION_TYPE.RETURN_VALUE:
@@ -362,7 +388,19 @@ export default class VMachine {
               const value_token = parse_info.inputTokens[value_instr.level][value_instr.inputTokenIndex] || {};
               throw new InvalidTokenError(value_token.value, value_token.start, value_token.end);
             } else {
-              last_frame.store[vname] = vvalue;
+              let cur_frame: Frame | void = last_frame;
+              let val_found = false;
+              while (typeof cur_frame !== 'undefined') {
+                if (Object.hasOwn(cur_frame.store, vname)) {
+                  cur_frame.store[vname] = vvalue;
+                  val_found = true;
+                  break;
+                }
+                cur_frame = cur_frame.prevFrame;
+              }
+              if (!val_found) {
+                last_frame.store[vname] = vvalue;
+              }
             }
           }
           break;
@@ -414,7 +452,6 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.BUILD_LIST:
           {
-            debugger;
             const iter_count = instr.dataIndex;
             const value = [];
             for (let i = 0; i < iter_count; ++i) {
@@ -462,7 +499,7 @@ export default class VMachine {
               if (typeof name === 'string') {
                 this.registerCommand(name, cmd_def)
               }
-              last_frame.values.push(trash_func);
+              last_frame.values.push(cmd_def);
             }
           }
           break;

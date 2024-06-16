@@ -149,7 +149,25 @@ export default class TestTrash extends TerminalTestSuite {
     // Functions
     results = await this.terminal.getShell().eval("function mop(a,  b  )  { $c = $b - $a  ; return    $c }; mop 10 2");
     this.assertEqual(results, -8);
-    results = await this.terminal.getShell().eval("$mop = function ()  { return (gen -mi 4 -ma 7) }; $mop");
+    results = await this.terminal.getShell().eval("$mop = function (   a,    b  )  { $c = $b - $a  ; return    $c  }; $$mop 10 2");
+    this.assertEqual(results, -8);
+    results = await this.terminal.getShell().eval("$mop = function (   a,    b  )  { $c = $b - $a  ; return    $c  }; silent print '42' + ($$mop 10 2)");
+    this.assertEqual(results.substr(0, 2), '42');
+    this.assertEqual(results.substr(2), '-8');
+    results = await this.terminal.getShell().eval("$mop = function ()  { return (gen -mi 4 -ma 7) }; $$mop");
     this.assertTrue(results.length > 0);
+    results = await this.terminal.getShell().eval("$mop = function ()  { return (gen -mi 4 -ma 7) }; silent print '42' + $$mop");
+    this.assertTrue(results.length > 2);
+    this.assertEqual(results.substr(0, 2), '42');
+
+    // If Else
+    results = await this.terminal.getShell().eval("$num = (gen int -mi 0 -ma 10); if (($num + 10) < 5) { return 66 } else { return 42 }");
+    this.assertEqual(results, 42);
+    results = await this.terminal.getShell().eval("$num = (gen int -mi 0 -ma 10); if ($num <= 10) { $num = $num + 10; if ($num >= 10) { return 42 }; return 66; } else { return 120 }");
+    this.assertEqual(results, 42);
+
+    // For Loop
+    results = await this.terminal.getShell().eval("$buff = ''; for ($i = 0; $i < 100; $i = $i + 1) { $buff = $buff + 'A'; }; $buff");
+    this.assertTrue(results.length === 100);
   }
 }

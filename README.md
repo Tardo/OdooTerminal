@@ -181,6 +181,12 @@ Example:
   - `if ((gen int 0 8) > 2) { print 'Yes!' } else { print 'No' }`
   - `$num = (gen int 0 8); if ($num > 2) { print 'Yes! ' + $num + ' > 2' } else { print 'No... ' + $num + ' <= 2' }`
 
+#### + Functions
+
+Example:
+  - `function myfun(user_name) { print "Hello, " + $user_name }; myfun 'world!'`
+  - `$myfun = function (user_name) { print "Hello, " + $user_name }; $$myfun 'world!'`
+
 ---
 
 # Extension Permissions

@@ -16,8 +16,8 @@ export default class Frame {
     this.values = [];
     this.prevFrame = prev_frame;
 
-    if (this.prevFrame) {
-      this.store = {...this.prevFrame.store};
-    }
+    // if (this.prevFrame) {
+    //   this.store = {...this.prevFrame.store};
+    // }
   }
 }

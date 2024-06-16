@@ -1,4 +1,6 @@
 {
+  "": "",
+  "<InvalidName>": "",
   "No": "",
   "Yes": "",
   "checkStorageError": {
@@ -784,6 +786,7 @@
       "requiredNotSet": "Required arguments not set! ({{required_not_set}})"
     },
     "exception": {
+      "NotCalleableNameError": "The loaded name is not calleable",
       "invalidCommandArgumentsError": "Invalid command arguments",
       "invalidCommandArugmentValueError": "Unexpected '{{arg_value}}' value!",
       "invalidCommandDefinition": "Invalid command definition!",
