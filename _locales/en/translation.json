@@ -244,6 +244,11 @@
     "detail": "Exports the command result to a browser console variable.",
     "resultExported": "Command result exported! now you can use '{{varname}}' variable in the browser console"
   },
+  "cmdFuncTrash": {
+    "args": {
+      "name": "The name of the alias"
+    }
+  },
   "cmdGen": {
     "args": {
       "max": "Max. value",
@@ -530,6 +535,9 @@
     },
     "question": {
       "showMore": "There are still results to print ({{len}} records). Show more?"
+    },
+    "result": {
+      "count": "Records count: {{count}}"
     }
   },
   "cmdSettings": {
@@ -744,9 +752,6 @@
       "default": {
         "definition": "Undefined command",
         "detail": "This command hasn't a properly detailed information"
-      },
-      "error": {
-        "invalidDefinition": "Invalid command definition!"
       }
     },
     "error": {
@@ -775,12 +780,13 @@
   "trash": {
     "argument": {
       "invalid": "Invalid argument '{{arg_long_name}}' value type: {{value_type}} is not {{arg_type}}",
-      "noExist": "The argument '${arg_name}' does not exist",
+      "noExist": "The argument '{{arg_name}}' does not exist",
       "requiredNotSet": "Required arguments not set! ({{required_not_set}})"
     },
     "exception": {
       "invalidCommandArgumentsError": "Invalid command arguments",
       "invalidCommandArugmentValueError": "Unexpected '{{arg_value}}' value!",
+      "invalidCommandDefinition": "Invalid command definition!",
       "invalidInstructionError": "Invalid instruction",
       "invalidNameError": "Invalid name '{{vname}}' at {{start}}:{{end}}",
       "invalidTokenError": "Invalid token '{{vname}}' at {{start}}:{{end}}",
@@ -788,6 +794,12 @@
       "notExpectedCommandArgumentError": "Argument '{{arg_name}}' not expected at {{start}}:{{end}}",
       "unknownCommandError": "Unknown Command '{{cmd_name}}' at {{start}}:{{end}}",
       "unknownNameError": "Unknown name '{{vname}}' at {{start}}:{{end}}"
+    },
+    "vmachine": {
+      "func": {
+        "definition": "Internal function",
+        "detail": "Internal function"
+      }
     }
   },
   "utilInjectResource": {

@@ -5,14 +5,15 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
-import type {default as Terminal, JobInfo} from '@terminal/terminal';
+import type Terminal from '@terminal/terminal';
+import type {JobInfo} from '@trash/shell';
 
 async function cmdJobs(
   this: Terminal,
   kwargs: CMDCallbackArgs,
   ctx: CMDCallbackContext,
 ): Promise<$ReadOnlyArray<JobInfo>> {
-  const jobs = this.getActiveJobs();
+  const jobs = this.getShell().getActiveJobs();
   ctx.screen.print(
     jobs.map(
       item =>

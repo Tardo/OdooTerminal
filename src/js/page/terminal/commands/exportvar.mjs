@@ -4,7 +4,7 @@
 
 // $FlowIgnore
 import i18n from 'i18next';
-import uniqueId from '@terminal/utils/unique_id';
+import uniqueId from '@trash/utils/unique_id';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';

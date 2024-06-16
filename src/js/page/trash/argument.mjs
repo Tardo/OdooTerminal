@@ -5,6 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from './constants';
+import FunctionTrash from './function';
 import difference from './utils/difference';
 import isEmpty from './utils/is_empty';
 import isFalsy from './utils/is_falsy';
@@ -96,7 +97,7 @@ function checkArgumentValueType(val: mixed, arg_type: number) {
 /**
  * Check if the parameter type correspond with the expected type.
  */
-export function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[string]: mixed}): {[string]: mixed} {
+export function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwargs: {[string]: mixed}): {[string]: mixed} {
   // Map full info arguments
   const args_infos_map: Array<[string, ArgInfo]> = cmd_def.args
     .map(x => getArgumentInfo(x))
@@ -109,7 +110,7 @@ export function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[string]: m
   for (const arg_name of in_arg_names) {
     const arg_info = getArgumentInfoByName(cmd_def.args, arg_name);
     if (!arg_info) {
-      throw new Error(i18n.t('trash.argument.noExist', "The argument '${arg_name}' does not exist", {arg_name}));
+      throw new Error(i18n.t('trash.argument.noExist', "The argument '{{arg_name}}' does not exist", {arg_name}));
     }
     full_kwargs[arg_info.names.long] = kwargs[arg_name];
   }
@@ -119,7 +120,7 @@ export function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[string]: m
   const required_args: Array<string> = [];
   for (const arg_name in args_infos) {
     const arg_def = args_infos[arg_name];
-    if (typeof arg_def.default_value !== 'undefined') {
+    if (cmd_def.is_function === true || typeof arg_def.default_value !== 'undefined') {
       default_values_map.push([arg_name, arg_def.default_value]);
     }
     if (arg_def.is_required) {

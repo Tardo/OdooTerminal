@@ -21,7 +21,7 @@ async function cmdAlias(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbac
       }
     }
     return aliases;
-  } else if (Object.hasOwn(this.registeredCmds, kwargs.name)) {
+  } else if (Object.hasOwn(this.getShell().getVM().getRegisteredCmds(), kwargs.name)) {
     throw new Error(i18n.t('cmdAlias.invalidAliasName', 'Invalid alias name'));
   }
   if (kwargs.cmd && kwargs.cmd.length) {

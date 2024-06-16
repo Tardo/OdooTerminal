@@ -68,7 +68,7 @@ async function getOdooVersionByNetwork(): Promise<{
  */
 async function updateContextServerInfo(): Promise<void> {
   const server_ver = getOdooVersion();
-  if (server_ver !== null && typeof server_ver === 'string') {
+  if (typeof server_ver === 'string') {
     _updateContextServerInfo(server_ver);
   } else {
     const req_res = await getOdooVersionByNetwork();

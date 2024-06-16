@@ -8,6 +8,7 @@ import prettyObjectString from '@terminal/utils/pretty_object_string';
 import renderTable from './screen_table';
 import renderTableCellRecord from './screen_table_cell_record';
 import renderTableCellRecordId from './screen_table_cell_record_id';
+import FunctionTrash from '@trash/function';
 import type {Record} from '@terminal/core/recordset';
 
 export function renderLineText(msg: string, cls?: string): string {
@@ -65,6 +66,8 @@ export default function renderLine(msg: mixed, cls?: string): Array<string> {
       res.push(renderLineRecordsetTable(msg.model, msg, cls));
     } else if (msg instanceof Array) {
       res.push(...renderLineArray(msg, cls));
+    } else if (msg instanceof FunctionTrash) {
+      res.push(renderLineText(msg, cls));
     } else {
       res.push(renderLineObject(msg, cls));
     }

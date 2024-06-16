@@ -2,6 +2,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
+import i18n from 'i18next';
 import {
   INSTRUCTION_TYPE,
   KEYWORDS,
@@ -14,8 +16,10 @@ import {
   SYMBOLS_MATH_OPER,
 } from './constants';
 import Instruction from './instruction';
+import {ARG} from './constants';
 import countBy from './utils/count_by';
 import isFalsy from './utils/is_falsy';
+
 
 export type ArgDefNames = [string, string];
 export type ArgDef = [type: number, args: [string, string], is_required: boolean, description: string, default_value?: mixed, strict_values?: $ReadOnlyArray<number | string>];
@@ -41,6 +45,33 @@ export type CMDCallbackArgs = {[string]: Any};
 export type CMDCallback = (kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) => Promise<mixed>;
 export type CMDOptionsCallback = (arg_name: string) => Promise<$ReadOnlyArray<string>>;
 
+export type TokenInfo = {
+  value: string,
+  raw: string,
+  type: number,
+  start: number,
+  end: number,
+  index: number,
+};
+
+export type ParseStackInfo = {
+  instructions: Array<Instruction>,
+  names: Array<string | null>,
+  values: Array<mixed>,
+  inputTokens: Array<Array<TokenInfo>>,
+};
+export type ParseInfo = {
+  stack: {
+    instructions: Array<Instruction>,
+    names: Array<Array<string | null>>,
+    values: Array<Array<mixed>>,
+  },
+  inputTokens: Array<Array<TokenInfo>>,
+  inputRawString: string,
+  unions: number,
+  maxULevel: number,
+};
+
 export type CMDDef = {
   definition: string,
   callback: CMDCallback,
@@ -50,15 +81,7 @@ export type CMDDef = {
   secured: boolean,
   aliases: $ReadOnlyArray<string>,
   example: string,
-};
-
-export type TokenInfo = {
-  value: string,
-  raw: string,
-  type: number,
-  start: number,
-  end: number,
-  index: number,
+  is_function: boolean,
 };
 
 export type RegisteredCMD = {[string]: CMDDef};
@@ -69,28 +92,12 @@ export type ParserOptions = {
   isData?: boolean,
   offset?: number,
   silent?: boolean,
-};
-export type ParseStackInfo = {
-  instructions: Array<Instruction>,
-  names: Array<string | null>,
-  values: Array<mixed>,
-  arguments: Array<string>,
-  inputTokens: Array<Array<TokenInfo>>,
-};
-export type ParseInfo = {
-  stack: {
-    instructions: Array<Instruction>,
-    names: Array<Array<string | null>>,
-    values: Array<Array<mixed>>,
-    arguments: Array<Array<string>>,
-  },
-  inputTokens: Array<Array<TokenInfo>>,
-  inputRawString: string,
-  unions: number,
-  maxULevel: number,
+  noReturn?: boolean,
 };
 
 export type LexerInfo = [number, string, string];
+
+export type FunctionParseInfo = [fun_name: string | void, fun_args: $ReadOnlyArray<ArgDef>, fun_code: string, index: number];
 
 /**
  * This is TraSH
@@ -137,19 +144,17 @@ export default class Interpreter {
     let value = '';
     let in_string = '';
     let in_array = 0;
-    let in_dict = 0;
-    let in_runner = 0;
+    let in_lblock = 0;
     let in_block = 0;
     let do_cut = false;
     let do_skip = false;
-    let prev_char_no_space = '';
     let prev_char = '';
     let prev_token: LexerInfo | void;
     let prev_token_no_space: LexerInfo | void;
     const clean_data_len = clean_data.length;
     for (let char_index = 0; char_index < clean_data_len; ++char_index) {
       const char = clean_data[char_index];
-      const in_data_type = in_array || in_dict || in_runner || in_block;
+      const in_data_type = in_array || in_block || in_lblock;
       if (prev_char !== SYMBOLS.ESCAPE) {
         if (char === SYMBOLS.STRING || char === SYMBOLS.STRING_SIMPLE) {
           if (in_string && char === in_string) {
@@ -170,20 +175,16 @@ export default class Interpreter {
             if (!in_data_type) {
               do_cut = true;
             }
-            ++in_dict;
-          } else if (in_dict && char === SYMBOLS.BLOCK_END) {
-            --in_dict;
-          } else if (prev_char === SYMBOLS.VARIABLE && char === SYMBOLS.RUNNER_START) {
-            ++in_runner;
-          } else if (in_runner && char === SYMBOLS.RUNNER_END) {
-            --in_runner;
-          } else if (char === SYMBOLS.MATH_BLOCK_START) {
+            ++in_block;
+          } else if (in_block && char === SYMBOLS.BLOCK_END) {
+            --in_block;
+          } else if (char === SYMBOLS.LOGIC_BLOCK_START) {
             if (!in_data_type) {
               do_cut = true;
             }
-            ++in_block;
-          } else if (in_block && char === SYMBOLS.MATH_BLOCK_END) {
-            --in_block;
+            ++in_lblock;
+          } else if (in_lblock && char === SYMBOLS.LOGIC_BLOCK_END) {
+            --in_lblock;
           } else if (!in_data_type) {
             if (
               !isFalsy(options.isData) &&
@@ -196,13 +197,15 @@ export default class Interpreter {
             } else if (
               char === SYMBOLS.EOC ||
               char === SYMBOLS.EOL ||
-              char === SYMBOLS.VARIABLE ||
-              char === SYMBOLS.ASSIGNMENT ||
-              char === SYMBOLS.CONCAT ||
+              (char === SYMBOLS.VARIABLE && prev_char !== SYMBOLS.VARIABLE) ||
+              (char === SYMBOLS.ASSIGNMENT && prev_char !== SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length) ||
+              (char === SYMBOLS.NOT && prev_char !== SYMBOLS.NOT) ||
+              (SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length) ||
               prev_char === SYMBOLS.EOC ||
               prev_char === SYMBOLS.EOL ||
-              prev_char === SYMBOLS.ASSIGNMENT ||
-              prev_char === SYMBOLS.CONCAT
+              (char !== SYMBOLS.ASSIGNMENT && prev_char === SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.includes(value)) ||
+              (char !== SYMBOLS.NOT && prev_char === SYMBOLS.NOT) ||
+              (!SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && SYMBOLS_MATH_OPER.includes(value))
             ) {
               do_cut = true;
             } else if (
@@ -211,17 +214,12 @@ export default class Interpreter {
             ) {
               do_cut = true;
             }
-            if (!isFalsy(options?.math)) {
-              if (SYMBOLS_MATH_OPER.includes(char) || SYMBOLS_MATH_OPER.includes(prev_char_no_space)) {
-                do_cut = true;
-              }
-            }
           }
         }
 
         if (do_cut) {
           if (value) {
-            prev_token = this.#lexer(value, prev_token_no_space, options);
+            prev_token = this.#lexer(value, char, prev_token, prev_token_no_space, options);
             tokens.push(prev_token);
             if (prev_token[0] !== LEXER.Space) {
               prev_token_no_space = prev_token;
@@ -235,18 +233,13 @@ export default class Interpreter {
         }
       }
       prev_char = char;
-      if (prev_char !== SYMBOLS.SPACE) {
-        prev_char_no_space = prev_char;
-      }
       do_skip = false;
     }
     if (value) {
-      tokens.push(this.#lexer(value, prev_token, options));
+      tokens.push(this.#lexer(value, undefined, prev_token, prev_token_no_space, options));
     }
 
-    if (!isFalsy(options?.math)) {
-      tokens = this.#prioritizer(tokens);
-    }
+    tokens = this.#prioritizer(tokens);
 
     const tokens_info: Array<TokenInfo> = [];
     const tokens_len: number = tokens.length;
@@ -274,7 +267,7 @@ export default class Interpreter {
    * Classify tokens
    * @param {Array} tokens
    */
-  #lexer(token: string, prev_token_info: LexerInfo | void, options: ParserOptions): LexerInfo {
+  #lexer(token: string, next_char: string | void, prev_token_info: LexerInfo | void, prev_token_info_no_space: LexerInfo | void, options: ParserOptions): LexerInfo {
     // FIXME: New level of ugly implementation here... but works :/
     const isDict = (stoken: string) => {
       const sepcount = countBy(stoken, char => char === ':').true;
@@ -297,7 +290,7 @@ export default class Interpreter {
       } else {
         ttype = LEXER.Space;
       }
-    } else if (isFalsy(options?.math) && isFalsy(options?.isData) && token_san[0] === SYMBOLS.ARGUMENT) {
+    } else if (isFalsy(options?.isData) && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && next_char !== SYMBOLS.VARIABLE && next_char !== SYMBOLS.SPACE && next_char !== SYMBOLS.LOGIC_BLOCK_START && isNaN(Number(next_char))) {
       if (token_san[1] === SYMBOLS.ARGUMENT) {
         ttype = LEXER.ArgumentLong;
         token_san = token_san.substr(2);
@@ -311,6 +304,24 @@ export default class Interpreter {
       token_san === SYMBOLS.ITEM_DELIMITER
     ) {
       ttype = LEXER.Delimiter;
+    } else if (token_san === SYMBOLS.AND) {
+      ttype = LEXER.And;
+    } else if (token_san === SYMBOLS.OR) {
+      ttype = LEXER.Or;
+    } else if (token_san === SYMBOLS.NOT) {
+      ttype = LEXER.Not;
+    } else if (token_san === SYMBOLS.EQUAL) {
+      ttype = LEXER.Equal;
+    } else if (token_san === SYMBOLS.NOT_EQUAL) {
+      ttype = LEXER.NotEqual;
+    } else if (token_san === SYMBOLS.GREATER_THAN_OPEN) {
+      ttype = LEXER.GreaterThanOpen;
+    } else if (token_san === SYMBOLS.LESS_THAN_OPEN) {
+      ttype = LEXER.LessThanOpen;
+    } else if (token_san === SYMBOLS.GREATER_THAN_CLOSED) {
+      ttype = LEXER.GreaterThanClosed;
+    } else if (token_san === SYMBOLS.LESS_THAN_CLOSED) {
+      ttype = LEXER.LessThanClosed;
     } else if (token_san === SYMBOLS.ASSIGNMENT) {
       ttype = LEXER.Assignment;
     } else if (token_san[0] === SYMBOLS.ARRAY_START && token_san.at(-1) === SYMBOLS.ARRAY_END) {
@@ -320,7 +331,7 @@ export default class Interpreter {
         prev_token_info &&
         (prev_token_info[0] === LEXER.Variable ||
           prev_token_info[0] === LEXER.DataAttribute ||
-          prev_token_info[0] === LEXER.Runner)
+          prev_token_info[0] === LEXER.LogicBlock)
       ) {
         ttype = LEXER.DataAttribute;
       } else {
@@ -335,29 +346,12 @@ export default class Interpreter {
         ttype = LEXER.Block;
       }
     } else if (
-      !isFalsy(options?.math) &&
-      token_san[0] === SYMBOLS.MATH_BLOCK_START &&
-      token_san.at(-1) === SYMBOLS.MATH_BLOCK_END
+      token_san[0] === SYMBOLS.LOGIC_BLOCK_START &&
+      token_san.at(-1) === SYMBOLS.LOGIC_BLOCK_END
     ) {
       token_san = token_san.substr(1, token_san.length - 2);
       token_san = token_san.trim();
-      ttype = LEXER.Math;
-    } else if (
-      token_san[0] === SYMBOLS.VARIABLE &&
-      token_san[1] === SYMBOLS.RUNNER_START &&
-      token_san[2] === SYMBOLS.MATH_START &&
-      token_san.at(-1) === SYMBOLS.RUNNER_END &&
-      token_san.at(-2) === SYMBOLS.MATH_END
-    ) {
-      ttype = LEXER.Math;
-      token_san = token_san.substr(3, token_san.length - 5).trim();
-    } else if (
-      token_san[0] === SYMBOLS.VARIABLE &&
-      token_san[1] === SYMBOLS.RUNNER_START &&
-      token_san.at(-1) === SYMBOLS.RUNNER_END
-    ) {
-      ttype = LEXER.Runner;
-      token_san = token_san.substr(2, token_san.length - 3).trim();
+      ttype = LEXER.LogicBlock;
     } else if (token_san[0] === SYMBOLS.VARIABLE) {
       ttype = LEXER.Variable;
       token_san = token_san.substr(1);
@@ -369,36 +363,41 @@ export default class Interpreter {
       ttype = LEXER.Number;
     } else if (token_san_lower === KEYWORDS.TRUE || token_san_lower === KEYWORDS.FALSE) {
       ttype = LEXER.Boolean;
-    }
-    // else if (token_san_lower === KEYWORDS.FOR) {
-    //   ttype = LEXER.ForLoop;
-    // } else if (token_san_lower === KEYWORDS.IN) {
-    //   ttype = LEXER.In;
-    // }
-    else if (!isFalsy(options.math)) {
-      if (token_san === SYMBOLS.ADD) {
-        if (!prev_token_info || LEXER_MATH_OPER.includes(prev_token_info[0])) {
-          ttype = LEXER.Positive;
-        } else {
-          ttype = LEXER.Add;
-        }
-      } else if (token_san === SYMBOLS.SUBSTRACT) {
-        if (!prev_token_info || LEXER_MATH_OPER.includes(prev_token_info[0])) {
-          ttype = LEXER.Negative;
-        } else {
-          ttype = LEXER.Substract;
-        }
-      } else if (token_san === SYMBOLS.MULTIPLY) {
-        ttype = LEXER.Multiply;
-      } else if (token_san === SYMBOLS.DIVIDE) {
-        ttype = LEXER.Divide;
-      } else if (token_san === SYMBOLS.MODULO) {
-        ttype = LEXER.Modulo;
-      } else if (token_san === SYMBOLS.POW) {
-        ttype = LEXER.Pow;
+    } else if (token_san_lower === KEYWORDS.FUNCTION) {
+      ttype = LEXER.Function;
+    } else if (token_san_lower === KEYWORDS.RETURN) {
+      ttype = LEXER.Return;
+    } else if (token_san_lower === KEYWORDS.IF) {
+      ttype = LEXER.If;
+    } else if (token_san_lower === KEYWORDS.ELIF) {
+      ttype = LEXER.Elif;
+    } else if (token_san_lower === KEYWORDS.ELSE) {
+      ttype = LEXER.Else;
+    } else if (token_san_lower === KEYWORDS.FOR) {
+      ttype = LEXER.For;
+    } else if (token_san === SYMBOLS.ADD) {
+      // if (prev_token_info && prev_token_info[0] === LEXER.Space && (next_char === SYMBOLS.VARIABLE || !isNaN(Number(next_char)) || (prev_token_info_no_space && LEXER_MATH_OPER.includes(prev_token_info_no_space[0])))) {
+      //   debugger;
+      //   ttype = LEXER.Positive;
+      // } else {
+      //   ttype = LEXER.Add;
+      // }
+      ttype = LEXER.Add;
+    } else if (token_san === SYMBOLS.SUBSTRACT) {
+      // FIXME: This is a bit crazy :)
+      if ((!prev_token_info || (prev_token_info && (prev_token_info[0] === LEXER.Space || (isNaN(Number(prev_token_info[1])) && prev_token_info[0] !== LEXER.Variable && prev_token_info[0] !== LEXER.LogicBlock)))) && next_char !== SYMBOLS.SPACE && (next_char === SYMBOLS.VARIABLE || next_char === SYMBOLS.LOGIC_BLOCK_START || !isNaN(Number(next_char)) || (prev_token_info_no_space && LEXER_MATH_OPER.includes(prev_token_info_no_space[0])))) {
+        ttype = LEXER.Negative;
+      } else {
+        ttype = LEXER.Substract;
       }
-    } else if (token_san === SYMBOLS.CONCAT) {
-      ttype = LEXER.Concat;
+    } else if (token_san === SYMBOLS.MULTIPLY) {
+      ttype = LEXER.Multiply;
+    } else if (token_san === SYMBOLS.DIVIDE) {
+      ttype = LEXER.Divide;
+    } else if (token_san === SYMBOLS.MODULO) {
+      ttype = LEXER.Modulo;
+    } else if (token_san === SYMBOLS.POW) {
+      ttype = LEXER.Pow;
     }
 
     if (ttype === LEXER.String || ttype === LEXER.StringSimple) {
@@ -437,7 +436,7 @@ export default class Interpreter {
   #tokenList2str(tokens: Array<LexerInfo>): string {
     let res_str = '';
     for (const token of tokens) {
-      res_str += token[0] === LEXER.Math ? `(${token[1]})` : token[2];
+      res_str += token[0] === LEXER.LogicBlock ? `(${token[1]})` : token[2];
     }
     return res_str;
   }
@@ -465,7 +464,7 @@ export default class Interpreter {
             ++token_index;
           }
           const fstr = `${prev_tokens_str}${token_val}${next_tokens_str}`;
-          ntokens.push([LEXER.Math, fstr, `(${fstr})`]);
+          ntokens.push([LEXER.LogicBlock, fstr, `(${fstr})`]);
         } else {
           ntokens.push(tokens_no_spaces[token_index]);
         }
@@ -473,6 +472,151 @@ export default class Interpreter {
       tokens_no_spaces = ntokens;
     }
     return tokens_no_spaces;
+  }
+
+  #parseFunction(inputTokens: $ReadOnlyArray<TokenInfo>, index: number): FunctionParseInfo | void {
+    let init_index: number = index;
+    let fun_name: string;
+    let fun_args: Array<ArgDef> = [];
+
+    let token_active = inputTokens[++init_index];
+    if (typeof token_active === 'undefined') {
+      return;
+    }
+    // Name
+    let active_value = token_active.raw.trim();
+    if (active_value.startsWith(SYMBOLS.FUNCTION_ARGS_START)) {
+      fun_args = token_active.value.split(',')
+        .map(item => ([ARG.Any, [item, item], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+    } else {
+      fun_name = active_value;
+      // Args
+      token_active = inputTokens[++init_index];
+      if (typeof token_active === 'undefined') {
+        return;
+      }
+      active_value = token_active.value.trim();
+      fun_args = active_value.split(',')
+        .map(item => ([ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+    }
+
+    // Code
+    token_active = inputTokens[++init_index];
+    if (typeof token_active === 'undefined') {
+      return;
+    }
+    if (token_active.type !== LEXER.Block) {
+      return;
+    }
+
+    const fun_code = token_active.value.trim();
+    return [fun_name, fun_args, fun_code, init_index];
+  }
+
+  #parseLoopFor(inputTokens: $ReadOnlyArray<TokenInfo>, index: number): LoopForParseInfo | void {
+    let init_index: number = index;
+    let for_args: Array<string> = [];
+
+    let token_active = inputTokens[++init_index];
+    if (typeof token_active === 'undefined') {
+      return;
+    }
+    // Args
+    const active_value = token_active.raw.trim();
+    if (active_value.startsWith(SYMBOLS.FUNCTION_ARGS_START)) {
+      for_args = token_active.value.split(';');
+    }
+
+    if (for_args.length === 0) {
+      return;
+    }
+
+    // Code
+    token_active = inputTokens[++init_index];
+    if (typeof token_active === 'undefined') {
+      return;
+    }
+    if (token_active.type !== LEXER.Block) {
+      return;
+    }
+    const for_code = token_active.raw.trim();
+
+    return [for_args[0], for_args[1], for_args[2], for_code, init_index];
+  }
+
+  #parseIf(inputTokens: $ReadOnlyArray<TokenInfo>, index: number): IfParseInfo | void {
+    let init_index: number = index;
+    let else_code: string;
+
+    // Check
+    let token_active = inputTokens[++init_index];
+    if (typeof token_active === 'undefined') {
+      return;
+    }
+    if (token_active.type !== LEXER.LogicBlock) {
+      return;
+    }
+    const if_check = token_active.raw.trim();
+
+    // Code
+    token_active = inputTokens[++init_index];
+    if (typeof token_active === 'undefined') {
+      return;
+    }
+    if (token_active.type !== LEXER.Block) {
+      return;
+    }
+    const if_code = token_active.raw.trim();
+
+    // Else
+    token_active = inputTokens[++init_index];
+    if (typeof token_active !== 'undefined' && token_active.type === LEXER.Else) {
+      token_active = inputTokens[++init_index];
+      if (typeof token_active === 'undefined') {
+        return;
+      }
+      if (token_active.type !== LEXER.Block) {
+        return;
+      }
+      else_code = token_active.raw.trim();
+    }
+
+    return [if_check, if_code, else_code, init_index];
+  }
+
+  #appendParse(value: string, options: ParserOptions, res: ParseInfo, to_append: ParseStackInfo, beforeAppend) {
+    const parse_res = this.parse(
+      value,
+      options,
+      res.maxULevel + 1,
+    );
+    if (beforeAppend) {
+      beforeAppend(parse_res);
+    }
+    res.stack.values.push(...parse_res.stack.values);
+    res.stack.names.push(...parse_res.stack.names);
+    to_append.inputTokens.push(...parse_res.inputTokens);
+    to_append.instructions.push(...parse_res.stack.instructions);
+    res.maxULevel = parse_res.maxULevel;
+    return parse_res;
+  }
+
+  #parse(data: ParseInfo, stack_info: ParseStackInfo, token: TokenInfo, registeredCmds: RegisteredCMD | void): ParseInfo {
+    const parse_info = this.parse(
+      token.value,
+      {
+        registeredCmds: registeredCmds,
+        silent: true,
+        offset: token.start + 1,
+      },
+      data.maxULevel + 1,
+    );
+    data.stack.values.push(...parse_info.stack.values);
+    data.stack.names.push(...parse_info.stack.names);
+    stack_info.inputTokens.push(...parse_info.inputTokens);
+    stack_info.instructions.push(...parse_info.stack.instructions);
+    data.maxULevel = parse_info.maxULevel;
+    return data;
   }
 
   /**
@@ -489,7 +633,6 @@ export default class Interpreter {
         instructions: [],
         names: [[]],
         values: [[]],
-        arguments: [[]],
       },
       inputTokens: [this.tokenize(data, options)],
       inputRawString: data,
@@ -499,9 +642,6 @@ export default class Interpreter {
 
     const pushParseData = (parse_data: ParseStackInfo) => {
       res.stack.instructions.push(...parse_data.instructions);
-      if (parse_data.arguments.length) {
-        res.stack.arguments[0].push(...parse_data.arguments);
-      }
       if (parse_data.values.length) {
         res.stack.values[0].push(...parse_data.values);
       }
@@ -513,7 +653,6 @@ export default class Interpreter {
       }
 
       parse_data.instructions = [];
-      parse_data.arguments = [];
       parse_data.values = [];
       parse_data.names = [];
       parse_data.inputTokens = [];
@@ -525,21 +664,18 @@ export default class Interpreter {
       instructions: [],
       names: [],
       values: [],
-      arguments: [],
       inputTokens: [],
     };
     const to_append_eoi: ParseStackInfo = {
       instructions: [],
       names: [],
       values: [],
-      arguments: [],
       inputTokens: [],
     };
     const to_append: ParseStackInfo = {
       instructions: [],
       names: [],
       values: [],
-      arguments: [],
       inputTokens: [],
     };
     let sign_cache = null;
@@ -563,16 +699,8 @@ export default class Interpreter {
           break;
         case LEXER.ArgumentLong:
         case LEXER.ArgumentShort:
-          {
-            to_append.arguments.push(token.value);
-            const dindex = res.stack.arguments[0].length;
-            to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_ARG, index, level, dindex));
-          }
-          break;
-        case LEXER.Concat:
-          ignore_instr_eoi = true;
-          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.CONCAT, index, level));
-          ++res.unions;
+            ignore_instr_eoi = true;
+            to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_ARG, index, level));
           break;
         case LEXER.Negative:
           sign_cache = INSTRUCTION_TYPE.UNITARY_NEGATIVE;
@@ -602,6 +730,42 @@ export default class Interpreter {
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.POW, index, level));
           break;
+        case LEXER.And:
+            ignore_instr_eoi = true;
+            to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.AND, index, level));
+            break;
+        case LEXER.Or:
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.OR, index, level));
+          break;
+        case LEXER.Not:
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.NOT, index, level));
+          break;
+        case LEXER.Equal:
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.EQUAL, index, level));
+          break;
+        case LEXER.NotEqual:
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.NOT_EQUAL, index, level));
+          break;
+        case LEXER.GreaterThanOpen:
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.GREATER_THAN_OPEN, index, level));
+          break;
+        case LEXER.LessThanOpen:
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.LESS_THAN_OPEN, index, level));
+          break;
+        case LEXER.GreaterThanClosed:
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.GREATER_THAN_CLOSED, index, level));
+          break;
+        case LEXER.LessThanClosed:
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.LESS_THAN_CLOSED, index, level));
+          break;
         case LEXER.Number:
           {
             to_append.values.push(Number(token.value));
@@ -618,6 +782,170 @@ export default class Interpreter {
             to_append.values.push(token.value.toLocaleLowerCase() === 'true');
             const dindex = res.stack.values[0].length;
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_CONST, index, level, dindex));
+          }
+          break;
+        case LEXER.Function:
+          {
+            const result = this.#parseFunction(res.inputTokens[0], index);
+            if (typeof result !== 'undefined') {
+              const [fun_name, fun_args, fun_code, uindex] = result;
+              let dindex = res.stack.values[0].length;
+              // Function Code
+              to_append.values.push(this.parse(fun_code, options));
+              to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_CONST, index, level, dindex));
+              // Function Args
+              to_append.values.push(fun_args);
+              to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_CONST, index, level, ++dindex));
+              // Function Name
+              to_append.values.push(fun_name);
+              to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_CONST, index+1, level, ++dindex));
+              // Make Function
+              to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.MAKE_FUNCTION, -1, level, -1));
+              index = uindex;
+            }
+          }
+          break;
+        case LEXER.Return:
+          {
+            ignore_instr_eoi = true;
+            const next_token = res.inputTokens[0][index + 1];
+            if (typeof next_token === 'undefined' || next_token.type === LEXER.Delimiter) {
+              to_append.values.push(null);
+              const dindex = res.stack.values[0].length;
+              to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_CONST, index, level, dindex));
+            }
+            to_append_eoc.instructions.push(new Instruction(INSTRUCTION_TYPE.RETURN_VALUE, -1, -1));
+          }
+          break;
+        case LEXER.If:
+          {
+            const result = this.#parseIf(res.inputTokens[0], index);
+            if (typeof result !== 'undefined') {
+              const [if_check, if_code, else_code, uindex] = result;
+
+              // Check
+              this.#appendParse(
+                if_check,
+                {
+                  registeredCmds: options.registeredCmds,
+                  silent: true,
+                  offset: token.start + 3,
+                  noReturn: true,
+                },
+                res,
+                to_append,
+              );
+              const ref_if_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, -1));
+
+              // Code
+              const parsed_if_block = this.#appendParse(
+                if_code,
+                {
+                  registeredCmds: options.registeredCmds,
+                  silent: false,
+                  offset: token.start + 3,
+                  noReturn: true,
+                },
+                res,
+                to_append,
+              );
+              if (parsed_if_block) {
+                to_append.instructions[ref_if_instr_index - 1].dataIndex = parsed_if_block.stack.instructions.length;
+              }
+
+              // Else Code
+              if (else_code) {
+                const ref_else_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_TRUE, index, level, -1));
+                // Code
+                const parsed_else_block = this.#appendParse(
+                  else_code,
+                  {
+                    registeredCmds: options.registeredCmds,
+                    silent: false,
+                    offset: token.start + 3,
+                    noReturn: true,
+                  },
+                  res,
+                  to_append,
+                );
+                if (parsed_else_block) {
+                  to_append.instructions[ref_else_instr_index - 1].dataIndex = parsed_else_block.stack.instructions.length;
+                }
+              }
+
+              index = uindex;
+            }
+          }
+          break;
+        case LEXER.For:
+          {
+            const result = this.#parseLoopFor(res.inputTokens[0], index);
+            if (typeof result !== 'undefined') {
+              const [for_init, for_check, for_iter, for_code, uindex] = result;
+              to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.PUSH_FRAME, index, level));
+
+              // Init Code
+              this.#appendParse(
+                for_init.replaceAll(',', ';'), // FIXME: Don't do it in strings!!
+                {
+                  registeredCmds: options.registeredCmds,
+                  silent: true,
+                  offset: token.start + 3,
+                  noReturn: true,
+                },
+                res,
+                to_append,
+              );
+              const anchor_index = to_append.instructions.length;
+
+              // Check Code
+              this.#appendParse(
+                for_check,
+                {
+                  registeredCmds: options.registeredCmds,
+                  silent: true,
+                  offset: token.start + 3,
+                  noReturn: true,
+                },
+                res,
+                to_append,
+              );
+              const ref_check_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, -1));
+
+              // Code
+              const parsed_for_block = this.#appendParse(
+                for_code,
+                {
+                  registeredCmds: options.registeredCmds,
+                  silent: false,
+                  offset: token.start + 3,
+                  noReturn: true,
+                },
+                res,
+                to_append,
+              );
+
+              // Iter
+              const parsed_iter_block = this.#appendParse(
+                for_iter.replaceAll(',', ';'),  // FIXME: Don't do it in strings!!
+                {
+                  registeredCmds: options.registeredCmds,
+                  silent: true,
+                  offset: token.start + 3,
+                  noReturn: true,
+                },
+                res,
+                to_append,
+              );
+
+              if (parsed_for_block && parsed_iter_block) {
+                to_append.instructions[ref_check_instr_index - 1].dataIndex = parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length;
+              }
+
+              to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_BACKWARD, index, level, to_append.instructions.length - anchor_index));
+
+              index = uindex;
+            }
           }
           break;
         case LEXER.String:
@@ -651,7 +979,7 @@ export default class Interpreter {
           break;
         case LEXER.Array:
           {
-            const parsed_array = this.parse(
+            const parsed_array = this.#appendParse(
               token.value,
               {
                 registeredCmds: options.registeredCmds,
@@ -659,22 +987,17 @@ export default class Interpreter {
                 isData: true,
                 offset: token.start + 1,
               },
-              res.maxULevel + 1,
+              res,
+              to_append,
             );
             const dindex =
               parsed_array.inputTokens[0].filter(item => LEXERDATA.includes(item.type)).length - parsed_array.unions;
-            res.stack.arguments.push(...parsed_array.stack.arguments);
-            res.stack.values.push(...parsed_array.stack.values);
-            res.stack.names.push(...parsed_array.stack.names);
-            to_append.inputTokens.push(...parsed_array.inputTokens);
-            to_append.instructions.push(...parsed_array.stack.instructions);
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.BUILD_LIST, index, level, dindex));
-            res.maxULevel = parsed_array.maxULevel;
           }
           break;
         case LEXER.Dictionary:
           {
-            const parsed_dict = this.parse(
+            const parsed_dict = this.#appendParse(
               token.value,
               {
                 registeredCmds: options.registeredCmds,
@@ -682,18 +1005,13 @@ export default class Interpreter {
                 isData: true,
                 offset: token.start + 1,
               },
-              res.maxULevel + 1,
+              res,
+              to_append,
             );
             let dindex =
               parsed_dict.inputTokens[0].filter(item => LEXERDATA.includes(item.type)).length - parsed_dict.unions;
             dindex = parseInt(dindex / 2, 10);
-            res.stack.arguments.push(...parsed_dict.stack.arguments);
-            res.stack.values.push(...parsed_dict.stack.values);
-            res.stack.names.push(...parsed_dict.stack.names);
-            to_append.inputTokens.push(...parsed_dict.inputTokens);
-            to_append.instructions.push(...parsed_dict.stack.instructions);
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.BUILD_MAP, index, level, dindex));
-            res.maxULevel = parsed_dict.maxULevel;
           }
           break;
         case LEXER.Assignment:
@@ -730,7 +1048,7 @@ export default class Interpreter {
         case LEXER.DataAttribute:
           {
             ignore_instr_eoi = true;
-            const parsed_attribute = this.parse(
+            const parsed_attribute = this.#appendParse(
               token.value,
               {
                 registeredCmds: options.registeredCmds,
@@ -738,13 +1056,9 @@ export default class Interpreter {
                 isData: true,
                 offset: token.start + 1,
               },
-              res.maxULevel + 1,
+              res,
+              to_append,
             );
-            res.stack.arguments.push(...parsed_attribute.stack.arguments);
-            res.stack.values.push(...parsed_attribute.stack.values);
-            res.stack.names.push(...parsed_attribute.stack.names);
-            to_append.inputTokens.push(...parsed_attribute.inputTokens);
-            to_append.instructions.push(...parsed_attribute.stack.instructions);
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_DATA_ATTR, index, level));
             const last_instr: Instruction | void = res.stack.instructions.at(-1);
             if (last_instr && last_instr.type === INSTRUCTION_TYPE.UNITARY_NEGATIVE) {
@@ -754,100 +1068,70 @@ export default class Interpreter {
             res.maxULevel = parsed_attribute.maxULevel;
           }
           break;
-        case LEXER.Runner:
-          {
-            const parsed_runner = this.parse(
-              token.value,
-              {
-                registeredCmds: options.registeredCmds,
-                silent: true,
-                offset: token.start + 1,
-              },
-              res.maxULevel + 1,
-            );
-            res.stack.arguments.push(...parsed_runner.stack.arguments);
-            res.stack.values.push(...parsed_runner.stack.values);
-            res.stack.names.push(...parsed_runner.stack.names);
-            to_append.inputTokens.push(...parsed_runner.inputTokens);
-            to_append.instructions.push(...parsed_runner.stack.instructions);
-            if (sign_cache) {
-              to_append.instructions.push(new Instruction(sign_cache, index, level));
-              sign_cache = null;
-            }
-            res.maxULevel = parsed_runner.maxULevel;
-          }
-          break;
         case LEXER.Block:
           {
-            const parsed_block = this.parse(
+            to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.PUSH_FRAME, index, level));
+            this.#appendParse(
               token.value,
               {
                 registeredCmds: options.registeredCmds,
                 silent: false,
-                offset: token.start + 1,
+                offset: token.start + 3,
+                noReturn: true,
               },
-              res.maxULevel + 1,
+              res,
+              to_append,
             );
-            res.stack.arguments.push(...parsed_block.stack.arguments);
-            res.stack.values.push(...parsed_block.stack.values);
-            res.stack.names.push(...parsed_block.stack.names);
-            to_append.inputTokens.push(...parsed_block.inputTokens);
-            to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.PUSH_FRAME, index, level));
-            to_append.instructions.push(...parsed_block.stack.instructions);
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.POP_FRAME, index, level));
-            res.maxULevel = parsed_block.maxULevel;
+
+
+            // const parsed_block = this.parse(
+            //   token.value,
+            //   {
+            //     registeredCmds: options.registeredCmds,
+            //     silent: false,
+            //     offset: token.start + 1,
+            //   },
+            //   res.maxULevel + 1,
+            // );
+            // if (in_if || in_else) {
+            //   to_append.instructions.push(new Instruction(in_else ? INSTRUCTION_TYPE.JUMP_IF_TRUE : INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, parsed_block.stack.instructions.length));
+            // }
+            // res.stack.values.push(...parsed_block.stack.values);
+            // res.stack.names.push(...parsed_block.stack.names);
+            // to_append.inputTokens.push(...parsed_block.inputTokens);
+            // to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.PUSH_FRAME, index, level));
+            // to_append.instructions.push(...parsed_block.stack.instructions);
+            // to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.POP_FRAME, index, level));
+            // res.maxULevel = parsed_block.maxULevel;
+
+            // if (in_for) {
+            //   to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_BACKWARD, index, level, parsed_block.stack.instructions.length));
+            //   to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.POP_FRAME, index, level));
+            // }
           }
           break;
-        // Case LEXER.For: {
-        //     for (
-        //         const nindex = index + 1;
-        //         nindex < tokens_len;
-        //         ++nindex
-        //     ) {
-        //         ntoken = res.inputTokens[0][nindex];
-        //         if (ntoken.type === LEXER.Space) {
-        //             continue;
-        //         }
-        //         if (
-        //             ntoken.type === LEXER.EOC ||
-        //             ntoken.type === LEXER.Block
-        //         ) {
-        //             break;
-        //         }
-
-        //         //    2 GET_ITER
-        //         //    >>    4 FOR_ITER                 6 (to 18)
-        //         //    6 STORE_NAME               1 (aa)
-        //     }
-        // }
         case LEXER.Space:
           ignore_instr_eoi = true;
           break;
         case LEXER.Delimiter:
           token_subindex = -1;
           break;
-        case LEXER.Math:
-          {
-            const parsed_math = this.parse(
-              token.value,
-              {
-                registeredCmds: options.registeredCmds,
-                silent: true,
-                math: true,
-                offset: token.start + 3,
-              },
-              res.maxULevel + 1,
-            );
-            res.stack.arguments.push(...parsed_math.stack.arguments);
-            res.stack.values.push(...parsed_math.stack.values);
-            res.stack.names.push(...parsed_math.stack.names);
-            to_append.inputTokens.push(...parsed_math.inputTokens);
-            to_append.instructions.push(...parsed_math.stack.instructions);
-            if (sign_cache) {
-              to_append.instructions.push(new Instruction(sign_cache, index, level));
-              sign_cache = null;
-            }
-            res.maxULevel = parsed_math.maxULevel;
+        case LEXER.LogicBlock:
+          this.#appendParse(
+            token.value,
+            {
+              registeredCmds: options.registeredCmds,
+              silent: true,
+              offset: token.start + 3,
+              noReturn: true,
+            },
+            res,
+            to_append,
+          );
+          if (sign_cache) {
+            to_append.instructions.push(new Instruction(sign_cache, index, level));
+            sign_cache = null;
           }
           break;
       }
@@ -866,8 +1150,11 @@ export default class Interpreter {
       }
     }
 
-    if (isFalsy(options?.math) && level === 0) {
-      res.stack.instructions.push(new Instruction(INSTRUCTION_TYPE.RETURN_VALUE, -1, -1));
+    if ((options.noReturn === false || typeof options.noReturn === 'undefined') && level === 0) {
+      const last_instr = res.stack.instructions.at(-1);
+      if (typeof last_instr !== 'undefined' && last_instr.type !== INSTRUCTION_TYPE.RETURN_VALUE) {
+        res.stack.instructions.push(new Instruction(INSTRUCTION_TYPE.RETURN_VALUE, -1, -1));
+      }
     }
 
     return res;

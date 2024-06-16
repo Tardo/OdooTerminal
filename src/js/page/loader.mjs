@@ -55,10 +55,10 @@ function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   };
   const term_obj = getTerminalObj();
   if (term_obj) {
-    registerCoreFuncs(term_obj);
-    registerCommonFuncs(term_obj);
+    registerCoreFuncs(term_obj.getShell().getVM());
+    registerCommonFuncs(term_obj.getShell().getVM());
     if (isBackOffice()) {
-      registerBackofficeFuncs(term_obj);
+      registerBackofficeFuncs(term_obj.getShell().getVM());
     }
     term_obj.init(config);
     let odoo_ver = getOdooVersion();

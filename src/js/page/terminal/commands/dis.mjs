@@ -11,7 +11,7 @@ import type Terminal from '@terminal/terminal';
 type RowInfo = [string, number, string, number, number, string];
 
 async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<Array<RowInfo>> {
-  const parse_info = this.parse(kwargs.code);
+  const parse_info = this.getShell().parse(kwargs.code);
   const rows: Array<RowInfo> = [];
   const {stack} = parse_info;
   for (const instr of stack.instructions) {
@@ -30,9 +30,6 @@ async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
         lvalue = new String(rec_value).toString();
         break;
       }
-      case INSTRUCTION_TYPE.LOAD_ARG:
-        lvalue = stack.arguments[instr.level][instr.dataIndex];
-        break;
     }
 
     const humanType = INSTRUCTION_TYPE.getHumanType(instr.type);

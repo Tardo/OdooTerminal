@@ -2,8 +2,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
+import i18n from 'i18next';
 import {validateAndFormatArguments} from './argument';
 import {INSTRUCTION_TYPE} from './constants';
+import Frame from './frame';
+import FunctionTrash from './function';
 import InvalidCommandArgumentFormatError from './exceptions/invalid_command_argument_format_error';
 import InvalidCommandArgumentValueError from './exceptions/invalid_command_argument_value_error';
 import InvalidCommandArgumentsError from './exceptions/invalid_command_arguments_error';
@@ -14,10 +18,10 @@ import InvalidValueError from './exceptions/invalid_value_error';
 import NotExpectedCommandArgumentError from './exceptions/not_expected_command_argument_error';
 import UnknownCommandError from './exceptions/unknown_command_error';
 import UnknownNameError from './exceptions/unknown_name_error';
-import Interpreter from './interpreter';
+import InvalidCommandDefintionError from './exceptions/invalid_command_definition_error';
 import pluck from './utils/pluck';
 import isFalsy from './utils/is_falsy';
-import type {RegisteredCMD, ParserOptions, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
+import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
 
 export type ProcessCommandJobOptions = {
   cmdRaw: string,
@@ -37,72 +41,62 @@ export type EvalOptions = {
   silent?: boolean,
 };
 
-class Frame {
-  cmd: string | void;
-  store: {[string]: mixed};
-  args: Array<string>;
-  values: Array<mixed>;
-  prevFrame: Frame | void;
-
-  constructor(cmd_name: string | void, prev_frame: Frame | void) {
-    this.cmd = cmd_name;
-    this.store = {};
-    this.args = [];
-    this.values = [];
-    this.prevFrame = prev_frame;
-
-    if (this.prevFrame) {
-      this.store = {...this.prevFrame.store};
-    }
-  }
-}
-
 export default class VMachine {
+  #registeredCmds: RegisteredCMD = {};
   #registeredNames: {[string]: mixed} = {};
-  #interpreter: Interpreter;
-  registeredCmds: RegisteredCMD = {};
   options: VMachineOptions;
 
-  constructor(registered_cmds: RegisteredCMD, options: VMachineOptions) {
-    this.registeredCmds = registered_cmds;
+  constructor(options: VMachineOptions) {
     this.options = options;
-    this.#interpreter = new Interpreter();
   }
 
-  parse(data: string, options?: ParserOptions, level?: number = 0): ParseInfo {
-    const parse_options: ParserOptions = typeof options !== 'undefined' ? structuredClone(options) : {};
-    parse_options.registeredCmds = this.registeredCmds;
-    return this.#interpreter.parse(data, parse_options, level);
+  getRegisteredCmds(): RegisteredCMD {
+    return this.#registeredCmds;
   }
 
-  parseAliases(aliases: {[string]: string}, cmd_name: string, args: $ReadOnlyArray<string>): string | void {
-    let alias_cmd = aliases[cmd_name];
-    if (alias_cmd) {
-      const params_len = args.length;
-      let index = 0;
-      while (index < params_len) {
-        const re = new RegExp(`\\$${Number(index) + 1}(?:\\[[^\\]]+\\])?`, 'g');
-        alias_cmd = alias_cmd.replaceAll(re, args[index]);
-        ++index;
-      }
-      alias_cmd = alias_cmd.replaceAll(/\$\d+(?:\[([^\]]+)\])?/g, (_, group) => {
-        return group || '';
-      });
-      return alias_cmd;
-    }
-    return undefined;
+  static makeCommand(cmd_def: Partial<CMDDef>): CMDDef {
+    return {
+      definition: i18n.t('terminal.cmd.default.definition', 'Undefined command'),
+      callback: () => {
+        return this.#fallbackExecuteCommand();
+      },
+      options: () => {
+        return this.#fallbackCommandOptions();
+      },
+      detail: i18n.t('terminal.cmd.default.detail', "This command hasn't a properly detailed information"),
+      args: [],
+      secured: false,
+      aliases: [],
+      example: '',
+      is_function: false,
+      ...cmd_def,
+    };
   }
+
+  registerCommand(cmd: string, cmd_def: Partial<CMDDef>): CMDDef {
+    this.#registeredCmds[cmd] = VMachine.makeCommand(cmd_def);
+    return this.#registeredCmds[cmd];
+  }
+
+  static async #fallbackExecuteCommand(): Promise<> {
+    throw new InvalidCommandDefintionError;
+  }
+
+  static async #fallbackCommandOptions(): Promise<$ReadOnlyArray<string>> {
+    return [];
+  }
+
 
   async #callFunction(
-    aliases: {[string]: string},
+    opts: EvalOptions,
     frame: Frame,
     parse_info: ParseInfo,
     silent: boolean,
   ): Promise<mixed> {
     if (typeof frame.cmd !== 'undefined') {
       const frame_cmd = frame.cmd;
-      if (this.registeredCmds[frame_cmd]) {
-        const cmd_def = this.registeredCmds[frame_cmd];
+      const cmd_def = this.#registeredCmds[frame_cmd];
+      if (typeof cmd_def !== 'undefined') {
         const items_len = frame.values.length;
         if (frame.args.length > items_len) {
           throw new InvalidCommandArgumentsError(frame_cmd, frame.args);
@@ -127,6 +121,9 @@ export default class VMachine {
           throw new InvalidCommandArgumentFormatError(err.message, frame_cmd);
         }
 
+        if (cmd_def.is_function) {
+          return await cmd_def.callback(this, kwargs, frame, opts);
+        }
         return await this.options.processCommandJob(
           {
             cmdRaw: parse_info.inputRawString,
@@ -137,46 +134,21 @@ export default class VMachine {
           silent,
         );
       }
-
-      // Alias
-      // $FlowFixMe
-      const alias_cmd = this.parseAliases(aliases, frame_cmd, frame.values);
-      if (typeof alias_cmd !== 'undefined') {
-        const res = await this.eval(alias_cmd, {
-          aliases: aliases,
-        });
-        return res[0];
-      }
     }
   }
 
-  #checkGlobalName(global_name: string | null, aliases: {[string]: string}): boolean {
-    if (global_name === null) {
-      return false;
-    }
-    return Object.hasOwn(this.registeredCmds, global_name) || !isFalsy(aliases[global_name]);
-  }
-
-  async eval(cmd_raw: string, options?: Partial<EvalOptions>): Promise<$ReadOnlyArray<mixed>> {
-    if (cmd_raw?.constructor !== String) {
-      throw new Error('Invalid input!');
-    }
-    const opts: EvalOptions = {
-      aliases: {},
-      isData: false,
-      silent: false,
-      ...options,
-    };
-    const parse_info = this.parse(cmd_raw, {
-      isData: opts.isData,
-    });
+  async execute(parse_info: ParseInfo, opts: EvalOptions, aframe?: Frame): Promise<mixed> {
     const {stack} = parse_info;
     const stack_instr_len = stack.instructions.length;
     const stack_instr_done = [];
-    const root_frame = new Frame();
-    root_frame.store = this.#registeredNames;
+    let root_frame = aframe;
+    if (typeof root_frame === 'undefined') {
+      root_frame = new Frame();
+      root_frame.store = this.#registeredNames;
+    }
     const frames = [];
-    const return_values = [];
+    let eoe = false;
+    let last_flow_check;
     let last_frame = root_frame;
     for (let index = 0; index < stack_instr_len; ++index) {
       const instr = stack.instructions[index];
@@ -194,7 +166,8 @@ export default class VMachine {
             const var_name = stack.names[instr.level][instr.dataIndex] || '';
             // Check stores
             if (last_frame && Object.hasOwn(last_frame.store, var_name)) {
-              last_frame.values.push(last_frame.store[var_name]);
+              const val = last_frame.store[var_name];
+              last_frame.values.push(val);
             } else if (Object.hasOwn(this.#registeredNames, var_name)) {
               last_frame.values.push(this.#registeredNames[var_name]);
             } else {
@@ -202,17 +175,20 @@ export default class VMachine {
             }
           }
           break;
-        case INSTRUCTION_TYPE.LOAD_GLOBAL: {
-          let cmd_name = stack.names[instr.level][instr.dataIndex];
-          if (cmd_name === null || typeof cmd_name === 'undefined') {
-            cmd_name = 'Undefined';
-          } else if (this.#checkGlobalName(cmd_name, opts.aliases)) {
-            last_frame = new Frame(cmd_name, last_frame);
-            frames.push(last_frame);
-            break;
+        case INSTRUCTION_TYPE.LOAD_GLOBAL:
+          {
+            const cmd_name = stack.names[instr.level][instr.dataIndex];
+            if (cmd_name === null || typeof cmd_name === 'undefined') {
+              return [false];
+            }
+            if (Object.hasOwn(this.#registeredCmds, cmd_name) || !isFalsy(opts.aliases[cmd_name])) {
+              last_frame = new Frame(cmd_name, last_frame);
+              frames.push(last_frame);
+            } else {
+              throw new UnknownCommandError(cmd_name, token.start, token.end);
+            }
           }
-          throw new UnknownCommandError(cmd_name, token.start, token.end);
-        }
+          break;
         case INSTRUCTION_TYPE.LOAD_CONST:
           {
             const value = stack.values[instr.level][instr.dataIndex];
@@ -221,24 +197,19 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.LOAD_ARG:
           {
-            const arg = stack.arguments[instr.level][instr.dataIndex];
+            const val = last_frame.values.pop();
+            if (typeof val !== 'string') {
+              throw new InvalidValueError(val);
+            }
             if (!last_frame) {
-              throw new NotExpectedCommandArgumentError(arg, token.start, token.end);
+              throw new NotExpectedCommandArgumentError(val, token.start, token.end);
             }
             // Flag arguments can be implicit
             const next_instr = stack.instructions[index + 1];
             if (next_instr && next_instr.type > INSTRUCTION_TYPE.LOAD_CONST) {
               last_frame.values.push(true);
             }
-            last_frame.args.push(arg);
-          }
-          break;
-        case INSTRUCTION_TYPE.CONCAT:
-          {
-            const valB = last_frame.values.pop();
-            const valA = last_frame.values.pop();
-            // $FlowFixMe
-            last_frame.values.push(`${valA}${valB}`);
+            last_frame.args.push(val);
           }
           break;
         case INSTRUCTION_TYPE.UNITARY_NEGATIVE:
@@ -252,6 +223,18 @@ export default class VMachine {
           }
           break;
         case INSTRUCTION_TYPE.ADD:
+          {
+            const valB = last_frame.values.pop();
+            const valA = last_frame.values.pop();
+            if (typeof valB !== 'number' && typeof valB !== 'string') {
+              throw new InvalidValueError(valB);
+            }
+            if (typeof valA !== 'number' && typeof valA !== 'string') {
+              throw new InvalidValueError(valA);
+            }
+            last_frame.values.push(valA + valB);
+          }
+          break;
         case INSTRUCTION_TYPE.SUBSTRACT:
         case INSTRUCTION_TYPE.MULTIPLY:
         case INSTRUCTION_TYPE.DIVIDE:
@@ -266,9 +249,7 @@ export default class VMachine {
             if (typeof valA !== 'number') {
               throw new InvalidValueError(valA);
             }
-            if (instr.type === INSTRUCTION_TYPE.ADD) {
-              last_frame.values.push(valA + valB);
-            } else if (instr.type === INSTRUCTION_TYPE.SUBSTRACT) {
+            if (instr.type === INSTRUCTION_TYPE.SUBSTRACT) {
               last_frame.values.push(valA - valB);
             } else if (instr.type === INSTRUCTION_TYPE.MULTIPLY) {
               last_frame.values.push(valA * valB);
@@ -281,13 +262,74 @@ export default class VMachine {
             }
           }
           break;
+        case INSTRUCTION_TYPE.AND:
+        case INSTRUCTION_TYPE.OR:
+        case INSTRUCTION_TYPE.EQUAL:
+        case INSTRUCTION_TYPE.NOT_EQUAL:
+          {
+            const valB = last_frame.values.pop();
+            const valA = last_frame.values.pop();
+
+            if (valB === null || typeof valB === 'undefined') {
+              throw new InvalidValueError(valB);
+            }
+            if (valA === null || typeof valA === 'undefined') {
+              throw new InvalidValueError(valA);
+            }
+
+            if (instr.type === INSTRUCTION_TYPE.AND) {
+              last_frame.values.push(valA && valB);
+            } else if (instr.type === INSTRUCTION_TYPE.OR) {
+              last_frame.values.push(valA || valB);
+            } else if (instr.type === INSTRUCTION_TYPE.EQUAL) {
+              last_frame.values.push(valA === valB);
+            } else if (instr.type === INSTRUCTION_TYPE.NOT_EQUAL) {
+              last_frame.values.push(valA !== valB);
+            }
+          }
+          break;
+        case INSTRUCTION_TYPE.GREATER_THAN_OPEN:
+        case INSTRUCTION_TYPE.LESS_THAN_OPEN:
+        case INSTRUCTION_TYPE.GREATER_THAN_CLOSED:
+        case INSTRUCTION_TYPE.LESS_THAN_CLOSED:
+          {
+            const valB = last_frame.values.pop();
+            const valA = last_frame.values.pop();
+
+            if (typeof valB !== 'number') {
+              throw new InvalidValueError(valB);
+            }
+            if (typeof valA !== 'number') {
+              throw new InvalidValueError(valA);
+            }
+
+            if (instr.type === INSTRUCTION_TYPE.GREATER_THAN_OPEN) {
+              last_frame.values.push(valA > valB);
+            } else if (instr.type === INSTRUCTION_TYPE.LESS_THAN_OPEN) {
+              last_frame.values.push(valA < valB);
+            } else if (instr.type === INSTRUCTION_TYPE.GREATER_THAN_CLOSED) {
+              last_frame.values.push(valA >= valB);
+            } else if (instr.type === INSTRUCTION_TYPE.LESS_THAN_CLOSED) {
+              last_frame.values.push(valA <= valB);
+            }
+          }
+          break;
+        case INSTRUCTION_TYPE.NOT:
+          {
+            const val = last_frame.values.pop();
+            if (typeof val !== 'boolean') {
+              throw new InvalidValueError(val);
+            }
+            last_frame.values.push(!val);
+          }
+          break;
         case INSTRUCTION_TYPE.CALL_FUNCTION_SILENT:
         case INSTRUCTION_TYPE.CALL_FUNCTION:
           {
             const frame = frames.pop();
             // Subframes are executed in silent mode
             const ret = await this.#callFunction(
-              opts.aliases,
+              opts,
               frame,
               parse_info,
               instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
@@ -297,7 +339,12 @@ export default class VMachine {
           }
           break;
         case INSTRUCTION_TYPE.RETURN_VALUE:
-          return_values.push(last_frame.values.at(-1));
+          {
+            const frame = frames.pop() || root_frame;
+            last_frame = frames.at(-1) || root_frame;
+            last_frame.values.push(frame.values.pop());
+            eoe = true;
+          }
           break;
         case INSTRUCTION_TYPE.STORE_NAME:
           {
@@ -393,10 +440,57 @@ export default class VMachine {
           frames.pop();
           last_frame = frames.at(-1) || root_frame;
           break;
+        case INSTRUCTION_TYPE.MAKE_FUNCTION:
+          {
+            const name = last_frame.values.pop();
+            const args = last_frame.values.pop();
+            const code = last_frame.values.pop();
+            if (args instanceof Array && code !== null && typeof code === 'object') {
+              const trash_func = new FunctionTrash(args, code);
+              const cmd_def = {
+                is_function: true,
+                callback: trash_func.exec.bind(trash_func),
+                args: args,
+                definition: i18n.t('trash.vmachine.func.definition', 'Internal function'),
+                detail: i18n.t('trash.vmachine.func.detail', 'Internal function'),
+              };
+              if (typeof name === 'string') {
+                this.registerCommand(name, cmd_def)
+              }
+              last_frame.values.push(trash_func);
+            }
+          }
+          break;
+        case INSTRUCTION_TYPE.JUMP_IF_FALSE:
+          {
+            last_flow_check = last_frame.values.pop();
+            const num_to_skip = instr.dataIndex;
+            if (typeof last_flow_check !== 'undefined' && last_flow_check !== null && !last_flow_check) {
+              index += num_to_skip + 1;
+            }
+          }
+          break;
+        case INSTRUCTION_TYPE.JUMP_IF_TRUE:
+          {
+            const num_to_skip = instr.dataIndex;
+            if (typeof last_flow_check !== 'undefined' && last_flow_check !== null && last_flow_check) {
+              index += num_to_skip + 1;
+            }
+          }
+          break;
+        case INSTRUCTION_TYPE.JUMP_BACKWARD:
+            {
+              const num_to_back = instr.dataIndex;
+              index -= num_to_back + 1;
+            }
+            break;
       }
 
       stack_instr_done.push(instr);
+      if (eoe) {
+        break;
+      }
     }
-    return return_values;
+    return last_frame.values.pop();
   }
 }

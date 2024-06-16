@@ -16,22 +16,22 @@ import cmdPrint from './print';
 import cmdQuit from './quit';
 import cmdRepeat from './repeat';
 import cmdToggleTerm from './toggle_term';
-import type Terminal from '@terminal/terminal';
+import type VMachine from '@trash/vmachine';
 
-export default function (TerminalObj: Terminal) {
-  TerminalObj.registerCommand('help', cmdHelp());
-  TerminalObj.registerCommand('clear', cmdClear());
-  TerminalObj.registerCommand('print', cmdPrint());
-  TerminalObj.registerCommand('load', cmdLoad());
-  TerminalObj.registerCommand('context_term', cmdContextTerm());
-  TerminalObj.registerCommand('alias', cmdAlias());
-  TerminalObj.registerCommand('quit', cmdQuit());
-  TerminalObj.registerCommand('exportvar', cmdExportVar());
-  TerminalObj.registerCommand('exportfile', cmdExportFile());
-  TerminalObj.registerCommand('chrono', cmdChrono());
-  TerminalObj.registerCommand('repeat', cmdRepeat());
-  TerminalObj.registerCommand('jobs', cmdJobs());
-  TerminalObj.registerCommand('toggle_term', cmdToggleTerm());
-  TerminalObj.registerCommand('dis', cmdDis());
-  TerminalObj.registerCommand('genfile', cmdGenFile());
+export default function (vm: VMachine) {
+  vm.registerCommand('help', cmdHelp());
+  vm.registerCommand('clear', cmdClear());
+  vm.registerCommand('print', cmdPrint());
+  vm.registerCommand('load', cmdLoad());
+  vm.registerCommand('context_term', cmdContextTerm());
+  vm.registerCommand('alias', cmdAlias());
+  vm.registerCommand('quit', cmdQuit());
+  vm.registerCommand('exportvar', cmdExportVar());
+  vm.registerCommand('exportfile', cmdExportFile());
+  vm.registerCommand('chrono', cmdChrono());
+  vm.registerCommand('repeat', cmdRepeat());
+  vm.registerCommand('jobs', cmdJobs());
+  vm.registerCommand('toggle_term', cmdToggleTerm());
+  vm.registerCommand('dis', cmdDis());
+  vm.registerCommand('genfile', cmdGenFile());
 }

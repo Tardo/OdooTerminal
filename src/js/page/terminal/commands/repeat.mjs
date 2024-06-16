@@ -23,10 +23,10 @@ async function cmdRepeat(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallba
       );
       return Promise.resolve(res);
     }
-    this.eval(`$repeat_index=${kwargs.times - rtimes}`, {silent: true});
-    return this.eval(kwargs.cmd, {silent: kwargs.silent})
+    this.getShell().eval(`$repeat_index=${kwargs.times - rtimes}`, {silent: true});
+    return this.getShell().eval(kwargs.cmd, {silent: kwargs.silent})
       .then(result => {
-        res.push(result[0]);
+        res.push(result);
         return res;
       })
       .finally(() => do_repeat(rtimes - 1));

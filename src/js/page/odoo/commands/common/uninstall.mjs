@@ -16,8 +16,8 @@ async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
   const modue_infos = await searchModules.bind(this)(kwargs.module);
   if (!isEmpty(modue_infos)) {
     if (!kwargs.force) {
-      const res: $ReadOnlyArray<mixed> = await this.execute(`depends -m ${kwargs.module}`, false, true);
-      if (isEmpty(res)) {
+      const res: mixed = await this.execute(`depends -m ${kwargs.module}`, false, true);
+      if (typeof res === 'undefined') {
         return;
       }
       // $FlowFixMe

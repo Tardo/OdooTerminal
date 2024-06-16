@@ -6,7 +6,7 @@
 ![Chrome Add-on](https://img.shields.io/chrome-web-store/users/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
 
 <h1 align="center">
-  <img src="src/img/terminal-128.png" />
+  <img src="OdooTerminal.png" />
   <div>Odoo Terminal - WebExtension</div>
 
 [![Tests](https://github.com/Tardo/OdooTerminal/actions/workflows/tests.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/tests.yml)
@@ -98,17 +98,17 @@ write values with `commit` command.
 Example:
 
 ```
-$rs = $(search res.partner)
+$rs = (search res.partner)
 $rs[4]['name'] = 'The Name'
 $rs[2]['name'] = 'Other Name'
 commit $rs
 
-$record = $(read res.partner 8)
+$record = (read res.partner 8)
 $record['name'] = 'Willy Wonka'
 $record['city'] = 'O Courel'
 commit $record
 
-$new_rec = $(create res.partner {name: 'The test'})
+$new_rec = (create res.partner {name: 'The test'})
 print $new_rec
 ```
 
@@ -131,10 +131,10 @@ For example:
 #### + Nested Calls
 
 You can execute "commands" to use the result in a new command call. The syntax
-of 'nested calls' looks like `$(command)`.
+of 'nested calls' looks like `(command)`.
 
-For example: `read -m res.users -i $(search -m res.users -f id)[0]['id']` or
-`read -m res.users -i $(search -m res.users -f id)['ids']`
+For example: `read -m res.users -i (search -m res.users -f id)[0]['id']` or
+`read -m res.users -i (search -m res.users -f id)['ids']`
 
 #### + Massive operations
 
@@ -145,9 +145,9 @@ performance.
 Examples:
 
 - Create 5000 res.partner:
-  `repeat -t 5000 -c "create -m res.partner -v {name: $(gen str 12 8) + ' (Test)'}" --silent`
+  `repeat -t 5000 -c "create -m res.partner -v {name: (gen str 12 8) + ' (Test)'}" --silent`
 - Cancel all sale.order:
-  `$orders = $(search sale.order); repeat -t $orders['length'] -c "call sale.order action_cancel [$orders[$repeat_index]['id']]"`
+  `$orders = (search sale.order); repeat -t $orders['length'] -c "call sale.order action_cancel [$orders[$repeat_index]['id']]"`
 
 #### + Send files
 
@@ -155,7 +155,7 @@ Can use the command 'genfile' to create a file object that can be sent via post.
 
 Example:
 
-- `post /web/binary/upload_attachment -d {callback: '', model: 'res.partner', id: 1, ufile: $(genfile)}`
+- `post /web/binary/upload_attachment -d {callback: '', model: 'res.partner', id: 1, ufile: (genfile)}`
 
 #### + Websockets
 
@@ -164,20 +164,18 @@ Can open websocket connections (Odoo 16.0+).
 Example:
 
 - ```
-  $webs = $(ws -o open -e /websocket)
+  $webs = (ws -o open -e /websocket)
   ws -o send -wo $webs -d "hello"
   ```
 
 #### + Math operations
 
-The way to do math operations is pretty similar to 'shell script' syntax:
-`$((<OPERATION>))`
-
 Examples:
 
-- Print 3*2 result: `print $((3*2))`
+- Print 3*2 result: `print 3*2`
 - Modify the lst_price of the 3,product.product:
-  `$prod = $(read product.product 3 -f lst_price); $prod['lst_price'] = $((5*$prod['lst_price'])); commit $prod;`
+  `$prod = (read product.product 3 -f lst_price); $prod['lst_price'] = (5*$prod['lst_price']); commit $prod;`
+
 
 ---
 

@@ -57,14 +57,14 @@ async function printHelpDetailed(screen: Screen, cmd: string, cmd_def: CMDDef) {
 
 async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<void> {
   if (typeof kwargs.cmd === 'undefined') {
-    const sorted_cmd_keys = Object.keys(this.registeredCmds).sort();
+    const sorted_cmd_keys = Object.keys(this.getShell().getVM().getRegisteredCmds()).sort();
     const sorted_keys_len = sorted_cmd_keys.length;
     for (let x = 0; x < sorted_keys_len; ++x) {
       const _cmd = sorted_cmd_keys[x];
-      ctx.screen.printHelpSimple(_cmd, this.registeredCmds[_cmd]);
+      ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd]);
     }
-  } else if (Object.hasOwn(this.registeredCmds, kwargs.cmd)) {
-    await printHelpDetailed.call(this, ctx.screen, kwargs.cmd, this.registeredCmds[kwargs.cmd]);
+  } else if (Object.hasOwn(this.getShell().getVM().getRegisteredCmds(), kwargs.cmd)) {
+    await printHelpDetailed.call(this, ctx.screen, kwargs.cmd, this.getShell().getVM().getRegisteredCmds()[kwargs.cmd]);
   } else {
     throw new Error(i18n.t('cmdHelp.error.commandNotExist', "'{{cmd}}' command doesn't exist", {cmd: kwargs.cmd}));
   }
@@ -72,7 +72,7 @@ async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
 
 function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
   if (arg_name === 'cmd') {
-    return Promise.resolve(Object.keys(this.virtMachine.registeredCmds));
+    return Promise.resolve(Object.keys(this.getShell().getVM().getRegisteredCmds()));
   }
   return Promise.resolve([]);
 }

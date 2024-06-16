@@ -4,8 +4,9 @@
 
 import isEmpty from '@trash/utils/is_empty';
 import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
-import {INSTRUCTION_TYPE} from '@trash/constants';
-import type VMachine from '@trash/vmachine';
+import {INSTRUCTION_TYPE, KEYMAP} from '@trash/constants';
+import difference from '@trash/utils/difference';
+import type Shell from '@trash/shell';
 import type {CMDDef, ArgInfo, ParseInfo} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
@@ -37,16 +38,16 @@ export type CMDAssistantInputInfo = {
 };
 
 export default class CommandAssistant {
-  #virtMachine: VMachine;
+  #shell: Shell;
   #parent: Terminal;
 
   constructor(parent: Terminal) {
     this.#parent = parent;
-    this.#virtMachine = parent.virtMachine;
+    this.#shell = parent.getShell();
   }
 
   #getAvailableCommandNames(name: string): Array<string> {
-    const cmd_names = Object.keys(this.#virtMachine.registeredCmds);
+    const cmd_names = Object.keys(this.#shell.getVM().getRegisteredCmds());
     return cmd_names.filter(cmd_name => cmd_name.startsWith(name));
   }
 
@@ -208,7 +209,7 @@ export default class CommandAssistant {
   }
 
   getInputInfo(data: string, caret_pos: number): CMDAssistantInputInfo {
-    const parse_info = this.#virtMachine.parse(data);
+    const parse_info = this.#shell.parse(data);
     const [sel_cmd_index, sel_token_index, sel_arg_index] = this.getSelectedParameterIndex(parse_info, caret_pos);
     let sel_token_index_san = sel_token_index;
     // If not current, force last arg
@@ -258,14 +259,14 @@ export default class CommandAssistant {
           type: -1,
           string: cmd_name,
           is_command: true,
-          description: this.#virtMachine.registeredCmds[cmd_name].definition,
+          description: this.#shell.getVM().getRegisteredCmds()[cmd_name].definition,
         });
       }
       return ret;
     }
 
-    const command_info = input_info.token.cmd ? this.#virtMachine.registeredCmds[input_info.token.cmd] : undefined;
-    if (!command_info) {
+    const command_info = input_info.token.cmd ? this.#shell.getVM().getRegisteredCmds()[input_info.token.cmd] : undefined;
+    if (!command_info || command_info.is_function) {
       return [];
     }
 
@@ -319,5 +320,93 @@ export default class CommandAssistant {
     }
 
     return ret;
+  }
+
+   // Key Distance Comparison (Simple mode)
+  // Comparison by distance between keys.
+  //
+  // This mode of analysis limit it to qwerty layouts
+  // but can predict words with a better accuracy.
+  // Example Case:
+  //   - Two commands: horse, house
+  //   - User input: hoese
+  //
+  //   - Output using simple comparison: horse and house (both have the
+  //     same weight)
+  //   - Output using KDC: horse
+  searchSimiliarCommand(in_cmd: string): string | void {
+    if (in_cmd.length < 3) {
+      return undefined;
+    }
+
+    // Only consider words with score lower than this limit
+    const SCORE_LIMIT = 50;
+    // Columns per Key and Rows per Key
+    const cpk = 10,
+      rpk = 3;
+    const max_dist = Math.sqrt(cpk + rpk);
+    const _get_key_dist = function (from: string, to: string) {
+      const _get_key_pos2d = function (key: string) {
+        const i = KEYMAP.indexOf(key);
+        if (i === -1) {
+          return [cpk, rpk];
+        }
+        return [i / cpk, i % rpk];
+      };
+
+      const from_pos = _get_key_pos2d(from);
+      const to_pos = _get_key_pos2d(to);
+      const x = (to_pos[0] - from_pos[0]) * (to_pos[0] - from_pos[0]);
+      const y = (to_pos[1] - from_pos[1]) * (to_pos[1] - from_pos[1]);
+      return Math.sqrt(x + y);
+    };
+
+    const sanitized_in_cmd = in_cmd.toLowerCase();
+    const sorted_cmd_keys = Object.keys(this.#shell.getVM().getRegisteredCmds()).sort();
+    const min_score = [0, ''];
+    const sorted_keys_len = sorted_cmd_keys.length;
+    for (let x = 0; x < sorted_keys_len; ++x) {
+      const cmd = sorted_cmd_keys[x];
+      // Analize typo's
+      const search_index = sanitized_in_cmd.search(cmd);
+      let cmd_score = 0;
+      if (search_index === -1) {
+        // Penalize word length diff
+        cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length) / 2 + max_dist;
+        // Analize letter key distances
+        for (let i = 0; i < sanitized_in_cmd.length; ++i) {
+          if (i < cmd.length) {
+            const score = _get_key_dist(sanitized_in_cmd.charAt(i), cmd.charAt(i));
+            if (score === 0) {
+              --cmd_score;
+            } else {
+              cmd_score += score;
+            }
+          } else {
+            break;
+          }
+        }
+        // Using all letters?
+        const cmd_vec = cmd.split('').map(k => k.charCodeAt(0));
+        const in_cmd_vec = sanitized_in_cmd.split('').map(k => k.charCodeAt(0));
+        if (difference(in_cmd_vec, cmd_vec).length === 0) {
+          cmd_score -= max_dist;
+        }
+      } else {
+        cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length) / 2;
+      }
+
+      // Search lower score
+      // if zero = perfect match (this never should happens)
+      if (min_score[1] === '' || cmd_score < min_score[0]) {
+        min_score[0] = cmd_score;
+        min_score[1] = cmd;
+        if (min_score[0] === 0.0) {
+          break;
+        }
+      }
+    }
+
+    return min_score[0] < SCORE_LIMIT ? min_score[1] : undefined;
   }
 }

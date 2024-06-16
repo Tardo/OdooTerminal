@@ -19,7 +19,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   let fields = kwargs.field;
 
   if (kwargs.more) {
-    const buff = search_buffer[ctx.meta.name];
+    const buff = search_buffer[ctx.meta.info.cmdName];
     if (!buff || !buff.data.length) {
       throw new Error(i18n.t('cmdSearch.error.noMoreResults', 'There are no more results to print'));
     }
@@ -83,7 +83,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   const need_truncate = !ctx.meta.silent && !kwargs.all && result.length > lines_total;
   let sresult = result;
   if (need_truncate) {
-    search_buffer[ctx.meta.name] = {
+    search_buffer[ctx.meta.info.cmdName] = {
       model: kwargs.model,
       data: sresult.slice(lines_total),
     };
@@ -91,7 +91,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   }
   const recordset = Recordset.make(kwargs.model, sresult);
   ctx.screen.print(recordset);
-  ctx.screen.print(`Records count: ${sresult.length}`);
+  ctx.screen.print(i18n.t("cmdSearch.result.count", "Records count: {{count}}", {count: sresult.length}));
   if (need_truncate) {
     ctx.screen.printError(
       i18n.t(
@@ -105,7 +105,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     return ctx.screen
       .showQuestion(
         i18n.t('cmdSearch.question.showMore', 'There are still results to print ({{len}} records). Show more?', {
-          len: search_buffer[ctx.meta.name].data.length,
+          len: search_buffer[ctx.meta.info.cmdName].data.length,
         }),
         ['y', 'n'],
         'y',

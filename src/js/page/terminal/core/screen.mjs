@@ -54,30 +54,6 @@ export type ScreenOptions = {
 export const PROMPT = '>';
 export const LINE_SELECTOR = ':scope > span .print-table tr, :scope > span';
 
-const ALLOWED_FUNCS = ['eprint', 'print', 'printError', 'printTable', 'updateInputInfo', 'showQuestion', 'clean'];
-
-const ALLOWED_SILENT_FUNCS = ['updateInputInfo'];
-
-const dummyCall = () => {
-  // Do nothing
-};
-
-export const ScreenCommandHandler = {
-  silent: false,
-
-  // $FlowFixMe
-  get<T>(this: T, target: Object, prop: mixed): mixed {
-    const ref = target[prop];
-    if (typeof ref === 'function' && ALLOWED_FUNCS.includes(prop)) {
-      // $FlowFixMe
-      if (this.silent && !ALLOWED_SILENT_FUNCS.includes(prop)) {
-        return dummyCall;
-      }
-      return ref.bind(target);
-    }
-    return target[prop];
-  },
-};
 
 export default class Screen {
   #max_lines = 750;
