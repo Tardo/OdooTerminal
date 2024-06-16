@@ -138,16 +138,15 @@ For example: `read -m res.users -i (search -m res.users -f id)[0]['id']` or
 
 #### + Massive operations
 
-Massive operations are possible using the command `repeat`. Print to screen is a
-expensive task, consider use the `--silent` argument to increase the
-performance.
+Massive operations are possible using the command `for loops`. Print to screen is a
+expensive task, consider use the keyword `silent` to increase the performance.
 
 Examples:
 
-- Create 5000 res.partner:
-  `repeat -t 5000 -c "create -m res.partner -v {name: (gen str 12 8) + ' (Test)'}" --silent`
+- Create 5000 res.partner:{
+  `for ($i = 0; $i < 5000; $i = $i + 1) { silent create -m res.partner -v {name: (gen str 12 8) + ' (Test)'} }`
 - Cancel all sale.order:
-  `$orders = (search sale.order); repeat -t $orders['length'] -c "call sale.order action_cancel [$orders[$repeat_index]['id']]"`
+  `$orders = (search sale.order); for ($i = 0; $i < $orders['length']; $i = $i + 1) { silent call sale.order action_cancel [$orders[$i]['id']] }`
 
 #### + Send files
 
@@ -174,8 +173,13 @@ Examples:
 
 - Print 3*2 result: `print 3*2`
 - Modify the lst_price of the 3,product.product:
-  `$prod = (read product.product 3 -f lst_price); $prod['lst_price'] = (5*$prod['lst_price']); commit $prod;`
+  `$prod = (read product.product 3 -f lst_price); $prod['lst_price'] = (5 * $prod['lst_price']); commit $prod;`
 
+#### + If, Else
+
+Example:
+  - `if ((gen int 0 8) > 2) { print 'Yes!' } else { print 'No' }`
+  - `$num = (gen int 0 8); if ($num > 2) { print 'Yes! ' + $num + ' > 2' } else { print 'No... ' + $num + ' <= 2' }`
 
 ---
 

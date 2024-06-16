@@ -9,6 +9,7 @@ import processKeybind from '@common/utils/process_keybind';
 import {SETTING_DEFAULTS} from '@common/constants';
 import Shell from '@trash/shell';
 import UnknownCommandError from '@trash/exceptions/unknown_command_error';
+import InvalidCommandDefintionError from '@trash/exceptions/invalid_command_definition_error';
 import isEmpty from '@trash/utils/is_empty';
 import CommandAssistant from './core/command_assistant';
 import Screen from './core/screen';
@@ -301,6 +302,9 @@ export default class Terminal {
       screen: new Proxy(this.screen, {...ScreenCommandHandler, silent: meta.silent}),
       meta: meta,
     };
+    if (typeof meta.info.cmdDef.callback === 'undefined') {
+      throw new InvalidCommandDefintionError();
+    }
     return await meta.info.cmdDef.callback.call(this, meta.info.kwargs, call_ctx);
   }
 

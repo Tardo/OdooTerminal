@@ -43,6 +43,7 @@ export const LEXER = {
   If: 37,
   Elif: 38,
   Else: 39,
+  Silent: 40,
 };
 
 export const LEXER_MATH_OPER = [
@@ -277,6 +278,7 @@ export const KEYWORDS = {
   IF: 'if',
   ELIF: 'elif',
   ELSE: 'else',
+  SILENT: 'silent',
 };
 
 export const MATH_OPER_PRIORITIES = [

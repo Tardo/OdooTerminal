@@ -122,7 +122,10 @@ export default class VMachine {
         }
 
         if (cmd_def.is_function) {
-          return await cmd_def.callback(this, kwargs, frame, opts);
+          if (typeof cmd_def.callback_internal === 'undefined') {
+            throw new InvalidCommandDefintionError();
+          }
+          return await cmd_def.callback_internal(this, kwargs, frame, opts);
         }
         return await this.options.processCommandJob(
           {
@@ -140,7 +143,6 @@ export default class VMachine {
   async execute(parse_info: ParseInfo, opts: EvalOptions, aframe?: Frame): Promise<mixed> {
     const {stack} = parse_info;
     const stack_instr_len = stack.instructions.length;
-    const stack_instr_done = [];
     let root_frame = aframe;
     if (typeof root_frame === 'undefined') {
       root_frame = new Frame();
@@ -150,7 +152,7 @@ export default class VMachine {
     let eoe = false;
     let last_flow_check;
     let last_frame = root_frame;
-    for (let index = 0; index < stack_instr_len; ++index) {
+    for (let index = 0; !eoe && index < stack_instr_len; ++index) {
       const instr = stack.instructions[index];
       const token =
         instr.inputTokenIndex >= 0
@@ -412,6 +414,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.BUILD_LIST:
           {
+            debugger;
             const iter_count = instr.dataIndex;
             const value = [];
             for (let i = 0; i < iter_count; ++i) {
@@ -446,10 +449,12 @@ export default class VMachine {
             const args = last_frame.values.pop();
             const code = last_frame.values.pop();
             if (args instanceof Array && code !== null && typeof code === 'object') {
+              // $FlowFixMe
               const trash_func = new FunctionTrash(args, code);
               const cmd_def = {
                 is_function: true,
-                callback: trash_func.exec.bind(trash_func),
+                // $FlowFixMe
+                callback_internal: trash_func.exec.bind(trash_func),
                 args: args,
                 definition: i18n.t('trash.vmachine.func.definition', 'Internal function'),
                 detail: i18n.t('trash.vmachine.func.detail', 'Internal function'),
@@ -484,11 +489,6 @@ export default class VMachine {
               index -= num_to_back + 1;
             }
             break;
-      }
-
-      stack_instr_done.push(instr);
-      if (eoe) {
-        break;
       }
     }
     return last_frame.values.pop();

@@ -22,7 +22,7 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results[2], 3);
     this.assertEqual(results[3], -345);
     results = await this.terminal.getShell().eval(
-      "[[ 1, 2, 3 ,4], ['test', 'this','lalala lo,  lolo', [12,   3,    [123   ,'oops'   , {   key: 'the value'}]]]]",
+      "[[ 1, 2, 3 ,4], ['test', 'this','lalala lo,  lolo', [12,   3,    [123   ,'oops'   , 123 * 2 + 4 - 2 + 6 / 2, {   key: 'the value'}]]]]",
     );
     this.assertEqual(results[0][0], 1);
     this.assertEqual(results[0][1], 2);
@@ -35,7 +35,8 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results[1][3][1], 3);
     this.assertEqual(results[1][3][2][0], 123);
     this.assertEqual(results[1][3][2][1], 'oops');
-    this.assertEqual(results[1][3][2][2].key, 'the value');
+    this.assertEqual(results[1][3][2][2], 251);
+    this.assertEqual(results[1][3][2][3].key, 'the value');
 
     // Dictionary
     results = await this.terminal.getShell().eval("{keyA: 'the value', keyB: 'the, value'}");

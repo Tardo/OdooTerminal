@@ -209,7 +209,7 @@ export default class CommandAssistant {
   }
 
   getInputInfo(data: string, caret_pos: number): CMDAssistantInputInfo {
-    const parse_info = this.#shell.parse(data);
+    const parse_info = this.#shell.parse(data, {ignoreErrors: true});
     const [sel_cmd_index, sel_token_index, sel_arg_index] = this.getSelectedParameterIndex(parse_info, caret_pos);
     let sel_token_index_san = sel_token_index;
     // If not current, force last arg
