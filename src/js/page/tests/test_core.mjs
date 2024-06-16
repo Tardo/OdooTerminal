@@ -105,11 +105,6 @@ export default class TestCore extends TerminalTestSuite {
     this.assertNotEqual(res, -1);
   }
 
-  async test_repeat() {
-    const res = await this.terminal.execute('repeat -t 50 -c "print -m \'This is a test\'" --silent', false, true);
-    this.assertNotEqual(res, -1);
-  }
-
   async test_jobs() {
     const res = await this.terminal.execute('jobs', false, true);
     this.assertEqual(res[0]?.cmdInfo.cmdName, 'jobs');

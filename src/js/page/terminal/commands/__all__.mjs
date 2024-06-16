@@ -14,7 +14,6 @@ import cmdJobs from './jobs';
 import cmdLoad from './load';
 import cmdPrint from './print';
 import cmdQuit from './quit';
-import cmdRepeat from './repeat';
 import cmdToggleTerm from './toggle_term';
 import type VMachine from '@trash/vmachine';
 
@@ -29,7 +28,6 @@ export default function (vm: VMachine) {
   vm.registerCommand('exportvar', cmdExportVar());
   vm.registerCommand('exportfile', cmdExportFile());
   vm.registerCommand('chrono', cmdChrono());
-  vm.registerCommand('repeat', cmdRepeat());
   vm.registerCommand('jobs', cmdJobs());
   vm.registerCommand('toggle_term', cmdToggleTerm());
   vm.registerCommand('dis', cmdDis());
