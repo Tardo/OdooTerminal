@@ -6,3 +6,4 @@ dist
 *.toml
 package-lock.json
 *.py
+*.png
