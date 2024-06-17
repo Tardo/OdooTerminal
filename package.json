@@ -122,8 +122,7 @@
     "extends": [
       "eslint:recommended",
       "plugin:ft-flow/recommended",
-      "prettier",
-      "plugin:json/recommended"
+      "prettier"
     ],
     "overrides": [
       {

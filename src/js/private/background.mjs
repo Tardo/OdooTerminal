@@ -53,6 +53,7 @@ function onInstalled() {
     // $FlowFixMe
     const to_update: Object = {};
     for (const setting_name of SETTING_NAMES) {
+      // $FlowFixMe
       if (typeof items[setting_name] === 'undefined' && typeof SETTING_DEFAULTS[setting_name] !== 'undefined') {
         to_update[setting_name] = SETTING_DEFAULTS[setting_name];
       }

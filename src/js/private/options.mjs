@@ -60,6 +60,7 @@ function saveOptions() {
   // $FlowFixMe
   const data: Object = {};
   for (const name of SETTING_NAMES) {
+    // $FlowFixMe
     const type = SETTING_TYPES[name];
     if (type === 'manual') {
       continue;
@@ -87,6 +88,7 @@ function applyInputValues() {
   getStorageSync(SETTING_NAMES).then(result => {
     const cmd_names = Object.keys(result);
     for (const name of cmd_names) {
+      // $FlowFixMe
       const type = SETTING_TYPES[name];
       if (type === 'manual') {
         continue;

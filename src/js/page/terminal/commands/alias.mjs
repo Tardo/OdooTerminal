@@ -17,6 +17,7 @@ async function cmdAlias(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbac
       ctx.screen.print(i18n.t('cmdAlias.notDefined', 'No aliases defined.'));
     } else {
       for (const alias_name in aliases) {
+        // $FlowFixMe
         ctx.screen.print(` - ${alias_name}  <small class="text-muted"><i>${aliases[alias_name]}</i></small>`);
       }
     }
