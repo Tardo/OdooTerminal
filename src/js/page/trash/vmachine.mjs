@@ -4,7 +4,7 @@
 
 // $FlowIgnore
 import i18n from 'i18next';
-import {validateAndFormatArguments} from './argument';
+import {validateAndFormatArguments, getArgumentInputCount, getArgumentInfoByName} from './argument';
 import {INSTRUCTION_TYPE} from './constants';
 import Frame from './frame';
 import FunctionTrash from './function';
@@ -23,6 +23,7 @@ import InvalidCommandDefintionError from './exceptions/invalid_command_definitio
 import pluck from './utils/pluck';
 import isFalsy from './utils/is_falsy';
 import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
+import { ARG } from './constants.mjs';
 
 export type ProcessCommandJobOptions = {
   cmdRaw: string,
@@ -88,22 +89,32 @@ export default class VMachine {
   }
 
   async #invokeFunction(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef, parse_info: ParseInfo, silent: boolean): Promise<mixed> {
+    const arg_defs = cmd_def.args.filter(arg => frame.args.filter(farg => farg in arg[1]).length)
+    if (getArgumentInputCount(arg_defs) > frame.args.length) {
+      throw new InvalidCommandArgumentsError(name, frame.args);
+    }
     const items_len = frame.values.length;
-    if (frame.args.length > items_len) {
+    if (getArgumentInputCount(arg_defs, true) > items_len) {
       throw new InvalidCommandArgumentsError(name, frame.args);
     }
     let kwargs: {[string]: mixed} = {};
+    let arg_def;
     const {values} = frame;
-    for (let index = items_len - 1; index >= 0; --index) {
+    for (let index = items_len - 1, adone = index; index >= 0; --index) {
       let arg_name = frame.args.pop();
       if (!arg_name) {
-        const arg_def = cmd_def.args[index];
+        arg_def = cmd_def.args[index];
         if (!arg_def) {
-          throw new InvalidCommandArgumentValueError(name, values[index]);
+          throw new InvalidCommandArgumentValueError(name, values[adone--]);
         }
         arg_name = arg_def[1][1];
+      } else {
+        arg_def = getArgumentInfoByName(cmd_def.args, arg_name);
+        if (!arg_def) {
+          throw new InvalidCommandArgumentValueError(name, values[adone--]);
+        }
       }
-      kwargs[arg_name] = values[index];
+      kwargs[arg_name] = arg_def.type === ARG.Flag ? true : values[adone--];
     }
 
     try {
@@ -203,11 +214,7 @@ export default class VMachine {
             if (!last_frame) {
               throw new NotExpectedCommandArgumentError(arg_name, token.start, token.end);
             }
-            // Flag arguments can be implicit
-            const prev_instr = stack.instructions[index - 1];
-            if (!prev_instr || (prev_instr && (prev_instr.type !== INSTRUCTION_TYPE.LOAD_CONST))) {
-              last_frame.values.push(true);
-            } else if (typeof arg_name === 'string') {
+            if (typeof arg_name === 'string') {
               last_frame.args.push(arg_name);
             } else {
               throw new InvalidValueError(arg_name);

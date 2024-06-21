@@ -174,3 +174,14 @@ export function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwar
 
   return new_kwargs;
 }
+
+export function getArgumentInputCount(args: $ReadOnlyArray<ArgDef>, required: boolean = false): number {
+  let count = 0;
+  for (const arg of args) {
+    const arg_def = getArgumentInfo(arg);
+    if (arg_def.type !== ARG.Flag && (!required || arg_def.is_required)) {
+      ++count;
+    }
+  }
+  return count;
+}
