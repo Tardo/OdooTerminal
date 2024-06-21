@@ -95,7 +95,7 @@ export default class TestCore extends TerminalTestSuite {
   }
 
   async test_exportvar() {
-    const res = await this.terminal.execute("exportvar -v $(print 'This is a test')", false, true);
+    const res = await this.terminal.execute("exportvar -v (print 'This is a test')", false, true);
     this.assertTrue(Object.hasOwn(window, res));
     this.assertEqual(window[res], 'This is a test');
   }
@@ -154,7 +154,7 @@ export default class TestCore extends TerminalTestSuite {
   }
 
   async test_commit() {
-    await this.terminal.execute("$rs = $(read res.partner 8); $rs['name'] = 'Willy Wonka';", false, true);
+    await this.terminal.execute("$rs = (read res.partner 8); $rs['name'] = 'Willy Wonka';", false, true);
     let res = await this.terminal.execute('print $rs', false, true);
     this.assertNotEmpty(res.toWrite());
     res = await this.terminal.execute('commit $rs', false, true);
@@ -166,7 +166,7 @@ export default class TestCore extends TerminalTestSuite {
   }
 
   async test_rollback() {
-    await this.terminal.execute("$rsb = $(read res.partner 8); $rsb['name'] = 'Willy Wonka';", false, true);
+    await this.terminal.execute("$rsb = (read res.partner 8); $rsb['name'] = 'Willy Wonka';", false, true);
     const res = await this.terminal.execute('print $rsb', false, true);
     this.assertNotEmpty(res.toWrite());
     await this.terminal.execute('rollback $rsb', false, true);

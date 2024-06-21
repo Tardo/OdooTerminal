@@ -169,5 +169,24 @@ export default class TestTrash extends TerminalTestSuite {
     // For Loop
     results = await this.terminal.getShell().eval("$buff = ''; for ($i = 0; $i < 100; $i = $i + 1) { $buff = $buff + 'A'; }; $buff");
     this.assertTrue(results.length === 100);
+
+    // Mix
+    const code = `
+      function getPartnerCompanies() {
+        $res = []
+        $partners = (search res.partner -f is_company)
+        for ($i = 0; $i < $partners['length']; $i = $i + 1) {
+          $partner = $partners[$i]
+          if ($partner['is_company']) {
+            (arr_append $res $partner)
+          }
+        }
+        return $res
+      }
+      getPartnerCompanies
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertTrue(results instanceof Array);
+    this.assertTrue(results.length > 0);
   }
 }

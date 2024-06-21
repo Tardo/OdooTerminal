@@ -1,5 +1,4 @@
 {
-  "": "",
   "<InvalidName>": "",
   "No": "",
   "Yes": "",
@@ -482,20 +481,6 @@
   "cmdReload": {
     "definition": "Reload current page",
     "detail": "Reload current page."
-  },
-  "cmdRepeat": {
-    "arg": {
-      "cmd": "The command to run",
-      "times": "Times to run"
-    },
-    "args": {
-      "silent": "Used to don't print command output"
-    },
-    "definition": "Repeat a command N times",
-    "detail": "Repeat a command N times.\nCan use '$repeat_index' to get the iterator index.",
-    "error": {
-      "mustBePositive": "<i>** Repeat finsihed: '{{cmd}}' called {{times}} times</i>"
-    }
   },
   "cmdRollback": {
     "args": {

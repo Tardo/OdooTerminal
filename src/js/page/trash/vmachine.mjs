@@ -199,19 +199,19 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.LOAD_ARG:
           {
-            const val = last_frame.values.pop();
-            if (typeof val !== 'string') {
-              throw new InvalidValueError(val);
-            }
+            const arg_name = token.value;
             if (!last_frame) {
-              throw new NotExpectedCommandArgumentError(val, token.start, token.end);
+              throw new NotExpectedCommandArgumentError(arg_name, token.start, token.end);
             }
             // Flag arguments can be implicit
-            const next_instr = stack.instructions[index + 1];
-            if (next_instr && next_instr.type > INSTRUCTION_TYPE.LOAD_CONST) {
+            const prev_instr = stack.instructions[index - 1];
+            if (!prev_instr || (prev_instr && (prev_instr.type !== INSTRUCTION_TYPE.LOAD_CONST))) {
               last_frame.values.push(true);
+            } else if (typeof arg_name === 'string') {
+              last_frame.args.push(arg_name);
+            } else {
+              throw new InvalidValueError(arg_name);
             }
-            last_frame.args.push(val);
           }
           break;
         case INSTRUCTION_TYPE.UNITARY_NEGATIVE:

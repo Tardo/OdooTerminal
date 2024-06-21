@@ -206,12 +206,12 @@ export default class Interpreter {
               (char === SYMBOLS.VARIABLE && prev_char !== SYMBOLS.VARIABLE) ||
               (char === SYMBOLS.ASSIGNMENT && prev_char !== SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length) ||
               (char === SYMBOLS.NOT && prev_char !== SYMBOLS.NOT) ||
-              (SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length) ||
+              (SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length && !value.startsWith(SYMBOLS.ARGUMENT)) ||
               prev_char === SYMBOLS.EOC ||
               prev_char === SYMBOLS.EOL ||
               (char !== SYMBOLS.ASSIGNMENT && prev_char === SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.includes(value)) ||
               (char !== SYMBOLS.NOT && prev_char === SYMBOLS.NOT) ||
-              (!SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && SYMBOLS_MATH_OPER.includes(value))
+              (!SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && SYMBOLS_MATH_OPER.includes(value) && (!isNaN(Number(char)) || char === SYMBOLS.VARIABLE))
             ) {
               do_cut = true;
             } else if (
@@ -296,7 +296,7 @@ export default class Interpreter {
       } else {
         ttype = LEXER.Space;
       }
-    } else if (isFalsy(options?.isData) && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && next_char !== SYMBOLS.VARIABLE && next_char !== SYMBOLS.SPACE && next_char !== SYMBOLS.LOGIC_BLOCK_START && isNaN(Number(next_char))) {
+    } else if (isFalsy(options?.isData) && token_san.length > 1 && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && next_char !== SYMBOLS.VARIABLE && next_char !== SYMBOLS.LOGIC_BLOCK_START && (next_char === SYMBOLS.SPACE || isNaN(Number(next_char)))) {
       if (token_san[1] === SYMBOLS.ARGUMENT) {
         ttype = LEXER.ArgumentLong;
         token_san = token_san.substr(2);
@@ -731,8 +731,10 @@ export default class Interpreter {
           break;
         case LEXER.ArgumentLong:
         case LEXER.ArgumentShort:
-            ignore_instr_eoi = true;
-            to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_ARG, index, level));
+          ignore_instr_eoi = true;
+          to_append_eoi.instructions.push(
+            new Instruction(INSTRUCTION_TYPE.LOAD_ARG, index, level, -1),
+          );
           break;
         case LEXER.Negative:
           sign_cache = INSTRUCTION_TYPE.UNITARY_NEGATIVE;

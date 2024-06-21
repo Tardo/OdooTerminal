@@ -7,6 +7,7 @@ import i18n from 'i18next';
 import VMachine from './vmachine';
 import ProcessJobError from './exceptions/process_job_error';
 import Interpreter from './interpreter';
+import codeArray from './libs/tl/array';
 import type {ParserOptions, ParseInfo} from './interpreter';
 import type {EvalOptions, ProcessCommandJobOptions} from './vmachine';
 
@@ -52,6 +53,9 @@ export default class Shell {
       processCommandJob: (cmdInfo, silent) => this.#processCommandJob(cmdInfo, silent),
       silent: false,
     });
+
+    // Load STL
+    this.eval(codeArray);
   }
 
   getCommandJobMeta(command_info: ProcessCommandJobOptions, job_index: number, silent: boolean = false): JobMetaInfo {

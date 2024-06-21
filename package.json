@@ -30,10 +30,10 @@
     "babel-plugin-i18next-extract": "^0.10",
     "babel-plugin-syntax-hermes-parser": "^0.22",
     "cssnano": "^7.0",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1",
     "eslint-plugin-ft-flow": "3.0.9",
-    "eslint-plugin-json": "^4.0",
+    "eslint-plugin-json": "^4.0.0",
     "eslint-plugin-prettier": "^5.1",
     "flow-bin": "^0.237",
     "hermes-eslint": "^0.22",
@@ -48,7 +48,7 @@
     "rollup-plugin-analyzer": "^4.0",
     "rollup-plugin-postcss": "^4.0",
     "simple-git": "^3.25",
-    "web-ext": "^8.1"
+    "web-ext": "^8.1.0"
   },
   "husky": {
     "hooks": {
@@ -57,7 +57,7 @@
     }
   },
   "lint-staged": {
-    "*": [
+    "!(*.{mjs,js})": [
       "prettier --write"
     ],
     "*.{mjs,js}": [
@@ -121,6 +121,7 @@
     ],
     "extends": [
       "eslint:recommended",
+      "plugin:json/recommended-legacy",
       "plugin:ft-flow/recommended",
       "prettier"
     ],
