@@ -310,25 +310,25 @@ export default class Interpreter {
       token_san === SYMBOLS.ITEM_DELIMITER
     ) {
       ttype = LEXER.Delimiter;
-    } else if (token_san === SYMBOLS.AND) {
+    } else if (token_san === SYMBOLS.AND && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.And;
-    } else if (token_san === SYMBOLS.OR) {
+    } else if (token_san === SYMBOLS.OR && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.Or;
-    } else if (token_san === SYMBOLS.NOT) {
+    } else if (token_san === SYMBOLS.NOT && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.Not;
-    } else if (token_san === SYMBOLS.EQUAL) {
+    } else if (token_san === SYMBOLS.EQUAL && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.Equal;
-    } else if (token_san === SYMBOLS.NOT_EQUAL) {
+    } else if (token_san === SYMBOLS.NOT_EQUAL && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.NotEqual;
-    } else if (token_san === SYMBOLS.GREATER_THAN_OPEN) {
+    } else if (token_san === SYMBOLS.GREATER_THAN_OPEN && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.GreaterThanOpen;
-    } else if (token_san === SYMBOLS.LESS_THAN_OPEN) {
+    } else if (token_san === SYMBOLS.LESS_THAN_OPEN && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.LessThanOpen;
-    } else if (token_san === SYMBOLS.GREATER_THAN_CLOSED) {
+    } else if (token_san === SYMBOLS.GREATER_THAN_CLOSED && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.GreaterThanClosed;
-    } else if (token_san === SYMBOLS.LESS_THAN_CLOSED) {
+    } else if (token_san === SYMBOLS.LESS_THAN_CLOSED && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.LessThanClosed;
-    } else if (token_san === SYMBOLS.ASSIGNMENT) {
+    } else if (token_san === SYMBOLS.ASSIGNMENT && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.Assignment;
     } else if (token_san[0] === SYMBOLS.ARRAY_START && token_san.at(-1) === SYMBOLS.ARRAY_END) {
       token_san = token_san.substr(1, token_san.length - 2);
@@ -387,12 +387,6 @@ export default class Interpreter {
     } else if (token_san_lower === KEYWORDS.SILENT) {
       ttype = LEXER.Silent;
     } else if (token_san === SYMBOLS.ADD) {
-      // if (prev_token_info && prev_token_info[0] === LEXER.Space && (next_char === SYMBOLS.VARIABLE || !isNaN(Number(next_char)) || (prev_token_info_no_space && LEXER_MATH_OPER.includes(prev_token_info_no_space[0])))) {
-      //   debugger;
-      //   ttype = LEXER.Positive;
-      // } else {
-      //   ttype = LEXER.Add;
-      // }
       ttype = LEXER.Add;
     } else if (token_san === SYMBOLS.SUBSTRACT) {
       // FIXME: This is a bit crazy :)
@@ -502,8 +496,11 @@ export default class Interpreter {
     // Name
     let active_value = token_active.raw.trim();
     if (active_value.startsWith(SYMBOLS.FUNCTION_ARGS_START)) {
-      fun_args = token_active.value.split(',')
-        .map(item => ([ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+      active_value = token_active.value.trim();
+      if (active_value.length > 0) {
+        fun_args = active_value.split(',')
+          .map(item => ([ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+      }
     } else {
       fun_name = active_value;
       // Args
@@ -512,8 +509,10 @@ export default class Interpreter {
         return;
       }
       active_value = token_active.value.trim();
-      fun_args = active_value.split(',')
-        .map(item => ([ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+      if (active_value.length > 0) {
+        fun_args = active_value.split(',')
+          .map(item => ([ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+      }
     }
 
     // Code

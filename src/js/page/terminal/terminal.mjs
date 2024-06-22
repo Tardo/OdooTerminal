@@ -204,7 +204,7 @@ export default class Terminal {
     }
   }
 
-  start(): void {
+  async start(): Promise<> {
     if (!this.#wasLoaded) {
       throw new Error(i18n.t('terminal.error.notLoaded', 'Terminal not loaded'));
     }
@@ -261,9 +261,25 @@ export default class Terminal {
     }
   }
 
-  async execute(code: string, store: boolean = true, silent: boolean = false): Promise<mixed> {
-    await this.#wakeUp();
+  #parseAlias(aliases: {[string]: string}, cmd_name: string, args: $ReadOnlyArray<string>): string | void {
+    let alias_cmd = aliases[cmd_name];
+    if (alias_cmd) {
+      const params_len = args.length;
+      let index = 0;
+      while (index < params_len) {
+        const re = new RegExp(`\\$${Number(index) + 1}(?:\\[[^\\]]+\\])?`, 'g');
+        alias_cmd = alias_cmd.replaceAll(re, args[index]);
+        ++index;
+      }
+      alias_cmd = alias_cmd.replaceAll(/\$\d+(?:\[([^\]]+)\])?/g, (_, group) => {
+        return group || '';
+      });
+      return alias_cmd;
+    }
+    return undefined;
+  }
 
+  async execute(code: string, store: boolean = true, silent: boolean = false): Promise<mixed> {
     if (!silent) {
       this.screen.printCommand(code);
     }
@@ -298,6 +314,15 @@ export default class Terminal {
   }
 
   async #invokeExternalCommand(meta: JobMetaInfo): Promise<mixed> {
+    const aliases = getStorageLocalItem('terminal_aliases', {});
+    if (meta.info.cmdName in aliases) {
+      const alias_cmd = this.#parseAlias(aliases, meta.info.cmdName, meta.info.args);
+      return this.#shell.eval(alias_cmd || "", {
+        silent: meta.silent,
+        aliases: aliases,
+      });
+    }
+
     const call_ctx = {
       screen: new Proxy(this.screen, {...ScreenCommandHandler, silent: meta.silent}),
       meta: meta,

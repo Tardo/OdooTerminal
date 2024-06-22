@@ -305,7 +305,7 @@ export default class TestCommon extends TerminalTestSuite {
   async test_json() {
     const res =
       await this.terminal.execute(
-        "json -e /web_editor/get_assets_editor_resources -d {key:'web.assets_backend'}",
+        "json -e '/web_editor/get_assets_editor_resources' -d {key:'web.assets_backend'}",
         false,
         true,
       );
@@ -363,9 +363,23 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_url() {
+    await this.terminal.execute('view res.partner 1', false, true);
     let res = await this.terminal.execute('url', false, true);
     this.assertNotEmpty(res);
-    res = await this.terminal.execute('url -s hash -k menu_id', false, true);
+    res = await this.terminal.execute('url -s hash -k model', false, true);
     this.assertNotEmpty(res);
+  }
+
+  async test_helpers() {
+    await this.terminal.execute('view res.partner 1', false, true);
+    let res = await this.terminal.execute('$$RMOD', false, true);
+    this.assertEqual(res, 'res.partner');
+    res = await this.terminal.execute('$$RID', false, true);
+    this.assertEqual(res, '1');
+    await this.terminal.execute('view res.partner 3', false, true);
+    res = await this.terminal.execute('$$RMOD', false, true);
+    this.assertEqual(res, 'res.partner');
+    res = await this.terminal.execute('$$RID', false, true);
+    this.assertEqual(res, '3');
   }
 }

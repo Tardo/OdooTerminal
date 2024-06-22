@@ -166,9 +166,9 @@ export default class Shell {
   onFinishCommand(job_index: number) {
     const job_info = this.#jobs[job_index];
     clearTimeout(job_info.timeout);
-    if (typeof this.#options.onFinishCommand !== 'undefined') {
-      this.#options.onFinishCommand(this.#jobs[job_index]);
-    }
     delete this.#jobs[job_index];
+    if (typeof this.#options.onFinishCommand !== 'undefined') {
+      this.#options.onFinishCommand(job_info);
+    }
   }
 }

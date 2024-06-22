@@ -57,6 +57,19 @@ export default class OdooTerminal extends Terminal {
   /**
    * @override
    */
+  async start(): Promise<> {
+    await super.start();
+    // Helpers
+    const helpers = `
+      $RMOD=function(){return (url -s hash -k model)}
+      $RID=function(){return (url -s hash -k id)}
+    `;
+    await this.execute(helpers, false, true);
+  }
+
+  /**
+   * @override
+   */
   onStart() {
     super.onStart();
     this.parameterGenerator = new ParameterGenerator();

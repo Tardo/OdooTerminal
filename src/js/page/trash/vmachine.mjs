@@ -16,12 +16,10 @@ import InvalidNameError from './exceptions/invalid_name_error';
 import InvalidTokenError from './exceptions/invalid_token_error';
 import InvalidValueError from './exceptions/invalid_value_error';
 import NotExpectedCommandArgumentError from './exceptions/not_expected_command_argument_error';
-import NotCalleableNameError from './exceptions/not_calleable_name_error';
 import UnknownCommandError from './exceptions/unknown_command_error';
 import UnknownNameError from './exceptions/unknown_name_error';
 import InvalidCommandDefintionError from './exceptions/invalid_command_definition_error';
 import pluck from './utils/pluck';
-import isFalsy from './utils/is_falsy';
 import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
 import { ARG } from './constants.mjs';
 
@@ -30,6 +28,7 @@ export type ProcessCommandJobOptions = {
   cmdName: string,
   cmdDef: CMDDef,
   kwargs: CMDCallbackArgs,
+  args: Array<string>,
 };
 export type ProcessCommandJobCallback = (options: ProcessCommandJobOptions, silect: boolean) => Promise<mixed>;
 export type VMachineOptions = {
@@ -38,9 +37,9 @@ export type VMachineOptions = {
 };
 
 export type EvalOptions = {
-  aliases: {[string]: string},
   isData?: boolean,
   silent?: boolean,
+  aliases: {[string]: string},
 };
 
 export default class VMachine {
@@ -89,52 +88,56 @@ export default class VMachine {
   }
 
   async #invokeFunction(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef, parse_info: ParseInfo, silent: boolean): Promise<mixed> {
-    const arg_defs = cmd_def.args.filter(arg => frame.args.filter(farg => farg in arg[1]).length)
-    if (getArgumentInputCount(arg_defs) > frame.args.length) {
-      throw new InvalidCommandArgumentsError(name, frame.args);
-    }
-    const items_len = frame.values.length;
-    if (getArgumentInputCount(arg_defs, true) > items_len) {
-      throw new InvalidCommandArgumentsError(name, frame.args);
-    }
     let kwargs: {[string]: mixed} = {};
-    let arg_def;
-    const {values} = frame;
-    for (let index = items_len - 1, adone = index; index >= 0; --index) {
-      let arg_name = frame.args.pop();
-      if (!arg_name) {
-        arg_def = cmd_def.args[index];
-        if (!arg_def) {
-          throw new InvalidCommandArgumentValueError(name, values[adone--]);
-        }
-        arg_name = arg_def[1][1];
-      } else {
-        arg_def = getArgumentInfoByName(cmd_def.args, arg_name);
-        if (!arg_def) {
-          throw new InvalidCommandArgumentValueError(name, values[adone--]);
-        }
+    if (typeof cmd_def !== 'undefined') {
+      const arg_defs = cmd_def.args.filter(arg => frame.args.filter(farg => farg in arg[1]).length)
+      if (getArgumentInputCount(arg_defs) > frame.args.length) {
+        throw new InvalidCommandArgumentsError(name, frame.args);
       }
-      kwargs[arg_name] = arg_def.type === ARG.Flag ? true : values[adone--];
+      const items_len = Math.max(frame.values.length, frame.args.length);
+      if (getArgumentInputCount(arg_defs, true) > items_len) {
+        throw new InvalidCommandArgumentsError(name, frame.args);
+      }
+      let arg_def;
+      const {values} = frame;
+      for (let index = items_len - 1, adone = frame.values.length - 1; index >= 0; --index) {
+        let arg_name = frame.args.pop();
+        if (!arg_name) {
+          arg_def = cmd_def.args[index];
+          if (!arg_def) {
+            throw new InvalidCommandArgumentValueError(name, values[adone--]);
+          }
+          arg_name = arg_def[1][1];
+        } else {
+          arg_def = getArgumentInfoByName(cmd_def.args, arg_name);
+          if (!arg_def) {
+            throw new InvalidCommandArgumentValueError(name, values[adone--]);
+          }
+        }
+        kwargs[arg_name] = arg_def.type === ARG.Flag ? true : values[adone--];
+      }
+
+      try {
+        kwargs = await validateAndFormatArguments(cmd_def, kwargs);
+      } catch (err) {
+        throw new InvalidCommandArgumentFormatError(err.message, name);
+      }
+
+      if (cmd_def.is_function) {
+        if (typeof cmd_def.callback_internal === 'undefined') {
+          throw new InvalidCommandDefintionError();
+        }
+        return await cmd_def.callback_internal(this, kwargs, frame, opts);
+      }
     }
 
-    try {
-      kwargs = await validateAndFormatArguments(cmd_def, kwargs);
-    } catch (err) {
-      throw new InvalidCommandArgumentFormatError(err.message, name);
-    }
-
-    if (cmd_def.is_function) {
-      if (typeof cmd_def.callback_internal === 'undefined') {
-        throw new InvalidCommandDefintionError();
-      }
-      return await cmd_def.callback_internal(this, kwargs, frame, opts);
-    }
     return await this.options.processCommandJob(
       {
         cmdRaw: parse_info.inputRawString,
         cmdName: name,
         cmdDef: cmd_def,
         kwargs: kwargs,
+        args: frame.values.map(item => new String(item).toString()),
       },
       silent,
     );
@@ -194,7 +197,7 @@ export default class VMachine {
             if (cmd_name === null || typeof cmd_name === 'undefined') {
               throw new UnknownNameError(i18n.t('<InvalidName>'), token.start, token.end)
             }
-            if (typeof cmd_name !== 'undefined' && Object.hasOwn(this.#registeredCmds, cmd_name) || !isFalsy(opts.aliases[cmd_name])) {
+            if (typeof cmd_name !== 'undefined' && (Object.hasOwn(this.#registeredCmds, cmd_name) || cmd_name in opts.aliases)) {
               last_frame = new Frame(cmd_name, last_frame);
               frames.push(last_frame);
             } else {
@@ -341,35 +344,24 @@ export default class VMachine {
               const frame_cmd = frame.cmd;
               let cmd_def = this.#registeredCmds[frame_cmd];
               if (typeof cmd_def === 'undefined') {
-                // $FlowFixMe
-                cmd_def = frame.values.shift();
-                if (typeof cmd_def !== 'object') {
-                  throw new NotCalleableNameError();
-                }
-                // Subframes are executed in silent mode
-                const ret = await this.#invokeFunction(
-                  opts,
-                  frame,
-                  frame_cmd,
+                // FIXME: Done in this way to support 'aliases'
+                if (!(frame_cmd in opts.aliases) && typeof frame.values[0] === 'object') {
                   // $FlowFixMe
-                  cmd_def,
-                  parse_info,
-                  instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
-                );
-                last_frame = frames.at(-1) || root_frame;
-                last_frame.values.push(ret);
-              } else {
-                const ret = await this.#invokeFunction(
-                  opts,
-                  frame,
-                  frame_cmd,
-                  cmd_def,
-                  parse_info,
-                  instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
-                );
-                last_frame = frames.at(-1) || root_frame;
-                last_frame.values.push(ret);
+                  cmd_def = frame.values.shift();
+                }
               }
+              // Subframes are executed in silent mode
+              const ret = await this.#invokeFunction(
+                opts,
+                frame,
+                frame_cmd,
+                // $FlowFixMe
+                cmd_def,
+                parse_info,
+                instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
+              );
+              last_frame = frames.at(-1) || root_frame;
+              last_frame.values.push(ret);
             }
           }
           break;

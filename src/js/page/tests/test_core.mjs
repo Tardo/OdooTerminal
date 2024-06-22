@@ -79,7 +79,7 @@ export default class TestCore extends TerminalTestSuite {
     // This.assertEmpty(res);
     res = (
       await this.terminal.execute('alias -n test -c "print -m \'This is a test! $1 ($2[Nothing])\'"', false, true)
-    )[0];
+    );
     this.assertIn(res, 'test');
     res = await this.terminal.execute('test Foo "Bar Space"', false, true);
     this.assertEqual(res, 'This is a test! Foo (Bar Space)');
