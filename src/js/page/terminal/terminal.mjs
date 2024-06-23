@@ -7,7 +7,7 @@ import i18n from 'i18next';
 import logger from '@common/logger';
 import processKeybind from '@common/utils/process_keybind';
 import {SETTING_DEFAULTS} from '@common/constants';
-import Shell from '@trash/shell';
+import Shell from './shell';
 import UnknownCommandError from '@trash/exceptions/unknown_command_error';
 import InvalidCommandDefintionError from '@trash/exceptions/invalid_command_definition_error';
 import isEmpty from '@trash/utils/is_empty';
@@ -26,7 +26,7 @@ import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 // $FlowIgnore
 import {Mutex} from 'async-mutex';
-import type {JobMetaInfo} from '@trash/shell';
+import type {JobMetaInfo} from './shell';
 import type {ExtensionSettings} from '@common/constants';
 import type {CMDAssistantOption} from './core/command_assistant';
 export type TerminalOptions = {

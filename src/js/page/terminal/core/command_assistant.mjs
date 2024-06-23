@@ -6,8 +6,8 @@ import isEmpty from '@trash/utils/is_empty';
 import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
 import {INSTRUCTION_TYPE, KEYMAP} from '@trash/constants';
 import difference from '@trash/utils/difference';
-import type Shell from '@trash/shell';
 import type {CMDDef, ArgInfo, ParseInfo} from '@trash/interpreter';
+import type Shell from '@terminal/shell';
 import type Terminal from '@terminal/terminal';
 
 export type CMDAssistantOption = {

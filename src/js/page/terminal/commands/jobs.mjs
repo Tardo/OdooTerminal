@@ -6,7 +6,7 @@
 import i18n from 'i18next';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
-import type {JobInfo} from '@trash/shell';
+import type {JobInfo} from '@terminal/shell';
 
 async function cmdJobs(
   this: Terminal,

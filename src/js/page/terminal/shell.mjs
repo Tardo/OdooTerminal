@@ -4,12 +4,12 @@
 
 // $FlowIgnore
 import i18n from 'i18next';
-import VMachine from './vmachine';
+import VMachine from '@trash/vmachine';
 import ProcessJobError from './exceptions/process_job_error';
-import Interpreter from './interpreter';
-import codeArray from './libs/tl/array';
-import type {ParserOptions, ParseInfo} from './interpreter';
-import type {EvalOptions, ProcessCommandJobOptions} from './vmachine';
+import Interpreter from '@trash/interpreter';
+import codeArray from '@trash/libs/tl/array';
+import type {ParserOptions, ParseInfo} from '@trash/interpreter';
+import type {EvalOptions, ProcessCommandJobOptions} from '@trash/vmachine';
 
 
 export type ShellCMDCallback = (job_info: JobInfo) => void;
