@@ -93,8 +93,8 @@ The following are available:
 
 Examples:
 
-- `search $$AMOD`
-- `write $$AMOD $$UID {name: 'The new name'}`
+- `search $$RMOD`
+- `write $$RMOD $$RID {name: 'The new name'}`
 
 #### + Recordsets
 

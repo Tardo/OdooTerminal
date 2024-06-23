@@ -372,14 +372,16 @@ export default class TestCommon extends TerminalTestSuite {
 
   async test_helpers() {
     await this.terminal.execute('view res.partner 1', false, true);
+    await asyncSleep(2500);
     let res = await this.terminal.execute('$$RMOD', false, true);
     this.assertEqual(res, 'res.partner');
     res = await this.terminal.execute('$$RID', false, true);
     this.assertEqual(res, '1');
-    await this.terminal.execute('view res.partner 3', false, true);
+    await this.terminal.execute('view res.partner 7', false, true);
+    await asyncSleep(2500);
     res = await this.terminal.execute('$$RMOD', false, true);
     this.assertEqual(res, 'res.partner');
     res = await this.terminal.execute('$$RID', false, true);
-    this.assertEqual(res, '3');
+    this.assertEqual(res, '7');
   }
 }

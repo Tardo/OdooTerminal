@@ -119,7 +119,7 @@ class TestExtension:
     #     self._login_as(browser, construct_url, 'portal', 'portal')
     #     self._open_terminal(browser)
 
-    def test_admin(self, browser, docker_compose, construct_url):
+    def test_admin(self, browser, construct_url):
         browser.get(construct_url('/'))
         self._login_as(browser, construct_url, 'admin', 'admin')
         self._open_terminal(browser)
@@ -129,7 +129,6 @@ class TestExtension:
         elem = self._wait_for_element_located(
             browser, '.o_terminal .terminal-test-ok,.o_terminal .terminal-test-fail', delay=1200, by=By.CSS_SELECTOR)
         # Always print Terminal Output
-        log = logging.getLogger('terminal')
         term_screen = self._wait_for_element_located(
             browser, '#terminal #terminal_screen', by=By.CSS_SELECTOR)
         if term_screen:

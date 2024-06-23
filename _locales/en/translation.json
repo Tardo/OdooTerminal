@@ -771,7 +771,6 @@
       "requiredNotSet": "Required arguments not set! ({{required_not_set}})"
     },
     "exception": {
-      "NotCalleableNameError": "The loaded name is not calleable",
       "invalidCommandArgumentsError": "Invalid command arguments",
       "invalidCommandArugmentValueError": "Unexpected '{{arg_value}}' value!",
       "invalidCommandDefinition": "Invalid command definition!",
@@ -781,7 +780,8 @@
       "invalidValueError": "Invalid value '{{value}}'",
       "notExpectedCommandArgumentError": "Argument '{{arg_name}}' not expected at {{start}}:{{end}}",
       "unknownCommandError": "Unknown Command '{{cmd_name}}' at {{start}}:{{end}}",
-      "unknownNameError": "Unknown name '{{vname}}' at {{start}}:{{end}}"
+      "unknownNameError": "Unknown name '{{vname}}' at {{start}}:{{end}}",
+      "unknownStoreValue": "Unknown store value '{{vname}}'"
     },
     "vmachine": {
       "func": {

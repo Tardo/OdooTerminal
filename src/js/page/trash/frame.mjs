@@ -2,6 +2,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import UnknownStoreValue from './exceptions/unknown_store_value';
+
 export default class Frame {
   cmd: string | void;
   store: {[string]: mixed};
@@ -15,9 +17,32 @@ export default class Frame {
     this.args = [];
     this.values = [];
     this.prevFrame = prev_frame;
+  }
 
-    // if (this.prevFrame) {
-    //   this.store = {...this.prevFrame.store};
-    // }
+  getStoreValue(var_name: string): mixed {
+    let cur_frame: Frame | void = this;
+    while (typeof cur_frame !== 'undefined') {
+      if (Object.hasOwn(cur_frame.store, var_name)) {
+        return cur_frame.store[var_name];
+      }
+      cur_frame = cur_frame.prevFrame;
+    }
+    throw new UnknownStoreValue(var_name);
+  }
+
+  setStoreValue(var_name: string, value: mixed) {
+    let cur_frame: Frame | void = this;
+    let val_found = false;
+    while (typeof cur_frame !== 'undefined') {
+      if (Object.hasOwn(cur_frame.store, var_name)) {
+        cur_frame.store[var_name] = value;
+        val_found = true;
+        break;
+      }
+      cur_frame = cur_frame.prevFrame;
+    }
+    if (!val_found) {
+      this.store[var_name] = value;
+    }
   }
 }

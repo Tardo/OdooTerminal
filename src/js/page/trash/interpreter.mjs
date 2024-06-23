@@ -384,6 +384,10 @@ export default class Interpreter {
       ttype = LEXER.Else;
     } else if (token_san_lower === KEYWORDS.FOR) {
       ttype = LEXER.For;
+    } else if (token_san_lower === KEYWORDS.BREAK) {
+      ttype = LEXER.Break;
+    } else if (token_san_lower === KEYWORDS.CONTINUE) {
+      ttype = LEXER.Continue;
     } else if (token_san_lower === KEYWORDS.SILENT) {
       ttype = LEXER.Silent;
     } else if (token_san === SYMBOLS.ADD) {
@@ -542,7 +546,7 @@ export default class Interpreter {
       for_args = token_active.value.split(';');
     }
 
-    if (for_args.length === 0) {
+    if (for_args.length !== 3) {
       return;
     }
 
@@ -594,6 +598,8 @@ export default class Interpreter {
         return;
       }
       else_code = token_active.raw.trim();
+    } else {
+      --init_index;
     }
 
     return [if_check, if_code, else_code, init_index];
@@ -992,17 +998,33 @@ export default class Interpreter {
               );
 
               if (parsed_for_block && parsed_iter_block) {
-                to_append.instructions[ref_check_instr_index - 1].dataIndex = parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length;
+                // Update JUMPS
+                const parsed_instr_len = parsed_for_block.stack.instructions.length;
+                for (let instr_index = 0; instr_index < parsed_instr_len; ++instr_index) {
+                  const instr = parsed_for_block.stack.instructions[instr_index];
+                  if (instr.type === INSTRUCTION_TYPE.JUMP_FORWARD) {
+                    if (instr.dataIndex === -1) {
+                      instr.dataIndex = (parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length) - instr_index;
+                    } else {
+                      instr.dataIndex = parsed_for_block.stack.instructions.length - instr_index - 1;
+                    }
+                  }
+                }
+                to_append.instructions[ref_check_instr_index - 1].dataIndex = parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length + 1;
               } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                 throw new InvalidTokenError(token.value, token.start, token.end);
               }
-
               to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_BACKWARD, index, level, to_append.instructions.length - anchor_index));
               to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.POP_FRAME, index, level));
-
               index = uindex;
             }
           }
+          break;
+        case LEXER.Break:
+          to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, -1));
+          break;
+        case LEXER.Continue:
+          to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, 0));
           break;
         case LEXER.String:
         case LEXER.StringSimple:
@@ -1143,7 +1165,7 @@ export default class Interpreter {
           ignore_instr_eoi = true;
           break;
         case LEXER.Delimiter:
-          token_subindex = -1;
+          token_subindex = 0;
           break;
         case LEXER.LogicBlock:
           this.#appendParse(
@@ -1175,7 +1197,9 @@ export default class Interpreter {
 
       if (token.type !== LEXER.Space) {
         last_token_index = index;
-        ++token_subindex;
+        if (token.type !== LEXER.Delimiter) {
+          ++token_subindex;
+        }
       }
     }
 

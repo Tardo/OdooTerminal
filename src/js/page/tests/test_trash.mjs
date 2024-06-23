@@ -171,14 +171,14 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertTrue(results.length === 100);
 
     // Mix
-    const code = `
+    let code = `
       function getPartnerCompanies() {
         $res = []
         $partners = (search res.partner -f is_company)
         for ($i = 0; $i < $partners['length']; $i = $i + 1) {
           $partner = $partners[$i]
           if ($partner['is_company']) {
-            (arr_append $res $partner)
+            arr_append $res $partner
           }
         }
         return $res
@@ -188,5 +188,33 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.getShell().eval(code);
     this.assertTrue(results instanceof Array);
     this.assertTrue(results.length > 0);
+
+    code = `
+      $arr = []
+      for ($i = 0; $i < 100; $i = $i + 1) {
+        if ($i % 2 == 0) {
+          continue
+        }
+        arr_append $arr $i
+      }
+      $arr
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertTrue(results instanceof Array);
+    this.assertEqual(results.length, 50);
+
+    code = `
+      $arr = []
+      for ($i = 0; $i < 100; $i = $i + 1) {
+        if ($i >= 10) {
+          break
+        }
+        arr_append $arr $i
+      }
+      $arr
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertTrue(results instanceof Array);
+    this.assertEqual(results.length, 10);
   }
 }

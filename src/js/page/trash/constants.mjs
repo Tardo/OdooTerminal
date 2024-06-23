@@ -45,6 +45,8 @@ export const LEXER = {
   Else: 39,
   Silent: 40,
   VariableCall: 41,
+  Break: 42,
+  Continue: 43,
 };
 
 export const LEXER_MATH_OPER = [
@@ -122,6 +124,7 @@ export const INSTRUCTION_TYPE = {
   JUMP_IF_FALSE: 36,
   JUMP_IF_TRUE: 37,
   JUMP_BACKWARD: 38,
+  JUMP_FORWARD: 39,
 
   getHumanType: function (type: number): string {
     const res = Object.entries(INSTRUCTION_TYPE).find(item => item[1] === type);
@@ -282,6 +285,8 @@ export const KEYWORDS = {
   ELIF: 'elif',
   ELSE: 'else',
   SILENT: 'silent',
+  CONTINUE: 'continue',
+  BREAK: 'break',
 };
 
 export const MATH_OPER_PRIORITIES = [

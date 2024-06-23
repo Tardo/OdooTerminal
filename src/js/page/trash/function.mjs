@@ -20,7 +20,7 @@ export default class FunctionTrash {
   }
 
   async exec(vmachine: VMachine, kwargs: {[string]: mixed}, frame: Frame, opts: EvalOptions): Promise<mixed> {
-    frame.store = {...frame.store, ...kwargs};
+    frame.store = {...kwargs};
     return await vmachine.execute(this.code, opts, frame);
   }
 }

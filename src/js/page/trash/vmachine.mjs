@@ -175,18 +175,10 @@ export default class VMachine {
               frames.push(last_frame);
             }
             // Check stores
-            let cur_frame: Frame | void = last_frame;
-            let val_found = false;
-            while (typeof cur_frame !== 'undefined') {
-              if (Object.hasOwn(cur_frame.store, var_name)) {
-                const val = cur_frame.store[var_name];
-                last_frame.values.push(val);
-                val_found = true;
-                break;
-              }
-              cur_frame = cur_frame.prevFrame;
-            }
-            if (!val_found) {
+            try {
+              const store_val = last_frame.getStoreValue(var_name);
+              last_frame.values.push(store_val);
+            } catch (err) {
               throw new UnknownNameError(var_name, token.start, token.end);
             }
           }
@@ -196,8 +188,7 @@ export default class VMachine {
             const cmd_name = stack.names[instr.level][instr.dataIndex];
             if (cmd_name === null || typeof cmd_name === 'undefined') {
               throw new UnknownNameError(i18n.t('<InvalidName>'), token.start, token.end)
-            }
-            if (typeof cmd_name !== 'undefined' && (Object.hasOwn(this.#registeredCmds, cmd_name) || cmd_name in opts.aliases)) {
+            } else if (Object.hasOwn(this.#registeredCmds, cmd_name) || cmd_name in opts.aliases) {
               last_frame = new Frame(cmd_name, last_frame);
               frames.push(last_frame);
             } else {
@@ -387,19 +378,7 @@ export default class VMachine {
               const value_token = parse_info.inputTokens[value_instr.level][value_instr.inputTokenIndex] || {};
               throw new InvalidTokenError(value_token.value, value_token.start, value_token.end);
             } else {
-              let cur_frame: Frame | void = last_frame;
-              let val_found = false;
-              while (typeof cur_frame !== 'undefined') {
-                if (Object.hasOwn(cur_frame.store, vname)) {
-                  cur_frame.store[vname] = vvalue;
-                  val_found = true;
-                  break;
-                }
-                cur_frame = cur_frame.prevFrame;
-              }
-              if (!val_found) {
-                last_frame.store[vname] = vvalue;
-              }
+              last_frame.setStoreValue(vname, vvalue);
             }
           }
           break;
@@ -507,7 +486,7 @@ export default class VMachine {
             last_flow_check = last_frame.values.pop();
             const num_to_skip = instr.dataIndex;
             if (typeof last_flow_check !== 'undefined' && last_flow_check !== null && !last_flow_check) {
-              index += num_to_skip + 1;
+              index += num_to_skip;
             }
           }
           break;
@@ -515,16 +494,24 @@ export default class VMachine {
           {
             const num_to_skip = instr.dataIndex;
             if (typeof last_flow_check !== 'undefined' && last_flow_check !== null && last_flow_check) {
-              index += num_to_skip + 1;
+              index += num_to_skip;
             }
           }
           break;
         case INSTRUCTION_TYPE.JUMP_BACKWARD:
-            {
-              const num_to_back = instr.dataIndex;
-              index -= num_to_back + 1;
+          {
+            const num_to_back = instr.dataIndex;
+            index -= num_to_back + 1;
+          }
+          break;
+        case INSTRUCTION_TYPE.JUMP_FORWARD:
+          {
+            const num_to_adv = instr.dataIndex;
+            if (num_to_adv > 0) {
+              index += num_to_adv;
             }
-            break;
+          }
+          break;
       }
     }
     return last_frame.values.pop();
