@@ -7,7 +7,7 @@ import i18n from 'i18next';
 import VMachine from '@trash/vmachine';
 import ProcessJobError from './exceptions/process_job_error';
 import Interpreter from '@trash/interpreter';
-import codeArray from '@trash/libs/tl/array';
+import codeArray from '@trash/tl/array';
 import type {ParserOptions, ParseInfo} from '@trash/interpreter';
 import type {EvalOptions, ProcessCommandJobOptions} from '@trash/vmachine';
 
@@ -54,7 +54,7 @@ export default class Shell {
       silent: false,
     });
 
-    // Load STL
+    // Load TL
     this.eval(codeArray);
   }
 

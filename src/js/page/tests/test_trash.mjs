@@ -159,6 +159,14 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.getShell().eval("$mop = function ()  { return (gen -mi 4 -ma 7) }; silent print '42' + $$mop");
     this.assertTrue(results.length > 2);
     this.assertEqual(results.substr(0, 2), '42');
+    let code = `
+      $nums = [1, 2, 3]
+      $nums = (arr_map $nums (function (item) { return $item * 2 }))
+      $nums = (arr_filter $nums (function (item) { return $item != 4 }))
+      arr_reduce $nums 0 (function (a, b) { return $a + $b })
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertEqual(results, 8);
 
     // If Else
     results = await this.terminal.getShell().eval("$num = (gen int -mi 0 -ma 10); if (($num + 10) < 5) { return 66 } else { return 42 }");
@@ -171,7 +179,7 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertTrue(results.length === 100);
 
     // Mix
-    let code = `
+    code = `
       function getPartnerCompanies() {
         $res = []
         $partners = (search res.partner -f is_company)

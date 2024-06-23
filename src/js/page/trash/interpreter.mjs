@@ -210,7 +210,7 @@ export default class Interpreter {
               prev_char === SYMBOLS.EOC ||
               prev_char === SYMBOLS.EOL ||
               (char !== SYMBOLS.ASSIGNMENT && prev_char === SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.includes(value)) ||
-              (char !== SYMBOLS.NOT && prev_char === SYMBOLS.NOT) ||
+              (char !== SYMBOLS.NOT && prev_char === SYMBOLS.NOT && char !== SYMBOLS.NOT_EQUAL[1]) ||
               (!SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && SYMBOLS_MATH_OPER.includes(value) && (!isNaN(Number(char)) || char === SYMBOLS.VARIABLE))
             ) {
               do_cut = true;

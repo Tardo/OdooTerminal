@@ -1,5 +1,20 @@
 # Changelog
 
+**11.0.0**
+
+```
+IMP: TraSH: Turing completeness
+IMP: Use 'flow'
+
+ADD: TrasH: Global names $RMOD and $RID (issue #131)
+ADD: Multi-line input mode
+ADD: Translations
+
+FIX: 'debug' command (issue #132)
+
+DEL: Command 'repeat': It presented problems if more than one 'repeat' was executed at the same time.
+```
+
 **10.4.2**
 
 ```
