@@ -119,7 +119,7 @@ class TestExtension:
     #     self._login_as(browser, construct_url, 'portal', 'portal')
     #     self._open_terminal(browser)
 
-    def test_admin(self, browser, construct_url):
+    def test_admin(self, browser, docker_compose, construct_url):
         browser.get(construct_url('/'))
         self._login_as(browser, construct_url, 'admin', 'admin')
         self._open_terminal(browser)
