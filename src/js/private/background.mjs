@@ -22,12 +22,12 @@ import {sendInternalMessage} from '@shared/tabs';
  * @param {String} bg_color - badge background color
  */
 function updateBrowserAction(icon: string, text: string | null, bg_color: string | null) {
-  ubrowser.browserAction.setIcon({path: `/src/img/${icon}.png`});
-  ubrowser.browserAction.setBadgeText({
+  ubrowser.action.setIcon({path: `/src/img/${icon}.png`});
+  ubrowser.action.setBadgeText({
     text: text,
   });
   if (bg_color !== null && bg_color !== '') {
-    ubrowser.browserAction.setBadgeBackgroundColor({
+    ubrowser.action.setBadgeBackgroundColor({
       color: bg_color,
     });
   }
@@ -39,10 +39,10 @@ function onInternalMessage(request: Object, sender: Object) {
     const {context} = request;
     const ver_clean = context.serverVersion.raw?.replace('saas~', '');
     if (context.isCompatible) {
-      ubrowser.browserAction.enable(sender.tab.id);
+      ubrowser.action.enable(sender.tab.id);
       updateBrowserAction('terminal-16', ver_clean, context.isSaas ? '#9e7163' : '#71639e');
     } else {
-      ubrowser.browserAction.disable(sender.tab.id);
+      ubrowser.action.disable(sender.tab.id);
       updateBrowserAction('terminal-disabled-16', ver_clean, '#878787');
     }
   }
@@ -76,7 +76,7 @@ function onTabUpdated(tab_id: number, change_info: Object) {
 function onTabActivated(active_info: Object) {
   // Because the script may be unavailable, we always assume
   // that the page is not compatible with the extension.
-  ubrowser.browserAction.disable(active_info.tabId);
+  ubrowser.action.disable(active_info.tabId);
   updateBrowserAction('terminal-disabled-16', null, null);
   sendInternalMessage(active_info.tabId, 'update_odoo_terminal_info');
 }
@@ -96,4 +96,4 @@ ubrowser.tabs.onUpdated.addListener(onTabUpdated);
 ubrowser.tabs.onActivated.addListener(onTabActivated);
 
 // Listen the extension browser icon click event to toggle terminal visibility
-ubrowser.browserAction.onClicked.addListener(onClickBrowserAction);
+ubrowser.action.onClicked.addListener(onClickBrowserAction);

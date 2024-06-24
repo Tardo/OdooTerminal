@@ -452,7 +452,6 @@ export default class Screen {
   }
 
   #updateInputMode(mode: InputMode) {
-    console.log("MODE", mode)
     this.#$inputMulti.toggleClass('d-none hidden', mode !== 'multi');
     this.#$inputMultiInfo.toggleClass('d-none hidden', mode !== 'multi');
     this.#$input.toggleClass('d-none hidden', mode === 'multi');

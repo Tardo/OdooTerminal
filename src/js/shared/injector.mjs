@@ -27,7 +27,7 @@ export function injectPageScript(doc: Document, script: string, callback?: Injec
   if (callback) {
     script_page.onload = callback;
   }
-  script_page.src = ubrowser.extension.getURL(script);
+  script_page.src = ubrowser.runtime.getURL(script);
 }
 
 /**
@@ -39,7 +39,7 @@ export function injectPageCSS(doc: Document, css: string) {
   link_page.setAttribute('rel', 'stylesheet');
   link_page.setAttribute('type', 'text/css');
   (doc.head || doc.documentElement)?.appendChild(link_page);
-  link_page.href = ubrowser.extension.getURL(css);
+  link_page.href = ubrowser.runtime.getURL(css);
 }
 
 /**

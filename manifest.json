@@ -1,8 +1,10 @@
 {
   "background": {
-    "page": "src/html/background.html"
+    "service_worker": "dist/priv/background.mjs",
+    "scripts": ["dist/priv/background.mjs"],
+    "type": "module"
   },
-  "browser_action": {
+  "action": {
     "default_icon": "src/img/terminal-disabled-16.png",
     "default_title": "Odoo Terminal (CTRL + ,)"
   },
@@ -26,23 +28,27 @@
     "128": "src/img/terminal-128.png"
   },
   "commands": {
-    "_execute_browser_action": {
+    "_execute_action": {
       "suggested_key": {
         "default": "Ctrl+Comma"
       }
     }
   },
-  "manifest_version": 2,
+  "manifest_version": 3,
   "default_locale": "en",
   "name": "__MSG_extensionName__",
   "options_ui": {
     "page": "src/html/options.html",
     "open_in_tab": true,
-    "browser_style": true,
-    "chrome_style": true
+    "browser_style": true
   },
   "permissions": ["activeTab", "storage"],
   "short_name": "__MSG_extensionName__",
   "version": "10.4.2",
-  "web_accessible_resources": ["dist/pub/**", "_locales/**/translation.json"]
+  "web_accessible_resources": [
+    {
+      "resources": ["dist/pub/**", "_locales/**/translation.json"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
