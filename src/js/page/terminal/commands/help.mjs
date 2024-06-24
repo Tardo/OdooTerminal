@@ -61,7 +61,10 @@ async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
     const sorted_keys_len = sorted_cmd_keys.length;
     for (let x = 0; x < sorted_keys_len; ++x) {
       const _cmd = sorted_cmd_keys[x];
-      ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd]);
+      const cmd_def = this.getShell().getVM().getRegisteredCmds()[_cmd];
+      if (!cmd_def.is_function) {
+        ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd]);
+      }
     }
   } else if (Object.hasOwn(this.getShell().getVM().getRegisteredCmds(), kwargs.cmd)) {
     await printHelpDetailed.call(this, ctx.screen, kwargs.cmd, this.getShell().getVM().getRegisteredCmds()[kwargs.cmd]);
