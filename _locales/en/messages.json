@@ -19,6 +19,9 @@
   "optionsTitleBehaviourMaximized": {
     "message": "Maximized"
   },
+  "optionsTitleBehaviourMultiline": {
+    "message": "Multi-line"
+  },
   "optionsTitleBehaviourOpacity": {
     "message": "Opacity:"
   },

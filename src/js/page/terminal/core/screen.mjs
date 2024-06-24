@@ -31,6 +31,8 @@ export type InputInfo = {
   host: string,
 };
 
+export type InputMode = 'single' | 'multi';
+
 export type Question = {
   question: string,
   values: $ReadOnlyArray<string>,
@@ -45,6 +47,7 @@ export type onInputCallback = (ev: KeyboardEvent) => void;
 export type onInputKeyUpCallback = (ev: KeyboardEvent) => void;
 
 export type ScreenOptions = {
+  inputMode: InputMode,
   onCleanScreen: OnCleanScreenCallback,
   onSaveScreen: onSaveScreenCallback,
   onInput: onInputCallback,
@@ -79,6 +82,10 @@ export default class Screen {
   // $FlowFixMe
   #$input: Object;
   // $FlowFixMe
+  #$inputMulti: Object;
+  // $FlowFixMe
+  #$inputMultiInfo: Object;
+  // $FlowFixMe
   #$shadowInput: Object;
   // $FlowFixMe
   #$userInput: Object;
@@ -102,8 +109,7 @@ export default class Screen {
   #wasStart = false;
   #flushing = false;
 
-  constructor(options: ScreenOptions, inputInfo: Partial<InputInfo>) {
-    this.#options = options;
+  constructor(inputInfo: Partial<InputInfo>) {
     this.updateInputInfo(inputInfo);
   }
 
@@ -113,7 +119,8 @@ export default class Screen {
   }
 
   // $FlowFixMe
-  start(container: Object) {
+  start(container: Object, options: ScreenOptions) {
+    this.#options = options;
     this.#$container = container;
     this.#createScreen();
     this.#createAssistantPanel();
@@ -166,7 +173,7 @@ export default class Screen {
   }
 
   cleanShadowInput() {
-    if (!this.#wasStart) {
+    if (!this.#wasStart || !this.#$shadowInput) {
       return;
     }
     this.#$shadowInput.val('');
@@ -187,6 +194,11 @@ export default class Screen {
     return this.#$input[0].selectionStart;
   }
 
+  setInputMode(mode: InputMode) {
+    this.#options.inputMode = mode;
+    this.#updateInputMode(this.#options.inputMode);
+  }
+
   setInputCaretPos(start: number, end?: number) {
     if (!this.#wasStart) {
       return;
@@ -196,7 +208,7 @@ export default class Screen {
   }
 
   updateShadowInput(str: string) {
-    if (!this.#wasStart) {
+    if (!this.#wasStart || !this.#$shadowInput) {
       return;
     }
     this.#$shadowInput.val(str);
@@ -205,6 +217,12 @@ export default class Screen {
     setTimeout(() => {
       this.#$shadowInput.scrollLeft(this.#$input.scrollLeft(), 0);
     }, 1);
+  }
+
+  #cleanAssistant() {
+    this.#$assistant_args.html('');
+    this.#$assistant_args_info.html('');
+    this.#$assistant_desc.html('');
   }
 
   updateAssistantPanelOptions(
@@ -217,9 +235,7 @@ export default class Screen {
     }
 
     if (typeof this.#question_active !== 'undefined') {
-      this.#$assistant_args.html('');
-      this.#$assistant_args_info.html('');
-      this.#$assistant_desc.html('');
+      this.#cleanAssistant();
       return;
     }
 
@@ -266,6 +282,9 @@ export default class Screen {
   getUserInput(): string {
     if (!this.#wasStart) {
       return '';
+    }
+    if (this.#options.inputMode === 'multi') {
+      return this.#$inputMulti.val();
     }
     return this.#$input.val();
   }
@@ -432,6 +451,15 @@ export default class Screen {
     }
   }
 
+  #updateInputMode(mode: InputMode) {
+    console.log("MODE", mode)
+    this.#$inputMulti.toggleClass('d-none hidden', mode !== 'multi');
+    this.#$inputMultiInfo.toggleClass('d-none hidden', mode !== 'multi');
+    this.#$input.toggleClass('d-none hidden', mode === 'multi');
+    this.#$shadowInput.toggleClass('d-none hidden', mode === 'multi');
+    this.#cleanAssistant();
+  }
+
   getQuestionActive(): Question | void {
     return this.#question_active;
   }
@@ -450,6 +478,9 @@ export default class Screen {
 
   updateQuestions() {
     if (typeof this.#question_active === 'undefined' && this.#questions.length) {
+      if (this.#options.inputMode !== 'single') {
+        this.#updateInputMode('single');
+      }
       this.#question_active = this.#questions.shift();
       const values = this.#question_active.values.map(item => {
         // $FlowFixMe
@@ -470,6 +501,9 @@ export default class Screen {
       this.#question_active = undefined;
       this.#$interactiveContainer.html('');
       this.#$interactiveContainer.addClass('d-none hidden');
+      if (this.#options.inputMode !== 'single') {
+        this.#updateInputMode(this.#options.inputMode);
+      }
     }
   }
 
@@ -558,9 +592,13 @@ export default class Screen {
     this.#$promptInfoContainer = this.#$userInput.find('.terminal-prompt-container.terminal-prompt-info');
     this.#$input = this.#$userInput.find('#terminal_input');
     this.#$shadowInput = this.#$userInput.find('#terminal_shadow_input');
+    this.#$inputMulti = this.#$userInput.find('#terminal_input_multi');
+    this.#$inputMultiInfo = this.#$container.find('#terminal_input_multi_info');
     this.#$input.on('keyup', ev => this.#options.onInputKeyUp(ev));
     this.#$input.on('keydown', ev => this.#onInputKeyDown(ev));
     this.#$input.on('input', ev => this.#options.onInput(ev));
+    this.#$inputMulti.on('keyup', ev => this.#options.onInputKeyUp(ev));
+    this.#updateInputMode(this.#options.inputMode);
   }
 
   /* EVENTS */

@@ -52,8 +52,7 @@
   overflow-y: scroll;
   padding: 0;
   resize: none;
-  scrollbar-color: var(--terminal-screen-text-color)
-    var(--terminal-screen-background-color);
+  scrollbar-color: var(--terminal-screen-text-color) var(--terminal-screen-background-color);
   white-space: pre;
 }
 .o_terminal div#terminal_screen::-webkit-scrollbar {
@@ -176,25 +175,17 @@
   max-width: 15%;
   display: flex;
 }
-.o_terminal
-  .terminal-user-input
-  > .terminal-prompt-container.terminal-prompt-interactive {
+.o_terminal .terminal-user-input > .terminal-prompt-container.terminal-prompt-interactive {
   max-width: 50%;
 }
-.o_terminal
-  .terminal-user-input
-  > .terminal-prompt-container
-  > .terminal-prompt {
+.o_terminal .terminal-user-input > .terminal-prompt-container > .terminal-prompt {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: bold;
 }
 
-.o_terminal
-  .terminal-user-input
-  > .terminal-prompt-info-container
-  > .terminal-prompt-info {
+.o_terminal .terminal-user-input > .terminal-prompt-info-container > .terminal-prompt-info {
   white-space: nowrap;
 }
 
@@ -216,6 +207,11 @@
   width: 100%;
   padding: 3px;
 }
+.o_terminal .terminal-user-input .rich-input > #terminal_input_multi {
+  flex: 1 1 auto; /* Here to force BS4 behavior */
+  width: 100%;
+  padding: 3px;
+}
 
 .o_terminal .terminal-user-input input {
   background-color: var(--terminal-screen-background-color);
@@ -224,6 +220,12 @@
   color: var(--terminal-screen-text-color);
   height: var(--terminal-input-height);
 }
+.o_terminal .terminal-user-input textarea {
+  background-color: var(--terminal-screen-background-color);
+  border: 0;
+  caret-color: var(--terminal-screen-text-color);
+  color: var(--terminal-screen-text-color);
+}
 
 .o_terminal .terminal-user-input input[type='edit'] {
   padding: 0;
@@ -231,6 +233,12 @@
 .o_terminal .terminal-user-input input:active,
 .o_terminal .terminal-user-input input:focus {
   outline: none;
+}
+
+.o_terminal #terminal_input_multi_info {
+  position: absolute;
+  top: 50px;
+  right: 1em;
 }
 
 .o_terminal .print-table thead th {

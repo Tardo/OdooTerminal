@@ -105,28 +105,10 @@ export default class Terminal {
       onTimeoutCommand: () => this.#updateJobsInfo(),
       onFinishCommand: () => this.#updateJobsInfo(),
     });
-    this.screen = new Screen(
-      {
-        onSaveScreen: function (this: Terminal, content: string) {
-          debounce(() => {
-            setStorageSessionItem('terminal_screen', content, err => this.screen.print(err));
-          }, 350);
-        }.bind(this),
-        onCleanScreen: () => {
-          removeStorageSessionItem('terminal_screen');
-        },
-        onInputKeyUp: ev => {
-          this.#onInputKeyUp(ev);
-        },
-        onInput: () => {
-          this.#onInput();
-        },
-      },
-      {
-        username: 'Unregistered User',
-        host: window.location.host,
-      },
-    );
+    this.screen = new Screen({
+      username: 'Unregistered User',
+      host: window.location.host,
+    });
 
     // Cached content
     const cachedScreen = getStorageSessionItem('terminal_screen');
@@ -157,6 +139,9 @@ export default class Terminal {
       this.$el.addClass('term-maximized');
       this.$el.find('.terminal-screen-icon-maximize').removeClass('btn-dark').addClass('btn-light');
     }
+    if (this.#config.multiline) {
+      this.$el.find('.terminal-multiline').removeClass('btn-dark').addClass('btn-light');
+    }
 
     // $FlowFixMe
     window.addEventListener('message', this.#onWindowMessage.bind(this), false);
@@ -170,6 +155,8 @@ export default class Terminal {
     this.$el.find('.terminal-screen-icon-maximize').on('click', this.#onClickToggleMaximize.bind(this));
     // $FlowFixMe
     this.$el.find('.terminal-screen-icon-pin').on('click', this.#onClickToggleScreenPin.bind(this));
+    // $FlowFixMe
+    this.$el.find('.terminal-multiline').on('click', this.#onClickToggleMultiline.bind(this));
     // Custom Events
     // $FlowFixMe
     this.$el[0].addEventListener('toggle', this.doToggle.bind(this));
@@ -211,7 +198,23 @@ export default class Terminal {
 
     this.$runningCmdCount = this.$el.find('#terminal_running_cmd_count');
     this.#commandAssistant = new CommandAssistant(this);
-    this.screen.start(this.$el);
+    this.screen.start(this.$el, {
+      inputMode: this.#config.multiline ? 'multi' : 'single',
+      onSaveScreen: function (this: Terminal, content: string) {
+        debounce(() => {
+          setStorageSessionItem('terminal_screen', content, err => this.screen.print(err));
+        }, 350);
+      }.bind(this),
+      onCleanScreen: () => {
+        removeStorageSessionItem('terminal_screen');
+      },
+      onInputKeyUp: ev => {
+        this.#onInputKeyUp(ev);
+      },
+      onInput: () => {
+        this.#onInput();
+      },
+    });
     this.screen.applyStyle('opacity', new String(this.#config.opacity).toString());
     this.onStart();
   }
@@ -440,6 +443,7 @@ export default class Terminal {
     Object.assign(this.#config, {
       pinned: getStorageSessionItem('terminal_pinned', config.pinned),
       maximized: getStorageSessionItem('screen_maximized', config.maximized),
+      multiline: getStorageSessionItem('terminal_multiline', config.multiline),
       opacity: config.opacity * 0.01,
       shortcuts: config.shortcuts,
       term_context: config.term_context || {},
@@ -549,6 +553,21 @@ export default class Terminal {
     this.screen.preventLostInputFocus();
   }
 
+  #onClickToggleMultiline(ev: MouseEvent) {
+    // $FlowFixMe
+    const $target = $(ev.currentTarget);
+    this.#config.multiline = !this.#config.multiline;
+    setStorageSessionItem('terminal_multiline', this.#config.multiline, err => this.screen.print(err));
+    if (this.#config.multiline) {
+      $target.removeClass('btn-dark').addClass('btn-light');
+      this.screen.setInputMode('multi');
+    } else {
+      $target.removeClass('btn-light').addClass('btn-dark');
+      this.screen.setInputMode('single');
+    }
+    this.screen.preventLostInputFocus();
+  }
+
   #onKeyEnter() {
     this.execute(this.screen.getUserInput()).catch(() => {
       // Do nothing
@@ -648,27 +667,35 @@ export default class Terminal {
   #onInputKeyUp(ev: KeyboardEvent) {
     const question_active = this.screen.getQuestionActive();
     if (typeof question_active === 'undefined') {
-      if (ev.keyCode === keyCode.ENTER) {
-        this.#onKeyEnter();
-      } else if (ev.keyCode === keyCode.UP) {
-        this.#onKeyArrowUp();
-      } else if (ev.keyCode === keyCode.DOWN) {
-        this.#onKeyArrowDown();
-      } else if (ev.keyCode === keyCode.RIGHT) {
-        this.#onKeyArrowRight(ev);
-      } else if (ev.keyCode === keyCode.LEFT) {
-        this.#onKeyArrowLeft();
-      } else if (ev.keyCode === keyCode.TAB) {
-        this.#onKeyTab(ev);
+      if (this.#config.multiline) {
+        if (ev.ctrlKey && ev.keyCode === keyCode.ENTER) {
+          this.#onKeyEnter();
+        }
       } else {
-        this.#searchHistoryIter = this.#inputHistory.length;
-        this.#searchHistoryQuery = '';
+        if (ev.keyCode === keyCode.ENTER) {
+          this.#onKeyEnter();
+        } else if (ev.keyCode === keyCode.UP) {
+          this.#onKeyArrowUp();
+        } else if (ev.keyCode === keyCode.DOWN) {
+          this.#onKeyArrowDown();
+        } else if (ev.keyCode === keyCode.RIGHT) {
+          this.#onKeyArrowRight(ev);
+        } else if (ev.keyCode === keyCode.LEFT) {
+          this.#onKeyArrowLeft();
+        } else if (ev.keyCode === keyCode.TAB) {
+          this.#onKeyTab(ev);
+        } else {
+          this.#searchHistoryIter = this.#inputHistory.length;
+          this.#searchHistoryQuery = '';
+        }
       }
-    } else if (ev.keyCode === keyCode.ENTER) {
-      this.screen.responseQuestion(question_active, ev.target instanceof HTMLInputElement ? ev.target.value : '');
-    } else if (ev.keyCode === keyCode.ESCAPE) {
-      this.screen.rejectQuestion(question_active, i18n.t('terminal.question.aborted', 'Operation aborted'));
-      ev.preventDefault();
+    } else {
+      if (ev.keyCode === keyCode.ENTER) {
+        this.screen.responseQuestion(question_active, ev.target instanceof HTMLInputElement ? ev.target.value : '');
+      } else if (ev.keyCode === keyCode.ESCAPE) {
+        this.screen.rejectQuestion(question_active, i18n.t('terminal.question.aborted', 'Operation aborted'));
+        ev.preventDefault();
+      }
     }
   }
 

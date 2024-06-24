@@ -15,14 +15,10 @@
         <label for="pinned">Pinned</label><br />
         <input type="checkbox" id="maximized" name="maximized" />
         <label for="maximized">Maximized</label><br />
+        <input type="checkbox" id="multiline" name="multiline" />
+        <label for="multiline">Multi-line</label><br />
         <label for="opacity">Opacity:</label>
-        <input
-          type="range"
-          id="opacity"
-          name="opacity"
-          min="0"
-          max="100"
-        /><br />
+        <input type="range" id="opacity" name="opacity" min="0" max="100" /><br />
       </div>
 
       <div class="optsection">
@@ -39,19 +35,8 @@
           <tbody></tbody>
         </table>
         <div class="shortcut_btn_zone">
-          <input
-            type="edit"
-            id="shortcut_keybind"
-            readonly="1"
-            name="shortcut_keybind"
-            placeholder="Keybind"
-          />
-          <input
-            type="edit"
-            id="shortcut_commands"
-            name="shortcut_commands"
-            placeholder="Command"
-          />
+          <input type="edit" id="shortcut_keybind" readonly="1" name="shortcut_keybind" placeholder="Keybind" />
+          <input type="edit" id="shortcut_commands" name="shortcut_commands" placeholder="Command" />
           <button id="add_shortcut">Add</button>
         </div>
       </div>
@@ -59,14 +44,8 @@
       <div class="optsection">
         <h4 id="title_command_assistant">Command Assistant</h4>
         <p></p>
-        <input
-          type="checkbox"
-          id="cmd_assistant_dyn_options_disabled"
-          name="cmd_assistant_dyn_options_disabled"
-        />
-        <label for="cmd_assistant_dyn_options_disabled"
-          >Disable dynamic options</label
-        ><br />
+        <input type="checkbox" id="cmd_assistant_dyn_options_disabled" name="cmd_assistant_dyn_options_disabled" />
+        <label for="cmd_assistant_dyn_options_disabled">Disable dynamic options</label><br />
         <label for="cmd_assistant_match_mode">Match mode:</label>
         <select id="cmd_assistant_match_mode" name="cmd_assistant_match_mode">
           <option value="startsWith">startsWith</option>
@@ -74,22 +53,15 @@
         </select>
         <br />
         <label for="cmd_assistant_max_results">Max. results:</label>
-        <input
-          type="number"
-          id="cmd_assistant_max_results"
-          name="cmd_assistant_max_results"
-          min="1"
-          max="50"
-        />
+        <input type="number" id="cmd_assistant_max_results" name="cmd_assistant_max_results" min="1" max="50" />
         <br />
       </div>
 
       <div class="optsection">
         <h4 id="title_init_commands">Init Commands</h4>
         <p id="desc_init_commands">
-          Run these commands when initialize the terminal (one per line). Be
-          careful! changes here can cause unwanted exceptions. Note that the
-          commands will be executed on all 'odoo' pages.
+          Run these commands when initialize the terminal (one per line). Be careful! changes here can cause unwanted
+          exceptions. Note that the commands will be executed on all 'odoo' pages.
         </p>
         <textarea id="init_cmds"></textarea>
       </div>
@@ -97,8 +69,7 @@
       <div class="optsection">
         <h4 id="title_terminal_context">Terminal Context</h4>
         <p id="desc_terminal_context">
-          This context will be merged with the "normal" context on terminal
-          operations. In json format.
+          This context will be merged with the "normal" context on terminal operations. In json format.
         </p>
         <textarea id="term_context"></textarea>
       </div>
@@ -108,23 +79,12 @@
         <p></p>
         <input type="checkbox" id="devmode_tests" name="devmode_tests" />
         <label for="devmode_tests">Use OdooTerminalTests</label><br />
-        <input
-          type="checkbox"
-          id="devmode_ignore_comp_checks"
-          name="devmode_ignore_comp_checks"
-        />
+        <input type="checkbox" id="devmode_ignore_comp_checks" name="devmode_ignore_comp_checks" />
         <label for="devmode_ignore_comp_checks"
-          >Disable Odoo version checking (this can cause unwanted
-          exceptions!)</label
+          >Disable Odoo version checking (this can cause unwanted exceptions!)</label
         ><br />
-        <input
-          type="checkbox"
-          id="devmode_console_errors"
-          name="devmode_console_errors"
-        />
-        <label for="devmode_console_errors"
-          >Show errors in the browser console</label
-        ><br />
+        <input type="checkbox" id="devmode_console_errors" name="devmode_console_errors" />
+        <label for="devmode_console_errors">Show errors in the browser console</label><br />
       </div>
 
       <div class="btn_zone">

@@ -14,6 +14,7 @@ export default function (PROMPT: string): string {
     <div class='rich-input'>
       <input type='edit' id='terminal_shadow_input' autocomplete='off-term-shadow' spellcheck="false" autocapitalize="off" readonly='readonly'/>
       <input type='edit' id='terminal_input' autocomplete='off' spellcheck="false" autocapitalize="off" />
+      <textarea id='terminal_input_multi' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" rows="8"></textarea>
     </div>
     <div class="terminal-prompt-container terminal-prompt-info">
       <span id="terminal-prompt-info-version" class='terminal-prompt-info'></span>
@@ -21,5 +22,8 @@ export default function (PROMPT: string): string {
     <div class="terminal-prompt-container terminal-prompt-host-container">
       <span id="terminal-prompt-info-host" class='terminal-prompt'></span>
     </div>
+  </div>
+  <div id="terminal_input_multi_info">
+    <span>Press 'CTRL + &lt;Intro&gt;' to execute.</span>
   </div>`;
 }

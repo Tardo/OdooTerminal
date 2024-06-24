@@ -13,6 +13,9 @@ export default function (): string {
     "<div class='btn btn-sm btn-dark terminal-screen-icon-pin p-2' role='button' title='Pin'>" +
     "<i class='fa fa-map-pin'></i>" +
     '</div>' +
+    "<div class='btn btn-sm btn-dark terminal-multiline p-2' role='button' title='Multi-line'>" +
+    "<i class='fa fa-code'></i>" +
+    '</div>' +
     '</div>' +
     '</div>'
   );

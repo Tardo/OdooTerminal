@@ -181,6 +181,7 @@ function i18n() {
   _apply_i18n('#title_behaviour', 'optionsTitleBehaviour');
   _apply_i18n("label[for='pinned']", 'optionsTitleBehaviourPinned');
   _apply_i18n("label[for='maximized']", 'optionsTitleBehaviourMaximized');
+  _apply_i18n("label[for='multiline']", 'optionsTitleBehaviourMultiline');
   _apply_i18n("label[for='opacity']", 'optionsTitleBehaviourOpacity');
 
   _apply_i18n('#title_shortcuts', 'optionsTitleShortcuts');
