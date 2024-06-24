@@ -266,7 +266,7 @@ export default class CommandAssistant {
     }
 
     const command_info = input_info.token.cmd ? this.#shell.getVM().getRegisteredCmds()[input_info.token.cmd] : undefined;
-    if (!command_info || command_info.is_function) {
+    if (!command_info) {
       return [];
     }
 

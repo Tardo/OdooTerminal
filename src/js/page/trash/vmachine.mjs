@@ -70,7 +70,6 @@ export default class VMachine {
       aliases: [],
       example: '',
       is_function: false,
-      is_hidden: false,
       ...cmd_def,
     };
   }

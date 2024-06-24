@@ -7,9 +7,9 @@ import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import uniqueId from '@trash/utils/unique_id';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
-import type Terminal from '@terminal/terminal';
+import type VMachine from '@trash/vmachine';
 
-async function cmd2DCreateWindow(this: Terminal, kwargs: CMDCallbackArgs): Promise<HTMLCanvasElement> {
+async function func2DCreateWindow(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<HTMLCanvasElement> {
   const canvas = document.createElement('canvas');
   canvas.id = uniqueId("TerminalGraphics");
   canvas.width = kwargs.width;
@@ -31,8 +31,8 @@ async function cmd2DCreateWindow(this: Terminal, kwargs: CMDCallbackArgs): Promi
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmd2DCreateWindow.definition', 'Create 2D Window'),
-    callback: cmd2DCreateWindow,
-    is_hidden: true,
+    callback_internal: func2DCreateWindow,
+    is_function: true,
     detail: i18n.t('cmd2DCreateWindow.detail', 'Create 2D Window'),
     args: [
       [ARG.Number, ['w', 'width'], true, i18n.t('cmd2DCreateWindow.args.width', 'The canvas width')],

@@ -120,7 +120,7 @@ export function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwar
   const required_args: Array<string> = [];
   for (const arg_name in args_infos) {
     const arg_def = args_infos[arg_name];
-    if (cmd_def.is_function === true || typeof arg_def.default_value !== 'undefined') {
+    if (typeof arg_def.default_value !== 'undefined') {
       default_values_map.push([arg_name, arg_def.default_value]);
     }
     if (arg_def.is_required) {

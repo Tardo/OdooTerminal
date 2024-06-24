@@ -6,17 +6,17 @@
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
-import type Terminal from '@terminal/terminal';
+import type VMachine from '@trash/vmachine';
 
-async function cmdFloor(this: Terminal, kwargs: CMDCallbackArgs): Promise<number> {
+async function funcFloor(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<number> {
   return Math.floor(kwargs.num);
 }
 
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdFloor.definition', 'Rounds a number DOWN to the nearest integer'),
-    callback: cmdFloor,
-    is_hidden: true,
+    callback_internal: funcFloor,
+    is_function: true,
     detail: i18n.t('cmdFloor.detail', 'Rounds a number DOWN to the nearest integer'),
     args: [
       [ARG.Number, ['n', 'num'], true, i18n.t('cmdFloor.args.num', 'The number')],

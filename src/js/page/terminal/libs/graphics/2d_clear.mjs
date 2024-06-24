@@ -6,9 +6,9 @@
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
-import type Terminal from '@terminal/terminal';
+import type VMachine from '@trash/vmachine';
 
-async function cmd2DClear(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
+async function func2DClear(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
   const ctx = kwargs.canvas.getContext("2d");
   const w = (kwargs.width === -1) ? kwargs.canvas.width : kwargs.width;
   const h = (kwargs.width === -1) ? kwargs.canvas.height : kwargs.height;
@@ -18,8 +18,8 @@ async function cmd2DClear(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmd2DClear.definition', 'Clear canvas'),
-    callback: cmd2DClear,
-    is_hidden: true,
+    callback_internal: func2DClear,
+    is_function: true,
     detail: i18n.t('cmd2DClear.detail', 'Clear canvas'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DClear.args.canvas', 'The canvas')],

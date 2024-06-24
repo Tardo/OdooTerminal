@@ -6,9 +6,9 @@
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
-import type Terminal from '@terminal/terminal';
+import type VMachine from '@trash/vmachine';
 
-async function cmd2DRect(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
+async function func2DRect(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
   const ctx = kwargs.canvas.getContext("2d");
   ctx.fillStyle = kwargs.color;
   ctx.fillRect(kwargs.x, kwargs.y, kwargs.width, kwargs.height);
@@ -17,8 +17,8 @@ async function cmd2DRect(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmd2DRect.definition', 'Draw a rect'),
-    callback: cmd2DRect,
-    is_hidden: true,
+    callback_internal: func2DRect,
+    is_function: true,
     detail: i18n.t('cmd2DRect.detail', 'Draw a rect'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DRect.args.canvas', 'The canvas')],

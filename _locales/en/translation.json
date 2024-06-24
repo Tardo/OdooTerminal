@@ -24,10 +24,7 @@
       "width": "The canvas width"
     },
     "definition": "Load external resource",
-    "detail": "Load external source (javascript & css)",
-    "error": {
-      "inUse": "Only can exists one graphic"
-    }
+    "detail": "Load external source (javascript & css)"
   },
   "cmd2DDestroyWindow": {
     "args": {

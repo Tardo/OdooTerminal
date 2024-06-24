@@ -15,7 +15,6 @@ import cmdLoad from './load';
 import cmdPrint from './print';
 import cmdQuit from './quit';
 import cmdToggleTerm from './toggle_term';
-import cmdSleep from './sleep';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -33,5 +32,4 @@ export default function (vm: VMachine) {
   vm.registerCommand('toggle_term', cmdToggleTerm());
   vm.registerCommand('dis', cmdDis());
   vm.registerCommand('genfile', cmdGenFile());
-  vm.registerCommand('sleep', cmdSleep());
 }
