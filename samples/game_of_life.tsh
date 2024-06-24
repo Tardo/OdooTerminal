@@ -1,0 +1,71 @@
+// Conway's Game of Life
+
+function update_cell_state(grid, width, index) {
+  $cx = (fixed ($index % $width))
+  $cy = (fixed ($index / $width))
+
+  $pos_check = [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]]
+  $alive_count = 0
+  for ($o = 0; $o < $pos_check['length']; $o = $o + 1) {
+    $nx = $cx + $pos_check[$o][0]
+    $ny = $cy + $pos_check[$o][1]
+    $npos = $width * $ny + $nx
+    if ($npos > 0 && $npos < $grid['length']) {
+      if ($grid[$npos] == 1) {
+        $alive_count = $alive_count + 1
+      }
+    }
+  }
+
+  $nstate = 0
+  if ($grid[$index] == 0 && $alive_count == 3) {
+    $nstate = 1
+  }
+  if ($grid[$index] == 1 && ($alive_count > 3 || $alive_count <= 1)) {
+    $nstate = 0
+  }
+  if ($grid[$index] == 1 && ($alive_count == 2 || $alive_count == 3)) {
+    $nstate = 1
+  }
+  $grid[$index] = $nstate
+}
+
+function update_and_draw_grid_state(grid, width, cell_size) {
+  for ($e = 0; $e < $grid['length']; $e = $e + 1) {
+    update_cell_state $grid $width $e
+    if ($grid[$e] == 0) {
+      continue
+    }
+
+    $x = (fixed ($e % $width)) * $cell_size
+    $y = (fixed ($e / $width)) * $cell_size
+    2d_rect -c $win -x $x -y $y -w $cell_size -h $cell_size -rc '#0000ff'
+  }
+}
+
+$win = (2d_create_window -w 400 -h 400 -x 600 -y 120)
+$CELL_S = 16
+$NUM_CELLS_ROW = (floor $win['width'] / $CELL_S)
+$NUM_CELLS_COL = (floor $win['height'] / $CELL_S)
+$TOTAL_CELLS = $NUM_CELLS_ROW * $NUM_CELLS_COL
+$ITERATIONS = 25
+
+$grid = []
+// Populate Grid
+for ($i=0; $i<$TOTAL_CELLS; $i=$i+1) {
+    if ((gen int 0 5) == 0) {
+        arr_append $grid 1
+    }
+    else {
+        arr_append $grid 0
+    }
+}
+
+for ($i = 0; $i < $ITERATIONS; $i = $i + 1) {
+  2d_clear -c $win
+  update_and_draw_grid_state $grid $NUM_CELLS_ROW $CELL_S
+  sleep 1
+}
+
+sleep 1200
+2d_destroy_window $win

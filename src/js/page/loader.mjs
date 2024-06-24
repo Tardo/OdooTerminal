@@ -18,6 +18,8 @@ import getUID from '@odoo/utils/get_uid';
 import getUsername from '@odoo/utils/get_username';
 import isBackOffice from '@odoo/utils/is_backoffice';
 import registerCoreFuncs from '@terminal/commands/__all__';
+import registerMathFuncs from '@terminal/libs/math/__all__';
+import registerGraphicsFuncs from '@terminal/libs/graphics/__all__';
 import OdooTerminalTests from '@tests/terminal';
 import type {TerminalOptions} from '@terminal/terminal';
 import type {InputInfo} from '@terminal/core/screen';
@@ -56,6 +58,8 @@ function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   const term_obj = getTerminalObj();
   if (term_obj) {
     registerCoreFuncs(term_obj.getShell().getVM());
+    registerMathFuncs(term_obj.getShell().getVM());
+    registerGraphicsFuncs(term_obj.getShell().getVM());
     registerCommonFuncs(term_obj.getShell().getVM());
     if (isBackOffice()) {
       registerBackofficeFuncs(term_obj.getShell().getVM());

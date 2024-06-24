@@ -6,6 +6,57 @@
     "message": "",
     "warning": ""
   },
+  "cmd2DClear": {
+    "args": {
+      "canvas": "The canvas",
+      "from-x": "The rect X point",
+      "from-y": "The rect Y point",
+      "width": "The rect height"
+    },
+    "definition": "Clear canvas",
+    "detail": "Clear canvas"
+  },
+  "cmd2DCreateWindow": {
+    "args": {
+      "height": "The canvas height",
+      "posx": "The canvas position X",
+      "posy": "The canvas position Y",
+      "width": "The canvas width"
+    },
+    "definition": "Load external resource",
+    "detail": "Load external source (javascript & css)",
+    "error": {
+      "inUse": "Only can exists one graphic"
+    }
+  },
+  "cmd2DDestroyWindow": {
+    "args": {
+      "canvas": "The canvas"
+    },
+    "definition": "Load external resource"
+  },
+  "cmd2DLine": {
+    "args": {
+      "canvas": "The canvas",
+      "from-x": "The line from X point",
+      "from-y": "The line from Y point",
+      "to-x": "The line to X point",
+      "to-y": "The line to Y point",
+      "width": "The line color"
+    },
+    "definition": "Load external resource",
+    "detail": "Load external source (javascript & css)"
+  },
+  "cmd2DRect": {
+    "args": {
+      "canvas": "The canvas",
+      "from-x": "The rect X point",
+      "from-y": "The rect Y point",
+      "width": "The rect color"
+    },
+    "definition": "Load external resource",
+    "detail": "Load external source (javascript & css)"
+  },
   "cmdAction": {
     "args": {
       "action": "The action to launch<br/>Can be an string, number or object",
@@ -244,6 +295,20 @@
     "definition": "Exports the command result to a browser console variable",
     "detail": "Exports the command result to a browser console variable.",
     "resultExported": "Command result exported! now you can use '{{varname}}' variable in the browser console"
+  },
+  "cmdFixed": {
+    "args": {
+      "num": "The number"
+    },
+    "definition": "Rounds a number DOWN to the nearest integer",
+    "detail": "Rounds a number DOWN to the nearest integer"
+  },
+  "cmdFloor": {
+    "args": {
+      "num": "The number"
+    },
+    "definition": "Rounds a number DOWN to the nearest integer",
+    "detail": "Rounds a number DOWN to the nearest integer"
   },
   "cmdFuncTrash": {
     "args": {

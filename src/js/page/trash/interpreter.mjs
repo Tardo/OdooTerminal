@@ -85,6 +85,7 @@ export type CMDDef = {
   aliases: $ReadOnlyArray<string>,
   example: string,
   is_function: boolean,
+  is_hidden: boolean,
 };
 
 export type RegisteredCMD = {[string]: CMDDef};

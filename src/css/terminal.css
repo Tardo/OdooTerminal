@@ -274,6 +274,14 @@
   color: var(--terminal-screen-extra-info-color);
 }
 
+/** GRAPHICS CANVAS **/
+.terminal-graphics-window {
+  position: absolute;
+  z-index: 2000;
+  background-color: black;
+  border: 2px solid gray;
+}
+
 /** COMMAND ASSISTANT **/
 
 /** HELP COMMAND **/

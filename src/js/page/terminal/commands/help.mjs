@@ -62,7 +62,7 @@ async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
     for (let x = 0; x < sorted_keys_len; ++x) {
       const _cmd = sorted_cmd_keys[x];
       const cmd_def = this.getShell().getVM().getRegisteredCmds()[_cmd];
-      if (!cmd_def.is_function) {
+      if (!cmd_def.is_function && cmd_def.is_hidden) {
         ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd]);
       }
     }
