@@ -534,6 +534,13 @@
     "definition": "Open settings page",
     "detail": "Open settings page."
   },
+  "cmdSleep": {
+    "args": {
+      "time": "The time to sleep (in ms)"
+    },
+    "definition": "Sleep",
+    "detail": "Sleep (time in ms)"
+  },
   "cmdToggleTerm": {
     "definition": "Toggle terminal visibility",
     "detail": "Toggle terminal visibility"

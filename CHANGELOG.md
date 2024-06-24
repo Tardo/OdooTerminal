@@ -9,6 +9,7 @@ IMP: Use 'flow'
 ADD: TrasH: Global names $RMOD and $RID (issue #131)
 ADD: Multi-line input mode
 ADD: Translations
+ADD: Command 'sleep'
 
 FIX: 'debug' command (issue #132)
 
