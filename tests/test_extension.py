@@ -4,6 +4,7 @@ import pytest
 import time
 import pathlib
 import logging
+from os import path
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options as ChromeOptions
@@ -31,13 +32,14 @@ class TestExtension:
                 chrome_type = ChromeType.CHROMIUM
             else:
                 chrome_type = ChromeType.GOOGLE
-            service = ChromeService(ChromeDriverManager(chrome_type=chrome_type).install())
+            service = ChromeService(ChromeDriverManager(chrome_type=chrome_type).install(), log_path=path.devnull)
             options = ChromeOptions()
             options.add_extension('./OdooTerminal.zip')
             browser = webdriver.Chrome(service=service, options=options)
         else:
-            service = FirefoxService(GeckoDriverManager().install())
+            service = FirefoxService(GeckoDriverManager().install(), log_path=path.devnull)
             options = FirefoxOptions()
+            options.add_argument("-headless")
             options.set_preference('profile', False)
             browser = webdriver.Firefox(service=service, options=options)
             browser.install_addon(str(pathlib.Path('./OdooTerminal.zip').absolute()), temporary=True)
