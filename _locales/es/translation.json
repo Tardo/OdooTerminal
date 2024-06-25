@@ -758,6 +758,35 @@
   "file2file": {
     "aborted": ""
   },
+  "funcAbs": {
+    "args": {
+      "num": "The number"
+    },
+    "definition": "Absolute value of a number",
+    "detail": "Returns the absolute value of a number."
+  },
+  "funcFixed": {
+    "args": {
+      "num": "The number of decimals"
+    },
+    "definition": "Rounds a number DOWN to the nearest integer",
+    "detail": "Rounds a number DOWN to the nearest integer"
+  },
+  "funcFloor": {
+    "args": {
+      "num": "The number"
+    },
+    "definition": "Rounds a number DOWN to the nearest integer",
+    "detail": "Rounds a number DOWN to the nearest integer"
+  },
+  "funcRand": {
+    "args": {
+      "max": "Max. value",
+      "min": "Min. value"
+    },
+    "definition": "Rounds a number DOWN to the nearest integer",
+    "detail": "Rounds a number DOWN to the nearest integer"
+  },
   "getOdooEnvService": {
     "error": "Service '{{service_name}}' not available"
   },

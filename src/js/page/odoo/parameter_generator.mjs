@@ -67,7 +67,7 @@ export default class ParameterGenerator {
   generateInt(min: number, max: ?number): number {
     const min_s = typeof max === 'undefined' ? 0 : Number(min);
     const max_s = typeof max === 'undefined' ? Number(min) : Number(max);
-    return Math.floor(Math.random() * (max_s - min_s + 1) + min_s);
+    return parseInt(Math.floor(Math.random() * (max_s - min_s + 1) + min_s), 10);
   }
 
   generateIntSeq(min: number, max: ?number): $ReadOnlyArray<number> {
