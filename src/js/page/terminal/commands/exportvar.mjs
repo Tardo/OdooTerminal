@@ -28,6 +28,6 @@ export default function (): Partial<CMDDef> {
     callback: cmdExportVar,
     detail: i18n.t('cmdExportVar.detail', 'Exports the command result to a browser console variable.'),
     args: [[ARG.Any, ['v', 'value'], true, i18n.t('cmdExportVar.args.value', 'The value to export')]],
-    example: '-v $(search res.partner)',
+    example: '-v (search res.partner)',
   };
 }

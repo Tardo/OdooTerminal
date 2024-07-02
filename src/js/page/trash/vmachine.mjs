@@ -187,7 +187,7 @@ export default class VMachine {
           {
             const cmd_name = stack.names[instr.level][instr.dataIndex];
             if (cmd_name === null || typeof cmd_name === 'undefined') {
-              throw new UnknownNameError(i18n.t('<InvalidName>'), token.start, token.end)
+              throw new UnknownNameError(i18n.t('UnknownNameError.invalidName', '<InvalidName>'), token.start, token.end)
             } else if (Object.hasOwn(this.#registeredCmds, cmd_name) || cmd_name in opts.aliases) {
               last_frame = new Frame(cmd_name, last_frame);
               frames.push(last_frame);

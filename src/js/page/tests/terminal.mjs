@@ -18,7 +18,7 @@ export default class OdooTerminalTests extends OdooTerminal {
   createTerminal() {
     super.createTerminal();
     // $FlowFixMe
-    this.$el[0].addEventListener('start_terminal_tests', this.onStartTests.bind(this));
+    this.el.addEventListener('start_terminal_tests', this.onStartTests.bind(this));
   }
 
   onStartTests(ev: CustomEvent) {

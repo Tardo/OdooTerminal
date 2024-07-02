@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooSession from './get_odoo_session';
+import sanitizeOdooVersion from '@common/utils/sanitize_odoo_version';
 import isEmpty from '@trash/utils/is_empty';
 
 export type OdooVersionInfo = {
@@ -24,7 +25,7 @@ export default function (type: 'raw' | 'major' | 'minor' = 'raw'): string | numb
     if (!raw) {
       return;
     }
-    const raw_split = raw.replace('saas~', '').split('.');
+    const raw_split = sanitizeOdooVersion(raw).split('.');
     Object.assign(cache, {
       raw: raw,
       major: Number(raw_split[0]),

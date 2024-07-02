@@ -72,9 +72,8 @@ export default class TerminalTestSuite {
     }
   }
 
-  // $FlowFixMe
-  getModalOpen(): Object {
-    return $('.modal.show,.modal.in,.modal.o_technical_modal');
+  getModalOpen(): HTMLElement | null {
+    return document.querySelector('.modal.show,.modal.in,.modal.o_technical_modal');
   }
   // $FlowFixMe
   isModalType($modal: Object, type: string): boolean {

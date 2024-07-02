@@ -6,6 +6,7 @@
 IMP: TraSH: Turing completeness
 IMP: Use 'flow'
 IMP: Use Manifest V3
+IMP: jQuery is no longer used
 
 ADD: TrasH: Global names $RMOD and $RID (issue #131)
 ADD: Multi-line input mode

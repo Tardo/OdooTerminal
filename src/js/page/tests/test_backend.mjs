@@ -9,8 +9,7 @@ export default class TestBackend extends TerminalTestSuite {
   async test_settings() {
     await this.terminal.execute('settings', false, true);
     await asyncSleep(2000);
-    // $FlowFixMe
-    this.assertTrue($('.o_form_view .settings, .o_form_view > .settings').length > 0);
+    this.assertNotEqual(document.querySelector('.o_form_view .settings, .o_form_view > .settings'), null);
   }
 
   async test_view() {

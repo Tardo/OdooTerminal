@@ -4,6 +4,7 @@
     "prepare": "husky install",
     "release": "node scripts/release.mjs",
     "clean": "rm -rf ./dist",
+    "dev:web-ext": "export ODOO_TERMINAL_ENV=development && web-ext lint --ignore-files=src/js/**",
     "dev:eslint": "export ODOO_TERMINAL_ENV=development && eslint --color .",
     "dev:flowcheck": "export ODOO_TERMINAL_ENV=development && flow check",
     "dev:rollup": "export ODOO_TERMINAL_ENV=development && rollup -c",
@@ -33,9 +34,9 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1",
     "eslint-plugin-ft-flow": "3.0.9",
-    "eslint-plugin-json": "^4.0.0",
+    "eslint-plugin-json": "^4.0",
     "eslint-plugin-prettier": "^5.1",
-    "flow-bin": "^0.237",
+    "flow-bin": "^0.238",
     "hermes-eslint": "^0.22",
     "husky": "^9.0",
     "i18next": "^23.11",
@@ -48,7 +49,7 @@
     "rollup-plugin-analyzer": "^4.0",
     "rollup-plugin-postcss": "^4.0",
     "simple-git": "^3.25",
-    "web-ext": "^8.1.0"
+    "web-ext": "^8.2.0"
   },
   "husky": {
     "hooks": {

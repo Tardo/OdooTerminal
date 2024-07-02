@@ -52,6 +52,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Any, ['d', 'data'], true, i18n.t('cmdCopy.args.data', 'The data')],
       [ARG.String, ['t', 'type'], false, i18n.t('cmdCopy.args.type', 'The type of data'), 'auto', ['auto', 'var']],
     ],
-    example: '-t model -d $(search res.partner -f *)',
+    example: '-t model -d (search res.partner -f *)',
   };
 }

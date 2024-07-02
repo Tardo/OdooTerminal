@@ -91,7 +91,7 @@ export default class TestCore extends TerminalTestSuite {
 
   async test_quit() {
     await this.terminal.execute('quit', false, true);
-    this.assertFalse(this.terminal.$el.hasClass('terminal-transition-topdown'));
+    this.assertFalse(this.terminal.el.classList.contains('terminal-transition-topdown'));
   }
 
   async test_exportvar() {

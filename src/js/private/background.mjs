@@ -12,6 +12,7 @@
  */
 
 import {SETTING_DEFAULTS, SETTING_NAMES} from '@common/constants';
+import sanitizeOdooVersion from '@common/utils/sanitize_odoo_version';
 import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
 import {sendInternalMessage} from '@shared/tabs';
@@ -37,7 +38,7 @@ function updateBrowserAction(icon: string, text: string | null, bg_color: string
 function onInternalMessage(request: Object, sender: Object) {
   if (request.message === 'update_terminal_badge_info') {
     const {context} = request;
-    const ver_clean = context.serverVersion.raw?.replace('saas~', '');
+    const ver_clean = sanitizeOdooVersion(context.serverVersion.raw);
     if (context.isCompatible) {
       ubrowser.action.enable(sender.tab.id);
       updateBrowserAction('terminal-16', ver_clean, context.isSaas ? '#9e7163' : '#71639e');

@@ -17,19 +17,10 @@ function get_cell_state(grid, width, height, index) {
   }
 
   $cstate = $grid[$index]
-  $nstate = 0
-  if ($cstate == 0 && $alive_count == 3) {
-    $nstate = 1
-  } else {
-    if ($cstate == 1 && ($alive_count > 3 || $alive_count <= 1)) {
-      $nstate = 0
-    } else {
-      if ($cstate == 1 && $alive_count >= 2 && $alive_count <= 3) {
-        $nstate = 1
-      }
-    }
+  if (($cstate == 0 && $alive_count == 3) || ($cstate == 1 && $alive_count >= 2 && $alive_count <= 3)) {
+    return 1
   }
-  return $nstate
+  return 0
 }
 
 function get_new_grid_state(grid, width, height, cell_size) {
@@ -61,7 +52,7 @@ $ITERATIONS = 150
 
 $grid = []
 // Populate Grid
-for ($i=0; $i<$TOTAL_CELLS; $i=$i+1) {
+for ($i = 0; $i < $TOTAL_CELLS; $i = $i + 1) {
   arr_append $grid (rand 0 1)
 }
 

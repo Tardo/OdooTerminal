@@ -4,10 +4,10 @@
 
 // $FlowIgnore
 import i18n from 'i18next';
-import renderErrorMessage from '@terminal/templates/error_message';
-import renderHelpCmd from '@terminal/templates/help_command';
 import renderPromptCmd from '@terminal/templates/prompt_command';
 import renderPromptCmdHiddenArgs from '@terminal/templates/prompt_command_hidden_args';
+import renderErrorMessage from '@terminal/templates/error_message';
+import renderHelpCmd from '@terminal/templates/help_command';
 import renderScreen from '@terminal/templates/screen';
 import renderAssistantPanel from '@terminal/templates/screen_assistant_panel';
 import renderAssistantArgOptionItem from '@terminal/templates/screen_assistant_panel_arg_option_item';
@@ -15,12 +15,14 @@ import renderAssistantArgOptionList from '@terminal/templates/screen_assistant_p
 import renderLine from '@terminal/templates/screen_line';
 import renderTable from '@terminal/templates/screen_table';
 import renderUserInput from '@terminal/templates/screen_user_input';
+import parseHTML from '@terminal/utils/parse_html';
 import debounce from '@terminal/utils/debounce';
 import defer from '@terminal/utils/defer';
 import encodeHTML from '@terminal/utils/encode_html';
 import genColorFromString from '@terminal/utils/gen_color_from_string';
 import hsv2rgb from '@terminal/utils/hsv2rgb';
 import rgb2hsv from '@terminal/utils/rgb2hsv';
+import ElementNotFoundError from '@terminal/exceptions/element_not_found_error';
 import type {CMDAssistantOption} from './command_assistant';
 import type {DebounceInnerCallback} from '@terminal/utils/debounce';
 import type {CMDDef, TokenInfo} from '@trash/interpreter';
@@ -43,7 +45,7 @@ export type Question = {
 
 export type OnCleanScreenCallback = (content: string) => void;
 export type onSaveScreenCallback = (content: string) => void;
-export type onInputCallback = (ev: KeyboardEvent) => void;
+export type onInputCallback = (ev: InputEvent) => void;
 export type onInputKeyUpCallback = (ev: KeyboardEvent) => void;
 
 export type ScreenOptions = {
@@ -73,38 +75,23 @@ export default class Screen {
   #lazyVacuum: DebounceInnerCallback = debounce(() => this.#vacuum(), 650);
 
   #options: ScreenOptions;
-  #buff: Array<string> = [];
+  #buff: Array<HTMLElement> = [];
 
-  // $FlowFixMe
-  #$container: Object;
-  // $FlowFixMe
-  #$screen: Object;
-  // $FlowFixMe
-  #$input: Object;
-  // $FlowFixMe
-  #$inputMulti: Object;
-  // $FlowFixMe
-  #$inputMultiInfo: Object;
-  // $FlowFixMe
-  #$shadowInput: Object;
-  // $FlowFixMe
-  #$userInput: Object;
-  // $FlowFixMe
-  #$promptContainers: Object;
-  // $FlowFixMe
-  #$interactiveContainer: Object;
-  // $FlowFixMe
-  #$prompt: Object;
-  // $FlowFixMe
-  #$promptInfoContainer: Object;
-  // $FlowFixMe
-  #$assistant: Object;
-  // $FlowFixMe
-  #$assistant_desc: Object;
-  // $FlowFixMe
-  #$assistant_args: Object;
-  // $FlowFixMe
-  #$assistant_args_info: Object;
+  #container_el: HTMLElement;
+  #screen_el: HTMLElement;
+  #input_el: HTMLInputElement;
+  #inputMulti_el: HTMLInputElement;
+  #inputMultiInfo_el: HTMLInputElement;
+  #shadowInput_el: HTMLInputElement;
+  #userInput_el: HTMLElement;
+  #promptContainer_els: NodeList<HTMLElement>;
+  #interactiveContainer_el: HTMLElement;
+  #prompt_el: HTMLElement;
+  #promptInfoContainer_el: HTMLElement;
+  #assistant_el: HTMLElement;
+  #assistant_desc_el: HTMLElement;
+  #assistant_args_el: HTMLElement;
+  #assistant_args_info_el: HTMLElement;
 
   #wasStart = false;
   #flushing = false;
@@ -118,46 +105,39 @@ export default class Screen {
     return this.#max_lines;
   }
 
-  // $FlowFixMe
-  start(container: Object, options: ScreenOptions) {
+  start(container: HTMLElement, options: ScreenOptions) {
     this.#options = options;
-    this.#$container = container;
+    this.#container_el = container;
     this.#createScreen();
-    this.#createAssistantPanel();
     this.#createUserInput();
+    this.#createAssistantPanel();
     this.#wasStart = true;
     this.updateInputInfo();
   }
 
   destroy() {
-    if (!this.#wasStart) {
-      return;
-    }
-    this.#$screen.off('keydown');
-    this.#$input.off('keyup');
-    this.#$input.off('keydown');
-    this.#$input.off('input');
+    // To override
   }
 
   getContent(): string {
     if (!this.#wasStart) {
       return '';
     }
-    return this.#$screen.html();
+    return this.#screen_el.innerHTML;
   }
 
   scrollDown() {
     if (!this.#wasStart) {
       return;
     }
-    this.#$screen[0].scrollTop = this.#$screen[0].scrollHeight;
+    this.#screen_el.scrollTop = this.#screen_el.scrollHeight;
   }
 
   clean() {
     if (!this.#wasStart) {
       return;
     }
-    this.#$screen.html('');
+    this.#screen_el.textContent = '';
     if (Object.hasOwn(this.#options, 'onCleanScreen')) {
       this.#options.onCleanScreen(this.getContent());
     }
@@ -167,23 +147,23 @@ export default class Screen {
     if (!this.#wasStart) {
       return;
     }
-    this.#$input.val('');
+    this.#input_el.value = '';
     this.cleanShadowInput();
     this.updateAssistantPanelOptions([], -1, 0);
   }
 
   cleanShadowInput() {
-    if (!this.#wasStart || !this.#$shadowInput) {
+    if (!this.#wasStart || !this.#shadowInput_el) {
       return;
     }
-    this.#$shadowInput.val('');
+    this.#shadowInput_el.value = '';
   }
 
   updateInput(str: string) {
     if (!this.#wasStart) {
       return;
     }
-    this.#$input.val(str);
+    this.#input_el.value = str;
     this.cleanShadowInput();
   }
 
@@ -191,7 +171,7 @@ export default class Screen {
     if (!this.#wasStart) {
       return -1;
     }
-    return this.#$input[0].selectionStart;
+    return this.#input_el.selectionStart;
   }
 
   setInputMode(mode: InputMode) {
@@ -203,26 +183,28 @@ export default class Screen {
     if (!this.#wasStart) {
       return;
     }
-    this.#$input[0].selectionStart = start;
-    this.#$input[0].selectionEnd = end !== null && typeof end !== 'undefined' ? end : start;
+    this.#input_el.selectionStart = start;
+    this.#input_el.selectionEnd = end !== null && typeof end !== 'undefined' ? end : start;
   }
 
   updateShadowInput(str: string) {
-    if (!this.#wasStart || !this.#$shadowInput) {
+    if (!this.#wasStart || !this.#shadowInput_el) {
       return;
     }
-    this.#$shadowInput.val(str);
+    this.#shadowInput_el.value = str;
     // Deferred to ensure that has updated values
     // The trick here is to jump to a new frame
     setTimeout(() => {
-      this.#$shadowInput.scrollLeft(this.#$input.scrollLeft(), 0);
+      this.#shadowInput_el.scrollLeft = this.#input_el.scrollLeft;
     }, 1);
   }
 
   #cleanAssistant() {
-    this.#$assistant_args.html('');
-    this.#$assistant_args_info.html('');
-    this.#$assistant_desc.html('');
+    if (this.#assistant_args_el) {
+      this.#assistant_args_el.textContent = '';
+      this.#assistant_args_info_el.textContent = '';
+      this.#assistant_desc_el.textContent = '';
+    }
   }
 
   updateAssistantPanelOptions(
@@ -243,22 +225,23 @@ export default class Screen {
     options.forEach((option, index) =>
       html_options.push(renderAssistantArgOptionItem(option, index, selected_option_index)),
     );
-    this.#$assistant_args.html(renderAssistantArgOptionList(html_options));
+    this.#assistant_args_el.textContent = '';
+    this.#assistant_args_el.append(parseHTML(renderAssistantArgOptionList(html_options)));
     if (total_options_count <= 0) {
-      this.#$assistant_args_info.html('');
+      this.#assistant_args_info_el.textContent = '';
     } else {
-      this.#$assistant_args_info.text(`${options.length} of ${total_options_count}`);
+      this.#assistant_args_info_el.textContent = `${options.length} of ${total_options_count}`;
     }
 
     if (selected_option_index !== -1 || options.length === 1) {
       const opt = options[selected_option_index === -1 ? 0 : selected_option_index];
       if (opt.is_command) {
-        this.#$assistant_desc.html(opt.description);
+        this.#assistant_desc_el.textContent = opt.description;
       } else {
-        this.#$assistant_desc.html(`${opt.type}. ${opt.description}`);
+        this.#assistant_desc_el.textContent = `${opt.type}. ${opt.description}`;
       }
     } else {
-      this.#$assistant_desc.html('');
+      this.#assistant_desc_el.textContent = '';
     }
   }
 
@@ -276,7 +259,7 @@ export default class Screen {
     if (!this.#wasStart) {
       return;
     }
-    this.#$input.focus();
+    this.#input_el.focus();
   }
 
   getUserInput(): string {
@@ -284,9 +267,9 @@ export default class Screen {
       return '';
     }
     if (this.#options.inputMode === 'multi') {
-      return this.#$inputMulti.val();
+      return this.#inputMulti_el.value || '';
     }
-    return this.#$input.val();
+    return this.#input_el.value;
   }
 
   /* PRINT */
@@ -302,7 +285,10 @@ export default class Screen {
       this.#flushing = false;
       return;
     }
-    this.#$screen.append(this.#buff.splice(0, this.#max_buff_lines).join(''));
+    const buff_els = this.#buff.splice(0, this.#max_buff_lines);
+    for (let i = 0; i < buff_els.length; ++i) {
+      this.#screen_el.append(buff_els[i]);
+    }
     this.#lazyVacuum();
     this.scrollDown();
 
@@ -321,7 +307,7 @@ export default class Screen {
   }
 
   #printHTML(html: string) {
-    this.#buff.push(html);
+    this.#buff.push(parseHTML(html));
     this.flush();
   }
 
@@ -400,51 +386,56 @@ export default class Screen {
       return;
     }
     if (Object.hasOwn(this.#input_info, 'username')) {
-      this.#$userInput
-        .find('#terminal-prompt-main')
-        // $FlowFixMe
-        .html(`${this.#input_info.username}&nbsp;`)
-        .attr('title', this.#input_info.username);
+      const prompt_el = this.#userInput_el.querySelector('#terminal-prompt-main');
+      if (prompt_el) {
+        prompt_el.textContent = this.#input_info.username;
+        prompt_el.setAttribute('title', this.#input_info.username);
+      }
     }
     if (Object.hasOwn(this.#input_info, 'version')) {
-      this.#$userInput
-        .find('#terminal-prompt-info-version')
-        .text(this.#input_info.version)
-        .attr('title', this.#input_info.version);
+      const info_ver_info = this.#userInput_el.querySelector('#terminal-prompt-info-version');
+      if (info_ver_info) {
+        info_ver_info.textContent = this.#input_info.version;
+        info_ver_info.setAttribute('title', this.#input_info.version);
+      }
     }
     if (
       Object.hasOwn(this.#input_info, 'host') &&
       this.#input_info.host !== null &&
       typeof this.#input_info.host !== 'undefined'
     ) {
-      this.#$userInput
-        .find('#terminal-prompt-info-host')
-        .text(this.#input_info.host)
-        .attr('title', this.#input_info.host);
+      const info_host_el = this.#userInput_el.querySelector('#terminal-prompt-info-host');
+      if (info_host_el) {
+        info_host_el.textContent = this.#input_info.host;
+        info_host_el.setAttribute('title', this.#input_info.host);
+      }
       // Custom color indicator per host
-      // $FlowFixMe
       if (this.#input_info.host.startsWith('localhost') || this.#input_info.host.startsWith('127.0.0.1')) {
-        this.#$promptContainers.css({
-          'background-color': '#adb5bd',
-          color: 'black',
-        });
-        this.#$promptInfoContainer.css({
-          'background-color': '#828587',
+        for (const container_el of this.#promptContainer_els) {
+          Object.assign(container_el.style, {
+            backgroundColor: '#adb5bd',
+            color: 'black',
+          });
+        }
+        Object.assign(this.#promptInfoContainer_el.style, {
+          backgroundColor: '#828587',
           color: 'black',
         });
       } else {
-        // $FlowFixMe
         const color_info = genColorFromString(this.#input_info.host);
-        this.#$promptContainers.css({
-          'background-color': `rgb(${color_info.rgb[0]},${color_info.rgb[1]},${color_info.rgb[2]})`,
-          color: color_info.gv < 0.5 ? '#000' : '#fff',
-        });
+        for (const container_el of this.#promptContainer_els) {
+          Object.assign(container_el.style, {
+            backgroundColor: `rgb(${color_info.rgb[0]},${color_info.rgb[1]},${color_info.rgb[2]})`,
+            color: color_info.gv < 0.5 ? '#000' : '#fff',
+          });
+        }
+
         // eslint-disable-next-line prefer-const
         let [h, s, v] = rgb2hsv(color_info.rgb[0] / 255.0, color_info.rgb[1] / 255.0, color_info.rgb[2] / 255.0);
         v -= 0.2;
         const [r, g, b] = hsv2rgb(h, s, v);
-        this.#$promptInfoContainer.css({
-          'background-color': `rgb(${r * 255},${g * 255},${b * 255})`,
+        Object.assign(this.#promptInfoContainer_el.style, {
+          backgroundColor: `rgb(${r * 255},${g * 255},${b * 255})`,
           color: color_info.gv < 0.5 ? '#000' : '#fff',
         });
       }
@@ -452,10 +443,14 @@ export default class Screen {
   }
 
   #updateInputMode(mode: InputMode) {
-    this.#$inputMulti.toggleClass('d-none hidden', mode !== 'multi');
-    this.#$inputMultiInfo.toggleClass('d-none hidden', mode !== 'multi');
-    this.#$input.toggleClass('d-none hidden', mode === 'multi');
-    this.#$shadowInput.toggleClass('d-none hidden', mode === 'multi');
+    this.#inputMulti_el.classList.toggle('d-none', mode !== 'multi');
+    this.#inputMulti_el.classList.toggle('hidden', mode !== 'multi');
+    this.#inputMultiInfo_el.classList.toggle('d-none', mode !== 'multi');
+    this.#inputMultiInfo_el.classList.toggle('hidden', mode !== 'multi');
+    this.#input_el.classList.toggle('d-none', mode === 'multi');
+    this.#input_el.classList.toggle('hidden', mode === 'multi');
+    this.#shadowInput_el.classList.toggle('d-none', mode === 'multi');
+    this.#shadowInput_el.classList.toggle('hidden', mode === 'multi');
     this.#cleanAssistant();
   }
 
@@ -489,17 +484,15 @@ export default class Screen {
         return item;
       });
       if (values.length === 0) {
-        // $FlowFixMe
-        this.#$interactiveContainer.html(`<span>${this.#question_active.question}</span>`);
+        this.#interactiveContainer_el.textContent = this.#question_active?.question || '';
       } else {
-        // $FlowFixMe
-        this.#$interactiveContainer.html(`<span>${this.#question_active.question} [${values.join('/')}]</span>`);
+        this.#interactiveContainer_el.textContent = `${this.#question_active?.question || ''} [${values.join('/')}]`;
       }
-      this.#$interactiveContainer.removeClass('d-none hidden');
+      this.#interactiveContainer_el.classList.remove('d-none', 'hidden');
     } else {
       this.#question_active = undefined;
-      this.#$interactiveContainer.html('');
-      this.#$interactiveContainer.addClass('d-none hidden');
+      this.#interactiveContainer_el.textContent = '';
+      this.#interactiveContainer_el.classList.add('d-none', 'hidden');
       if (this.#options.inputMode !== 'single') {
         this.#updateInputMode(this.#options.inputMode);
       }
@@ -519,7 +512,9 @@ export default class Screen {
   }
 
   applyStyle(name: string, value: string) {
-    this.#$screen.css(name, value);
+    Object.assign(this.#screen_el.style, {
+      [name]: value,
+    });
   }
 
   replaceUserInputToken(input_str: string, cur_token: TokenInfo, str: string) {
@@ -554,7 +549,7 @@ export default class Screen {
       return;
     }
 
-    const $lines = Array.from(this.#$screen[0].querySelectorAll(LINE_SELECTOR));
+    const $lines = Array.from(this.#screen_el.querySelectorAll(LINE_SELECTOR));
     const diff = $lines.length - this.#max_lines;
     if (diff > 0) {
       const nodes = $lines.slice(0, diff);
@@ -569,34 +564,94 @@ export default class Screen {
   }
 
   #createScreen() {
-    this.#$screen = $(renderScreen());
-    this.#$screen.appendTo(this.#$container);
-    this.#$screen.on('keydown', ev => this.preventLostInputFocus(ev));
+    this.#screen_el = parseHTML(renderScreen());
+    this.#container_el.append(this.#screen_el);
+    this.#screen_el.addEventListener('keydown', ev => this.preventLostInputFocus(ev));
   }
 
-  #createAssistantPanel() {
-    this.#$assistant = $(renderAssistantPanel());
-    this.#$assistant_args = this.#$assistant.find('#terminal_assistant_args');
-    this.#$assistant_args_info = this.#$assistant.find('#terminal_assistant_args_info');
-    this.#$assistant_desc = this.#$assistant.find('#terminal_assistant_desc');
-    this.#$assistant.appendTo(this.#$container);
+  #createAssistantPanel(): void {
+    this.#assistant_el = parseHTML(renderAssistantPanel());
+
+    let elm = this.#assistant_el.querySelector('#terminal_assistant_args');
+    if (elm) {
+      this.#assistant_args_el = elm;
+    } else {
+      throw new ElementNotFoundError('#terminal_assistant_args');
+    }
+    elm = this.#assistant_el.querySelector('#terminal_assistant_args_info');
+    if (elm) {
+      this.#assistant_args_info_el = elm;
+    } else {
+      throw new ElementNotFoundError('#terminal_assistant_args_info');
+    }
+    elm = this.#assistant_el.querySelector('#terminal_assistant_desc');
+    if (elm) {
+      this.#assistant_desc_el = elm;
+    } else {
+      throw new ElementNotFoundError('#terminal_assistant_desc');
+    }
+    this.#container_el.append(this.#assistant_el);
   }
 
-  #createUserInput() {
-    this.#$userInput = $(renderUserInput(PROMPT));
-    this.#$userInput.appendTo(this.#$container);
-    this.#$promptContainers = this.#$userInput.find('.terminal-prompt-container');
-    this.#$interactiveContainer = this.#$userInput.find('.terminal-prompt-container.terminal-prompt-interactive');
-    this.#$prompt = this.#$promptContainers.find('.terminal-prompt');
-    this.#$promptInfoContainer = this.#$userInput.find('.terminal-prompt-container.terminal-prompt-info');
-    this.#$input = this.#$userInput.find('#terminal_input');
-    this.#$shadowInput = this.#$userInput.find('#terminal_shadow_input');
-    this.#$inputMulti = this.#$userInput.find('#terminal_input_multi');
-    this.#$inputMultiInfo = this.#$container.find('#terminal_input_multi_info');
-    this.#$input.on('keyup', ev => this.#options.onInputKeyUp(ev));
-    this.#$input.on('keydown', ev => this.#onInputKeyDown(ev));
-    this.#$input.on('input', ev => this.#options.onInput(ev));
-    this.#$inputMulti.on('keyup', ev => this.#options.onInputKeyUp(ev));
+  #createUserInput(): void {
+    this.#userInput_el = parseHTML(renderUserInput(PROMPT));
+    this.#container_el.append(this.#userInput_el)
+    const elms = this.#userInput_el.querySelectorAll('.terminal-prompt-container');
+    if (elms) {
+      this.#promptContainer_els = elms;
+    } else {
+      throw new ElementNotFoundError('.terminal-prompt-container');
+    }
+    let elm = this.#userInput_el.querySelector('.terminal-prompt-container.terminal-prompt-interactive');
+    if (elm) {
+      this.#interactiveContainer_el = elm;
+    } else {
+      throw new ElementNotFoundError('.terminal-prompt-container.terminal-prompt-interactive');
+    }
+    elm = this.#userInput_el.querySelector('.terminal-prompt');
+    if (elm) {
+      this.#prompt_el = elm;
+    } else {
+      throw new ElementNotFoundError('.terminal-prompt');
+    }
+    elm = this.#userInput_el.querySelector('.terminal-prompt-container.terminal-prompt-info');
+    if (elm) {
+      this.#promptInfoContainer_el = elm;
+    } else {
+      throw new ElementNotFoundError('.terminal-prompt-container.terminal-prompt-info');
+    }
+    elm = this.#userInput_el.querySelector('#terminal_input');
+    if (elm) {
+      // $FlowFixMe
+      this.#input_el = elm;
+    } else {
+      throw new ElementNotFoundError('#terminal_input');
+    }
+    elm = this.#userInput_el.querySelector('#terminal_shadow_input');
+    if (elm) {
+      // $FlowFixMe
+      this.#shadowInput_el = elm;
+    } else {
+      throw new ElementNotFoundError('#terminal_shadow_input');
+    }
+    elm = this.#userInput_el.querySelector('#terminal_input_multi');
+    if (elm) {
+      // $FlowFixMe
+      this.#inputMulti_el = elm;
+    } else {
+      throw new ElementNotFoundError('#terminal_input_multi');
+    }
+    elm = this.#userInput_el.querySelector('#terminal_input_multi_info');
+    if (elm) {
+      // $FlowFixMe
+      this.#inputMultiInfo_el = elm;
+    } else {
+      throw new ElementNotFoundError('#terminal_input_multi_info');
+    }
+    this.#input_el.addEventListener('keyup', ev => this.#options.onInputKeyUp(ev));
+    this.#input_el.addEventListener('keydown', ev => this.#onInputKeyDown(ev));
+    this.#input_el.addEventListener('input', ev => this.#options.onInput(ev));
+    this.#inputMulti_el.addEventListener('keyup', ev => this.#options.onInputKeyUp(ev));
     this.#updateInputMode(this.#options.inputMode);
   }
 
@@ -608,7 +663,7 @@ export default class Screen {
     }
     // Only allow valid responses to questions
     if (ev.keyCode !== 8 && typeof this.#question_active !== 'undefined' && this.#question_active.values.length) {
-      const cur_value = this.#$input.value;
+      const cur_value = this.#input_el.value;
       const next_value = `${cur_value}${String.fromCharCode(ev.keyCode)}`.toLowerCase();
       // $FlowFixMe
       const is_invalid = this.#question_active.values.filter(item => item.startsWith(next_value)).length === 0;

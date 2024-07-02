@@ -8,6 +8,7 @@ import logger from '@common/logger';
 import processKeybind from '@common/utils/process_keybind';
 import {SETTING_DEFAULTS} from '@common/constants';
 import Shell from './shell';
+import ElementNotFoundError from './exceptions/element_not_found_error';
 import UnknownCommandError from '@trash/exceptions/unknown_command_error';
 import InvalidCommandDefintionError from '@trash/exceptions/invalid_command_definition_error';
 import isEmpty from '@trash/utils/is_empty';
@@ -20,10 +21,10 @@ import {
   setStorageItem as setStorageSessionItem,
 } from './core/storage/session';
 import renderTerminal from './templates/terminal';
-import renderUnknownCommand from './templates/unknown_command';
 import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
+import parseHTML from './utils/parse_html';
 // $FlowIgnore
 import {Mutex} from 'async-mutex';
 import type {JobMetaInfo} from './shell';
@@ -66,10 +67,8 @@ export default class Terminal {
   userContext: {[string]: mixed} = {};
 
   screen: Screen;
-  // $FlowFixMe
-  $el: Object;
-  // $FlowFixMe
-  $runningCmdCount: Object;
+  el: HTMLElement;
+  runningCmdCount_el: HTMLElement;
 
   #shell: Shell;
 
@@ -133,14 +132,26 @@ export default class Terminal {
     this.#wasLoaded = true;
     if (this.#config.pinned) {
       this.doShow();
-      this.$el.find('.terminal-screen-icon-pin').removeClass('btn-dark').addClass('btn-light');
+      const elm = this.el.querySelector('.terminal-screen-icon-pin');
+      if (elm) {
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
+      }
     }
     if (this.#config.maximized) {
-      this.$el.addClass('term-maximized');
-      this.$el.find('.terminal-screen-icon-maximize').removeClass('btn-dark').addClass('btn-light');
+      this.el.classList.add('term-maximized');
+      const elm = this.el.querySelector('.terminal-screen-icon-maximize');
+      if (elm) {
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
+      }
     }
     if (this.#config.multiline) {
-      this.$el.find('.terminal-multiline').removeClass('btn-dark').addClass('btn-light');
+      const elm = this.el.querySelector('.terminal-multiline');
+      if (elm) {
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
+      }
     }
 
     // $FlowFixMe
@@ -152,14 +163,14 @@ export default class Terminal {
     // $FlowFixMe
     window.addEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
     // $FlowFixMe
-    this.$el.find('.terminal-screen-icon-maximize').on('click', this.#onClickToggleMaximize.bind(this));
+    this.el.querySelector('.terminal-screen-icon-maximize').addEventListener('click', this.#onClickToggleMaximize.bind(this));
     // $FlowFixMe
-    this.$el.find('.terminal-screen-icon-pin').on('click', this.#onClickToggleScreenPin.bind(this));
+    this.el.querySelector('.terminal-screen-icon-pin').addEventListener('click', this.#onClickToggleScreenPin.bind(this));
     // $FlowFixMe
-    this.$el.find('.terminal-multiline').on('click', this.#onClickToggleMultiline.bind(this));
+    this.el.querySelector('.terminal-multiline').addEventListener('click', this.#onClickToggleMultiline.bind(this));
     // Custom Events
     // $FlowFixMe
-    this.$el[0].addEventListener('toggle', this.doToggle.bind(this));
+    this.el.addEventListener('toggle', this.doToggle.bind(this));
 
     if (!isEmpty(this.#config.init_cmds)) {
       this.#wakeUp();
@@ -179,15 +190,15 @@ export default class Terminal {
     }
   }
 
-  #injectTerminal() {
+  #injectTerminal(): void {
     // $FlowFixMe
-    const $terms = $('body').children('.o_terminal');
-    if ($terms.length > 1) {
+    const terms_elms = document.body.querySelectorAll('.o_terminal:not(:first-child)');
+    if (terms_elms.length > 1) {
       // Remove extra terminals
-      $terms.filter(':not(:first-child)').remove();
-    } else if ($terms.length === 0) {
-      this.$el = $(this.#rawTerminalTemplate);
-      this.$el.prependTo('body');
+      terms_elms.forEach(elm => elm.remove());
+    } else if (terms_elms.length === 0) {
+      this.el = parseHTML(this.#rawTerminalTemplate);
+      document.body?.append(this.el);
     }
   }
 
@@ -196,9 +207,13 @@ export default class Terminal {
       throw new Error(i18n.t('terminal.error.notLoaded', 'Terminal not loaded'));
     }
 
-    this.$runningCmdCount = this.$el.find('#terminal_running_cmd_count');
+    const elm = this.el.querySelector('#terminal_running_cmd_count');
+    if (!elm) {
+      throw new ElementNotFoundError('#terminal_running_cmd_count');
+    }
+    this.runningCmdCount_el = elm;
     this.#commandAssistant = new CommandAssistant(this);
-    this.screen.start(this.$el, {
+    this.screen.start(this.el, {
       inputMode: this.#config.multiline ? 'multi' : 'single',
       onSaveScreen: function (this: Terminal, content: string) {
         debounce(() => {
@@ -231,7 +246,7 @@ export default class Terminal {
     // $FlowFixMe
     window.removeEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
     // $FlowFixMe
-    this.$el[0].removeEventListener('toggle', this.doToggle.bind(this));
+    this.el.removeEventListener('toggle', this.doToggle.bind(this));
   }
 
   /* BASIC FUNCTIONS */
@@ -304,7 +319,16 @@ export default class Terminal {
         // Search similar commands
         const similar_cmd = this.#commandAssistant.searchSimiliarCommand(err.cmd_name);
         if (typeof similar_cmd !== 'undefined') {
-          err_msg = renderUnknownCommand(err.cmd_name, [err.start, err.end], similar_cmd);
+          err_msg = i18n.t(
+            'terminal.unknownCommand',
+            "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
+            {
+              org_cmd: err.cmd_name,
+              start: err.start,
+              end: err.end,
+              cmd: similar_cmd,
+            },
+          );
         }
       }
       this.screen.printError(err_msg, true);
@@ -343,12 +367,12 @@ export default class Terminal {
     }
     // Only start the terminal if needed
     await this.#wakeUp();
-    this.$el.addClass('terminal-transition-topdown');
+    this.el.classList.add('terminal-transition-topdown');
     this.screen.focus();
   }
 
   async doHide() {
-    this.$el.removeClass('terminal-transition-topdown');
+    this.el.classList.remove('terminal-transition-topdown');
   }
 
   doToggle(): Promise<> {
@@ -379,7 +403,7 @@ export default class Terminal {
   }
 
   #isTerminalVisible(): boolean {
-    return this.$el && parseInt(this.$el.css('top'), 10) >= 0;
+    return this.el && this.el.style && parseInt(this.el.style.top, 10) >= 0;
   }
 
   printWelcomeMessage() {
@@ -430,12 +454,11 @@ export default class Terminal {
         str_info += i18n.t('terminal.info.job.unhealthy', ' ({{count_unhealthy}} unhealthy)', {count: count_unhealthy});
       }
       str_info += '...';
-      this.$runningCmdCount.html(str_info).show();
+      this.runningCmdCount_el.textContent = str_info;
+      this.runningCmdCount_el.classList.remove('hidden');
     } else {
-      this.$runningCmdCount.fadeOut('fast', function (this: HTMLElement) {
-        // $FlowFixMe
-        $(this).html('');
-      });
+      this.runningCmdCount_el.classList.add('hidden');
+      this.runningCmdCount_el.textContent = '';
     }
   }
 
@@ -462,7 +485,7 @@ export default class Terminal {
     this.#mutexAvailableOptions
       .runExclusive(async () => {
         const user_input = this.screen.getUserInput();
-        if (typeof user_input === 'undefined') {
+        if (typeof user_input === 'undefined' || user_input.length === 0) {
           return [];
         }
         return await this.#commandAssistant.getAvailableOptions(
@@ -525,15 +548,18 @@ export default class Terminal {
   }
 
   #onClickToggleMaximize(ev: MouseEvent) {
-    // $FlowFixMe
-    const $target = $(ev.currentTarget);
     this.#config.maximized = !this.#config.maximized;
-    if (this.#config.maximized) {
-      this.$el.addClass('term-maximized');
-      $target.removeClass('btn-dark').addClass('btn-light');
-    } else {
-      this.$el.removeClass('term-maximized');
-      $target.removeClass('btn-light').addClass('btn-dark');
+    if (ev.currentTarget instanceof HTMLElement) {
+      const target = ev.currentTarget;
+      if (this.#config.maximized) {
+        this.el.classList.add('term-maximized');
+        target.classList.remove('btn-dark');
+        target.classList.add('btn-light');
+      } else {
+        this.el.classList.remove('term-maximized');
+        target.classList.remove('btn-light')
+        target.classList.add('btn-dark');
+      }
     }
     setStorageSessionItem('screen_maximized', this.#config.maximized, err => this.screen.print(err));
     this.screen.scrollDown();
@@ -541,30 +567,36 @@ export default class Terminal {
   }
 
   #onClickToggleScreenPin(ev: MouseEvent) {
-    // $FlowFixMe
-    const $target = $(ev.currentTarget);
     this.#config.pinned = !this.#config.pinned;
-    setStorageSessionItem('terminal_pinned', this.#config.pinned, err => this.screen.print(err));
-    if (this.#config.pinned) {
-      $target.removeClass('btn-dark').addClass('btn-light');
-    } else {
-      $target.removeClass('btn-light').addClass('btn-dark');
+    if (ev.currentTarget instanceof HTMLElement) {
+      const target = ev.currentTarget;
+      if (this.#config.pinned) {
+        target.classList.remove('btn-dark');
+        target.classList.add('btn-light');
+      } else {
+        target.classList.remove('btn-light')
+        target.classList.add('btn-dark');
+      }
     }
+    setStorageSessionItem('terminal_pinned', this.#config.pinned, err => this.screen.print(err));
     this.screen.preventLostInputFocus();
   }
 
   #onClickToggleMultiline(ev: MouseEvent) {
-    // $FlowFixMe
-    const $target = $(ev.currentTarget);
     this.#config.multiline = !this.#config.multiline;
-    setStorageSessionItem('terminal_multiline', this.#config.multiline, err => this.screen.print(err));
-    if (this.#config.multiline) {
-      $target.removeClass('btn-dark').addClass('btn-light');
-      this.screen.setInputMode('multi');
-    } else {
-      $target.removeClass('btn-light').addClass('btn-dark');
-      this.screen.setInputMode('single');
+    if (ev.currentTarget instanceof HTMLElement) {
+      const target = ev.currentTarget;
+      if (this.#config.multiline) {
+        target.classList.remove('btn-dark');
+        target.classList.add('btn-light');
+        this.screen.setInputMode('multi');
+      } else {
+        target.classList.remove('btn-light')
+        target.classList.add('btn-dark');
+        this.screen.setInputMode('single');
+      }
     }
+    setStorageSessionItem('terminal_multiline', this.#config.multiline, err => this.screen.print(err));
     this.screen.preventLostInputFocus();
   }
 
@@ -702,8 +734,9 @@ export default class Terminal {
   onCoreClick(ev: MouseEvent) {
     // Auto-Hide
     if (
-      this.$el &&
-      !this.$el[0].contains(ev.target) &&
+      this.el &&
+      ev.target instanceof HTMLElement &&
+      !this.el.contains(ev.target) &&
       this.#isTerminalVisible() &&
       !this.#config.maximized &&
       !this.#config.pinned

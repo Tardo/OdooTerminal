@@ -1,10 +1,12 @@
 {
-  "<InvalidName>": "",
-  "No": "",
-  "Yes": "",
+  "No": "No",
+  "UnknownNameError": {
+    "invalidName": "<InvalidName>"
+  },
+  "Yes": "Yes",
   "checkStorageError": {
-    "message": "",
-    "warning": ""
+    "message": "Clear the <b class='o_terminal_click o_terminal_cmd' data-cmd='clear screen' style='color:orange;'>screen</b> or/and <b class='o_terminal_click o_terminal_cmd' data-cmd='clear history' style='color:orange;'>history</b> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
+    "warning": "WARNING: "
   },
   "cmd2DClear": {
     "args": {
@@ -23,14 +25,14 @@
       "posy": "The canvas position Y",
       "width": "The canvas width"
     },
-    "definition": "Load external resource",
-    "detail": "Load external source (javascript & css)"
+    "definition": "Create 2D Window",
+    "detail": "Create 2D Window"
   },
   "cmd2DDestroyWindow": {
     "args": {
       "canvas": "The canvas"
     },
-    "definition": "Load external resource"
+    "definition": "Destroy 2D Window"
   },
   "cmd2DLine": {
     "args": {
@@ -41,8 +43,8 @@
       "to-y": "The line to Y point",
       "width": "The line color"
     },
-    "definition": "Load external resource",
-    "detail": "Load external source (javascript & css)"
+    "definition": "Draw a line",
+    "detail": "Draw a line"
   },
   "cmd2DRect": {
     "args": {
@@ -51,8 +53,8 @@
       "from-y": "The rect Y point",
       "width": "The rect color"
     },
-    "definition": "Load external resource",
-    "detail": "Load external source (javascript & css)"
+    "definition": "Draw a rect",
+    "detail": "Draw a rect"
   },
   "cmdAction": {
     "args": {
@@ -214,7 +216,7 @@
     "definition": "Show database names",
     "detail": "Show database names",
     "error": {
-      "noDBNames": ""
+      "noDBNames": "Can't get database names"
     },
     "result": {
       "activeDatabase": "<strong>{{database}}</strong> (Active Database)"
@@ -271,10 +273,10 @@
     "definition": "Show effect",
     "detail": "Show effect",
     "error": {
-      "incompatibleOdooVersion": ""
+      "incompatibleOdooVersion": "This command is only available in Odoo 15.0+"
     },
     "result": {
-      "availableEffects": ""
+      "availableEffects": "Available effects:"
     }
   },
   "cmdExportFile": {
@@ -293,23 +295,9 @@
     "detail": "Exports the command result to a browser console variable.",
     "resultExported": "Command result exported! now you can use '{{varname}}' variable in the browser console"
   },
-  "cmdFixed": {
-    "args": {
-      "num": "The number"
-    },
-    "definition": "Rounds a number DOWN to the nearest integer",
-    "detail": "Rounds a number DOWN to the nearest integer"
-  },
-  "cmdFloor": {
-    "args": {
-      "num": "The number"
-    },
-    "definition": "Rounds a number DOWN to the nearest integer",
-    "detail": "Rounds a number DOWN to the nearest integer"
-  },
   "cmdFuncTrash": {
     "args": {
-      "name": "The name of the alias"
+      "name": "The function parameter"
     }
   },
   "cmdGen": {
@@ -753,10 +741,10 @@
     }
   },
   "file2base64": {
-    "aborted": ""
+    "aborted": "Aborted by user. No file given..."
   },
   "file2file": {
-    "aborted": ""
+    "aborted": "Aborted by user. No file given..."
   },
   "funcAbs": {
     "args": {
@@ -784,11 +772,11 @@
       "max": "Max. value",
       "min": "Min. value"
     },
-    "definition": "Rounds a number DOWN to the nearest integer",
-    "detail": "Rounds a number DOWN to the nearest integer"
+    "definition": "Generate random integers",
+    "detail": "Return random integers"
   },
   "getOdooEnvService": {
-    "error": "Service '{{service_name}}' not available"
+    "error": "Service '{{service_name}}' is not available"
   },
   "loader": {
     "cantInitTerm": "Can't initilize terminal",
@@ -796,7 +784,7 @@
   },
   "longpolling": {
     "error": {
-      "notAvailable": ""
+      "notAvailable": "bus service not available"
     }
   },
   "odoo": {
@@ -842,11 +830,15 @@
     "error": {
       "invalidHTTPRequest": "Invalid HTTP Request",
       "notInitJob": "Unexpected error: can't initialize the job!",
-      "notLoaded": "",
+      "notLoaded": "Terminal not loaded",
       "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
     },
     "exception": {
-      "ProcessJobError": "Error executing '{{cmd_name}}'"
+      "ElementNotFoundError": "Element not found error ({{selector}})!",
+      "ElementNotFoundTemplateError": "No elements found!",
+      "InvalidElementTemplateError": "Invalid element in template!",
+      "ProcessJobError": "Error executing '{{cmd_name}}'",
+      "TooManyElementsTemplateError": "Too many elements in the template to be assigned to one element!"
     },
     "info": {
       "job": {
@@ -858,9 +850,7 @@
     "question": {
       "aborted": "Operation aborted"
     },
-    "templates": {
-      "unknownCommand": "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?"
-    }
+    "unknownCommand": "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?"
   },
   "trash": {
     "argument": {

@@ -148,7 +148,7 @@ function buildQuery(options: Partial<BuildQueryOptions>): BuildQuery {
  */
 export default function doQuery<T>(params: Partial<BuildQueryOptions>, options: ?{[string]: mixed}): Promise<T> {
   const query = buildQuery(params);
-  const rpc_service = getOdooService('web.ajax', '@web/legacy/js/core/ajax', '@web/core/network/rpc_service');
+  const rpc_service = getOdooService('web.ajax', '@web/legacy/js/core/ajax', '@web/core/network/rpc_service', '@web/core/network/rpc');
   if (Object.hasOwn(rpc_service, 'rpc')) {
     return rpc_service.rpc(query.route, query.params, options);
   } else if (Object.hasOwn(rpc_service, 'jsonrpc')) {

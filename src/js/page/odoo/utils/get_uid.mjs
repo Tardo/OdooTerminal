@@ -5,14 +5,11 @@
 import getOdooSession from './get_odoo_session';
 
 export default function (): number {
-  const session = getOdooSession();
-  if (session !== undefined) {
-    if (session.uid !== null && typeof session.uid === 'number') {
-      return session.uid;
-    }
-    if (session.user_id !== null && typeof session.user_id === 'number') {
-      return session.user_id;
-    }
+  const uid = getOdooSession()?.uid || getOdooSession()?.user_id;
+  if (typeof uid === 'number') {
+    return uid;
+  } else if (uid instanceof Array) {
+    return uid[0];
   }
   return -1;
 }

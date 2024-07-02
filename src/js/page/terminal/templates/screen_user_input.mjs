@@ -22,8 +22,8 @@ export default function (PROMPT: string): string {
     <div class="terminal-prompt-container terminal-prompt-host-container">
       <span id="terminal-prompt-info-host" class='terminal-prompt'></span>
     </div>
-  </div>
-  <div id="terminal_input_multi_info">
-    <span>Press 'CTRL + &lt;Intro&gt;' to execute.</span>
+    <div id="terminal_input_multi_info">
+      <span>Press 'CTRL + &lt;Intro&gt;' to execute.</span>
+    </div>
   </div>`;
 }

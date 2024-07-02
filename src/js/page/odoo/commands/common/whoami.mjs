@@ -8,6 +8,7 @@ import searchRead from '@odoo/orm/search_read';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import renderWhoami from '@odoo/templates/whoami';
 import renderWhoamiListItem from '@odoo/templates/whoami_group_item';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import getUID from '@odoo/utils/get_uid';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -23,31 +24,57 @@ async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
     throw new Error(i18n.t('cmdWhoami.error.noLogin', "Oops! can't get the login :/"));
   }
   const record = result[0];
-  const result_tasks = await Promise.all([
-    callModelMulti<$ReadOnlyArray<[number, string]>>(
-      'res.groups',
-      record.groups_id,
-      'name_get',
-      null,
-      null,
-      this.getContext(),
-    ),
-    callModelMulti<$ReadOnlyArray<[number, string]>>(
-      'res.company',
-      record.company_ids,
-      'name_get',
-      null,
-      null,
-      this.getContext(),
-    ),
-  ]);
+  const OdooVerMajor = getOdooVersion('major');
+  const OdooVerMinor = getOdooVersion('minor');
   const groups_list = [];
-  for (const group of result_tasks[0]) {
-    groups_list.push(renderWhoamiListItem(group[1], 'res.groups', group[0]));
-  }
   const companies_list = [];
-  for (const company of result_tasks[1]) {
-    companies_list.push(renderWhoamiListItem(company[1], 'res.company', company[0]));
+  if (typeof OdooVerMajor === 'number' && typeof OdooVerMinor === 'number' && OdooVerMajor >= 17 && OdooVerMinor > 1) {
+    const result_tasks = await Promise.all([
+      searchRead(
+        'res.groups',
+        [['id', 'in', record.groups_id]],
+        ['display_name'],
+        this.getContext(),
+      ),
+      searchRead(
+        'res.company',
+        [['id', 'in', record.company_ids]],
+        ['display_name'],
+        this.getContext(),
+      ),
+    ]);
+    for (const group of result_tasks[0]) {
+      groups_list.push(renderWhoamiListItem(group.display_name, 'res.groups', group.id));
+    }
+    for (const company of result_tasks[1]) {
+      companies_list.push(renderWhoamiListItem(company.display_name, 'res.company', company.id));
+    }
+  } else {
+    const result_tasks = await Promise.all([
+      callModelMulti<$ReadOnlyArray<[number, string]>>(
+        'res.groups',
+        record.groups_id,
+        'name_get',
+        null,
+        null,
+        this.getContext(),
+      ),
+      callModelMulti<$ReadOnlyArray<[number, string]>>(
+        'res.company',
+        record.company_ids,
+        'name_get',
+        null,
+        null,
+        this.getContext(),
+      ),
+    ]);
+
+    for (const group of result_tasks[0]) {
+      groups_list.push(renderWhoamiListItem(group[1], 'res.groups', group[0]));
+    }
+    for (const company of result_tasks[1]) {
+      companies_list.push(renderWhoamiListItem(company[1], 'res.company', company[0]));
+    }
   }
 
   const template_values = {
