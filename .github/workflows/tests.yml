@@ -50,13 +50,13 @@ jobs:
       - name: web-ext
         run: npx -c "web-ext lint --ignore-files=src/js/**"
 
-  selenium:
-    name: Selenium Tests
+  jest-puppiteer:
+    name: Jest-Puppiteer Tests
     needs: validations
     strategy:
       matrix:
         # Use only lower and active versions
-        instance: [11.0, 15.0, 16.0, 17.0]
+        instance: ['11.0', '15.0', '16.0', '17.0']
         browser: [chrome]
       fail-fast: false
     runs-on: ubuntu-latest

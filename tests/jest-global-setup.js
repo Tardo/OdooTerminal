@@ -7,7 +7,7 @@ export default async function globalSetup(globalConfig) {
   await setupPuppeteer(globalConfig);
   await compose.buildOne('odoo', {
     cwd: 'tests/docker/',
-    commandOptions: [["--build-arg", `ODOO_VERSION=${process.env.ODOO_VERSION}.0`]],
+    commandOptions: [["--build-arg", `ODOO_VERSION=${process.env.ODOO_VERSION}`]],
   });
   await compose.upOne('db', {
     cwd: 'tests/docker/',
