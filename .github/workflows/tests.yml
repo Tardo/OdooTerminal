@@ -87,8 +87,6 @@ jobs:
         run: |
           npm ci --cache .npm --prefer-offline
           npm install --global npm
-          poetry config virtualenvs.in-project true
-          poetry install
           npm install
 
       - name: Install browser firefox
