@@ -46,12 +46,6 @@ function update_version(mode) {
     /VERSION\s?=\s?'\d+\.\d+\.\d+'/,
     `VERSION = '${extension_ver}'`,
   );
-  // pyproject.toml
-  replaceFileVersion(
-    './pyproject.toml',
-    /version = "\d+\.\d+\.\d+"/,
-    `version = "${extension_ver}"`,
-  );
 
   return extension_ver;
 }
