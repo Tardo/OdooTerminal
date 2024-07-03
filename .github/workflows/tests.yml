@@ -50,8 +50,8 @@ jobs:
       - name: web-ext
         run: npx -c "web-ext lint --ignore-files=src/js/**"
 
-  jest-puppiteer:
-    name: Jest-Puppiteer Tests
+  jest-puppeteer:
+    name: Jest-Puppeteer Tests
     needs: validations
     strategy:
       matrix:
