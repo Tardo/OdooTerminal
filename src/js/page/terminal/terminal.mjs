@@ -403,7 +403,7 @@ export default class Terminal {
   }
 
   #isTerminalVisible(): boolean {
-    return this.el && this.el.style && parseInt(this.el.style.top, 10) >= 0;
+    return this.el.classList.contains('terminal-transition-topdown');
   }
 
   printWelcomeMessage() {

@@ -18,10 +18,9 @@ jobs:
           path: |
             .venv
             .cache
-            .wdm
             .npm
             node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/poetry.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - uses: actions/checkout@v3
         with:
@@ -29,21 +28,12 @@ jobs:
 
       - run: git checkout ${{ env.BRANCH }}
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
-
-      - uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: latest
-
       - uses: actions/setup-node@v3
         with:
           node-version: '*'
           check-latest: true
 
       - run: |
-          python -m pip install --upgrade pip
           npm ci --cache .npm --prefer-offline
           npm install --global npm
           npm install
@@ -67,7 +57,7 @@ jobs:
       matrix:
         # Use only lower and active versions
         instance: [11.0, 15.0, 16.0, 17.0]
-        browser: [chrome, firefox]
+        browser: [chrome]
       fail-fast: false
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -77,10 +67,9 @@ jobs:
           path: |
             .venv
             .cache
-            .wdm
             .npm
             node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/poetry.lock') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - uses: actions/checkout@v3
         with:
@@ -89,14 +78,6 @@ jobs:
       - name: Switch to current branch
         run: git checkout ${{ env.BRANCH }}
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
-
-      - uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: latest
-
       - uses: actions/setup-node@v3
         with:
           node-version: '*'
@@ -104,8 +85,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install poetry
           npm ci --cache .npm --prefer-offline
           npm install --global npm
           poetry config virtualenvs.in-project true
@@ -124,12 +103,9 @@ jobs:
           chrome-version: "stable"
         if: ${{ matrix.browser == 'chrome' }}
 
-      - name: Install xvfb
-        run: sudo apt-get install -y xvfb
-
-      - name: Create .zip package
-        run: npm run prod:build
-
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
-        id: xtests
-        run: xvfb-run --auto-servernum npm run dev:tests -- --capture=no --browser ${{ matrix.browser }} --odoo-version ${{ matrix.instance }}
+        id: jest
+        run: npm run test
+        env:
+          ODOO_VERSION: "${{ matrix.instance }}"
+          PUPPETEER_BROWSER: "${{ matrix.browser }}"

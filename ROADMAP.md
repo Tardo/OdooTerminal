@@ -6,6 +6,5 @@
 - Use some kind of mock to cover all commands in tests (See Untested Commands section in docs/testing.md)
 - Explicity define the states for the state machine... sounds like a good idea uh?
 - Use better english...
-- Rewrite tests in JS and drop python usage
 - Use less flowjs generic types
 ```

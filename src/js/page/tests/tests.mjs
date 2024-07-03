@@ -49,16 +49,14 @@ export default class TerminalTestSuite {
       throw new TerminalTestValidationError(msg || `'${this.#toString(valA)}' must not be equal to '${this.#toString(valB)}'`);
     }
   }
-  // $FlowFixMe
-  assertIn(obj: Object, key: string, msg: string = ''): void {
+  assertIn(obj: {...}, key: string, msg: string = ''): void {
     if (!Object.hasOwn(obj, key)) {
-      throw new TerminalTestValidationError(msg || `'${key}' must be in '${obj}'`);
+      throw new TerminalTestValidationError(msg || `'${key}' must be in '${obj.constructor.name}'`);
     }
   }
-  // $FlowFixMe
-  assertNotIn(obj: Object, key: string, msg: string = ''): void {
+  assertNotIn(obj: {...}, key: string, msg: string = ''): void {
     if (Object.hasOwn(obj, key)) {
-      throw new TerminalTestValidationError(msg || `'${key}' must not be in '${obj}'`);
+      throw new TerminalTestValidationError(msg || `'${key}' must not be in '${obj.constructor.name}'`);
     }
   }
   assertEmpty(val: mixed, msg: string = ''): void {
@@ -75,13 +73,11 @@ export default class TerminalTestSuite {
   getModalOpen(): HTMLElement | null {
     return document.querySelector('.modal.show,.modal.in,.modal.o_technical_modal');
   }
-  // $FlowFixMe
-  isModalType($modal: Object, type: string): boolean {
-    return $modal.find(`.o_${type}_view`).length > 0;
+  isModalType(modal_el: HTMLElement | null, type: string): boolean {
+    return modal_el !== null && modal_el.querySelector(`.o_${type}_view`) !== null;
   }
-  // $FlowFixMe
-  closeModal($modal: Object) {
-    $modal.find('.close,.btn-close')[0].click();
+  closeModal(modal_el: HTMLElement | null) {
+    modal_el?.querySelector('.close,.btn-close')?.click();
   }
 
   isFormOpen(): boolean {

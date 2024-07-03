@@ -503,8 +503,8 @@
     "args": {
       "msg": "The message to print"
     },
-    "definition": "Print a message",
-    "detail": "Eval parameters and print the result."
+    "definition": "Close terminal",
+    "detail": "Close the terminal."
   },
   "cmdRead": {
     "args": {

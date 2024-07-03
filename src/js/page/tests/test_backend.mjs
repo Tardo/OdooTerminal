@@ -15,9 +15,9 @@ export default class TestBackend extends TerminalTestSuite {
   async test_view() {
     await this.terminal.execute('view -m res.company', false, true);
     await asyncSleep(2500);
-    const $modal = this.getModalOpen();
-    this.assertTrue(this.isModalType($modal, 'list'));
-    this.closeModal($modal);
+    const modal_el = this.getModalOpen();
+    this.assertTrue(this.isModalType(modal_el, 'list'));
+    this.closeModal(modal_el);
     await this.terminal.execute('view -m res.company -i 1', false, true);
     await asyncSleep(2500);
     this.assertTrue(this.isFormOpen());
