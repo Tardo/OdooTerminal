@@ -4,7 +4,7 @@
 
 import isEmpty from '@trash/utils/is_empty';
 import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
-import {INSTRUCTION_TYPE, KEYMAP} from '@trash/constants';
+import {INSTRUCTION_TYPE, KEYMAP, LEXER} from '@trash/constants';
 import difference from '@trash/utils/difference';
 import type {CMDDef, ArgInfo, ParseInfo} from '@trash/interpreter';
 import type Shell from '@terminal/shell';
@@ -172,6 +172,12 @@ export default class CommandAssistant {
       if (caret_pos >= token.start && caret_pos <= token.end) {
         sel_token_index = instr.inputTokenIndex;
         end_i = index;
+        if (instr.inputTokenIndex > 0) {
+          const prev_token = parse_info.inputTokens[instr.level][instr.inputTokenIndex - 1];
+          if (prev_token.type === LEXER.ArgumentShort || prev_token.type === LEXER.ArgumentLong) {
+            ++end_i;
+          }
+        }
       }
     }
 

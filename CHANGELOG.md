@@ -4,6 +4,7 @@
 
 ```
 FIX: Implicit strings (issue #133)
+FIX: Command assistant
 ```
 
 **11.0.0**
