@@ -399,14 +399,16 @@ export default class Interpreter {
       } else {
         ttype = LEXER.Substract;
       }
-    } else if (token_san === SYMBOLS.MULTIPLY) {
-      ttype = LEXER.Multiply;
-    } else if (token_san === SYMBOLS.DIVIDE) {
-      ttype = LEXER.Divide;
-    } else if (token_san === SYMBOLS.MODULO) {
-      ttype = LEXER.Modulo;
-    } else if (token_san === SYMBOLS.POW) {
-      ttype = LEXER.Pow;
+    } else if (prev_token_info_no_space && prev_token_info_no_space[0] !== LEXER.ArgumentShort && prev_token_info_no_space[0] !== LEXER.ArgumentLong) {
+      if (token_san === SYMBOLS.MULTIPLY) {
+        ttype = LEXER.Multiply;
+      } else if (token_san === SYMBOLS.DIVIDE) {
+        ttype = LEXER.Divide;
+      } else if (token_san === SYMBOLS.MODULO) {
+        ttype = LEXER.Modulo;
+      } else if (token_san === SYMBOLS.POW) {
+        ttype = LEXER.Pow;
+      }
     }
 
     if (ttype === LEXER.String || ttype === LEXER.StringSimple) {

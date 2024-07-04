@@ -1,5 +1,11 @@
 # Changelog
 
+**11.0.1**
+
+```
+FIX: Implicit strings (issue #133)
+```
+
 **11.0.0**
 
 ```
