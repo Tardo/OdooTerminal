@@ -22,12 +22,12 @@ export default function (): Partial<CMDDef> {
     detail: i18n.t('cmd2DRect.detail', 'Draw a rect'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DRect.args.canvas', 'The canvas')],
-      [ARG.Number, ['x', 'x'], true, i18n.t('cmd2DRect.args.from-x', 'The rect X point')],
-      [ARG.Number, ['y', 'y'], true, i18n.t('cmd2DRect.args.from-y', 'The rect Y point')],
+      [ARG.Number, ['x', 'x'], true, i18n.t('cmd2DRect.args.x', 'The rect X point')],
+      [ARG.Number, ['y', 'y'], true, i18n.t('cmd2DRect.args.y', 'The rect Y point')],
       [ARG.Number, ['w', 'width'], true, i18n.t('cmd2DRect.args.width', 'The rect width'), 1],
       [ARG.Number, ['h', 'height'], true, i18n.t('cmd2DRect.args.width', 'The rect height'), 1],
       [ARG.String, ['rc', 'color'], false, i18n.t('cmd2DRect.args.width', 'The rect color'), "#000"],
     ],
-    example: "-c $myWindow -fx 20 -fy 20 -w 120 -h 120 -rc '#ff0000'",
+    example: "-c $myWindow -x 20 -y 20 -w 120 -h 120 -rc '#ff0000'",
   };
 }

@@ -26,7 +26,7 @@
       "width": "The canvas width"
     },
     "definition": "Create 2D Window",
-    "detail": "Create 2D Window"
+    "detail": "Destroy 2D Window"
   },
   "cmd2DDestroyWindow": {
     "args": {
@@ -49,9 +49,9 @@
   "cmd2DRect": {
     "args": {
       "canvas": "The canvas",
-      "from-x": "The rect X point",
-      "from-y": "The rect Y point",
-      "width": "The rect color"
+      "width": "The rect color",
+      "x": "The rect X point",
+      "y": "The rect Y point"
     },
     "definition": "Draw a rect",
     "detail": "Draw a rect"
@@ -746,6 +746,18 @@
   "file2file": {
     "aborted": "Aborted by user. No file given..."
   },
+  "func2DText": {
+    "args": {
+      "canvas": "The canvas",
+      "font": "The text font",
+      "text": "The text",
+      "width": "The text color",
+      "x": "The text X point",
+      "y": "The text Y point"
+    },
+    "definition": "Draw a text",
+    "detail": "Draw a text"
+  },
   "funcAbs": {
     "args": {
       "num": "The number"
@@ -766,6 +778,10 @@
     },
     "definition": "Rounds a number DOWN to the nearest integer",
     "detail": "Rounds a number DOWN to the nearest integer"
+  },
+  "funcPNow": {
+    "definition": "High resolution timestamp in milliseconds",
+    "detail": "High resolution timestamp in milliseconds."
   },
   "funcRand": {
     "args": {

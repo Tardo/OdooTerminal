@@ -49,6 +49,7 @@
     "jest-puppeteer": "^10.0.1",
     "lint-staged": "^15.2",
     "minimist": "^1.2",
+    "object-hash": "^3.0.0",
     "prettier": "^3.3",
     "puppeteer-core": "^22.12.1",
     "rimraf": "^5.0",

@@ -49,6 +49,14 @@ export const LEXER = {
   Continue: 43,
 };
 
+export const LEXER_MATH_C = [
+  LEXER.Variable,
+  LEXER.DataAttribute,
+  LEXER.Number,
+  LEXER.LogicBlock,
+  LEXER.VariableCall,
+]
+
 export const LEXER_MATH_OPER = [
   LEXER.Add,
   LEXER.Substract,

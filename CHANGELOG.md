@@ -1,5 +1,15 @@
 # Changelog
 
+**11.1.0**
+
+```
+IMP: Cache
+
+ADD: Internal Command 'pnow': high resolution timestamp
+
+FIX: Command assistant
+```
+
 **11.0.1**
 
 ```

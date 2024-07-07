@@ -43,6 +43,7 @@ function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
       [],
       ['model'],
       this.getContext({active_test: true}),
+      {orderBy: 'model ASC'},
       item => item.model,
     );
   }

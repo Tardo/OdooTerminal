@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import isEmpty from '@trash/utils/is_empty';
+import isNumber from '@trash/utils/is_number';
 
 const RecordHandler = {
   // $FlowFixMe
@@ -118,7 +119,7 @@ const RecordsetHandler = {
       return target[prop];
     }
 
-    if (typeof prop === 'string' && isNaN(Number(prop)) && target.records.length === 1) {
+    if (typeof prop === 'string' && !isNumber(prop) && target.records.length === 1) {
       return target.records[0][prop];
     }
     return target.records[prop];

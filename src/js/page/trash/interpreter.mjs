@@ -19,6 +19,7 @@ import Instruction from './instruction';
 import {ARG} from './constants';
 import countBy from './utils/count_by';
 import isFalsy from './utils/is_falsy';
+import isNumber from './utils/is_number';
 import InvalidTokenError from './exceptions/invalid_token_error';
 import type {default as VMachine, EvalOptions} from './vmachine';
 import type Frame from './frame';
@@ -211,7 +212,7 @@ export default class Interpreter {
               prev_char === SYMBOLS.EOL ||
               (char !== SYMBOLS.ASSIGNMENT && prev_char === SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.includes(value)) ||
               (char !== SYMBOLS.NOT && prev_char === SYMBOLS.NOT && char !== SYMBOLS.NOT_EQUAL[1]) ||
-              (!SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && SYMBOLS_MATH_OPER.includes(value) && (!isNaN(Number(char)) || char === SYMBOLS.VARIABLE))
+              (!SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && SYMBOLS_MATH_OPER.includes(value) && (isNumber(char) || char === SYMBOLS.VARIABLE))
             ) {
               do_cut = true;
             } else if (
@@ -288,7 +289,6 @@ export default class Interpreter {
       return rsepcount !== sepcount;
     };
     let token_san = token.trim();
-    const token_san_lower = token_san.toLocaleLowerCase();
     let ttype = LEXER.String;
     if (!token_san) {
       if (token === SYMBOLS.EOL) {
@@ -296,7 +296,7 @@ export default class Interpreter {
       } else {
         ttype = LEXER.Space;
       }
-    } else if (isFalsy(options?.isData) && token_san.length > 1 && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && next_char !== SYMBOLS.VARIABLE && next_char !== SYMBOLS.LOGIC_BLOCK_START && (next_char === SYMBOLS.SPACE || isNaN(Number(next_char)))) {
+    } else if (isFalsy(options?.isData) && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && ((token_san.length === 1 && typeof next_char === 'undefined') || (token_san.length > 1 && token_san[1] !== SYMBOLS.LOGIC_BLOCK_START && !isNumber(token_san[1])))) {
       if (token_san[1] === SYMBOLS.ARGUMENT) {
         ttype = LEXER.ArgumentLong;
         token_san = token_san.substr(2);
@@ -368,33 +368,33 @@ export default class Interpreter {
       ttype = LEXER.String;
     } else if (token_san[0] === SYMBOLS.STRING_SIMPLE && token_san.at(-1) === SYMBOLS.STRING_SIMPLE) {
       ttype = LEXER.StringSimple;
-    } else if (!isNaN(Number(token_san))) {
+    } else if (isNumber(token_san)) {
       ttype = LEXER.Number;
-    } else if (token_san_lower === KEYWORDS.TRUE || token_san_lower === KEYWORDS.FALSE) {
+    } else if (token_san === KEYWORDS.TRUE || token_san === KEYWORDS.FALSE) {
       ttype = LEXER.Boolean;
-    } else if (token_san_lower === KEYWORDS.FUNCTION) {
+    } else if (token_san === KEYWORDS.FUNCTION) {
       ttype = LEXER.Function;
-    } else if (token_san_lower === KEYWORDS.RETURN) {
+    } else if (token_san === KEYWORDS.RETURN) {
       ttype = LEXER.Return;
-    } else if (token_san_lower === KEYWORDS.IF) {
+    } else if (token_san === KEYWORDS.IF) {
       ttype = LEXER.If;
-    } else if (token_san_lower === KEYWORDS.ELIF) {
+    } else if (token_san === KEYWORDS.ELIF) {
       ttype = LEXER.Elif;
-    } else if (token_san_lower === KEYWORDS.ELSE) {
+    } else if (token_san === KEYWORDS.ELSE) {
       ttype = LEXER.Else;
-    } else if (token_san_lower === KEYWORDS.FOR) {
+    } else if (token_san === KEYWORDS.FOR) {
       ttype = LEXER.For;
-    } else if (token_san_lower === KEYWORDS.BREAK) {
+    } else if (token_san === KEYWORDS.BREAK) {
       ttype = LEXER.Break;
-    } else if (token_san_lower === KEYWORDS.CONTINUE) {
+    } else if (token_san === KEYWORDS.CONTINUE) {
       ttype = LEXER.Continue;
-    } else if (token_san_lower === KEYWORDS.SILENT) {
+    } else if (token_san === KEYWORDS.SILENT) {
       ttype = LEXER.Silent;
     } else if (token_san === SYMBOLS.ADD) {
       ttype = LEXER.Add;
     } else if (token_san === SYMBOLS.SUBSTRACT) {
       // FIXME: This is a bit crazy :)
-      if ((!prev_token_info || (prev_token_info && (prev_token_info[0] === LEXER.Space || (isNaN(Number(prev_token_info[1])) && prev_token_info[0] !== LEXER.Variable && prev_token_info[0] !== LEXER.LogicBlock)))) && next_char !== SYMBOLS.SPACE && (next_char === SYMBOLS.VARIABLE || next_char === SYMBOLS.LOGIC_BLOCK_START || !isNaN(Number(next_char)) || (prev_token_info_no_space && LEXER_MATH_OPER.includes(prev_token_info_no_space[0])))) {
+      if ((!prev_token_info || (prev_token_info && (prev_token_info[0] === LEXER.Space || (!isNumber(prev_token_info[1]) && prev_token_info[0] !== LEXER.Variable && prev_token_info[0] !== LEXER.LogicBlock)))) && next_char !== SYMBOLS.SPACE && (next_char === SYMBOLS.VARIABLE || next_char === SYMBOLS.LOGIC_BLOCK_START || isNumber(next_char) || (prev_token_info_no_space && LEXER_MATH_OPER.includes(prev_token_info_no_space[0])))) {
         ttype = LEXER.Negative;
       } else {
         ttype = LEXER.Substract;
@@ -420,7 +420,7 @@ export default class Interpreter {
   #getDataInstructions(tokens: Array<LexerInfo>, from: number, inverse_search: boolean): Array<LexerInfo> {
     const data_tokens = [];
     const push_token = function (token: LexerInfo) {
-      if (!LEXERDATA_EXTENDED.includes(token[0])) {
+      if (token[0] === LEXER.String || token[0] === LEXER.StringSimple || !LEXERDATA_EXTENDED.includes(token[0])) {
         return false;
       }
       data_tokens.push(token);
@@ -466,7 +466,7 @@ export default class Interpreter {
         if (ntokens.length > 0 && token_val === tok_prio) {
           const prev_token = tokens_no_spaces[token_index - 1];
           const next_token = tokens_no_spaces[token_index + 1];
-          if (prev_token[0] === LEXER.String || prev_token[0] === LEXER.StringSimple || next_token[0] === LEXER.String || next_token[0] === LEXER.StringSimple) {
+          if (prev_token[0] === LEXER.String || prev_token[0] === LEXER.StringSimple || (next_token && (next_token[0] === LEXER.String || next_token[0] === LEXER.StringSimple))) {
             return tokens;
           }
           const prev_ntokens = this.#getDataInstructions(ntokens, ntokens.length - 1, true);

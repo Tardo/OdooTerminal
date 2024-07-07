@@ -10,7 +10,7 @@ import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function funcSleep(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  await asyncSleep(kwargs.time);
+  return await asyncSleep(kwargs.time);
 }
 
 export default function (): Partial<CMDDef> {

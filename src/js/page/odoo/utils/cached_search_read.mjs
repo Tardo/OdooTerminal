@@ -2,6 +2,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
+import hash from 'object-hash';
 import searchRead from '@odoo/orm/search_read';
 import type {SearchReadOptions} from '@odoo/orm/search_read';
 
@@ -21,21 +23,23 @@ export default async function (
   domain: $ReadOnlyArray<OdooDomainTuple>,
   fields: $ReadOnlyArray<string> | false,
   context: {[string]: mixed},
-  map_func: CachedSearchReadMapCallback,
+  options: ?Partial<SearchReadOptions>,
+  map_func: ?CachedSearchReadMapCallback,
   // $FlowFixMe
 ): Promise<Array<Object>> {
-  if (typeof cache[cache_name] === 'undefined') {
+  const cache_hash = hash(Array.from(arguments).slice(0, 6));
+  if (typeof cache[cache_hash] === 'undefined') {
     let records: Array<OdooSearchResponse> = [];
     try {
-      records = await searchRead(model, domain, fields, context);
+      records = await searchRead(model, domain, fields, context, options);
     } catch (e) {
       // Do nothing
     }
     if (map_func) {
-      cache[cache_name] = records.map(map_func);
+      cache[cache_hash] = records.map(map_func);
     } else {
-      cache[cache_name] = records;
+      cache[cache_hash] = records;
     }
   }
-  return cache[cache_name];
+  return cache[cache_hash];
 }

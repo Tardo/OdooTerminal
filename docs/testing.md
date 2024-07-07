@@ -2,32 +2,27 @@
 
 #### Installation
 
-_For environments without a real X11 server see 'xvfb' (X11 Virtual
-FrameBuffer)_
-
-Test env. uses 'docker compose v2'!
-
 ```
-apt-get install python poetry npm
+apt-get install npm
 npm install --global npm
-poetry install
 npm install
 ```
 
 #### Usage
 
 ```
-npm run dev:tests -- --browser chromium --odoo-version 16
+export ODOO_VERSION=17.0
+export PUPPETEER_BROWSER=chrome
+npm run test
 ```
 
-\*\* Available browsers: firefox, chromium, chrome
+\*\* Available browsers: chromium, chrome \*\* Maybe, one day... can install the extension in firefox using puppeteer
 
-\*\* Avaiblable versions: 11, 12, 13, 14, 15, 16
+\*\* Avaiblable versions: 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0
 
 ## Unit Tests
 
-**All**:
-`document.querySelector(".o_terminal").dispatchEvent(new Event('start_terminal_tests'))`
+**All**: `document.querySelector(".o_terminal").dispatchEvent(new Event('start_terminal_tests'))`
 
 **Selected (Example: whoami and search)**
 `document.querySelector(".o_terminal").dispatchEvent(new CustomEvent('start_terminal_tests', {detail:'test_whoami,test_search'}))`

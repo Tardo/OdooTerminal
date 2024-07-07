@@ -2,6 +2,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+// $FlowIgnore
+import hash from 'object-hash';
 import callService from '@odoo/osv/call_service';
 
 export type CachedCallServiceOptions = {
@@ -21,7 +23,8 @@ export default async function (
   map_func?: MapCallback,
   // $FlowFixMe
 ): Object {
-  if (options?.force === true || typeof cache[cache_name] === 'undefined') {
+  const cache_hash = hash(Array.from(arguments).slice(0, 4));
+  if (options?.force === true || typeof cache[cache_hash] === 'undefined') {
     let values: Array<mixed> = [];
     try {
       values = await callService(service, method, args);
@@ -29,10 +32,10 @@ export default async function (
       // Do nothing
     }
     if (map_func) {
-      cache[cache_name] = values.map(map_func);
+      cache[cache_hash] = values.map(map_func);
     } else {
-      cache[cache_name] = values;
+      cache[cache_hash] = values;
     }
   }
-  return cache[cache_name];
+  return cache[cache_hash];
 }

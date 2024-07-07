@@ -57,6 +57,7 @@ function getOptions(this: Terminal, arg_name: string) {
       [],
       ['login'],
       this.getContext({active_test: true}),
+      {orderBy: 'login ASC'},
       item => item.name,
     );
   }

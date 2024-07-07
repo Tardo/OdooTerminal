@@ -69,6 +69,7 @@ function getOptions(this: Terminal, arg_name: string) {
       [],
       ['name'],
       this.getContext({active_test: true}),
+      {orderBy: 'name ASC'},
       item => item.name,
     );
   }

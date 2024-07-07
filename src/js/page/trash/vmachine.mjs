@@ -20,6 +20,7 @@ import UnknownCommandError from './exceptions/unknown_command_error';
 import UnknownNameError from './exceptions/unknown_name_error';
 import InvalidCommandDefintionError from './exceptions/invalid_command_definition_error';
 import pluck from './utils/pluck';
+import isNumber from './utils/is_number';
 import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
 import { ARG } from './constants.mjs';
 
@@ -416,7 +417,7 @@ export default class VMachine {
               // Do nothing
             }
             if (res_value === null || typeof res_value === 'undefined') {
-              if (typeof attr_name === 'string' && isNaN(Number(attr_name)) && value instanceof Array) {
+              if (typeof attr_name === 'string' && !isNumber(attr_name) && value instanceof Array) {
                 res_value = pluck(value, attr_name);
                 if (res_value.every(item => typeof item === 'undefined')) {
                   res_value = undefined;

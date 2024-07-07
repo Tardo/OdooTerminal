@@ -55,6 +55,7 @@ function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
       [],
       ['name'],
       this.getContext({active_test: true}),
+      {orderBy: 'name ASC'},
       item => item.name,
     );
   }
