@@ -882,7 +882,7 @@ export default class Interpreter {
                 {
                   registeredCmds: options.registeredCmds,
                   silent: true,
-                  offset: token.start + 3,
+                  offset: token.start + 1,
                   noReturn: true,
                 },
                 res,
@@ -896,7 +896,7 @@ export default class Interpreter {
                 {
                   registeredCmds: options.registeredCmds,
                   silent: false,
-                  offset: token.start + 3,
+                  offset: token.start + 1,
                   noReturn: true,
                 },
                 res,
@@ -917,7 +917,7 @@ export default class Interpreter {
                   {
                     registeredCmds: options.registeredCmds,
                     silent: false,
-                    offset: token.start + 3,
+                    offset: token.start + 1,
                     noReturn: true,
                   },
                   res,
@@ -951,7 +951,7 @@ export default class Interpreter {
                 {
                   registeredCmds: options.registeredCmds,
                   silent: true,
-                  offset: token.start + 3,
+                  offset: token.start + 1,
                   noReturn: true,
                 },
                 res,
@@ -965,7 +965,7 @@ export default class Interpreter {
                 {
                   registeredCmds: options.registeredCmds,
                   silent: true,
-                  offset: token.start + 3,
+                  offset: token.start + 1,
                   noReturn: true,
                 },
                 res,
@@ -979,7 +979,7 @@ export default class Interpreter {
                 {
                   registeredCmds: options.registeredCmds,
                   silent: false,
-                  offset: token.start + 3,
+                  offset: token.start + 1,
                   noReturn: true,
                 },
                 res,
@@ -992,7 +992,7 @@ export default class Interpreter {
                 {
                   registeredCmds: options.registeredCmds,
                   silent: true,
-                  offset: token.start + 3,
+                  offset: token.start + 1,
                   noReturn: true,
                 },
                 res,
@@ -1155,7 +1155,7 @@ export default class Interpreter {
             {
               registeredCmds: options.registeredCmds,
               silent: false,
-              offset: token.start + 3,
+              offset: token.start + 1,
               noReturn: true,
             },
             res,
@@ -1175,7 +1175,7 @@ export default class Interpreter {
             {
               registeredCmds: options.registeredCmds,
               silent: true,
-              offset: token.start + 3,
+              offset: token.start + 1,
               noReturn: true,
             },
             res,

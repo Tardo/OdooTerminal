@@ -649,14 +649,14 @@ export default class Terminal {
       return;
     }
     const parse_info = this.#shell.parse(user_input);
-    const [sel_cmd_index, sel_token_index] = this.#commandAssistant.getSelectedParameterIndex(
+    const [sel_cmd_index, sel_token_index, _unused, sel_level] = this.#commandAssistant.getSelectedParameterIndex(
       parse_info,
       this.screen.getInputCaretStartPos(),
     );
     if (sel_cmd_index === null) {
       return;
     }
-    const cur_token = parse_info.inputTokens[0][sel_token_index];
+    const cur_token = parse_info.inputTokens[sel_level][sel_token_index];
     if (ev.shiftKey) {
       --this.#selAssistanOption;
     } else {

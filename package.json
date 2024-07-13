@@ -192,6 +192,12 @@
       "no-useless-rename": "error",
       "no-useless-return": "error",
       "no-void": "error",
+      "no-unused-vars": [
+        "error",
+        {
+          "destructuredArrayIgnorePattern": "^_"
+        }
+      ],
       "no-console": [
         "warn",
         {

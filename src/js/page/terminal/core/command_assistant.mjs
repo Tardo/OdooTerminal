@@ -29,6 +29,7 @@ export type CMDAssistantInputInfo = {
     cmd: number,
     current: number,
     arg: number,
+    level: number,
   },
   token: {
     cmd: string,
@@ -149,20 +150,21 @@ export default class CommandAssistant {
     return ret;
   }
 
-  getSelectedParameterIndex(parse_info: ParseInfo, caret_pos: number): [number, number, number] {
+  getSelectedParameterIndex(parse_info: ParseInfo, caret_pos: number): [number, number, number, number] {
     const {stack} = parse_info;
     if (!stack.instructions.length) {
-      return [-1, -1, -1];
+      return [-1, -1, -1, 0];
     }
     let sel_token_index = -1;
     let sel_cmd_index = -1;
     let sel_arg_index = -1;
+    let sel_level = 0;
     let end_i = -1;
     const instr_count = stack.instructions.length;
     // Found selected token and EOC/EOL
-    for (let index = 0; index < instr_count; ++index) {
+    for (let index = instr_count - 1; index >= 0 ; --index) {
       const instr = stack.instructions[index];
-      if (instr.level !== 0) {
+      if (instr.level === -1) {
         continue;
       }
       const token = parse_info.inputTokens[instr.level][instr.inputTokenIndex];
@@ -171,6 +173,7 @@ export default class CommandAssistant {
       }
       if (caret_pos >= token.start && caret_pos <= token.end) {
         sel_token_index = instr.inputTokenIndex;
+        sel_level = instr.level;
         end_i = index;
         if (instr.inputTokenIndex > 0) {
           const prev_token = parse_info.inputTokens[instr.level][instr.inputTokenIndex - 1];
@@ -188,6 +191,7 @@ export default class CommandAssistant {
         const instr = stack.instructions[pend];
         if (instr.type === INSTRUCTION_TYPE.LOAD_ARG || instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL) {
           sel_token_index = -1;
+          sel_level = 0;
           end_i = pend;
         }
       }
@@ -195,7 +199,7 @@ export default class CommandAssistant {
 
     for (let cindex = end_i; cindex >= 0; --cindex) {
       const instr = stack.instructions[cindex];
-      if (instr.level > 0) {
+      if (instr.level !== sel_level) {
         continue;
       }
       const token = parse_info.inputTokens[instr.level][instr.inputTokenIndex];
@@ -204,19 +208,21 @@ export default class CommandAssistant {
       }
       if (sel_arg_index === -1 && instr.type === INSTRUCTION_TYPE.LOAD_ARG) {
         sel_arg_index = instr.inputTokenIndex;
+        sel_level = instr.level;
         continue;
       }
       if (instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL) {
         sel_cmd_index = instr.inputTokenIndex;
+        sel_level = instr.level;
         break;
       }
     }
-    return [sel_cmd_index, sel_token_index, sel_arg_index];
+    return [sel_cmd_index, sel_token_index, sel_arg_index, sel_level];
   }
 
   getInputInfo(data: string, caret_pos: number): CMDAssistantInputInfo {
     const parse_info = this.#shell.parse(data, {ignoreErrors: true});
-    const [sel_cmd_index, sel_token_index, sel_arg_index] = this.getSelectedParameterIndex(parse_info, caret_pos);
+    const [sel_cmd_index, sel_token_index, sel_arg_index, sel_level] = this.getSelectedParameterIndex(parse_info, caret_pos);
     let sel_token_index_san = sel_token_index;
     // If not current, force last arg
     if (sel_token_index_san === -1) {
@@ -230,11 +236,12 @@ export default class CommandAssistant {
         cmd: sel_cmd_index,
         current: sel_token_index_san,
         arg: sel_arg_index,
+        level: sel_level,
       },
       token: {
-        cmd: parse_info.inputTokens[0][sel_cmd_index]?.value,
-        current: parse_info.inputTokens[0][sel_token_index_san]?.value,
-        arg: parse_info.inputTokens[0][sel_arg_index]?.value,
+        cmd: parse_info.inputTokens[sel_level][sel_cmd_index]?.value,
+        current: parse_info.inputTokens[sel_level][sel_token_index_san]?.value,
+        arg: parse_info.inputTokens[sel_level][sel_arg_index]?.value,
       },
     };
   }

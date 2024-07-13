@@ -4,10 +4,11 @@
 
 ```
 IMP: Cache
+IMP: Command assistant: multi-level help
 
 ADD: Internal Command 'pnow': high resolution timestamp
 
-FIX: Command assistant
+FIX: TraSH Interpreter: Token position
 ```
 
 **11.0.1**
