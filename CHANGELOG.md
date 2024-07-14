@@ -7,6 +7,7 @@ IMP: Cache
 IMP: Command assistant: multi-level help
 
 ADD: Internal Command 'pnow': high resolution timestamp
+ADD: Command 'input': requests user input
 
 FIX: TraSH Interpreter: Token position
 ```

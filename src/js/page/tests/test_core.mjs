@@ -3,6 +3,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import TerminalTestSuite from './tests';
+import asyncSleep from '@terminal/utils/async_sleep';
+import keyCode from '@terminal/utils/keycode';
 
 export default class TestCore extends TerminalTestSuite {
   _orig_context: {[string]: mixed} = {};
@@ -171,5 +173,20 @@ export default class TestCore extends TerminalTestSuite {
     this.assertNotEmpty(res.toWrite());
     await this.terminal.execute('rollback $rsb', false, true);
     this.assertEmpty(res.toWrite());
+  }
+
+  async test_input() {
+    const red_prom = this.terminal.execute("$ind = (input 'test:'); print $ind;", false, true);
+    await asyncSleep(300);
+    const input_el = this.terminal.screen.getUserInputEl();
+    this.assertFalse(typeof input_el === 'undefined');
+    input_el.value = "testing!";
+    this.terminal.screen.focus();
+    input_el.dispatchEvent(new KeyboardEvent('keyup', {
+      key: 'Enter',
+      keyCode: keyCode.ENTER,
+    }));
+    const res = await red_prom;
+    this.assertEqual(res, "testing!");
   }
 }

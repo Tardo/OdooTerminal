@@ -38,7 +38,7 @@ export type InputMode = 'single' | 'multi';
 export type Question = {
   question: string,
   values: $ReadOnlyArray<string>,
-  def_value: string | number,
+  def_value: string | number | void,
   // $FlowFixMe
   defer: Object,
 };
@@ -262,14 +262,22 @@ export default class Screen {
     this.#input_el.focus();
   }
 
-  getUserInput(): string {
+  getUserInputEl(): HTMLInputElement | void {
     if (!this.#wasStart) {
-      return '';
+      return undefined;
     }
     if (this.#options.inputMode === 'multi') {
-      return this.#inputMulti_el.value || '';
+      return this.#inputMulti_el;
     }
-    return this.#input_el.value;
+    return this.#input_el;
+  }
+
+  getUserInput(): string {
+    const input_el = this.getUserInputEl();
+    if (typeof input_el === 'undefined') {
+      return '';
+    }
+    return input_el.value || '';
   }
 
   /* PRINT */
@@ -458,16 +466,16 @@ export default class Screen {
     return this.#question_active;
   }
 
-  showQuestion(question: string, values: $ReadOnlyArray<string>, def_value: string): Promise<> {
+  async showQuestion(question: string, values: $ReadOnlyArray<string>, def_value: string): Promise<> {
     const _defer = defer();
     this.#questions.push({
       question: question,
-      values: values,
+      values: values || [],
       def_value: def_value,
       defer: _defer,
     });
     this.updateQuestions();
-    return _defer.promise;
+    return await _defer.promise;
   }
 
   updateQuestions() {
@@ -476,23 +484,27 @@ export default class Screen {
         this.#updateInputMode('single');
       }
       this.#question_active = this.#questions.shift();
-      const values = this.#question_active.values.map(item => {
-        // $FlowFixMe
-        if (item === this.#question_active.def_value) {
-          return `<strong>${item.toUpperCase()}</strong>`;
+      if (this.#question_active.values) {
+        const values = this.#question_active.values.map(item => {
+          // $FlowFixMe
+          if (item === this.#question_active.def_value) {
+            return item.toUpperCase();
+          }
+          return item;
+        });
+        if (values.length === 0) {
+          this.#interactiveContainer_el.textContent = this.#question_active?.question || '';
+        } else {
+          this.#interactiveContainer_el.textContent = `${this.#question_active?.question || ''} [${values.join('/')}]`;
         }
-        return item;
-      });
-      if (values.length === 0) {
-        this.#interactiveContainer_el.textContent = this.#question_active?.question || '';
-      } else {
-        this.#interactiveContainer_el.textContent = `${this.#question_active?.question || ''} [${values.join('/')}]`;
       }
       this.#interactiveContainer_el.classList.remove('d-none', 'hidden');
+      this.#input_el.classList.add('highlight');
     } else {
       this.#question_active = undefined;
       this.#interactiveContainer_el.textContent = '';
       this.#interactiveContainer_el.classList.add('d-none', 'hidden');
+      this.#input_el.classList.remove('highlight');
       if (this.#options.inputMode !== 'single') {
         this.#updateInputMode(this.#options.inputMode);
       }
@@ -500,6 +512,7 @@ export default class Screen {
   }
 
   responseQuestion(question: Question, response: string) {
+    // $FlowIgnore
     question.defer.resolve((!response && question.def_value) || response);
     this.updateQuestions();
     this.cleanInput();

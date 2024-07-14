@@ -61,14 +61,14 @@ for ($i = 0; $i < $TOTAL_CELLS; $i = $i + 1) {
 $last_time = (pnow)
 $iter_count = 0
 for (;;) {
-  if ($iter_count == $MAX_ITERATIONS) {
-    break
-  }
   if (((pnow) - $last_time) >= 16.0) {
     2d_clear -c $win
     draw_grid_state $grid $NUM_CELLS_ROW $CELL_S
     $grid = (get_new_grid_state $grid $NUM_CELLS_ROW $NUM_CELLS_COL $CELL_S)
     $iter_count = $iter_count + 1
+    if ($iter_count == $MAX_ITERATIONS) {
+      break
+    }
     $last_time = (pnow)
     // Hack: We give the navigator the opportunity to do his thing...
     sleep 0

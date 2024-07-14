@@ -333,6 +333,15 @@
       "name": "NAME"
     }
   },
+  "cmdInput": {
+    "args": {
+      "choices": "The choices",
+      "default": "The default choice",
+      "question": "The question"
+    },
+    "definition": "Requests user input",
+    "detail": "Returns the data entered by the user."
+  },
   "cmdInstall": {
     "args": {
       "module": "The module technical name"

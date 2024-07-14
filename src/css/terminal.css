@@ -171,12 +171,13 @@
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt-container {
-  padding: 3px;
+  padding: 2px;
   max-width: 15%;
   display: flex;
 }
 .o_terminal .terminal-user-input > .terminal-prompt-container.terminal-prompt-interactive {
   max-width: 50%;
+  background-color: rgb(160, 130, 49) !important;
 }
 .o_terminal .terminal-user-input > .terminal-prompt-container > .terminal-prompt {
   overflow: hidden;
@@ -195,6 +196,10 @@
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input {
   background-color: transparent;
+}
+.o_terminal .terminal-user-input .rich-input > #terminal_input.highlight {
+  background-color: white;
+  color: black;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_shadow_input {
   color: var(--terminal-shadow-input-color);

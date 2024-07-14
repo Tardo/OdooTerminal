@@ -39,7 +39,7 @@ export type TerminalOptions = {
 export type MessageListenerCallback = (data: {[string]: mixed}) => Promise<mixed>;
 
 const ALLOWED_FUNCS = ['eprint', 'print', 'printError', 'printTable', 'updateInputInfo', 'showQuestion', 'clean'];
-const ALLOWED_SILENT_FUNCS = ['updateInputInfo'];
+const ALLOWED_SILENT_FUNCS = ['updateInputInfo', 'showQuestion', 'clean'];
 
 const dummyCall = () => {
   // Do nothing
@@ -344,19 +344,21 @@ export default class Terminal {
     const aliases = getStorageLocalItem('terminal_aliases', {});
     if (meta.info.cmdName in aliases) {
       const alias_cmd = this.#parseAlias(aliases, meta.info.cmdName, meta.info.args);
-      return this.#shell.eval(alias_cmd || "", {
+      return await this.#shell.eval(alias_cmd || "", {
         silent: meta.silent,
         aliases: aliases,
       });
+    }
+
+    if (typeof meta.info.cmdDef.callback === 'undefined') {
+      throw new InvalidCommandDefintionError();
     }
 
     const call_ctx = {
       screen: new Proxy(this.screen, {...ScreenCommandHandler, silent: meta.silent}),
       meta: meta,
     };
-    if (typeof meta.info.cmdDef.callback === 'undefined') {
-      throw new InvalidCommandDefintionError();
-    }
+    // $FlowIgnore
     return await meta.info.cmdDef.callback.call(this, meta.info.kwargs, call_ctx);
   }
 

@@ -108,7 +108,6 @@ export default class Shell {
     return await this.#virtMachine.execute(parse_info, opts);
   }
 
-  // FIXME:
   async #processCommandJob(command_info: ProcessCommandJobOptions, silent: boolean = false): Promise<mixed> {
     const job_index = this.onStartCommand(command_info);
     if (job_index === -1) {
