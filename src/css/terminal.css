@@ -175,7 +175,7 @@
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt-container {
-  padding: 2px;
+  padding: 2px 3px;
   max-width: 15%;
   display: flex;
 }

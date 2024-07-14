@@ -7,7 +7,7 @@
 
 <h1 align="center">
   <img src="OdooTerminal.png" />
-  <div>Odoo Terminal - WebExtension</div>
+  <div>OdooTerminal - WebExtension</div>
 
 [![Tests](https://github.com/Tardo/OdooTerminal/actions/workflows/tests.yml/badge.svg)](https://github.com/Tardo/OdooTerminal/actions/workflows/tests.yml)
 
@@ -159,15 +159,15 @@ Example:
 
 Examples:
 
-- Print 3*2 result: `print 3*2`
+- Print 3*2 result: `print 3 * 2`
 - Modify the lst_price of the 3,product.product:
-  `$prod = (read product.product 3 -f lst_price); $prod['lst_price'] = (5 * $prod['lst_price']); commit $prod;`
+  `$prod = (read product.product 3 -f lst_price); $prod['lst_price'] = 5 * $prod['lst_price']; commit $prod;`
 
 #### + If, Else
 
 Example:
 
-- `if ((gen int 0 8) > 2) { print 'Yes!' } else { print 'No' }`
+- `if ((gen int 0 8) > 2) { print 'Yussef Dayes & Alfa Mist - Blacked Out' } else { print 'Vincenzo Salvia & PJ D\'Atri - The Elemental Dive' }`
 - `$num = (gen int 0 8); if ($num > 2) { print 'Yes! ' + $num + ' > 2' } else { print 'No... ' + $num + ' <= 2' }`
 
 #### + Functions

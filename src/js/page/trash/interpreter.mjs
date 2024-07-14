@@ -146,7 +146,7 @@ export default class Interpreter {
    */
   tokenize(data: string, options: ParserOptions): Array<TokenInfo> {
     // Remove comments
-    const clean_data = data.replaceAll(this.#regexComments, '');
+    const clean_data = data.replaceAll(this.#regexComments, '').replaceAll(SYMBOLS.ESCAPE, "\\");
     let tokens = [];
     let value = '';
     let in_string = '';
@@ -223,21 +223,20 @@ export default class Interpreter {
             }
           }
         }
-
-        if (do_cut) {
-          if (value) {
-            prev_token = this.#lexer(value, char, prev_token, prev_token_no_space, options);
-            tokens.push(prev_token);
-            if (prev_token[0] !== LEXER.Space) {
-              prev_token_no_space = prev_token;
-            }
-            value = '';
+      }
+      if (do_cut) {
+        if (value) {
+          prev_token = this.#lexer(value, char, prev_token, prev_token_no_space, options);
+          tokens.push(prev_token);
+          if (prev_token[0] !== LEXER.Space) {
+            prev_token_no_space = prev_token;
           }
-          do_cut = false;
+          value = '';
         }
-        if (!do_skip) {
-          value += char;
-        }
+        do_cut = false;
+      }
+      if (!do_skip) {
+        value += char;
       }
       prev_char = char;
       do_skip = false;
