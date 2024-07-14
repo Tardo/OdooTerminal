@@ -62,8 +62,8 @@ async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
     for (let x = 0; x < sorted_keys_len; ++x) {
       const _cmd = sorted_cmd_keys[x];
       const cmd_def = this.getShell().getVM().getRegisteredCmds()[_cmd];
-      if (!cmd_def.is_function) {
-        ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd]);
+      if (kwargs.all || (!kwargs.only_internal && !cmd_def.is_function) || (kwargs.only_internal && cmd_def.is_function)) {
+        ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd], cmd_def.is_function);
       }
     }
   } else if (Object.hasOwn(this.getShell().getVM().getRegisteredCmds(), kwargs.cmd)) {
@@ -89,7 +89,11 @@ export default function (): Partial<CMDDef> {
       'cmdHelp.detail',
       'Show commands and a quick definition.<br/>- <> ~> Required Parameter<br/>- [] ~> Optional Parameter',
     ),
-    args: [[ARG.String, ['c', 'cmd'], false, i18n.t('cmdHelp.args.cmd', 'The command to consult')]],
+    args: [
+      [ARG.String, ['c', 'cmd'], false, i18n.t('cmdHelp.args.cmd', 'The command to consult')],
+      [ARG.Flag, ['a', 'all'], false, i18n.t('cmdHelp.args.all', 'Show all commands')],
+      [ARG.Flag, ['oi', 'only-internal'], false, i18n.t('cmdHelp.args.onlyInternal', 'Show only internal commands')],
+    ],
     example: '-c search',
   };
 }

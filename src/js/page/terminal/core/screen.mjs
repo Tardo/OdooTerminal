@@ -310,8 +310,8 @@ export default class Screen {
     }
   }
 
-  printHelpSimple(cmd: string, cmd_def: CMDDef) {
-    this.print(renderHelpCmd(cmd, cmd_def.definition));
+  printHelpSimple(cmd: string, cmd_def: CMDDef, is_internal: boolean) {
+    this.print(renderHelpCmd(cmd, cmd_def.definition, is_internal));
   }
 
   #printHTML(html: string) {

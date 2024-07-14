@@ -5,6 +5,7 @@
 ```
 IMP: Cache
 IMP: Command assistant: multi-level help
+IMP: Command 'help': show 'internal' commands
 
 ADD: Internal Command 'pnow': high resolution timestamp
 ADD: Command 'input': requests user input

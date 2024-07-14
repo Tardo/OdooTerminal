@@ -81,6 +81,10 @@
   cursor: pointer;
 }
 
+.o_terminal div#terminal_screen .o_internal_cmd {
+  color: #00b6ff;
+}
+
 .o_terminal div#terminal_screen .error_message {
   background-color: darkred;
   border: 1px solid red;
@@ -177,7 +181,7 @@
 }
 .o_terminal .terminal-user-input > .terminal-prompt-container.terminal-prompt-interactive {
   max-width: 50%;
-  background-color: rgb(160, 130, 49) !important;
+  background-color: rgb(37 93 193) !important;
 }
 .o_terminal .terminal-user-input > .terminal-prompt-container > .terminal-prompt {
   overflow: hidden;

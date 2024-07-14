@@ -319,7 +319,9 @@
   },
   "cmdHelp": {
     "args": {
-      "cmd": "The command to consult"
+      "all": "Show all commands",
+      "cmd": "The command to consult",
+      "onlyInternal": "Show only internal commands"
     },
     "definition": "Print this help or command detailed info",
     "detail": "Show commands and a quick definition.<br/>- <> ~> Required Parameter<br/>- [] ~> Optional Parameter",
