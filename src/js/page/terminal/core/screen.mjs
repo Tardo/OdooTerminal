@@ -273,11 +273,7 @@ export default class Screen {
   }
 
   getUserInput(): string {
-    const input_el = this.getUserInputEl();
-    if (typeof input_el === 'undefined') {
-      return '';
-    }
-    return input_el.value || '';
+    return this.getUserInputEl()?.value ?? '';
   }
 
   /* PRINT */

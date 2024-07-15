@@ -36,11 +36,7 @@ async function printHelpDetailed(screen: Screen, cmd: string, cmd_def: CMDDef) {
     }
     if (typeof arg_info.default_value !== 'undefined') {
       if ((arg_info.type & ARG.List) === ARG.List || (arg_info.type & ARG.Dictionary) === ARG.Dictionary) {
-        let info = JSON.stringify(arg_info.default_value);
-        if (info === null || typeof info === 'undefined') {
-          info = 'Unknown';
-        }
-        arg_info_str += info;
+        arg_info_str += JSON.stringify(arg_info.default_value) ?? 'Unknown';
       } else {
         arg_info_str += new String(arg_info.default_value).toString();
       }

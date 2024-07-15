@@ -50,10 +50,7 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
     }
     const l2 = fieldParams.length;
     for (let x2 = 0; x2 < l2; ++x2) {
-      let value = fieldDef[fieldParams[x2]];
-      if (typeof value === 'undefined' || value === null) {
-        value = '';
-      }
+      const value = fieldDef[fieldParams[x2]] ?? '';
       rows[row_index].push(new String(value).toString());
     }
   }

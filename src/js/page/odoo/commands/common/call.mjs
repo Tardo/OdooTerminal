@@ -12,9 +12,8 @@ import type Terminal from '@odoo/terminal';
 
 async function cmdCallModelMethod(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
   const pkwargs = kwargs.kwarg;
-  if (typeof pkwargs.context === 'undefined') {
-    pkwargs.context = this.getContext();
-  }
+  pkwargs.context ??= this.getContext();
+
   return rpcQuery<mixed>({
     method: kwargs.call,
     model: kwargs.model,

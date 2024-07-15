@@ -40,10 +40,7 @@ export default class OdooTerminal extends Terminal {
   // eslint-disable-next-line no-unused-vars
   getContext(extra_context: ?{[string]: mixed}): {[string]: mixed} {
     const context = super.getContext(arguments);
-    let sess_user_ctx = getOdooSession()?.user_context;
-    if (sess_user_ctx === null || typeof sess_user_ctx === 'undefined') {
-      sess_user_ctx = {};
-    }
+    const sess_user_ctx = getOdooSession()?.user_context ?? {};
     return Object.assign({}, sess_user_ctx, context);
   }
 

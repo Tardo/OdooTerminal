@@ -47,7 +47,7 @@ export default function (): Partial<CMDDef> {
       'Define aliases to run commands easy. ' +
         "<br><b>WARNING:</b> This command uses 'local storage' " +
         'to persist the data even if you close the browser. ' +
-        'This data can be easy accessed by other computer usedrs. ' +
+        'This data can be easy accessed by other computer users. ' +
         "Don't use sensible data if you are using a shared " +
         'computer.' +
         '<br><br>Can use positional parameters ($1,$2,$3,$N...)',
