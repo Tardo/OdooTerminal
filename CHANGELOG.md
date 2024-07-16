@@ -1,5 +1,13 @@
 # Changelog
 
+**11.2.0**
+
+```
+IMP: Minor refactor
+
+ADD: Internal Command 'fetch': HTTP requests
+```
+
 **11.1.0**
 
 ```

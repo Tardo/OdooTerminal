@@ -19,6 +19,7 @@ import getUsername from '@odoo/utils/get_username';
 import isBackOffice from '@odoo/utils/is_backoffice';
 import registerMathFuncs from '@trash/libs/math/__all__';
 import registerTimeFuncs from '@trash/libs/time/__all__';
+import registerNetFuncs from '@trash/libs/net/__all__';
 import registerCoreFuncs from '@terminal/commands/__all__';
 import registerGraphicsFuncs from '@terminal/libs/graphics/__all__';
 import OdooTerminalTests from '@tests/terminal';
@@ -60,6 +61,7 @@ function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   if (term_obj) {
     registerCoreFuncs(term_obj.getShell().getVM());
     registerMathFuncs(term_obj.getShell().getVM());
+    registerNetFuncs(term_obj.getShell().getVM());
     registerTimeFuncs(term_obj.getShell().getVM());
     registerGraphicsFuncs(term_obj.getShell().getVM());
     registerCommonFuncs(term_obj.getShell().getVM());

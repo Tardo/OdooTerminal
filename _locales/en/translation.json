@@ -776,6 +776,13 @@
     "definition": "Absolute value of a number",
     "detail": "Returns the absolute value of a number."
   },
+  "funcFetch": {
+    "args": {
+      "url": "The fetch options"
+    },
+    "definition": "HTTP requests",
+    "detail": "Interface for making HTTP requests and processing the responses."
+  },
   "funcFixed": {
     "args": {
       "num": "The number of decimals"
