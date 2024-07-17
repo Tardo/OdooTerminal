@@ -15,7 +15,6 @@ export default function (
   domain: $ReadOnlyArray<OdooDomainTuple>,
   fields: $ReadOnlyArray<string> | false,
   context: ?{[string]: mixed},
-  extra_params: ?Partial<SearchReadOptions>,
   options: ?{[string]: mixed},
 ): Promise<Array<OdooSearchResponse>> {
   return callModel(model, 'search_read', [domain], null, context, {

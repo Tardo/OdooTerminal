@@ -49,7 +49,7 @@ describe('OdooTerminal', () => {
       timeout: WAIT_MINS * 30,
     });
     const text = await page.evaluate(() => {
-      const elm = document.querySelector('.o_terminal .terminal-test-ok,.o_terminal .terminal-test-fail');
+      const elm = document.querySelector('.o_terminal #terminal_screen');
       return elm.textContent;
     });
     console.debug('---- TERMINAL OUTPUT:', text);

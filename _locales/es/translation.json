@@ -784,7 +784,6 @@
   },
   "funcFetch": {
     "args": {
-      "abort": "Abort the fetch requests immediately (useful for flood)",
       "timeout": "The timeout",
       "url": "The fetch options"
     },

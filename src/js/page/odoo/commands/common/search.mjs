@@ -66,11 +66,11 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     });
   }
 
-  const result = await searchRead(kwargs.model, kwargs.domain, fields, this.getContext(), {
+  const result = await searchRead(kwargs.model, kwargs.domain, fields, this.getContext(), Object.assign({}, kwargs.options, {
     limit: kwargs.limit,
     offset: kwargs.offset,
     orderBy: kwargs.order,
-  }, kwargs.options);
+  }));
 
   if (bin_fields.length !== 0) {
     for (const item of result) {
