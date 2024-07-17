@@ -15,13 +15,14 @@ export default function (
   domain: $ReadOnlyArray<OdooDomainTuple>,
   fields: $ReadOnlyArray<string> | false,
   context: ?{[string]: mixed},
+  extra_params: ?Partial<SearchReadOptions>,
   options: ?{[string]: mixed},
 ): Promise<Array<OdooSearchResponse>> {
-  return callModel(model, 'search_read', [domain], null, context, {
+  return callModel(model, 'search_read', [domain], null, context, Object.assign({
     fields: fields,
     orderBy: options?.orderBy,
     limit: options?.limit,
     offset: options?.offset,
-  },
+  }, extra_params),
   options);
 }
