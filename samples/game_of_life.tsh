@@ -1,3 +1,4 @@
+// min-v 11.1.0
 // Conway's Game of Life
 // Note that the terminal is not ready to render graphics. 
 // The mechanisms designed for this purpose are not used, which exausts the execution thread.
@@ -60,7 +61,7 @@ for ($i = 0; $i < $TOTAL_CELLS; $i = $i + 1) {
 
 $last_time = (pnow)
 $iter_count = 0
-for (;;) {
+for (;1;) {
   if (((pnow) - $last_time) >= 16.0) {
     2d_clear -c $win
     draw_grid_state $grid $NUM_CELLS_ROW $CELL_S

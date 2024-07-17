@@ -10,6 +10,7 @@ export default class Frame {
   args: Array<string>;
   values: Array<mixed>;
   prevFrame: Frame | void;
+  lastFlowCheck: mixed | void;
 
   constructor(cmd_name: string | void, prev_frame: Frame | void) {
     this.cmd = cmd_name;
@@ -17,6 +18,7 @@ export default class Frame {
     this.args = [];
     this.values = [];
     this.prevFrame = prev_frame;
+    this.lastFlowCheck = undefined;
   }
 
   getStoreValue(var_name: string): mixed {

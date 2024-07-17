@@ -11,7 +11,7 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdWriteModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  return writeRecord(kwargs.model, kwargs.id, kwargs.value, this.getContext()).then(result => {
+  return writeRecord(kwargs.model, kwargs.id, kwargs.value, this.getContext(), kwargs.options).then(result => {
     ctx.screen.print(
       i18n.t('cmdWrite.result.success', '{{model}} record updated successfully', {
         model: kwargs.model,
@@ -46,6 +46,7 @@ export default function (): Partial<CMDDef> {
       [ARG.String, ['m', 'model'], true, i18n.t('cmdWrite.args.model', 'The model technical name')],
       [ARG.List | ARG.Number, ['i', 'id'], true, i18n.t('cmdWrite.args.id', "The record id's")],
       [ARG.Dictionary, ['v', 'value'], true, i18n.t('cmdWrite.args.value', 'The values to write')],
+      [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdWrite.args.options', 'The options')],
     ],
     example: "-m res.partner -i 10,4,2 -v {street: 'Diagon Alley'}",
   };

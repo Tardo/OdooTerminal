@@ -195,7 +195,8 @@
   "cmdCount": {
     "args": {
       "domain": "The domain",
-      "model": "The model technical name"
+      "model": "The model technical name",
+      "options": "The options"
     },
     "definition": "Gets number of records from the given model in the selected domain",
     "detail": "Gets number of records from the given model in the selected domain",
@@ -204,6 +205,7 @@
   "cmdCreate": {
     "args": {
       "model": "The model technical name",
+      "options": "The options",
       "value": "The values to write"
     },
     "definition": "Create new record",
@@ -522,6 +524,7 @@
       "field": "The fields to request<br/>Can use '*' to show all fields",
       "id": "The record id's",
       "model": "The model technical name",
+      "options": "The options",
       "readBinary": "Don't filter binary fields"
     },
     "definition": "Search model record",
@@ -572,6 +575,7 @@
       "model": "The model technical name",
       "more": "Flag to indicate that show more results",
       "offset": "The offset (from)<br/>Can be zero (no limit)",
+      "options": "The options",
       "order": "The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
       "readBinary": "Don't filter binary fields"
     },
@@ -671,7 +675,8 @@
   "cmdUnlink": {
     "args": {
       "id": "The record id's",
-      "model": "The model technical name"
+      "model": "The model technical name",
+      "options": "The options"
     },
     "definition": "Unlink record",
     "detail": "Delete a record.",
@@ -721,6 +726,7 @@
     "args": {
       "id": "The record id's",
       "model": "The model technical name",
+      "options": "The options",
       "value": "The values to write"
     },
     "definition": "Update record values",
@@ -778,6 +784,8 @@
   },
   "funcFetch": {
     "args": {
+      "abort": "Abort the fetch requests immediately (useful for flood)",
+      "timeout": "The timeout",
       "url": "The fetch options"
     },
     "definition": "HTTP requests",

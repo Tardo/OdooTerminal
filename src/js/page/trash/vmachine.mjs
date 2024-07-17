@@ -128,7 +128,16 @@ export default class VMachine {
         if (typeof cmd_def.callback_internal === 'undefined') {
           throw new InvalidCommandDefintionError();
         }
-        return await cmd_def.callback_internal(this, kwargs, frame, opts);
+        let internal_res;
+        try {
+          internal_res = await cmd_def.callback_internal(this, kwargs, frame, opts);
+        } catch (err) {
+          if (!silent) {
+            throw err;
+          }
+          return null;
+        }
+        return internal_res;
       }
     }
 
@@ -154,7 +163,6 @@ export default class VMachine {
     }
     const frames = [];
     let eoe = false;
-    let last_flow_check;
     let last_frame = root_frame;
     for (let index = 0; !eoe && index < stack_instr_len; ++index) {
       const instr = stack.instructions[index];
@@ -273,17 +281,11 @@ export default class VMachine {
           {
             const valB = last_frame.values.pop();
             const valA = last_frame.values.pop();
-
-            if (valB === null || typeof valB === 'undefined') {
-              throw new InvalidValueError(valB);
-            }
-            if (valA === null || typeof valA === 'undefined') {
-              throw new InvalidValueError(valA);
-            }
-
             if (instr.type === INSTRUCTION_TYPE.AND) {
+              // $FlowIgnore
               last_frame.values.push(valA && valB);
             } else if (instr.type === INSTRUCTION_TYPE.OR) {
+              // $FlowIgnore
               last_frame.values.push(valA || valB);
             } else if (instr.type === INSTRUCTION_TYPE.EQUAL) {
               last_frame.values.push(valA === valB);
@@ -321,9 +323,6 @@ export default class VMachine {
         case INSTRUCTION_TYPE.NOT:
           {
             const val = last_frame.values.pop();
-            if (typeof val !== 'boolean') {
-              throw new InvalidValueError(val);
-            }
             last_frame.values.push(!val);
           }
           break;
@@ -484,9 +483,9 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.JUMP_IF_FALSE:
           {
-            last_flow_check = last_frame.values.pop();
+            last_frame.lastFlowCheck = last_frame.values.pop();
             const num_to_skip = instr.dataIndex;
-            if (typeof last_flow_check !== 'undefined' && last_flow_check !== null && !last_flow_check) {
+            if (typeof last_frame.lastFlowCheck === 'undefined' || last_frame.lastFlowCheck === null || !last_frame.lastFlowCheck) {
               index += num_to_skip;
             }
           }
@@ -494,7 +493,7 @@ export default class VMachine {
         case INSTRUCTION_TYPE.JUMP_IF_TRUE:
           {
             const num_to_skip = instr.dataIndex;
-            if (typeof last_flow_check !== 'undefined' && last_flow_check !== null && last_flow_check) {
+            if (typeof last_frame.lastFlowCheck !== 'undefined' && last_frame.lastFlowCheck !== null && last_frame.lastFlowCheck) {
               index += num_to_skip;
             }
           }

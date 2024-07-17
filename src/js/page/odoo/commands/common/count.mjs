@@ -11,7 +11,7 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdCount(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  return searchCount(kwargs.model, kwargs.domain, this.getContext()).then(result => {
+  return searchCount(kwargs.model, kwargs.domain, this.getContext(), kwargs.options).then(result => {
     ctx.screen.print(i18n.t('cmdCount.result', 'Result: {{result}}', {result}));
     return result;
   });
@@ -41,6 +41,7 @@ export default function (): Partial<CMDDef> {
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdCount.args.model', 'The model technical name')],
       [ARG.List | ARG.Any, ['d', 'domain'], false, i18n.t('cmdCount.args.domain', 'The domain'), []],
+      [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdCount.args.options', 'The options')],
     ],
     example: "-m res.partner -d [['name', '=ilike', 'A%']]",
   };

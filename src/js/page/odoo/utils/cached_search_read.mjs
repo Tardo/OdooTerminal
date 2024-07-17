@@ -23,7 +23,7 @@ export default async function (
   domain: $ReadOnlyArray<OdooDomainTuple>,
   fields: $ReadOnlyArray<string> | false,
   context: {[string]: mixed},
-  options: ?Partial<SearchReadOptions>,
+  extra_params: ?Partial<SearchReadOptions>,
   map_func: ?CachedSearchReadMapCallback,
   // $FlowFixMe
 ): Promise<Array<Object>> {
@@ -31,7 +31,7 @@ export default async function (
   if (typeof cache[cache_hash] === 'undefined') {
     let records: Array<OdooSearchResponse> = [];
     try {
-      records = await searchRead(model, domain, fields, context, options);
+      records = await searchRead(model, domain, fields, context, extra_params, {'silent': true});
     } catch (e) {
       // Do nothing
     }

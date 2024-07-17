@@ -6,6 +6,7 @@
 IMP: Minor refactor
 
 ADD: Internal Command 'fetch': HTTP requests
+ADD: Samples
 ```
 
 **11.1.0**

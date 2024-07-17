@@ -11,7 +11,7 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdUnlinkModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  return unlinkRecord(kwargs.model, kwargs.id, this.getContext()).then(result => {
+  return unlinkRecord(kwargs.model, kwargs.id, this.getContext(), kwargs.options).then(result => {
     ctx.screen.print(
       i18n.t('cmdUnlink.result.success', '{{model}} record deleted successfully', {
         model: kwargs.model,
@@ -45,6 +45,7 @@ export default function (): Partial<CMDDef> {
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdUnlink.args.model', 'The model technical name')],
       [ARG.List | ARG.Number, ['i', 'id'], true, i18n.t('cmdUnlink.args.id', "The record id's")],
+      [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdUnlink.args.options', 'The options')],
     ],
     example: '-m res.partner -i 10,4,2',
   };

@@ -684,17 +684,20 @@ export default class Terminal {
   }
 
   #onInput() {
-    // Fish-like feature
-    this.updateAssistantoptions();
-    const user_input = this.screen.getUserInput();
-    this.#searchHistoryQuery = user_input;
-    this.#searchHistoryIter = this.#inputHistory.length;
-    if (user_input) {
-      const found_hist = this.#doSearchPrevHistory();
-      this.screen.updateShadowInput(found_hist || '');
+    const question_active = this.screen.getQuestionActive();
+    if (typeof question_active === 'undefined') {
+      // Fish-like feature
+      this.updateAssistantoptions();
+      const user_input = this.screen.getUserInput();
+      this.#searchHistoryQuery = user_input;
       this.#searchHistoryIter = this.#inputHistory.length;
-    } else {
-      this.screen.cleanShadowInput();
+      if (user_input) {
+        const found_hist = this.#doSearchPrevHistory();
+        this.screen.updateShadowInput(found_hist || '');
+        this.#searchHistoryIter = this.#inputHistory.length;
+      } else {
+        this.screen.cleanShadowInput();
+      }
     }
   }
 

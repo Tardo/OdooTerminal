@@ -371,6 +371,8 @@ export default class Interpreter {
       ttype = LEXER.Number;
     } else if (token_san === KEYWORDS.TRUE || token_san === KEYWORDS.FALSE) {
       ttype = LEXER.Boolean;
+    } else if (token_san === KEYWORDS.NULL) {
+      ttype = LEXER.Null;
     } else if (token_san === KEYWORDS.FUNCTION) {
       ttype = LEXER.Function;
     } else if (token_san === KEYWORDS.RETURN) {
@@ -824,6 +826,13 @@ export default class Interpreter {
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_CONST, index, level, dindex));
           }
           break;
+        case LEXER.Null:
+            {
+              to_append.values.push(null);
+              const dindex = res.stack.values[0].length;
+              to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_CONST, index, level, dindex));
+            }
+            break;
         case LEXER.Function:
           {
             const result = this.#parseFunction(res.inputTokens[0], index);

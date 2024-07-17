@@ -26,6 +26,7 @@ async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, c
       [fields],
       null,
       this.getContext(),
+      kwargs.options,
     );
 
     fields = [];
@@ -85,6 +86,7 @@ export default function (): Partial<CMDDef> {
         ['display_name'],
       ],
       [ARG.Flag, ['rb', 'read-binary'], false, i18n.t('cmdRead.args.readBinary', "Don't filter binary fields")],
+      [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdRead.args.options', 'The options')],
     ],
     example: '-m res.partner -i 10,4,2 -f name,street',
   };

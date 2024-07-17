@@ -4,6 +4,6 @@
 
 import callModel from '@odoo/osv/call_model';
 
-export default function (model: string, ids: $ReadOnlyArray<number>, data: {...}, context: {...}): Promise<> {
-  return callModel(model, 'write', [ids, data], null, context);
+export default function (model: string, ids: $ReadOnlyArray<number>, data: {...}, context: ?{[string]: mixed}, options: ?{[string]: mixed}): Promise<> {
+  return callModel(model, 'write', [ids, data], null, context, undefined, options);
 }

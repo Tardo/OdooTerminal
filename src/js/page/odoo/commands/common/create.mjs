@@ -25,7 +25,7 @@ async function cmdCreateModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     return;
   }
 
-  const results = await createRecord(kwargs.model, kwargs.value, this.getContext());
+  const results = await createRecord(kwargs.model, kwargs.value, this.getContext(), kwargs.options);
   ctx.screen.print(renderRecordCreated(kwargs.model, results));
 
   const records = [];
@@ -59,6 +59,7 @@ export default function (): Partial<CMDDef> {
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdCreate.args.model', 'The model technical name')],
       [ARG.List | ARG.Dictionary, ['v', 'value'], false, i18n.t('cmdCreate.args.value', 'The values to write')],
+      [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdCreate.args.options', 'The options')],
     ],
     example: "-m res.partner -v {name: 'Poldoore'}",
   };

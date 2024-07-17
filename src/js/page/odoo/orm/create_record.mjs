@@ -5,12 +5,12 @@
 import callModel from '@odoo/osv/call_model';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 
-export default function (model: string, records: $ReadOnlyArray<{...}>, context: {...}): Promise<Array<number>> {
+export default function (model: string, records: $ReadOnlyArray<{...}>, context: ?{[string]: mixed}, options: ?{[string]: mixed}): Promise<Array<number>> {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor < 13) {
-    const proms = records.map(record => callModel<Array<number>>(model, 'create', [record], undefined, context));
+    const proms = records.map(record => callModel<Array<number>>(model, 'create', [record], undefined, context, options));
     // $FlowFixMe
     return Promise.all(proms);
   }
-  return callModel(model, 'create', [records], null, context);
+  return callModel(model, 'create', [records], null, context, undefined, options);
 }

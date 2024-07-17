@@ -11,7 +11,8 @@ export default async function <T>(
   args: ?$ReadOnlyArray<mixed>,
   kwargs: ?{[string]: mixed},
   context: ?{[string]: mixed},
-  extra_options: ?{[string]: mixed},
+  extra_params: ?{[string]: mixed},
+  options: ?{[string]: mixed},
 ): Promise<T> {
   const skwargs = Object.assign(
     {
@@ -19,11 +20,11 @@ export default async function <T>(
     },
     kwargs,
   );
-  const options: Partial<BuildQueryOptions> = {
+  const params: Partial<BuildQueryOptions> = {
     method: method,
     model: model,
     args: args || [],
     kwargs: skwargs,
   };
-  return await rpcQuery<T>(Object.assign(options, extra_options));
+  return await rpcQuery<T>(Object.assign(params, extra_params), options);
 }

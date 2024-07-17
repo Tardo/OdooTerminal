@@ -113,7 +113,7 @@ export default class Shell {
     if (job_index === -1) {
       throw new Error(i18n.t('terminal.error.notInitJob', "Unexpected error: can't initialize the job!"));
     }
-    let result: mixed;
+    let result: mixed = null;
     let error = '';
     let is_failed = false;
     const meta = this.getCommandJobMeta(command_info, job_index, silent);
@@ -127,7 +127,7 @@ export default class Shell {
     } finally {
       this.onFinishCommand(job_index);
     }
-    if (is_failed) {
+    if (is_failed && !silent) {
       throw new ProcessJobError(command_info.cmdName, error);
     }
     return result;

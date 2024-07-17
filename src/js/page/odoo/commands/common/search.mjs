@@ -54,7 +54,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   // Due to possible problems with binary fields it is necessary to filter them out
   const bin_fields = [];
   if (search_all_fields && !kwargs.read_binary) {
-    const fieldDefs = await getFieldsInfo(kwargs.model, false, this.getContext());
+    const fieldDefs = await getFieldsInfo(kwargs.model, false, this.getContext(), kwargs.options);
 
     fields = [];
     Object.entries(fieldDefs).forEach(item => {
@@ -70,7 +70,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     limit: kwargs.limit,
     offset: kwargs.offset,
     orderBy: kwargs.order,
-  });
+  }, kwargs.options);
 
   if (bin_fields.length !== 0) {
     for (const item of result) {
@@ -170,6 +170,7 @@ export default function (): Partial<CMDDef> {
       [ARG.Flag, ['more', 'more'], false, i18n.t('cmdSearch.args.more', 'Flag to indicate that show more results')],
       [ARG.Flag, ['all', 'all'], false, i18n.t('cmdSearch.args.all', 'Show all records (not truncated)')],
       [ARG.Flag, ['rb', 'read-binary'], false, i18n.t('cmdSearch.args.readBinary', "Don't filter binary fields")],
+      [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdSearch.args.options', 'The options')],
     ],
     example: "-m res.partner -f * -l 100 -of 5 -o 'id DESC, name'",
   };

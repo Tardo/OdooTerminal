@@ -47,6 +47,7 @@ export const LEXER = {
   VariableCall: 41,
   Break: 42,
   Continue: 43,
+  Null: 44,
 };
 
 export const LEXER_MATH_C = [
@@ -286,6 +287,7 @@ export const SYMBOLS_MATH_SIGN = [SYMBOLS.ADD, SYMBOLS.SUBSTRACT];
 export const KEYWORDS = {
   TRUE: 'true',
   FALSE: 'false',
+  NULL: 'null',
   FOR: 'for',
   FUNCTION: 'function',
   RETURN: 'return',
