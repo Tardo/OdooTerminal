@@ -43,7 +43,7 @@
   },
   "permissions": ["activeTab", "storage"],
   "short_name": "__MSG_extensionName__",
-  "version": "11.1.0",
+  "version": "11.2.0",
   "web_accessible_resources": [
     {
       "resources": ["dist/pub/**", "_locales/**/translation.json"],
