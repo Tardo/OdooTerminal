@@ -5,19 +5,17 @@ const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitT
 
 export default async function globalSetup(globalConfig) {
   await setupPuppeteer(globalConfig);
-  await compose.buildOne('odoo', {
-    cwd: 'tests/docker/',
-    commandOptions: [["--build-arg", `ODOO_VERSION=${process.env.ODOO_VERSION}`]],
-  });
   await compose.upOne('db', {
     cwd: 'tests/docker/',
+    commandOptions: [['--pull', 'missing']],
   });
-  await compose.run('odoo', ['addons', 'init', '-w', 'base,bus,barcodes,mail'], {
+  await compose.run('odoo', ['--stop-after-init', '-d', 'postgres', '-r', 'odoo', '-w', 'odoo', '-i', 'base,bus,barcodes,mail'], {
     cwd: 'tests/docker/',
-    commandOptions: [["--rm"]],
-  })
+    commandOptions: [['--rm']],
+  });
   await compose.upOne('odoo', {
     cwd: 'tests/docker/',
+    commandOptions: [['--pull', 'missing']],
   });
   await sleep(10000);
 };

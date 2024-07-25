@@ -1,29 +1,14 @@
-version: '3.9'
-
 services:
   odoo:
-    build:
-      context: .
-      args:
-        UID: '${UID:-1000}'
-        GID: '${GID:-1000}'
-        WITHOUT_DEMO: ''
-    environment:
-      EMAIL_FROM: ''
-      PGDATABASE: &dbname test
-      PGUSER: &dbuser 'odoo'
-      PGPASSWORD: &dbpass supersecretpassword
-      PROXY_MODE: 'false'
-      LIST_DB: 'true'
-    tty: true
+    image: odoo:$ODOO_VERSION
+    depends_on:
+      - db
     ports:
       - '8069:8069'
-
+    command: odoo -d postgres -r odoo -w odoo
   db:
-    image: ghcr.io/tecnativa/postgres-autoconf:13-alpine
+    image: postgres:15
     environment:
-      POSTGRES_DB: *dbname
-      POSTGRES_USER: *dbuser
-      POSTGRES_PASSWORD: *dbpass
-      CONF_EXTRA: |
-        work_mem = 8MB
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
