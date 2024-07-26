@@ -590,6 +590,9 @@ export default class Interpreter {
     }
     const if_code = token_active.raw.trim();
 
+    // Elif
+    // TODO
+
     // Else
     token_active = inputTokens[++init_index];
     if (typeof token_active !== 'undefined' && token_active.type === LEXER.Else) {
@@ -702,6 +705,7 @@ export default class Interpreter {
     let sign_cache = null;
     let last_token_index = -1;
     let token_subindex = 0;
+    let jump_instr_index = -1;
     for (let index = 0; index < tokens_len; ++index) {
       const token = res.inputTokens[0][index];
       let ignore_instr_eoi = false;
@@ -774,6 +778,7 @@ export default class Interpreter {
           break;
         case LEXER.And:
             ignore_instr_eoi = true;
+            jump_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, -1));
             to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.AND, index, level));
             break;
         case LEXER.Or:
@@ -1199,6 +1204,10 @@ export default class Interpreter {
       pushParseData(to_append);
       if (index === tokens_len - 1 || !ignore_instr_eoi || token.type === LEXER.Delimiter) {
         pushParseData(to_append_eoi);
+        if (jump_instr_index !== -1) {
+          to_append.instructions[jump_instr_index - 1].dataIndex = res.stack.instructions.length;
+          jump_instr_index = -1;
+        }
       }
       if (index === tokens_len - 1 || token.type === LEXER.Delimiter) {
         pushParseData(to_append_eoc);

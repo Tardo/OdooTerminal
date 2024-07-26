@@ -1,4 +1,4 @@
-// min-v 11.2.0
+// min-v 11.2.0; group system
 // Removes modules that doesn't exists anymore...
 // WARNING: This is destructive!! Installed modules can't be removed, but act prudently.
 
