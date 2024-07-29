@@ -224,5 +224,26 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.getShell().eval(code);
     this.assertTrue(results instanceof Array);
     this.assertEqual(results.length, 10);
+
+    code = `
+      $arr = false
+      if ($arr && $arr['test']) {
+        return 'a'
+      }
+      return 'b'
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertEqual(results, 'b');
+
+    code = `
+      $arr = false
+      $val = true
+      if ($arr && $arr['test'] || $val) {
+        return 'a'
+      }
+      return 'b'
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertEqual(results, 'a');
   }
 }

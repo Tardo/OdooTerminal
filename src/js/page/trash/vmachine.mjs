@@ -483,7 +483,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.JUMP_IF_FALSE:
           {
-            last_frame.lastFlowCheck = last_frame.values.pop();
+            last_frame.lastFlowCheck = last_frame.values.at(-1);
             const num_to_skip = instr.dataIndex;
             if (typeof last_frame.lastFlowCheck === 'undefined' || last_frame.lastFlowCheck === null || !last_frame.lastFlowCheck) {
               index += num_to_skip;

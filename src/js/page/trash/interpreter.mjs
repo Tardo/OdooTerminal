@@ -777,10 +777,11 @@ export default class Interpreter {
           to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.POW, index, level));
           break;
         case LEXER.And:
-            ignore_instr_eoi = true;
-            jump_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, -1));
-            to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.AND, index, level));
-            break;
+          ignore_instr_eoi = true;
+          jump_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, -1));
+          jump_instr_index += res.stack.instructions.length;
+          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.AND, index, level));
+          break;
         case LEXER.Or:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.OR, index, level));
@@ -1203,11 +1204,13 @@ export default class Interpreter {
 
       pushParseData(to_append);
       if (index === tokens_len - 1 || !ignore_instr_eoi || token.type === LEXER.Delimiter) {
-        pushParseData(to_append_eoi);
         if (jump_instr_index !== -1) {
-          to_append.instructions[jump_instr_index - 1].dataIndex = res.stack.instructions.length;
+          const rindex = jump_instr_index - 1;
+          res.stack.instructions[rindex].dataIndex = res.stack.instructions.length - rindex;
           jump_instr_index = -1;
         }
+
+        pushParseData(to_append_eoi);
       }
       if (index === tokens_len - 1 || token.type === LEXER.Delimiter) {
         pushParseData(to_append_eoc);
