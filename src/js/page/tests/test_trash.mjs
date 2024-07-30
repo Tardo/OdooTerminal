@@ -245,5 +245,48 @@ export default class TestTrash extends TerminalTestSuite {
     `;
     results = await this.terminal.getShell().eval(code);
     this.assertEqual(results, 'a');
+
+    code = `
+      function test_paramsA(paramA: Number, paramB: String, paramC: Number = 42) {
+        return $paramC;
+      }
+      test_paramsA 10 'dummy'
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertEqual(results, 42);
+
+    code = `
+      function test_paramsB(paramA: Number, paramB: String, paramC: Number = 42) {
+        return $paramC;
+      }
+      test_paramsB 10 'dummy' 74
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertEqual(results, 74);
+
+    code = `
+      function test_paramsC(paramA: Number, paramB: String, paramC: String = '42') {
+        return $paramC;
+      }
+      test_paramsC 10 'dummy'
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertEqual(results, '42');
+
+    code = `
+      $var_test = '32'
+      function test_paramsD(paramA: Number, paramB: String, paramC: String = $var_test) {
+        return $paramC;
+      }
+      test_paramsD 10 'dummy'
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertEqual(results, '32');
+    code = `
+      $var_test = '72'
+      test_paramsD 10 'dummy'
+    `;
+    results = await this.terminal.getShell().eval(code);
+    this.assertEqual(results, '72');
   }
 }

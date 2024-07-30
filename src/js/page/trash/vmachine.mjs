@@ -119,7 +119,7 @@ export default class VMachine {
       }
 
       try {
-        kwargs = await validateAndFormatArguments(cmd_def, kwargs);
+        kwargs = await validateAndFormatArguments(cmd_def, kwargs, this, opts, frame);
       } catch (err) {
         throw new InvalidCommandArgumentFormatError(err.message, name);
       }

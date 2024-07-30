@@ -194,7 +194,7 @@ export default class Interpreter {
             --in_lblock;
           } else if (!in_data_type) {
             if (
-              !isFalsy(options.isData) &&
+              !isFalsy(options?.isData) &&
               (char === SYMBOLS.ITEM_DELIMITER ||
                 char === SYMBOLS.DICTIONARY_SEPARATOR ||
                 prev_char === SYMBOLS.ITEM_DELIMITER ||
@@ -249,7 +249,7 @@ export default class Interpreter {
 
     const tokens_info: Array<TokenInfo> = [];
     const tokens_len: number = tokens.length;
-    let offset: number = options.offset || 0;
+    let offset: number = options?.offset || 0;
     for (let i = 0; i < tokens_len; ++i) {
       const [token_type, token, raw] = tokens[i];
       if (token_type === LEXER.Space) {
@@ -491,7 +491,7 @@ export default class Interpreter {
     return tokens_no_spaces;
   }
 
-  #parseFunction(inputTokens: $ReadOnlyArray<TokenInfo>, index: number): FunctionParseInfo | void {
+  #parseFunction(inputTokens: $ReadOnlyArray<TokenInfo>, index: number, options: ParserOptions): FunctionParseInfo | void {
     let init_index: number = index;
     let fun_name: string;
     let fun_args: Array<ArgDef> = [];
@@ -518,7 +518,20 @@ export default class Interpreter {
       active_value = token_active.value.trim();
       if (active_value.length > 0) {
         fun_args = active_value.split(',')
-          .map(item => ([ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+          .map(item => {
+            // eslint-disable-next-line prefer-const
+            let [varass, vardef] = item.split('=');
+            vardef = vardef && vardef.trim();
+            if (vardef) {
+              // $FlowIgnore
+              vardef = this.parse(vardef, options);
+            }
+            let [varname, vartype] = varass.split(':');
+            varname = varname && varname.trim();
+            vartype = vartype && vartype.trim();
+            const svartype = Object.hasOwn(ARG, vartype) ? ARG[vartype] : ARG.Any;
+            return ([svartype, [varname, varname], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), vardef]: ArgDef);
+          });
       }
     }
 
@@ -841,7 +854,7 @@ export default class Interpreter {
             break;
         case LEXER.Function:
           {
-            const result = this.#parseFunction(res.inputTokens[0], index);
+            const result = this.#parseFunction(res.inputTokens[0], index, options);
             if (typeof result === 'undefined') {
               if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                 throw new InvalidTokenError(token.value, token.start, token.end);
@@ -1225,7 +1238,7 @@ export default class Interpreter {
       }
     }
 
-    if ((options.noReturn === false || typeof options.noReturn === 'undefined') && level === 0) {
+    if ((options?.noReturn === false || typeof options?.noReturn === 'undefined') && level === 0) {
       const last_instr = res.stack.instructions.at(-1);
       if (typeof last_instr !== 'undefined' && last_instr.type !== INSTRUCTION_TYPE.RETURN_VALUE) {
         res.stack.instructions.push(new Instruction(INSTRUCTION_TYPE.RETURN_VALUE, -1, -1));

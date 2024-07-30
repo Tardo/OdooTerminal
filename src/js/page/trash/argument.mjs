@@ -9,7 +9,9 @@ import FunctionTrash from './function';
 import difference from './utils/difference';
 import isEmpty from './utils/is_empty';
 import isFalsy from './utils/is_falsy';
-import type {ArgDef, ArgInfo, CMDDef} from './interpreter';
+import type {ArgDef, ArgInfo, CMDDef, ParseInfo} from './interpreter';
+import type {default as VMachine, EvalOptions} from './vmachine';
+import type Frame from './frame';
 
 /**
  * Resolve argument information
@@ -63,7 +65,7 @@ function sanitizeArgumentValue(val: mixed, arg_type: number): mixed {
     return [val];
   }
 
-  return val;
+  return (typeof val === 'string') ? ARG.cast(val.trim(), arg_type) : val;
 }
 
 function checkArgumentValueType(val: mixed, arg_type: number) {
@@ -97,7 +99,7 @@ function checkArgumentValueType(val: mixed, arg_type: number) {
 /**
  * Check if the parameter type correspond with the expected type.
  */
-export function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwargs: {[string]: mixed}): {[string]: mixed} {
+export async function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwargs: {[string]: mixed}, vmachine: VMachine, opts: EvalOptions, aframe?: Frame): Promise<{[string]: mixed}> {
   // Map full info arguments
   const args_infos_map: Array<[string, ArgInfo]> = cmd_def.args
     .map(x => getArgumentInfo(x))
@@ -112,7 +114,7 @@ export function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwar
     if (!arg_info) {
       throw new Error(i18n.t('trash.argument.noExist', "The argument '{{arg_name}}' does not exist", {arg_name}));
     }
-    full_kwargs[arg_info.names.long] = kwargs[arg_name];
+    full_kwargs[arg_info.names.long] = sanitizeArgumentValue(kwargs[arg_name], arg_info.type);
   }
 
   // Get default/required values/args
@@ -121,7 +123,12 @@ export function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwar
   for (const arg_name in args_infos) {
     const arg_def = args_infos[arg_name];
     if (typeof arg_def.default_value !== 'undefined') {
-      default_values_map.push([arg_name, arg_def.default_value]);
+      let def_val: ParseInfo | mixed = arg_def.default_value;
+      if (cmd_def instanceof FunctionTrash) {
+        // $FlowIgnore
+        def_val = await vmachine.execute(def_val, opts, aframe);
+      }
+      default_values_map.push([arg_name, def_val]);
     }
     if (arg_def.is_required) {
       required_args.push(arg_def.names.long);
@@ -151,7 +158,7 @@ export function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwar
   const new_kwargs: {[string]: mixed} = {};
   for (const arg_name of arg_names) {
     const arg_info = args_infos[arg_name];
-    const arg_value = sanitizeArgumentValue(full_kwargs[arg_name], arg_info.type);
+    const arg_value = full_kwargs[arg_name];
     const arg_long_name = arg_info.names.long;
     const s_arg_long_name = arg_long_name.replaceAll('-', '_');
     if (!checkArgumentValueType(arg_value, arg_info.type)) {

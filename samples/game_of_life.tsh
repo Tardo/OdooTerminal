@@ -1,11 +1,11 @@
-// min-v 11.1.0; group none
+// min-v 11.2.1; group none
 // Conway's Game of Life
 // Note that the terminal is not ready to render graphics. 
 // The mechanisms designed for this purpose are not used, which exausts the execution thread.
 
 $POS_CHECK = [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]]
 $POS_CHECK_LEN = $POS_CHECK['length']
-function get_cell_state(grid, width, height, index) {
+function get_cell_state(grid, width: Number, height: Number, index: Number) {
   $cx = (floor $index % $width)
   $cy = (floor $index / $width)
 
@@ -26,7 +26,7 @@ function get_cell_state(grid, width, height, index) {
   return 0
 }
 
-function get_new_grid_state(grid, width, height, cell_size) {
+function get_new_grid_state(grid, width: Number, height: Number, cell_size: Number) {
   $cgrid = []
   $grid_len = $grid['length']
   for ($e = 0; $e < $grid_len; $e = $e + 1) {
@@ -35,7 +35,7 @@ function get_new_grid_state(grid, width, height, cell_size) {
   return $cgrid
 }
 
-function draw_grid_state(grid, width, cell_size) {
+function draw_grid_state(grid, width: Number, cell_size: Number) {
   $grid_len = $grid['length']
   for ($e = 0; $e < $grid_len; $e = $e + 1) {
     if ($grid[$e] == 1) {
