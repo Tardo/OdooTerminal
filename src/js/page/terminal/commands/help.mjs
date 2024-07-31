@@ -6,6 +6,7 @@
 import i18n from 'i18next';
 import {getArgumentInfo} from '@trash/argument';
 import {ARG} from '@trash/constants';
+import {FUNCTION_TYPE} from '@trash/function';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 import type Screen from '@terminal/core/screen';
@@ -58,8 +59,9 @@ async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
     for (let x = 0; x < sorted_keys_len; ++x) {
       const _cmd = sorted_cmd_keys[x];
       const cmd_def = this.getShell().getVM().getRegisteredCmds()[_cmd];
-      if (kwargs.all || (!kwargs.only_internal && !cmd_def.is_function) || (kwargs.only_internal && cmd_def.is_function)) {
-        ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd], cmd_def.is_function);
+      const is_command = cmd_def.type === FUNCTION_TYPE.Command;
+      if (kwargs.all || (!kwargs.only_internal && is_command) || (kwargs.only_internal && !is_command)) {
+        ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd], !is_command);
       }
     }
   } else if (Object.hasOwn(this.getShell().getVM().getRegisteredCmds(), kwargs.cmd)) {

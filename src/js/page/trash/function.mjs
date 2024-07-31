@@ -6,6 +6,12 @@ import type {ArgDef, ParseInfo} from './interpreter';
 import type {default as VMachine, EvalOptions} from './vmachine';
 import type Frame from './frame';
 
+export const FUNCTION_TYPE: {+[string]: number} = {
+  Native: 1,
+  Internal: 2,
+  Command: 3,
+};
+
 export default class FunctionTrash {
   args: $ReadOnlyArray<ArgDef>;
   code: ParseInfo;

@@ -5,6 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
+import {FUNCTION_TYPE} from '@trash/function';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
@@ -15,8 +16,8 @@ async function func2DDestroyWindow(vmachine: VMachine, kwargs: CMDCallbackArgs):
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmd2DDestroyWindow.definition', 'Destroy 2D Window'),
-    callback_internal: func2DDestroyWindow,
-    is_function: true,
+    callback: func2DDestroyWindow,
+    type: FUNCTION_TYPE.Internal,
     detail: i18n.t('cmd2DCreateWindow.detail', 'Destroy 2D Window'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DDestroyWindow.args.canvas', 'The canvas')],

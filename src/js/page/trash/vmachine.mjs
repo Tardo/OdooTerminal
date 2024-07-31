@@ -6,6 +6,7 @@
 import i18n from 'i18next';
 import {validateAndFormatArguments, getArgumentInputCount, getArgumentInfoByName} from './argument';
 import {INSTRUCTION_TYPE} from './constants';
+import {FUNCTION_TYPE} from './function';
 import Frame from './frame';
 import FunctionTrash from './function';
 import InvalidCommandArgumentFormatError from './exceptions/invalid_command_argument_format_error';
@@ -70,7 +71,7 @@ export default class VMachine {
       secured: false,
       aliases: [],
       example: '',
-      is_function: false,
+      type: FUNCTION_TYPE.Command,
       ...cmd_def,
     };
   }
@@ -124,13 +125,14 @@ export default class VMachine {
         throw new InvalidCommandArgumentFormatError(err.message, name);
       }
 
-      if (cmd_def.is_function) {
-        if (typeof cmd_def.callback_internal === 'undefined') {
+      if (cmd_def.type !== FUNCTION_TYPE.Command) {
+        if (typeof cmd_def.callback === 'undefined') {
           throw new InvalidCommandDefintionError();
         }
         let internal_res;
         try {
-          internal_res = await cmd_def.callback_internal(this, kwargs, frame, opts);
+          // $FlowFixMe
+          internal_res = await cmd_def.callback(this, kwargs, frame, opts);
         } catch (err) {
           if (!silent) {
             throw err;
@@ -467,9 +469,9 @@ export default class VMachine {
               // $FlowFixMe
               const trash_func = new FunctionTrash(args, code);
               const cmd_def = {
-                is_function: true,
                 // $FlowFixMe
-                callback_internal: trash_func.exec.bind(trash_func),
+                callback: trash_func.exec.bind(trash_func),
+                type: FUNCTION_TYPE.Native,
                 args: args,
                 definition: i18n.t('trash.vmachine.func.definition', 'Internal function'),
                 detail: i18n.t('trash.vmachine.func.detail', 'Internal function'),

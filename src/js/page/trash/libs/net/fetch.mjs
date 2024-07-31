@@ -5,6 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
+import {FUNCTION_TYPE} from '@trash/function';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
@@ -38,8 +39,8 @@ async function funcFetch(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<R
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('funcFetch.definition', 'HTTP requests'),
-    callback_internal: funcFetch,
-    is_function: true,
+    callback: funcFetch,
+    type: FUNCTION_TYPE.Internal,
     detail: i18n.t('funcFetch.detail', 'Interface for making HTTP requests and processing the responses.'),
     args: [
       [ARG.String, ['u', 'url'], true, i18n.t('funcFetch.args.url', 'The URL')],

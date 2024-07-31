@@ -5,6 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
+import {FUNCTION_TYPE} from '@trash/function';
 import asyncSleep from '@terminal/utils/async_sleep';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
@@ -16,8 +17,8 @@ async function funcSleep(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<>
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdSleep.definition', 'Sleep'),
-    callback_internal: funcSleep,
-    is_function: true,
+    callback: funcSleep,
+    type: FUNCTION_TYPE.Internal,
     detail: i18n.t('cmdSleep.detail', 'Sleep (time in ms)'),
     args: [
       [ARG.Number, ['t', 'time'], false, i18n.t('cmdSleep.args.time', 'The time to sleep (in ms)')],

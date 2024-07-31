@@ -5,13 +5,13 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from './constants';
-import FunctionTrash from './function';
 import difference from './utils/difference';
 import isEmpty from './utils/is_empty';
 import isFalsy from './utils/is_falsy';
 import type {ArgDef, ArgInfo, CMDDef, ParseInfo} from './interpreter';
 import type {default as VMachine, EvalOptions} from './vmachine';
 import type Frame from './frame';
+import { FUNCTION_TYPE } from './function.mjs';
 
 /**
  * Resolve argument information
@@ -99,7 +99,7 @@ function checkArgumentValueType(val: mixed, arg_type: number) {
 /**
  * Check if the parameter type correspond with the expected type.
  */
-export async function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash, kwargs: {[string]: mixed}, vmachine: VMachine, opts: EvalOptions, aframe?: Frame): Promise<{[string]: mixed}> {
+export async function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[string]: mixed}, vmachine: VMachine, opts: EvalOptions, aframe?: Frame): Promise<{[string]: mixed}> {
   // Map full info arguments
   const args_infos_map: Array<[string, ArgInfo]> = cmd_def.args
     .map(x => getArgumentInfo(x))
@@ -114,7 +114,7 @@ export async function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash
     if (!arg_info) {
       throw new Error(i18n.t('trash.argument.noExist', "The argument '{{arg_name}}' does not exist", {arg_name}));
     }
-    full_kwargs[arg_info.names.long] = sanitizeArgumentValue(kwargs[arg_name], arg_info.type);
+    full_kwargs[arg_info.names.long] = [sanitizeArgumentValue(kwargs[arg_name], arg_info.type), false];
   }
 
   // Get default/required values/args
@@ -124,11 +124,11 @@ export async function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash
     const arg_def = args_infos[arg_name];
     if (typeof arg_def.default_value !== 'undefined') {
       let def_val: ParseInfo | mixed = arg_def.default_value;
-      if (cmd_def instanceof FunctionTrash) {
+      if (cmd_def.type === FUNCTION_TYPE.Native) {
         // $FlowIgnore
         def_val = await vmachine.execute(def_val, opts, aframe);
       }
-      default_values_map.push([arg_name, def_val]);
+      default_values_map.push([arg_name, [def_val, true]]);
     }
     if (arg_def.is_required) {
       required_args.push(arg_def.names.long);
@@ -158,10 +158,10 @@ export async function validateAndFormatArguments(cmd_def: CMDDef | FunctionTrash
   const new_kwargs: {[string]: mixed} = {};
   for (const arg_name of arg_names) {
     const arg_info = args_infos[arg_name];
-    const arg_value = full_kwargs[arg_name];
+    const [arg_value, is_default] = full_kwargs[arg_name];
     const arg_long_name = arg_info.names.long;
     const s_arg_long_name = arg_long_name.replaceAll('-', '_');
-    if (!checkArgumentValueType(arg_value, arg_info.type)) {
+    if (!is_default && !checkArgumentValueType(arg_value, arg_info.type)) {
       // $FlowFixMe
       const value_type = isFalsy(arg_value) ? 'null/undefined' : arg_value.constructor?.name;
       throw new Error(

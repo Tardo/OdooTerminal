@@ -4,6 +4,7 @@
 
 // $FlowIgnore
 import i18n from 'i18next';
+import {FUNCTION_TYPE} from '@trash/function';
 import type {CMDDef} from '@trash/interpreter';
 
 async function funcPNow(): Promise<number> {
@@ -13,8 +14,8 @@ async function funcPNow(): Promise<number> {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('funcPNow.definition', 'High resolution timestamp in milliseconds'),
-    callback_internal: funcPNow,
-    is_function: true,
+    callback: funcPNow,
+    type: FUNCTION_TYPE.Internal,
     detail: i18n.t('funcPNow.detail', 'High resolution timestamp in milliseconds.'),
   };
 }

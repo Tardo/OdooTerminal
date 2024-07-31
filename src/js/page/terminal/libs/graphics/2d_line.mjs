@@ -5,6 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
+import {FUNCTION_TYPE} from '@trash/function';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
@@ -21,8 +22,8 @@ async function func2DLine(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmd2DLine.definition', 'Draw a line'),
-    callback_internal: func2DLine,
-    is_function: true,
+    callback: func2DLine,
+    type: FUNCTION_TYPE.Internal,
     detail: i18n.t('cmd2DLine.detail', 'Draw a line'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DLine.args.canvas', 'The canvas')],

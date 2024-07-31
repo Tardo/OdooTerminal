@@ -77,15 +77,14 @@ export type ParseInfo = {
 
 export type CMDDef = {
   definition: string,
-  callback?: CMDCallback,
-  callback_internal?: CMDCallbackInternal,
+  callback: CMDCallback | CMDCallbackInternal,
   options: CMDOptionsCallback,
   detail: string,
   args: $ReadOnlyArray<ArgDef>,
   secured: boolean,
   aliases: $ReadOnlyArray<string>,
   example: string,
-  is_function: boolean,
+  type: number,
 };
 
 export type RegisteredCMD = {[string]: CMDDef};
@@ -529,7 +528,19 @@ export default class Interpreter {
             let [varname, vartype] = varass.split(':');
             varname = varname && varname.trim();
             vartype = vartype && vartype.trim();
-            const svartype = Object.hasOwn(ARG, vartype) ? ARG[vartype] : ARG.Any;
+            // FIXME: I'm not really convinced by the way it's done
+            const vartypes = vartype?.split('|');
+            let svartype = 0;
+            if (vartypes?.length > 0) {
+              for (const vtype of vartypes) {
+                if (Object.hasOwn(ARG, vtype)) {
+                  svartype |= ARG[vtype];
+                }
+              }
+            }
+            if (svartype === 0) {
+              svartype = ARG.Any;
+            }
             return ([svartype, [varname, varname], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), vardef]: ArgDef);
           });
       }
