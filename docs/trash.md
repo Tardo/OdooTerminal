@@ -24,24 +24,24 @@ If the variable is of type 'función', it is used `$$` to invoke: `$$mifunc para
 
 There are three families of functions:
 
-- Native functions: Are executed entirely by the TraSH virtual machine
+- Native functions: Are executed entirely by the TraSH vm (ofc js vm is used internally).
 
   - Normal (named):
     ```
     function myfun(paramA: Number, paramB: String) { print 'Hello World: ' + $paramA + ' -- ' + $paramB }
     ```
     ```
-    myfunc 10 'Hola'
+    myfunc 10 'Yo'
     ```
   - Anonymous:
     ```
     $myfunc = function(paramA: Number, paramB: String) { print 'Hello World: ' + $paramA + ' -- ' + $paramB }
     ```
     ```
-    $$myfunc 10 'Hola'
+    $$myfunc 10 'Yo'
     ```
 
-- Internal functions: Are executed by the JavaScript virtual machine
+- Internal functions: Are executed by the JavaScript vm
 
   **In Javascript (flow typed)**
 
@@ -49,12 +49,12 @@ There are three families of functions:
   async function funcMy(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<number> { return 42; }
   ```
 
-- Commands: Are executed by the shell and the JavaScript virtual machine
+- Commands: Are executed by the shell and the JavaScript vm
 
   **In Javascript (flow typed)**
 
   ```js
-  async function cmdMy(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<number> { return 42; }
+  async function cmdMy(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<number> { ctx.screen.print('O_o 42!'); return 42; }
   ```
 
 ## If-Elif-Else
