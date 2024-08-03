@@ -1,4 +1,4 @@
-// min-v 11.2.1; group none
+// min-v 11.3.0; group none
 // Barcode Flood
 // What is shown here was reported to Odoo (but ignored as it was not considered important).
 // You can use this script to determine if any action is required on your server to mitigate the problem.

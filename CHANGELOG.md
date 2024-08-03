@@ -1,6 +1,6 @@
 # Changelog
 
-**11.2.1**
+**11.3.0**
 
 ```
 UPD: Docs
@@ -12,6 +12,7 @@ IMP: Tests: Use Official Odoo Docker Image
 
 ADD: TraSH: typed function paramaters
 ADD: TraSH: elif
+ADD: Terminal: Button to reload the shell
 ```
 
 **11.2.0**

@@ -1,4 +1,4 @@
-// min-v 11.2.1; group none
+// min-v 11.3.0; group none
 // Conway's Game of Life
 // Note that the terminal is not ready to render graphics. 
 // The mechanisms designed for this purpose are not used, which exausts the execution thread.
