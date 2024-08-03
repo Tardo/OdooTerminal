@@ -159,6 +159,11 @@ export default class Screen {
     this.#shadowInput_el.value = '';
   }
 
+  refresh() {
+    this.clean();
+    this.cleanInput();
+  }
+
   updateInput(str: string) {
     if (!this.#wasStart) {
       return;

@@ -168,6 +168,8 @@ export default class Terminal {
     this.el.querySelector('.terminal-screen-icon-pin').addEventListener('click', this.#onClickToggleScreenPin.bind(this));
     // $FlowFixMe
     this.el.querySelector('.terminal-multiline').addEventListener('click', this.#onClickToggleMultiline.bind(this));
+    // $FlowFixMe
+    this.el.querySelector('.terminal-screen-icon-reload-shell').addEventListener('click', this.#onClickReloadShell.bind(this));
     // Custom Events
     // $FlowFixMe
     this.el.addEventListener('toggle', this.doToggle.bind(this));
@@ -600,6 +602,15 @@ export default class Terminal {
     }
     setStorageSessionItem('terminal_multiline', this.#config.multiline, err => this.screen.print(err));
     this.screen.preventLostInputFocus();
+  }
+
+  #onClickReloadShell() {
+    this.screen.refresh();
+    this.cleanInputHistory();
+    this.#shell.getVM().cleanNames();
+    this.#updateJobsInfo();
+    this.updateAssistantoptions();
+    this.printWelcomeMessage();
   }
 
   #onKeyEnter() {

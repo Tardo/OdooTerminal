@@ -76,6 +76,10 @@ export default class VMachine {
     };
   }
 
+  cleanNames() {
+    this.#registeredNames = {};
+  }
+
   registerCommand(cmd: string, cmd_def: Partial<CMDDef>): CMDDef {
     this.#registeredCmds[cmd] = VMachine.makeCommand(cmd_def);
     return this.#registeredCmds[cmd];
