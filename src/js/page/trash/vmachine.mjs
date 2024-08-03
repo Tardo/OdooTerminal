@@ -5,10 +5,9 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import {validateAndFormatArguments, getArgumentInputCount, getArgumentInfoByName} from './argument';
-import {INSTRUCTION_TYPE} from './constants';
-import {FUNCTION_TYPE} from './function';
+import {INSTRUCTION_TYPE, ARG} from './constants';
+import {default as FunctionTrash, FUNCTION_TYPE} from './function';
 import Frame from './frame';
-import FunctionTrash from './function';
 import InvalidCommandArgumentFormatError from './exceptions/invalid_command_argument_format_error';
 import InvalidCommandArgumentValueError from './exceptions/invalid_command_argument_value_error';
 import InvalidCommandArgumentsError from './exceptions/invalid_command_arguments_error';
@@ -23,7 +22,6 @@ import InvalidCommandDefintionError from './exceptions/invalid_command_definitio
 import pluck from './utils/pluck';
 import isNumber from './utils/is_number';
 import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
-import { ARG } from './constants.mjs';
 
 export type ProcessCommandJobOptions = {
   cmdRaw: string,

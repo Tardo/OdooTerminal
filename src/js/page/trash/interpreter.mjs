@@ -14,9 +14,9 @@ import {
   MATH_OPER_PRIORITIES,
   SYMBOLS,
   SYMBOLS_MATH_OPER,
+  ARG,
 } from './constants';
 import Instruction from './instruction';
-import {ARG} from './constants';
 import countBy from './utils/count_by';
 import isFalsy from './utils/is_falsy';
 import isNumber from './utils/is_number';
@@ -689,7 +689,6 @@ export default class Interpreter {
 
   /**
    * Create the execution stack
-   * FIXME: maybe RL?
    * FIXME: This is getting a lot of complexity... need be refactored!
    * @param {String} data
    * @param {Boolean} need_reset_stores
@@ -1033,6 +1032,7 @@ export default class Interpreter {
               // Set Jumps
               for (const jump_ref of jump_refs) {
                 to_append.instructions[jump_ref - 1].dataIndex = to_append.instructions.length - jump_ref;
+                console.log(to_append.instructions[jump_ref - 1].type, " //// ", to_append.instructions[jump_ref - 1].dataIndex)
               }
 
               index = uindex;
@@ -1110,9 +1110,9 @@ export default class Interpreter {
                 for (let instr_index = 0; instr_index < parsed_instr_len; ++instr_index) {
                   const instr = parsed_for_block.stack.instructions[instr_index];
                   if (instr.type === INSTRUCTION_TYPE.JUMP_FORWARD) {
-                    if (instr.dataIndex === -1) {
+                    if (instr.dataIndex === -2) {
                       instr.dataIndex = (parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length) - instr_index;
-                    } else {
+                    } else if (instr.dataIndex === -1) {
                       instr.dataIndex = parsed_for_block.stack.instructions.length - instr_index - 1;
                     }
                   }
@@ -1128,10 +1128,10 @@ export default class Interpreter {
           }
           break;
         case LEXER.Break:
-          to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, -1));
+          to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, -2));
           break;
         case LEXER.Continue:
-          to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, 0));
+          to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, -1));
           break;
         case LEXER.String:
         case LEXER.StringSimple:

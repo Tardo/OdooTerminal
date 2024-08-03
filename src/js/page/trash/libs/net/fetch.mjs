@@ -9,7 +9,7 @@ import {FUNCTION_TYPE} from '@trash/function';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
-async function funcFetch(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<Response | void | false> {
+async function funcFetch(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<Response | null | false> {
   if (typeof kwargs.timeout !== 'undefined') {
     const controller = new AbortController();
     const prom = fetch(
@@ -24,7 +24,7 @@ async function funcFetch(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<R
       // FIXME: This is necessary because TraSH does not handle exceptions.
       // If it is null it is an unhandled exception failure.
       if (err === 'timeout') {
-        return false;
+        return null;
       }
       throw err;
     }
