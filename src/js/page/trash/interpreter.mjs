@@ -746,7 +746,6 @@ export default class Interpreter {
     };
     let silent = false;
     let sign_cache = null;
-    let last_token_index = -1;
     let token_subindex = 0;
     let jump_instr_index = -1;
     for (let index = 0; index < tokens_len; ++index) {
@@ -793,7 +792,6 @@ export default class Interpreter {
           break;
         case LEXER.Negative:
           sign_cache = INSTRUCTION_TYPE.UNITARY_NEGATIVE;
-          last_token_index = index;
           continue;
         case LEXER.Add:
           ignore_instr_eoi = true;
@@ -1032,7 +1030,6 @@ export default class Interpreter {
               // Set Jumps
               for (const jump_ref of jump_refs) {
                 to_append.instructions[jump_ref - 1].dataIndex = to_append.instructions.length - jump_ref;
-                console.log(to_append.instructions[jump_ref - 1].type, " //// ", to_append.instructions[jump_ref - 1].dataIndex)
               }
 
               index = uindex;
@@ -1202,32 +1199,14 @@ export default class Interpreter {
         case LEXER.Assignment:
           {
             const last_instr = res.stack.instructions.at(-1);
-            if (last_instr) {
-              if (last_instr.type === INSTRUCTION_TYPE.LOAD_DATA_ATTR) {
-                res.stack.instructions.pop();
-                to_append_eoc.instructions.push(
-                  new Instruction(INSTRUCTION_TYPE.STORE_SUBSCR, index, level, res.stack.names.length - 1),
-                );
-              } else {
-                res.stack.instructions.pop();
-                let dindex = -1;
-                if (last_instr.type === INSTRUCTION_TYPE.LOAD_NAME) {
-                  dindex = res.stack.names[0].length - 1;
-                } else {
-                  to_append_eoc.names.push(null);
-                  dindex = res.stack.names[0].length;
-                }
-                to_append_eoc.instructions.push(
-                  new Instruction(INSTRUCTION_TYPE.STORE_NAME, last_token_index, level, dindex),
-                );
-              }
-            } else {
-              to_append_eoc.names.push(null);
-              const dindex = res.stack.names[0].length;
-              to_append_eoc.instructions.push(
-                new Instruction(INSTRUCTION_TYPE.STORE_NAME, last_token_index, level, dindex),
-              );
+            if (!last_instr || (last_instr.type !== INSTRUCTION_TYPE.LOAD_DATA_ATTR && last_instr.type !== INSTRUCTION_TYPE.LOAD_NAME)) {
+              throw new InvalidTokenError(token.value, token.start, token.end);
             }
+            res.stack.instructions.pop();
+            const instr_type = last_instr.type === INSTRUCTION_TYPE.LOAD_DATA_ATTR ? INSTRUCTION_TYPE.STORE_SUBSCR : INSTRUCTION_TYPE.STORE_NAME;
+            to_append_eoc.instructions.push(
+              new Instruction(instr_type, index, level, res.stack.names[0].length - 1),
+            );
           }
           break;
         case LEXER.DataAttribute:
@@ -1309,7 +1288,6 @@ export default class Interpreter {
       }
 
       if (token.type !== LEXER.Space) {
-        last_token_index = index;
         if (token.type !== LEXER.Delimiter) {
           ++token_subindex;
         }
