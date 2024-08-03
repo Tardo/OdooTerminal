@@ -1,5 +1,19 @@
 # Changelog
 
+**11.2.1**
+
+```
+UPD: Docs
+UPD: Samples
+
+IMP: TraSH: functions
+IMP: TraSH: if/else
+IMP: Tests: Use Official Odoo Docker Image
+
+ADD: TraSH: typed function paramaters
+ADD: TraSH: elif
+```
+
 **11.2.0**
 
 ```

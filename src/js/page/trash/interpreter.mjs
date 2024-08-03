@@ -103,7 +103,7 @@ export type LexerInfo = [number, string, string];
 
 export type FunctionParseInfo = [fun_name: string | void, fun_args: $ReadOnlyArray<ArgDef>, fun_code: string, index: number];
 export type LoopForParseInfo = [for_init: string, for_check: string, for_iter: string, for_code: string, index: number];
-export type IfParseInfo = [if_check: string, if_code: string, else_code: string | void, index: number];
+export type IfParseInfo = [if_check: string, if_code: string, elif_codes: Array<[string, string]>, else_code: string | void, index: number];
 
 /**
  * This is TraSH
@@ -593,6 +593,7 @@ export default class Interpreter {
   #parseIf(inputTokens: $ReadOnlyArray<TokenInfo>, index: number): IfParseInfo | void {
     let init_index: number = index;
     let else_code: string;
+    const elif_codes: Array<[string, string]> = [];
 
     // Check
     let token_active = inputTokens[++init_index];
@@ -614,11 +615,30 @@ export default class Interpreter {
     }
     const if_code = token_active.raw.trim();
 
+    token_active = inputTokens[++init_index];
     // Elif
-    // TODO
+    while (typeof token_active !== 'undefined' && token_active.type === LEXER.Elif) {
+      // Check
+      token_active = inputTokens[++init_index];
+      if (token_active.type !== LEXER.LogicBlock) {
+        break;
+      }
+      const elif_check = token_active.raw.trim();
+      // Code
+      token_active = inputTokens[++init_index];
+      if (typeof token_active === 'undefined') {
+        return;
+      }
+      if (token_active.type !== LEXER.Block) {
+        return;
+      }
+      const elif_code = token_active.raw.trim();
+
+      elif_codes.push([elif_check, elif_code]);
+      token_active = inputTokens[++init_index];
+    }
 
     // Else
-    token_active = inputTokens[++init_index];
     if (typeof token_active !== 'undefined' && token_active.type === LEXER.Else) {
       token_active = inputTokens[++init_index];
       if (typeof token_active === 'undefined') {
@@ -632,7 +652,7 @@ export default class Interpreter {
       --init_index;
     }
 
-    return [if_check, if_code, else_code, init_index];
+    return [if_check, if_code, elif_codes, else_code, init_index];
   }
 
   #appendParse(value: string, options: ParserOptions, res: ParseInfo, to_append: ParseStackInfo): ParseInfo {
@@ -912,7 +932,8 @@ export default class Interpreter {
                 throw new InvalidTokenError(token.value, token.start, token.end);
               }
             } else {
-              const [if_check, if_code, else_code, uindex] = result;
+              const jump_refs = [];
+              const [if_check, if_code, elif_codes, else_code, uindex] = result;
 
               // Check
               this.#appendParse(
@@ -941,9 +962,50 @@ export default class Interpreter {
                 to_append,
               );
               if (parsed_if_block) {
-                to_append.instructions[ref_if_instr_index - 1].dataIndex = parsed_if_block.stack.instructions.length;
+                jump_refs.push(
+                  to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, -1))
+                );
+                to_append.instructions[ref_if_instr_index - 1].dataIndex = parsed_if_block.stack.instructions.length + 1;
               } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                 throw new InvalidTokenError(token.value, token.start, token.end);
+              }
+
+              // Elif Codes
+              for (const [elif_check, elif_code] of elif_codes) {
+                // Check
+                this.#appendParse(
+                  elif_check,
+                  {
+                    registeredCmds: options.registeredCmds,
+                    silent: true,
+                    offset: token.start + 1,
+                    noReturn: true,
+                  },
+                  res,
+                  to_append,
+                );
+                const ref_elif_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, -1));
+
+                // Code
+                const parsed_elif_block = this.#appendParse(
+                  elif_code,
+                  {
+                    registeredCmds: options.registeredCmds,
+                    silent: false,
+                    offset: token.start + 1,
+                    noReturn: true,
+                  },
+                  res,
+                  to_append,
+                );
+                if (parsed_elif_block) {
+                  jump_refs.push(
+                    to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, -1))
+                  );
+                  to_append.instructions[ref_elif_instr_index - 1].dataIndex = parsed_elif_block.stack.instructions.length + 1;
+                } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
+                  throw new InvalidTokenError(token.value, token.start, token.end);
+                }
               }
 
               // Else Code
@@ -966,6 +1028,11 @@ export default class Interpreter {
                 } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                   throw new InvalidTokenError(token.value, token.start, token.end);
                 }
+              }
+
+              // Set Jumps
+              for (const jump_ref of jump_refs) {
+                to_append.instructions[jump_ref - 1].dataIndex = to_append.instructions.length - jump_ref;
               }
 
               index = uindex;

@@ -18,11 +18,9 @@ for ($i = 20000; $i > 0; $i = $i - 100) {
     if ($resp && $resp['status'] == 200) {
         $vuln_location = $full_vuln_location
         break
-    } else {
-        if ($resp == null) {
-            print "Website offline! (Has endured less than expected :S)"
-            return -1 
-        }
+    } elif ($resp == null) {
+        print "Website offline! (Has endured less than expected :S)"
+        return -1
     }
 }
 
@@ -39,11 +37,9 @@ for (;1;) {
     if ($resp && $resp['status'] != 200) {
         print "Website offline! (Proxied)"
         break
-    } else {
-        if ($resp == null) {
-            print "Website offline!"
-            break 
-        }
+    } elif ($resp == null) {
+        print "Website offline!"
+        break
     }
     $count = $count + 1
 }
