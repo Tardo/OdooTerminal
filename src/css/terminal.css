@@ -220,6 +220,10 @@
   flex: 1 1 auto; /* Here to force BS4 behavior */
   width: 100%;
   padding: 3px;
+  border: none;
+  overflow: auto;
+  outline: none;
+  box-shadow: none;
 }
 
 .o_terminal .terminal-user-input input {
