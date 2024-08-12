@@ -70,7 +70,7 @@
     },
     "created": "Alias created successfully",
     "definition": "Create aliases",
-    "detail": "Define aliases to run commands easy. <br><b>WARNING:</b> This command uses 'local storage' to persist the data even if you close the browser. This data can be easy accessed by other computer usedrs. Don't use sensible data if you are using a shared computer.<br><br>Can use positional parameters ($1,$2,$3,$N...)",
+    "detail": "Define aliases to run commands easy. <br><b>WARNING:</b> This command uses 'local storage' to persist the data even if you close the browser. This data can be easy accessed by other computer users. Don't use sensible data if you are using a shared computer.<br><br>Can use positional parameters ($1,$2,$3,$N...)",
     "example": "-n myalias -c \"print 'Hello, $1!'\"",
     "invalidAliasName": "Invalid alias name",
     "notDefined": "No aliases defined.",
@@ -516,8 +516,8 @@
     "args": {
       "msg": "The message to print"
     },
-    "definition": "Close terminal",
-    "detail": "Close the terminal."
+    "definition": "Print a message",
+    "detail": "Eval parameters and print the result."
   },
   "cmdRead": {
     "args": {
