@@ -32,7 +32,7 @@ export function setStorageItem(item: string, value: mixed, on_error?: SessionSto
 export function removeStorageItem(item: string): boolean {
   try {
     sessionStorage.removeItem(item);
-  } catch (err) {
+  } catch (_err) {
     return false;
   }
   return true;

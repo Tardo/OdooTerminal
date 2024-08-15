@@ -32,7 +32,7 @@ export function setStorageItem(item: string, value: mixed, on_error?: LocalStora
 export function removeStorageItem(item: string): boolean {
   try {
     localStorage.removeItem(item);
-  } catch (err) {
+  } catch (_err) {
     return false;
   }
   return true;

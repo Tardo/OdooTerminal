@@ -32,7 +32,7 @@ export default async function (
     let records: Array<OdooSearchResponse> = [];
     try {
       records = await searchRead(model, domain, fields, context, extra_params, {'silent': true});
-    } catch (e) {
+    } catch (_err) {
       // Do nothing
     }
     if (map_func) {

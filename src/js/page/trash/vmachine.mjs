@@ -106,7 +106,7 @@ export default class VMachine {
       const {values} = frame;
       for (let index = items_len - 1, adone = frame.values.length - 1; index >= 0; --index) {
         let arg_name = frame.args.pop();
-        if (!arg_name) {
+        if (typeof arg_name === 'undefined' || !arg_name) {
           arg_def = cmd_def.args[index];
           if (!arg_def) {
             throw new InvalidCommandArgumentValueError(name, values[adone--]);
@@ -191,7 +191,7 @@ export default class VMachine {
             try {
               const store_val = last_frame.getStoreValue(var_name);
               last_frame.values.push(store_val);
-            } catch (err) {
+            } catch (_err) {
               throw new UnknownNameError(var_name, token.start, token.end);
             }
           }
@@ -335,7 +335,7 @@ export default class VMachine {
           {
             const frame = frames.pop();
             // Subframes are executed in silent mode
-            if (typeof frame.cmd !== 'undefined') {
+            if (typeof frame?.cmd !== 'undefined') {
               const frame_cmd = frame.cmd;
               let cmd_def = this.#registeredCmds[frame_cmd];
               if (typeof cmd_def === 'undefined') {
@@ -416,7 +416,7 @@ export default class VMachine {
             try {
               // $FlowFixMe
               res_value = value[attr_name];
-            } catch (err) {
+            } catch (_err) {
               // Do nothing
             }
             if (res_value === null || typeof res_value === 'undefined') {

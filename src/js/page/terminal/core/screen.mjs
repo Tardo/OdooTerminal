@@ -485,7 +485,7 @@ export default class Screen {
         this.#updateInputMode('single');
       }
       this.#question_active = this.#questions.shift();
-      if (this.#question_active.values) {
+      if (this.#question_active?.values) {
         const values = this.#question_active.values.map(item => {
           // $FlowFixMe
           if (item === this.#question_active.def_value) {
@@ -569,9 +569,11 @@ export default class Screen {
       const nodes = $lines.slice(0, diff);
       do {
         const node = nodes.pop();
-        const can_be_deleted = node.querySelector('.print-table tbody:empty') || !node.querySelector('.print-table');
-        if (can_be_deleted) {
-          node.remove();
+        if (node) {
+          const can_be_deleted = node.querySelector('.print-table tbody:empty') || !node.querySelector('.print-table');
+          if (can_be_deleted) {
+            node.remove();
+          }
         }
       } while (nodes.length);
     }

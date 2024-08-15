@@ -26,7 +26,7 @@
       "width": "The canvas width"
     },
     "definition": "Create 2D Window",
-    "detail": "Destroy 2D Window"
+    "detail": "Create 2D Window"
   },
   "cmd2DDestroyWindow": {
     "args": {

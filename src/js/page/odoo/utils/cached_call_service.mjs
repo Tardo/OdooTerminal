@@ -28,7 +28,7 @@ export default async function (
     let values: Array<mixed> = [];
     try {
       values = await callService(service, method, args);
-    } catch (e) {
+    } catch (_err) {
       // Do nothing
     }
     if (map_func) {

@@ -1227,6 +1227,9 @@ export default class Interpreter {
             const last_instr: Instruction | void = res.stack.instructions.at(-1);
             if (last_instr && last_instr.type === INSTRUCTION_TYPE.UNITARY_NEGATIVE) {
               const instr = res.stack.instructions.pop();
+              if (!instr) {
+                throw new InvalidTokenError(token.value, token.start, token.end);
+              }
               to_append.instructions.push(instr);
             }
             res.maxULevel = parsed_attribute.maxULevel;

@@ -778,7 +778,7 @@ export default class Terminal {
           ev.preventDefault();
         }
       }
-    } catch (err) {
+    } catch (_err) {
       // Do nothing
     }
   }

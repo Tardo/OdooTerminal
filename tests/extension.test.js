@@ -22,7 +22,7 @@ async function loginAs(login, password) {
       });
       expect(text).toContain('Only employee can access this database');
     }
-  } catch(e) {
+  } catch (_err) {
     // do nothing
   }
 }
@@ -52,7 +52,7 @@ describe('OdooTerminal', () => {
       const elm = document.querySelector('.o_terminal #terminal_screen');
       return elm.textContent;
     });
-    console.debug('---- TERMINAL OUTPUT:', text);
+    console.debug('---- TERMINAL OUTPUT:', text); // eslint-disable-line no-console
 
     await page.waitForSelector('.o_terminal .terminal-test-ok');
   }, WAIT_MINS * 35);

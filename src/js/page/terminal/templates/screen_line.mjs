@@ -19,7 +19,7 @@ export function renderLineArray(msg: Array<mixed>, cls?: string): Array<string> 
   const res = [];
   const l = msg.length;
   for (let x = 0; x < l; ++x) {
-    res.push(`<span class='line-array ${cls || ''}'>${renderLine(msg[x])[0]}</span>`); // eslint-disable-line no-use-before-define
+    res.push(`<span class='line-array ${cls || ''}'>${renderLine(msg[x])[0]}</span>`);  
   }
   return res;
 }

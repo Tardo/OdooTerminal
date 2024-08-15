@@ -1,4 +1,3 @@
-/* eslint-disable */
 import alias from '@rollup/plugin-alias';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
@@ -34,7 +33,6 @@ export default [
 
       eslint({
         fix: true,
-        exclude: ['node_modules/**', '**.css'],
       }),
 
       is_production && terser(),
@@ -111,7 +109,6 @@ export default [
 
       eslint({
         fix: true,
-        exclude: ['node_modules/**', '**.css'],
       }),
 
       is_production && terser(),
@@ -168,7 +165,6 @@ export default [
       }),
       eslint({
         fix: true,
-        exclude: ['node_modules/**', '**.css'],
       }),
 
       is_production && terser(),
