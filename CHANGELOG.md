@@ -1,5 +1,11 @@
 # Changelog
 
+**11.3.1**
+
+```
+UPD: Manifest strings
+```
+
 **11.3.0**
 
 ```

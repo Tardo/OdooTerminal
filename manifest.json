@@ -6,7 +6,7 @@
   },
   "action": {
     "default_icon": "src/img/terminal-disabled-16.png",
-    "default_title": "Odoo Terminal (CTRL + ,)"
+    "default_title": "OdooTerminal (CTRL + ,)"
   },
   "browser_specific_settings": {
     "gecko": {
@@ -36,7 +36,7 @@
   },
   "manifest_version": 3,
   "default_locale": "en",
-  "name": "__MSG_extensionName__",
+  "name": "OdooTerminal",
   "options_ui": {
     "page": "src/html/options.html",
     "open_in_tab": true
