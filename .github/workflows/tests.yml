@@ -90,15 +90,11 @@ jobs:
           npm install
 
       - name: Install browser firefox
-        uses: browser-actions/setup-firefox@latest
-        with:
-          firefox-version: "latest"
+        run: npx @puppeteer/browsers install firefox
         if: ${{ matrix.browser == 'firefox' }}
 
       - name: Install browser chrome
-        uses: browser-actions/setup-chrome@latest
-        with:
-          chrome-version: "stable"
+        run: npx @puppeteer/browsers install chrome
         if: ${{ matrix.browser == 'chrome' }}
 
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
