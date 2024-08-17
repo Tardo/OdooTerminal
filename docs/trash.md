@@ -18,7 +18,7 @@ validate the types.
 
 To declare a variable: `$var = 'value'` To retrieve the value: `$var`
 
-If the variable is of type 'función', it is used `$$` to invoke: `$$mifunc paramA paramB`
+If the variable is of type 'function', it is used `$$` to invoke: `$$mifunc paramA paramB`
 
 ## Functions
 
