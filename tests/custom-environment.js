@@ -1,6 +1,6 @@
 import { TestEnvironment } from 'jest-environment-puppeteer';
 
-// FIXME: Here beceause of https://github.com/argos-ci/jest-puppeteer/issues/586
+// FIXME: Here due to https://github.com/argos-ci/jest-puppeteer/issues/586
 class Env extends TestEnvironment {
   async setup() {
     await super.setup();

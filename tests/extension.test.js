@@ -1,3 +1,6 @@
+/**
+ * @jest-environment ./tests/custom-environment
+ */
 const WAIT_MINS = 60000;
 
 function construct_url(relative_path = '') {
