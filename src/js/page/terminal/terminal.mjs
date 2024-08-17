@@ -587,6 +587,10 @@ export default class Terminal {
   }
 
   #onClickToggleMultiline(ev: MouseEvent) {
+    const question_active = this.screen.getQuestionActive();
+    if (typeof question_active !== 'undefined') {
+      return;
+    }
     this.#config.multiline = !this.#config.multiline;
     if (ev.currentTarget instanceof HTMLElement) {
       const target = ev.currentTarget;
