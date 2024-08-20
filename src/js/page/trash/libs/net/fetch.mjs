@@ -11,19 +11,18 @@ import type VMachine from '@trash/vmachine';
 
 async function funcFetch(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<Response | null | false> {
   if (typeof kwargs.timeout !== 'undefined') {
-    const controller = new AbortController();
     const prom = fetch(
       kwargs.url,
-      Object.assign({signal: controller.signal}, kwargs.options),
+      // $FlowFixMe
+      Object.assign({signal: AbortSignal.timeout(kwargs.timeout)}, kwargs.options),
     );
-    setTimeout(() => controller.abort('timeout'), kwargs.timeout);
     let res;
     try {
       res = await prom;
     } catch (err) {
       // FIXME: This is necessary because TraSH does not handle exceptions.
       // If it is null it is an unhandled exception failure.
-      if (err === 'timeout') {
+      if (err?.name === 'TimeoutError') {
         return null;
       }
       throw err;
