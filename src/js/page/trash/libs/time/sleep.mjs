@@ -23,6 +23,6 @@ export default function (): Partial<CMDDef> {
     args: [
       [ARG.Number, ['t', 'time'], false, i18n.t('cmdSleep.args.time', 'The time to sleep (in ms)')],
     ],
-    example: '200',
+    example: '-t 200',
   };
 }
