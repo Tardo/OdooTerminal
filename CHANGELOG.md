@@ -3,7 +3,11 @@
 **11.3.1**
 
 ```
+IMP: Internal Command 'fetch': Use AbortSignal.timeout
+
 UPD: Manifest strings
+
+FIX: Extension options page
 ```
 
 **11.3.0**

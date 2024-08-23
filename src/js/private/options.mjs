@@ -72,12 +72,31 @@ function saveOptions() {
       } else if (type === 'check') {
         data[name] = target.checked;
       } else if (type === 'json') {
-        data[name] = JSON.parse(target.value);
+        try {
+          data[name] = JSON.parse(target.value);
+        } catch (_err) {
+          data[name] = '';
+        }
+      }
+    } else if (target instanceof HTMLTextAreaElement) {
+      if (type === 'json') {
+        try {
+          data[name] = JSON.parse(target.value);
+        } catch (_err) {
+          data[name] = '';
+        }
+      }
+    } else if (target instanceof HTMLSelectElement) {
+      if (type === 'option') {
+        data[name] = target.value;
+      }
+    }
+    if (typeof data[name] === 'undefined') {
+      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+        data[name] = target.value;
       } else {
         data[name] = '';
       }
-    } else {
-      data[name] = '';
     }
   }
   data.shortcuts = shortcuts_defs;
@@ -94,17 +113,28 @@ function applyInputValues() {
         continue;
       }
       const elm = document.getElementById(name);
-      if (elm && elm instanceof HTMLInputElement) {
-        if (type === 'edit') {
-          elm.value = result[name] || '';
-        } else if (type === 'check') {
-          elm.checked = result[name] || false;
-        } else if (type === 'int') {
-          elm.value = result[name] || 0;
-        } else if (type === 'json') {
-          elm.value = JSON.stringify(result[name], null, 4) || '{}';
-        } else if (type === 'option') {
-          elm.value = result[name] || null;
+      if (elm) {
+        if (elm instanceof HTMLInputElement) {
+          if (type === 'edit') {
+            elm.value = result[name] || '';
+          } else if (type === 'check') {
+            elm.checked = result[name] || false;
+          } else if (type === 'int') {
+            elm.value = result[name] || 0;
+          } else if (type === 'json') {
+            elm.value = JSON.stringify(result[name] || {}, null, 4);
+          }
+        } else if (elm instanceof HTMLTextAreaElement) {
+          if (type === 'edit') {
+            elm.value = result[name] || '';
+          } else if (type === 'json') {
+            elm.value = JSON.stringify(result[name] || {}, null, 4);
+          }
+        } else if (elm instanceof HTMLSelectElement) {
+          if (type === 'option') {
+            // $FlowIgnore
+            elm.value = result[name] || SETTING_DEFAULTS[name];
+          }
         }
       }
     }
