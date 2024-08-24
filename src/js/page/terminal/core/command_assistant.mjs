@@ -36,6 +36,7 @@ export type CMDAssistantInputInfo = {
     current: string,
     arg: string,
   },
+  total_args: number,
 };
 
 export default class CommandAssistant {
@@ -63,8 +64,8 @@ export default class CommandAssistant {
     return arg_infos;
   }
 
-  #getAvailableParameters(command_info: CMDDef, arg_name: string, arg_value: string): Array<CMDAssistantOption> {
-    const arg_info = getArgumentInfoByName(command_info.args, arg_name);
+  #getAvailableParameters(command_info: CMDDef, arg_key: string | number, arg_value: string): Array<CMDAssistantOption> {
+    const arg_info = (typeof arg_key === 'number') ? getArgumentInfo(command_info.args[arg_key]) : getArgumentInfoByName(command_info.args, arg_key);
     const res_param_infos: Array<CMDAssistantOption> = [];
     if (arg_info) {
       if (arg_info.strict_values) {
@@ -123,11 +124,11 @@ export default class CommandAssistant {
 
   async #getAvailableDynamicParameters(
     command_info: CMDDef,
-    arg_name: string,
+    arg_key: string | number,
     arg_value: string,
     filter_mode: string,
   ): Promise<Array<CMDAssistantOption>> {
-    const arg_info = getArgumentInfoByName(command_info.args, arg_name);
+    const arg_info = (typeof arg_key === 'number') ? getArgumentInfo(command_info.args[arg_key]) : getArgumentInfoByName(command_info.args, arg_key);
     if (!arg_info) {
       return [];
     }
@@ -150,16 +151,17 @@ export default class CommandAssistant {
     return ret;
   }
 
-  getSelectedParameterIndex(parse_info: ParseInfo, caret_pos: number): [number, number, number, number] {
+  getSelectedParameterIndex(parse_info: ParseInfo, caret_pos: number): [number, number, number, number, number] {
     const {stack} = parse_info;
     if (!stack.instructions.length) {
-      return [-1, -1, -1, 0];
+      return [-1, -1, -1, 0, 0];
     }
     let sel_token_index = -1;
     let sel_cmd_index = -1;
     let sel_arg_index = -1;
     let sel_level = 0;
     let end_i = -1;
+    const total_args: {[number]: number} = {};
     const instr_count = stack.instructions.length;
     // Found selected token and EOC/EOL
     for (let index = instr_count - 1; index >= 0 ; --index) {
@@ -171,6 +173,14 @@ export default class CommandAssistant {
       if (!token) {
         continue;
       }
+
+      if (caret_pos >= token.end && (token.type === LEXER.ArgumentShort || token.type === LEXER.ArgumentLong)) {
+        if (!Object.hasOwn(total_args, instr.level)) {
+          total_args[instr.level] = 0;
+        }
+        ++total_args[instr.level];
+      }
+
       if (caret_pos >= token.start && caret_pos <= token.end) {
         sel_token_index = instr.inputTokenIndex;
         sel_level = instr.level;
@@ -217,12 +227,12 @@ export default class CommandAssistant {
         break;
       }
     }
-    return [sel_cmd_index, sel_token_index, sel_arg_index, sel_level];
+    return [sel_cmd_index, sel_token_index, sel_arg_index, sel_level, total_args[sel_level] || 0];
   }
 
   getInputInfo(data: string, caret_pos: number): CMDAssistantInputInfo {
     const parse_info = this.#shell.parse(data, {ignoreErrors: true});
-    const [sel_cmd_index, sel_token_index, sel_arg_index, sel_level] = this.getSelectedParameterIndex(parse_info, caret_pos);
+    const [sel_cmd_index, sel_token_index, sel_arg_index, sel_level, total_args] = this.getSelectedParameterIndex(parse_info, caret_pos);
     let sel_token_index_san = sel_token_index;
     // If not current, force last arg
     if (sel_token_index_san === -1) {
@@ -243,6 +253,7 @@ export default class CommandAssistant {
         current: parse_info.inputTokens[sel_level][sel_token_index_san]?.value,
         arg: parse_info.inputTokens[sel_level][sel_arg_index]?.value,
       },
+      total_args: total_args,
     };
   }
 
@@ -302,15 +313,23 @@ export default class CommandAssistant {
       }
     } else if (
       input_info.index.current !== input_info.index.cmd &&
-      input_info.index.current - 1 === input_info.index.arg &&
-      input_info.token.arg
+      ((
+        input_info.index.current - 1 === input_info.index.arg &&
+        input_info.token.arg
+      ) || (
+        !input_info.token.arg && input_info.total_args === 0
+      ))
     ) {
       // Parameter
-      let param_infos = this.#getAvailableParameters(command_info, input_info.token.arg, input_info.token.current);
+      let param_infos = this.#getAvailableParameters(
+        command_info,
+        input_info.token.arg || (input_info.index.current - 1),
+        input_info.token.current,
+      );
       if (!dyn_opts && isEmpty(param_infos)) {
         param_infos = await this.#getAvailableDynamicParameters(
           command_info,
-          input_info.token.arg,
+          input_info.token.arg || (input_info.index.current - 1),
           input_info.token.current,
           filter_mode,
         );
