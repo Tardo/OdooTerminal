@@ -16,7 +16,8 @@ export PUPPETEER_BROWSER=chrome
 npm run test
 ```
 
-\*\* Available browsers: chromium, chrome \*\* Maybe, one day... can install the extension in firefox using puppeteer
+\*\* Available browsers: chromium, chrome (Maybe, someday it will be possible to install the extension in firefox using
+puppeteer)
 
 \*\* Avaiblable versions: 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0
 

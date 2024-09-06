@@ -14,15 +14,16 @@ export default function (): Object {
   if (typeof OdooVerMajor === 'number') {
     if (OdooVerMajor >= 15) {
       const OwlVer = getOwlVersionMajor();
+      const OwlCompatServ = getOdooService('web.OwlCompatibility');
       if (OwlVer === 1) {
         // $FlowIgnore
         const {Component} = owl;
-        const {ComponentAdapter} = getOdooService('web.OwlCompatibility');
+        const {ComponentAdapter} = OwlCompatServ;
         return new ComponentAdapter(null, {Component});
       } else if (OwlVer === 2) {
         // $FlowIgnore
         const {Component} = owl;
-        const {standaloneAdapter} = getOdooService('web.OwlCompatibility');
+        const {standaloneAdapter} = OwlCompatServ;
         return standaloneAdapter({Component});
       }
     } else if (OdooVerMajor >= 14) {

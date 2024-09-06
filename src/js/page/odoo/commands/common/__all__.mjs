@@ -43,6 +43,8 @@ import cmdWhoami from './whoami';
 import cmdWrite from './write';
 import cmdWS from './ws';
 import cmdURL from './url';
+import cmdInfo from './info';
+import cmdNotify from './notify';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -87,4 +89,6 @@ export default function (vm: VMachine) {
   vm.registerCommand('rollback', cmdRollback());
   vm.registerCommand('now', cmdNow());
   vm.registerCommand('url', cmdURL());
+  vm.registerCommand('info', cmdInfo());
+  vm.registerCommand('notify', cmdNotify());
 }

@@ -31,7 +31,7 @@ export default async function (
   if (typeof cache[cache_hash] === 'undefined') {
     let records: Array<OdooSearchResponse> = [];
     try {
-      records = await searchRead(model, domain, fields, context, extra_params, {'silent': true});
+      records = await searchRead(model, domain, fields, context, extra_params || {}, {'silent': true});
     } catch (_err) {
       // Do nothing
     }

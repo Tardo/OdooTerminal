@@ -25,5 +25,5 @@ export default function (...service_names: Array<string>): Object {
     service_cache[service_names_set] = service;
     return service;
   }
-  return null;
+  return undefined;
 }

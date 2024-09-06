@@ -12,6 +12,7 @@ declare type OdooSession = {
   db: string,
   uid: number,
   user_id: number,
+  storeData: Object,
   [string]: number | string,
 };
 declare type OdooLongpollingItem = [string, string] | {...};

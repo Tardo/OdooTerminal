@@ -88,6 +88,14 @@ export default class TerminalTestSuite {
     );
   }
 
+  isNotifyShowed(): boolean {
+    return (
+      document.querySelector(
+        '.o_notification_manager',
+      ) !== null
+    );
+  }
+
   async onStartTests(test_names: $ReadOnlyArray<string>): Promise<$ReadOnlyArray<string>> {
     return test_names;
   }

@@ -14,6 +14,7 @@ import registerBackofficeFuncs from '@odoo/commands/backoffice/__all__';
 import registerCommonFuncs from '@odoo/commands/common/__all__';
 import OdooTerminal from '@odoo/terminal';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
+import getOdooService from '@odoo/utils/get_odoo_service';
 import getUID from '@odoo/utils/get_uid';
 import getUsername from '@odoo/utils/get_username';
 import isBackOffice from '@odoo/utils/is_backoffice';
@@ -52,7 +53,23 @@ function getTerminalObj(): OdooTerminal | void {
   return terminal;
 }
 
-function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
+async function postInitTerminal(term_obj: OdooTerminal) {
+  let odoo_ver = getOdooVersion();
+  if (typeof odoo_ver !== 'string') {
+    odoo_ver = 'unknown';
+  }
+  const vals: Partial<InputInfo> = {
+    version: odoo_ver,
+  };
+  const username = await getUsername();
+  const uid = getUID();
+  if (uid && uid !== -1) {
+    vals.username = username ? username : `uid: ${uid}`;
+  }
+  term_obj.screen.updateInputInfo(vals);
+}
+
+async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   window.__OdooTerminal = {
     raw_server_info: info,
     load_tests: config.devmode_tests,
@@ -68,20 +85,18 @@ function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
     if (isBackOffice()) {
       registerBackofficeFuncs(term_obj.getShell().getVM());
     }
-    term_obj.init(config);
-    let odoo_ver = getOdooVersion();
-    if (typeof odoo_ver !== 'string') {
-      odoo_ver = 'unknown';
+    let lazyLoaderServ = getOdooService("@web/legacy/js/public/lazyloader");
+    if (typeof lazyLoaderServ === 'undefined') {
+      term_obj.init(config);
+      await postInitTerminal(term_obj);
+    } else {
+      // Caching call: see command implementation for more details.
+      getUID();
+      lazyLoaderServ = lazyLoaderServ[Symbol.for('default')];
+      await lazyLoaderServ.allScriptsLoaded;
+      term_obj.init(config);
+      await postInitTerminal(term_obj);
     }
-    const vals: Partial<InputInfo> = {
-      version: odoo_ver,
-    };
-    const username = getUsername();
-    const uid = getUID();
-    if (uid && uid !== -1) {
-      vals.username = username ? username : `uid: ${uid}`;
-    }
-    term_obj.screen.updateInputInfo(vals);
   }
 }
 

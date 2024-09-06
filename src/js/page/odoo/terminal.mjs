@@ -11,6 +11,7 @@ import searchRead from './orm/search_read';
 import ParameterGenerator from './parameter_generator';
 import renderWelcome from './templates/welcome';
 import getOdooSession from './utils/get_odoo_session';
+import codeHelpers from './tl/helpers';
 
 export default class OdooTerminal extends Terminal {
   parameterGenerator: ParameterGenerator;
@@ -56,12 +57,7 @@ export default class OdooTerminal extends Terminal {
    */
   async start(): Promise<> {
     await super.start();
-    // Helpers
-    const helpers = `
-      $RMOD=function(){return (url -s hash -k model)}
-      $RID=function(){return (url -s hash -k id)}
-    `;
-    await this.execute(helpers, false, true);
+    await this.execute(codeHelpers, false, true);
   }
 
   /**

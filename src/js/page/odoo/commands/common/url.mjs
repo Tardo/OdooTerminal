@@ -4,6 +4,7 @@
 
 // $FlowIgnore
 import i18n from 'i18next';
+import getUrlInfo from '@odoo/utils/get_url_info';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
@@ -14,22 +15,12 @@ async function cmdURL(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise
       ctx.screen.printError(i18n.t('cmdURL.error.notKey', 'A key has not been provided'));
       return res;
     }
-    const data = Object.fromEntries(
-      window.location[kwargs.section]
-        .substr(1)
-        .split('&')
-        .map(item => item.split('=')),
-    );
-    if (Object.hasOwn(data, kwargs.key)) {
-      res = data[kwargs.key];
-    }
+    res = getUrlInfo(kwargs.section, kwargs.key) || '';
   } else {
     res = window.location[kwargs.section];
   }
 
-  if (res !== '') {
-    ctx.screen.print(res);
-  }
+  ctx.screen.print(res);
   return res;
 }
 

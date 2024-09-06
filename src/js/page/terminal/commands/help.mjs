@@ -23,6 +23,9 @@ async function printHelpDetailed(screen: Screen, cmd: string, cmd_def: CMDDef) {
   let arg_info_str = '';
   for (const arg of cmd_def.args) {
     const arg_info = getArgumentInfo(arg);
+    if (arg_info === null) {
+      continue;
+    }
     const lnames = [`-${arg_info.names.short}`, `--${arg_info.names.long}`];
     const arg_symbols = arg_info.is_required ? ['<', '>'] : ['[', ']'];
     arg_info_str += `${arg_symbols[0]}${lnames.join(', ')} [${ARG.getHumanType(arg_info.type)}`;

@@ -370,18 +370,40 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertNotEmpty(res);
   }
 
+  async test_info() {
+    let res = await this.terminal.execute('info -ui', false, true);
+    this.assertTrue(res > 0);
+    res = await this.terminal.execute('info -ul', false, true);
+    this.assertEqual(res, 'admin');
+    await this.terminal.execute('view res.partner 7', false, true);
+    await asyncSleep(2500);
+    res = await this.terminal.execute('info -ai', false, true);
+    this.assertEqual(res, 7);
+    res = await this.terminal.execute('info -am', false, true);
+    this.assertEqual(res, 'res.partner');
+  }
+
   async test_helpers() {
+    let res = await this.terminal.execute('$$UID', false, true);
+    this.assertTrue(res > 0);
+    res = await this.terminal.execute('$$UNAME', false, true);
+    this.assertEqual(res, 'admin');
     await this.terminal.execute('view res.partner 1', false, true);
     await asyncSleep(2500);
-    let res = await this.terminal.execute('$$RMOD', false, true);
+    res = await this.terminal.execute('$$RMOD', false, true);
     this.assertEqual(res, 'res.partner');
     res = await this.terminal.execute('$$RID', false, true);
-    this.assertEqual(res, '1');
+    this.assertEqual(res, 1);
     await this.terminal.execute('view res.partner 7', false, true);
     await asyncSleep(2500);
     res = await this.terminal.execute('$$RMOD', false, true);
     this.assertEqual(res, 'res.partner');
     res = await this.terminal.execute('$$RID', false, true);
-    this.assertEqual(res, '7');
+    this.assertEqual(res, 7);
+  }
+
+  async test_notify() {
+    await this.terminal.execute('notify -m "This is a test!" -t "The Test"', false, true);
+    this.assertTrue(this.isNotifyShowed());
   }
 }

@@ -1200,13 +1200,16 @@ export default class Interpreter {
           {
             const last_instr = res.stack.instructions.at(-1);
             if (!last_instr || (last_instr.type !== INSTRUCTION_TYPE.LOAD_DATA_ATTR && last_instr.type !== INSTRUCTION_TYPE.LOAD_NAME)) {
-              throw new InvalidTokenError(token.value, token.start, token.end);
+              if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
+                throw new InvalidTokenError(token.value, token.start, token.end);
+              }
+            } else {
+              res.stack.instructions.pop();
+              const instr_type = last_instr.type === INSTRUCTION_TYPE.LOAD_DATA_ATTR ? INSTRUCTION_TYPE.STORE_SUBSCR : INSTRUCTION_TYPE.STORE_NAME;
+              to_append_eoc.instructions.push(
+                new Instruction(instr_type, index, level, res.stack.names[0].length - 1),
+              );
             }
-            res.stack.instructions.pop();
-            const instr_type = last_instr.type === INSTRUCTION_TYPE.LOAD_DATA_ATTR ? INSTRUCTION_TYPE.STORE_SUBSCR : INSTRUCTION_TYPE.STORE_NAME;
-            to_append_eoc.instructions.push(
-              new Instruction(instr_type, index, level, res.stack.names[0].length - 1),
-            );
           }
           break;
         case LEXER.DataAttribute:
@@ -1228,9 +1231,12 @@ export default class Interpreter {
             if (last_instr && last_instr.type === INSTRUCTION_TYPE.UNITARY_NEGATIVE) {
               const instr = res.stack.instructions.pop();
               if (!instr) {
-                throw new InvalidTokenError(token.value, token.start, token.end);
+                if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
+                  throw new InvalidTokenError(token.value, token.start, token.end);
+                }
+              } else {
+                to_append.instructions.push(instr);
               }
-              to_append.instructions.push(instr);
             }
             res.maxULevel = parsed_attribute.maxULevel;
           }

@@ -57,7 +57,7 @@ export default class CommandAssistant {
     const arg_infos = [];
     for (const arg of command_info.args) {
       const arg_info = getArgumentInfo(arg);
-      if (!arg_name || arg_info.names.long.startsWith(arg_name)) {
+      if (arg_info !== null && (!arg_name || arg_info.names.long.startsWith(arg_name))) {
         arg_infos.push(arg_info);
       }
     }
@@ -65,8 +65,8 @@ export default class CommandAssistant {
   }
 
   #getAvailableParameters(command_info: CMDDef, arg_key: string | number, arg_value: string): Array<CMDAssistantOption> {
-    const arg_info = (typeof arg_key === 'number') ? getArgumentInfo(command_info.args[arg_key]) : getArgumentInfoByName(command_info.args, arg_key);
     const res_param_infos: Array<CMDAssistantOption> = [];
+    const arg_info = (typeof arg_key === 'number') ? getArgumentInfo(command_info.args[arg_key]) : getArgumentInfoByName(command_info.args, arg_key);
     if (arg_info) {
       if (arg_info.strict_values) {
         const def_value = arg_info.default_value;

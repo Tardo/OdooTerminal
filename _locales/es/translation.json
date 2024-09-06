@@ -337,6 +337,16 @@
       "name": "NAME"
     }
   },
+  "cmdInfo": {
+    "args": {
+      "activeId": "The active record id",
+      "activeModel": "The active record model",
+      "userId": "The user id",
+      "userLogin": "The user login"
+    },
+    "definition": "Get information",
+    "detail": "Get information"
+  },
   "cmdInput": {
     "args": {
       "choices": "The choices",
@@ -479,6 +489,19 @@
     "error": {
       "notFound": "Can't found any metadata for the given id"
     }
+  },
+  "cmdNotify": {
+    "args": {
+      "buttons": "The buttons",
+      "className": "The className",
+      "message": "The message",
+      "sticky": "Is sticky",
+      "subtitle": "The subtitle",
+      "title": "The title",
+      "type": "The type"
+    },
+    "definition": "Shows a notification",
+    "detail": "Displays a notification with a custom message"
   },
   "cmdNow": {
     "args": {

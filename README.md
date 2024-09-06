@@ -86,10 +86,12 @@ You can toggle terminal using one of these options:
 
 The following are available:
 
-| Name   | Description                   |
-| ------ | ----------------------------- |
-| $$RMOD | Returns the active model name |
-| $$RID  | Returns the active record id  |
+| Name    | Description                   |
+| ------- | ----------------------------- |
+| $$RMOD  | Returns the active model name |
+| $$RID   | Returns the active record id  |
+| $$UID   | Returns the active user id    |
+| $$UNAME | Returns the active user login |
 
 Examples:
 
@@ -163,12 +165,13 @@ Examples:
 - Modify the lst_price of the 3,product.product:
   `$prod = (read product.product 3 -f lst_price); $prod['lst_price'] = 5 * $prod['lst_price']; commit $prod;`
 
-#### + If, Else
+#### + If, Elif, Else
 
 Example:
 
 - `if ((gen int 0 8) > 2) { print 'Yussef Dayes & Alfa Mist - Blacked Out' } else { print 'Vincenzo Salvia & PJ D\'Atri - The Elemental Dive' }`
 - `$num = (gen int 0 8); if ($num > 2) { print 'Yes! ' + $num + ' > 2' } else { print 'No... ' + $num + ' <= 2' }`
+- `$num = (gen int 0 8); if ($num > 4) { print 'Yes! ' + $num + ' > 4' } elif ($num > 2) { print 'Yes! ' + $num + ' > 2' } else { print 'No... ' + $num + ' <= 2' }`
 
 #### + Functions
 

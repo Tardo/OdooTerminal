@@ -16,7 +16,10 @@ import { FUNCTION_TYPE } from './function.mjs';
 /**
  * Resolve argument information
  */
-export function getArgumentInfo(arg: ArgDef): ArgInfo {
+export function getArgumentInfo(arg: ArgDef | void): ArgInfo | null {
+  if (typeof arg === 'undefined') {
+    return null;
+  }
   const [type, names, is_required, descr, default_value, strict_values] = arg;
   const [short_name, long_name] = names;
   const list_mode = (type & ARG.List) === ARG.List;
@@ -103,6 +106,8 @@ export async function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[stri
   // Map full info arguments
   const args_infos_map: Array<[string, ArgInfo]> = cmd_def.args
     .map(x => getArgumentInfo(x))
+    .filter(x => x !== null)
+    // $FlowFixMe
     .map(x => [x.names.long, x]);
   const args_infos = Object.fromEntries(args_infos_map);
 
@@ -186,7 +191,7 @@ export function getArgumentInputCount(args: $ReadOnlyArray<ArgDef>, required: bo
   let count = 0;
   for (const arg of args) {
     const arg_def = getArgumentInfo(arg);
-    if (arg_def.type !== ARG.Flag && (!required || arg_def.is_required)) {
+    if (arg_def !== null && arg_def.type !== ARG.Flag && (!required || arg_def.is_required)) {
       ++count;
     }
   }

@@ -1,11 +1,18 @@
 # Changelog
 
-**11.3.1**
+**11.4.0**
 
 ```
 IMP: Internal Command 'fetch': Use AbortSignal.timeout
+IMP: Command Assistant
+IMP: Helpers: add $UID and $UNAME
+IMP: Loader: Handle lazy load
+
+ADD: Command 'info': Get generic information
+ADD: Command 'notify': Show notifications
 
 UPD: Manifest strings
+UPD: Docs
 
 FIX: Extension options page
 ```
