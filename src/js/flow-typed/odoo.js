@@ -1,6 +1,7 @@
 declare var odoo: Object;
 declare var owl: Object;
 declare var luxon: Object;
+declare var moment: Object;
 declare type OdooDomainTuple = [string, string, string | number | $ReadOnlyArray<string | number>];
 declare type OdooMany2One = [number, string];
 declare type OdooSearchRecord = {[string]: mixed};

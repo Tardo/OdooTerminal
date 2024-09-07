@@ -94,8 +94,7 @@ export default class Terminal {
 
   #messageListeners: {[string]: Array<MessageListenerCallback>} = {};
 
-  // $FlowFixMe
-  #mutexAvailableOptions: Object = new Mutex();
+  #mutexAvailableOptions: AMutex = new Mutex();
 
   constructor() {
     this.#shell = new Shell({

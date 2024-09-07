@@ -94,17 +94,14 @@ export default class ParameterGenerator {
     return result;
   }
 
-  // $FlowFixMe
   generateTzDate(min: number, max: ?number): string {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
       return getOdooService('@web/core/l10n/dates').formatDate(
-        // $FlowFixMe
         luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}).setZone(getUserTZ()),
       );
     }
-    // $FlowFixMe
     return moment(new Date(rdate)).format(getOdooService('web.time').getLangDateFormat());
   }
 
@@ -112,7 +109,6 @@ export default class ParameterGenerator {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
-      // $FlowFixMe
       return getOdooService('@web/core/l10n/dates').serializeDate(luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}));
     }
     return getOdooService('web.time').date_to_str(new Date(rdate));
@@ -123,26 +119,21 @@ export default class ParameterGenerator {
     const OdooVerMajor = getOdooVersion('major');
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
       return getOdooService('@web/core/l10n/dates').formatDateTime(
-        // $FlowFixMe
         luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}).setZone(getUserTZ()),
       );
     }
-    // $FlowFixMe
     return moment(new Date(rdate)).format(getOdooService('web.time').getLangDatetimeFormat());
   }
 
-  // $FlowFixMe
   generateDateTime(min: number, max: ?number): string {
     const rdate = this.generateInt(min, max);
     const OdooVerMajor = getOdooVersion('major');
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
-      // $FlowFixMe
       return getOdooService('@web/core/l10n/dates').serializeDateTime(luxon.DateTime.fromSeconds(rdate, {zone: 'utc'}));
     }
     return getOdooService('web.time').datetime_to_str(new Date(rdate));
   }
 
-  // $FlowFixMe
   generateTzTime(min: number, max: ?number): string {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
@@ -150,11 +141,9 @@ export default class ParameterGenerator {
       const dt = this.generateTzDateTime(min, max);
       return dt.split(' ')[1];
     }
-    // $FlowFixMe
     return moment(new Date(rdate)).format(getOdooService('web.time').getLangTimeFormat());
   }
 
-  // $FlowFixMe
   generateTime(min: number, max: ?number): string {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);

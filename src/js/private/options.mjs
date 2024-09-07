@@ -59,6 +59,7 @@ function renderShortcutTable() {
 function saveOptions() {
   const data: {[string]: mixed} = {};
   for (const name of SETTING_NAMES) {
+    // $FlowFixMe
     const type = SETTING_TYPES[name];
     if (type === 'manual') {
       continue;
