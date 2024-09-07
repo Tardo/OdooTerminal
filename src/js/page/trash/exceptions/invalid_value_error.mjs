@@ -11,7 +11,7 @@ export default class extends Error {
   constructor(value: mixed) {
     super(
       i18n.t('trash.exception.invalidValueError', "Invalid value '{{value}}'", {
-        value,
+        value: new String(value).toString(),
       }),
     );
     this.name = 'InvalidValueError';
