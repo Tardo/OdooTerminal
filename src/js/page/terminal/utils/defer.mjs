@@ -4,11 +4,14 @@
 
 // FIXME: This is an anti-pattern. Use only if you know what you are doing.
 export default function (): Deferred {
-  const deferred: Deferred = {
-    promise: new Promise((resolve, reject) => {
-      deferred.resolve = resolve;
-      deferred.reject = reject;
-    }),
-  }
-  return deferred;
+  let resolve_fn, reject_fn;
+  const promise = new Promise((resolve, reject) => {
+    resolve_fn = resolve;
+    reject_fn = reject;
+  });
+  return {
+    promise,
+    resolve: resolve_fn,
+    reject: reject_fn,
+  };
 }
