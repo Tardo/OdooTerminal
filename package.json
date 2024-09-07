@@ -16,11 +16,11 @@
     "start:chrome": "export ODOO_TERMINAL_ENV=development && node scripts/build.mjs && web-ext run --verbose -t chromium --chromium-binary $(which chrome)"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24",
+    "@babel/cli": "^7.25",
     "@babel/core": "^7.25",
     "@babel/preset-env": "^7.25",
     "@babel/preset-flow": "^7.24",
-    "@puppeteer/browsers": "^2.3",
+    "@puppeteer/browsers": "^2.4",
     "@rollup/plugin-alias": "^5.1",
     "@rollup/plugin-babel": "^6.0",
     "@rollup/plugin-commonjs": "^26.0",
@@ -35,33 +35,33 @@
     "babel-plugin-syntax-hermes-parser": "^0.23",
     "cssnano": "^7.0",
     "docker-compose": "^0.24",
-    "eslint": "^9.9",
+    "eslint": "^9.10",
     "eslint-config-prettier": "^9.1",
     "eslint-plugin-ft-flow": "^3.0",
     "eslint-plugin-json": "^4.0",
     "eslint-plugin-prettier": "^5.2",
-    "flow-bin": "^0.243",
+    "flow-bin": "^0.245",
     "hermes-eslint": "^0.23",
     "husky": "^9.1",
-    "i18next": "^23.12",
-    "i18next-http-backend": "^2.5",
+    "i18next": "^23.14",
+    "i18next-http-backend": "^2.6",
     "jest": "^29.7",
-    "jest-puppeteer": "^10.0",
+    "jest-puppeteer": "^10.1",
     "lint-staged": "^15.2",
     "minimist": "^1.2",
     "object-hash": "^3.0",
     "prettier": "^3.3",
-    "puppeteer-core": "^23.1",
+    "puppeteer-core": "^23.3",
     "rimraf": "^6.0",
-    "rollup": "^4.20",
+    "rollup": "^4.21",
     "rollup-plugin-analyzer": "^4.0",
     "rollup-plugin-postcss": "^4.0",
-    "simple-git": "^3.25",
+    "simple-git": "^3.26",
     "web-ext": "^8.2"
   },
   "overrides": {
     "@rollup/plugin-eslint": {
-      "eslint": "^9.9"
+      "eslint": "^9.10"
     }
   },
   "husky": {
