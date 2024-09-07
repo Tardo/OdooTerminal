@@ -12,8 +12,7 @@ export type CachedCallServiceOptions = {
 
 export type MapCallback = (item: mixed) => mixed;
 
-// $FlowFixMe
-const cache: {[string]: Object} = {};
+const cache: {[string]: OdooService} = {};
 export default async function (
   cache_name: string,
   service: string,
@@ -21,8 +20,7 @@ export default async function (
   args: $ReadOnlyArray<mixed>,
   options?: CachedCallServiceOptions,
   map_func?: MapCallback,
-  // $FlowFixMe
-): Object {
+): OdooService {
   const cache_hash = hash(Array.from(arguments).slice(0, 4));
   if (options?.force === true || typeof cache[cache_hash] === 'undefined') {
     let values: Array<mixed> = [];

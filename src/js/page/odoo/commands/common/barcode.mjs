@@ -34,8 +34,7 @@ function getBarcodeEvent(data: string) {
   });
 }
 
-// $FlowFixMe
-function getBarcodeInfo(barcodeService: Object) {
+function getBarcodeInfo(barcodeService: BarcodeService) {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 16) {
     return [

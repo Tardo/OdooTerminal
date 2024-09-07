@@ -95,7 +95,7 @@ export default class ParameterGenerator {
   }
 
   // $FlowFixMe
-  generateTzDate(min: number, max: ?number): Object {
+  generateTzDate(min: number, max: ?number): string {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
@@ -108,8 +108,7 @@ export default class ParameterGenerator {
     return moment(new Date(rdate)).format(getOdooService('web.time').getLangDateFormat());
   }
 
-  // $FlowFixMe
-  generateDate(min: number, max: ?number): Object {
+  generateDate(min: number, max: ?number): string {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
@@ -119,8 +118,7 @@ export default class ParameterGenerator {
     return getOdooService('web.time').date_to_str(new Date(rdate));
   }
 
-  // $FlowFixMe
-  generateTzDateTime(min: number, max: ?number): Object {
+  generateTzDateTime(min: number, max: ?number): string {
     const rdate = this.generateInt(min, max);
     const OdooVerMajor = getOdooVersion('major');
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
@@ -134,7 +132,7 @@ export default class ParameterGenerator {
   }
 
   // $FlowFixMe
-  generateDateTime(min: number, max: ?number): Object {
+  generateDateTime(min: number, max: ?number): string {
     const rdate = this.generateInt(min, max);
     const OdooVerMajor = getOdooVersion('major');
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
@@ -145,7 +143,7 @@ export default class ParameterGenerator {
   }
 
   // $FlowFixMe
-  generateTzTime(min: number, max: ?number): Object {
+  generateTzTime(min: number, max: ?number): string {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
@@ -157,7 +155,7 @@ export default class ParameterGenerator {
   }
 
   // $FlowFixMe
-  generateTime(min: number, max: ?number): Object {
+  generateTime(min: number, max: ?number): string {
     const OdooVerMajor = getOdooVersion('major');
     const rdate = this.generateInt(min, max);
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {

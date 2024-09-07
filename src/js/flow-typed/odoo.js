@@ -17,3 +17,8 @@ declare type OdooSession = {
 };
 declare type OdooLongpollingItem = [string, string] | {...};
 declare type OdooSearchResponse = Object;
+
+declare type OdooRoot = Object;
+declare type OdooService = Object;
+declare type BusService = OdooService;
+declare type BarcodeService = OdooService;

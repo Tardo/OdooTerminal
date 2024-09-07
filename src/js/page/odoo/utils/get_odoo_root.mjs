@@ -4,8 +4,7 @@
 
 import getOdooService from './get_odoo_service';
 
-// $FlowFixMe
-export default function (): Object {
+export default function (): OdooRoot {
   const root = getOdooService('root.widget', 'web.web_client', '@web/legacy/js/env');
   // This is necessary for master branch, public pages.
   if (!root || root.constructor === Promise) {

@@ -37,7 +37,7 @@ export default class Longpolling {
   }
 
   // $FlowFixMe
-  #getBusService(): Object {
+  #getBusService(): BusService {
     return getOdooService('bus.bus')?.bus;
   }
 
