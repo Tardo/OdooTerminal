@@ -5,6 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import VMachine from '@trash/vmachine';
+import Frame from '@trash/frame';
 import ProcessJobError from './exceptions/process_job_error';
 import Interpreter from '@trash/interpreter';
 import codeArray from '@trash/tl/array';
@@ -92,7 +93,7 @@ export default class Shell {
     return this.#interpreter.parse(data, parse_options, level);
   }
 
-  async eval(code: string, options?: Partial<EvalOptions>): Promise<mixed> {
+  async eval(code: string, options?: Partial<EvalOptions>, isolated_frame?: boolean = false): Promise<mixed> {
     if (code?.constructor !== String) {
       throw new Error('Invalid input!');
     }
@@ -105,7 +106,8 @@ export default class Shell {
     const parse_info = this.parse(code, {
       isData: opts.isData,
     });
-    return await this.#virtMachine.execute(parse_info, opts);
+    const root_frame = isolated_frame ? new Frame() : undefined;
+    return await this.#virtMachine.execute(parse_info, opts, root_frame);
   }
 
   async #processCommandJob(command_info: ProcessCommandJobOptions, silent: boolean = false): Promise<mixed> {

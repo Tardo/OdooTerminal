@@ -20,7 +20,7 @@ export default function (): Partial<CMDDef> {
     detail: i18n.t('cmdLoad.detail', 'Load external source (javascript & css)'),
     args: [
       [ARG.String, ['u', 'url'], true, i18n.t('cmdLoad.args.url', 'The URL of the asset')],
-      [ARG.String, ['t', 'type'], false, i18n.t('cmdLoad.args.type', 'The type of the asset')],
+      [ARG.String, ['t', 'type'], false, i18n.t('cmdLoad.args.type', 'The type of the asset'), undefined, ['js', 'mjs', 'css']],
     ],
     example: "-u 'https://example.com/libs/term_extra.js'",
   };

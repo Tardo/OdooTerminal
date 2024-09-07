@@ -26,7 +26,7 @@
       "width": "The canvas width"
     },
     "definition": "Create 2D Window",
-    "detail": "Create 2D Window"
+    "detail": "Destroy 2D Window"
   },
   "cmd2DDestroyWindow": {
     "args": {
@@ -344,8 +344,8 @@
       "userId": "The user id",
       "userLogin": "The user login"
     },
-    "definition": "Get information",
-    "detail": "Get information"
+    "definition": "Get session information",
+    "detail": "Obtains various information from the session"
   },
   "cmdInput": {
     "args": {
@@ -539,8 +539,8 @@
     "args": {
       "msg": "The message to print"
     },
-    "definition": "Close terminal",
-    "detail": "Close the terminal."
+    "definition": "Print a message",
+    "detail": "Eval parameters and print the result."
   },
   "cmdRead": {
     "args": {
@@ -588,6 +588,10 @@
     },
     "definition": "Execute raw rpc",
     "detail": "Execute raw rpc"
+  },
+  "cmdRun": {
+    "definition": "Run a TraSH script",
+    "detail": "Run a TraSH script"
   },
   "cmdSearch": {
     "args": {

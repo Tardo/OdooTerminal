@@ -10,6 +10,7 @@ IMP: Loader: Handle lazy load
 
 ADD: Command 'info': Get generic information
 ADD: Command 'notify': Show notifications
+ADD: Command 'run': Run a TraSH script
 
 UPD: Manifest strings
 UPD: Docs

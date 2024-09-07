@@ -6,7 +6,7 @@
 import i18n from 'i18next';
 import debounce from './debounce';
 
-export default function <T>(this: T): Promise<> {
+export default function <T>(this: T): Promise<string> {
   const input_elm = window.document.createElement('input');
   input_elm.type = 'file';
   document.body?.appendChild(input_elm);
@@ -17,6 +17,7 @@ export default function <T>(this: T): Promise<> {
     }
   };
 
+  // $FlowFixMe
   return new Promise((resolve, reject) => {
     window.addEventListener('focus', debounce(onBodyFocus.bind(this, reject), 200));
     input_elm.onchange = e => {

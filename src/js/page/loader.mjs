@@ -26,6 +26,7 @@ import registerGraphicsFuncs from '@terminal/libs/graphics/__all__';
 import OdooTerminalTests from '@tests/terminal';
 import type {TerminalOptions} from '@terminal/terminal';
 import type {InputInfo} from '@terminal/core/screen';
+import type VMachine from '@trash/vmachine';
 
 export type LoaderConfig = {
   config: {[string]: mixed},
@@ -69,6 +70,18 @@ async function postInitTerminal(term_obj: OdooTerminal) {
   term_obj.screen.updateInputInfo(vals);
 }
 
+function loadVMFunctions(vm: VMachine) {
+  registerCoreFuncs(vm);
+  registerMathFuncs(vm);
+  registerNetFuncs(vm);
+  registerTimeFuncs(vm);
+  registerGraphicsFuncs(vm);
+  registerCommonFuncs(vm);
+  if (isBackOffice()) {
+    registerBackofficeFuncs(vm);
+  }
+}
+
 async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   window.__OdooTerminal = {
     raw_server_info: info,
@@ -76,15 +89,7 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   };
   const term_obj = getTerminalObj();
   if (term_obj) {
-    registerCoreFuncs(term_obj.getShell().getVM());
-    registerMathFuncs(term_obj.getShell().getVM());
-    registerNetFuncs(term_obj.getShell().getVM());
-    registerTimeFuncs(term_obj.getShell().getVM());
-    registerGraphicsFuncs(term_obj.getShell().getVM());
-    registerCommonFuncs(term_obj.getShell().getVM());
-    if (isBackOffice()) {
-      registerBackofficeFuncs(term_obj.getShell().getVM());
-    }
+    loadVMFunctions(term_obj.getShell().getVM());
     let lazyLoaderServ = getOdooService("@web/legacy/js/public/lazyloader");
     if (typeof lazyLoaderServ === 'undefined') {
       term_obj.init(config);

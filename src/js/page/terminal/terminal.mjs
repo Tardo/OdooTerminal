@@ -299,7 +299,7 @@ export default class Terminal {
     return undefined;
   }
 
-  async execute(code: string, store: boolean = true, silent: boolean = false): Promise<mixed> {
+  async execute(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false): Promise<mixed> {
     if (!silent) {
       this.screen.printCommand(code);
     }
@@ -313,7 +313,7 @@ export default class Terminal {
       cmd_res = await this.#shell.eval(code, {
         silent: silent,
         aliases: getStorageLocalItem('terminal_aliases', {}),
-      });
+      }, isolated_frame);
     } catch (err) {
       this.screen.printError(`${err.name}: ${err.message}`);
       let err_msg = err.data;

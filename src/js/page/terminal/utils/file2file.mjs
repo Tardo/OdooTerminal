@@ -6,7 +6,7 @@
 import i18n from 'i18next';
 import debounce from './debounce';
 
-export default function <T>(this: T, filename: string, options: {[string]: mixed}): Promise<> {
+export default function <T>(this: T, filename: ?string, options: ?{[string]: mixed}): Promise<File> {
   const soptions = Object.assign({}, options, {
     type: 'application/octet-stream',
   });
@@ -20,6 +20,7 @@ export default function <T>(this: T, filename: string, options: {[string]: mixed
     }
   };
 
+  // $FlowFixMe
   return new Promise((resolve, reject) => {
     window.addEventListener('focus', debounce(onBodyFocus.bind(this, reject), 200));
     input_elm.onchange = e => {
@@ -32,7 +33,7 @@ export default function <T>(this: T, filename: string, options: {[string]: mixed
       reader.onload = readerEvent => {
         // $FlowFixMe
         const blob = new Blob([readerEvent.target.result], soptions);
-        const sfilename = filename ? filename : input_elm.value;
+        const sfilename = (typeof filename === 'undefined' ? input_elm.value : filename) ?? 'unnamed';
         return resolve(new File([blob], sfilename, soptions));
       };
     };
