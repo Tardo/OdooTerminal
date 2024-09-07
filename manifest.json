@@ -42,7 +42,7 @@
     "open_in_tab": true
   },
   "permissions": ["activeTab", "storage"],
-  "short_name": "__MSG_extensionName__",
+  "short_name": "OdooTerminal",
   "version": "11.4.0",
   "web_accessible_resources": [
     {

@@ -1,8 +1,4 @@
 {
-  "extensionName": {
-    "message": "OdooTerminal"
-  },
-
   "extensionDescription": {
     "message": "Terminal-like to send json-rpc requests and use tools for Odoo developers"
   },
