@@ -11,7 +11,7 @@ import searchRead from './orm/search_read';
 import ParameterGenerator from './parameter_generator';
 import renderWelcome from './templates/welcome';
 import getOdooSession from './utils/get_odoo_session';
-import codeHelpers from './tl/helpers';
+import codeHelpers from './base/helpers';
 
 export default class OdooTerminal extends Terminal {
   parameterGenerator: ParameterGenerator;
