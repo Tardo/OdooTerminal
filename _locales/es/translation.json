@@ -634,6 +634,10 @@
     "detail": "Sleep (time in ms)"
   },
   "cmdToggleTerm": {
+    "args": {
+      "force": "Force show/hide",
+      "show": "Force show/hide"
+    },
     "definition": "Toggle terminal visibility",
     "detail": "Toggle terminal visibility"
   },

@@ -13,7 +13,6 @@ import cmdHelp from './help';
 import cmdJobs from './jobs';
 import cmdLoad from './load';
 import cmdPrint from './print';
-import cmdQuit from './quit';
 import cmdToggleTerm from './toggle_term';
 import cmdInput from './input';
 import cmdRun from './run';
@@ -26,7 +25,6 @@ export default function (vm: VMachine) {
   vm.registerCommand('load', cmdLoad());
   vm.registerCommand('context_term', cmdContextTerm());
   vm.registerCommand('alias', cmdAlias());
-  vm.registerCommand('quit', cmdQuit());
   vm.registerCommand('exportvar', cmdExportVar());
   vm.registerCommand('exportfile', cmdExportFile());
   vm.registerCommand('chrono', cmdChrono());

@@ -171,7 +171,7 @@ export default class Terminal {
     this.el.querySelector('.terminal-screen-icon-reload-shell').addEventListener('click', this.#onClickReloadShell.bind(this));
     // Custom Events
     // $FlowFixMe
-    this.el.addEventListener('toggle', this.doToggle.bind(this));
+    this.el.addEventListener('toggle', this.#onTerminalToggle.bind(this));
 
     if (!isEmpty(this.#config.init_cmds)) {
       this.#wakeUp();
@@ -247,7 +247,7 @@ export default class Terminal {
     // $FlowFixMe
     window.removeEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
     // $FlowFixMe
-    this.el.removeEventListener('toggle', this.doToggle.bind(this));
+    this.el.removeEventListener('toggle', this.#onTerminalToggle.bind(this));
   }
 
   /* BASIC FUNCTIONS */
@@ -378,12 +378,16 @@ export default class Terminal {
     this.el.classList.remove('terminal-transition-topdown');
   }
 
-  doToggle(): Promise<> {
-    if (this.#isTerminalVisible()) {
-      return this.doHide();
+  doToggle(show: boolean | void): Promise<> {
+    if (typeof show === 'undefined') {
+      if (this.#isTerminalVisible()) {
+        return this.doHide();
+      }
+      return this.doShow();
+    } else if (show) {
+      return this.doShow();
     }
-
-    return this.doShow();
+    return this.doHide();
   }
 
   createTerminal() {
@@ -540,6 +544,10 @@ export default class Terminal {
     if (Object.hasOwn(this.#messageListeners, ev_data.type)) {
       this.#messageListeners[ev_data.type].forEach((callback: MessageListenerCallback) => callback.bind(this)(ev_data));
     }
+  }
+
+  #onTerminalToggle() {
+    this.doToggle();
   }
 
   #onClickTerminalCommand(target: HTMLElement) {

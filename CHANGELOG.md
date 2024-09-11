@@ -1,5 +1,11 @@
 # Changelog
 
+**11.4.1**
+
+```
+UPD: Remove command 'quit': Now can use 'toggle_term 0' to close terminal.
+```
+
 **11.4.0**
 
 ```

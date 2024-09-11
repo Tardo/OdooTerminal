@@ -1,4 +1,8 @@
 {
+  "extensionName": {
+    "message": "OdooTerminal"
+  },
+
   "extensionDescription": {
     "message": "Algo parecido a un terminal para enviar peticiones json-rpc y utilizar herramientas para desarrolladores de Odoo"
   },
