@@ -6,19 +6,20 @@ import getOdooSession from './get_odoo_session';
 import getUID from './get_uid';
 import cachedSearchRead from './cached_search_read';
 
-export default async function (): Promise<string> {
+export default async function (use_net: boolean = false): Promise<string> {
   // $FlowFixMe
   let username = getOdooSession()?.username;
   if (typeof username === 'string') {
     return username;
   }
-  if (typeof username === 'undefined' && getUID()) {
+  const uid = getUID();
+  if (use_net && typeof username === 'undefined' && uid > 0) {
     // $FlowFixMe
     const user_ctx: {[string]: mixed} = getOdooSession()?.user_context ?? {};
     const res = await cachedSearchRead(
-      `get_username.login.${getUID()}`,
+      `get_username.login.${uid}`,
       'res.users',
-      [['id', 'in', [getUID()]]],
+      [['id', 'in', [uid]]],
       ['login'],
       user_ctx,
     );

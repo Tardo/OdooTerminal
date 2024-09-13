@@ -25,6 +25,9 @@
   "optionsTitleBehaviourOpacity": {
     "message": "Opacidad:"
   },
+  "optionsTitleBehaviourElephant": {
+    "message": "Intentar resolver valores desconocidos (principalmente el login de usuario)"
+  },
   "optionsTitleShortcuts": {
     "message": "Atajos"
   },

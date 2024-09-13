@@ -54,7 +54,7 @@ function getTerminalObj(): OdooTerminal | void {
   return terminal;
 }
 
-async function postInitTerminal(term_obj: OdooTerminal) {
+async function postInitTerminal(term_obj: OdooTerminal, config: TerminalOptions) {
   let odoo_ver = getOdooVersion();
   if (typeof odoo_ver !== 'string') {
     odoo_ver = 'unknown';
@@ -62,7 +62,7 @@ async function postInitTerminal(term_obj: OdooTerminal) {
   const vals: Partial<InputInfo> = {
     version: odoo_ver,
   };
-  const username = await getUsername();
+  const username = await getUsername(config.elephant);
   const uid = getUID();
   if (uid && uid !== -1) {
     vals.username = username ? username : `uid: ${uid}`;
@@ -91,17 +91,14 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   if (term_obj) {
     loadVMFunctions(term_obj.getShell().getVM());
     let lazyLoaderServ = getOdooService("@web/legacy/js/public/lazyloader");
-    if (typeof lazyLoaderServ === 'undefined') {
-      term_obj.init(config);
-      await postInitTerminal(term_obj);
-    } else {
+    if (typeof lazyLoaderServ !== 'undefined') {
       // Caching call: see command implementation for more details.
       getUID();
       lazyLoaderServ = lazyLoaderServ[Symbol.for('default')];
       await lazyLoaderServ.allScriptsLoaded;
-      term_obj.init(config);
-      await postInitTerminal(term_obj);
     }
+    term_obj.init(config);
+    await postInitTerminal(term_obj, config);
   }
 }
 

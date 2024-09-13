@@ -469,20 +469,9 @@ export default class Terminal {
   }
 
   #applySettings(config: TerminalOptions) {
-    Object.assign(this.#config, {
-      pinned: getStorageSessionItem('terminal_pinned', config.pinned),
-      maximized: getStorageSessionItem('screen_maximized', config.maximized),
-      multiline: getStorageSessionItem('terminal_multiline', config.multiline),
-      opacity: config.opacity * 0.01,
-      shortcuts: config.shortcuts,
-      term_context: config.term_context || {},
-      init_cmds: config.init_cmds,
-      devmode_console_errors: config.devmode_console_errors,
-      cmd_assistant_dyn_options_disabled: config.cmd_assistant_dyn_options_disabled,
-      cmd_assistant_match_mode: config.cmd_assistant_match_mode,
-      cmd_assistant_max_results: config.cmd_assistant_max_results,
-    });
-
+    Object.assign(this.#config, config);
+    this.#config.opacity *= 0.01;
+    this.#config.term_context = this.#config.term_context || {};
     this.userContext = Object.assign({}, this.#config.term_context, this.userContext);
   }
 

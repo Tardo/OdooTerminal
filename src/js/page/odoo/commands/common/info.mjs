@@ -25,7 +25,7 @@ async function cmdInfo(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
   } else if (kwargs.user_id) {
     res = getUID();
   } else if (kwargs.user_login) {
-    res = await getUserName();
+    res = await getUserName(true);
   }
   ctx.screen.print(res);
   return res;
@@ -44,5 +44,3 @@ export default function (): Partial<CMDDef> {
     ],
   };
 }
-
-// SEND NOTIFICATION: getOdooEnv().services.notification.notify({message: 'sss'})

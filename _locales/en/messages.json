@@ -21,6 +21,9 @@
   "optionsTitleBehaviourOpacity": {
     "message": "Opacity:"
   },
+  "optionsTitleBehaviourElephant": {
+    "message": "Attempt to resolve unknown values (mainly the login name)"
+  },
   "optionsTitleShortcuts": {
     "message": "Shortcuts"
   },

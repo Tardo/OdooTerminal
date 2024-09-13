@@ -3,6 +3,9 @@
 **11.4.1**
 
 ```
+IMP: showQuestion: show terminal
+IMP: Don't resolve unknown values by default
+
 UPD: Remove command 'quit': Now can use 'toggle_term 0' to close terminal.
 ```
 
