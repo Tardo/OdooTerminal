@@ -635,8 +635,7 @@
   },
   "cmdToggleTerm": {
     "args": {
-      "force": "Force show/hide",
-      "show": "Force show/hide"
+      "force": "Force show/hide"
     },
     "definition": "Toggle terminal visibility",
     "detail": "Toggle terminal visibility"

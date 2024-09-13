@@ -370,12 +370,11 @@ export default class Terminal {
     }
     // Only start the terminal if needed
     await this.#wakeUp();
-    this.el.classList.add('terminal-transition-topdown');
-    this.screen.focus();
+    this.screen.show();
   }
 
   async doHide() {
-    this.el.classList.remove('terminal-transition-topdown');
+    this.screen.hide();
   }
 
   doToggle(show: boolean | void): Promise<> {

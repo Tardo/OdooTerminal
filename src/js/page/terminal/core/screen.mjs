@@ -119,6 +119,15 @@ export default class Screen {
     // To override
   }
 
+  show() {
+    this.#container_el.classList.add('terminal-transition-topdown');
+    this.focus();
+  }
+
+  hide() {
+    this.#container_el.classList.remove('terminal-transition-topdown');
+  }
+
   getContent(): string {
     if (!this.#wasStart) {
       return '';
@@ -501,6 +510,7 @@ export default class Screen {
       }
       this.#interactiveContainer_el.classList.remove('d-none', 'hidden');
       this.#input_el.classList.add('highlight');
+      this.show();
     } else {
       this.#question_active = undefined;
       this.#interactiveContainer_el.textContent = '';
