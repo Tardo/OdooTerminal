@@ -134,9 +134,9 @@ keyword `silent` to increase the performance.
 Examples:
 
 - Create 5000 res.partner:{
-  `for ($i = 0; $i < 5000; $i = $i + 1) { silent create -m res.partner -v {name: (gen str 12 8) + ' (Test)'} }`
+  `for ($i = 0; $i < 5000; $i += 1) { silent create -m res.partner -v {name: (gen str 12 8) + ' (Test)'} }`
 - Cancel all sale.order:
-  `$orders = (search sale.order); for ($i = 0; $i < $orders['length']; $i = $i + 1) { silent call sale.order action_cancel [$orders[$i]['id']] }`
+  `$orders = (search sale.order); for ($i = 0; $i < $orders['length']; $i += 1) { silent call sale.order action_cancel [$orders[$i]['id']] }`
 
 #### + Send files
 

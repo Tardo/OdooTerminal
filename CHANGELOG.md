@@ -8,8 +8,9 @@ IMP: Don't resolve unknown values by default
 
 ADD: TraSH: +=, -=, *=, /=
 
-UPD: Remove command 'quit': Now can use 'toggle_term 0' to close terminal.
 UPD: Samples
+
+FIX: TraSH: Store SUBSCR
 
 DEL: Command 'quit'
 ```
