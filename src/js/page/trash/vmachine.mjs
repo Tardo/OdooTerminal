@@ -183,7 +183,7 @@ export default class VMachine {
         case INSTRUCTION_TYPE.LOAD_NAME_CALLEABLE:
         case INSTRUCTION_TYPE.LOAD_NAME:
           {
-            const var_name = stack.names[instr.level][instr.dataIndex] || '';
+            const var_name = stack.names[instr.level][instr.meta] || '';
             if (instr.type === INSTRUCTION_TYPE.LOAD_NAME_CALLEABLE) {
               last_frame = new Frame('__anon__', last_frame);
               frames.push(last_frame);
@@ -199,7 +199,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.LOAD_GLOBAL:
           {
-            const cmd_name = stack.names[instr.level][instr.dataIndex];
+            const cmd_name = stack.names[instr.level][instr.meta];
             if (cmd_name === null || typeof cmd_name === 'undefined') {
               throw new UnknownNameError(i18n.t('UnknownNameError.invalidName', '<InvalidName>'), token.start, token.end)
             } else if (Object.hasOwn(this.#registeredCmds, cmd_name) || cmd_name in opts.aliases) {
@@ -212,7 +212,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.LOAD_CONST:
           {
-            const value = stack.values[instr.level][instr.dataIndex];
+            const value = stack.values[instr.level][instr.meta];
             last_frame.values.push(value);
           }
           break;
@@ -371,7 +371,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.STORE_NAME:
           {
-            const vname = stack.names[instr.level][instr.dataIndex];
+            const vname = stack.names[instr.level][instr.meta];
             const vvalue = last_frame.values.pop();
             if (vname === null || typeof vname === 'undefined') {
               if (!token) {
@@ -411,7 +411,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.STORE_SUBSCR:
           {
-            // const vname = stack.names[instr.level][instr.dataIndex];
+            // const vname = stack.names[instr.level][instr.meta];
             const attr_value = last_frame.values.pop();
             const attr_name = last_frame.values.pop();
             const data = last_frame.values.pop();
@@ -470,7 +470,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.BUILD_LIST:
           {
-            const iter_count = instr.dataIndex;
+            const iter_count = instr.meta;
             const value = [];
             for (let i = 0; i < iter_count; ++i) {
               value.push(last_frame.values.pop());
@@ -480,7 +480,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.BUILD_MAP:
           {
-            const iter_count = instr.dataIndex;
+            const iter_count = instr.meta;
             const value: {[mixed]: mixed} = {};
             for (let i = 0; i < iter_count; ++i) {
               const val = last_frame.values.pop();
@@ -524,7 +524,7 @@ export default class VMachine {
         case INSTRUCTION_TYPE.JUMP_IF_FALSE:
           {
             last_frame.lastFlowCheck = last_frame.values.at(-1);
-            const num_to_skip = instr.dataIndex;
+            const num_to_skip = instr.meta;
             if (typeof last_frame.lastFlowCheck === 'undefined' || last_frame.lastFlowCheck === null || !last_frame.lastFlowCheck) {
               index += num_to_skip;
             }
@@ -532,7 +532,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.JUMP_IF_TRUE:
           {
-            const num_to_skip = instr.dataIndex;
+            const num_to_skip = instr.meta;
             if (typeof last_frame.lastFlowCheck !== 'undefined' && last_frame.lastFlowCheck !== null && last_frame.lastFlowCheck) {
               index += num_to_skip;
             }
@@ -540,13 +540,13 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.JUMP_BACKWARD:
           {
-            const num_to_back = instr.dataIndex;
+            const num_to_back = instr.meta;
             index -= num_to_back + 1;
           }
           break;
         case INSTRUCTION_TYPE.JUMP_FORWARD:
           {
-            const num_to_adv = instr.dataIndex;
+            const num_to_adv = instr.meta;
             if (num_to_adv > 0) {
               index += num_to_adv;
             }

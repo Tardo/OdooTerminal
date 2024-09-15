@@ -21,12 +21,12 @@ async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
       case INSTRUCTION_TYPE.LOAD_GLOBAL:
       case INSTRUCTION_TYPE.STORE_NAME:
       case INSTRUCTION_TYPE.STORE_SUBSCR: {
-        const rec_name = stack.names[instr.level][instr.dataIndex];
+        const rec_name = stack.names[instr.level][instr.meta];
         lvalue = new String(rec_name).toString();
         break;
       }
       case INSTRUCTION_TYPE.LOAD_CONST: {
-        const rec_value = stack.values[instr.level][instr.dataIndex];
+        const rec_value = stack.values[instr.level][instr.meta];
         lvalue = new String(rec_value).toString();
         break;
       }
@@ -37,7 +37,7 @@ async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
       humanType,
       instr.type,
       lvalue,
-      instr.dataIndex,
+      instr.meta,
       instr.level,
       instr.level >= 0 ? parse_info.inputTokens[instr.level][instr.inputTokenIndex]?.raw || '' : '',
     ]);
@@ -47,7 +47,7 @@ async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
       i18n.t('cmdDis.table.instrName', 'Instr. Name'),
       i18n.t('cmdDis.table.instrCode', 'Instr. Code'),
       i18n.t('cmdDis.table.value', 'Name/Value/Argument'),
-      i18n.t('cmdDis.table.dataIndex', 'Data Index'),
+      i18n.t('cmdDis.table.meta', 'Meta'),
       i18n.t('cmdDis.table.level', 'Level'),
       i18n.t('cmdDis.table.token', 'Token'),
     ],

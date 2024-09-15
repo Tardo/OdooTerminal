@@ -970,7 +970,7 @@ export default class Interpreter {
                 jump_refs.push(
                   to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, -1))
                 );
-                to_append.instructions[ref_if_instr_index - 1].dataIndex = parsed_if_block.stack.instructions.length + 1;
+                to_append.instructions[ref_if_instr_index - 1].meta = parsed_if_block.stack.instructions.length + 1;
               } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                 throw new InvalidTokenError(token.value, token.start, token.end);
               }
@@ -1007,7 +1007,7 @@ export default class Interpreter {
                   jump_refs.push(
                     to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_FORWARD, index, level, -1))
                   );
-                  to_append.instructions[ref_elif_instr_index - 1].dataIndex = parsed_elif_block.stack.instructions.length + 1;
+                  to_append.instructions[ref_elif_instr_index - 1].meta = parsed_elif_block.stack.instructions.length + 1;
                 } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                   throw new InvalidTokenError(token.value, token.start, token.end);
                 }
@@ -1029,7 +1029,7 @@ export default class Interpreter {
                   to_append,
                 );
                 if (parsed_else_block) {
-                  to_append.instructions[ref_else_instr_index - 1].dataIndex = parsed_else_block.stack.instructions.length;
+                  to_append.instructions[ref_else_instr_index - 1].meta = parsed_else_block.stack.instructions.length;
                 } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                   throw new InvalidTokenError(token.value, token.start, token.end);
                 }
@@ -1037,7 +1037,7 @@ export default class Interpreter {
 
               // Set Jumps
               for (const jump_ref of jump_refs) {
-                to_append.instructions[jump_ref - 1].dataIndex = to_append.instructions.length - jump_ref;
+                to_append.instructions[jump_ref - 1].meta = to_append.instructions.length - jump_ref;
               }
 
               index = uindex;
@@ -1115,14 +1115,14 @@ export default class Interpreter {
                 for (let instr_index = 0; instr_index < parsed_instr_len; ++instr_index) {
                   const instr = parsed_for_block.stack.instructions[instr_index];
                   if (instr.type === INSTRUCTION_TYPE.JUMP_FORWARD) {
-                    if (instr.dataIndex === -2) {
-                      instr.dataIndex = (parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length) - instr_index;
-                    } else if (instr.dataIndex === -1) {
-                      instr.dataIndex = parsed_for_block.stack.instructions.length - instr_index - 1;
+                    if (instr.meta === -2) {
+                      instr.meta = (parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length) - instr_index;
+                    } else if (instr.meta === -1) {
+                      instr.meta = parsed_for_block.stack.instructions.length - instr_index - 1;
                     }
                   }
                 }
-                to_append.instructions[ref_check_instr_index - 1].dataIndex = parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length + 1;
+                to_append.instructions[ref_check_instr_index - 1].meta = parsed_for_block.stack.instructions.length + parsed_iter_block.stack.instructions.length + 1;
               } else if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                 throw new InvalidTokenError(token.value, token.start, token.end);
               }
@@ -1296,7 +1296,7 @@ export default class Interpreter {
       if (index === tokens_len - 1 || !ignore_instr_eoi || token.type === LEXER.Delimiter) {
         if (jump_instr_index !== -1) {
           const rindex = jump_instr_index - 1;
-          res.stack.instructions[rindex].dataIndex = res.stack.instructions.length - rindex;
+          res.stack.instructions[rindex].meta = res.stack.instructions.length - rindex;
           jump_instr_index = -1;
         }
 
