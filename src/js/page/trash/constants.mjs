@@ -138,6 +138,7 @@ export const INSTRUCTION_TYPE = {
   JUMP_IF_TRUE: 37,
   JUMP_BACKWARD: 38,
   JUMP_FORWARD: 39,
+  ADD_SELF: 40,
 
   getHumanType: function (type: number): string {
     const res = Object.entries(INSTRUCTION_TYPE).find(item => item[1] === type);

@@ -1,4 +1,4 @@
-// min-v 11.3.0; group none
+// min-v 11.5.0; group none
 // Conway's Game of Life
 // Note that the terminal is not ready to render graphics. 
 // The mechanisms designed for this purpose are not used, which exausts the execution thread.
@@ -10,12 +10,12 @@ function get_cell_state(grid: List, width: Number, height: Number, index: Number
   $cy = (floor $index / $width)
 
   $alive_count = 0
-  for ($o = 0; $o < $POS_CHECK_LEN; $o = $o + 1) {
+  for ($o = 0; $o < $POS_CHECK_LEN; $o += 1) {
     $nx = $cx + $POS_CHECK[$o][0]
     $ny = $cy + $POS_CHECK[$o][1]
     if ($nx >= 0 && $nx < $width && $ny >= 0 && $ny < $height) {
       $npos = $width * $ny + $nx
-      $alive_count = $alive_count + $grid[$npos]
+      $alive_count += $grid[$npos]
     }
   }
 
@@ -29,7 +29,7 @@ function get_cell_state(grid: List, width: Number, height: Number, index: Number
 function get_new_grid_state(grid: List, width: Number, height: Number, cell_size: Number) {
   $cgrid = []
   $grid_len = $grid['length']
-  for ($e = 0; $e < $grid_len; $e = $e + 1) {
+  for ($e = 0; $e < $grid_len; $e += 1) {
     arr_append $cgrid (get_cell_state $grid $width $height $e)
   }
   return $cgrid
@@ -37,7 +37,7 @@ function get_new_grid_state(grid: List, width: Number, height: Number, cell_size
 
 function draw_grid_state(grid: List, width: Number, cell_size: Number) {
   $grid_len = $grid['length']
-  for ($e = 0; $e < $grid_len; $e = $e + 1) {
+  for ($e = 0; $e < $grid_len; $e += 1) {
     if ($grid[$e] == 1) {
       $x = (floor $e % $width) * $cell_size
       $y = (floor $e / $width) * $cell_size
@@ -55,7 +55,7 @@ $MAX_ITERATIONS = 150
 
 $grid = []
 // Populate Grid
-for ($i = 0; $i < $TOTAL_CELLS; $i = $i + 1) {
+for ($i = 0; $i < $TOTAL_CELLS; $i += 1) {
   arr_append $grid (rand 0 1)
 }
 
@@ -66,7 +66,7 @@ for (;1;) {
     2d_clear -c $win
     draw_grid_state $grid $NUM_CELLS_ROW $CELL_S
     $grid = (get_new_grid_state $grid $NUM_CELLS_ROW $NUM_CELLS_COL $CELL_S)
-    $iter_count = $iter_count + 1
+    $iter_count += 1
     if ($iter_count == $MAX_ITERATIONS) {
       break
     }

@@ -5,8 +5,7 @@
 import TerminalTestSuite from './tests';
 
 export default class TestTrash extends TerminalTestSuite {
-  async test_trash() {
-    // Array
+  async test_trash_array() {
     let results = await this.terminal.getShell().eval('[1,    2    , 3,     4     ]');
     this.assertEqual(results[0], 1);
     this.assertEqual(results[1], 2);
@@ -37,9 +36,10 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results[1][3][2][1], 'oops');
     this.assertEqual(results[1][3][2][2], 251);
     this.assertEqual(results[1][3][2][3].key, 'the value');
+  }
 
-    // Dictionary
-    results = await this.terminal.getShell().eval("{keyA: 'the value', keyB: 'the, value'}");
+  async test_trash_dictionary() {
+    let results = await this.terminal.getShell().eval("{keyA: 'the value', keyB: 'the, value'}");
     this.assertEqual(results.keyA, 'the value');
     this.assertEqual(results.keyB, 'the, value');
     results = await this.terminal.getShell().eval("{keyA: -23, keyB: 'the, value'}");
@@ -59,10 +59,22 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results.keyD.keyB[1], 33);
     this.assertEqual(results.keyD.keyB[2], 4);
     this.assertEqual(results.keyD.keyC.keyA, 'the, value');
+  }
 
-    // Global variables
+  async test_trash_assigments() {
+    let results = await this.terminal.getShell().eval("$var_at = 2; $var_at += 5; $var_at -= 1; $var_at *= 2; $var_at /= 2; $var_at");
+    this.assertEqual(results, 6);
+    results = await this.terminal.getShell().eval("$arr_at = [1, [34, [2, 10], 4]]; $arr_at[1][1][0] += 5; $arr_at[1][1][0] -= 1; $arr_at[1][1][0] *= 2; $arr_at[1][1][0] /= 2; $arr_at;");
+    this.assertEqual(results[1][1][0], 6);
+    results = await this.terminal.getShell().eval("$var_at_t = 5; $var_at = 2; $var_at += $var_at_t; $var_at");
+    this.assertEqual(results, 7);
+    results = await this.terminal.getShell().eval("$arr_at_t = [1, [34, [2, 10], 4]]; $var_at = 2; $var_at += $arr_at_t[1][1][1]; $var_at");
+    this.assertEqual(results, 12);
+  }
+
+  async test_trash_variables() {
     await this.terminal.getShell().eval("$test = 'this is a test'");
-    results = await this.terminal.getShell().eval('$test');
+    let results = await this.terminal.getShell().eval('$test');
     this.assertEqual(results, 'this is a test');
     await this.terminal.getShell().eval('$test = 1234');
     results = await this.terminal.getShell().eval('$test');
@@ -79,10 +91,11 @@ export default class TestTrash extends TerminalTestSuite {
     await this.terminal.getShell().eval(`$test['this'] = "blabla'bla; 'a'nd, bla"`);
     results = await this.terminal.getShell().eval('$test');
     this.assertEqual(results.this, "blabla'bla; 'a'nd, bla");
+  }
 
-    // Runners
+  async test_trash_runners() {
     await this.terminal.getShell().eval('$test = (search res.partner)');
-    results = await this.terminal.getShell().eval("$test['ids']");
+    let results = await this.terminal.getShell().eval("$test['ids']");
     this.assertEqual(results.constructor, Array);
     this.assertTrue(results.length > 0);
     results = await this.terminal.getShell().eval("(search res.partner -f name)['ids']");
@@ -99,9 +112,10 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertTrue(results.fulano.length > 0);
     this.assertTrue(results.mengano.length > 0);
     this.assertTrue(results.zutano.perengano > 6);
+  }
 
-    // Concat
-    results = await this.terminal.getShell().eval("$a = 'blabla'; $b = 1234;$a+'---' + $b;");
+  async test_trash_concat() {
+    let results = await this.terminal.getShell().eval("$a = 'blabla'; $b = 1234;$a+'---' + $b;");
     this.assertEqual(results, 'blabla---1234');
     results = await this.terminal.getShell().eval("$a = 'blabla'\n $b = 1234\n$a+'---' + $b;");
     this.assertEqual(results, 'blabla---1234');
@@ -109,9 +123,10 @@ export default class TestTrash extends TerminalTestSuite {
       "$a = [{test: 124, this: 'lelele lololo'}]; $b = [54,42]; $a[0]['this'] + '---' + $b[1];",
     );
     this.assertEqual(results, 'lelele lololo---42');
+  }
 
-    // Arithmetic Operations
-    results = await this.terminal.getShell().eval('(((5+5)*2))');
+  async test_trash_arithmetic() {
+    let results = await this.terminal.getShell().eval('(((5+5)*2))');
     this.assertEqual(results, 20);
     results = await this.terminal.getShell().eval('$val = 5*2; 5+$val');
     this.assertEqual(results, 15);
@@ -121,21 +136,10 @@ export default class TestTrash extends TerminalTestSuite {
       "$data = {numA: 4, numB:9, numC: [23,2]}; ($data['numA']    * $data['numB'] + $data['numC'][1] +    4  )  * -2   ",
     );
     this.assertEqual(results, -84);
+  }
 
-    // Mix
-    results = await this.terminal.getShell().eval("$data = {numA: 4, numB:9}; ['te'+ 'st' + '!', $data['numA'], 42]");
-    this.assertEqual(results[0], 'test!');
-    this.assertEqual(results[1], 4);
-    this.assertEqual(results[2], 42);
-    results = await this.terminal.getShell().eval(
-      "$data = {numA: 4, numB:9}; {'key' + 'A' + '001' + 'K' + 'Z': $data['numA'], (print 'Test Runner') + '_o': 'Val:' + $data['numB'] + '-E', 'key' + $data['numB']: 42}",
-    );
-    this.assertEqual(results.keyA001KZ, 4);
-    this.assertEqual(results['Test Runner_o'], 'Val:9-E');
-    this.assertEqual(results.key9, 42);
-
-    // Logic Operations
-    results = await this.terminal.getShell().eval("$data = {numA: 4, numB:9}; $data['numB'] > 3");
+  async test_trash_logic() {
+    let results = await this.terminal.getShell().eval("$data = {numA: 4, numB:9}; $data['numB'] > 3");
     this.assertTrue(results);
     results = await this.terminal.getShell().eval("$data = {numA: 4, numB:9}; $data['numB'] > 13");
     this.assertFalse(results);
@@ -145,9 +149,10 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertTrue(results);
     results = await this.terminal.getShell().eval("$data = {numA: 4, numB:9}; ($data['numB'] > 0 && $data['numB'] < 9) || $data['numA'] >= 4");
     this.assertTrue(results);
+  }
 
-    // Functions
-    results = await this.terminal.getShell().eval("function mop(a,  b  )  { $c = $b - $a  ; return    $c }; mop 10 2");
+  async test_trash_functions() {
+    let results = await this.terminal.getShell().eval("function mop(a,  b  )  { $c = $b - $a  ; return    $c }; mop 10 2");
     this.assertEqual(results, -8);
     results = await this.terminal.getShell().eval("$mop = function (   a,    b  )  { $c = $b - $a  ; return    $c  }; $$mop 10 2");
     this.assertEqual(results, -8);
@@ -159,7 +164,7 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.getShell().eval("$mop = function ()  { return (gen -mi 4 -ma 7) }; silent print '42' + $$mop");
     this.assertTrue(results.length > 2);
     this.assertEqual(results.substr(0, 2), '42');
-    let code = `
+    const code = `
       $nums = [1, 2, 3]
       $nums = (arr_map $nums (function (item) { return $item * 2 }))
       $nums = (arr_filter $nums (function (item) { return $item != 4 }))
@@ -167,23 +172,37 @@ export default class TestTrash extends TerminalTestSuite {
     `;
     results = await this.terminal.getShell().eval(code);
     this.assertEqual(results, 8);
+  }
 
-    // If Else
-    results = await this.terminal.getShell().eval("$num = (gen int -mi 0 -ma 10); if (($num + 10) < 5) { return 66 } else { return 42 }");
+  async test_trash_if() {
+    let results = await this.terminal.getShell().eval("$num = (gen int -mi 0 -ma 10); if (($num + 10) < 5) { return 66 } else { return 42 }");
     this.assertEqual(results, 42);
     results = await this.terminal.getShell().eval("$num = (gen int -mi 0 -ma 10); if ($num <= 10) { $num = $num + 10; if ($num >= 10) { return 42 }; return 66; } else { return 120 }");
     this.assertEqual(results, 42);
+  }
 
-    // For Loop
-    results = await this.terminal.getShell().eval("$buff = ''; for ($i = 0; $i < 100; $i = $i + 1) { $buff = $buff + 'A'; }; $buff");
+  async test_trash_loop() {
+    const results = await this.terminal.getShell().eval("$buff = ''; for ($i = 0; $i < 100; $i += 1) { $buff = $buff + 'A'; }; $buff");
     this.assertTrue(results.length === 100);
+  }
 
-    // Mix
-    code = `
+  async test_trash_mix() {
+    let results = await this.terminal.getShell().eval("$data = {numA: 4, numB:9}; ['te'+ 'st' + '!', $data['numA'], 42]");
+    this.assertEqual(results[0], 'test!');
+    this.assertEqual(results[1], 4);
+    this.assertEqual(results[2], 42);
+    results = await this.terminal.getShell().eval(
+      "$data = {numA: 4, numB:9}; {'key' + 'A' + '001' + 'K' + 'Z': $data['numA'], (print 'Test Runner') + '_o': 'Val:' + $data['numB'] + '-E', 'key' + $data['numB']: 42}",
+    );
+    this.assertEqual(results.keyA001KZ, 4);
+    this.assertEqual(results['Test Runner_o'], 'Val:9-E');
+    this.assertEqual(results.key9, 42);
+
+    let code = `
       function getPartnerCompanies() {
         $res = []
         $partners = (search res.partner -f is_company)
-        for ($i = 0; $i < $partners['length']; $i = $i + 1) {
+        for ($i = 0; $i < $partners['length']; $i += 1) {
           $partner = $partners[$i]
           if ($partner['is_company']) {
             arr_append $res $partner
@@ -199,7 +218,7 @@ export default class TestTrash extends TerminalTestSuite {
 
     code = `
       $arr = []
-      for ($i = 0; $i < 100; $i = $i + 1) {
+      for ($i = 0; $i < 100; $i += 1) {
         if ($i % 2 == 0) {
           continue
         }
@@ -213,7 +232,7 @@ export default class TestTrash extends TerminalTestSuite {
 
     code = `
       $arr = []
-      for ($i = 0; $i < 100; $i = $i + 1) {
+      for ($i = 0; $i < 100; $i += 1) {
         if ($i >= 10) {
           break
         }
@@ -335,14 +354,14 @@ export default class TestTrash extends TerminalTestSuite {
 
     code = `
       $var_test = 0;
-      for ($i = 0; $i < 2; $i = $i + 1) {
-        for ($e = 0; $e < 10; $e = $e + 1) {
+      for ($i = 0; $i < 2; $i += 1) {
+        for ($e = 0; $e < 10; $e += 1) {
           if ($e == 5) {
             break
           }
-          $var_test = $var_test + 1
+          $var_test += 1
         }
-        $var_test = $var_test + 1
+        $var_test += 1
       }
       return $var_test
     `;

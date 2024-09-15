@@ -22,6 +22,7 @@ import InvalidCommandDefintionError from './exceptions/invalid_command_definitio
 import pluck from './utils/pluck';
 import isNumber from './utils/is_number';
 import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
+import { SYMBOLS } from './constants.mjs';
 
 export type ProcessCommandJobOptions = {
   cmdRaw: string,
@@ -382,21 +383,56 @@ export default class VMachine {
               const value_token = parse_info.inputTokens[value_instr.level][value_instr.inputTokenIndex] || {};
               throw new InvalidTokenError(value_token.value, value_token.start, value_token.end);
             } else {
-              last_frame.setStoreValue(vname, vvalue);
+              if (token.value === SYMBOLS.ASSIGNMENT_ADD || token.value === SYMBOLS.ASSIGNMENT_SUBSTRACT || token.value === SYMBOLS.ASSIGNMENT_MULTIPLY || token.value === SYMBOLS.ASSIGNMENT_DIVIDE) {
+                let stored_value = last_frame.getStoreValue(vname);
+                if (typeof stored_value === 'undefined') {
+                  throw new InvalidNameError(vname, token.start, token.end);
+                }
+
+                if (token.value === SYMBOLS.ASSIGNMENT_ADD) {
+                  // $FlowFixMe
+                  stored_value += vvalue;
+                } else if (token.value === SYMBOLS.ASSIGNMENT_SUBSTRACT) {
+                  // $FlowFixMe
+                  stored_value -= vvalue;
+                } else if (token.value === SYMBOLS.ASSIGNMENT_MULTIPLY) {
+                  // $FlowFixMe
+                  stored_value *= vvalue;
+                } else if (token.value === SYMBOLS.ASSIGNMENT_DIVIDE) {
+                  // $FlowFixMe
+                  stored_value /= vvalue;
+                }
+                last_frame.setStoreValue(vname, stored_value);
+              } else {
+                last_frame.setStoreValue(vname, vvalue);
+              }
             }
           }
           break;
         case INSTRUCTION_TYPE.STORE_SUBSCR:
           {
-            const vname = stack.names[instr.level][instr.dataIndex];
+            // const vname = stack.names[instr.level][instr.dataIndex];
             const attr_value = last_frame.values.pop();
             const attr_name = last_frame.values.pop();
             const data = last_frame.values.pop();
             try {
-              // $FlowFixMe
-              data[attr_name] = attr_value;
-              // $FlowFixMe
-              last_frame.store[vname] = data;
+              if (token.value === SYMBOLS.ASSIGNMENT_ADD) {
+                // $FlowFixMe
+                data[attr_name] += attr_value;
+              } else if (token.value === SYMBOLS.ASSIGNMENT_SUBSTRACT) {
+                // $FlowFixMe
+                data[attr_name] -= attr_value;
+              } else if (token.value === SYMBOLS.ASSIGNMENT_MULTIPLY) {
+                // $FlowFixMe
+                data[attr_name] *= attr_value;
+              } else if (token.value === SYMBOLS.ASSIGNMENT_DIVIDE) {
+                // $FlowFixMe
+                data[attr_name] /= attr_value;
+              } else {
+                // $FlowFixMe
+                data[attr_name] = attr_value;
+              }
+              // last_frame.setStoreValue(vname, data);
             } catch (err) {
               throw new InvalidInstructionError(err.message);
             }

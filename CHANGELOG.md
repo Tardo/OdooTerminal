@@ -1,12 +1,15 @@
 # Changelog
 
-**11.4.1**
+**11.5.0**
 
 ```
 IMP: showQuestion: show terminal
 IMP: Don't resolve unknown values by default
 
+ADD: TraSH: +=, -=, *=, /=
+
 UPD: Remove command 'quit': Now can use 'toggle_term 0' to close terminal.
+UPD: Samples
 ```
 
 **11.4.0**

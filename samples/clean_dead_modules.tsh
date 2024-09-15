@@ -1,4 +1,4 @@
-// min-v 11.2.0; group system
+// min-v 11.5.0; group system
 // Removes modules that doesn't exists anymore...
 // WARNING: This is destructive!! Installed modules can't be removed, but act prudently.
 
@@ -18,7 +18,7 @@ $do = (input -q 'Remove ' + $dmods_len + ' modules?' -c ['y','n'] -d 'n')
 if ($do == 'y') {
     $rids = (arr_map $dmods function(item) { return $item['id'] })
     $fails = []
-    for ($i = 0; $i < $dmods_len; $i = $i + 1) {
+    for ($i = 0; $i < $dmods_len; $i += 1) {
         $rid = $rids[$i]
         $res = (unlink -m ir.module.module -i $rid)
         if (!$res) {

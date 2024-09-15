@@ -294,7 +294,7 @@ export default class Interpreter {
       } else {
         ttype = LEXER.Space;
       }
-    } else if (isFalsy(options?.isData) && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && ((token_san.length === 1 && typeof next_char === 'undefined') || (token_san.length > 1 && token_san[1] !== SYMBOLS.LOGIC_BLOCK_START && !isNumber(token_san[1])))) {
+    } else if (isFalsy(options?.isData) && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && ((token_san.length === 1 && typeof next_char === 'undefined') || (token_san.length > 1 && token_san[1] !== SYMBOLS.LOGIC_BLOCK_START && token_san[1] !== SYMBOLS.ASSIGNMENT && !isNumber(token_san[1])))) {
       if (token_san[1] === SYMBOLS.ARGUMENT) {
         ttype = LEXER.ArgumentLong;
         token_san = token_san.substr(2);
@@ -328,6 +328,14 @@ export default class Interpreter {
       ttype = LEXER.LessThanClosed;
     } else if (token_san === SYMBOLS.ASSIGNMENT && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
       ttype = LEXER.Assignment;
+    } else if (token_san === SYMBOLS.ASSIGNMENT_ADD && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
+      ttype = LEXER.AssignmentAdd;
+    } else if (token_san === SYMBOLS.ASSIGNMENT_SUBSTRACT && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
+      ttype = LEXER.AssignmentSubstract;
+    } else if (token_san === SYMBOLS.ASSIGNMENT_MULTIPLY && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
+      ttype = LEXER.AssignmentMultiply;
+    } else if (token_san === SYMBOLS.ASSIGNMENT_DIVIDE && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
+      ttype = LEXER.AssignmentDivide;
     } else if (token_san[0] === SYMBOLS.ARRAY_START && token_san.at(-1) === SYMBOLS.ARRAY_END) {
       token_san = token_san.substr(1, token_san.length - 2);
       token_san = token_san.trim();
@@ -1197,14 +1205,17 @@ export default class Interpreter {
           }
           break;
         case LEXER.Assignment:
+        case LEXER.AssignmentAdd:
+        case LEXER.AssignmentSubstract:
+        case LEXER.AssignmentMultiply:
+        case LEXER.AssignmentDivide:
           {
-            const last_instr = res.stack.instructions.at(-1);
+            const last_instr = res.stack.instructions.pop();
             if (!last_instr || (last_instr.type !== INSTRUCTION_TYPE.LOAD_DATA_ATTR && last_instr.type !== INSTRUCTION_TYPE.LOAD_NAME)) {
               if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
                 throw new InvalidTokenError(token.value, token.start, token.end);
               }
             } else {
-              res.stack.instructions.pop();
               const instr_type = last_instr.type === INSTRUCTION_TYPE.LOAD_DATA_ATTR ? INSTRUCTION_TYPE.STORE_SUBSCR : INSTRUCTION_TYPE.STORE_NAME;
               to_append_eoc.instructions.push(
                 new Instruction(instr_type, index, level, res.stack.names[0].length - 1),
