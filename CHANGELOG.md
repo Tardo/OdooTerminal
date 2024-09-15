@@ -10,6 +10,8 @@ ADD: TraSH: +=, -=, *=, /=
 
 UPD: Remove command 'quit': Now can use 'toggle_term 0' to close terminal.
 UPD: Samples
+
+DEL: Command 'quit'
 ```
 
 **11.4.0**

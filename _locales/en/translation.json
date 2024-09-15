@@ -259,7 +259,6 @@
     "definition": "Dissasembler bytecode",
     "detail": "Shows the bytecode generated for the input",
     "table": {
-      "dataIndex": "Data Index",
       "instrCode": "Instr. Code",
       "instrName": "Instr. Name",
       "level": "Level",

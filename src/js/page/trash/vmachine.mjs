@@ -5,7 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import {validateAndFormatArguments, getArgumentInputCount, getArgumentInfoByName} from './argument';
-import {INSTRUCTION_TYPE, ARG} from './constants';
+import {INSTRUCTION_TYPE, ARG, LEXER} from './constants';
 import {default as FunctionTrash, FUNCTION_TYPE} from './function';
 import Frame from './frame';
 import InvalidCommandArgumentFormatError from './exceptions/invalid_command_argument_format_error';
@@ -22,7 +22,6 @@ import InvalidCommandDefintionError from './exceptions/invalid_command_definitio
 import pluck from './utils/pluck';
 import isNumber from './utils/is_number';
 import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
-import { SYMBOLS } from './constants.mjs';
 
 export type ProcessCommandJobOptions = {
   cmdRaw: string,
@@ -383,22 +382,22 @@ export default class VMachine {
               const value_token = parse_info.inputTokens[value_instr.level][value_instr.inputTokenIndex] || {};
               throw new InvalidTokenError(value_token.value, value_token.start, value_token.end);
             } else {
-              if (token.value === SYMBOLS.ASSIGNMENT_ADD || token.value === SYMBOLS.ASSIGNMENT_SUBSTRACT || token.value === SYMBOLS.ASSIGNMENT_MULTIPLY || token.value === SYMBOLS.ASSIGNMENT_DIVIDE) {
+              if (token.type === LEXER.AssignmentAdd || token.type === LEXER.AssignmentSubstract || token.type === LEXER.AssignmentMultiply || token.type === LEXER.AssignmentDivide) {
                 let stored_value = last_frame.getStoreValue(vname);
                 if (typeof stored_value === 'undefined') {
                   throw new InvalidNameError(vname, token.start, token.end);
                 }
 
-                if (token.value === SYMBOLS.ASSIGNMENT_ADD) {
+                if (token.type === LEXER.AssignmentAdd) {
                   // $FlowFixMe
                   stored_value += vvalue;
-                } else if (token.value === SYMBOLS.ASSIGNMENT_SUBSTRACT) {
+                } else if (token.type === LEXER.AssignmentSubstract) {
                   // $FlowFixMe
                   stored_value -= vvalue;
-                } else if (token.value === SYMBOLS.ASSIGNMENT_MULTIPLY) {
+                } else if (token.type === LEXER.AssignmentMultiply) {
                   // $FlowFixMe
                   stored_value *= vvalue;
-                } else if (token.value === SYMBOLS.ASSIGNMENT_DIVIDE) {
+                } else if (token.type === LEXER.AssignmentDivide) {
                   // $FlowFixMe
                   stored_value /= vvalue;
                 }
@@ -416,16 +415,16 @@ export default class VMachine {
             const attr_name = last_frame.values.pop();
             const data = last_frame.values.pop();
             try {
-              if (token.value === SYMBOLS.ASSIGNMENT_ADD) {
+              if (token.type === LEXER.AssignmentAdd) {
                 // $FlowFixMe
                 data[attr_name] += attr_value;
-              } else if (token.value === SYMBOLS.ASSIGNMENT_SUBSTRACT) {
+              } else if (token.type === LEXER.AssignmentSubstract) {
                 // $FlowFixMe
                 data[attr_name] -= attr_value;
-              } else if (token.value === SYMBOLS.ASSIGNMENT_MULTIPLY) {
+              } else if (token.type === LEXER.AssignmentMultiply) {
                 // $FlowFixMe
                 data[attr_name] *= attr_value;
-              } else if (token.value === SYMBOLS.ASSIGNMENT_DIVIDE) {
+              } else if (token.type === LEXER.AssignmentDivide) {
                 // $FlowFixMe
                 data[attr_name] /= attr_value;
               } else {
