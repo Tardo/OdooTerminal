@@ -167,6 +167,7 @@
     "detail": "Operations over session context dictionary.",
     "error": {
       "keyNotPresent": "The selected key is not present in the terminal context",
+      "notSession": "Cannot find session information",
       "operationNotSupported": "This operation is currently not supported in v15.0+"
     }
   },
@@ -218,7 +219,8 @@
     "definition": "Show database names",
     "detail": "Show database names",
     "error": {
-      "noDBNames": "Can't get database names"
+      "noDBNames": "Can't get database names",
+      "notSession": "Cannot find session information"
     },
     "result": {
       "activeDatabase": "<strong>{{database}}</strong> (Active Database)"
@@ -446,6 +448,7 @@
     "definition": "Login as...",
     "detail": "Login as selected user.",
     "error": {
+      "notSession": "Cannot find session information",
       "unknownDB": "Unknown active database. Try using '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>' command."
     },
     "result": {
@@ -455,6 +458,9 @@
   "cmdLogout": {
     "definition": "Log out",
     "detail": "Session log out",
+    "error": {
+      "notSession": "Cannot find session information"
+    },
     "result": {
       "success": "Logged out"
     }
@@ -734,7 +740,10 @@
   },
   "cmdVersion": {
     "definition": "Know Odoo version",
-    "detail": "Shows Odoo version"
+    "detail": "Shows Odoo version",
+    "error": {
+      "notVersionInfo": "Cannot find version information"
+    }
   },
   "cmdView": {
     "args": {
@@ -866,6 +875,9 @@
     }
   },
   "odoo": {
+    "error": {
+      "notRoot": "Cannot find root object"
+    },
     "longpolling": {
       "error": {
         "init": "Can't initilize longpolling: ",

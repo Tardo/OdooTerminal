@@ -90,12 +90,12 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   const term_obj = getTerminalObj();
   if (term_obj) {
     loadVMFunctions(term_obj.getShell().getVM());
-    let lazyLoaderServ = getOdooService("@web/legacy/js/public/lazyloader");
-    if (typeof lazyLoaderServ !== 'undefined') {
+    let lazy_loader_obj = getOdooService("@web/legacy/js/public/lazyloader");
+    if (typeof lazy_loader_obj !== 'undefined') {
       // Caching call: see command implementation for more details.
       getUID();
-      lazyLoaderServ = lazyLoaderServ[Symbol.for('default')];
-      await lazyLoaderServ.allScriptsLoaded;
+      lazy_loader_obj = lazy_loader_obj[Symbol.for('default')];
+      await lazy_loader_obj.allScriptsLoaded;
     }
     term_obj.init(config);
     await postInitTerminal(term_obj, config);

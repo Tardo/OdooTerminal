@@ -13,18 +13,18 @@ export default function (): Object {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number') {
     if (OdooVerMajor >= 15) {
-      const OwlVer = getOwlVersionMajor();
-      const OwlCompatServ = getOdooService('web.OwlCompatibility');
-      if (typeof OwlCompatServ !== 'undefined') {
-        if (OwlVer === 1) {
+      const owl_ver = getOwlVersionMajor();
+      const owl_compat_obj = getOdooService('web.OwlCompatibility');
+      if (typeof owl_compat_obj !== 'undefined') {
+        if (owl_ver === 1) {
           // $FlowIgnore
           const {Component} = owl;
-          const {ComponentAdapter} = OwlCompatServ;
+          const {ComponentAdapter} = owl_compat_obj;
           return new ComponentAdapter(null, {Component});
-        } else if (OwlVer === 2) {
+        } else if (owl_ver === 2) {
           // $FlowIgnore
           const {Component} = owl;
-          const {standaloneAdapter} = OwlCompatServ;
+          const {standaloneAdapter} = owl_compat_obj;
           return standaloneAdapter({Component});
         }
       }
