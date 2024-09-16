@@ -22,7 +22,13 @@ async function cmdShowEffect(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
     return;
   }
   if (isEmpty(kwargs.type)) {
-    const {registry} = getOdooService('@web/core/registry');
+    const registry_obj = getOdooService('@web/core/registry');
+    if (typeof registry_obj === 'undefined') {
+      throw new Error(
+        i18n.t('cmdEffect.error.notRegistryService','Cannot find registry service')
+      );
+    }
+    const {registry} = registry_obj;
     const effects = registry.category('effects');
     ctx.screen.print(i18n.t('cmdEffect.result.availableEffects', 'Available effects:'));
     ctx.screen.print(effects.getEntries().map(item => item[0]));

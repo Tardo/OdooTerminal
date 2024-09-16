@@ -25,6 +25,11 @@ function openSelectCreateDialog(
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor < 16) {
     const dialogs = getOdooService('web.view_dialogs');
+    if (typeof dialogs === 'undefined') {
+      throw new Error(
+        i18n.t('cmdView.error.notViewDialogsService', 'Cannot find view dialog service')
+      );
+    }
     const dialog = new dialogs.SelectCreateDialog(getParentAdapter(), {
       res_model: model,
       title: title,
@@ -37,14 +42,17 @@ function openSelectCreateDialog(
   }
 
   const {Component} = owl;
-  const {SelectCreateDialog} = getOdooService('@web/views/view_dialogs/select_create_dialog');
-  Component.env.services.dialog.add(SelectCreateDialog, {
-    resModel: model,
-    domain: domain,
-    title: title,
-    multiSelect: false,
-    onSelected: on_selected,
-  });
+  const select_create_dialog_obj = getOdooService('@web/views/view_dialogs/select_create_dialog');
+  if (typeof select_create_dialog_obj !== 'undefined') {
+    const {SelectCreateDialog} = select_create_dialog_obj;
+    Component.env.services.dialog.add(SelectCreateDialog, {
+      resModel: model,
+      domain: domain,
+      title: title,
+      multiSelect: false,
+      onSelected: on_selected,
+    });
+  }
 }
 
 async function cmdViewModelRecord(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {

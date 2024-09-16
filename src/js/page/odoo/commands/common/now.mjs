@@ -12,6 +12,11 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 
 async function cmdNow(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const time = getOdooService('web.time', '@web/core/l10n/dates');
+  if (typeof time === 'undefined') {
+    throw new Error(
+      i18n.t('cmdNow.error.notViewDialogsService', 'Cannot find time service')
+    );
+  }
   const OdooVerMajor = getOdooVersion('major');
   let res = false;
   if (kwargs.type === 'full') {

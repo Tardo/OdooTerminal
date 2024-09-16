@@ -12,7 +12,7 @@ function getOrigService(serv_name: string) {
 // $FlowFixMe
 const service_cache: {[Array<string>]: OdooService} = {};
 // $FlowFixMe
-export default function (...service_names: Array<string>): OdooService {
+export default function (...service_names: Array<string>): OdooService | void {
   const service_names_set = Array.from(new Set(service_names));
   if (Object.hasOwn(service_cache, service_names_set)) {
     return service_cache[service_names_set];

@@ -9,6 +9,12 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 
 async function cmdShowOdooVersion(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const version_info = getOdooVersionInfo();
+  if (typeof version_info === 'undefined') {
+    throw new Error(
+      i18n.t('cmdVersion.error.notVersionInfo', 'Cannot find version information')
+    );
+  }
+
   ctx.screen.print(`${version_info.slice(0, 3).join('.')} (${version_info.slice(3).join(' ')})`);
   return version_info;
 }

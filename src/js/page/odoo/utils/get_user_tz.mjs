@@ -4,7 +4,7 @@
 
 import getOdooSession from './get_odoo_session';
 
-export default function (): string {
+export default function (): string | void {
   // $FlowIgnore
   return getOdooSession()?.user_context?.tz || luxon?.Settings?.defaultZoneName;
 }

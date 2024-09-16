@@ -4,7 +4,7 @@
 
 import getOdooService from './get_odoo_service';
 
-export default function (): OdooSession {
+export default function (): OdooSession | void {
   const sess_obj = getOdooService('web.session', '@web/session');
   if (!sess_obj) {
     return odoo.session_info || odoo.info;

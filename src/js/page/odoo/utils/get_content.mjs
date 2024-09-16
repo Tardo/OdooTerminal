@@ -7,7 +7,7 @@ import getOdooSession from './get_odoo_session';
 
 export type GetContentOnErrorCallback = (error: {[string]: mixed}) => void;
 
-export default function (data_opts: {[string]: mixed}, onerror: GetContentOnErrorCallback): boolean {
+export default function (data_opts: {[string]: mixed}, onerror: GetContentOnErrorCallback): boolean | void {
   return getOdooSession()?.get_file({
     complete: getOdooService('web.framework')?.unblockUI,
     data: Object.assign({}, data_opts, {

@@ -23,3 +23,4 @@ declare type OdooRoot = Object;
 declare type OdooService = Object;
 declare type BusService = OdooService;
 declare type BarcodeService = OdooService;
+declare type UserService = OdooService;

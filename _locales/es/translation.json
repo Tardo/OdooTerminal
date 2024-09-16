@@ -275,7 +275,8 @@
     "definition": "Show effect",
     "detail": "Show effect",
     "error": {
-      "incompatibleOdooVersion": "This command is only available in Odoo 15.0+"
+      "incompatibleOdooVersion": "This command is only available in Odoo 15.0+",
+      "notRegistryService": "Cannot find registry service"
     },
     "result": {
       "availableEffects": "Available effects:"
@@ -509,7 +510,10 @@
       "tz": "Use timezone"
     },
     "definition": "Current time",
-    "detail": "Prints the current time"
+    "detail": "Prints the current time",
+    "error": {
+      "notViewDialogsService": "Cannot find time service"
+    }
   },
   "cmdPaste": {
     "args": {
@@ -740,6 +744,9 @@
     },
     "definition": "View model record/s",
     "detail": "Open model record in form view or records in list view.",
+    "error": {
+      "notViewDialogsService": "Cannot find view dialog service"
+    },
     "result": {
       "selectRecord": "Select a record",
       "viewRecord": "View Record"

@@ -13,6 +13,12 @@ import type Terminal from '@odoo/terminal';
 
 async function cmdLoginAs(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const session = getOdooSession();
+  if (typeof session === 'undefined') {
+    throw new Error(
+      i18n.t('cmdLogin.error.notSession', 'Cannot find session information')
+    );
+  }
+
   let db = kwargs.database;
   let login = kwargs.user;
   let passwd = kwargs.password || false;

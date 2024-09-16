@@ -9,7 +9,14 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdLogOut(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  const res = await getOdooSession().session_logout();
+  const session = getOdooSession();
+  if (typeof session === 'undefined') {
+    throw new Error(
+      i18n.t('cmdLogout.error.notSession', 'Cannot find session information')
+    );
+  }
+
+  const res = await session.session_logout();
   ctx.screen.updateInputInfo({username: 'Public User'});
   ctx.screen.print(i18n.t('cmdLogout.result.success', 'Logged out'));
   await this.execute('reload', false, true);

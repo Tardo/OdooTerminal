@@ -28,7 +28,11 @@ function getTourNames(only_active: boolean = false): $ReadOnlyArray<string> {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
     if (only_active) {
-      const {tourState} = getOdooService('@web_tour/tour_service/tour_state');
+      const tour_state_obj = getOdooService('@web_tour/tour_service/tour_state');
+      if (!tour_state_obj) {
+        throw new Error(i18n.t('cmdTour.error.notAccesible', "tour not accesible! Can't use it in this moment."));
+      }
+      const {tourState} = tour_state_obj;
       return tourState.getActiveTourNames();
     }
     return tour_obj.getSortedTours().map(item => item.name);
@@ -44,16 +48,20 @@ function runTour(name: string) {
   const OdooVerMajor = getOdooVersion('major');
   const tour_obj = getTourObj();
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
-    tour_obj.startTour(name, {mode: 'manual'});
+    tour_obj?.startTour(name, {mode: 'manual'});
   } else {
-    tour_obj.run(name);
+    tour_obj?.run(name);
   }
 }
 
 async function cmdRunTour(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   if (kwargs.name) {
     if (kwargs.clear) {
-      const {tourState} = getOdooService('@web_tour/tour_service/tour_state');
+      const tour_state_obj = getOdooService('@web_tour/tour_service/tour_state');
+      if (!tour_state_obj) {
+        throw new Error(i18n.t('cmdTour.error.notAccesible', "tour not accesible! Can't use it in this moment."));
+      }
+      const {tourState} = tour_state_obj
       tourState.clear(kwargs.name);
       ctx.screen.print(
         i18n.t('cmdTour.result.clean', "Tour '{{name}}' clean", {

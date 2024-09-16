@@ -13,6 +13,12 @@ import type Terminal from '@odoo/terminal';
 
 async function cmdShowDBList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const session = getOdooSession();
+  if (typeof session === 'undefined') {
+    throw new Error(
+      i18n.t('cmdDBList.error.notSession', 'Cannot find session information')
+    );
+  }
+
   const _onSuccess = (databases: $ReadOnlyArray<string>) => {
     const databases_len = databases.length;
     if (!databases_len) {

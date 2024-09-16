@@ -9,9 +9,14 @@ import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
-const session: OdooSession = getOdooSession();
-
 async function cmdContextOperation(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+  const session = getOdooSession();
+  if (typeof session === 'undefined') {
+    throw new Error(
+      i18n.t('cmdContext.error.notSession', 'Cannot find session information')
+    );
+  }
+
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 15) {
     if (kwargs.operation === 'set' || kwargs.operation === 'write' || kwargs.operation === 'delete') {

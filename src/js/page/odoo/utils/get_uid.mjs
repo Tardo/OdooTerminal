@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import getOdooSession from './get_odoo_session';
+import getOdooUser from './get_odoo_user';
 
 // Odoo deletes the 'uid' key in Odoo >17.0, we store it for future reference.
 let cachedUID = -1;
@@ -12,9 +13,14 @@ export default function (): number {
     cachedUID = uid;
   } else if (uid instanceof Array) {
     cachedUID = uid[0];
+  } else if (getOdooUser()?.userId) {
+    cachedUID = getOdooUser()?.userId || -1;
   } else if (getOdooSession()?.storeData?.Store?.self.id) {
     // FIXME: Strange, but that's how it is... Odoo making friends :)
-    cachedUID = getOdooSession()?.storeData?.Store?.self.id - 1;
+    cachedUID = getOdooSession()?.storeData?.Store?.self?.id || -1;
+    if (cachedUID !== -1) {
+      --cachedUID;
+    }
   }
   return cachedUID;
 }
