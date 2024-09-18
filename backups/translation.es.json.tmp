@@ -42,14 +42,7 @@
     "detail": "Dibuja una línea"
   },
   "cmd2DRect": {
-    "args": {
-      "canvas": "El lienzo",
-      "color": "El color del rectágulo",
-      "height": "La altura del rectángulo",
-      "width": "El ancho del rectángulo",
-      "x": "El punto X del rectángulo",
-      "y": "El punto Y del rectángulo"
-    },
+    "args": {"canvas": "El lienzo", "color": "El color del rectágulo", "height": "La altura del rectángulo", "width": "El ancho del rectángulo", "x": "El punto X del rectángulo", "y": "El punto Y del rectángulo"},
     "definition": "Dibujar un rectágulo",
     "detail": "Dibujar un rectágulo"
   },

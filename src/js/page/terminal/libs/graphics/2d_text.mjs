@@ -28,7 +28,7 @@ export default function (): Partial<CMDDef> {
       [ARG.Number, ['x', 'x'], true, i18n.t('func2DText.args.x', 'The text X point')],
       [ARG.Number, ['y', 'y'], true, i18n.t('func2DText.args.y', 'The text Y point')],
       [ARG.String, ['f', 'font'], true, i18n.t('func2DText.args.font', 'The text font'), 1],
-      [ARG.String, ['tc', 'color'], false, i18n.t('func2DText.args.width', 'The text color'), "#000"],
+      [ARG.String, ['tc', 'color'], false, i18n.t('func2DText.args.color', 'The text color'), "#000"],
     ],
     example: "-c $myWindow 'Hello World!' -x 20 -y 20 -tc '#ff0000'",
   };

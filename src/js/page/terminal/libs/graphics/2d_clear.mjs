@@ -27,7 +27,7 @@ export default function (): Partial<CMDDef> {
       [ARG.Number, ['x', 'x'], false, i18n.t('cmd2DClear.args.from-x', 'The rect X point'), 0],
       [ARG.Number, ['y', 'y'], false, i18n.t('cmd2DClear.args.from-y', 'The rect Y point'), 0],
       [ARG.Number, ['w', 'width'], false, i18n.t('cmd2DClear.args.width', 'The rect width'), -1],
-      [ARG.Number, ['h', 'height'], false, i18n.t('cmd2DClear.args.width', 'The rect height'), -1],
+      [ARG.Number, ['h', 'height'], false, i18n.t('cmd2DClear.args.height', 'The rect height'), -1],
     ],
     example: "-c $myWindow",
   };

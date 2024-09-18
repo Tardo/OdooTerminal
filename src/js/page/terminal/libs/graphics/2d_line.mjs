@@ -32,7 +32,7 @@ export default function (): Partial<CMDDef> {
       [ARG.Number, ['tx', 'to-x'], true, i18n.t('cmd2DLine.args.to-x', 'The line to X point')],
       [ARG.Number, ['ty', 'to-y'], true, i18n.t('cmd2DLine.args.to-y', 'The line to Y point')],
       [ARG.Number, ['w', 'width'], false, i18n.t('cmd2DLine.args.width', 'The line width'), 1],
-      [ARG.String, ['lc', 'color'], false, i18n.t('cmd2DLine.args.width', 'The line color'), "#000"],
+      [ARG.String, ['lc', 'color'], false, i18n.t('cmd2DLine.args.color', 'The line color'), "#000"],
     ],
     example: "-c $myWindow -fx 20 -fy 20 -tx 40 -ty 40 -w 2 -lc '#ff0000'",
   };

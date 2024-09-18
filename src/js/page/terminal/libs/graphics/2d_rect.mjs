@@ -26,8 +26,8 @@ export default function (): Partial<CMDDef> {
       [ARG.Number, ['x', 'x'], true, i18n.t('cmd2DRect.args.x', 'The rect X point')],
       [ARG.Number, ['y', 'y'], true, i18n.t('cmd2DRect.args.y', 'The rect Y point')],
       [ARG.Number, ['w', 'width'], true, i18n.t('cmd2DRect.args.width', 'The rect width'), 1],
-      [ARG.Number, ['h', 'height'], true, i18n.t('cmd2DRect.args.width', 'The rect height'), 1],
-      [ARG.String, ['rc', 'color'], false, i18n.t('cmd2DRect.args.width', 'The rect color'), "#000"],
+      [ARG.Number, ['h', 'height'], true, i18n.t('cmd2DRect.args.height', 'The rect height'), 1],
+      [ARG.String, ['rc', 'color'], false, i18n.t('cmd2DRect.args.color', 'The rect color'), "#000"],
     ],
     example: "-c $myWindow -x 20 -y 20 -w 120 -h 120 -rc '#ff0000'",
   };

@@ -1,5 +1,12 @@
 # Changelog
 
+**11.5.1**
+
+```
+IMP: Translations
+IMP: Core resilience
+```
+
 **11.5.0**
 
 ```

@@ -104,7 +104,7 @@ export default class Terminal {
       onFinishCommand: () => this.#updateJobsInfo(),
     });
     this.screen = new Screen({
-      username: 'Unregistered User',
+      username: i18n.t('terminal.unregisteredUser','Unregistered User'),
       host: window.location.host,
     });
 

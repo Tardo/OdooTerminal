@@ -8,4 +8,5 @@ package-lock.json
 *.py
 *.png
 *.tsh
+*.tmp
 LICENSE

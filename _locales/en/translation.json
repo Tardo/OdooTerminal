@@ -13,6 +13,7 @@
       "canvas": "The canvas",
       "from-x": "The rect X point",
       "from-y": "The rect Y point",
+      "height": "The rect height",
       "width": "The rect height"
     },
     "definition": "Clear canvas",
@@ -37,6 +38,7 @@
   "cmd2DLine": {
     "args": {
       "canvas": "The canvas",
+      "color": "The line color",
       "from-x": "The line from X point",
       "from-y": "The line from Y point",
       "to-x": "The line to X point",
@@ -49,6 +51,8 @@
   "cmd2DRect": {
     "args": {
       "canvas": "The canvas",
+      "color": "The rect color",
+      "height": "The rect height",
       "width": "The rect color",
       "x": "The rect X point",
       "y": "The rect Y point"
@@ -812,6 +816,7 @@
   "func2DText": {
     "args": {
       "canvas": "The canvas",
+      "color": "The text color",
       "font": "The text font",
       "text": "The text",
       "width": "The text color",
@@ -940,7 +945,8 @@
     "question": {
       "aborted": "Operation aborted"
     },
-    "unknownCommand": "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?"
+    "unknownCommand": "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
+    "unregisteredUser": "Unregistered User"
   },
   "trash": {
     "argument": {
