@@ -1,6 +1,8 @@
 {
   "No": "No",
-  "UnknownNameError": {"invalidName": "<Nombre no válido>"},
+  "UnknownNameError": {
+    "invalidName": "<Nombre no válido>"
+  },
   "Yes": "Sí",
   "checkStorageError": {
     "message": "Borre la <b class='o_terminal_click o_terminal_cmd' data-cmd='clear screen' style='color:orange;'>pantalla</b> o/y <b class='o_terminal_click o_terminal_cmd' data-cmd='clear historial ' style='color:orange;'>el historial</b> para liberar espacio de almacenamiento. El navegador reporta: <u>Cuota de almacenamiento excedida</u> 😭",
@@ -27,7 +29,12 @@
     "definition": "Crear ventana 2D",
     "detail": "Destruir ventana 2D"
   },
-  "cmd2DDestroyWindow": {"args": {"canvas": "El lienzo"}, "definition": "Destruir ventana 2D"},
+  "cmd2DDestroyWindow": {
+    "args": {
+      "canvas": "El lienzo"
+    },
+    "definition": "Destruir ventana 2D"
+  },
   "cmd2DLine": {
     "args": {
       "canvas": "El lienzo",
@@ -61,7 +68,10 @@
     "definition": "Llamar a una acción"
   },
   "cmdAlias": {
-    "args": {"cmd": "El comando para ejecutar", "name": "El nombre del pseudónimo"},
+    "args": {
+      "cmd": "El comando para ejecutar",
+      "name": "El nombre del pseudónimo"
+    },
     "created": "Pseudónimo ​​creado exitosamente",
     "definition": "Crear pseudónimos",
     "detail": "Defina pseudónimos para ejecutar comandos fácilmente. <br><b>ADVERTENCIA:</b> Este comando utiliza 'almacenamiento local' para conservar los datos incluso si cierra el navegador. Otros usuarios del ordenador pueden acceder fácilmente a estos datos. No emplee datos sensibles si está utilizando un ordenador compartido.<br><br>Se pueden usar parámetros posicionales ($1,$2,$3,$N...)",
@@ -78,7 +88,7 @@
       "operation": "La operacion",
       "pressDelay": "El retraso entre eventos de pulsación de tecla (en ms)"
     },
-    "definition": "Operaciones sobre código de barras",
+    "definition": "Operaciones con el código de barras",
     "detail": "Ver información y enviar cadenas de códigos de barras",
     "error": {
       "invalidOperation": "¡Operación no válida!",
@@ -98,8 +108,8 @@
       "filter": "El filtro a aplicar",
       "model": "El nombre técnico del modelo"
     },
-    "definition": "Consultar acceso a los campos del modelo",
-    "detail": "Mostrar campos accesibles del modelo seleccionado"
+    "definition": "Consultar nivel de acceso a los campos del modelo",
+    "detail": "Mostrar campos accesibles del modelo"
   },
   "cmdCall": {
     "args": {
@@ -112,7 +122,10 @@
     "detail": "Llamar a un método de modelo. Recuerde: los métodos con el decorador @api.model no necesitan pasar el 'id'"
   },
   "cmdCam": {
-    "args": {"model": "El nombre técnico del modelo.", "operation": "La operación a realizar"},
+    "args": {
+      "model": "El nombre técnico del modelo.",
+      "operation": "La operación a realizar"
+    },
     "definition": "Consultar acceso al modelo",
     "detail": "Mostrar derechos de acceso para la operación seleccionada en el modelo seleccionado",
     "result": {
@@ -121,20 +134,26 @@
     }
   },
   "cmdChrono": {
-    "args": {"cmd": "El comando a ejecutar"},
+    "args": {
+      "cmd": "El comando a ejecutar"
+    },
     "definition": "Imprimir el tiempo empleado en ejecutar un comando.",
     "detail": "Imprime el tiempo transcurrido en segundos para ejecutar un comando. <br/>¡Observe que este tiempo incluye el tiempo para formatear el resultado!",
-    "result": {"timeElapsed": "Tiempo transcurrido: '{{time_elapsed_secs}}' segundos"}
+    "result": {
+      "timeElapsed": "Tiempo transcurrido: '{{time_elapsed_secs}}' segundos"
+    }
   },
   "cmdClear": {
     "args": {
       "section": "La sección para borrar<br/>- screen: Limpiar la pantalla<br/>- history: Limpiar el historial de comandos"
     },
-    "definition": "Limpiar la sección del terminal",
-    "detail": "Limpiar la sección seleccionada."
+    "definition": "Limpiar una sección del terminal",
+    "detail": "Limpiar la sección indicada"
   },
   "cmdCommit": {
-    "args": {"recordset": "El conjunto de registros"},
+    "args": {
+      "recordset": "El conjunto de registros"
+    },
     "definition": "Confirmar cambios en el conjunto de registros",
     "detail": "Escribir cambios en el conjunto de registros",
     "error": {
@@ -144,8 +163,11 @@
     }
   },
   "cmdContext": {
-    "args": {"operation": "La operación a realizar", "value": "Los valores"},
-    "definition": "Operaciones sobre el contexto de sesi̇ón",
+    "args": {
+      "operation": "La operación a realizar",
+      "value": "Los valores"
+    },
+    "definition": "Operaciones con el contexto de sesi̇ón",
     "detail": "Contexto de sesión.",
     "error": {
       "keyNotPresent": "La clave seleccionada no está presente en el contexto del terminal",
@@ -154,43 +176,69 @@
     }
   },
   "cmdContextTerm": {
-    "args": {"operation": "La operación a realizar", "value": "el valor"},
-    "definition": "Operaciones sobre el contexto del terminal",
-    "detail": "Operaciones sobre el contexto del terminal. Este contexto sólo afecta a las operaciones del terminal",
-    "error": {"notPresent": "La clave seleccionada no está presente en el contexto del terminal"}
+    "args": {
+      "operation": "La operación a realizar",
+      "value": "el valor"
+    },
+    "definition": "Operaciones con el contexto del terminal",
+    "detail": "Operaciones con el contexto del terminal. Este contexto sólo afecta a las operaciones del terminal",
+    "error": {
+      "notPresent": "La clave seleccionada no está presente en el contexto del terminal"
+    }
   },
   "cmdCopy": {
-    "args": {"data": "Los datos", "type": "El tipo de datos"},
+    "args": {
+      "data": "Los datos",
+      "type": "El tipo de datos"
+    },
     "definition": "Copiar datos para pegarlos en otras instancias",
     "detail": "Copiar registros de modelo o variables",
-    "result": {"dateCopied": "¡Datos copiados!"}
+    "result": {
+      "dateCopied": "¡Datos copiados!"
+    }
   },
   "cmdCount": {
-    "args": {"domain": "El dominio", "model": "El nombre técnico del modelo", "options": "Las opciones"},
+    "args": {
+      "domain": "El dominio",
+      "model": "El nombre técnico del modelo",
+      "options": "Las opciones"
+    },
     "definition": "Obtiene la cantidad de registros del modelo dado en el dominio seleccionado",
     "detail": "Obtiene la cantidad de registros del modelo dado en el dominio seleccionado",
     "result": "Resultado: {{result}}"
   },
   "cmdCreate": {
-    "args": {"model": "El nombre técnico del modelo.", "options": "Las opciones", "value": "Los valores a escribir"},
+    "args": {
+      "model": "El nombre técnico del modelo.",
+      "options": "Las opciones",
+      "value": "Los valores a escribir"
+    },
     "definition": "Crear un nuevo registro",
     "detail": "Abra un nuevo registro de modelo en la vista de formulario o crearlo directamente"
   },
   "cmdDBList": {
-    "args": {"onlyActive": "Indica que solo se imprime el nombre de la base de datos activa"},
+    "args": {
+      "onlyActive": "Indica que solo se imprime el nombre de la base de datos activa"
+    },
     "definition": "Mostrar nombres de bases de datos",
     "detail": "Mostrar nombres de bases de datos",
     "error": {
       "noDBNames": "No se pueden obtener los nombres de las bases de datos",
       "notSession": "No se puede encontrar la información de la sesión"
     },
-    "result": {"activeDatabase": "<strong>{{database}}</strong> (base de datos activa)"}
+    "result": {
+      "activeDatabase": "<strong>{{database}}</strong> (base de datos activa)"
+    }
   },
   "cmdDebug": {
-    "args": {"mode": "El modo<br>- 0: Deshabilitado<br>- 1: Habilitado<br>- 2: Habilitado con Activos"},
+    "args": {
+      "mode": "El modo<br>- 0: Deshabilitado<br>- 1: Habilitado<br>- 2: Habilitado con Activos"
+    },
     "definition": "Establecer el modo de depuración",
     "detail": "Establecer el modo de depuración",
-    "error": {"invalidDebugMode": "Modo de depuración no válido"},
+    "error": {
+      "invalidDebugMode": "Modo de depuración no válido"
+    },
     "result": {
       "disabled": "Modo de depuración <strong>deshabilitado</strong>",
       "enabled": "Modo de depuración <strong>habilitado</strong>",
@@ -199,13 +247,21 @@
     }
   },
   "cmdDepends": {
-    "args": {"key": "La clave", "module": "El nombre técnico del módulo", "section": "La sección de URL"},
+    "args": {
+      "key": "La clave",
+      "module": "El nombre técnico del módulo",
+      "section": "La sección de URL"
+    },
     "definition": "Conozca los módulos que dependen del módulo dado",
     "detail": "Mostrar una lista de los módulos que depende del módulo dado",
-    "error": {"notInstalled": "El módulo '{{module}}' no está instalado"}
+    "error": {
+      "notInstalled": "El módulo '{{module}}' no está instalado"
+    }
   },
   "cmdDis": {
-    "args": {"code": "Código de TraSH"},
+    "args": {
+      "code": "Código de TraSH"
+    },
     "definition": "Muestra el pseudo-bytecode generado",
     "detail": "Muestra el pseudo-bytecode generado para la entrada",
     "table": {
@@ -218,35 +274,55 @@
     }
   },
   "cmdEffect": {
-    "args": {"options": "Las opciones adicionales para usar", "type": "El tipo de efecto"},
+    "args": {
+      "options": "Las opciones adicionales para usar",
+      "type": "El tipo de efecto"
+    },
     "definition": "Mostrar efecto",
     "detail": "Mostrar efecto",
     "error": {
       "incompatibleOdooVersion": "Este comando solo está disponible en Odoo 15.0+",
       "notRegistryService": "No se puede encontrar el servicio de registro"
     },
-    "result": {"availableEffects": "Efectos disponibles:"}
+    "result": {
+      "availableEffects": "Efectos disponibles:"
+    }
   },
   "cmdExportFile": {
-    "args": {"value": "El valor a exportar"},
+    "args": {
+      "value": "El valor a exportar"
+    },
     "definition": "Exporta el resultado del comando a un archivo de texto/json",
     "detail": "Exporta el resultado del comando a un archivo de texto/json.",
     "resultExported": "Resultado del comando exportado al archivo '{{filename}}'"
   },
   "cmdExportVar": {
-    "args": {"value": "El valor a exportar"},
+    "args": {
+      "value": "El valor a exportar"
+    },
     "definition": "Exporta el resultado del comando a una variable de consola del navegador",
     "detail": "Exporta el resultado del comando a una variable de consola del navegador",
     "resultExported": "¡Resultado del comando exportado! ahora puedes usar la variable '{{varname}}' en la consola del navegador"
   },
-  "cmdFuncTrash": {"args": {"name": "El parámetro de función"}},
+  "cmdFuncTrash": {
+    "args": {
+      "name": "El parámetro de función"
+    }
+  },
   "cmdGen": {
-    "args": {"max": "Máx. valor", "min": "Mín. valor", "type": "Tipo de generador"},
+    "args": {
+      "max": "Máx. valor",
+      "min": "Mín. valor",
+      "type": "Tipo de generador"
+    },
     "definition": "Generar valores aleatorios",
     "detail": "Genera números, cadenas, URL, fechas, etc..."
   },
   "cmdGenFile": {
-    "args": {"name": "El nombre del archivo del objeto Archivo", "options": "Las opciones del objeto Archivo"},
+    "args": {
+      "name": "El nombre del archivo del objeto Archivo",
+      "options": "Las opciones del objeto Archivo"
+    },
     "definition": "Generar un objeto de archivo",
     "detail": "Abra un cuadro de diálogo de archivo del navegador e instancia un objeto Archivo con el contenido del archivo seleccionado."
   },
@@ -258,8 +334,15 @@
     },
     "definition": "Imprima esta ayuda o información detallada",
     "detail": "Muestra comandos y una definición rápida.<br/>- <> ~> Parámetro requerido<br/>- [] ~> Parámetro opcional",
-    "error": {"commandNotExist": "El comando '{{cmd}}' no existe"},
-    "result": {"arguments": "ARGUMENTOS", "description": "DESCRIPCIÓN", "example": "EJEMPLO", "name": "NOMBRE"}
+    "error": {
+      "commandNotExist": "El comando '{{cmd}}' no existe"
+    },
+    "result": {
+      "arguments": "ARGUMENTOS",
+      "description": "DESCRIPCIÓN",
+      "example": "EJEMPLO",
+      "name": "NOMBRE"
+    }
   },
   "cmdInfo": {
     "args": {
@@ -272,32 +355,48 @@
     "detail": "Obtener diversa información de la sesión"
   },
   "cmdInput": {
-    "args": {"choices": "Las opciones", "default": "La elección predeterminada", "question": "La pregunta"},
+    "args": {
+      "choices": "Las opciones",
+      "default": "La elección predeterminada",
+      "question": "La pregunta"
+    },
     "definition": "Solicita datos de entrada al usuario",
     "detail": "Devuelve los datos ingresados ​​por el usuario"
   },
   "cmdInstall": {
-    "args": {"module": "El nombre técnico del módulo"},
+    "args": {
+      "module": "El nombre técnico del módulo"
+    },
     "definition": "Instalar un módulo",
     "detail": "Iniciar el proceso de instalación del módulo",
     "error": {
       "moduleNotExist": "Los módulos '{{module}}' no existen",
       "moduleNotInstalled": "Error inesperado. Módulos no instalados"
     },
-    "result": {"success": "{{modules}} módulos instalados correctamente"}
+    "result": {
+      "success": "{{modules}} módulos instalados correctamente"
+    }
   },
   "cmdJSTest": {
-    "args": {"device": "El dispositivo a probar", "module": "El nombre técnico del módulo"},
+    "args": {
+      "device": "El dispositivo a probar",
+      "module": "El nombre técnico del módulo"
+    },
     "definition": "Lanzar pruebas JS",
     "detail": "Ejecuta pruebas js en modo de escritorio o móvil para el módulo seleccionado"
   },
   "cmdJobs": {
     "definition": "Mostrar trabajos en ejecución",
     "detail": "Mostrar trabajos en ejecución",
-    "result": {"timeout": "Este trabajo esta tomando mucho tiempo"}
+    "result": {
+      "timeout": "Este trabajo esta tomando mucho tiempo"
+    }
   },
   "cmdJson": {
-    "args": {"data": "Los datos a enviar", "endpoint": "El 'endpoint'"},
+    "args": {
+      "data": "Los datos a enviar",
+      "endpoint": "El 'endpoint'"
+    },
     "definition": "Enviar datos JSON",
     "detail": "Envía una solicitud HTTP POST 'aplicación/json'"
   },
@@ -310,8 +409,8 @@
       "noOverwrite": "Marcar para indicar que no se sobrescriban las traducciones actuales",
       "operation": "La operacion"
     },
-    "definition": "Operaciones sobre traducciones",
-    "detail": "Operaciones sobre traducciones",
+    "definition": "Operaciones con las traducciones",
+    "detail": "Operaciones con las traducciones",
     "error": {
       "exportInvalidArguments": "La operación 'export' necesita los siguientes argumentos: --lang, --format, --module",
       "importInvalidArguments": "La operación de 'import' necesita los siguientes argumentos: --name, --lang, --format, --module",
@@ -319,16 +418,27 @@
       "noModulesFound": "¡No se encontraron módulos!",
       "noWizard": "¡No se ha podido crear un registro de asistente!"
     },
-    "result": {"success": "Archivo de idioma importado exitosamente"}
+    "result": {
+      "success": "Archivo de idioma importado exitosamente"
+    }
   },
   "cmdLastSeen": {
     "definition": "Conocer la presencia de los usuarios",
     "detail": "Mostrar usuarios vistos por última vez",
-    "error": {"notAvailable": "No se puede usar la 'lastseen', el módulo 'bus' no está instalado"},
-    "table": {"lastSeen": "Visto por última vez", "userID": "ID de usuario", "userName": "Nombre de usuario"}
+    "error": {
+      "notAvailable": "No se puede usar la 'lastseen', el módulo 'bus' no está instalado"
+    },
+    "table": {
+      "lastSeen": "Visto por última vez",
+      "userID": "ID de usuario",
+      "userName": "Nombre de usuario"
+    }
   },
   "cmdLoad": {
-    "args": {"type": "El tipo de activo", "url": "La URL del recurso"},
+    "args": {
+      "type": "El tipo de activo",
+      "url": "La URL del recurso"
+    },
     "definition": "Cargar recurso externo",
     "detail": "Cargar fuente externa (javascript y css)"
   },
@@ -345,13 +455,19 @@
       "notSession": "No se pudo encontrar información de la sesión",
       "unknownDB": "Base de datos activa desconocida. Intente utilizar el comando '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>'."
     },
-    "result": {"success": "Se ha iniciado sesión correctamente como '{{login}}'"}
+    "result": {
+      "success": "Se ha iniciado sesión correctamente como '{{login}}'"
+    }
   },
   "cmdLogout": {
     "definition": "Finalizar la sesión",
     "detail": "Cerrar sesión",
-    "error": {"notSession": "No se pudo encontrar información de la sesión"},
-    "result": {"success": "Sesión cerrada"}
+    "error": {
+      "notSession": "No se pudo encontrar información de la sesión"
+    },
+    "result": {
+      "success": "Sesión cerrada"
+    }
   },
   "cmdLongpolling": {
     "args": {
@@ -375,10 +491,15 @@
     }
   },
   "cmdMetadata": {
-    "args": {"id": "El 'id' del registro", "model": "El nombre técnico del modelo"},
+    "args": {
+      "id": "El 'id' del registro",
+      "model": "El nombre técnico del modelo"
+    },
     "definition": "Ver metadatos del registro",
     "detail": "Ver metadatos del registro",
-    "error": {"notFound": "No se pueden encontrar metadatos para el 'id' proporcionado"}
+    "error": {
+      "notFound": "No se pueden encontrar metadatos para el 'id' proporcionado"
+    }
   },
   "cmdNotify": {
     "args": {
@@ -394,28 +515,44 @@
     "detail": "Muestra una notificación con un mensaje personalizado"
   },
   "cmdNow": {
-    "args": {"type": "Tipo de fecha", "tz": "Usar zona horaria"},
+    "args": {
+      "type": "Tipo de fecha",
+      "tz": "Usar zona horaria"
+    },
     "definition": "Hora actual",
     "detail": "Imprime la hora actual",
-    "error": {"notViewDialogsService": "No se pudo encontrar el servicio de hora"}
+    "error": {
+      "notViewDialogsService": "No se pudo encontrar el servicio de hora"
+    }
   },
   "cmdPaste": {
-    "args": {"merge": "Intentar fusionar los datos (si el tipo es 'model')", "yes": "No mostrar preguntas"},
+    "args": {
+      "merge": "Intentar fusionar los datos (si el tipo es 'model')",
+      "yes": "No mostrar preguntas"
+    },
     "definition": "Pega los datos copiados",
     "detail": "Pegar registros del modelo o variables",
     "error": {
       "invalidData": "¡Datos no válidos para pegar! Ningún modelo definido",
       "noData": "¡No hay datos para copiar!"
     },
-    "question": {"continue": "Esto modificará el modelo '{{model}}'. ¿Continuar?"}
+    "question": {
+      "continue": "Esto modificará el modelo '{{model}}'. ¿Continuar?"
+    }
   },
   "cmdPost": {
-    "args": {"data": "Los datos", "endpoit": "El 'endpoint'", "mode": "El modo"},
+    "args": {
+      "data": "Los datos",
+      "endpoit": "El 'endpoint'",
+      "mode": "El modo"
+    },
     "definition": "Enviar solicitud POST",
     "detail": "Enviar solicitud POST al 'endpoint' seleccionado"
   },
   "cmdPrint": {
-    "args": {"msg": "El mensaje a imprimir"},
+    "args": {
+      "msg": "El mensaje a imprimir"
+    },
     "definition": "Imprimir un mensaje",
     "detail": "Evalúa los parámetros e imprime el resultado"
   },
@@ -431,25 +568,45 @@
     "detail": "Leer un registro de modelo"
   },
   "cmdRef": {
-    "args": {"xmlid": "El ID-XML"},
+    "args": {
+      "xmlid": "El ID-XML"
+    },
     "definition": "Mostrar el nombre técnico del modelo y el 'id' del xmlid dado",
     "detail": "Mostrar el nombre técnico del modelo y el 'id' del xmlid dado",
-    "table": {"resID": "Res. Id.", "resModel": "Res. Modelo", "xmlID": "ID-XML"}
+    "table": {
+      "resID": "Res. Id.",
+      "resModel": "Res. Modelo",
+      "xmlID": "ID-XML"
+    }
   },
-  "cmdReload": {"definition": "Recargar la página actual", "detail": "Recargar la página actual"},
+  "cmdReload": {
+    "definition": "Recargar la página actual",
+    "detail": "Recargar la página actual"
+  },
   "cmdRollback": {
-    "args": {"recordset": "El conjunto de registros"},
+    "args": {
+      "recordset": "El conjunto de registros"
+    },
     "definition": "Revertir cambios en el conjunto de registros",
     "detail": "Deshacer cambios en el conjunto de registros",
-    "error": {"invalidRecordset": "Conjunto de registros no válido"},
-    "result": {"success": "Cambios en el conjunto de registros deshechos"}
+    "error": {
+      "invalidRecordset": "Conjunto de registros no válido"
+    },
+    "result": {
+      "success": "Cambios en el conjunto de registros deshechos"
+    }
   },
   "cmdRpc": {
-    "args": {"options": "Las opciones de consulta rpc"},
+    "args": {
+      "options": "Las opciones de consulta rpc"
+    },
     "definition": "Ejecutar rpc sin formato",
     "detail": "Ejecutar rpc sin formato"
   },
-  "cmdRun": {"definition": "Ejecutar un script TrasH", "detail": "Ejecutar un script TrasH"},
+  "cmdRun": {
+    "definition": "Ejecutar un script TrasH",
+    "detail": "Ejecutar un script TrasH"
+  },
   "cmdSearch": {
     "args": {
       "all": "Mostrar todos los registros (no truncados)",
@@ -469,21 +626,31 @@
       "noMoreResults": "No hay más resultados para imprimir",
       "resultTruncated": "<strong class='text-warning'>¡Resultado truncado a {{len}} registros!</strong> La consulta es demasiado grande para mostrarse en su totalidad."
     },
-    "question": {"showMore": "Aún quedan resultados por imprimir ({{len}} registros). ¿Mostrar más?"},
-    "result": {"count": "Recuento de registros: {{count}}"}
+    "question": {
+      "showMore": "Aún quedan resultados por imprimir ({{len}} registros). ¿Mostrar más?"
+    },
+    "result": {
+      "count": "Recuento de registros: {{count}}"
+    }
   },
   "cmdSettings": {
-    "args": {"module": "El nombre técnico del módulo"},
+    "args": {
+      "module": "El nombre técnico del módulo"
+    },
     "definition": "Abrir la página de configuración",
     "detail": "Abra la página de configuración"
   },
   "cmdSleep": {
-    "args": {"time": "El tiempo para dormir (en ms)"},
+    "args": {
+      "time": "El tiempo para dormir (en ms)"
+    },
     "definition": "Dormir",
     "detail": "Dormir (tiempo en ms)"
   },
   "cmdToggleTerm": {
-    "args": {"force": "Forzar mostrar/ocultar"},
+    "args": {
+      "force": "Forzar mostrar/ocultar"
+    },
     "definition": "Alternar visibilidad de terminal",
     "detail": "Alternar visibilidad de terminal"
   },
@@ -509,13 +676,19 @@
   "cmdURL": {
     "definition": "Obtener parámetros de la URL",
     "detail": "Obtener parámetros de la URL",
-    "error": {"notKey": "No se ha proporcionado una clave"}
+    "error": {
+      "notKey": "No se ha proporcionado una clave"
+    }
   },
   "cmdUal": {
     "definition": "Actualizar la lista de aplicaciones",
     "detail": "Actualizar la lista de aplicaciones",
-    "error": {"noUpdate": "¡No pudo actualizar la lista de aplicaciones!"},
-    "result": {"success": "La lista de aplicaciones se ha actualizado correctamente"}
+    "error": {
+      "noUpdate": "¡No pudo actualizar la lista de aplicaciones!"
+    },
+    "result": {
+      "success": "La lista de aplicaciones se ha actualizado correctamente"
+    }
   },
   "cmdUhg": {
     "args": {
@@ -525,11 +698,19 @@
     "detail": "Compruebe si el usuario está en los grupos seleccionados"
   },
   "cmdUninstall": {
-    "args": {"force": "Modo forzado", "module": "El nombre técnico del módulo"},
+    "args": {
+      "force": "Modo forzado",
+      "module": "El nombre técnico del módulo"
+    },
     "definition": "Desinstalar un módulo",
     "detail": "Iniciar el proceso de eliminación del módulo",
-    "error": {"canceled": "Operación cancelada", "notExist": "El módulo '{{module}}' no existe"},
-    "question": {"continue": "¿Quieres continuar?"},
+    "error": {
+      "canceled": "Operación cancelada",
+      "notExist": "El módulo '{{module}}' no existe"
+    },
+    "question": {
+      "continue": "¿Quieres continuar?"
+    },
     "result": {
       "success": "Módulo '{{module}}' ({{name}}) desinstalado exitosamente",
       "willRemoved": "Esta operación también eliminará estos módulos:"
@@ -543,22 +724,30 @@
     },
     "definition": "Eliminar un registro",
     "detail": "Eliminar un registro",
-    "result": {"success": "{{model}} registro eliminado correctamente"}
+    "result": {
+      "success": "{{model}} registro eliminado correctamente"
+    }
   },
   "cmdUpgrade": {
-    "args": {"module": "El nombre técnico del módulo"},
+    "args": {
+      "module": "El nombre técnico del módulo"
+    },
     "definition": "Actualizar un módulo",
     "detail": "Iniciar el proceso de actualización del módulo",
     "error": {
       "notExist": "Los módulos '{{module}}' no existen",
       "notUpgraded": "Error inesperado. Módulo no actualizado"
     },
-    "result": {"sucess": "Los módulos '{{modules}}' se actualizaron correctamente"}
+    "result": {
+      "sucess": "Los módulos '{{modules}}' se actualizaron correctamente"
+    }
   },
   "cmdVersion": {
     "definition": "Imprime la versión de Odoo",
     "detail": "Muestra la versión de Odoo",
-    "error": {"notVersionInfo": "No pudo encontrar la información de la versión"}
+    "error": {
+      "notVersionInfo": "No pudo encontrar la información de la versión"
+    }
   },
   "cmdView": {
     "args": {
@@ -568,13 +757,20 @@
     },
     "definition": "Ver registros de modelo",
     "detail": "Abrir el registro del modelo en la vista de formulario o registros en la vista de lista",
-    "error": {"notViewDialogsService": "No se pudo encontrar el servicio visualización de diálogo"},
-    "result": {"selectRecord": "Seleccione un registro", "viewRecord": "Ver registro"}
+    "error": {
+      "notViewDialogsService": "No se pudo encontrar el servicio visualización de diálogo"
+    },
+    "result": {
+      "selectRecord": "Seleccione un registro",
+      "viewRecord": "Ver registro"
+    }
   },
   "cmdWhoami": {
     "definition": "Conocer el nombre de inicio de sesión del usuario actual",
     "detail": "Muestra el nombre de inicio de sesión del usuario actual",
-    "error": {"noLogin": "¡Ups! no se pudo iniciar sesión :/"}
+    "error": {
+      "noLogin": "¡Ups! no se pudo iniciar sesión :/"
+    }
   },
   "cmdWrite": {
     "args": {
@@ -585,7 +781,9 @@
     },
     "definition": "Actualizar valores de registro",
     "detail": "Actualizar valores de registro.",
-    "result": {"success": "{{model}} registro actualizado correctamente"}
+    "result": {
+      "success": "{{model}} registro actualizado correctamente"
+    }
   },
   "cmdWs": {
     "args": {
@@ -609,14 +807,18 @@
       "connectionEstablished": "[{{url}}] Conexión establecida"
     }
   },
-  "file2base64": {"aborted": "Abortado por el usuario. No se ha proporcionado ningún archivo..."},
-  "file2file": {"aborted": "Abortado por el usuario. No se ha proporcionado ningún archivo..."},
+  "file2base64": {
+    "aborted": "Abortado por el usuario. No se ha proporcionado ningún archivo..."
+  },
+  "file2file": {
+    "aborted": "Abortado por el usuario. No se ha proporcionado ningún archivo..."
+  },
   "func2DText": {
     "args": {
       "canvas": "El lienzo",
+      "color": "The text color",
       "font": "La fuente del texto",
       "text": "El texto",
-      "width": "El color del texto",
       "x": "El punto X del texto",
       "y": "El punto Y del texto"
     },
@@ -624,22 +826,31 @@
     "detail": "Dibujar un texto"
   },
   "funcAbs": {
-    "args": {"num": "El numero"},
+    "args": {
+      "num": "El numero"
+    },
     "definition": "Valor absoluto de un numero",
     "detail": "Devuelve el valor absoluto de un número"
   },
   "funcFetch": {
-    "args": {"timeout": "El tiempo de espera", "url": "Las opciones de la petición"},
+    "args": {
+      "timeout": "El tiempo de espera",
+      "url": "Las opciones de la petición"
+    },
     "definition": "Solicitudes HTTP",
     "detail": "Interfaz para realizar solicitudes HTTP y procesar las respuestas"
   },
   "funcFixed": {
-    "args": {"num": "El numero de decimales"},
+    "args": {
+      "num": "El numero de decimales"
+    },
     "definition": "Redondea un número hacia ARRIBA al entero más cercano",
     "detail": "Redondea un número hacia ARRIBA al entero más cercano"
   },
   "funcFloor": {
-    "args": {"num": "el numero"},
+    "args": {
+      "num": "el numero"
+    },
     "definition": "Redondea un número hacia ABAJO al entero más cercano",
     "detail": "Redondea un número hacia ABAJO al entero más cercano"
   },
@@ -648,17 +859,34 @@
     "detail": "Marca de tiempo de alta resolución en milisegundos"
   },
   "funcRand": {
-    "args": {"max": "Máx. valor", "min": "Mín. valor"},
+    "args": {
+      "max": "Máx. valor",
+      "min": "Mín. valor"
+    },
     "definition": "Generar números enteros aleatorios",
     "detail": "Devuelve enteros aleatorios"
   },
-  "getOdooEnvService": {"error": "El servicio '{{service_name}}' no está disponible"},
-  "loader": {"cantInitTerm": "No se puede inicializar el terminal", "testsEnabled": "Pruebas habilitadas"},
-  "longpolling": {"error": {"notAvailable": "El servicio 'bus' no está disponible"}},
+  "getOdooEnvService": {
+    "error": "El servicio '{{service_name}}' no está disponible"
+  },
+  "loader": {
+    "cantInitTerm": "No se puede inicializar el terminal",
+    "testsEnabled": "Pruebas habilitadas"
+  },
+  "longpolling": {
+    "error": {
+      "notAvailable": "El servicio 'bus' no está disponible"
+    }
+  },
   "odoo": {
-    "error": {"notRoot": "No se puede encontrar el objeto raíz"},
+    "error": {
+      "notRoot": "No se puede encontrar el objeto raíz"
+    },
     "longpolling": {
-      "error": {"init": "No se puede inicializar el 'longpolling':", "read": "** ¡Error de lectura! **"},
+      "error": {
+        "init": "No se puede inicializar el 'longpolling':",
+        "read": "** ¡Error de lectura! **"
+      },
       "new": "Nueva notificación de 'longpolling':"
     },
     "templates": {
@@ -670,7 +898,9 @@
         "writeUID": "Escribir UID",
         "xmlID": "ID-XML"
       },
-      "recordCreated": {"sucess": "{{model}} registros creados correctamente: {{- links}}"},
+      "recordCreated": {
+        "sucess": "{{model}} registros creados correctamente: {{- links}}"
+      },
       "whoami": {
         "activeCompany": "Empresa Activa",
         "inCompanies": "En Empresas",
@@ -682,7 +912,9 @@
     }
   },
   "terminal": {
-    "close": {"prevented": "El terminal ha impedido que la pestaña actual se cierre debido a tareas inacabadas:"},
+    "close": {
+      "prevented": "El terminal ha impedido que la pestaña actual se cierre debido a tareas inacabadas:"
+    },
     "cmd": {
       "default": {
         "definition": "Comando indefinido",
@@ -702,11 +934,18 @@
       "ProcessJobError": "Error al ejecutar '{{cmd_name}}'",
       "TooManyElementsTemplateError": "¡Demasiados elementos en la plantilla para asignarlos a un solo elemento!"
     },
-    "info": {"job": {"running": "Ejecutando {{count}} comando(s)", "unhealthy": "({{count_unhealthy}} no saludable)"}},
+    "info": {
+      "job": {
+        "running": "Ejecutando {{count}} comando(s)",
+        "unhealthy": "({{count_unhealthy}} no saludable)"
+      }
+    },
     "notLoaded": "Terminal no cargada",
-    "question": {"aborted": "Operación abortada"},
+    "question": {
+      "aborted": "Operación abortada"
+    },
     "unknownCommand": "Comando desconocido '{{org_cmd}}' en {{start}}:{{end}}. ¿Quiso decir '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
-    "unregisteredUser": "Usario sin registrar"
+    "unregisteredUser": "Usuario sin registrar"
   },
   "trash": {
     "argument": {
@@ -727,7 +966,16 @@
       "unknownNameError": "Nombre desconocido '{{vname}}' en {{start}}:{{end}}",
       "unknownStoreValue": "Valor de variable desconocido '{{vname}}'"
     },
-    "vmachine": {"func": {"definition": "Función interna", "detail": "Función interna"}}
+    "vmachine": {
+      "func": {
+        "definition": "Función interna",
+        "detail": "Función interna"
+      }
+    }
   },
-  "utilInjectResource": {"error": {"invalidType": "Tipo de recurso no válido"}}
+  "utilInjectResource": {
+    "error": {
+      "invalidType": "Tipo de recurso no válido"
+    }
+  }
 }

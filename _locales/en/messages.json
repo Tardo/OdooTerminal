@@ -24,6 +24,9 @@
   "optionsTitleBehaviourElephant": {
     "message": "Attempt to resolve unknown values (mainly the login name)"
   },
+  "optionsLanguage": {
+    "message": "Language"
+  },
   "optionsTitleShortcuts": {
     "message": "Shortcuts"
   },
