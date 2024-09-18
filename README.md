@@ -128,8 +128,8 @@ For example: `read -m res.users -i (search -m res.users -f id)[0]['id']` or
 
 #### + Loops
 
-Massive operations are possible using the command `for loops`. Print to screen is a expensive task, consider use the
-keyword `silent` to increase the performance.
+Massive operations are possible using `for loops`. Print to screen is a expensive task, consider use the keyword
+`silent` to increase the performance.
 
 Examples:
 
@@ -191,15 +191,14 @@ Example:
 
 ---
 
-# Contributing
+# More resources!
 
-- [contributing.md](./docs/contributing.md)
-
----
-
-# Changelog
-
-- [CHANGELOG.md](CHANGELOG.md)
+- [CHANGELOG](CHANGELOG.md)
+- [Contributing](./docs/contributing.md)
+- [Developing](./docs/developing.md)
+- [Testing](./docs/testing.md)
+- [TraSH](./docs/trash.md)
+- [Translations](./docs/translations.md)
 
 ---
 
