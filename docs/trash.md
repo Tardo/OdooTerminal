@@ -43,7 +43,7 @@ There are three families of functions:
 
 - Internal functions: Are executed by the JavaScript vm
 
-  **In Javascript (flow typed)**
+  **In JavaScript (flow typed)**
 
   ```js
   async function funcMy(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<number> { return 42; }
@@ -51,7 +51,7 @@ There are three families of functions:
 
 - Commands: Are executed by the shell and the JavaScript vm
 
-  **In Javascript (flow typed)**
+  **In JavaScript (flow typed)**
 
   ```js
   async function cmdMy(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<number> { ctx.screen.print('O_o 42!'); return 42; }

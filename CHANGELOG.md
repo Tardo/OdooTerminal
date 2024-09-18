@@ -5,6 +5,8 @@
 ```
 IMP: Translations
 IMP: Core resilience
+
+UPD: Docs
 ```
 
 **11.5.0**
