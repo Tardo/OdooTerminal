@@ -78,7 +78,7 @@
       "operation": "La operacion",
       "pressDelay": "El retraso entre eventos de pulsación de tecla (en ms)"
     },
-    "definition": "Operaciones sobre código de barras",
+    "definition": "Operaciones con el código de barras",
     "detail": "Ver información y enviar cadenas de códigos de barras",
     "error": {
       "invalidOperation": "¡Operación no válida!",
@@ -98,8 +98,8 @@
       "filter": "El filtro a aplicar",
       "model": "El nombre técnico del modelo"
     },
-    "definition": "Consultar acceso a los campos del modelo",
-    "detail": "Mostrar campos accesibles del modelo seleccionado"
+    "definition": "Consultar nivel de acceso a los campos del modelo",
+    "detail": "Mostrar campos accesibles del modelo"
   },
   "cmdCall": {
     "args": {
@@ -130,8 +130,8 @@
     "args": {
       "section": "La sección para borrar<br/>- screen: Limpiar la pantalla<br/>- history: Limpiar el historial de comandos"
     },
-    "definition": "Limpiar la sección del terminal",
-    "detail": "Limpiar la sección seleccionada."
+    "definition": "Limpiar una sección del terminal",
+    "detail": "Limpiar la sección indicada"
   },
   "cmdCommit": {
     "args": {"recordset": "El conjunto de registros"},
@@ -145,7 +145,7 @@
   },
   "cmdContext": {
     "args": {"operation": "La operación a realizar", "value": "Los valores"},
-    "definition": "Operaciones sobre el contexto de sesi̇ón",
+    "definition": "Operaciones con el contexto de sesi̇ón",
     "detail": "Contexto de sesión.",
     "error": {
       "keyNotPresent": "La clave seleccionada no está presente en el contexto del terminal",
@@ -155,8 +155,8 @@
   },
   "cmdContextTerm": {
     "args": {"operation": "La operación a realizar", "value": "el valor"},
-    "definition": "Operaciones sobre el contexto del terminal",
-    "detail": "Operaciones sobre el contexto del terminal. Este contexto sólo afecta a las operaciones del terminal",
+    "definition": "Operaciones con el contexto del terminal",
+    "detail": "Operaciones con el contexto del terminal. Este contexto sólo afecta a las operaciones del terminal",
     "error": {"notPresent": "La clave seleccionada no está presente en el contexto del terminal"}
   },
   "cmdCopy": {
@@ -310,8 +310,8 @@
       "noOverwrite": "Marcar para indicar que no se sobrescriban las traducciones actuales",
       "operation": "La operacion"
     },
-    "definition": "Operaciones sobre traducciones",
-    "detail": "Operaciones sobre traducciones",
+    "definition": "Operaciones con las traducciones",
+    "detail": "Operaciones con las traducciones",
     "error": {
       "exportInvalidArguments": "La operación 'export' necesita los siguientes argumentos: --lang, --format, --module",
       "importInvalidArguments": "La operación de 'import' necesita los siguientes argumentos: --name, --lang, --format, --module",
@@ -706,7 +706,7 @@
     "notLoaded": "Terminal no cargada",
     "question": {"aborted": "Operación abortada"},
     "unknownCommand": "Comando desconocido '{{org_cmd}}' en {{start}}:{{end}}. ¿Quiso decir '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
-    "unregisteredUser": "Usario sin registrar"
+    "unregisteredUser": "Usuario sin registrar"
   },
   "trash": {
     "argument": {

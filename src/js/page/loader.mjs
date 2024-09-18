@@ -102,9 +102,10 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   }
 }
 
-function initTranslations(langpath: string) {
+function initTranslations(langpath: string, lang: string) {
+  const lang_s = lang === 'auto' ? navigator.language.replace('-', '_') : lang;
   return i18n.use(HttpApi).init({
-    lng: navigator.language.replace('-', '_'),
+    lng: lang_s,
     fallbackLng: 'en',
     supportedLngs: ['en', 'es'],
     load: ['currentOnly', 'languageOnly'],
@@ -129,7 +130,7 @@ function onWindowMessage(ev: MessageEvent) {
   if (ev.data !== null && typeof ev.data === 'object') {
     if (ev.data.type === 'ODOO_TERM_CONFIG') {
       // $FlowFixMe
-      initTranslations(ev.data.langpath).then(() => initTerminal(ev.data.config, ev.data.info));
+      initTranslations(ev.data.langpath, ev.data.config.language).then(() => initTerminal(ev.data.config, ev.data.info));
     }
   }
 }

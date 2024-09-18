@@ -28,6 +28,9 @@
   "optionsTitleBehaviourElephant": {
     "message": "Intentar resolver valores desconocidos (principalmente el login de usuario)"
   },
+  "optionsLanguage": {
+    "message": "Idioma"
+  },
   "optionsTitleShortcuts": {
     "message": "Atajos"
   },
