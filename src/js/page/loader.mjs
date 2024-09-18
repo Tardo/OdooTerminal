@@ -40,7 +40,7 @@ function getTerminalObj(): OdooTerminal | void {
     return terminal;
   }
 
-  // $FlowIgnore: 'webdriver' is used by selenium
+  // $FlowIgnore: 'webdriver' is used by automated browsers
   const load_tests = window.__OdooTerminal?.load_tests || navigator.webdriver;
   if (load_tests) {
     logger.info('loader', i18n.t('loader.testsEnabled', 'Tests Enabled'));
