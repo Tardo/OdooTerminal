@@ -765,8 +765,7 @@ export default class Terminal {
   #onCoreKeyDown(this: Terminal, ev: KeyboardEvent) {
     // Don't crash when press keys!
     try {
-      if (ev.keyCode === 27 && isEmpty(this.screen.getQuestionActive())) {
-        // Press Escape
+      if (ev.keyCode === keyCode.ESCAPE && this.#isTerminalVisible() && isEmpty(this.screen.getQuestionActive())) {
         this.doHide();
       } else {
         const keybind = processKeybind(ev);
