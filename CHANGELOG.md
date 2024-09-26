@@ -1,5 +1,11 @@
 # Changelog
 
+**11.5.2**
+
+```
+FIX: Press escape key without having the terminal fully initialized (issue #134)
+```
+
 **11.5.1**
 
 ```
