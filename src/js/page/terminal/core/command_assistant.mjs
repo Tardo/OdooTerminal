@@ -114,9 +114,9 @@ export default class CommandAssistant {
     let res = values || [];
     if (filter_by) {
       if (filter_mode === 'includes') {
-        res = values.filter(item => item.includes(filter_by));
+        res = values.filter(item => typeof item === 'string' && item.includes(filter_by));
       } else {
-        res = values.filter(item => item.startsWith(filter_by));
+        res = values.filter(item => typeof item === 'string' && item.startsWith(filter_by));
       }
     }
     return res;

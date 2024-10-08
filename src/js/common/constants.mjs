@@ -91,6 +91,8 @@ export const COMPATIBLE_VERSIONS: Array<string> = [
   'saas~15',
   '16.',
   'saas~16',
-  '17.0',
-  'saas~17.0',
+  '17.',
+  'saas~17',
+  '18.0',
+  'saas~18.0',
 ];

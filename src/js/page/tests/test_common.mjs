@@ -366,8 +366,17 @@ export default class TestCommon extends TerminalTestSuite {
     await this.terminal.execute('view res.partner 1', false, true);
     let res = await this.terminal.execute('url', false, true);
     this.assertNotEmpty(res);
-    res = await this.terminal.execute('url -s hash -k model', false, true);
-    this.assertNotEmpty(res);
+    const OdooVerMajor = getOdooVersion('major');
+    this.assertTrue(typeof OdooVerMajor === 'number');
+    // $FlowIgnore
+    if (OdooVerMajor < 18) {
+      res = await this.terminal.execute('url -s hash -k model', false, true);
+      this.assertNotEmpty(res);
+    } else {
+      res = await this.terminal.execute('url -s href', false, true);
+      this.assertNotEmpty(res);
+    }
+
   }
 
   async test_info() {

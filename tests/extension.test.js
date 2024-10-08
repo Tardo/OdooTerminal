@@ -1,6 +1,3 @@
-/**
- * @jest-environment ./tests/custom-environment
- */
 const WAIT_MINS = 60000;
 
 function construct_url(relative_path = '') {
@@ -9,12 +6,12 @@ function construct_url(relative_path = '') {
 
 async function loginAs(login, password) {
   await page.goto(construct_url('/web/login'));
-  await page.waitForSelector('input#login');
-  let input_el = await page.$('input#login');
-  await input_el.type(login);
-  input_el = await page.$('input#password');
-  await input_el.type(password);
-  await page.click('button[type="submit"]');
+  await page.waitForSelector('input#login', {visible: true});
+  await page.type('input#login', login);
+  await page.waitForSelector('input#password', {visible: true});
+  await page.type('input#password', password);
+  await page.waitForSelector('button[type="submit"]:not(.oe_search_button)', {visible: true});
+  await page.click('button[type="submit"]:not(.oe_search_button)');
 
   try {
     const elem_selector = await page.waitForSelector('p.alert-danger', {timeout: 5000});

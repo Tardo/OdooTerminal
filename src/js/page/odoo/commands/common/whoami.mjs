@@ -50,30 +50,54 @@ async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
       companies_list.push(renderWhoamiListItem(company.display_name, 'res.company', company.id));
     }
   } else {
-    const result_tasks = await Promise.all([
-      callModelMulti<$ReadOnlyArray<[number, string]>>(
-        'res.groups',
-        record.groups_id,
-        'name_get',
-        null,
-        null,
-        this.getContext(),
-      ),
-      callModelMulti<$ReadOnlyArray<[number, string]>>(
-        'res.company',
-        record.company_ids,
-        'name_get',
-        null,
-        null,
-        this.getContext(),
-      ),
-    ]);
+    if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 18) {
+      const result_tasks = await Promise.all([
+        searchRead(
+          'res.groups',
+          [['id', 'in', record.groups_id]],
+          ['display_name'],
+          this.getContext(),
+        ),
+        searchRead(
+          'res.company',
+          [['id', 'in', record.company_ids]],
+          ['display_name'],
+          this.getContext(),
+        ),
+      ]);
 
-    for (const group of result_tasks[0]) {
-      groups_list.push(renderWhoamiListItem(group[1], 'res.groups', group[0]));
-    }
-    for (const company of result_tasks[1]) {
-      companies_list.push(renderWhoamiListItem(company[1], 'res.company', company[0]));
+      for (const group of result_tasks[0]) {
+        groups_list.push(renderWhoamiListItem(group.display_name, 'res.groups', group.id));
+      }
+      for (const company of result_tasks[1]) {
+        companies_list.push(renderWhoamiListItem(company.display_name, 'res.company', company.id));
+      }
+    } else {
+      const result_tasks = await Promise.all([
+        callModelMulti<$ReadOnlyArray<[number, string]>>(
+          'res.groups',
+          record.groups_id,
+          'name_get',
+          null,
+          null,
+          this.getContext(),
+        ),
+        callModelMulti<$ReadOnlyArray<[number, string]>>(
+          'res.company',
+          record.company_ids,
+          'name_get',
+          null,
+          null,
+          this.getContext(),
+        ),
+      ]);
+
+      for (const group of result_tasks[0]) {
+        groups_list.push(renderWhoamiListItem(group[1], 'res.groups', group[0]));
+      }
+      for (const company of result_tasks[1]) {
+        companies_list.push(renderWhoamiListItem(company[1], 'res.company', company[0]));
+      }
     }
   }
 

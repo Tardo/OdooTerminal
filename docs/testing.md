@@ -11,7 +11,7 @@ npm install
 #### Usage
 
 ```
-export ODOO_VERSION=17.0
+export ODOO_VERSION=18.0
 export PUPPETEER_BROWSER=chrome
 npm run test
 ```
@@ -19,7 +19,7 @@ npm run test
 \*\* Available browsers: chromium, chrome (Maybe, someday it will be possible to install the extension in firefox using
 puppeteer)
 
-\*\* Avaiblable versions: 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0
+\*\* Avaiblable versions: 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0
 
 ## Unit Tests
 
