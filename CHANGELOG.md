@@ -1,5 +1,13 @@
 # Changelog
 
+**11.6.0**
+
+```
+IMP: Support Odoo 18.0
+
+FIX: Paste clipboard content in the terminal input
+```
+
 **11.5.2**
 
 ```

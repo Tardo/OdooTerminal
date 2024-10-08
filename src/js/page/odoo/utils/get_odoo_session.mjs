@@ -4,13 +4,13 @@
 
 import getOdooService from './get_odoo_service';
 
+let cachedSession;
 export default function (): OdooSession | void {
   const sess_obj = getOdooService('web.session', '@web/session');
   if (!sess_obj) {
-    return odoo.session_info || odoo.info;
+    cachedSession = odoo.session_info || odoo.info;
+  } else if (Object.hasOwn(sess_obj, 'session')) {
+    cachedSession = sess_obj.session;
   }
-  if (Object.hasOwn(sess_obj, 'session')) {
-    return sess_obj.session;
-  }
-  return sess_obj;
+  return cachedSession || sess_obj;
 }
