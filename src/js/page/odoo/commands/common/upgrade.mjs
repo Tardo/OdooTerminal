@@ -12,50 +12,47 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdUpgradeModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  return searchModules
-    .bind(this)(kwargs.module)
-    .then(result => {
-      if (result.length) {
-        return callModelMulti<{...}>(
-          'ir.module.module',
-          result.map(item => item.id),
-          'button_immediate_upgrade',
-          null,
-          null,
-          this.getContext(),
-        ).then(
-          () => {
-            ctx.screen.print(
-              i18n.t('cmdUpgrade.result.sucess', "'{{modules}}' modules successfully upgraded", {
-                modules: result.map(item => item.name).join(', '),
-              }),
-            );
-            return result;
-          },
-          res => {
-            throw new Error(
-              res?.message?.data?.message ||
-                i18n.t('cmdUpgrade.error.notUpgraded', 'Unexpected error. Module not upgraded'),
-            );
-          },
+  const result = await searchModules.bind(this)(kwargs.module);
+  if (result.length) {
+    return callModelMulti<{...}>(
+      'ir.module.module',
+      result.map(item => item.id),
+      'button_immediate_upgrade',
+      null,
+      null,
+      await this.getContext(),
+    ).then(
+      () => {
+        ctx.screen.print(
+          i18n.t('cmdUpgrade.result.sucess', "'{{modules}}' modules successfully upgraded", {
+            modules: result.map(item => item.name).join(', '),
+          }),
         );
-      }
-      throw new Error(
-        i18n.t('cmdUpgrade.error.notExist', "'{{module}}' modules doesn't exist", {
-          module: kwargs.module,
-        }),
-      );
-    });
+        return result;
+      },
+      res => {
+        throw new Error(
+          res?.message?.data?.message ||
+            i18n.t('cmdUpgrade.error.notUpgraded', 'Unexpected error. Module not upgraded'),
+        );
+      },
+    );
+  }
+  throw new Error(
+    i18n.t('cmdUpgrade.error.notExist', "'{{module}}' modules doesn't exist", {
+      module: kwargs.module,
+    }),
+  );
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'module') {
     return cachedSearchRead(
       'options_ir.module.module_active',
       'ir.module.module',
       [],
       ['name'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'name ASC'},
       item => item.name,

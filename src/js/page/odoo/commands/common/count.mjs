@@ -11,26 +11,26 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdCount(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  return searchCount(kwargs.model, kwargs.domain, this.getContext(), kwargs.options).then(result => {
+  return searchCount(kwargs.model, kwargs.domain, await this.getContext(), kwargs.options).then(result => {
     ctx.screen.print(i18n.t('cmdCount.result', 'Result: {{result}}', {result}));
     return result;
   });
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
       'ir.model',
       [],
       ['model'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

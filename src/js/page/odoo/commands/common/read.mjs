@@ -25,7 +25,7 @@ async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, c
       'fields_get',
       [fields],
       null,
-      this.getContext(),
+      await this.getContext(),
       kwargs.options,
     );
 
@@ -39,7 +39,7 @@ async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, c
     });
   }
 
-  const result = await searchRead(kwargs.model, [['id', 'in', kwargs.id]], fields, this.getContext());
+  const result = await searchRead(kwargs.model, [['id', 'in', kwargs.id]], fields, await this.getContext());
 
   if (bin_fields.length !== 0) {
     for (const item of result) {
@@ -54,20 +54,20 @@ async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, c
   return recordset;
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
       'ir.model',
       [],
       ['model'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

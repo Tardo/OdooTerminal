@@ -17,5 +17,5 @@ export async function searchModules(
   } else {
     domain = [['name', 'in', module_names]];
   }
-  return searchRead('ir.module.module', domain, ['name', 'display_name'], this.getContext());
+  return searchRead('ir.module.module', domain, ['name', 'display_name'], await this.getContext());
 }

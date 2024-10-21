@@ -12,57 +12,54 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdInstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  return searchModules
-    .bind(this)(kwargs.module)
-    .then(result => {
-      if (result.length) {
-        // $FlowFixMe
-        return callModelMulti<Object>(
-          'ir.module.module',
-          result.map(item => item.id),
-          'button_immediate_install',
-          null,
-          null,
-          this.getContext(),
-        ).then(
-          () => {
-            ctx.screen.print(
-              i18n.t('cmdInstall.result.success', '{{modules}} modules successfully installed', {
-                modules: result.map(item => item.name).join(', '),
-              }),
-            );
-            return result;
-          },
-          res => {
-            throw new Error(
-              res?.message?.data?.message ||
-                i18n.t('cmdInstall.error.moduleNotInstalled', 'Unexpected error. Modules not installed'),
-            );
-          },
+  const result = await searchModules.bind(this)(kwargs.module);
+  if (result.length) {
+    // $FlowFixMe
+    return callModelMulti<Object>(
+      'ir.module.module',
+      result.map(item => item.id),
+      'button_immediate_install',
+      null,
+      null,
+      await this.getContext(),
+    ).then(
+      () => {
+        ctx.screen.print(
+          i18n.t('cmdInstall.result.success', '{{modules}} modules successfully installed', {
+            modules: result.map(item => item.name).join(', '),
+          }),
         );
-      }
-      throw new Error(
-        i18n.t('cmdInstall.error.moduleNotExist', "'{{module}}' modules doesn't exist", {
-          module: kwargs.module,
-        }),
-      );
-    });
+        return result;
+      },
+      res => {
+        throw new Error(
+          res?.message?.data?.message ||
+            i18n.t('cmdInstall.error.moduleNotInstalled', 'Unexpected error. Modules not installed'),
+        );
+      },
+    );
+  }
+  throw new Error(
+    i18n.t('cmdInstall.error.moduleNotExist', "'{{module}}' modules doesn't exist", {
+      module: kwargs.module,
+    }),
+  );
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'module') {
     return cachedSearchRead(
       'options_ir.module.module',
       'ir.module.module',
       [],
       ['name'],
-      this.getContext(),
+      await this.getContext(),
       undefined,
       {orderBy: 'name ASC'},
       item => item.name,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

@@ -394,7 +394,7 @@ export default class Terminal {
     this.#initGuard();
   }
 
-  getContext(extra_context: ?{[string]: mixed}): {[string]: mixed} {
+  async getContext(extra_context: ?{[string]: mixed}): Promise<OdooSessionInfoUserContext> {
     return Object.assign({}, this.userContext, extra_context);
   }
 

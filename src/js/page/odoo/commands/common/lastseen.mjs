@@ -12,7 +12,7 @@ async function cmdLastSeen(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
   if (!this.longpolling) {
     throw new Error(i18n.t('cmdLastSeen.error.notAvailable', "Can't use lastseen, 'bus' module is not installed"));
   }
-  return searchRead('bus.presence', [], ['user_id', 'last_presence'], this.getContext(), {
+  return searchRead('bus.presence', [], ['user_id', 'last_presence'], await this.getContext(), {
     orderBy: 'last_presence DESC',
   }).then(result => {
     const rows = [];

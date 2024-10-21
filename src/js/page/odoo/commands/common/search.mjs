@@ -54,7 +54,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   // Due to possible problems with binary fields it is necessary to filter them out
   const bin_fields = [];
   if (search_all_fields && !kwargs.read_binary) {
-    const fieldDefs = await getFieldsInfo(kwargs.model, false, this.getContext(), kwargs.options);
+    const fieldDefs = await getFieldsInfo(kwargs.model, false, await this.getContext(), kwargs.options);
 
     fields = [];
     Object.entries(fieldDefs).forEach(item => {
@@ -66,7 +66,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     });
   }
 
-  const result = await searchRead(kwargs.model, kwargs.domain, fields, this.getContext(), Object.assign({}, kwargs.options, {
+  const result = await searchRead(kwargs.model, kwargs.domain, fields, await this.getContext(), Object.assign({}, kwargs.options, {
     limit: kwargs.limit,
     offset: kwargs.offset,
     orderBy: kwargs.order,
@@ -120,20 +120,20 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   return recordset;
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
       'ir.model',
       [],
       ['model'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

@@ -28,7 +28,7 @@ async function cmdMetadata(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
       'get_metadata',
       null,
       null,
-      this.getContext(),
+      await this.getContext(),
     )
   )[0];
 
@@ -49,20 +49,20 @@ async function cmdMetadata(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
   return metadata;
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
       'ir.model',
       [],
       ['model'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

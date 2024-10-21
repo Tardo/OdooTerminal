@@ -11,7 +11,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
 async function cmdContextOperation(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
-  const session = getOdooSession()?.user_context || (await getSessionInfo())?.user_context;
+  const session = getOdooSession()?.user_context ?? (await getSessionInfo())?.user_context;
   if (typeof session === 'undefined') {
     throw new Error(
       i18n.t('cmdContext.error.notSession', 'Cannot find session information')

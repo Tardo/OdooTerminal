@@ -16,14 +16,14 @@ import type Terminal from '@odoo/terminal';
 async function cmdUserHasGroups(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 18) {
-    return callModelMulti<boolean>('res.users', [await getUID(true)], 'has_group', [kwargs.group.join(',')], null, this.getContext()).then(
+    return callModelMulti<boolean>('res.users', [await getUID(true)], 'has_group', [kwargs.group.join(',')], null, await this.getContext()).then(
       result => {
         ctx.screen.print(result);
         return result;
       },
     );
   }
-  return callModel<boolean>('res.users', 'user_has_groups', [kwargs.group.join(',')], null, this.getContext()).then(
+  return callModel<boolean>('res.users', 'user_has_groups', [kwargs.group.join(',')], null, await this.getContext()).then(
     result => {
       ctx.screen.print(result);
       return result;
@@ -31,19 +31,19 @@ async function cmdUserHasGroups(this: Terminal, kwargs: CMDCallbackArgs, ctx: CM
   );
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'group') {
     return cachedSearchRead(
       'options_ir.model.data_res.groups_active',
       'ir.model.data',
       [['model', '=', 'res.groups']],
       ['name', 'module'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       // $FlowFixMe
       item => `${item.module}.${item.name}`,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

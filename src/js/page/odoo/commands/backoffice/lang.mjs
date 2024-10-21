@@ -35,7 +35,7 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
       );
     }
     // Get module ids
-    const modules = await searchRead('ir.module.module', [['name', 'in', kwargs.module]], ['id'], this.getContext());
+    const modules = await searchRead('ir.module.module', [['name', 'in', kwargs.module]], ['id'], await this.getContext());
     const module_ids = modules.map(item => item.id);
     if (isEmpty(module_ids)) {
       throw new Error(i18n.t('cmdLang.error.noModulesFound', 'No modules found!'));
@@ -52,7 +52,7 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
             modules: [[6, false, module_ids]],
           },
         ],
-        this.getContext(),
+        await this.getContext(),
       )
     )[0];
     if (!wizard_id) {
@@ -60,11 +60,11 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
     }
 
     // Get action to export
-    await callModelMulti<void>('base.language.export', [wizard_id], 'act_getfile', null, null, this.getContext());
+    await callModelMulti<void>('base.language.export', [wizard_id], 'act_getfile', null, null, await this.getContext());
 
     // Get updated wizard record data
     const wizard_record = (
-      await searchRead('base.language.export', [['id', '=', wizard_id]], false, this.getContext())
+      await searchRead('base.language.export', [['id', '=', wizard_id]], false, await this.getContext())
     )[0];
 
     // Get file
@@ -108,7 +108,7 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
             data: file64,
           },
         ],
-        this.getContext(),
+        await this.getContext(),
       )
     )[0];
     if (!wizard_id) {
@@ -122,7 +122,7 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
       'import_lang',
       null,
       null,
-      this.getContext(),
+      await this.getContext(),
     );
     if (status) {
       ctx.screen.print(i18n.t('cmdLang.result.success', 'Language file imported successfully'));
@@ -134,7 +134,7 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
       'get_installed',
       null,
       null,
-      this.getContext(),
+      await this.getContext(),
     );
     for (const lang of langs) {
       ctx.screen.print(` - ${lang[0]} (${lang[1]})`);
@@ -144,14 +144,14 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
   throw new Error(i18n.t('cmdLang.error.invalidOperation', 'Invalid operation!'));
 }
 
-function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
+async function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
   if (arg_name === 'module') {
     return cachedSearchRead(
       'options_ir.module.module_active',
       'ir.module.module',
       [],
       ['name'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'name ASC'},
       item => item.name,
@@ -162,13 +162,13 @@ function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
       'res.lang',
       [],
       ['code'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'code ASC'},
       item => item.code,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

@@ -24,7 +24,7 @@ async function cmdCommit(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallba
   const pids = [];
   const tasks = [];
   for (const [rec_id, values] of values_to_write) {
-    tasks.push(writeRecord(kwargs.recordset.model, rec_id, values, this.getContext()));
+    tasks.push(writeRecord(kwargs.recordset.model, rec_id, values, await this.getContext()));
     pids.push(rec_id);
   }
 

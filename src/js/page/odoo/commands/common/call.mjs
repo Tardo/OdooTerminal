@@ -25,20 +25,20 @@ async function cmdCallModelMethod(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
   });
 }
 
-function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
+async function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
       'ir.model',
       [],
       ['model'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

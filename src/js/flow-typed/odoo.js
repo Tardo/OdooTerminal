@@ -17,6 +17,7 @@ declare type OdooSession = {
   [string]: number | string,
 };
 declare type OdooSessionInfo = Object;
+declare type OdooSessionInfoUserContext = Object;
 declare type OdooLongpollingItem = [string, string] | {...};
 declare type OdooSearchResponse = Object;
 

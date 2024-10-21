@@ -53,7 +53,7 @@ async function cmdLoginAs(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
   return res;
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'database') {
     return cachedCallService('options_db_list', 'db', 'list', []);
   } else if (arg_name === 'user') {
@@ -62,13 +62,13 @@ function getOptions(this: Terminal, arg_name: string) {
       'res.users',
       [],
       ['login'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'login ASC'},
       item => item.name,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

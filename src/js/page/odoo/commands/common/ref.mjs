@@ -38,7 +38,7 @@ async function cmdRef(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
           'check_object_reference',
           [module, xid],
           null,
-          this.getContext(),
+          await this.getContext(),
           // $FlowFixMe
         ).then(
           ((active_xmlid: string, result: [number, string]) => {

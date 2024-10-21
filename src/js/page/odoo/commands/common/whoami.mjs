@@ -18,7 +18,7 @@ async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
     'res.users',
     [['id', '=', await getUID(true)]],
     ['id', 'display_name', 'login', 'partner_id', 'company_id', 'company_ids', 'groups_id'],
-    this.getContext(),
+    await this.getContext(),
   );
   if (!result.length) {
     throw new Error(i18n.t('cmdWhoami.error.noLogin', "Oops! can't get the login :/"));
@@ -34,13 +34,13 @@ async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
         'res.groups',
         [['id', 'in', record.groups_id]],
         ['display_name'],
-        this.getContext(),
+        await this.getContext(),
       ),
       searchRead(
         'res.company',
         [['id', 'in', record.company_ids]],
         ['display_name'],
-        this.getContext(),
+        await this.getContext(),
       ),
     ]);
     for (const group of result_tasks[0]) {
@@ -56,13 +56,13 @@ async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
           'res.groups',
           [['id', 'in', record.groups_id]],
           ['display_name'],
-          this.getContext(),
+          await this.getContext(),
         ),
         searchRead(
           'res.company',
           [['id', 'in', record.company_ids]],
           ['display_name'],
-          this.getContext(),
+          await this.getContext(),
         ),
       ]);
 
@@ -80,7 +80,7 @@ async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
           'name_get',
           null,
           null,
-          this.getContext(),
+          await this.getContext(),
         ),
         callModelMulti<$ReadOnlyArray<[number, string]>>(
           'res.company',
@@ -88,7 +88,7 @@ async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
           'name_get',
           null,
           null,
-          this.getContext(),
+          await this.getContext(),
         ),
       ]);
 

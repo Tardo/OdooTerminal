@@ -9,7 +9,7 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 async function cmdUpdateAppList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  return callModel<boolean>('ir.module.module', 'update_list', null, null, this.getContext()).then(result => {
+  return callModel<boolean>('ir.module.module', 'update_list', null, null, await this.getContext()).then(result => {
     if (result) {
       ctx.screen.print(i18n.t('cmdUal.result.success', 'The apps list has been updated successfully'));
     } else {

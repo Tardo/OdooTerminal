@@ -43,7 +43,7 @@ async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
       'button_immediate_uninstall',
       null,
       null,
-      this.getContext(),
+      await this.getContext(),
     );
 
     ctx.screen.print(
@@ -61,20 +61,20 @@ async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
   );
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'module') {
     return cachedSearchRead(
       'options_ir.module.module_active',
       'ir.module.module',
       [],
       ['name'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'name ASC'},
       item => item.name,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

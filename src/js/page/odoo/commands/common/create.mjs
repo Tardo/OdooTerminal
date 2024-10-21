@@ -25,7 +25,7 @@ async function cmdCreateModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     return;
   }
 
-  const results = await createRecord(kwargs.model, kwargs.value, this.getContext(), kwargs.options);
+  const results = await createRecord(kwargs.model, kwargs.value, await this.getContext(), kwargs.options);
   ctx.screen.print(renderRecordCreated(kwargs.model, results));
 
   const records = [];
@@ -35,20 +35,20 @@ async function cmdCreateModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   return Recordset.make(kwargs.model, records);
 }
 
-function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
+async function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
       'ir.model',
       [],
       ['model'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

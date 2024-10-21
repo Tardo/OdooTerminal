@@ -31,7 +31,7 @@ async function cmdModuleDepends(
     'onchange_module',
     [false, false, sanitizeCmdModuleDepends(kwargs.module)],
     null,
-    this.getContext(),
+    await this.getContext(),
   ).then(result => {
     let depend_names: Array<string> = [];
     if (isEmpty(result)) {
@@ -47,20 +47,20 @@ async function cmdModuleDepends(
   });
 }
 
-function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
+async function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
   if (arg_name === 'module') {
     return cachedSearchRead(
       'options_ir.module.module_active',
       'ir.module.module',
       [],
       ['name'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'name ASC'},
       item => item.name,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {

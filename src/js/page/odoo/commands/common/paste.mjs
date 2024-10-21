@@ -20,7 +20,7 @@ async function copyModelRecords(this: Terminal, model: string, data: $ReadOnlyAr
     delete item.display_name;
     return item;
   });
-  const result = await createRecord(model, records_vals, this.getContext());
+  const result = await createRecord(model, records_vals, await this.getContext());
   const records = result.map((nid, index) => {
     return Object.assign({}, records_vals[index], {id: nid});
   });

@@ -11,6 +11,7 @@ import searchRead from './orm/search_read';
 import ParameterGenerator from './parameter_generator';
 import renderWelcome from './templates/welcome';
 import getOdooSession from './utils/get_odoo_session';
+import getSessionInfo from './net_utils/get_session_info';
 import codeHelpers from './base/helpers';
 
 export default class OdooTerminal extends Terminal {
@@ -38,9 +39,9 @@ export default class OdooTerminal extends Terminal {
    * @override
    */
   // eslint-disable-next-line no-unused-vars
-  getContext(extra_context: ?{[string]: mixed}): {[string]: mixed} {
-    const context = super.getContext(arguments);
-    const sess_user_ctx = getOdooSession()?.user_context ?? {};
+  async getContext(extra_context: ?{[string]: mixed}): Promise<OdooSessionInfoUserContext> {
+    const context = await super.getContext(arguments);
+    const sess_user_ctx = getOdooSession()?.user_context ?? (await getSessionInfo())?.user_context ?? {};
     return Object.assign({}, sess_user_ctx, context);
   }
 
@@ -85,12 +86,12 @@ export default class OdooTerminal extends Terminal {
     }
   }
 
-  #onTryReadBinaryField(target: HTMLElement) {
+  async #onTryReadBinaryField(target: HTMLElement) {
     const {model} = target.dataset;
     const {field} = target.dataset;
     const {id} = target.dataset;
 
-    searchRead(model, [['id', '=', id]], [field], this.getContext())
+    searchRead(model, [['id', '=', id]], [field], await this.getContext())
       .then(result => {
         if (target.parentNode) {
           target.parentNode.textContent = JSON.stringify(result[0][field]) || '';

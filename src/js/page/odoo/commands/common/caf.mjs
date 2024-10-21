@@ -18,7 +18,7 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
     'fields_get',
     [fields],
     null,
-    this.getContext(),
+    await this.getContext(),
   );
 
   let s_result: {[string]: {[string]: string | number}} = {};
@@ -59,20 +59,20 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
   return s_result;
 }
 
-function getOptions(this: Terminal, arg_name: string) {
+async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'model') {
     return cachedSearchRead(
       'options_ir.model_active',
       'ir.model',
       [],
       ['model'],
-      this.getContext({active_test: true}),
+      await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );
   }
-  return Promise.resolve([]);
+  return [];
 }
 
 export default function (): Partial<CMDDef> {
