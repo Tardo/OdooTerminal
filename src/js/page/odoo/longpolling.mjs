@@ -104,7 +104,6 @@ export default class Longpolling {
     return getStorageItem('terminal_longpolling_mode') === 'verbose';
   }
 
-  //
   // $FlowFixMe
   #getNotificationsData(data: Object): $ReadOnlyArray<OdooLongpollingItem> {
     const OdooVerMajor = getOdooVersion('major');

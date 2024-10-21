@@ -5,7 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import isEmpty from '@trash/utils/is_empty';
 import {ARG} from '@trash/constants';
 import {searchModules} from './__utils__';
@@ -69,6 +69,7 @@ function getOptions(this: Terminal, arg_name: string) {
       [],
       ['name'],
       this.getContext({active_test: true}),
+      undefined,
       {orderBy: 'name ASC'},
       item => item.name,
     );

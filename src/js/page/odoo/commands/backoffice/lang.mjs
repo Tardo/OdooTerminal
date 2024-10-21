@@ -10,7 +10,7 @@ import searchRead from '@odoo/orm/search_read';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import callModel from '@odoo/osv/call_model';
 import getContent from '@odoo/utils/get_content';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import file2base64 from '@terminal/utils/file2base64';
 import isEmpty from '@trash/utils/is_empty';
 import {ARG} from '@trash/constants';
@@ -152,6 +152,7 @@ function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
       [],
       ['name'],
       this.getContext({active_test: true}),
+      undefined,
       {orderBy: 'name ASC'},
       item => item.name,
     );
@@ -162,6 +163,7 @@ function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
       [],
       ['code'],
       this.getContext({active_test: true}),
+      undefined,
       {orderBy: 'code ASC'},
       item => item.code,
     );

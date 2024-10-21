@@ -9,14 +9,14 @@ import callModelMulti from '@odoo/osv/call_model_multi';
 import renderWhoami from '@odoo/templates/whoami';
 import renderWhoamiListItem from '@odoo/templates/whoami_group_item';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
-import getUID from '@odoo/utils/get_uid';
+import getUID from '@odoo/net_utils/get_uid';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdShowWhoAmI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const result = await searchRead(
     'res.users',
-    [['id', '=', getUID()]],
+    [['id', '=', await getUID(true)]],
     ['id', 'display_name', 'login', 'partner_id', 'company_id', 'company_ids', 'groups_id'],
     this.getContext(),
   );

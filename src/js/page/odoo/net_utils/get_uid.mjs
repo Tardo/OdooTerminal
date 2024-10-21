@@ -2,12 +2,13 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import getOdooSession from './get_odoo_session';
-import getOdooUser from './get_odoo_user';
+import getSessionInfo from './get_session_info';
+import getOdooSession from '@odoo/utils/get_odoo_session';
+import getOdooUser from '@odoo/utils/get_odoo_user';
 
 // Odoo deletes the 'uid' key in Odoo >17.0, we store it for future reference.
 let cachedUID = -1;
-export default function (): number {
+export default async function (use_net: boolean = false): Promise<number> {
   const uid = getOdooSession()?.uid || getOdooSession()?.user_id;
   if (typeof uid === 'number') {
     cachedUID = uid;
@@ -15,6 +16,11 @@ export default function (): number {
     cachedUID = uid[0];
   } else if (getOdooUser()?.userId) {
     cachedUID = getOdooUser()?.userId || -1;
+  } else if (use_net) {
+    const session_info = await getSessionInfo();
+    if (typeof session_info?.uid === 'number') {
+      cachedUID = session_info.uid;
+    }
   } else if (getOdooSession()?.storeData?.Store?.self.id) {
     // FIXME: Strange, but that's how it is... Odoo making friends :)
     cachedUID = getOdooSession()?.storeData?.Store?.self?.id || -1;

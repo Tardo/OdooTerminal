@@ -5,7 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
@@ -31,6 +31,7 @@ function getOptions(this: Terminal, arg_name: string) {
       [],
       ['name'],
       this.getContext({active_test: true}),
+      undefined,
       {orderBy: 'name ASC'},
       item => item.name,
     );

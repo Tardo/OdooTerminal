@@ -15,8 +15,8 @@ import registerCommonFuncs from '@odoo/commands/common/__all__';
 import OdooTerminal from '@odoo/terminal';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import getOdooService from '@odoo/utils/get_odoo_service';
-import getUID from '@odoo/utils/get_uid';
-import getUsername from '@odoo/utils/get_username';
+import getUID from '@odoo/net_utils/get_uid';
+import getUsername from '@odoo/net_utils/get_username';
 import isBackOffice from '@odoo/utils/is_backoffice';
 import registerMathFuncs from '@trash/libs/math/__all__';
 import registerTimeFuncs from '@trash/libs/time/__all__';
@@ -63,7 +63,7 @@ async function postInitTerminal(term_obj: OdooTerminal, config: TerminalOptions)
     version: odoo_ver,
   };
   const username = await getUsername(config.elephant);
-  const uid = getUID();
+  const uid = await getUID(config.elephant);
   if (uid && uid !== -1) {
     vals.username = username ? username : `uid: ${uid}`;
   }
@@ -93,7 +93,7 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
     let lazy_loader_obj = getOdooService("@web/legacy/js/public/lazyloader");
     if (typeof lazy_loader_obj !== 'undefined') {
       // Caching call: see command implementation for more details.
-      getUID();
+      await getUID(config.elephant);
       lazy_loader_obj = lazy_loader_obj[Symbol.for('default')];
       await lazy_loader_obj.allScriptsLoaded;
     }

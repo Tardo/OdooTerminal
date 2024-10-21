@@ -6,7 +6,7 @@
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import Recordset from '@terminal/core/recordset';
 import renderRecordCreated from '@odoo/templates/record_created';
 import {ARG} from '@trash/constants';
@@ -43,6 +43,7 @@ function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
       [],
       ['model'],
       this.getContext({active_test: true}),
+      undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );

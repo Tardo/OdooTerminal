@@ -5,7 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import isEmpty from '@trash/utils/is_empty';
 import {ARG} from '@trash/constants';
@@ -55,6 +55,7 @@ function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
       [],
       ['name'],
       this.getContext({active_test: true}),
+      undefined,
       {orderBy: 'name ASC'},
       item => item.name,
     );

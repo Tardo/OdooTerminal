@@ -17,7 +17,6 @@ export default class OdooTerminal extends Terminal {
   parameterGenerator: ParameterGenerator;
   longpolling: ?Longpolling;
 
-  // $FlowFixMe
   onBusNotification(notifications: $ReadOnlyArray<[string, string] | {...}>) {
     const l = notifications.length;
     for (let x = 0; x < l; ++x) {

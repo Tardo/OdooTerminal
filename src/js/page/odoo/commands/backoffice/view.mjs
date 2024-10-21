@@ -8,7 +8,7 @@ import doAction from '@odoo/base/do_action';
 import getParentAdapter from '@odoo/utils/get_parent_adapter';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
@@ -93,6 +93,7 @@ function getOptions(this: Terminal, arg_name: string) {
       [],
       ['model'],
       this.getContext({active_test: true}),
+      undefined,
       {orderBy: 'model ASC'},
       item => item.model,
     );

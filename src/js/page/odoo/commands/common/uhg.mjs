@@ -7,8 +7,8 @@ import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
-import getUID from '@odoo/utils/get_uid';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import getUID from '@odoo/net_utils/get_uid';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -16,7 +16,7 @@ import type Terminal from '@odoo/terminal';
 async function cmdUserHasGroups(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 18) {
-    return callModelMulti<boolean>('res.users', [getUID()], 'has_group', [kwargs.group.join(',')], null, this.getContext()).then(
+    return callModelMulti<boolean>('res.users', [await getUID(true)], 'has_group', [kwargs.group.join(',')], null, this.getContext()).then(
       result => {
         ctx.screen.print(result);
         return result;

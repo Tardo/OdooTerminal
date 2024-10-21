@@ -5,8 +5,8 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import getOdooSession from '@odoo/utils/get_odoo_session';
-import cachedCallService from '@odoo/utils/cached_call_service';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import cachedCallService from '@odoo/net_utils/cached_call_service';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -63,6 +63,7 @@ function getOptions(this: Terminal, arg_name: string) {
       [],
       ['login'],
       this.getContext({active_test: true}),
+      undefined,
       {orderBy: 'login ASC'},
       item => item.name,
     );

@@ -4,13 +4,14 @@
 
 // $FlowIgnore
 import i18n from 'i18next';
+import getSessionInfo from '@odoo/net_utils/get_session_info';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
 async function cmdContextOperation(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
-  const session = getOdooSession();
+  const session = getOdooSession()?.user_context || (await getSessionInfo())?.user_context;
   if (typeof session === 'undefined') {
     throw new Error(
       i18n.t('cmdContext.error.notSession', 'Cannot find session information')
@@ -29,22 +30,20 @@ async function cmdContextOperation(kwargs: CMDCallbackArgs, ctx: CMDCallbackCont
   }
 
   if (kwargs.operation === 'set') {
-    session.user_context = kwargs.value;
+    Object.apply(session, kwargs.value);
   } else if (kwargs.operation === 'write') {
-    Object.assign(session.user_context, kwargs.value);
+    Object.assign(session, kwargs.value);
   } else if (kwargs.operation === 'delete') {
-    // $FlowFixMe
-    if (Object.hasOwn(session.user_context, kwargs.value)) {
-      // $FlowFixMe
-      delete session.user_context[kwargs.value];
+    if (Object.hasOwn(session, kwargs.value)) {
+      delete session[kwargs.value];
     } else {
       throw new Error(
         i18n.t('cmdContext.error.keyNotPresent', 'The selected key is not present in the terminal context'),
       );
     }
   }
-  ctx.screen.print(session.user_context);
-  return session.user_context;
+  ctx.screen.print(session);
+  return session;
 }
 
 export default function (): Partial<CMDDef> {

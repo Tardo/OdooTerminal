@@ -5,10 +5,22 @@ services:
       - db
     ports:
       - '8069:8069'
+    networks:
+      - frontend
+      - dbnet
     command: odoo -d postgres -r odoo -w odoo
   db:
     image: postgres:15
+    networks:
+      - dbnet
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_PASSWORD=odoo
       - POSTGRES_USER=odoo
+
+networks:
+  frontend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: '127.0.0.1'
+  dbnet:

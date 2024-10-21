@@ -5,7 +5,7 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
-import cachedSearchRead from '@odoo/utils/cached_search_read';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import {ARG} from '@trash/constants';
 import {searchModules} from './__utils__';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
@@ -57,6 +57,7 @@ function getOptions(this: Terminal, arg_name: string) {
       [],
       ['name'],
       this.getContext(),
+      undefined,
       {orderBy: 'name ASC'},
       item => item.name,
     );
