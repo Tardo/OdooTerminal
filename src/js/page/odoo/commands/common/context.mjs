@@ -11,8 +11,8 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
 async function cmdContextOperation(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
-  const session = getOdooSession()?.user_context ?? (await getSessionInfo())?.user_context;
-  if (typeof session === 'undefined') {
+  let user_context = getOdooSession()?.user_context ?? (await getSessionInfo())?.user_context;
+  if (typeof user_context === 'undefined') {
     throw new Error(
       i18n.t('cmdContext.error.notSession', 'Cannot find session information')
     );
@@ -30,20 +30,30 @@ async function cmdContextOperation(kwargs: CMDCallbackArgs, ctx: CMDCallbackCont
   }
 
   if (kwargs.operation === 'set') {
-    Object.apply(session, kwargs.value);
+    const odoo_session = getOdooSession();
+    if (typeof odoo_session?.user_context !== 'undefined') {
+      odoo_session.user_context = kwargs.value;
+      user_context = odoo_session.user_context;
+    } else {
+      const session_info = await getSessionInfo();
+      if (typeof session_info?.user_context !== 'undefined') {
+        session_info.user_context = kwargs.value;
+        user_context = session_info.user_context;
+      }
+    }
   } else if (kwargs.operation === 'write') {
-    Object.assign(session, kwargs.value);
+    Object.assign(user_context, kwargs.value);
   } else if (kwargs.operation === 'delete') {
-    if (Object.hasOwn(session, kwargs.value)) {
-      delete session[kwargs.value];
+    if (Object.hasOwn(user_context, kwargs.value)) {
+      delete user_context[kwargs.value];
     } else {
       throw new Error(
         i18n.t('cmdContext.error.keyNotPresent', 'The selected key is not present in the terminal context'),
       );
     }
   }
-  ctx.screen.print(session);
-  return session;
+  ctx.screen.print(user_context);
+  return user_context;
 }
 
 export default function (): Partial<CMDDef> {

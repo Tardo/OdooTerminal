@@ -26,7 +26,7 @@ export default async function <T>(
   map_func?: MapCallback,
 ): OdooService {
   const cache_hash = hash(Array.from(arguments).slice(0, 4));
-  if (options?.force === true || typeof cache[cache_hash] === 'undefined') {
+  if (options?.force === true || !Object.hasOwn(cache, cache_hash)) {
     let values: T;
     try {
       values = await callModelMulti<T>(model, ids, method, args, kwargs, context, extra_options);

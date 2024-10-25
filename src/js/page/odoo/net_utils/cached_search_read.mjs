@@ -28,7 +28,7 @@ export default async function (
   // $FlowFixMe
 ): Promise<Array<Object>> {
   const cache_hash = hash(Array.from(arguments).slice(0, 6));
-  if (options?.force === true || typeof cache[cache_hash] === 'undefined') {
+  if (options?.force === true || !Object.hasOwn(cache, cache_hash)) {
     let records: Array<OdooSearchResponse> = [];
     try {
       records = await searchRead(model, domain, fields, context, extra_params || {}, {'silent': true});
