@@ -78,6 +78,13 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
 
 export const IGNORED_KEYS: Array<string> = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];
 
+export const VERSION_COLOR = {
+  normal: '#71639e',
+  disabled: '#878787',
+  saas: '#9e7163',
+  enterprise: '#c0c18a',
+}
+
 export const COMPATIBLE_VERSIONS: Array<string> = [
   '11.',
   'saas~11',

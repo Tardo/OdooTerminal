@@ -11,7 +11,7 @@
  * 'update_terminal_badge_info'.
  */
 
-import {SETTING_DEFAULTS, SETTING_NAMES} from '@common/constants';
+import {SETTING_DEFAULTS, SETTING_NAMES, VERSION_COLOR} from '@common/constants';
 import sanitizeOdooVersion from '@common/utils/sanitize_odoo_version';
 import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
@@ -41,10 +41,18 @@ function onInternalMessage(request: Object, sender: Object) {
     const ver_clean = sanitizeOdooVersion(context.serverVersion.raw);
     if (context.isCompatible) {
       ubrowser.action.enable(sender.tab.id);
-      updateBrowserAction('terminal-16', ver_clean, context.isSaas ? '#9e7163' : '#71639e');
+      let color;
+      if (context.isEnterprise) {
+        color = 'enterprise';
+      } else if (context.isSaas) {
+        color = 'saas';
+      } else {
+        color = 'normal';
+      }
+      updateBrowserAction('terminal-16', ver_clean, VERSION_COLOR[color]);
     } else {
       ubrowser.action.disable(sender.tab.id);
-      updateBrowserAction('terminal-disabled-16', ver_clean, '#878787');
+      updateBrowserAction('terminal-disabled-16', ver_clean, VERSION_COLOR.disabled);
     }
   }
 }

@@ -84,6 +84,7 @@ if (ODOO_OBJ) {
         isOdoo: true,
         isCompatible: isCompatibleOdooVersion(serv_raw),
         isSaas: serv_raw.startsWith('saas~'),
+        isEnterprise: serv_raw.includes('+e'),
       });
     }
     postMessage('ODOO_TERM_INIT', {

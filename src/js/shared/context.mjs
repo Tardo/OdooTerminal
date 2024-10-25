@@ -8,6 +8,7 @@ export type Context = {
   isCompatible: boolean,
   isBackOffice: boolean,
   isSaas: boolean,
+  isEnterprise: boolean,
   serverVersion?: {
     raw: string,
     major: number,
@@ -23,6 +24,7 @@ export const InstanceContext: Context = {
   isCompatible: false,
   isBackOffice: false,
   isSaas: false,
+  isEnterprise: false,
 };
 
 export function updateContext(...values: Array<{...}>) {
