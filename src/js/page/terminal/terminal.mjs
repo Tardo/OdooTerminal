@@ -477,6 +477,7 @@ export default class Terminal {
 
   updateAssistantoptions() {
     this.#mutexAvailableOptions.cancel();
+    this.#mutexAvailableOptions.release();
     this.#mutexAvailableOptions
       .runExclusive(async () => {
         const user_input = this.screen.getUserInput();
