@@ -9,7 +9,7 @@ export default function (option: CMDAssistantOption, index: number, selected_opt
   const strname = option.name ?? 'Unknown';
   return `<li class="nav-item"><a class="nav-link p-1 px-2 ${
     option.is_default ? 'text-info' : ''
-  } ${option.is_required ? 'text-warning' : ''} ${
+  } ${option.is_required ? 'text-success' : ''} ${
     index === selected_option_index ? 'bg-black active' : ''
   }" data-string="${strval}" style="padding:0.25em" href="#">${strname}</a></li>`;
 }
