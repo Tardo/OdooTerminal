@@ -4,8 +4,11 @@
 
 ```
 IMP: Support Odoo 18.0
+IMP: Detect enterprise version
 
 FIX: Paste clipboard content in the terminal input
+FIX: Wrong version on docker instances (issue #136)
+FIX: Unwanted exceptions when writing code
 ```
 
 **11.5.2**
