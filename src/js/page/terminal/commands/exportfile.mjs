@@ -37,7 +37,7 @@ export default function (): Partial<CMDDef> {
     args: [
       [ARG.Flag, ['no-header', 'no-header'], false, i18n.t('cmdExportFile.args.noHeader', "Don't use header"), false],
       [ARG.String, ['f', 'format'], false, i18n.t('cmdExportFile.args.format', 'The format to use for exporting'), 'json', ['json', 'csv']],
-      [ARG.String, ['fn', 'filename'], true, i18n.t('cmdExportFile.args.filename', 'The filename')],
+      [ARG.String, ['fn', 'filename'], false, i18n.t('cmdExportFile.args.filename', 'The filename')],
       [ARG.Any, ['v', 'value'], true, i18n.t('cmdExportFile.args.value', 'The value to export')],
     ],
     example: "-c 'search res.partner'",
