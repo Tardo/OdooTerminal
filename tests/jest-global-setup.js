@@ -1,5 +1,5 @@
 import setupPuppeteer from 'jest-environment-puppeteer/setup';
-import { v2 as compose } from 'docker-compose'
+import * as compose from 'docker-compose'
 
 const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
 
