@@ -1,5 +1,11 @@
 # Changelog
 
+**11.6.1**
+
+```
+IMP: Command 'exportfile': Add CSV format [RFC-4180] (issue #138)
+```
+
 **11.6.0**
 
 ```

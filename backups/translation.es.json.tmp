@@ -290,6 +290,9 @@
   },
   "cmdExportFile": {
     "args": {
+      "filename": "El nombre del archivo",
+      "format": "El formato a utilizar",
+      "noHeader": "No usar cabecera",
       "value": "El valor a exportar"
     },
     "definition": "Exporta el resultado del comando a un archivo de texto/json",
