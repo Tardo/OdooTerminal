@@ -356,9 +356,9 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertNotEmpty(res);
     await this.terminal.execute('view -m res.company -i 1', false, true);
     await asyncSleep(2500);
-    res = await this.terminal.execute('barcode -o send -d O-CMD.EDIT', false, true);
+    res = await this.terminal.execute("barcode -o send -d 'O-CMD.EDIT'", false, true);
     this.assertNotEmpty(res);
-    res = await this.terminal.execute('barcode -o send -d O-CMD.DISCARD,O-CMD.EDIT,O-CMD.DISCARD', false, true);
+    res = await this.terminal.execute("barcode -o send -d ['O-CMD.DISCARD','O-CMD.EDIT','O-CMD.DISCARD']", false, true);
     this.assertNotEmpty(res);
   }
 

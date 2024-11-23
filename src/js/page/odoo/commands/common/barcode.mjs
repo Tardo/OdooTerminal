@@ -127,6 +127,6 @@ export default function (): Partial<CMDDef> {
         150,
       ],
     ],
-    example: '-o send -d O-CMD.NEXT',
+    example: '-o send -d "O-CMD.NEXT"',
   };
 }
