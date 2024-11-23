@@ -251,18 +251,16 @@ export default class Interpreter {
     let offset: number = options?.offset || 0;
     for (let i = 0; i < tokens_len; ++i) {
       const [token_type, token, raw] = tokens[i];
-      if (token_type === LEXER.Space) {
-        offset += raw.length;
-        continue;
+      if (token_type !== LEXER.Space) {
+        tokens_info.push({
+          value: token,
+          raw: raw,
+          type: token_type,
+          start: offset,
+          end: offset + raw.length,
+          index: i,
+        });
       }
-      tokens_info.push({
-        value: token,
-        raw: raw,
-        type: token_type,
-        start: offset,
-        end: offset + raw.length,
-        index: i,
-      });
       offset += raw.length;
     }
     return tokens_info;
@@ -420,6 +418,9 @@ export default class Interpreter {
     }
 
     if (ttype === LEXER.String || ttype === LEXER.StringSimple) {
+      if (typeof prev_token_info !== 'undefined' && LEXERDATA_EXTENDED.includes(prev_token_info[0])) {
+        ttype = LEXER.Unknown;
+      }
       token_san = this.#trimQuotes(token_san);
     }
     return [ttype, token_san, token];
@@ -760,6 +761,10 @@ export default class Interpreter {
       const token = res.inputTokens[0][index];
       let ignore_instr_eoi = false;
       switch (token.type) {
+        case LEXER.Unknown:
+          if (typeof options.ignoreErrors === 'undefined' || !options.ignoreErrors) {
+            throw new InvalidTokenError(token.value, token.start, token.end);
+          }
         case LEXER.Variable:
           {
             ignore_instr_eoi = true;

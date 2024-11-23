@@ -4,6 +4,7 @@
 
 
 export const LEXER = {
+  Unknown: 0,
   Delimiter: 1,
   Variable: 2,
   ArgumentShort: 3,

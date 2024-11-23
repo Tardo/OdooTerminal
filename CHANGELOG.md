@@ -1,9 +1,10 @@
 # Changelog
 
-**11.6.1**
+**11.7.0**
 
 ```
 IMP: Command 'exportfile': Add CSV format [RFC-4180] (issue #138)
+IMP: Interpreter: Add unknown lexer type (issue $139)
 ```
 
 **11.6.0**
