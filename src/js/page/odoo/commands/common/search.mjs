@@ -53,17 +53,21 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
 
   // Due to possible problems with binary fields it is necessary to filter them out
   const bin_fields = [];
-  if (search_all_fields && !kwargs.read_binary) {
-    const fieldDefs = await getFieldsInfo(kwargs.model, false, await this.getContext(), kwargs.options);
+  if (search_all_fields) {
+      if (!kwargs.read_binary) {
+      const fieldDefs = await getFieldsInfo(kwargs.model, false, await this.getContext(), kwargs.options);
 
-    fields = [];
-    Object.entries(fieldDefs).forEach(item => {
-      if (item[1].type === 'binary') {
-        bin_fields.push(item[0]);
-      } else {
-        fields.push(item[0]);
-      }
-    });
+      fields = [];
+      Object.entries(fieldDefs).forEach(item => {
+        if (item[1].type === 'binary') {
+          bin_fields.push(item[0]);
+        } else {
+          fields.push(item[0]);
+        }
+      });
+    } else {
+      fields = false;
+    }
   }
 
   const result = await searchRead(kwargs.model, kwargs.domain, fields, await this.getContext(), Object.assign({}, kwargs.options, {

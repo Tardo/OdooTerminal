@@ -17,8 +17,7 @@ export type BuildQueryOptions = {
   model: string,
   offset: number,
   orderBy: $ReadOnlyArray<string>,
-  // $FlowFixMe
-  params: Object,
+  params: OdooQueryRPCParams,
   route: string,
   lazy: boolean,
   expand: Boolean,
@@ -50,8 +49,7 @@ export type BuildQuery = {
  */
 function buildQuery(options: Partial<BuildQueryOptions>): BuildQuery {
   let route = '';
-  // $FlowFixMe
-  const params: Object = options.params || {};
+  const params: OdooQueryRPCParams = options.params || {};
   let orderBy: $ReadOnlyArray<string> = [];
   if (typeof options.route !== 'undefined') {
     route = options.route;

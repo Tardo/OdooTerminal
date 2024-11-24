@@ -5,7 +5,9 @@
 // $FlowIgnore
 import i18n from 'i18next';
 import save2file from '@terminal/utils/save2file';
-import {stringify} from '@terminal/utils/csv';
+import Recordset from '@terminal/core/recordset';
+import csvStringify from '@terminal/utils/csv';
+import xmlStringify from '@odoo/net_utils/xml';
 import uniqueId from '@trash/utils/unique_id';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
@@ -18,9 +20,17 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
   if (kwargs.format === 'json') {
     mime = 'text/json';
     data = JSON.stringify(kwargs.value, null, 4);
-  } else if (kwargs.format === 'csv') {
-    mime = 'text/csv';
-    data = stringify(kwargs.value, !kwargs.no_header);
+  } else if (kwargs.format === 'csv' || kwargs.format === 'xml') {
+    if (!(kwargs.value instanceof Recordset)) {
+      throw new Error(i18n.t('cmdExportFile.invalidValue', 'Invalid value: must be a recordset with csv and xml'));
+    }
+    if (kwargs.format === 'csv') {
+      mime = 'text/csv';
+      data = csvStringify(kwargs.value, !kwargs.no_header, kwargs.delimiter);
+    } else if (kwargs.format === 'xml') {
+      mime = 'text/xml';
+      data = await xmlStringify(kwargs.value, await this.getContext());
+    }
   }
   save2file(filename, mime, data);
   ctx.screen.print(
@@ -36,8 +46,9 @@ export default function (): Partial<CMDDef> {
     detail: i18n.t('cmdExportFile.detail', 'Exports the command result to a text/json file.'),
     args: [
       [ARG.Flag, ['no-header', 'no-header'], false, i18n.t('cmdExportFile.args.noHeader', "Don't use header"), false],
-      [ARG.String, ['f', 'format'], false, i18n.t('cmdExportFile.args.format', 'The format to use for exporting'), 'json', ['json', 'csv']],
+      [ARG.String, ['f', 'format'], false, i18n.t('cmdExportFile.args.format', 'The format to use for exporting'), 'json', ['json', 'csv', 'xml']],
       [ARG.String, ['fn', 'filename'], false, i18n.t('cmdExportFile.args.filename', 'The filename')],
+      [ARG.String, ['d', 'delimiter'], false, i18n.t('cmdExportFile.args.delimiter', 'The delimiter'), ','],
       [ARG.Any, ['v', 'value'], true, i18n.t('cmdExportFile.args.value', 'The value to export')],
     ],
     example: "-c 'search res.partner'",

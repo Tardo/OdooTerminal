@@ -18,25 +18,29 @@ async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, c
   const bin_fields = [];
 
   // Due to possible problems with binary fields it is necessary to filter them out
-  if (search_all_fields && !kwargs.read_binary) {
-    // $FlowFixMe
-    const fieldDefs = await callModel<{[string]: Object}>(
-      kwargs.model,
-      'fields_get',
-      [fields],
-      null,
-      await this.getContext(),
-      kwargs.options,
-    );
+  if (search_all_fields) {
+    if (!kwargs.read_binary) {
+      // $FlowFixMe
+      const fieldDefs = await callModel<{[string]: Object}>(
+        kwargs.model,
+        'fields_get',
+        [fields],
+        null,
+        await this.getContext(),
+        kwargs.options,
+      );
 
-    fields = [];
-    Object.entries(fieldDefs).forEach(item => {
-      if (item[1].type === 'binary') {
-        bin_fields.push(item[0]);
-      } else {
-        fields.push(item[0]);
-      }
-    });
+      fields = [];
+      Object.entries(fieldDefs).forEach(item => {
+        if (item[1].type === 'binary') {
+          bin_fields.push(item[0]);
+        } else {
+          fields.push(item[0]);
+        }
+      });
+    } else {
+      fields = false;
+    }
   }
 
   const result = await searchRead(kwargs.model, [['id', 'in', kwargs.id]], fields, await this.getContext());

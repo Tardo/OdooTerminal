@@ -18,6 +18,7 @@ declare type OdooSession = {
 };
 declare type OdooSessionInfo = Object;
 declare type OdooSessionInfoUserContext = Object;
+declare type OdooLongpollingData = Object;
 declare type OdooLongpollingItem = [string, string] | {...};
 declare type OdooSearchResponse = Object;
 
@@ -26,3 +27,15 @@ declare type OdooService = Object;
 declare type BusService = OdooService;
 declare type BarcodeService = OdooService;
 declare type UserService = OdooService;
+
+declare type OdooQueryRPCParams = Object;
+
+declare type OdooMetadataInfo = {
+  id: number,
+  create_uid: number,
+  create_date: string,
+  write_uid: number,
+  write_date: string,
+  noupdate: boolean,
+  xmlid: string,
+};

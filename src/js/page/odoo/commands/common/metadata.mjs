@@ -11,18 +11,10 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
-type MetadataInfo = {
-  create_uid: number,
-  create_date: string,
-  write_uid: number,
-  write_date: string,
-  noupdate: boolean,
-  xmlid: string,
-};
 
 async function cmdMetadata(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const metadata = (
-    await callModelMulti<$ReadOnlyArray<MetadataInfo>>(
+    await callModelMulti<$ReadOnlyArray<OdooMetadataInfo>>(
       kwargs.model,
       [kwargs.id],
       'get_metadata',

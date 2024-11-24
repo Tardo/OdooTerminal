@@ -4,7 +4,10 @@
 
 ```
 IMP: Command 'exportfile': Add CSV format [RFC-4180] (issue #138)
+IMP: Command 'exportfile': Add XML odoo format
 IMP: Interpreter: Add unknown lexer type (issue $139)
+
+FIX: Command 'search', 'read': --read-binary
 ```
 
 **11.6.0**

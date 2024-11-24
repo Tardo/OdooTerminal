@@ -13,8 +13,7 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-// $FlowFixMe
-export type CMDViewOnSelectedCallback = (records: $ReadOnlyArray<Object>) => mixed;
+export type CMDViewOnSelectedCallback = (records: $ReadOnlyArray<OdooSearchRecord>) => mixed;
 
 function openSelectCreateDialog(
   model: string,
@@ -77,7 +76,7 @@ async function cmdViewModelRecord(this: Terminal, kwargs: CMDCallbackArgs): Prom
       type: 'ir.actions.act_window',
       name: i18n.t('cmdView.result.viewRecord', 'View Record'),
       res_model: kwargs.model,
-      res_id: records[0].id || records[0],
+      res_id: records[0]?.id !== 'undefined' ? records[0]?.id : records[0],
       views: [[false, 'form']],
       target: 'current',
       context: context,

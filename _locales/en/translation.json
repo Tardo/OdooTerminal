@@ -290,6 +290,7 @@
   },
   "cmdExportFile": {
     "args": {
+      "delimiter": "The delimiter",
       "filename": "The filename",
       "format": "The format to use for exporting",
       "noHeader": "Don't use header",
@@ -297,6 +298,7 @@
     },
     "definition": "Exports the command result to a text/json file",
     "detail": "Exports the command result to a text/json file.",
+    "invalidValue": "Invalid value: need a recordset with csv and xml",
     "resultExported": "Command result exported to '{{filename}}' file"
   },
   "cmdExportVar": {

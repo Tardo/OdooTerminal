@@ -80,9 +80,9 @@ export default class OdooTerminal extends Terminal {
    */
   onCoreClick(ev: MouseEvent) {
     super.onCoreClick(ev);
-    if (ev.target instanceof HTMLElement && ev.target.classList.contains('o_terminal_read_bin_field')) {
-      // $FlowFixMe
-      this.#onTryReadBinaryField(ev.target);
+    const target = ev.target;
+    if (target instanceof HTMLElement && target.classList.contains('o_terminal_read_bin_field')) {
+      this.#onTryReadBinaryField(target);
     }
   }
 
