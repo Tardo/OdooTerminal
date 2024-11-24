@@ -20,16 +20,18 @@ export default class Longpolling {
     let has_listener = false;
     if (typeof OdooVerMajor === 'number') {
       if (OdooVerMajor <= 11) {
-        this.#getBusService().on('notification', this, this.onBusNotification);
+        // $FlowFixMe
+        this.#getBusService().on('notification', this, this.#onBusNotification.bind(this));
         has_listener = true;
       } else if (OdooVerMajor >= 16) {
-        this.#busServ('addEventListener', 'notification', this.onBusNotification);
+        // $FlowFixMe
+        this.#busServ('addEventListener', 'notification', this.#onBusNotification.bind(this));
         has_listener = true;
       }
     }
     if (!has_listener) {
       this.#busServ('onNotification', this, (data: $ReadOnlyArray<OdooLongpollingItem>) =>
-        this.onBusNotification(data),
+        this.#onBusNotification(data),
       );
     }
   }
@@ -109,7 +111,7 @@ export default class Longpolling {
     }
     return data;
   }
-  onBusNotification(data: $ReadOnlyArray<OdooLongpollingItem>) {
+  #onBusNotification(data: $ReadOnlyArray<OdooLongpollingItem>) {
     if (this.isVerbose()) {
       this.#terminal.onBusNotification(this.#getNotificationsData(data));
     }
