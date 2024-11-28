@@ -112,7 +112,8 @@ export default class Longpolling {
     return data;
   }
   #onBusNotification(data: $ReadOnlyArray<OdooLongpollingItem>) {
-    if (this.isVerbose()) {
+    // Fixme: Strange bug on first loads. It seems to not set the context correctly.
+    if ('isVerbose' in this && this.isVerbose()) {
       this.#terminal.onBusNotification(this.#getNotificationsData(data));
     }
   }

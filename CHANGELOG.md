@@ -8,6 +8,7 @@ IMP: Command 'exportfile': Add XML odoo format
 IMP: Interpreter: Add unknown lexer type (issue $139)
 
 FIX: Command 'search', 'read': --read-binary
+FIX: Exception with longpolling on first loads
 ```
 
 **11.6.0**
