@@ -3,7 +3,7 @@
 **11.7.1**
 
 ```
-FIX: Command 'view': Show selected record
+FIX: Command 'view': Show selected record (issue #140)
 ```
 
 **11.7.0**
