@@ -76,7 +76,7 @@ async function cmdViewModelRecord(this: Terminal, kwargs: CMDCallbackArgs): Prom
       type: 'ir.actions.act_window',
       name: i18n.t('cmdView.result.viewRecord', 'View Record'),
       res_model: kwargs.model,
-      res_id: records[0]?.id !== 'undefined' ? records[0]?.id : records[0],
+      res_id: typeof records[0]?.id !== 'undefined' ? records[0]?.id : records[0],
       views: [[false, 'form']],
       target: 'current',
       context: context,

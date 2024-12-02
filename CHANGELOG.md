@@ -1,5 +1,11 @@
 # Changelog
 
+**11.7.1**
+
+```
+FIX: Command 'view': Show selected record
+```
+
 **11.7.0**
 
 ```
