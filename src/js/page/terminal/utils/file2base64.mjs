@@ -23,13 +23,14 @@ export default function <T>(this: T): Promise<string> {
     input_elm.onchange = e => {
       const file = e.target.files[0];
       const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
+      reader.readAsDataURL(file);
 
       reader.onerror = reject;
       reader.onabort = reject;
-      reader.onload = readerEvent => {
+      reader.onload = (readerEvent) => {
         // $FlowFixMe
-        resolve(btoa(String.fromCharCode(...new Uint8Array(readerEvent.target.result))));
+        const [_, base64] = readerEvent.target.result.split(',');
+        resolve(base64);
       };
     };
     input_elm.click();

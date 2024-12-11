@@ -1,5 +1,11 @@
 # Changelog
 
+**11.7.2**
+
+```
+FIX: file2base64: Support large files
+```
+
 **11.7.1**
 
 ```
