@@ -62,7 +62,7 @@ export const ScreenCommandHandler = {
 };
 
 export default class Terminal {
-  VERSION = '11.8.0';
+  VERSION = '11.8.1';
 
   userContext: {[string]: mixed} = {};
 
