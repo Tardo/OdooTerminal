@@ -38,7 +38,7 @@ function updateBrowserAction(icon: string, text: string | null, bg_color: string
 function onInternalMessage(request: Object, sender: Object) {
   if (request.message === 'update_terminal_badge_info') {
     const {context} = request;
-    const ver_clean = sanitizeOdooVersion(context.serverVersion.raw);
+    const ver_clean = sanitizeOdooVersion(context?.serverVersion?.raw);
     if (context.isCompatible) {
       ubrowser.action.enable(sender.tab.id);
       let color;

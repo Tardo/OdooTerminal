@@ -4,6 +4,7 @@
 
 ```
 FIX: file2base64: Support large files
+FIX: onInternalMessage: Don't fail on non-Odoo pages (#141)
 ```
 
 **11.7.1**

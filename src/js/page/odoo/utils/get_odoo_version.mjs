@@ -25,12 +25,20 @@ export default function (type: 'raw' | 'major' | 'minor' = 'raw'): string | numb
     if (!raw) {
       return;
     }
-    const raw_split = sanitizeOdooVersion(raw).split('.');
-    Object.assign(cache, {
-      raw: raw,
-      major: Number(raw_split[0]),
-      minor: Number(raw_split[1]),
-    });
+    const raw_split = sanitizeOdooVersion(raw)?.split('.');
+    if (raw_split) {
+      Object.assign(cache, {
+        raw: raw,
+        major: Number(raw_split[0]),
+        minor: Number(raw_split[1]),
+      });
+    } else {
+      Object.assign(cache, {
+        raw: raw,
+        major: -1,
+        minor: -1,
+      });
+    }
   }
   return cache[type];
 }
