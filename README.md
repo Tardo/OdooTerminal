@@ -1,9 +1,7 @@
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
-![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge)
-![Mozilla Add-on](https://img.shields.io/amo/dw/odoo-terminal?style=for-the-badge)
-
-![Chrome Add-on](https://img.shields.io/chrome-web-store/v/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
-![Chrome Add-on](https://img.shields.io/chrome-web-store/users/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge) &nbsp;&nbsp; ![Chrome Add-on](https://img.shields.io/chrome-web-store/v/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+![Chrome Add-on](https://img.shields.io/chrome-web-store/users/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge) &nbsp;&nbsp; ![Edge Add-on](https://img.shields.io/badge/dynamic/json?style=for-the-badge&label=edge%20add-on&prefix=v&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Ffhndkkdikhceeojdacifnlmaeoklbogg)
+![](https://img.shields.io/badge/dynamic/json?style=for-the-badge&label=users&query=%24.activeInstallCount&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Ffhndkkdikhceeojdacifnlmaeoklbogg)
 
 <h1 align="center">
   <img src="OdooTerminal.png" />
@@ -29,8 +27,11 @@ extension is ~24ms.
 
 **Downloads**
 
+
+
 [<img src="https://www.mozilla.org/media/protocol/img/logos/firefox/browser/logo-lg.3d9087ac44e8.png" width="64">](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/)
 [<img src="https://www.google.com/chrome/static/images/chrome-logo.svg" width="64">](https://chrome.google.com/webstore/detail/odoo-terminal/fdidojpjkbpfplcdmeaaehnjfkgpbhad)
+[<img src="https://edgestatic.azureedge.net/shared/cms/lrs1c69a1j/section-images/29bfeef37eef4ca3bcf962274c1c7766.png" width="64">](https://microsoftedge.microsoft.com/addons/detail/odooterminal/fhndkkdikhceeojdacifnlmaeoklbogg)
 
 ---
 
