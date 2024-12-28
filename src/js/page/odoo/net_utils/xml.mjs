@@ -4,6 +4,7 @@
 
 import callModelMulti from '@odoo/osv/call_model_multi';
 import callModel from '@odoo/osv/call_model';
+import isNumber from '@trash/utils/is_number';
 import type Recordset from '@terminal/core/recordset';
 
 const IGNORED_FIELDS = [
@@ -44,7 +45,15 @@ async function getXMLIds(model: string, ids: $ReadOnlyArray<number>, context: ?{
       context,
     )
   );
-  return Object.fromEntries(metadatas.map((item) => [item.id, item.xmlid]));
+  const xmlIds = Object.fromEntries(metadatas.map((item) => [item.id, item.xmlid]));
+  for (const id of ids) {
+    if (typeof xmlIds[id] === 'undefined' || xmlIds[id] === false) {
+      // $FlowFixMe
+      xmlIds[id] = id;
+    }
+  }
+  debugger;
+  return xmlIds;
 }
 
 function createRecordField(model: string, field_name: string, value: mixed, field_info: {[string]: string | number}, field_xmlids: ?{[string]: $ReadOnlyArray<string>}): string | void {
@@ -72,7 +81,7 @@ function createRecordField(model: string, field_name: string, value: mixed, fiel
     if (xmlids_ids.length === 1 && field_info.type !== 'many2many' && field_info.type !== 'one2many') {
       return `\t\t<field name="${field_name}" ref="${xmlids_ids[0]}"/>\n`;
     } else {
-      const refs = xmlids_ids.filter((item) => item).map((item) => `Command.link(ref('${item}'))`);
+      const refs = xmlids_ids.filter((item) => item).map((item) => isNumber(item) ? `Command.link(${item})` : `Command.link(ref('${item}'))`);
       if (refs.length === 0) {
         return;
       }

@@ -1,5 +1,11 @@
 # Changelog
 
+**11.7.3**
+
+```
+FIX: exportfile xml: Include ids for records without reference
+```
+
 **11.7.2**
 
 ```

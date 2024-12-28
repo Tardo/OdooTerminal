@@ -27,7 +27,7 @@
       "width": "El ancho del lienzo"
     },
     "definition": "Crear ventana 2D",
-    "detail": "Destruir ventana 2D"
+    "detail": "Crear ventana 2D"
   },
   "cmd2DDestroyWindow": {
     "args": {

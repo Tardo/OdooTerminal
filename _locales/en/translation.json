@@ -14,7 +14,7 @@
       "from-x": "The rect X point",
       "from-y": "The rect Y point",
       "height": "The rect height",
-      "width": "The rect height"
+      "width": "The rect width"
     },
     "definition": "Clear canvas",
     "detail": "Clear canvas"
@@ -27,7 +27,7 @@
       "width": "The canvas width"
     },
     "definition": "Create 2D Window",
-    "detail": "Destroy 2D Window"
+    "detail": "Create 2D Window"
   },
   "cmd2DDestroyWindow": {
     "args": {
@@ -43,7 +43,7 @@
       "from-y": "The line from Y point",
       "to-x": "The line to X point",
       "to-y": "The line to Y point",
-      "width": "The line color"
+      "width": "The line width"
     },
     "definition": "Draw a line",
     "detail": "Draw a line"
@@ -53,7 +53,7 @@
       "canvas": "The canvas",
       "color": "The rect color",
       "height": "The rect height",
-      "width": "The rect color",
+      "width": "The rect width",
       "x": "The rect X point",
       "y": "The rect Y point"
     },
@@ -298,7 +298,7 @@
     },
     "definition": "Exports the command result to a text/json file",
     "detail": "Exports the command result to a text/json file.",
-    "invalidValue": "Invalid value: need a recordset with csv and xml",
+    "invalidValue": "Invalid value: must be a recordset with csv and xml",
     "resultExported": "Command result exported to '{{filename}}' file"
   },
   "cmdExportVar": {
@@ -849,8 +849,8 @@
     "args": {
       "num": "The number of decimals"
     },
-    "definition": "Rounds a number DOWN to the nearest integer",
-    "detail": "Rounds a number DOWN to the nearest integer"
+    "definition": "Rounds a number UP to the nearest integer",
+    "detail": "Rounds a number UP to the nearest integer"
   },
   "funcFloor": {
     "args": {
