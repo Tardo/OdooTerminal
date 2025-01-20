@@ -7,6 +7,11 @@ module.exports = {
     headless: process.env.PUPPETEER_HEADLESS !== 'false',
     product: process.env.PUPPETEER_BROWSER || 'chrome',
     protocol: 'webDriverBiDi',
-    args: [`--disable-extensions-except=${path.resolve(__dirname)}`, `--load-extension=${path.resolve(__dirname)}`],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      `--disable-extensions-except=${path.resolve(__dirname)}`,
+      `--load-extension=${path.resolve(__dirname)}`,
+    ],
   },
 };
