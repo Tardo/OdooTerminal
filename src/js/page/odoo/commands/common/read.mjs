@@ -15,16 +15,16 @@ import type Terminal from '@odoo/terminal';
 async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const search_all_fields = kwargs.field[0] === '*';
   let fields = kwargs.field;
-  const bin_fields = [];
+  let fieldDefs = {};
 
   // Due to possible problems with binary fields it is necessary to filter them out
   if (search_all_fields) {
     if (!kwargs.read_binary) {
       // $FlowFixMe
-      const fieldDefs = await callModel<{[string]: Object}>(
+      fieldDefs = await callModel<{[string]: Object}>(
         kwargs.model,
         'fields_get',
-        [fields],
+        [],
         null,
         await this.getContext(),
         kwargs.options,
@@ -32,9 +32,7 @@ async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, c
 
       fields = [];
       Object.entries(fieldDefs).forEach(item => {
-        if (item[1].type === 'binary') {
-          bin_fields.push(item[0]);
-        } else {
+        if (item[1].type !== 'binary') {
           fields.push(item[0]);
         }
       });
@@ -44,16 +42,20 @@ async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, c
   }
 
   const result = await searchRead(kwargs.model, [['id', 'in', kwargs.id]], fields, await this.getContext());
-
-  if (bin_fields.length !== 0) {
-    for (const item of result) {
-      for (const bin_field of bin_fields) {
-        item[bin_field] = {oterm: true, binary: true};
+  if (search_all_fields) {
+    if (!kwargs.read_binary) {
+      const def_fields = Object.keys(fieldDefs);
+      for (const field of def_fields) {
+        if (fieldDefs[field].type === 'binary') {
+          for (const record of result) {
+            record[field] = null;
+          }
+        }
       }
     }
   }
 
-  const recordset = Recordset.make(kwargs.model, result);
+  const recordset = Recordset.make(kwargs.model, result, fieldDefs);
   ctx.screen.print(recordset);
   return recordset;
 }

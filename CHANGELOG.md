@@ -1,9 +1,15 @@
 # Changelog
 
-**11.7.3**
+**11.8.0**
 
 ```
+ADD: options: Theming (part 1)
+
 FIX: exportfile xml: Include ids for records without reference
+FIX: hex2rgb: Correctly handle hex values
+FIX: Command Assistant: Colors (issue #142)
+FIX: Recordset Table: Display the contents of fields of type Object (issue #143)
+FIX: Recordset Table: Correct processing of binary type fields
 ```
 
 **11.7.2**

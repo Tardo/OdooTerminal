@@ -5,6 +5,8 @@
 import isEmpty from '@trash/utils/is_empty';
 import isNumber from '@trash/utils/is_number';
 
+export type FieldDef = {...};
+
 const RecordHandler = {
   // $FlowFixMe
   get(target: Object, prop: mixed) {
@@ -13,33 +15,31 @@ const RecordHandler = {
       prop === 'toWrite' ||
       prop === 'rollback' ||
       prop === 'persist' ||
+      prop === '__info' ||
       typeof prop === 'symbol'
     ) {
       const ref = target[prop];
-      if (typeof ref === 'function') {
-        return ref.bind(target);
-      }
-      return target[prop];
+      return  (typeof ref === 'function') ? ref.bind(target) : ref;
     }
-    return target.values[prop];
+    return target.__values[prop];
   },
   // $FlowFixMe
   set(target: Object, prop: mixed, value: mixed) {
-    target.modified_fields.push(prop);
-    if (target.values.length === 1) {
-      return Reflect.set(target.values[0], prop, value);
+    target.__modified_fields.push(prop);
+    if (target.__values.length === 1) {
+      return Reflect.set(target.__values[0], prop, value);
     }
-    return Reflect.set(target.values, prop, value);
+    return Reflect.set(target.__values, prop, value);
   },
 
   // $FlowFixMe
   ownKeys(target: Object) {
-    return Reflect.ownKeys(target.values);
+    return Reflect.ownKeys(target.__values);
   },
   // $FlowFixMe
   has(target: Object, prop: mixed) {
     if (typeof prop === 'string' || typeof prop === 'number') {
-      return prop in target.values;
+      return prop in target.__values;
     }
     return false;
   },
@@ -50,36 +50,38 @@ const RecordHandler = {
 
 export class Record {
   #origin: {[string]: mixed} = {};
-  values: {[string]: mixed};
-  modified_fields: Array<string> = [];
+  __info: FieldDef;
+  __values: {[string]: mixed};
+  __modified_fields: Array<string> = [];
 
-  constructor(values: {...}) {
+  constructor(values: {...}, field_info: FieldDef) {
     this.#origin = {...values};
-    this.values = values;
+    this.__values = values;
+    this.__info = field_info;
   }
 
   persist() {
-    this.#origin = {...this.values};
-    this.modified_fields = [];
+    this.#origin = {...this.__values};
+    this.__modified_fields = [];
   }
 
   toJSON(): {...} {
-    return this.values;
+    return this.__values;
   }
 
   toWrite(): {[string]: mixed} {
     const write_vals: {[string]: mixed} = {};
-    for (const field_name of this.modified_fields) {
-      write_vals[field_name] = this.values[field_name];
+    for (const field_name of this.__modified_fields) {
+      write_vals[field_name] = this.__values[field_name];
     }
     return write_vals;
   }
 
   rollback() {
-    for (const field_name of this.modified_fields) {
-      this.values[field_name] = this.#origin[field_name];
+    for (const field_name of this.__modified_fields) {
+      this.__values[field_name] = this.#origin[field_name];
     }
-    this.modified_fields = [];
+    this.__modified_fields = [];
   }
 
   // $FlowFixMe
@@ -90,7 +92,7 @@ export class Record {
   // $FlowFixMe
   [Symbol.toPrimitive](hint) {
     if (hint === 'string') {
-      return JSON.stringify(this.values);
+      return JSON.stringify(this.__values);
     }
   }
 }
@@ -136,21 +138,23 @@ const RecordsetHandler = {
 export default class Recordset {
   #model: string;
   #records: Array<Record> = [];
+  #fields: {[string]: FieldDef} = {};
 
   // $FlowFixMe
   static isValid(obj: Object) {
     return obj instanceof Recordset;
   }
 
-  static make(model: string, values: Array<{[string]: mixed}>): Recordset {
-    const rs = new Recordset(model, values);
+  static make(model: string, values: Array<{[string]: mixed}>, fields?: {[string]: FieldDef}): Recordset {
+    const rs = new Recordset(model, values, fields);
     return new Proxy(rs, RecordsetHandler);
   }
 
-  constructor(model: string, values: Array<{[string]: mixed}>) {
+  constructor(model: string, values: Array<{[string]: mixed}>, fields?: {[string]: FieldDef}) {
     this.#model = model;
+    this.#fields = fields || {};
     for (const rec_vals of values) {
-      const record = new Record(rec_vals);
+      const record = new Record(rec_vals, this.#fields);
       this.#records.push(new Proxy(record, RecordHandler));
     }
   }

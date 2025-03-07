@@ -25,7 +25,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     }
     const sresult = buff.data.slice(0, lines_total);
     buff.data = buff.data.slice(lines_total);
-    const recordset = Recordset.make(kwargs.model, sresult);
+    const recordset = Recordset.make(kwargs.model, sresult, buff.fieldDefs);
     ctx.screen.print(recordset);
     if (buff.data.length) {
       ctx.screen.printError(
@@ -52,16 +52,14 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   }
 
   // Due to possible problems with binary fields it is necessary to filter them out
-  const bin_fields = [];
+  let fieldDefs = {};
   if (search_all_fields) {
       if (!kwargs.read_binary) {
-      const fieldDefs = await getFieldsInfo(kwargs.model, false, await this.getContext(), kwargs.options);
+      fieldDefs = await getFieldsInfo(kwargs.model, false, await this.getContext(), kwargs.options);
 
       fields = [];
       Object.entries(fieldDefs).forEach(item => {
-        if (item[1].type === 'binary') {
-          bin_fields.push(item[0]);
-        } else {
+        if (item[1].type !== 'binary') {
           fields.push(item[0]);
         }
       });
@@ -76,10 +74,15 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     orderBy: kwargs.order,
   }));
 
-  if (bin_fields.length !== 0) {
-    for (const item of result) {
-      for (const bin_field of bin_fields) {
-        item[bin_field] = {oterm: true, binary: true};
+  if (search_all_fields) {
+    if (!kwargs.read_binary) {
+      const def_fields = Object.keys(fieldDefs);
+      for (const field of def_fields) {
+        if (fieldDefs[field].type === 'binary') {
+          for (const record of result) {
+            record[field] = null;
+          }
+        }
       }
     }
   }
@@ -90,10 +93,11 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     search_buffer[ctx.meta.info.cmdName] = {
       model: kwargs.model,
       data: sresult.slice(lines_total),
+      fieldDefs: fieldDefs,
     };
     sresult = sresult.slice(0, lines_total);
   }
-  const recordset = Recordset.make(kwargs.model, sresult);
+  const recordset = Recordset.make(kwargs.model, sresult, fieldDefs);
   ctx.screen.print(recordset);
   ctx.screen.print(i18n.t("cmdSearch.result.count", "Records count: {{count}}", {count: sresult.length}));
   if (need_truncate) {
