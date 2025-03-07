@@ -25,6 +25,7 @@ import hsl2rgb from '@terminal/utils/hsl2rgb';
 import rgb2hsl from '@terminal/utils/rgb2hsl';
 import hex2rgb from '@terminal/utils/hex2rgb';
 import ElementNotFoundError from '@terminal/exceptions/element_not_found_error';
+import type {RGB} from '@terminal/utils/hex2rgb';
 import type {CMDAssistantOption} from './command_assistant';
 import type {DebounceInnerCallback} from '@terminal/utils/debounce';
 import type {CMDDef, TokenInfo} from '@trash/interpreter';
@@ -444,7 +445,7 @@ export default class Screen {
           color: 'black',
         });
       } else {
-        let main_rgb = 255;
+        let main_rgb: RGB = [0, 0, 0];
         if (Object.hasOwn(this.#options.inputColors, this.#input_info.host)) {
           const hex_color = parseInt(this.#options.inputColors[this.#input_info.host].replace('#', ''), 16);
           main_rgb = hex2rgb(hex_color);

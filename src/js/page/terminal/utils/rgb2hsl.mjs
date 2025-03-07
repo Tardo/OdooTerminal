@@ -6,7 +6,6 @@ import type {RGB} from './hex2rgb';
 export type HSL = [number, number, number];
 
 export default function (rgb: RGB): HSL {
-  // Normalizar a rango 0-1
   const r = rgb[0] / 255;
   const g = rgb[1] / 255;
   const b = rgb[2] / 255;
@@ -15,16 +14,13 @@ export default function (rgb: RGB): HSL {
   const min = Math.min(r, g, b);
   const delta = max - min;
 
-  let h, s;
+  let h = 0, s = 0;
 
   // Lightness
   const l = (max + min) / 2;
 
   // Saturation y Hue
-  if (delta === 0) {
-      h = 0; // Undefined, pero usamos 0
-      s = 0;
-  } else {
+  if (delta !== 0) {
     // Saturation
     s = delta / (1 - Math.abs(2 * l - 1));
 

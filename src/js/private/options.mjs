@@ -9,7 +9,8 @@ import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
 import {IGNORED_KEYS, SETTING_DEFAULTS, SETTING_NAMES, SETTING_TYPES} from '../common/constants.mjs';
 
-export type EventCallback = (ev) => void;
+// $FlowFixMe
+export type EventCallback = (ev: any) => void;
 
 let unique_counter: number = 1;
 let shortcuts_defs: {[string]: string} = {};
