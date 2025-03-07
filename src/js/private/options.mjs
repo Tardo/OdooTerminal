@@ -9,8 +9,11 @@ import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
 import {IGNORED_KEYS, SETTING_DEFAULTS, SETTING_NAMES, SETTING_TYPES} from '../common/constants.mjs';
 
+export type EventCallback = (ev) => void;
+
 let unique_counter: number = 1;
 let shortcuts_defs: {[string]: string} = {};
+let color_domain_defs: {[string]: string} = {};
 
 function onClickShortcutRemove(e: MouseEvent) {
   if (e.target instanceof HTMLElement) {
@@ -20,6 +23,17 @@ function onClickShortcutRemove(e: MouseEvent) {
     row?.parentNode?.removeChild(row);
     const {keybind} = el_target.dataset;
     delete shortcuts_defs[keybind];
+  }
+}
+
+function onClickColorDomainRemove(e: MouseEvent) {
+  if (e.target instanceof HTMLElement) {
+    const el_target = e.target;
+    const row_target_id = el_target.dataset.target;
+    const row = document.getElementById(row_target_id);
+    row?.parentNode?.removeChild(row);
+    const {domain} = el_target.dataset;
+    delete color_domain_defs[domain];
   }
 }
 
@@ -52,6 +66,39 @@ function renderShortcutTable() {
     }
     for (const shortcut_keybind in shortcuts_defs) {
       renderShortcutTableItem(tbody, shortcut_keybind, shortcuts_defs[shortcut_keybind]);
+    }
+  }
+}
+
+function renderColorDomainTableItem(tbody: HTMLTableSectionElement, domain: string, color: string) {
+  const row_id = `color-domain-${unique_counter++}`;
+  const new_row = tbody.insertRow();
+  const new_cell_domain = new_row.insertCell(0);
+  const new_cell_color = new_row.insertCell(1);
+  const new_cell_options = new_row.insertCell(2);
+  new_row.setAttribute('id', row_id);
+  new_cell_domain.innerText = domain;
+  new_cell_color.innerText = color;
+  const elm_link_remove = document.createElement('a');
+  elm_link_remove.id = `${row_id}-remove'`;
+  elm_link_remove.innerText = 'Remove';
+  elm_link_remove.href = '#';
+  elm_link_remove.classList.add('color_domain_remove');
+  elm_link_remove.dataset.target = row_id;
+  elm_link_remove.dataset.domain = domain;
+  new_cell_options.appendChild(elm_link_remove);
+  elm_link_remove.addEventListener('click', onClickColorDomainRemove, false);
+}
+
+function renderColorDomainTable() {
+  const elm_color_domain_table = document.getElementById('color_domain_table');
+  const tbody = elm_color_domain_table?.getElementsByTagName('tbody')[0];
+  if (tbody && tbody instanceof HTMLTableSectionElement) {
+    while (tbody.rows.length > 0) {
+      tbody.deleteRow(0);
+    }
+    for (const color_domain_domain in color_domain_defs) {
+      renderColorDomainTableItem(tbody, color_domain_domain, color_domain_defs[color_domain_domain]);
     }
   }
 }
@@ -99,6 +146,7 @@ function saveOptions() {
     }
   }
   data.shortcuts = shortcuts_defs;
+  data.colors_domain = color_domain_defs;
   setStorageSync(data);
 }
 
@@ -138,7 +186,9 @@ function applyInputValues() {
       }
     }
     shortcuts_defs = result.shortcuts || {};
+    color_domain_defs = result.colors_domain || {};
     renderShortcutTable();
+    renderColorDomainTable();
   });
 }
 
@@ -192,15 +242,36 @@ function onClickShortcutAdd() {
   }
 }
 
+function onClickColorDomainAdd() {
+  const elm_color_domain_domain = document.getElementById('color_domain_domain');
+  const elm_color_domain_color = document.getElementById('color_domain_color');
+  if (
+    elm_color_domain_domain instanceof HTMLInputElement &&
+    elm_color_domain_domain.value &&
+    elm_color_domain_color instanceof HTMLInputElement &&
+    elm_color_domain_color.value
+  ) {
+    const elm_color_domain_table = document.getElementById('color_domain_table');
+    color_domain_defs[elm_color_domain_domain.value] = elm_color_domain_color.value;
+    const tbody = elm_color_domain_table?.getElementsByTagName('tbody')[0];
+    if (tbody) {
+      renderColorDomainTableItem(tbody, elm_color_domain_domain.value, elm_color_domain_color.value);
+    }
+    elm_color_domain_domain.value = '';
+    elm_color_domain_color.value = '';
+  }
+}
+
 function onClickResetSettings() {
   setStorageSync(SETTING_DEFAULTS);
   applyInputValues();
 }
 
 function _apply_i18n(selector: string, ikey: string) {
-  const elm = document.querySelector(selector);
-  if (elm) {
-    elm.innerText = ubrowser.i18n.getMessage(ikey);
+  const elms = document.querySelectorAll(selector);
+  const text = ubrowser.i18n.getMessage(ikey);
+  for (const elm of elms) {
+    elm.innerText = text;
   }
 }
 
@@ -211,9 +282,17 @@ function i18n() {
   _apply_i18n("label[for='pinned']", 'optionsTitleBehaviourPinned');
   _apply_i18n("label[for='maximized']", 'optionsTitleBehaviourMaximized');
   _apply_i18n("label[for='multiline']", 'optionsTitleBehaviourMultiline');
-  _apply_i18n("label[for='opacity']", 'optionsTitleBehaviourOpacity');
   _apply_i18n("label[for='elephant']", 'optionsTitleBehaviourElephant');
   _apply_i18n("label[for='language']", 'optionsLanguage');
+
+  _apply_i18n('#title_theme', 'optionsTitleTheme');
+  _apply_i18n("label[for='opacity']", 'optionsTitleThemeOpacity');
+  _apply_i18n("label[for='fontsize']", 'optionsTitleThemeFontSize');
+  _apply_i18n("label[for='fontsize_ca']", 'optionsTitleThemeFontSizeCA');
+  _apply_i18n("label[for='color_domain_table']", 'optionsTitleThemeColorDomainTable');
+  _apply_i18n('#column_color_domain_domain', 'optionsTitleThemeDomain');
+  _apply_i18n('#column_color_domain_color', 'optionsTitleThemeColor');
+  _apply_i18n('#add_color_domain', 'optionsTitleThemeAdd');
 
   _apply_i18n('#title_shortcuts', 'optionsTitleShortcuts');
   _apply_i18n('#column_shortcuts_keybin', 'optionsTitleShortcutsKeybind');
@@ -236,17 +315,25 @@ function i18n() {
   _apply_i18n("label[for='devmode_ignore_comp_checks']", 'optionsTitleDeveloperZoneModeIgnoreCompChecks');
   _apply_i18n("label[for='devmode_console_errors']", 'optionsTitleDeveloperZoneModeConsoleErrors');
 
-  _apply_i18n('#reset_settings', 'optionsReset');
-  _apply_i18n('#save_settings', 'optionsSave');
+  _apply_i18n('.reset_settings', 'optionsReset');
+  _apply_i18n('.save_settings', 'optionsSave');
+}
+
+function _add_event_listener(selector: string, event_type: string, callback: EventCallback) {
+  const elms = document.querySelectorAll(selector);
+  for (const elm of elms) {
+    elm.addEventListener(event_type, callback);
+  }
 }
 
 function onDOMLoaded() {
   applyInputValues();
-  document.getElementById('form_options')?.addEventListener('submit', onSubmitForm);
-  document.getElementById('shortcut_keybind')?.addEventListener('keydown', onKeyDownShortcut);
-  document.getElementById('shortcut_keybind')?.addEventListener('keyup', onKeyUpShortcut);
-  document.getElementById('add_shortcut')?.addEventListener('click', onClickShortcutAdd);
-  document.getElementById('reset_settings')?.addEventListener('click', onClickResetSettings);
+  _add_event_listener('#form_options', 'submit', onSubmitForm);
+  _add_event_listener('#shortcut_keybind', 'keydown', onKeyDownShortcut);
+  _add_event_listener('#shortcut_keybind', 'keyup', onKeyUpShortcut);
+  _add_event_listener('#add_shortcut', 'click', onClickShortcutAdd);
+  _add_event_listener('#add_color_domain', 'click', onClickColorDomainAdd);
+  _add_event_listener('.reset_settings', 'click', onClickResetSettings);
   i18n();
 }
 

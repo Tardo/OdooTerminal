@@ -18,11 +18,32 @@
   "optionsTitleBehaviourMultiline": {
     "message": "Multi-line"
   },
-  "optionsTitleBehaviourOpacity": {
-    "message": "Opacity:"
-  },
   "optionsTitleBehaviourElephant": {
     "message": "Attempt to resolve unknown values (mainly the login name)"
+  },
+  "optionsTitleTheme": {
+    "message": "Theme"
+  },
+  "optionsTitleThemeOpacity": {
+    "message": "Opacity:"
+  },
+  "optionsTitleThemeColorDomainTable": {
+    "message": "Color per domain:"
+  },
+  "optionsTitleThemeDomain": {
+    "message": "Domain (without https or http)"
+  },
+  "optionsTitleThemeColor": {
+    "message": "Color (hexadecimal)"
+  },
+  "optionsTitleThemeAdd": {
+    "message": "Add"
+  },
+  "optionsTitleThemeFontSize": {
+    "message": "Font size (General):"
+  },
+  "optionsTitleThemeFontSizeCA": {
+    "message": "Font size (Command Assistant):"
   },
   "optionsLanguage": {
     "message": "Language"

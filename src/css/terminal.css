@@ -6,7 +6,6 @@
   --terminal-screen-width: 70%;
   --terminal-screen-width-maximized: 100%;
   --terminal-screen-background-color: black;
-  --terminal-screen-assistant-bottom-pos: 27px;
   --terminal-screen-assistant-args-background-color: lightgray;
   --terminal-screen-assistant-desc-background-color: #c1c1c1;
   --terminal-screen-text-color: lightgray;
@@ -15,6 +14,17 @@
   --terminal-screen-height: 40vh;
   --terminal-screen-height-maximized: 100vh;
   --terminal-title-color: rgb(124, 123, 173);
+  --terminal-font-size: medium;
+  --terminal-font-size-ca: small;
+  --terminal-color-primary: #007bff;
+  --terminal-color-secondary: #6c757d;
+  --terminal-color-success: #28a745;
+  --terminal-color-danger: #dc3545;
+  --terminal-color-warning: #ffc107;
+  --terminal-color-info: #17a2b8;
+  --terminal-color-dark: #343a40;
+  --terminal-color-muted: #6c757d;
+  --terminal-color-white: #fff;
 }
 
 .o_terminal {
@@ -22,7 +32,6 @@
   border: 0 solid gray;
   border-width: 1px 1px 0 1px;
   font-family: var(--terminal-screen-font);
-  font-size: 14px;
   left: 50%;
   position: fixed;
   top: -110%;
@@ -35,6 +44,7 @@
   transition: 200ms;
   transition-timing-function: ease-out;
   height: var(--terminal-screen-height);
+  font-size: var(--terminal-font-size);
 }
 
 .o_terminal.term-maximized {
@@ -143,9 +153,8 @@
 }
 
 .o_terminal div#terminal_assistant {
-  font-size: x-small;
+  font-size: var(--terminal-font-size-ca);
   position: absolute;
-  bottom: var(--terminal-screen-assistant-bottom-pos);
   pointer-events: none;
   z-index: 10;
 }
@@ -214,6 +223,7 @@
   flex: 1 1 auto; /* Here to force BS4 behavior */
   position: absolute;
   width: 100%;
+  height: 100%;
   padding: 3px;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input_multi {
@@ -310,4 +320,189 @@
   top: 0;
   transition: 350ms;
   transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* BASE COLORS */
+.terminal-text-primary {
+  color: var(--terminal-color-primary) !important;
+}
+.terminal-text-secondary {
+  color: var(--terminal-color-secondary) !important;
+}
+.terminal-text-success {
+  color: var(--terminal-color-success) !important;
+}
+.terminal-text-danger {
+  color: var(--terminal-color-danger) !important;
+}
+.terminal-text-warning {
+  color: var(--terminal-color-warning) !important;
+}
+.terminal-text-info {
+  color: var(--terminal-color-info) !important;
+}
+.terminal-text-dark {
+  color: var(--terminal-color-dark) !important;
+}
+.terminal-text-muted {
+  color: var(--terminal-color-muted) !important;
+}
+.terminal-text-white {
+  color: var(--terminal-color-white) !important;
+}
+
+.terminal-bg-primary {
+  background-color: var(--terminal-color-primary) !important;
+}
+.terminal-bg-secondary {
+  background-color: var(--terminal-color-secondary) !important;
+}
+.terminal-bg-success {
+  background-color: var(--terminal-color-success) !important;
+}
+.terminal-bg-danger {
+  background-color: var(--terminal-color-danger) !important;
+}
+.terminal-bg-warning {
+  background-color: var(--terminal-color-warning) !important;
+}
+.terminal-bg-info {
+  background-color: var(--terminal-color-info) !important;
+}
+.terminal-bg-dark {
+  background-color: var(--terminal-color-dark) !important;
+}
+.terminal-bg-muted {
+  background-color: var(--terminal-color-muted) !important;
+}
+.terminal-bg-white {
+  background-color: var(--terminal-color-white) !important;
+}
+
+.terminal-border-primary {
+  border-color: var(--terminal-color-primary) !important;
+}
+.terminal-border-secondary {
+  border-color: var(--terminal-color-secondary) !important;
+}
+.terminal-border-success {
+  border-color: var(--terminal-color-success) !important;
+}
+.terminal-border-danger {
+  border-color: var(--terminal-color-danger) !important;
+}
+.terminal-border-warning {
+  border-color: var(--terminal-color-warning) !important;
+}
+.terminal-border-info {
+  border-color: var(--terminal-color-info) !important;
+}
+.terminal-border-dark {
+  border-color: var(--terminal-color-dark) !important;
+}
+.terminal-border-muted {
+  border-color: var(--terminal-color-muted) !important;
+}
+.terminal-border-white {
+  border-color: var(--terminal-color-white) !important;
+}
+
+.terminal-btn-primary {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-primary);
+  border-color: var(--terminal-color-primary);
+}
+.terminal-btn-primary:hover {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-primary);
+  border-color: var(--terminal-color-primary);
+  filter: brightness(80%);
+}
+.terminal-btn-secondary {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-secondary);
+  border-color: var(--terminal-color-secondary);
+}
+.terminal-btn-secondary:hover {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-secondary);
+  border-color: var(--terminal-color-secondary);
+  filter: brightness(80%);
+}
+.terminal-btn-success {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-success);
+  border-color: var(--terminal-color-success);
+}
+.terminal-btn-success:hover {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-success);
+  border-color: var(--terminal-color-success);
+  filter: brightness(80%);
+}
+.terminal-btn-danger {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-danger);
+  border-color: var(--terminal-color-danger);
+}
+.terminal-btn-danger:hover {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-danger);
+  border-color: var(--terminal-color-danger);
+  filter: brightness(80%);
+}
+.terminal-btn-warning {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-warning);
+  border-color: var(--terminal-color-warning);
+}
+.terminal-btn-warning:hover {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-warning);
+  border-color: var(--terminal-color-warning);
+  filter: brightness(80%);
+}
+.terminal-btn-info {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-info);
+  border-color: var(--terminal-color-info);
+}
+.terminal-btn-info:hover {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-info);
+  border-color: var(--terminal-color-info);
+  filter: brightness(80%);
+}
+.terminal-btn-dark {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-dark);
+  border-color: var(--terminal-color-dark);
+}
+.terminal-btn-dark:hover {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-dark);
+  border-color: var(--terminal-color-dark);
+  filter: brightness(80%);
+}
+.terminal-btn-muted {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-muted);
+  border-color: var(--terminal-color-muted);
+}
+.terminal-btn-muted:hover {
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-muted);
+  border-color: var(--terminal-color-muted);
+  filter: brightness(80%);
+}
+.terminal-btn-white {
+  color: var(--terminal-color-dark);
+  background-color: var(--terminal-color-white);
+  border-color: var(--terminal-color-white);
+}
+.terminal-btn-white:hover {
+  color: var(--terminal-color-dark);
+  background-color: var(--terminal-color-white);
+  border-color: var(--terminal-color-white);
+  filter: brightness(80%);
 }

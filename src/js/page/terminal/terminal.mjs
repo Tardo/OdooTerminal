@@ -133,25 +133,27 @@ export default class Terminal {
       this.doShow();
       const elm = this.el.querySelector('.terminal-screen-icon-pin');
       if (elm) {
-        elm.classList.remove('btn-dark');
-        elm.classList.add('btn-light');
+        elm.classList.remove('terminal-btn-dark');
+        elm.classList.add('terminal-btn-light');
       }
     }
     if (this.#config.maximized) {
       this.el.classList.add('term-maximized');
       const elm = this.el.querySelector('.terminal-screen-icon-maximize');
       if (elm) {
-        elm.classList.remove('btn-dark');
-        elm.classList.add('btn-light');
+        elm.classList.remove('terminal-btn-dark');
+        elm.classList.add('terminal-btn-light');
       }
     }
     if (this.#config.multiline) {
       const elm = this.el.querySelector('.terminal-multiline');
       if (elm) {
-        elm.classList.remove('btn-dark');
-        elm.classList.add('btn-light');
+        elm.classList.remove('terminal-btn-dark');
+        elm.classList.add('terminal-btn-light');
       }
     }
+
+    this.#applyTheme();
 
     // $FlowFixMe
     window.addEventListener('message', this.#onWindowMessage.bind(this), false);
@@ -203,6 +205,11 @@ export default class Terminal {
     }
   }
 
+  #applyTheme() {
+    document.documentElement?.style.setProperty('--terminal-font-size', this.#config.fontsize);
+    document.documentElement?.style.setProperty('--terminal-font-size-ca', this.#config.fontsize_ca);
+  }
+
   async start(): Promise<> {
     if (!this.#wasLoaded) {
       throw new Error(i18n.t('terminal.error.notLoaded', 'Terminal not loaded'));
@@ -215,6 +222,7 @@ export default class Terminal {
     this.runningCmdCount_el = elm;
     this.#commandAssistant = new CommandAssistant(this);
     this.screen.start(this.el, {
+      inputColors: this.#config.colors_domain,
       inputMode: this.#config.multiline ? 'multi' : 'single',
       onSaveScreen: function (this: Terminal, content: string) {
         debounce(() => {
@@ -553,12 +561,12 @@ export default class Terminal {
       const target = ev.currentTarget;
       if (this.#config.maximized) {
         this.el.classList.add('term-maximized');
-        target.classList.remove('btn-dark');
-        target.classList.add('btn-light');
+        target.classList.remove('terminal-btn-dark');
+        target.classList.add('terminal-btn-light');
       } else {
         this.el.classList.remove('term-maximized');
-        target.classList.remove('btn-light')
-        target.classList.add('btn-dark');
+        target.classList.remove('terminal-btn-light')
+        target.classList.add('terminal-btn-dark');
       }
     }
     setStorageSessionItem('screen_maximized', this.#config.maximized, err => this.screen.print(err));
@@ -571,11 +579,11 @@ export default class Terminal {
     if (ev.currentTarget instanceof HTMLElement) {
       const target = ev.currentTarget;
       if (this.#config.pinned) {
-        target.classList.remove('btn-dark');
-        target.classList.add('btn-light');
+        target.classList.remove('terminal-btn-dark');
+        target.classList.add('terminal-btn-light');
       } else {
-        target.classList.remove('btn-light')
-        target.classList.add('btn-dark');
+        target.classList.remove('terminal-btn-light')
+        target.classList.add('terminal-btn-dark');
       }
     }
     setStorageSessionItem('terminal_pinned', this.#config.pinned, err => this.screen.print(err));
@@ -591,12 +599,12 @@ export default class Terminal {
     if (ev.currentTarget instanceof HTMLElement) {
       const target = ev.currentTarget;
       if (this.#config.multiline) {
-        target.classList.remove('btn-dark');
-        target.classList.add('btn-light');
+        target.classList.remove('terminal-btn-dark');
+        target.classList.add('terminal-btn-light');
         this.screen.setInputMode('multi');
       } else {
-        target.classList.remove('btn-light')
-        target.classList.add('btn-dark');
+        target.classList.remove('terminal-btn-light')
+        target.classList.add('terminal-btn-dark');
         this.screen.setInputMode('single');
       }
     }

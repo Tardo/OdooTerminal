@@ -8,6 +8,11 @@
 
   <body>
     <form id="form_options">
+      <div class="btn_zone">
+        <button type="button" class="reset_settings">Reset</button>
+        <button type="submit" class="save_settings">Save</button>
+      </div>
+
       <div class="optsection">
         <h4 id="title_behaviour">Behaviour</h4>
         <p></p>
@@ -17,8 +22,6 @@
         <label for="maximized">Maximized</label><br />
         <input type="checkbox" id="multiline" name="multiline" />
         <label for="multiline">Multi-line</label><br />
-        <label for="opacity">Opacity:</label>
-        <input type="range" id="opacity" name="opacity" min="0" max="100" /><br />
         <input type="checkbox" id="elephant" name="elephant" />
         <label for="elephant">Attempt to resolve unknown values (mainly the login name)</label><br />
         <label for="language">Language:</label>
@@ -27,6 +30,45 @@
           <option value="en">English</option>
           <option value="es">Español (España)</option>
         </select>
+      </div>
+
+      <div class="optsection">
+        <h4 id="title_theme">Theme</h4>
+        <p></p>
+        <label for="opacity">Opacity:</label>
+        <input type="range" id="opacity" name="opacity" min="0" max="100" /><br />
+        <label for="fontsize">Font size (General):</label>
+        <select id="fontsize" name="fontsize">
+          <option value="small">Small</option>
+          <option value="medium">Medium</option>
+          <option value="large">Large</option>
+        </select>
+        <br />
+        <label for="fontsize_ca">Font size (Command Assistant):</label>
+        <select id="fontsize_ca" name="fontsize_ca">
+          <option value="x-small">X-Small</option>
+          <option value="small">Small</option>
+          <option value="medium">Medium</option>
+          <option value="large">Large</option>
+        </select>
+
+        <br />
+        <label for="color_domain_table">Color per domain:</label>
+        <table id="color_domain_table">
+          <thead>
+            <tr>
+              <th style="width: 80%" id="column_color_domain_domain">Domain (without https or http)</th>
+              <th style="width: 20%" id="column_color_domain_color">Color (hexadecimal)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="color_domain_btn_zone">
+          <input type="edit" id="color_domain_domain" name="color_domain_domain" placeholder="Domain" />
+          <input type="edit" id="color_domain_color" name="color_domain_color" placeholder="Color" />
+          <button id="add_color_domain">Add</button>
+        </div>
       </div>
 
       <div class="optsection">
@@ -96,8 +138,8 @@
       </div>
 
       <div class="btn_zone">
-        <button type="button" id="reset_settings">Reset</button>
-        <button type="submit" id="save_settings">Save</button>
+        <button type="button" class="reset_settings">Reset</button>
+        <button type="submit" class="save_settings">Save</button>
       </div>
     </form>
   </body>

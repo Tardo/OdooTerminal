@@ -20,8 +20,10 @@ import debounce from '@terminal/utils/debounce';
 import defer from '@terminal/utils/defer';
 import encodeHTML from '@terminal/utils/encode_html';
 import genColorFromString from '@terminal/utils/gen_color_from_string';
-import hsv2rgb from '@terminal/utils/hsv2rgb';
-import rgb2hsv from '@terminal/utils/rgb2hsv';
+import getColorGrayValue from '@terminal/utils/get_color_gray_value';
+import hsl2rgb from '@terminal/utils/hsl2rgb';
+import rgb2hsl from '@terminal/utils/rgb2hsl';
+import hex2rgb from '@terminal/utils/hex2rgb';
 import ElementNotFoundError from '@terminal/exceptions/element_not_found_error';
 import type {CMDAssistantOption} from './command_assistant';
 import type {DebounceInnerCallback} from '@terminal/utils/debounce';
@@ -49,6 +51,7 @@ export type onInputCallback = (ev: InputEvent) => void;
 export type onInputKeyUpCallback = (ev: KeyboardEvent) => void;
 
 export type ScreenOptions = {
+  inputColors: {[string]: string},
   inputMode: InputMode,
   onCleanScreen: OnCleanScreenCallback,
   onSaveScreen: onSaveScreenCallback,
@@ -408,6 +411,7 @@ export default class Screen {
       if (prompt_el) {
         prompt_el.textContent = this.#input_info.username;
         prompt_el.setAttribute('title', this.#input_info.username);
+        this.#assistant_el.style.bottom = (prompt_el.offsetHeight + 4) + 'px';
       }
     }
     if (Object.hasOwn(this.#input_info, 'version')) {
@@ -440,21 +444,26 @@ export default class Screen {
           color: 'black',
         });
       } else {
-        const color_info = genColorFromString(this.#input_info.host);
+        let main_rgb = 255;
+        if (Object.hasOwn(this.#options.inputColors, this.#input_info.host)) {
+          const hex_color = parseInt(this.#options.inputColors[this.#input_info.host].replace('#', ''), 16);
+          main_rgb = hex2rgb(hex_color);
+        } else {
+          main_rgb = genColorFromString(this.#input_info.host);
+        }
         for (const container_el of this.#promptContainer_els) {
           Object.assign(container_el.style, {
-            backgroundColor: `rgb(${color_info.rgb[0]},${color_info.rgb[1]},${color_info.rgb[2]})`,
-            color: color_info.gv < 0.5 ? '#000' : '#fff',
+            backgroundColor: `rgb(${main_rgb[0]},${main_rgb[1]},${main_rgb[2]})`,
+            color: getColorGrayValue(main_rgb) < 0.5 ? '#000' : '#fff',
           });
         }
 
-        // eslint-disable-next-line prefer-const
-        let [h, s, v] = rgb2hsv(color_info.rgb[0] / 255.0, color_info.rgb[1] / 255.0, color_info.rgb[2] / 255.0);
-        v -= 0.2;
-        const [r, g, b] = hsv2rgb(h, s, v);
+        const hsl = rgb2hsl(main_rgb);
+        hsl[2] = Math.max(hsl[2] - 0.2, 0.0);
+        const secondary_rgb = hsl2rgb(hsl);
         Object.assign(this.#promptInfoContainer_el.style, {
-          backgroundColor: `rgb(${r * 255},${g * 255},${b * 255})`,
-          color: color_info.gv < 0.5 ? '#000' : '#fff',
+          backgroundColor: `rgb(${secondary_rgb[0]},${secondary_rgb[1]},${secondary_rgb[2]})`,
+          color: getColorGrayValue(secondary_rgb) < 0.5 ? '#000' : '#fff',
         });
       }
     }

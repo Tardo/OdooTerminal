@@ -54,7 +54,8 @@ body {
   padding: 0.3em;
   border: 1px solid #999;
 }
-.optsection .shortcut_btn_zone {
+.optsection .shortcut_btn_zone,
+.optsection .color_domain_btn_zone {
   display: flex;
   gap: 0.2em;
   flex-direction: row;
@@ -65,4 +66,11 @@ body {
 }
 .optsection .shortcut_btn_zone input#shortcut_commands {
   flex-grow: 1;
+}
+
+.optsection .color_domain_btn_zone input#color_domain_domain {
+  flex-grow: 1;
+}
+.optsection .color_domain_btn_zone input#color_domain_color {
+  width: 18%;
 }

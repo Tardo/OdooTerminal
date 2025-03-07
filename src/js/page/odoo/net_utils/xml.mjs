@@ -52,7 +52,6 @@ async function getXMLIds(model: string, ids: $ReadOnlyArray<number>, context: ?{
       xmlIds[id] = id;
     }
   }
-  debugger;
   return xmlIds;
 }
 

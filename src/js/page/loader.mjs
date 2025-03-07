@@ -103,12 +103,12 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
 }
 
 function initTranslations(langpath: string, lang: string) {
-  const lang_s = lang === 'auto' ? navigator.language.replace('-', '_') : lang;
+  const lang_s = lang === 'auto' ? navigator.language : lang;
   return i18n.use(HttpApi).init({
     lng: lang_s,
     fallbackLng: 'en',
     supportedLngs: ['en', 'es'],
-    load: ['currentOnly', 'languageOnly'],
+    load: ['languageOnly'],
     debug: false,
     backend: {
       loadPath: langpath,

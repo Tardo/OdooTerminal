@@ -20,6 +20,9 @@ export const SETTING_TYPES: {
   cmd_assistant_match_mode: SettingType,
   cmd_assistant_max_results: SettingType,
   language: SettingType,
+  fontsize: SettingType,
+  fontsize_ca: SettingType,
+  colors_domain: SettingType,
 } = {
   init_cmds: 'edit',
   term_context: 'json',
@@ -36,6 +39,9 @@ export const SETTING_TYPES: {
   cmd_assistant_match_mode: 'option',
   cmd_assistant_max_results: 'int',
   language: 'option',
+  fontsize: 'option',
+  fontsize_ca: 'option',
+  colors_domain: 'manual',
 };
 
 export const SETTING_NAMES: Array<string> = Array.from(Object.keys(SETTING_TYPES));
@@ -56,6 +62,9 @@ export type ExtensionSettings = {
   cmd_assistant_match_mode: 'includes' | 'startsWith',
   cmd_assistant_max_results: number,
   language: 'auto' | 'en' | 'es',
+  fontsize: 'small' | 'medium' | 'large',
+  fontsize_ca: 'x-small' | 'small' | 'medium' | 'large',
+  colors_domain: {[string]: string},
 };
 
 export const SETTING_DEFAULTS: ExtensionSettings = {
@@ -74,6 +83,9 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   cmd_assistant_match_mode: 'includes',
   cmd_assistant_max_results: 35,
   language: 'auto',
+  fontsize: 'medium',
+  fontsize_ca: 'small',
+  colors_domain: {},
 };
 
 export const IGNORED_KEYS: Array<string> = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];

@@ -22,11 +22,32 @@
   "optionsTitleBehaviourMultiline": {
     "message": "Multi-línea"
   },
-  "optionsTitleBehaviourOpacity": {
-    "message": "Opacidad:"
-  },
   "optionsTitleBehaviourElephant": {
     "message": "Intentar resolver valores desconocidos (principalmente el login de usuario)"
+  },
+  "optionsTitleTheme": {
+    "message": "Tema"
+  },
+  "optionsTitleThemeOpacity": {
+    "message": "Opacidad:"
+  },
+  "optionsTitleThemeFontSize": {
+    "message": "Tamaño de la fuente (General):"
+  },
+  "optionsTitleThemeFontSizeCA": {
+    "message": "Tamaño de la fuente (Asistente de Comando):"
+  },
+  "optionsTitleThemeColorDomainTable": {
+    "message": "Color por dominio:"
+  },
+  "optionsTitleThemeDomain": {
+    "message": "Dominio (sin https o http)"
+  },
+  "optionsTitleThemeColor": {
+    "message": "Color (hexadecimal)"
+  },
+  "optionsTitleThemeAdd": {
+    "message": "Añadir"
   },
   "optionsLanguage": {
     "message": "Idioma"
