@@ -20,7 +20,7 @@ async function cmdJobs(
         `${item.cmdInfo.cmdName} <small><i>${item.cmdInfo.cmdRaw}</i></small> ${
           item.healthy
             ? ''
-            : `<span class="terminal-text-warning">${i18n.t('cmdJobs.result.timeout', 'This job is taking a long time')}</span>`
+            : `<span class="text-warning">${i18n.t('cmdJobs.result.timeout', 'This job is taking a long time')}</span>`
         }`,
     ),
   );

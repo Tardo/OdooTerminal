@@ -37,6 +37,39 @@
   "optionsTitleThemeFontSizeCA": {
     "message": "Tamaño de la fuente (Asistente de Comando):"
   },
+  "optionsTitleThemeFontFamily": {
+    "message": "Tipografía:"
+  },
+  "optionsTitleThemeColorPrimary": {
+    "message": "Color primario:"
+  },
+  "optionsTitleThemeColorSecondary": {
+    "message": "Color secundario:"
+  },
+  "optionsTitleThemeColorSuccess": {
+    "message": "Color para éxito:"
+  },
+  "optionsTitleThemeColorDanger": {
+    "message": "Color para peligro:"
+  },
+  "optionsTitleThemeColorWarning": {
+    "message": "Color para advertencia:"
+  },
+  "optionsTitleThemeColorInfo": {
+    "message": "Color para info.:"
+  },
+  "optionsTitleThemeColorLight": {
+    "message": "Color claro:"
+  },
+  "optionsTitleThemeColorDark": {
+    "message": "Color oscuro:"
+  },
+  "optionsTitleThemeColorMuted": {
+    "message": "Color silenciado:"
+  },
+  "optionsTitleThemeColorWhite": {
+    "message": "Color blanco:"
+  },
   "optionsTitleThemeColorDomainTable": {
     "message": "Color por dominio:"
   },

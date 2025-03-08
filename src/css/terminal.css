@@ -2,34 +2,28 @@
 /* License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). */
 :root {
   --terminal-input-height: 25px;
-  --terminal-shadow-input-color: #4a4a4a;
   --terminal-screen-width: 70%;
   --terminal-screen-width-maximized: 100%;
-  --terminal-screen-background-color: black;
-  --terminal-screen-assistant-args-background-color: lightgray;
-  --terminal-screen-assistant-desc-background-color: #c1c1c1;
-  --terminal-screen-text-color: lightgray;
   --terminal-screen-font: 'Lucida Console', Monaco, monospace;
-  --terminal-screen-extra-info-color: darkkhaki;
   --terminal-screen-height: 40vh;
   --terminal-screen-height-maximized: 100vh;
-  --terminal-title-color: rgb(124, 123, 173);
   --terminal-font-size: medium;
   --terminal-font-size-ca: small;
   --terminal-color-primary: #007bff;
-  --terminal-color-secondary: #6c757d;
+  --terminal-color-secondary: #677886;
   --terminal-color-success: #28a745;
   --terminal-color-danger: #dc3545;
   --terminal-color-warning: #ffc107;
   --terminal-color-info: #17a2b8;
+  --terminal-color-light: #f8f9fa;
   --terminal-color-dark: #343a40;
   --terminal-color-muted: #6c757d;
   --terminal-color-white: #fff;
 }
 
 .o_terminal {
-  box-shadow: 1px 1px 10px #cecece;
-  border: 0 solid gray;
+  box-shadow: 1px 1px 10px var(--terminal-color-secondary);
+  border: 0 solid var(--terminal-color-muted);
   border-width: 1px 1px 0 1px;
   font-family: var(--terminal-screen-font);
   left: 50%;
@@ -54,15 +48,15 @@
 }
 
 .o_terminal div#terminal_screen {
-  background-color: var(--terminal-screen-background-color);
-  caret-color: var(--terminal-screen-text-color);
-  color: var(--terminal-screen-text-color);
+  background-color: var(--terminal-color-dark);
+  caret-color: var(--terminal-color-white);
+  color: var(--terminal-color-light);
   height: 100%;
   opacity: 0.93;
   overflow-y: scroll;
   padding: 0;
   resize: none;
-  scrollbar-color: var(--terminal-screen-text-color) var(--terminal-screen-background-color);
+  scrollbar-color: var(--terminal-color-white) var(--terminal-color-dark);
   white-space: pre;
 }
 .o_terminal div#terminal_screen::-webkit-scrollbar {
@@ -73,15 +67,15 @@
   background: transparent;
 }
 .o_terminal div#terminal_screen::-webkit-scrollbar-thumb {
-  background-color: var(--terminal-screen-text-color);
+  background-color: var(--terminal-color-white);
 }
 
 .o_terminal div#terminal_screen hr {
-  border-color: gray;
+  border-color: var(--terminal-color-muted);
 }
 
 .o_terminal div#terminal_screen .o_terminal_title {
-  color: var(--terminal-title-color);
+  color: var(--terminal-color-primary);
 }
 
 .o_terminal div#terminal_screen .o_terminal_click {
@@ -92,12 +86,12 @@
 }
 
 .o_terminal div#terminal_screen .o_internal_cmd {
-  color: #00b6ff;
+  color: var(--terminal-color-info);
 }
 
 .o_terminal div#terminal_screen .error_message {
-  background-color: darkred;
-  border: 1px solid red;
+  background-color: var(--terminal-color-danger);
+  border: 1px solid var(--terminal-color-warning);
   padding: 0.3em;
   border-radius: 3px;
   margin: 0.3em;
@@ -124,7 +118,7 @@
   white-space: pre;
 }
 .o_terminal div#terminal_screen .error_message h4 {
-  color: var(--terminal-screen-text-color);
+  color: var(--terminal-color-light);
   margin: 0;
 }
 
@@ -160,11 +154,13 @@
 }
 
 .o_terminal div#terminal_assistant > .row > div#terminal_assistant_args {
-  background-color: var(--terminal-screen-assistant-args-background-color);
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-secondary);
 }
 
 .o_terminal div#terminal_assistant > .row > div#terminal_assistant_desc {
-  background-color: var(--terminal-screen-assistant-desc-background-color);
+  color: var(--terminal-color-white);
+  background-color: var(--terminal-color-muted);
 }
 
 .o_terminal div#terminal_assistant > span#terminal_assistant_args_info {
@@ -172,14 +168,14 @@
   bottom: 0;
   right: 10px;
   border-radius: 2px 2px 0 0;
-  background-color: #878787;
+  background-color: var(--terminal-color-muted);
 }
 
 .o_terminal .terminal-user-input {
-  background-color: var(--terminal-screen-background-color);
-  border: 1px dotted #5a5a5a;
+  background-color: var(--terminal-color-dark);
+  border: 1px dotted var(--terminal-color-dark);
   border-width: 1px 0 0 0;
-  color: var(--terminal-screen-text-color);
+  color: var(--terminal-color-light);
   display: flex;
 }
 
@@ -190,7 +186,7 @@
 }
 .o_terminal .terminal-user-input > .terminal-prompt-container.terminal-prompt-interactive {
   max-width: 50%;
-  background-color: rgb(37 93 193) !important;
+  background-color: var(--terminal-color-primary) !important;
 }
 .o_terminal .terminal-user-input > .terminal-prompt-container > .terminal-prompt {
   overflow: hidden;
@@ -211,11 +207,11 @@
   background-color: transparent;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input.highlight {
-  background-color: white;
-  color: black;
+  background-color: var(--terminal-color-white);
+  color: var(--terminal-color-dark);
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_shadow_input {
-  color: var(--terminal-shadow-input-color);
+  color: var(--terminal-color-muted);
   pointer-events: none;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input,
@@ -237,17 +233,17 @@
 }
 
 .o_terminal .terminal-user-input input {
-  background-color: var(--terminal-screen-background-color);
+  background-color: var(--terminal-color-dark);
   border: 0;
-  caret-color: var(--terminal-screen-text-color);
-  color: var(--terminal-screen-text-color);
+  caret-color: var(--terminal-color-white);
+  color: var(--terminal-color-light);
   height: var(--terminal-input-height);
 }
 .o_terminal .terminal-user-input textarea {
-  background-color: var(--terminal-screen-background-color);
+  background-color: var(--terminal-color-dark);
   border: 0;
-  caret-color: var(--terminal-screen-text-color);
-  color: var(--terminal-screen-text-color);
+  caret-color: var(--terminal-color-white);
+  color: var(--terminal-color-light);
 }
 
 .o_terminal .terminal-user-input input[type='edit'] {
@@ -260,16 +256,16 @@
 
 .o_terminal #terminal_input_multi_info {
   position: absolute;
-  top: 50px;
+  top: 60px;
   right: 1em;
 }
 
 .o_terminal .print-table thead th {
-  border: 1px solid white;
+  border: 1px solid var(--terminal-color-white);
   border-width: 0 1px 1px 0;
 }
 .o_terminal .print-table tbody td {
-  border: 1px solid white;
+  border: 1px solid var(--terminal-color-white);
   border-width: 1px 1px 0 0;
 }
 .o_terminal .print-table thead th,
@@ -277,8 +273,8 @@
   padding: 0.3em;
 }
 .o_terminal .print-table tbody tr:hover {
-  background-color: lightgray;
-  color: black;
+  background-color: var(--terminal-color-light);
+  color: var(--terminal-color-dark);
 }
 
 .o_terminal .print-table thead th:last-child,
@@ -294,15 +290,15 @@
   z-index: 10;
 }
 .o_terminal .terminal-screen-info-zone .terminal-screen-running-cmds {
-  color: var(--terminal-screen-extra-info-color);
+  color: var(--terminal-color-infor);
 }
 
 /** GRAPHICS CANVAS **/
 .terminal-graphics-window {
   position: absolute;
   z-index: 2000;
-  background-color: black;
-  border: 2px solid gray;
+  background-color: var(--terminal-color-dark);
+  border: 2px solid var(--terminal-color-secondary);
 }
 
 /** COMMAND ASSISTANT **/
@@ -323,186 +319,256 @@
 }
 
 /* BASE COLORS */
-.terminal-text-primary {
+.o_terminal .text-primary {
   color: var(--terminal-color-primary) !important;
 }
-.terminal-text-secondary {
+.o_terminal .text-primary.active {
+  color: color-mix(in srgb, var(--terminal-color-primary), white 20%) !important;
+}
+.o_terminal .nav.text-primary {
+  --nav-link-color: var(--terminal-color-primary);
+}
+.o_terminal .text-secondary {
   color: var(--terminal-color-secondary) !important;
 }
-.terminal-text-success {
+.o_terminal .text-secondary.active {
+  color: color-mix(in srgb, var(--terminal-color-secondary), white 20%) !important;
+}
+.o_terminal .nav.text-secondary {
+  --nav-link-color: var(--terminal-color-secondary);
+}
+.o_terminal .text-success {
   color: var(--terminal-color-success) !important;
 }
-.terminal-text-danger {
+.o_terminal .text-success.active {
+  color: color-mix(in srgb, var(--terminal-color-success), white 20%) !important;
+}
+.o_terminal .nav.text-success {
+  --nav-link-color: var(--terminal-color-success);
+}
+.o_terminal .text-danger {
   color: var(--terminal-color-danger) !important;
 }
-.terminal-text-warning {
+.o_terminal .text-danger.active {
+  color: color-mix(in srgb, var(--terminal-color-danger), white 20%) !important;
+}
+.o_terminal .nav.text-danger {
+  --nav-link-color: var(--terminal-color-danger);
+}
+.o_terminal .text-warning {
   color: var(--terminal-color-warning) !important;
 }
-.terminal-text-info {
+.o_terminal .text-warning.active {
+  color: color-mix(in srgb, var(--terminal-color-warning), white 20%) !important;
+}
+.o_terminal .nav.text-warning {
+  --nav-link-color: var(--terminal-color-warning);
+}
+.o_terminal .text-info {
   color: var(--terminal-color-info) !important;
 }
-.terminal-text-dark {
+.o_terminal .text-info.active {
+  color: color-mix(in srgb, var(--terminal-color-info), white 20%) !important;
+}
+.o_terminal .nav.text-info {
+  --nav-link-color: var(--terminal-color-info);
+}
+.o_terminal .text-light {
+  color: var(--terminal-color-light) !important;
+}
+.o_terminal .text-light.active {
+  color: color-mix(in srgb, var(--terminal-color-light), white 20%) !important;
+}
+.o_terminal .nav.text-light {
+  --nav-link-color: var(--terminal-color-light);
+}
+.o_terminal .text-dark {
   color: var(--terminal-color-dark) !important;
 }
-.terminal-text-muted {
+.o_terminal .text-dark.active {
+  color: color-mix(in srgb, var(--terminal-color-dark), white 20%) !important;
+}
+.o_terminal .nav.text-dark {
+  --nav-link-color: var(--terminal-color-dark);
+}
+.o_terminal .text-muted {
   color: var(--terminal-color-muted) !important;
 }
-.terminal-text-white {
+.o_terminal .text-muted.active {
+  color: color-mix(in srgb, var(--terminal-color-muted), white 20%) !important;
+}
+.o_terminal .nav.text-muted {
+  --nav-link-color: var(--terminal-color-muted);
+}
+.o_terminal .text-white {
   color: var(--terminal-color-white) !important;
 }
+.o_terminal .text-white.active {
+  color: color-mix(in srgb, var(--terminal-color-white), white 20%) !important;
+}
+.o_terminal .nav.text-white {
+  --nav-link-color: var(--terminal-color-white);
+}
 
-.terminal-bg-primary {
+.o_terminal .bg-primary {
   background-color: var(--terminal-color-primary) !important;
 }
-.terminal-bg-secondary {
+.o_terminal .bg-secondary {
   background-color: var(--terminal-color-secondary) !important;
 }
-.terminal-bg-success {
+.o_terminal .bg-success {
   background-color: var(--terminal-color-success) !important;
 }
-.terminal-bg-danger {
+.o_terminal .bg-danger {
   background-color: var(--terminal-color-danger) !important;
 }
-.terminal-bg-warning {
+.o_terminal .bg-warning {
   background-color: var(--terminal-color-warning) !important;
 }
-.terminal-bg-info {
+.o_terminal .bg-info {
   background-color: var(--terminal-color-info) !important;
 }
-.terminal-bg-dark {
+.o_terminal .bg-light {
+  background-color: var(--terminal-color-light) !important;
+}
+.o_terminal .bg-dark {
   background-color: var(--terminal-color-dark) !important;
 }
-.terminal-bg-muted {
+.o_terminal .bg-muted {
   background-color: var(--terminal-color-muted) !important;
 }
-.terminal-bg-white {
+.o_terminal .bg-white {
   background-color: var(--terminal-color-white) !important;
 }
 
-.terminal-border-primary {
+.o_terminal .border-primary {
   border-color: var(--terminal-color-primary) !important;
 }
-.terminal-border-secondary {
+.o_terminal .border-secondary {
   border-color: var(--terminal-color-secondary) !important;
 }
-.terminal-border-success {
+.o_terminal .border-success {
   border-color: var(--terminal-color-success) !important;
 }
-.terminal-border-danger {
+.o_terminal .border-danger {
   border-color: var(--terminal-color-danger) !important;
 }
-.terminal-border-warning {
+.o_terminal .border-warning {
   border-color: var(--terminal-color-warning) !important;
 }
-.terminal-border-info {
+.o_terminal .border-info {
   border-color: var(--terminal-color-info) !important;
 }
-.terminal-border-dark {
+.o_terminal .border-light {
+  border-color: var(--terminal-color-light) !important;
+}
+.o_terminal .border-dark {
   border-color: var(--terminal-color-dark) !important;
 }
-.terminal-border-muted {
+.o_terminal .border-muted {
   border-color: var(--terminal-color-muted) !important;
 }
-.terminal-border-white {
+.o_terminal .border-white {
   border-color: var(--terminal-color-white) !important;
 }
 
-.terminal-btn-primary {
+.o_terminal .btn-primary {
   color: var(--terminal-color-white);
   background-color: var(--terminal-color-primary);
   border-color: var(--terminal-color-primary);
 }
-.terminal-btn-primary:hover {
+.o_terminal .btn-primary:hover {
   color: var(--terminal-color-white);
-  background-color: var(--terminal-color-primary);
+  background-color: color-mix(in srgb, var(--terminal-color-primary), black 20%);
   border-color: var(--terminal-color-primary);
-  filter: brightness(80%);
 }
-.terminal-btn-secondary {
+.o_terminal .btn-secondary {
   color: var(--terminal-color-white);
   background-color: var(--terminal-color-secondary);
   border-color: var(--terminal-color-secondary);
 }
-.terminal-btn-secondary:hover {
+.o_terminal .btn-secondary:hover {
   color: var(--terminal-color-white);
-  background-color: var(--terminal-color-secondary);
+  background-color: color-mix(in srgb, var(--terminal-color-secondary), black 20%);
   border-color: var(--terminal-color-secondary);
-  filter: brightness(80%);
 }
-.terminal-btn-success {
+.o_terminal .btn-success {
   color: var(--terminal-color-white);
   background-color: var(--terminal-color-success);
   border-color: var(--terminal-color-success);
 }
-.terminal-btn-success:hover {
+.o_terminal .btn-success:hover {
   color: var(--terminal-color-white);
-  background-color: var(--terminal-color-success);
+  background-color: color-mix(in srgb, var(--terminal-color-success), black 20%);
   border-color: var(--terminal-color-success);
-  filter: brightness(80%);
 }
-.terminal-btn-danger {
+.o_terminal .btn-danger {
   color: var(--terminal-color-white);
   background-color: var(--terminal-color-danger);
   border-color: var(--terminal-color-danger);
 }
-.terminal-btn-danger:hover {
+.o_terminal .btn-danger:hover {
   color: var(--terminal-color-white);
-  background-color: var(--terminal-color-danger);
+  background-color: color-mix(in srgb, var(--terminal-color-danger), black 20%);
   border-color: var(--terminal-color-danger);
-  filter: brightness(80%);
 }
-.terminal-btn-warning {
+.o_terminal .btn-warning {
   color: var(--terminal-color-white);
   background-color: var(--terminal-color-warning);
   border-color: var(--terminal-color-warning);
 }
-.terminal-btn-warning:hover {
+.o_terminal .btn-warning:hover {
   color: var(--terminal-color-white);
-  background-color: var(--terminal-color-warning);
+  background-color: color-mix(in srgb, var(--terminal-color-warning), black 20%);
   border-color: var(--terminal-color-warning);
-  filter: brightness(80%);
 }
-.terminal-btn-info {
+.o_terminal .btn-info {
   color: var(--terminal-color-white);
   background-color: var(--terminal-color-info);
   border-color: var(--terminal-color-info);
 }
-.terminal-btn-info:hover {
+.o_terminal .btn-info:hover {
   color: var(--terminal-color-white);
-  background-color: var(--terminal-color-info);
+  background-color: color-mix(in srgb, var(--terminal-color-info), black 20%);
   border-color: var(--terminal-color-info);
-  filter: brightness(80%);
 }
-.terminal-btn-dark {
+.o_terminal .btn-light {
+  color: var(--terminal-color-dark);
+  background-color: var(--terminal-color-light);
+  border-color: var(--terminal-color-light);
+}
+.o_terminal .btn-light:hover {
+  color: var(--terminal-color-dark);
+  background-color: color-mix(in srgb, var(--terminal-color-light), black 20%);
+  border-color: var(--terminal-color-light);
+}
+.o_terminal .btn-dark {
   color: var(--terminal-color-white);
   background-color: var(--terminal-color-dark);
   border-color: var(--terminal-color-dark);
 }
-.terminal-btn-dark:hover {
+.o_terminal .btn-dark:hover {
   color: var(--terminal-color-white);
-  background-color: var(--terminal-color-dark);
+  background-color: color-mix(in srgb, var(--terminal-color-dark), black 20%);
   border-color: var(--terminal-color-dark);
-  filter: brightness(80%);
 }
-.terminal-btn-muted {
+.o_terminal .btn-muted {
   color: var(--terminal-color-white);
   background-color: var(--terminal-color-muted);
   border-color: var(--terminal-color-muted);
 }
-.terminal-btn-muted:hover {
+.o_terminal .btn-muted:hover {
   color: var(--terminal-color-white);
-  background-color: var(--terminal-color-muted);
+  background-color: color-mix(in srgb, var(--terminal-color-muted), black 20%);
   border-color: var(--terminal-color-muted);
-  filter: brightness(80%);
 }
-.terminal-btn-white {
+.o_terminal .btn-white {
   color: var(--terminal-color-dark);
   background-color: var(--terminal-color-white);
   border-color: var(--terminal-color-white);
 }
-.terminal-btn-white:hover {
+.o_terminal .btn-white:hover {
   color: var(--terminal-color-dark);
-  background-color: var(--terminal-color-white);
+  background-color: color-mix(in srgb, var(--terminal-color-white), black 20%);
   border-color: var(--terminal-color-white);
-  filter: brightness(80%);
 }

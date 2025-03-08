@@ -14,11 +14,11 @@ export default function (
   xmlid: string,
 ): string {
   return (
-    `<span style='color: gray;'>${i18n.t('odoo.templates.metadata.createUID', 'Create UID')}</span>: ${create_uid}<br>` +
-    `<span style='color: gray;'>${i18n.t('odoo.templates.metadata.createDate', 'Create Date')}</span>: ${create_date}<br>` +
-    `<span style='color: gray;'>${i18n.t('odoo.templates.metadata.writeUID', 'Write UID')}</span>: ${write_uid}<br>` +
-    `<span style='color: gray;'>${i18n.t('odoo.templates.metadata.writeDate', 'Write Date')}</span>: ${write_date}<br>` +
-    `<span style='color: gray;'>${i18n.t('odoo.templates.metadata.noUpdate', 'No Update')}</span>: ${noupdate ? i18n.t('Yes', 'Yes') : i18n.t('No', 'No')}<br>` +
-    `<span style='color: gray;'>${i18n.t('odoo.templates.metadata.xmlID', 'XML-ID')}</span>: ${xmlid}`
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.createUID', 'Create UID')}</span>: ${create_uid}<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.createDate', 'Create Date')}</span>: ${create_date}<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.writeUID', 'Write UID')}</span>: ${write_uid}<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.writeDate', 'Write Date')}</span>: ${write_date}<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.noUpdate', 'No Update')}</span>: ${noupdate ? i18n.t('Yes', 'Yes') : i18n.t('No', 'No')}<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.xmlID', 'XML-ID')}</span>: ${xmlid}`
   );
 }

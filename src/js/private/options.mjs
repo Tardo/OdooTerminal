@@ -114,7 +114,7 @@ function saveOptions() {
     }
     const target = document.getElementById(name);
     if (target instanceof HTMLInputElement) {
-      if (type === 'edit' || type === 'int' || type === 'option') {
+      if (type === 'edit' || type === 'int' || type === 'option' || type === 'color') {
         data[name] = target.value;
       } else if (type === 'check') {
         data[name] = target.checked;
@@ -163,7 +163,7 @@ function applyInputValues() {
       const elm = document.getElementById(name);
       if (elm) {
         if (elm instanceof HTMLInputElement) {
-          if (type === 'edit') {
+          if (type === 'edit' || type === 'color') {
             elm.value = result[name] || '';
           } else if (type === 'check') {
             elm.checked = result[name] || false;
@@ -290,6 +290,17 @@ function i18n() {
   _apply_i18n("label[for='opacity']", 'optionsTitleThemeOpacity');
   _apply_i18n("label[for='fontsize']", 'optionsTitleThemeFontSize');
   _apply_i18n("label[for='fontsize_ca']", 'optionsTitleThemeFontSizeCA');
+  _apply_i18n("label[for='fontfamily']", 'optionsTitleThemeFontFamily');
+  _apply_i18n("label[for='color_primary']", 'optionsTitleThemeColorPrimary');
+  _apply_i18n("label[for='color_secondary']", 'optionsTitleThemeColorSecondary');
+  _apply_i18n("label[for='color_success']", 'optionsTitleThemeColorSuccess');
+  _apply_i18n("label[for='color_danger']", 'optionsTitleThemeColorDanger');
+  _apply_i18n("label[for='color_warning']", 'optionsTitleThemeColorWarning');
+  _apply_i18n("label[for='color_info']", 'optionsTitleThemeColorInfo');
+  _apply_i18n("label[for='color_light']", 'optionsTitleThemeColorLight');
+  _apply_i18n("label[for='color_dark']", 'optionsTitleThemeColorDark');
+  _apply_i18n("label[for='color_muted']", 'optionsTitleThemeColorMuted');
+  _apply_i18n("label[for='color_white']", 'optionsTitleThemeColorWhite');
   _apply_i18n("label[for='color_domain_table']", 'optionsTitleThemeColorDomainTable');
   _apply_i18n('#column_color_domain_domain', 'optionsTitleThemeDomain');
   _apply_i18n('#column_color_domain_color', 'optionsTitleThemeColor');

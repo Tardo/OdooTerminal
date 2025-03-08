@@ -18,7 +18,7 @@ async function cmdAlias(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbac
     } else {
       for (const alias_name in aliases) {
         // $FlowFixMe
-        ctx.screen.print(` - ${alias_name}  <small class="terminal-text-muted"><i>${aliases[alias_name]}</i></small>`);
+        ctx.screen.print(` - ${alias_name}  <small class="text-muted"><i>${aliases[alias_name]}</i></small>`);
       }
     }
     return aliases;

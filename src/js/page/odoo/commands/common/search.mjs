@@ -31,7 +31,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
       ctx.screen.printError(
         i18n.t(
           'cmdSearch.error.resultTruncated',
-          "<strong class='terminal-text-warning'>Result truncated to {{len}} records!</strong> The query is too big to be displayed entirely.",
+          "<strong class='text-warning'>Result truncated to {{len}} records!</strong> The query is too big to be displayed entirely.",
           {
             len: sresult.length,
           },
@@ -104,7 +104,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     ctx.screen.printError(
       i18n.t(
         'cmdSearch.error.resultTruncated',
-        "<strong class='terminal-text-warning'>Result truncated to {{len}} records!</strong> The query is too big to be displayed entirely.",
+        "<strong class='text-warning'>Result truncated to {{len}} records!</strong> The query is too big to be displayed entirely.",
         {
           len: sresult.length,
         },

@@ -133,23 +133,23 @@ export default class Terminal {
       this.doShow();
       const elm = this.el.querySelector('.terminal-screen-icon-pin');
       if (elm) {
-        elm.classList.remove('terminal-btn-dark');
-        elm.classList.add('terminal-btn-light');
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
       }
     }
     if (this.#config.maximized) {
       this.el.classList.add('term-maximized');
       const elm = this.el.querySelector('.terminal-screen-icon-maximize');
       if (elm) {
-        elm.classList.remove('terminal-btn-dark');
-        elm.classList.add('terminal-btn-light');
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
       }
     }
     if (this.#config.multiline) {
       const elm = this.el.querySelector('.terminal-multiline');
       if (elm) {
-        elm.classList.remove('terminal-btn-dark');
-        elm.classList.add('terminal-btn-light');
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
       }
     }
 
@@ -208,6 +208,17 @@ export default class Terminal {
   #applyTheme() {
     document.documentElement?.style.setProperty('--terminal-font-size', this.#config.fontsize);
     document.documentElement?.style.setProperty('--terminal-font-size-ca', this.#config.fontsize_ca);
+    document.documentElement?.style.setProperty('--terminal-screen-font', this.#config.fontfamily);
+    document.documentElement?.style.setProperty('--terminal-color-primary', this.#config.color_primary);
+    document.documentElement?.style.setProperty('--terminal-color-secondary', this.#config.color_secondary);
+    document.documentElement?.style.setProperty('--terminal-color-success', this.#config.color_success);
+    document.documentElement?.style.setProperty('--terminal-color-danger', this.#config.color_danger);
+    document.documentElement?.style.setProperty('--terminal-color-warning', this.#config.color_warning);
+    document.documentElement?.style.setProperty('--terminal-color-info', this.#config.color_info);
+    document.documentElement?.style.setProperty('--terminal-color-light', this.#config.color_light);
+    document.documentElement?.style.setProperty('--terminal-color-dark', this.#config.color_dark);
+    document.documentElement?.style.setProperty('--terminal-color-muted', this.#config.color_muted);
+    document.documentElement?.style.setProperty('--terminal-color-white', this.#config.color_white);
   }
 
   async start(): Promise<> {
@@ -561,12 +572,12 @@ export default class Terminal {
       const target = ev.currentTarget;
       if (this.#config.maximized) {
         this.el.classList.add('term-maximized');
-        target.classList.remove('terminal-btn-dark');
-        target.classList.add('terminal-btn-light');
+        target.classList.remove('btn-dark');
+        target.classList.add('btn-light');
       } else {
         this.el.classList.remove('term-maximized');
-        target.classList.remove('terminal-btn-light')
-        target.classList.add('terminal-btn-dark');
+        target.classList.remove('btn-light')
+        target.classList.add('btn-dark');
       }
     }
     setStorageSessionItem('screen_maximized', this.#config.maximized, err => this.screen.print(err));
@@ -579,11 +590,11 @@ export default class Terminal {
     if (ev.currentTarget instanceof HTMLElement) {
       const target = ev.currentTarget;
       if (this.#config.pinned) {
-        target.classList.remove('terminal-btn-dark');
-        target.classList.add('terminal-btn-light');
+        target.classList.remove('btn-dark');
+        target.classList.add('btn-light');
       } else {
-        target.classList.remove('terminal-btn-light')
-        target.classList.add('terminal-btn-dark');
+        target.classList.remove('btn-light')
+        target.classList.add('btn-dark');
       }
     }
     setStorageSessionItem('terminal_pinned', this.#config.pinned, err => this.screen.print(err));
@@ -599,12 +610,12 @@ export default class Terminal {
     if (ev.currentTarget instanceof HTMLElement) {
       const target = ev.currentTarget;
       if (this.#config.multiline) {
-        target.classList.remove('terminal-btn-dark');
-        target.classList.add('terminal-btn-light');
+        target.classList.remove('btn-dark');
+        target.classList.add('btn-light');
         this.screen.setInputMode('multi');
       } else {
-        target.classList.remove('terminal-btn-light')
-        target.classList.add('terminal-btn-dark');
+        target.classList.remove('btn-light')
+        target.classList.add('btn-dark');
         this.screen.setInputMode('single');
       }
     }

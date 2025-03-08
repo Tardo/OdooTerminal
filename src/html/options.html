@@ -51,10 +51,103 @@
           <option value="medium">Medium</option>
           <option value="large">Large</option>
         </select>
-
         <br />
+        <label for="fontfamily">Font Family:</label>
+        <input type="edit" id="fontfamily" name="fontfamily" style="width: 40%" /><br />
+
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <label for="color_primary">Color Primary:</label>
+              </td>
+              <td>
+                <input type="color" id="color_primary" name="color_primary" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_secondary">Color Secondary:</label>
+              </td>
+              <td>
+                <input type="color" id="color_secondary" name="color_secondary" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_success">Color Success:</label>
+              </td>
+              <td>
+                <input type="color" id="color_success" name="color_success" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_danger">Color Danger:</label>
+              </td>
+              <td>
+                <input type="color" id="color_danger" name="color_danger" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_warning">Color Warning:</label>
+              </td>
+              <td>
+                <input type="color" id="color_warning" name="color_warning" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_info">Color Info:</label>
+              </td>
+              <td>
+                <input type="color" id="color_info" name="color_info" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_light">Color Light:</label>
+              </td>
+              <td>
+                <input type="color" id="color_light" name="color_light" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_dark">Color Dark:</label>
+              </td>
+              <td>
+                <input type="color" id="color_dark" name="color_dark" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_muted">Color Muted:</label>
+              </td>
+              <td>
+                <input type="color" id="color_muted" name="color_muted" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="color_white">Color White:</label>
+              </td>
+              <td>
+                <input type="color" id="color_white" name="color_white" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <label for="color_domain_table">Color per domain:</label>
-        <table id="color_domain_table">
+        <table class="fullwidth" id="color_domain_table">
           <thead>
             <tr>
               <th style="width: 80%" id="column_color_domain_domain">Domain (without https or http)</th>
@@ -74,7 +167,7 @@
       <div class="optsection">
         <h4 id="title_shortcuts">Shortcuts</h4>
         <p></p>
-        <table id="shorcut_table">
+        <table class="fullwidth" id="shorcut_table">
           <thead>
             <tr>
               <th style="width: 13%" id="column_shortcuts_keybin">Keybind</th>

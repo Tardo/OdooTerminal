@@ -34,23 +34,23 @@ body {
   white-space: pre;
   width: 100%;
 }
-.optsection table {
+.optsection table.fullwidth {
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #999;
 }
-.optsection table tr:nth-child(odd) {
+.optsection table.fullwidth tr:nth-child(odd) {
   background-color: rgb(209, 209, 209);
 }
-.optsection table > thead > tr > th {
+.optsection table.fullwidth > thead > tr > th {
   padding: 0.3em;
   text-align: left;
   border: 1px solid #999;
 }
-.optsection table > tbody > tr:hover {
+.optsection table.fullwidth > tbody > tr:hover {
   background-color: rgb(193, 211, 199);
 }
-.optsection table > tbody > tr > td {
+.optsection table.fullwidth > tbody > tr > td {
   padding: 0.3em;
   border: 1px solid #999;
 }

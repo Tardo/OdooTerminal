@@ -45,6 +45,39 @@
   "optionsTitleThemeFontSizeCA": {
     "message": "Font size (Command Assistant):"
   },
+  "optionsTitleThemeFontFamily": {
+    "message": "Font Family:"
+  },
+  "optionsTitleThemeColorPrimary": {
+    "message": "Color Primary:"
+  },
+  "optionsTitleThemeColorSecondary": {
+    "message": "Color Secondary:"
+  },
+  "optionsTitleThemeColorSuccess": {
+    "message": "Color Success:"
+  },
+  "optionsTitleThemeColorDanger": {
+    "message": "Color Danger:"
+  },
+  "optionsTitleThemeColorWarning": {
+    "message": "Color Warning:"
+  },
+  "optionsTitleThemeColorInfo": {
+    "message": "Color Info:"
+  },
+  "optionsTitleThemeColorLight": {
+    "message": "Color Light:"
+  },
+  "optionsTitleThemeColorDark": {
+    "message": "Color Dark:"
+  },
+  "optionsTitleThemeColorMuted": {
+    "message": "Color Muted:"
+  },
+  "optionsTitleThemeColorWhite": {
+    "message": "Color White:"
+  },
   "optionsLanguage": {
     "message": "Language"
   },

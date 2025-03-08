@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-type SettingType = 'edit' | 'json' | 'check' | 'manual' | 'option' | 'int';
+type SettingType = 'edit' | 'json' | 'check' | 'manual' | 'option' | 'int' | 'color';
 
 export const SETTING_TYPES: {
   init_cmds: SettingType,
@@ -22,6 +22,17 @@ export const SETTING_TYPES: {
   language: SettingType,
   fontsize: SettingType,
   fontsize_ca: SettingType,
+  fontfamily: SettingType,
+  color_primary: SettingType,
+  color_secondary: SettingType,
+  color_success: SettingType,
+  color_danger: SettingType,
+  color_warning: SettingType,
+  color_info: SettingType,
+  color_light: SettingType,
+  color_dark: SettingType,
+  color_muted: SettingType,
+  color_white: SettingType,
   colors_domain: SettingType,
 } = {
   init_cmds: 'edit',
@@ -41,6 +52,17 @@ export const SETTING_TYPES: {
   language: 'option',
   fontsize: 'option',
   fontsize_ca: 'option',
+  fontfamily: 'edit',
+  color_primary: 'color',
+  color_secondary: 'color',
+  color_success: 'color',
+  color_danger: 'color',
+  color_warning: 'color',
+  color_info: 'color',
+  color_light: 'color',
+  color_dark: 'color',
+  color_muted: 'color',
+  color_white: 'color',
   colors_domain: 'manual',
 };
 
@@ -64,6 +86,17 @@ export type ExtensionSettings = {
   language: 'auto' | 'en' | 'es',
   fontsize: 'small' | 'medium' | 'large',
   fontsize_ca: 'x-small' | 'small' | 'medium' | 'large',
+  fontfamily: string,
+  color_primary: string,
+  color_secondary: string,
+  color_success: string,
+  color_danger: string,
+  color_warning: string,
+  color_info: string,
+  color_light: string,
+  color_dark: string,
+  color_muted: string,
+  color_white: string,
   colors_domain: {[string]: string},
 };
 
@@ -85,6 +118,17 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   language: 'auto',
   fontsize: 'medium',
   fontsize_ca: 'small',
+  fontfamily: "'Lucida Console', Monaco, monospace",
+  color_primary: '#007bff',
+  color_secondary: '#677886',
+  color_success: '#28a745',
+  color_danger: '#dc3545',
+  color_warning: '#ffc107',
+  color_info: '#17a2b8',
+  color_light: '#f8f9fa',
+  color_dark: '#343a40',
+  color_muted: '#6c757d',
+  color_white: '#ffffff',
   colors_domain: {},
 };
 
