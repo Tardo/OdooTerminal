@@ -119,7 +119,7 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   fontsize: 'medium',
   fontsize_ca: 'small',
   fontfamily: "'Lucida Console', Monaco, monospace",
-  color_primary: '#007bff',
+  color_primary: '#3093fd',
   color_secondary: '#677886',
   color_success: '#28a745',
   color_danger: '#dc3545',

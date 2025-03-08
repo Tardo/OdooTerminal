@@ -2,7 +2,7 @@
   "opacity": 93,
   "fontsize": "medium",
   "fontsize_ca": "small",
-  "fontfamily": "'Lucida Console', Monaco, monospace",
+  "fontfamily": "'Courier New', monospace",
   "color_primary": "#80ff00",
   "color_secondary": "#101910",
   "color_success": "#ebffef",

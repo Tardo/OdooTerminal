@@ -2,7 +2,7 @@
   "opacity": 93,
   "fontsize": "medium",
   "fontsize_ca": "small",
-  "fontfamily": "'Lucida Console', Monaco, monospace",
+  "fontfamily": "'Inter', monospace",
   "color_primary": "#714B67",
   "color_secondary": "#017E84",
   "color_success": "#21B799",
@@ -10,7 +10,7 @@
   "color_warning": "#E4A900",
   "color_info": "#5B899E",
   "color_light": "#f8f9fa",
-  "color_dark": "#343a40",
+  "color_dark": "#191a1a",
   "color_muted": "#8F8F8F",
   "color_white": "#ffffff"
 }
