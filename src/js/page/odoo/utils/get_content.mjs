@@ -55,7 +55,7 @@ export default async function (data_opts: {[string]: mixed}, onerror: GetContent
     const mime = response.headers.get("content-type") || 'text/plain';
     // $FlowFixMe
     return save2file(filename || 'unnamed', mime, await response.bytes());
-  } catch (_err) {
-    onerror(_err);
+  } catch (err) {
+    onerror(err);
   }
 }
