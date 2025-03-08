@@ -319,6 +319,9 @@
 }
 
 /* BASE COLORS */
+.o_terminal .nav-link {
+  color: inherit;
+}
 .o_terminal .text-primary {
   color: var(--terminal-color-primary) !important;
 }
@@ -326,7 +329,7 @@
   color: color-mix(in srgb, var(--terminal-color-primary), white 20%) !important;
 }
 .o_terminal .nav.text-primary {
-  --nav-link-color: var(--terminal-color-primary);
+  --nav-link-color: var(--terminal-color-primary) !important;
 }
 .o_terminal .text-secondary {
   color: var(--terminal-color-secondary) !important;
@@ -335,7 +338,7 @@
   color: color-mix(in srgb, var(--terminal-color-secondary), white 20%) !important;
 }
 .o_terminal .nav.text-secondary {
-  --nav-link-color: var(--terminal-color-secondary);
+  --nav-link-color: var(--terminal-color-secondary) !important;
 }
 .o_terminal .text-success {
   color: var(--terminal-color-success) !important;
@@ -344,7 +347,7 @@
   color: color-mix(in srgb, var(--terminal-color-success), white 20%) !important;
 }
 .o_terminal .nav.text-success {
-  --nav-link-color: var(--terminal-color-success);
+  --nav-link-color: var(--terminal-color-success) !important;
 }
 .o_terminal .text-danger {
   color: var(--terminal-color-danger) !important;
@@ -353,7 +356,7 @@
   color: color-mix(in srgb, var(--terminal-color-danger), white 20%) !important;
 }
 .o_terminal .nav.text-danger {
-  --nav-link-color: var(--terminal-color-danger);
+  --nav-link-color: var(--terminal-color-danger) !important;
 }
 .o_terminal .text-warning {
   color: var(--terminal-color-warning) !important;
@@ -362,7 +365,7 @@
   color: color-mix(in srgb, var(--terminal-color-warning), white 20%) !important;
 }
 .o_terminal .nav.text-warning {
-  --nav-link-color: var(--terminal-color-warning);
+  --nav-link-color: var(--terminal-color-warning) !important;
 }
 .o_terminal .text-info {
   color: var(--terminal-color-info) !important;
@@ -371,7 +374,7 @@
   color: color-mix(in srgb, var(--terminal-color-info), white 20%) !important;
 }
 .o_terminal .nav.text-info {
-  --nav-link-color: var(--terminal-color-info);
+  --nav-link-color: var(--terminal-color-info) !important;
 }
 .o_terminal .text-light {
   color: var(--terminal-color-light) !important;
@@ -380,7 +383,7 @@
   color: color-mix(in srgb, var(--terminal-color-light), white 20%) !important;
 }
 .o_terminal .nav.text-light {
-  --nav-link-color: var(--terminal-color-light);
+  --nav-link-color: var(--terminal-color-light) !important;
 }
 .o_terminal .text-dark {
   color: var(--terminal-color-dark) !important;
@@ -389,7 +392,7 @@
   color: color-mix(in srgb, var(--terminal-color-dark), white 20%) !important;
 }
 .o_terminal .nav.text-dark {
-  --nav-link-color: var(--terminal-color-dark);
+  --nav-link-color: var(--terminal-color-dark) !important;
 }
 .o_terminal .text-muted {
   color: var(--terminal-color-muted) !important;
@@ -398,7 +401,7 @@
   color: color-mix(in srgb, var(--terminal-color-muted), white 20%) !important;
 }
 .o_terminal .nav.text-muted {
-  --nav-link-color: var(--terminal-color-muted);
+  --nav-link-color: var(--terminal-color-muted) !important;
 }
 .o_terminal .text-white {
   color: var(--terminal-color-white) !important;
@@ -407,7 +410,7 @@
   color: color-mix(in srgb, var(--terminal-color-white), white 20%) !important;
 }
 .o_terminal .nav.text-white {
-  --nav-link-color: var(--terminal-color-white);
+  --nav-link-color: var(--terminal-color-white) !important;
 }
 
 .o_terminal .bg-primary {
