@@ -66,7 +66,7 @@ export const SETTING_TYPES: {
   colors_domain: 'manual',
 };
 
-export const SETTING_NAMES: Array<string> = Array.from(Object.keys(SETTING_TYPES));
+export const SETTING_NAMES: $ReadOnlyArray<string> = Array.from(Object.keys(SETTING_TYPES));
 
 export type ExtensionSettings = {
   init_cmds: string,
@@ -132,7 +132,7 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   colors_domain: {},
 };
 
-export const IGNORED_KEYS: Array<string> = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];
+export const IGNORED_KEYS: $ReadOnlyArray<string> = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];
 
 export const VERSION_COLOR = {
   normal: '#71639e',
@@ -141,7 +141,7 @@ export const VERSION_COLOR = {
   enterprise: '#c0c18a',
 }
 
-export const COMPATIBLE_VERSIONS: Array<string> = [
+export const COMPATIBLE_VERSIONS: $ReadOnlyArray<string> = [
   '11.',
   'saas~11',
   '12.',
@@ -159,3 +159,10 @@ export const COMPATIBLE_VERSIONS: Array<string> = [
   '18.0',
   'saas~18.0',
 ];
+
+export const THEMES: $ReadOnlyArray<[string, string]> = [
+  ['dark', 'Dark'],
+  ['light', 'Light'],
+  ['odoo', 'Odoo'],
+  ['matrix', 'Matrix'],
+]

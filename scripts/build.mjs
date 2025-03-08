@@ -23,6 +23,7 @@ function createZipArchive() {
   zip.addLocalFolder('./src/img', './src/img');
   zip.addLocalFolder('./dist', './dist');
   zip.addLocalFolder('./_locales', './_locales');
+  zip.addLocalFolder('./themes', './themes');
   zip.addLocalFile('manifest.json');
   zip.addLocalFile('README.md');
   zip.writeZip(outputFile);

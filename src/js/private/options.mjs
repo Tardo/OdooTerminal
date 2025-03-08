@@ -7,14 +7,33 @@ import '@css/options.css';
 import processKeybind from '@common/utils/process_keybind';
 import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
-import {IGNORED_KEYS, SETTING_DEFAULTS, SETTING_NAMES, SETTING_TYPES} from '../common/constants.mjs';
+import {IGNORED_KEYS, SETTING_DEFAULTS, SETTING_NAMES, SETTING_TYPES, THEMES} from '../common/constants.mjs';
 
 // $FlowFixMe
-export type EventCallback = (ev: any) => void;
+export type EventCallback = (ev: any) => Promise<void> | void;
 
 let unique_counter: number = 1;
 let shortcuts_defs: {[string]: string} = {};
 let color_domain_defs: {[string]: string} = {};
+
+async function loadThemeValues(theme: string): Promise<{[string]: mixed}> {
+  return new Promise((resolve, reject) => {
+    ubrowser.runtime.getPackageDirectoryEntry((root) => {
+      root.getFile(`themes/${theme}.json`, {}, (fileEntry) => {
+        fileEntry.file((file) => {
+          const reader = new FileReader();
+          reader.onerror = reject;
+          reader.onabort = reject;
+          reader.onloadend = readerEvent => {
+            // $FlowFixMe
+            resolve(JSON.parse(readerEvent.target.result));
+          };
+          reader.readAsText(file);
+        }, reject);
+      }, reject);
+    });
+  });
+}
 
 function onClickShortcutRemove(e: MouseEvent) {
   if (e.target instanceof HTMLElement) {
@@ -114,8 +133,10 @@ function saveOptions() {
     }
     const target = document.getElementById(name);
     if (target instanceof HTMLInputElement) {
-      if (type === 'edit' || type === 'int' || type === 'option' || type === 'color') {
+      if (type === 'edit' || type === 'option' || type === 'color') {
         data[name] = target.value;
+      } else if (type === 'int') {
+        data[name] = Number(target.value);
       } else if (type === 'check') {
         data[name] = target.checked;
       } else if (type === 'json') {
@@ -151,46 +172,46 @@ function saveOptions() {
   setStorageSync(data);
 }
 
-function applyInputValues() {
-  getStorageSync(SETTING_NAMES).then(result => {
-    const cmd_names = Object.keys(result);
-    for (const name of cmd_names) {
-      // $FlowFixMe
-      const type = SETTING_TYPES[name];
-      if (type === 'manual') {
-        continue;
-      }
-      const elm = document.getElementById(name);
-      if (elm) {
-        if (elm instanceof HTMLInputElement) {
-          if (type === 'edit' || type === 'color') {
-            elm.value = result[name] || '';
-          } else if (type === 'check') {
-            elm.checked = result[name] || false;
-          } else if (type === 'int') {
-            elm.value = result[name] || 0;
-          } else if (type === 'json') {
-            elm.value = JSON.stringify(result[name] || {}, null, 4);
-          }
-        } else if (elm instanceof HTMLTextAreaElement) {
-          if (type === 'edit') {
-            elm.value = result[name] || '';
-          } else if (type === 'json') {
-            elm.value = JSON.stringify(result[name] || {}, null, 4);
-          }
-        } else if (elm instanceof HTMLSelectElement) {
-          if (type === 'option') {
-            // $FlowIgnore
-            elm.value = result[name] || SETTING_DEFAULTS[name];
-          }
+function applyInputValues(values: {[string]: mixed}) {
+  const cmd_names = Object.keys(values);
+  for (const name of cmd_names) {
+    // $FlowFixMe
+    const type = SETTING_TYPES[name];
+    if (type === 'manual') {
+      continue;
+    }
+    const elm = document.getElementById(name);
+    if (elm) {
+      if (elm instanceof HTMLInputElement) {
+        if ((type === 'edit' || type === 'color') && typeof values[name] === 'string') {
+          elm.value = values[name] || '';
+        } else if (type === 'check' && typeof values[name] === 'boolean') {
+          elm.checked = values[name] || false;
+        } else if (type === 'int' && (typeof values[name] === 'number' || typeof values[name] === 'string')) {
+          elm.value = new String(values[name] || 0).toString();
+        } else if (type === 'json' && typeof values[name] === 'object') {
+          elm.value = JSON.stringify(values[name] || {}, null, 4);
+        }
+      } else if (elm instanceof HTMLTextAreaElement) {
+        if (type === 'edit' && typeof values[name] === 'string') {
+          elm.value = values[name] || '';
+        } else if (type === 'json' && typeof values[name] === 'object') {
+          elm.value = JSON.stringify(values[name] || {}, null, 4);
+        }
+      } else if (elm instanceof HTMLSelectElement) {
+        if (type === 'option') {
+          // $FlowIgnore
+          elm.value = values[name] || SETTING_DEFAULTS[name];
         }
       }
     }
-    shortcuts_defs = result.shortcuts || {};
-    color_domain_defs = result.colors_domain || {};
-    renderShortcutTable();
-    renderColorDomainTable();
-  });
+  }
+  // $FlowFixMe
+  shortcuts_defs = values.shortcuts || {};
+  // $FlowFixMe
+  color_domain_defs = values.colors_domain || {};
+  renderShortcutTable();
+  renderColorDomainTable();
 }
 
 function onSubmitForm(e: Event) {
@@ -263,9 +284,20 @@ function onClickColorDomainAdd() {
   }
 }
 
-function onClickResetSettings() {
+async function onClickResetSettings() {
   setStorageSync(SETTING_DEFAULTS);
-  applyInputValues();
+  applyInputValues(await getStorageSync(SETTING_NAMES));
+}
+
+async function onChangeThemePreset(ev: Event) {
+  // $FlowFixMe
+  const theme_preset = ev.target.value;
+  try {
+    const theme_values = await loadThemeValues(theme_preset);
+    applyInputValues(theme_values);
+  } catch (e) {
+    console.error('Failed to load theme values:', e);
+  }
 }
 
 function _apply_i18n(selector: string, ikey: string) {
@@ -338,15 +370,24 @@ function _add_event_listener(selector: string, event_type: string, callback: Eve
   }
 }
 
-function onDOMLoaded() {
-  applyInputValues();
+async function onDOMLoaded() {
+  const config_values = await getStorageSync(SETTING_NAMES);
+  applyInputValues(config_values);
+
   _add_event_listener('#form_options', 'submit', onSubmitForm);
   _add_event_listener('#shortcut_keybind', 'keydown', onKeyDownShortcut);
   _add_event_listener('#shortcut_keybind', 'keyup', onKeyUpShortcut);
   _add_event_listener('#add_shortcut', 'click', onClickShortcutAdd);
   _add_event_listener('#add_color_domain', 'click', onClickColorDomainAdd);
   _add_event_listener('.reset_settings', 'click', onClickResetSettings);
+  _add_event_listener('#theme_preset', 'change', onChangeThemePreset);
   i18n();
+  for (const theme of THEMES) {
+    const option = document.createElement('option');
+    option.value = theme[0];
+    option.textContent = theme[1];
+    document.querySelector('#theme_preset')?.appendChild(option);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', onDOMLoaded);

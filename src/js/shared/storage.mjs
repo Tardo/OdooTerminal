@@ -5,7 +5,7 @@
 import {ubrowser} from './constants.mjs';
 
 // $FlowFixMe
-export function getStorageSync(keys: Array<string>): Promise<Object> {
+export function getStorageSync(keys: $ReadOnlyArray<string>): Promise<Object> {
   return new Promise((resolve, reject) => {
     ubrowser.storage.sync.get(keys, items => {
       if (ubrowser.runtime?.lastError) {

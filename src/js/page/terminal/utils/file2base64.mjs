@@ -27,7 +27,7 @@ export default function <T>(this: T): Promise<string> {
 
       reader.onerror = reject;
       reader.onabort = reject;
-      reader.onload = (readerEvent) => {
+      reader.onload = readerEvent => {
         // $FlowFixMe
         resolve(btoa(readerEvent.target.result));
       };

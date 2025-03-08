@@ -206,9 +206,11 @@ export default class Terminal {
   }
 
   #applyTheme() {
+    const opacity = new String(this.#config.opacity * 0.01).toString();
+    document.documentElement?.style.setProperty('--terminal-screen-ocapity', opacity);
+    document.documentElement?.style.setProperty('--terminal-screen-font', this.#config.fontfamily);
     document.documentElement?.style.setProperty('--terminal-font-size', this.#config.fontsize);
     document.documentElement?.style.setProperty('--terminal-font-size-ca', this.#config.fontsize_ca);
-    document.documentElement?.style.setProperty('--terminal-screen-font', this.#config.fontfamily);
     document.documentElement?.style.setProperty('--terminal-color-primary', this.#config.color_primary);
     document.documentElement?.style.setProperty('--terminal-color-secondary', this.#config.color_secondary);
     document.documentElement?.style.setProperty('--terminal-color-success', this.#config.color_success);
@@ -250,7 +252,6 @@ export default class Terminal {
         this.#onInput();
       },
     });
-    this.screen.applyStyle('opacity', new String(this.#config.opacity).toString());
     this.onStart();
   }
 
@@ -489,7 +490,6 @@ export default class Terminal {
 
   #applySettings(config: TerminalOptions) {
     Object.assign(this.#config, config);
-    this.#config.opacity *= 0.01;
     this.#config.term_context = this.#config.term_context || {};
     this.userContext = Object.assign({}, this.#config.term_context, this.userContext);
   }

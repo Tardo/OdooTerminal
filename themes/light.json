@@ -1,0 +1,16 @@
+{
+  "opacity": 93,
+  "fontsize": "medium",
+  "fontsize_ca": "small",
+  "fontfamily": "'Lucida Console', Monaco, monospace",
+  "color_primary": "#007bff",
+  "color_secondary": "#d0dce6",
+  "color_success": "#78dd90",
+  "color_danger": "#f7838e",
+  "color_warning": "#ffc107",
+  "color_info": "#1c7987",
+  "color_light": "#343a40",
+  "color_dark": "#f8f9fa",
+  "color_muted": "#bfbfbf",
+  "color_white": "#000000"
+}

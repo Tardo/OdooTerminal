@@ -7,6 +7,7 @@
   --terminal-screen-font: 'Lucida Console', Monaco, monospace;
   --terminal-screen-height: 40vh;
   --terminal-screen-height-maximized: 100vh;
+  --terminal-screen-opacity: 0.93;
   --terminal-font-size: medium;
   --terminal-font-size-ca: small;
   --terminal-color-primary: #007bff;
@@ -52,7 +53,7 @@
   caret-color: var(--terminal-color-white);
   color: var(--terminal-color-light);
   height: 100%;
-  opacity: 0.93;
+  opacity: var(--terminal-screen-opacity);
   overflow-y: scroll;
   padding: 0;
   resize: none;

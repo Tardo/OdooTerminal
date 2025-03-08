@@ -15,7 +15,7 @@
 
       <div class="optsection">
         <h4 id="title_behaviour">Behaviour</h4>
-        <p></p>
+        <br />
         <input type="checkbox" id="pinned" name="pinned" />
         <label for="pinned">Pinned</label><br />
         <input type="checkbox" id="maximized" name="maximized" />
@@ -34,7 +34,10 @@
 
       <div class="optsection">
         <h4 id="title_theme">Theme</h4>
-        <p></p>
+        <label for="theme_preset">Load Preset:</label>
+        <select id="theme_preset" name="theme_preset">
+          <option value=""></option></select
+        ><br /><br />
         <label for="opacity">Opacity:</label>
         <input type="range" id="opacity" name="opacity" min="0" max="100" /><br />
         <label for="fontsize">Font size (General):</label>
@@ -166,7 +169,7 @@
 
       <div class="optsection">
         <h4 id="title_shortcuts">Shortcuts</h4>
-        <p></p>
+        <br />
         <table class="fullwidth" id="shorcut_table">
           <thead>
             <tr>
@@ -186,7 +189,7 @@
 
       <div class="optsection">
         <h4 id="title_command_assistant">Command Assistant</h4>
-        <p></p>
+        <br />
         <input type="checkbox" id="cmd_assistant_dyn_options_disabled" name="cmd_assistant_dyn_options_disabled" />
         <label for="cmd_assistant_dyn_options_disabled">Disable dynamic options</label><br />
         <label for="cmd_assistant_match_mode">Match mode:</label>
@@ -219,7 +222,7 @@
 
       <div class="optsection">
         <h4 id="title_developer_zone">Extension Developer Zone</h4>
-        <p></p>
+        <br />
         <input type="checkbox" id="devmode_tests" name="devmode_tests" />
         <label for="devmode_tests">Use OdooTerminalTests</label><br />
         <input type="checkbox" id="devmode_ignore_comp_checks" name="devmode_ignore_comp_checks" />
