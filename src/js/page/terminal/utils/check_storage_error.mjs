@@ -14,17 +14,15 @@ export default function (err: Object): string {
     return '';
   }
   return (
-    "<span style='color:navajowhite'>" +
+    "<span class='text-warning'>" +
     `<strong>${i18n.t('checkStorageError.warning', 'WARNING: ')}</strong> ` +
     i18n.t(
       'checkStorageError.message',
       'Clear the ' +
-        "<b class='o_terminal_click o_terminal_cmd' " +
-        "data-cmd='clear screen' style='color:orange;'>screen</b> " +
-        'or/and ' +
-        "<b class='o_terminal_click o_terminal_cmd' " +
-        "data-cmd='clear history' style='color:orange;'>" +
-        'history</b> ' +
+        "<strong class='o_terminal_click o_terminal_cmd text-danger' " +
+        "data-cmd='clear screen'>screen</strong> or/and " +
+        "<strong class='o_terminal_click o_terminal_cmd text-danger' " +
+        "data-cmd='clear history'>history</strong> " +
         'to free storage space. Browser <u>Storage Quota Exceeded</u>' +
         ' 😭',
     ) +

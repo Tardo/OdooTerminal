@@ -44,7 +44,7 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
     const field = s_keys[x];
     const fieldDef = s_result[field];
     if (fieldDef.required) {
-      rows[row_index].push(`* <b style='color:mediumslateblue'>${field}</b>`);
+      rows[row_index].push(`* <strong class='text-info'>${field}</strong>`);
     } else {
       rows[row_index].push(field);
     }
