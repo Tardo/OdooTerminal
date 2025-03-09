@@ -25,6 +25,10 @@
 			"name": "i18n",
 		},
 		{
+			"path": "themes",
+			"name": "Themes",
+		},
+		{
 			"path": ".",
 			"name": "OdooTerminal - Root"
 		}
