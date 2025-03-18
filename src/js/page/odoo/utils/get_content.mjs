@@ -7,22 +7,22 @@ import save2file from '@terminal/utils/save2file';
 
 export type GetContentOnErrorCallback = (error: {[string]: mixed}) => void;
 
-function getFilenameFromContentDisposition(contentDisposition: string | null): string | null {
-  if (typeof contentDisposition !== 'string') {
+function getFilenameFromContentDisposition(content_disposition: string | null): string | null {
+  if (typeof content_disposition !== 'string') {
     return null;
   }
   try {
-    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i;
-    const matches = contentDisposition.match(filenameRegex);
+    const filename_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i;
+    const matches = content_disposition.match(filename_regex);
     if (!matches || matches.length < 1) {
         return null;
     }
     let filename = matches[1].replace(/['"]/g, '');
     // TODO: Support more charsets?
     if (filename.startsWith('UTF-8')) {
-        const utf8Match = contentDisposition.match(/filename\*=UTF-8''(.+?)(?:;|$)/i);
-        if (utf8Match && utf8Match[1]) {
-            filename = decodeURIComponent(utf8Match[1]);
+        const utf8_match = content_disposition.match(/filename\*=UTF-8''(.+?)(?:;|$)/i);
+        if (utf8_match && utf8_match[1]) {
+            filename = decodeURIComponent(utf8_match[1]);
         }
     } else {
         filename = decodeURIComponent(filename);
