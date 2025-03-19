@@ -156,8 +156,8 @@ export const COMPATIBLE_VERSIONS: $ReadOnlyArray<string> = [
   'saas~16',
   '17.',
   'saas~17',
-  '18.0',
-  'saas~18.0',
+  '18.',
+  'saas~18',
 ];
 
 export const THEMES: $ReadOnlyArray<[string, string]> = [
