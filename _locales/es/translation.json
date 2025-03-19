@@ -588,6 +588,19 @@
     "definition": "Recargar la página actual",
     "detail": "Recargar la página actual"
   },
+  "cmdRenewDatabase": {
+    "args": {
+      "dbuuid": "Renovar el UUID de la base de datos",
+      "expires_in": "Establecer en días el tiempo antes de la expiración de la base de datos. Predeterminado: 30"
+    },
+    "definition": "Renovar la base de datos",
+    "detail": "Re-generar un nuevo UUID y fecha de expiración para tu base de datos de desarrollo.",
+    "result": {
+      "success": "Base de datos renovada con éxito",
+      "success_date": "Nueva fecha de expiración: {{formattedExpirationDate}}.",
+      "success_with_uuid": "Nuevo UUID: {{uuid}}."
+    }
+  },
   "cmdRollback": {
     "args": {
       "recordset": "El conjunto de registros"
@@ -651,6 +664,27 @@
     },
     "definition": "Dormir",
     "detail": "Dormir (tiempo en ms)"
+  },
+  "cmdSysParam": {
+    "args": {
+      "key": "Clave del parámetro (requerido para operaciones get/set)",
+      "operation": "Operación a realizar.",
+      "value": "Valor del parámetro (requerido para la operación set)"
+    },
+    "definition": "Gestionar parámetros del sistema",
+    "detail": "Obtener, establecer o listar parámetros en el modelo ir.config_parameter.",
+    "error": {
+      "invalidOperation": "Operación no válida. Use 'get', 'set', o 'list'",
+      "listEmpty": "No se encontraron parámetros del sistema",
+      "missingKey": "Se requiere el parámetro clave para la operación set",
+      "missingValue": "Se requiere el parámetro valor para la operación set",
+      "noUpdate": "Error al actualizar el parámetro",
+      "notFound": "Parámetro no encontrado"
+    },
+    "result": {
+      "listTitle": "Parámetros del Sistema:",
+      "success": "Parámetro establecido exitosamente"
+    }
   },
   "cmdToggleTerm": {
     "args": {

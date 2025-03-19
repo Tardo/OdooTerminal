@@ -32,6 +32,7 @@ import cmdReload from './reload';
 import cmdRollback from './rollback';
 import cmdRpc from './rpc';
 import cmdSearch from './search';
+import cmdSysParam from './sysparam';
 import cmdTour from './tour';
 import cmdUal from './ual';
 import cmdUhg from './uhg';
@@ -46,6 +47,7 @@ import cmdURL from './url';
 import cmdInfo from './info';
 import cmdNotify from './notify';
 import cmdExportFile from './exportfile';
+import cmdRenewDatabase from './renew_database';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -93,4 +95,6 @@ export default function (vm: VMachine) {
   vm.registerCommand('info', cmdInfo());
   vm.registerCommand('notify', cmdNotify());
   vm.registerCommand('exportfile', cmdExportFile());
+  vm.registerCommand('sysparam', cmdSysParam());
+  vm.registerCommand('renew_database', cmdRenewDatabase());
 }

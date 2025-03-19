@@ -415,4 +415,94 @@ export default class TestCommon extends TerminalTestSuite {
     await this.terminal.execute('notify -m "This is a test!" -t "The Test"', false, true);
     this.assertTrue(this.isNotifyShowed());
   }
+
+  async test_sysparam() {
+    // Test set operation
+    const testKey = `test_key_${uniqueId()}`;
+    const testValue = `test_value_${uniqueId()}`;
+
+    // Test list operation first to verify basic functionality
+    let res = await this.terminal.execute('sysparam -o list', false, true);
+    this.assertTrue(Array.isArray(res), 'List operation should return an array');
+    this.assertTrue(res.length > 0, 'List operation should return at least one parameter');
+
+    // Test get operation with non-existent key
+    res = await this.terminal.execute('sysparam -o get -k non_existent_key', false, true);
+    this.assertTrue(res === false, 'Get operation should return false for non-existent key');
+
+    // Test set operation with missing parameters
+    res = await this.terminal.execute('sysparam -o set', false, true);
+    this.assertTrue(res === false, 'Set operation should return false when missing key');
+    res = await this.terminal.execute('sysparam -o set -k test_key', false, true);
+    this.assertTrue(res === false, 'Set operation should return false when missing value');
+
+    res = await this.terminal.execute(`sysparam -o set -k ${testKey} -v ${testValue}`, false, true);
+    this.assertTrue(res, 'Set operation should return true for new parameter or updated parameter');
+
+    // Test get operation with the set key
+    res = await this.terminal.execute(`sysparam -o get -k ${testKey}`, false, true);
+    this.assertEqual(res, testValue, 'Get operation should return the correct value');
+
+    // Test default get operation (without specifying -o get)
+    res = await this.terminal.execute(`sysparam -k ${testKey}`, false, true);
+    this.assertEqual(res, testValue, 'Default operation should return the correct value');
+
+    // Test update operation
+    const updatedValue = `updated_value_${uniqueId()}`;
+    res = await this.terminal.execute(`sysparam -o set -k ${testKey} -v ${updatedValue}`, false, true);
+    this.assertTrue(res, 'Update operation should return true');
+
+    // Verify the update
+    res = await this.terminal.execute(`sysparam -k ${testKey}`, false, true);
+    this.assertEqual(res, updatedValue, 'Get operation should return the updated value');
+
+    // Test list operation again to verify our parameter is in the list
+    res = await this.terminal.execute('sysparam -o list', false, true);
+    this.assertTrue(Array.isArray(res), 'List operation should return an array');
+    this.assertTrue(res.length > 0, 'List operation should return at least one parameter');
+
+    // Find our test parameter in the list
+    const foundParam = res.find(param => param.key === testKey);
+    this.assertNotEmpty(foundParam, 'Test parameter should be found in the list');
+    this.assertEqual(foundParam.value, updatedValue, 'Parameter value in list should match the updated value');
+
+    // Test invalid operation
+    res = await this.terminal.execute('sysparam -o invalid_operation', false, true);
+    this.assertTrue(res === false, 'Invalid operation should return false');
+  }
+
+  async test_renew_database() {
+    // Test with default parameters
+    let res = await this.terminal.execute('renew_database', false, true);
+    this.assertTrue(res.some(param => param.param === 'database.create_date'), "database.create_date should be in the list");
+    this.assertTrue(res.some(param => param.param === 'database.expiration_date'), "database.expiration_date should be in the list");
+
+    // Test with dbuuid flag
+    res = await this.terminal.execute('renew_database -r', false, true);
+    this.assertTrue(res.some(param => param.param === 'database.uuid'), "database.uuid should be in the list");
+
+    // Test with expires_in parameter
+    res = await this.terminal.execute('renew_database -e 60', false, true);
+    const expirationParam = res.find(param => param.param === 'database.expiration_date');
+    this.assertTrue(expirationParam && new Date(expirationParam.value) > new Date(), `expiration_date should be in the future ${expirationParam.value}`);
+
+    // Test with both dbuuid and expires_in parameters
+    res = await this.terminal.execute('renew_database -r -e 90', false, true);
+    this.assertTrue(res.some(param => param.param === 'database.uuid'), "database.uuid should be in the list");
+    const expirationParamWithUuid = res.find(param => param.param === 'database.expiration_date');
+    const expectedExpirationDate = new Date();
+    expectedExpirationDate.setDate(new Date().getDate() + 90)
+    expectedExpirationDate.setHours(0)
+    const expectedExpirationDateFormated = expectedExpirationDate.toISOString().slice(0, 10)
+    const actualExpirationDate = new Date(expirationParamWithUuid.value).toISOString().slice(0, 10);
+    this.assertTrue(
+      actualExpirationDate === expectedExpirationDateFormated,
+      `expiration_date should be as expected ${expectedExpirationDateFormated} != ${actualExpirationDate}`
+    );
+
+    // Test with past expires_in value
+    res = await this.terminal.execute('renew_database -e -10', false, true);
+    const pastExpirationParam = res.find(param => param.param === 'database.expiration_date');
+    this.assertTrue(pastExpirationParam && new Date(pastExpirationParam.value) < new Date(), "expiration_date should be in the past");
+  }
 }
