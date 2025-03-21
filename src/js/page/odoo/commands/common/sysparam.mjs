@@ -121,7 +121,7 @@ export default function (): Partial<CMDDef> {
     options: getOptions,
     detail: i18n.t('cmdSysParam.detail', 'Get, set, or list parameters in ir.config_parameter model.'),
     args: [
-      [ARG.String, ['o', 'operation'], false, i18n.t('cmdSysParam.args.operation', "Operation to perform: 'get', 'set', or 'list'. Default is 'get'")],
+      [ARG.String, ['o', 'operation'], true, i18n.t('cmdSysParam.args.operation', "Operation to perform."), 'get', ['get', 'set', 'list']],
       [ARG.String, ['k', 'key'], false, i18n.t('cmdSysParam.args.key', 'Parameter key (required for get/set operations)')],
       [ARG.String, ['v', 'value'], false, i18n.t('cmdSysParam.args.value', 'Parameter value (required for set operation)')],
     ],

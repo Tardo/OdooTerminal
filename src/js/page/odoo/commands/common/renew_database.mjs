@@ -19,7 +19,7 @@ async function cmdRenewDatabase(this: Terminal, kwargs: CMDCallbackArgs, ctx: CM
   const now = new Date();
   const createDate = now.toISOString().slice(0, 19).replace('T', ' ');
   const expirationDate = new Date(now);
-  expirationDate.setDate(now.getDate() + (kwargs.expires_in || 30));
+  expirationDate.setDate(now.getDate() + kwargs.expires_in);
   const formattedExpirationDate = expirationDate.toISOString().slice(0, 19).replace('T', ' ');
 
   const params = [
@@ -66,7 +66,8 @@ export default function (): Partial<CMDDef> {
         ARG.Number,
         ['e', 'expires_in'],
         false,
-        i18n.t('cmdRenewDatabase.args.expires_in', 'Set in days the delay before database expiration. Default: 30'),
+        i18n.t('cmdRenewDatabase.args.expires_in', 'Set in days the delay before database expiration.'),
+        30,
       ],
     ],
     example: 'renew_database\nrenew_database -r -e 180',
