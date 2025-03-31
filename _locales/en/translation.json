@@ -588,6 +588,19 @@
     "definition": "Reload current page",
     "detail": "Reload current page."
   },
+  "cmdRenewDatabase": {
+    "args": {
+      "dbuuid": "Renew the uuid of the database",
+      "expires_in": "Set in days the delay before database expiration. Default: 30"
+    },
+    "definition": "Renew the database",
+    "detail": "Re-generate a new uuid and expiration date for your development database.",
+    "result": {
+      "success": "Database renewed successfully",
+      "success_date": "New expiration date {{formattedExpirationDate}}.",
+      "success_with_uuid": "New uuid {{uuid}}."
+    }
+  },
   "cmdRollback": {
     "args": {
       "recordset": "The Recordset"
@@ -651,6 +664,27 @@
     },
     "definition": "Sleep",
     "detail": "Sleep (time in ms)"
+  },
+  "cmdSysParam": {
+    "args": {
+      "key": "Parameter key (required for get/set operations)",
+      "operation": "Operation to perform.",
+      "value": "Parameter value (required for set operation)"
+    },
+    "definition": "Manage system parameters",
+    "detail": "Get, set, or list parameters in ir.config_parameter model.",
+    "error": {
+      "invalidOperation": "Invalid operation. Use 'get', 'set', or 'list'",
+      "listEmpty": "No system parameters found",
+      "missingKey": "Key parameter is required for set operation",
+      "missingValue": "Value parameter is required for set operation",
+      "noUpdate": "Failed to update the parameter",
+      "notFound": "Parameter not found"
+    },
+    "result": {
+      "listTitle": "System Parameters:",
+      "success": "Parameter set successfully"
+    }
   },
   "cmdToggleTerm": {
     "args": {
