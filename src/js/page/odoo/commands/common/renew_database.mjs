@@ -70,6 +70,6 @@ export default function (): Partial<CMDDef> {
         30,
       ],
     ],
-    example: 'renew_database\nrenew_database -r -e 180',
+    example: '-r -e 180',
   };
 }

@@ -28,10 +28,20 @@ async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
       await this.getContext(),
     ).then(result => {
       if (result && result.length) {
-        ctx.screen.print(i18n.t('cmdSysParam.result.listTitle', 'System Parameters:'));
-        result.forEach(param => {
-          ctx.screen.print(`${param.key}: ${param.value}`);
-        });
+        const rows = [];
+        const len = result.length;
+        for (let x = 0; x < len; ++x) {
+          const row_index = rows.push([]) - 1;
+          const record = result[x];
+          rows[row_index].push(record.key, record.value);
+        }
+        ctx.screen.printTable(
+          [
+            i18n.t('cmdSysParam.table.param', 'Parameter'),
+            i18n.t('cmdSysParam.table.value', 'Value'),
+          ],
+          rows,
+        );
       } else {
         ctx.screen.printError(i18n.t('cmdSysParam.error.listEmpty', "No system parameters found"));
       }

@@ -1,5 +1,16 @@
 # Changelog
 
+**11.9.0**
+
+```
+ADD: Command 'sysparam': Edit odoo config. parameters (by baptiste-n42 - pr #144)
+ADD: Command 'renew_database': Edit database renewal values (by baptiste-n42 - pr #144)
+
+IMP: Minor code refactor
+
+FIX: Flow type for 'uniqueId'
+```
+
 **11.8.0**
 
 ```

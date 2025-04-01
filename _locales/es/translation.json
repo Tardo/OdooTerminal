@@ -682,8 +682,11 @@
       "notFound": "Parámetro no encontrado"
     },
     "result": {
-      "listTitle": "Parámetros del Sistema:",
       "success": "Parámetro establecido exitosamente"
+    },
+    "table": {
+      "param": "Parámetro",
+      "value": "Valor"
     }
   },
   "cmdToggleTerm": {

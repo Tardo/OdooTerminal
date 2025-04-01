@@ -682,8 +682,11 @@
       "notFound": "Parameter not found"
     },
     "result": {
-      "listTitle": "System Parameters:",
       "success": "Parameter set successfully"
+    },
+    "table": {
+      "param": "Parameter",
+      "value": "Value"
     }
   },
   "cmdToggleTerm": {
