@@ -28,7 +28,7 @@ async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
       await this.getContext(),
     ).then(result => {
       if (result && result.length) {
-        const rows = [];
+        const rows: Array<Array<string>> = [];
         const len = result.length;
         for (let x = 0; x < len; ++x) {
           const row_index = rows.push([]) - 1;
