@@ -7,6 +7,7 @@ import i18n from 'i18next';
 import save2file from '@terminal/utils/save2file';
 import Recordset from '@terminal/core/recordset';
 import csvStringify from '@terminal/utils/csv';
+import replacer from '@terminal/utils/stringify_replacer';
 import xmlStringify from '@odoo/net_utils/xml';
 import uniqueId from '@trash/utils/unique_id';
 import {ARG} from '@trash/constants';
@@ -19,7 +20,7 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
   let data = '';
   if (kwargs.format === 'json') {
     mime = 'text/json';
-    data = JSON.stringify(kwargs.value, null, 4);
+    data = JSON.stringify(kwargs.value, replacer, 4);
   } else if (kwargs.format === 'csv' || kwargs.format === 'xml') {
     if (!(kwargs.value instanceof Recordset)) {
       throw new Error(i18n.t('cmdExportFile.invalidValue', 'Invalid value: must be a recordset with csv and xml'));

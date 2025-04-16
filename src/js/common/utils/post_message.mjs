@@ -9,7 +9,7 @@ export type InternalMessageData = {
 };
 
 export default function (type: string, data: {[string]: mixed}, target_origin?: string): number {
-  const rid: number = new Date().getTime(); // FIXME: Not the best way to generate id's
+  const rid: number = Number(Math.random().toString(10).slice(2))
   const san_target_origin: string = target_origin !== undefined ? target_origin : document.location.href;
   const msg: InternalMessageData = {
     type: type,

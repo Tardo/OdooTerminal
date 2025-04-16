@@ -22,7 +22,6 @@ export default async function (use_net: boolean = false): Promise<number> {
       cachedUID = session_info.uid;
     }
   } else if (getOdooSession()?.storeData?.Store?.self.id) {
-    // FIXME: Strange, but that's how it is... Odoo making friends :)
     cachedUID = getOdooSession()?.storeData?.Store?.self?.id || -1;
     if (cachedUID !== -1) {
       --cachedUID;

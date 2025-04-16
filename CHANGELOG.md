@@ -1,5 +1,15 @@
 # Changelog
 
+**11.9.1**
+
+```
+IMP: Solve some 'FIXME' comments
+IMP: Command 'sysparam': Allow number and boolean values
+
+FIX: Command 'longpolling': New 'subscribe' and 'unsubscribe' options
+FIX: Command 'longpolling' in Odoo 17.0+: 'moment' is no longer used
+```
+
 **11.9.0**
 
 ```

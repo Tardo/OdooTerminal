@@ -18,19 +18,27 @@ export default class OdooTerminal extends Terminal {
   parameterGenerator: ParameterGenerator;
   longpolling: ?Longpolling;
 
-  onBusNotification(notifications: $ReadOnlyArray<[string, string] | {...}>) {
-    const l = notifications.length;
-    for (let x = 0; x < l; ++x) {
-      const notif = notifications[x];
-      this.screen.print(
-        // $FlowIgnore
-        `<strong>[<i class='fa fa-envelope-o'></i>][${moment().format()}] ${i18n.t('odoo.longpolling.new', 'New Longpolling Notification:')}</strong>`,
-      );
-      if (notif.constructor === Object) {
-        this.screen.print(notif, false);
-      } else if (notif instanceof Array) {
-        this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
-        this.screen.print(notif[1], false);
+  onBusNotification(subscription: string | void, notifications: $ReadOnlyArray<[string, string] | {...}>) {
+    const local_now = (new Date()).toLocaleString();
+    let section = i18n.t('odoo.longpolling.new', 'New Longpolling Notification:');
+    if (typeof subscription !== 'undefined') {
+      section = `${subscription}:`;
+    }
+    const head_msg = `<strong>[<i class='fa fa-envelope-o'></i>][${local_now}] ${section}</strong>`;
+    if (notifications.constructor === Object) {
+      this.screen.print(head_msg);
+      this.screen.print(notifications, false);
+    } else {
+      const l = notifications.length;
+      for (let x = 0; x < l; ++x) {
+        const notif = notifications[x];
+        this.screen.print(head_msg);
+        if (notif.constructor === Object) {
+          this.screen.print(notif, false);
+        } else if (notif instanceof Array) {
+          this.screen.print([`Channel ID: ${JSON.stringify(notif[0])}`]);
+          this.screen.print(notif[1], false);
+        }
       }
     }
   }

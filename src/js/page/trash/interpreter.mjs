@@ -97,6 +97,7 @@ export type ParserOptions = {
   silent?: boolean,
   noReturn?: boolean,
   ignoreErrors?: boolean,
+  delimiter?: string,
 };
 
 export type LexerInfo = [number, string, string];
@@ -146,6 +147,8 @@ export default class Interpreter {
   tokenize(data: string, options: ParserOptions): Array<TokenInfo> {
     // Remove comments
     const clean_data = data.replaceAll(this.#regexComments, '').replaceAll(SYMBOLS.ESCAPE, "\\");
+    // $FlowIgnore
+    const delimiter = options.delimiter || SYMBOLS.ITEM_DELIMITER;
     let tokens = [];
     let value = '';
     let in_string = '';
@@ -194,9 +197,9 @@ export default class Interpreter {
           } else if (!in_data_type) {
             if (
               !isFalsy(options?.isData) &&
-              (char === SYMBOLS.ITEM_DELIMITER ||
+              (char === delimiter ||
                 char === SYMBOLS.DICTIONARY_SEPARATOR ||
-                prev_char === SYMBOLS.ITEM_DELIMITER ||
+                prev_char === delimiter ||
                 prev_char === SYMBOLS.DICTIONARY_SEPARATOR)
             ) {
               do_cut = true;
@@ -284,6 +287,8 @@ export default class Interpreter {
       const rsepcount = countBy(rstr, char => char === ':').true;
       return rsepcount !== sepcount;
     };
+    // $FlowIgnore
+    const delimiter = options.delimiter || SYMBOLS.ITEM_DELIMITER;
     let token_san = token.trim();
     let ttype = LEXER.String;
     if (!token_san) {
@@ -303,7 +308,7 @@ export default class Interpreter {
     } else if (
       token_san === SYMBOLS.EOC ||
       token_san === SYMBOLS.DICTIONARY_SEPARATOR ||
-      token_san === SYMBOLS.ITEM_DELIMITER
+      token_san === delimiter
     ) {
       ttype = LEXER.Delimiter;
     } else if (token_san === SYMBOLS.AND && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
@@ -1067,13 +1072,14 @@ export default class Interpreter {
 
               // Init Code
               this.#appendParse(
-                for_init.replaceAll(',', ';'), // FIXME: Don't do it in strings!!
+                for_init,
                 {
                   registeredCmds: options.registeredCmds,
                   silent: true,
                   offset: token.start + 1,
                   noReturn: true,
                   ignoreErrors: options.ignoreErrors,
+                  delimiter: ',',
                 },
                 res,
                 to_append,
@@ -1111,13 +1117,14 @@ export default class Interpreter {
 
               // Iter
               const parsed_iter_block = this.#appendParse(
-                for_iter.replaceAll(',', ';'),  // FIXME: Don't do it in strings!!
+                for_iter,
                 {
                   registeredCmds: options.registeredCmds,
                   silent: true,
                   offset: token.start + 1,
                   noReturn: true,
                   ignoreErrors: options.ignoreErrors,
+                  delimiter: ',',
                 },
                 res,
                 to_append,

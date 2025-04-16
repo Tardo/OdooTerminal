@@ -5,7 +5,7 @@
   },
   "Yes": "Sí",
   "checkStorageError": {
-    "message": "Borre la <b class='o_terminal_click o_terminal_cmd' data-cmd='clear screen' style='color:orange;'>pantalla</b> o/y <b class='o_terminal_click o_terminal_cmd' data-cmd='clear historial ' style='color:orange;'>el historial</b> para liberar espacio de almacenamiento. El navegador reporta: <u>Cuota de almacenamiento excedida</u> 😭",
+    "message": "Borre la <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen' style='color:orange;'>pantalla</strong> o/y <b class='o_terminal_click o_terminal_cmd' data-cmd='clear historial ' style='color:orange;'>el historial</strong> para liberar espacio de almacenamiento. El navegador reporta: <u>Cuota de almacenamiento excedida</u> 😭",
     "warning": "ADVERTENCIA:"
   },
   "cmd2DClear": {
@@ -483,7 +483,7 @@
     "detail": "Operaciones de 'longpolling'",
     "error": {
       "invalidChannel": "Nombre de canal no válido",
-      "invalidOperation": "Operación no válida",
+      "invalidSubscription": "Nombre de subscripción no válida",
       "notAvailable": "No se puede utilizar el 'longpolling', el módulo 'bus' no está instalado"
     },
     "result": {
@@ -491,6 +491,8 @@
       "leave": "Abandonar el canal '{{channel_name}}'",
       "start": "Comenzó la encuesta larga",
       "stop": "Se detuvo la votación larga",
+      "subscribe": "Subscrito a '{{subscription}}'",
+      "unsubscribe": "Dado de baja de la subscripción '{{subscription}}'",
       "verboseDisabled": "Ahora el modo detallado de sondeo largo está deshabilitado",
       "verboseEnabled": "Ahora el sondeo largo está en modo detallado"
     }
@@ -591,7 +593,7 @@
   "cmdRenewDatabase": {
     "args": {
       "dbuuid": "Renovar el UUID de la base de datos",
-      "expires_in": "Establecer en días el tiempo antes de la expiración de la base de datos. Predeterminado: 30"
+      "expires_in": "Establecer en días el tiempo antes de la expiración de la base de datos."
     },
     "definition": "Renovar la base de datos",
     "detail": "Re-generar un nuevo UUID y fecha de expiración para tu base de datos de desarrollo.",
@@ -917,6 +919,7 @@
   },
   "longpolling": {
     "error": {
+      "invalidVersion": "Esta operación no es válida para la versión actual de Odoo",
       "notAvailable": "El servicio 'bus' no está disponible"
     }
   },

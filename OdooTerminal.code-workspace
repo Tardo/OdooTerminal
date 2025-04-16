@@ -35,6 +35,7 @@
 	],
 	"settings": {
     	"javascript.validate.enable": false,
+		"flow.enabled": true,
 		"flow.useNPMPackagedFlow": true,
 		"jest.runMode": "on-demand",
 		"jest.jestCommandLine": "yarn test",

@@ -42,8 +42,20 @@ async function cmdLongpolling(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDC
   } else if (kwargs.operation === 'stop') {
     this.longpolling.stopPoll();
     ctx.screen.print(i18n.t('cmdLongpolling.result.stop', 'Longpolling stopped'));
-  } else {
-    throw new Error(i18n.t('cmdLongpolling.error.invalidOperation', 'Invalid Operation.'));
+  } else if (kwargs.operation === 'subscribe' || kwargs.operation === 'unsubscribe') {
+    const subs_name = kwargs.param;
+    if (typeof subs_name === 'undefined') {
+      ctx.screen.printError(i18n.t('cmdLongpolling.error.invalidSubscription', 'Invalid subscription name'));
+    }
+    if (kwargs.operation === 'subscribe') {
+      // $FlowIgnore
+      this.longpolling.subscribe(subs_name);
+      ctx.screen.print(i18n.t('cmdLongpolling.result.subscribe', "Subscribed to '{{subscription}}'"), {subscription: subs_name});
+    } else {
+      // $FlowIgnore
+      this.longpolling.unsubscribe(subs_name);
+      ctx.screen.print(i18n.t('cmdLongpolling.result.unsubscribe', "Unsubscribed from '{{subscription}}'"), {subscription: subs_name});
+    }
   }
 }
 
@@ -62,7 +74,7 @@ export default function (): Partial<CMDDef> {
           'The operation to do<br>- verbose > Print incoming notificacions<br>- off > Stop verbose mode<br>- add_channel > Add a channel to listen<br>- del_channel > Delete a listening channel<br>- start > Start client longpolling service<br> - stop > Stop client longpolling service',
         ),
         undefined,
-        ['verbose', 'off', 'add_channel', 'del_channel', 'start', 'stop'],
+        ['verbose', 'off', 'add_channel', 'del_channel', 'start', 'stop', 'subscribe', 'unsubcribe'],
       ],
       [ARG.String, ['p', 'param'], false, i18n.t('cmdLongpolling.args.param', 'The parameter')],
     ],

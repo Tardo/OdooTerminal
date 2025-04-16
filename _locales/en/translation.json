@@ -5,7 +5,7 @@
   },
   "Yes": "Yes",
   "checkStorageError": {
-    "message": "Clear the <b class='o_terminal_click o_terminal_cmd' data-cmd='clear screen' style='color:orange;'>screen</b> or/and <b class='o_terminal_click o_terminal_cmd' data-cmd='clear history' style='color:orange;'>history</b> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
+    "message": "Clear the <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>screen</strong> or/and <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>history</strong> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
     "warning": "WARNING: "
   },
   "cmd2DClear": {
@@ -483,7 +483,7 @@
     "detail": "Operations over long-polling.",
     "error": {
       "invalidChannel": "Invalid channel name",
-      "invalidOperation": "Invalid Operation.",
+      "invalidSubscription": "Invalid subscription name",
       "notAvailable": "Can't use longpolling, 'bus' module is not installed"
     },
     "result": {
@@ -491,6 +491,8 @@
       "leave": "Leave the '{{channel_name}}' channel",
       "start": "Longpolling started",
       "stop": "Longpolling stopped",
+      "subscribe": "Subscribed to '{{subscription}}'",
+      "unsubscribe": "Unsubscribed from '{{subscription}}'",
       "verboseDisabled": "Now long-polling verbose mode is disabled",
       "verboseEnabled": "Now long-polling is in verbose mode"
     }
@@ -591,7 +593,7 @@
   "cmdRenewDatabase": {
     "args": {
       "dbuuid": "Renew the uuid of the database",
-      "expires_in": "Set in days the delay before database expiration. Default: 30"
+      "expires_in": "Set in days the delay before database expiration."
     },
     "definition": "Renew the database",
     "detail": "Re-generate a new uuid and expiration date for your development database.",
@@ -917,6 +919,7 @@
   },
   "longpolling": {
     "error": {
+      "invalidVersion": "This operation is not valid in the current Odoo version",
       "notAvailable": "bus service not available"
     }
   },
