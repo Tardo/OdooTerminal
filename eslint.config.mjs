@@ -67,13 +67,12 @@ export default [
       }
     ],
     "globals": {
-      "__OdooTerminal": "readonly",
       "_": "off",
       "moment": "readonly",
       "odoo": "readonly",
       "owl": "readonly",
       "luxon": "readonly",
-      "openerp": "off"
+      "openerp": "off",
     },
     "rules": {
       "eqeqeq": "error",

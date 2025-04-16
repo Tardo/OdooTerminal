@@ -776,7 +776,7 @@ export default class Interpreter {
             to_append.names.push(token.value);
             const dindex = res.stack.names[0].length;
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_NAME, index, level, dindex));
-            if (sign_cache) {
+            if (sign_cache !== null) {
               to_append.instructions.push(new Instruction(sign_cache, index, level));
               sign_cache = null;
             }
@@ -878,7 +878,7 @@ export default class Interpreter {
             to_append.values.push(Number(token.value));
             const dindex = res.stack.values[0].length;
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.LOAD_CONST, index, level, dindex));
-            if (sign_cache) {
+            if (sign_cache !== null) {
               to_append.instructions.push(new Instruction(sign_cache, index, level));
               sign_cache = null;
             }
@@ -1311,7 +1311,7 @@ export default class Interpreter {
             res,
             to_append,
           );
-          if (sign_cache) {
+          if (sign_cache !== null) {
             to_append.instructions.push(new Instruction(sign_cache, index, level));
             sign_cache = null;
           }
