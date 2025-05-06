@@ -44,23 +44,28 @@ function _updateContextServerInfo(ver: string, ver_info?: NetVersionInfo) {
 async function getOdooVersionByNetwork(): Promise<{
   server_version: string,
   server_version_info: NetVersionInfo,
-}> {
-  const response = await fetch('/web/webclient/version_info', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: '{}',
-  });
-  if (response.status === 200) {
-    const json_res = (await response.json()).result;
-    return {
-      server_version: json_res.server_version,
-      server_version_info: json_res.server_version_info,
-    };
+} | null> {
+  try {
+    const response = await fetch('/web/webclient/version_info', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
+    });
+    if (response.status === 200) {
+      const json_res = (await response.json()).result;
+      return {
+        server_version: json_res.server_version,
+        server_version_info: json_res.server_version_info,
+      };
+    }
+  } catch (_err) {
+    // Do nothing
   }
-  throw new Error(response);
+
+  return null;
 }
 
 /**
@@ -72,7 +77,9 @@ async function updateContextServerInfo(): Promise<void> {
     _updateContextServerInfo(server_ver);
   } else {
     const req_res = await getOdooVersionByNetwork();
-    _updateContextServerInfo(req_res.server_version, req_res.server_version_info);
+    if (req_res !== null) {
+      _updateContextServerInfo(req_res.server_version, req_res.server_version_info);
+    }
   }
 }
 

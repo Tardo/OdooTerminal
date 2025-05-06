@@ -5,9 +5,10 @@
 ```
 IMP: Solve some 'FIXME' comments
 IMP: Command 'sysparam': Allow number and boolean values
+IMP: Command 'longpolling': New 'subscribe' and 'unsubscribe' options
 
-FIX: Command 'longpolling': New 'subscribe' and 'unsubscribe' options
 FIX: Command 'longpolling' in Odoo 17.0+: 'moment' is no longer used
+FIX: Instance Analyzer: No crashing when using a blocking service worker
 ```
 
 **11.9.0**
