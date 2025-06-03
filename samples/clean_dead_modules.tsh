@@ -2,7 +2,8 @@
 // Removes modules that doesn't exists anymore...
 // WARNING: This is destructive!! Installed modules can't be removed, but act prudently.
 
-$mods = (search ir.module.module -f icon -d [['state', '=', 'uninstalled']])
+print "Searching modules..."
+$mods = (search ir.module.module -f icon,display_name -d [['state', '=', 'uninstalled']])
 $dmods = (arr_filter $mods function(item) { 
     $ficon = (fetch -u $item['icon'] -o {method: 'HEAD'})
     return ($ficon['status'] != 200)
@@ -13,9 +14,10 @@ if ($dmods_len == 0) {
     return -1
 }
 print "Modules to remove:"
-print $dmods
+print (arr_map $dmods function(item) { return $item['display_name'] })
 $do = (input -q 'Remove ' + $dmods_len + ' modules?' -c ['y','n'] -d 'n')
 if ($do == 'y') {
+    print "Removing modules..."
     $rids = (arr_map $dmods function(item) { return $item['id'] })
     $fails = []
     for ($i = 0; $i < $dmods_len; $i += 1) {
