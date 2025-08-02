@@ -1,5 +1,11 @@
 # Changelog
 
+**11.9.2**
+
+```
+FIX: race condition in dynamic options
+```
+
 **11.9.1**
 
 ```

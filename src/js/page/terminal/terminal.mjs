@@ -322,6 +322,7 @@ export default class Terminal {
       this.screen.printCommand(code);
     }
     this.screen.cleanInput();
+    this.updateAssistantoptions();
     if (store) {
       this.#storeUserInput(code);
     }
