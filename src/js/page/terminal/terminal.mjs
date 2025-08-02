@@ -194,8 +194,7 @@ export default class Terminal {
   }
 
   #injectTerminal(): void {
-    // $FlowFixMe
-    const terms_elms = document.body.querySelectorAll('.o_terminal:not(:first-child)');
+    const terms_elms = document.body?.querySelectorAll('.o_terminal:not(:first-child)') ?? [];
     if (terms_elms.length > 1) {
       // Remove extra terminals
       terms_elms.forEach(elm => elm.remove());
