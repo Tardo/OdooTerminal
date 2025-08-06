@@ -43,7 +43,7 @@
   },
   "permissions": ["activeTab", "storage"],
   "short_name": "OdooTerminal",
-  "version": "11.9.1",
+  "version": "11.9.2",
   "web_accessible_resources": [
     {
       "resources": ["dist/pub/**", "_locales/**/translation.json"],
