@@ -91,42 +91,47 @@ export default class VMachine {
     return [];
   }
 
-  async #invokeFunction(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef, parse_info: ParseInfo, silent: boolean): Promise<mixed> {
+  async #genKwargs(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef): Promise<{[string]: mixed}> {
     let kwargs: {[string]: mixed} = {};
-    if (typeof cmd_def !== 'undefined') {
-      const arg_defs = cmd_def.args.filter(arg => frame.args.filter(farg => farg in arg[1]).length)
-      if (getArgumentInputCount(arg_defs) > frame.args.length) {
-        throw new InvalidCommandArgumentsError(name, frame.args);
-      }
-      const items_len = Math.max(frame.values.length, frame.args.length);
-      if (getArgumentInputCount(arg_defs, true) > items_len) {
-        throw new InvalidCommandArgumentsError(name, frame.args);
-      }
-      let arg_def;
-      const {values} = frame;
-      for (let index = items_len - 1, adone = frame.values.length - 1; index >= 0; --index) {
-        let arg_name = frame.args.pop();
-        if (typeof arg_name === 'undefined' || !arg_name) {
-          arg_def = cmd_def.args[index];
-          if (!arg_def) {
-            throw new InvalidCommandArgumentValueError(name, values[adone--]);
-          }
-          arg_name = arg_def[1][1];
-        } else {
-          arg_def = getArgumentInfoByName(cmd_def.args, arg_name);
-          if (!arg_def) {
-            throw new InvalidCommandArgumentValueError(name, values[adone--]);
-          }
+    const arg_defs = cmd_def.args.filter(arg => frame.args.filter(farg => farg in arg[1]).length)
+    if (getArgumentInputCount(arg_defs) > frame.args.length) {
+      throw new InvalidCommandArgumentsError(name, frame.args);
+    }
+    const items_len = Math.max(frame.values.length, frame.args.length);
+    if (getArgumentInputCount(arg_defs, true) > items_len) {
+      throw new InvalidCommandArgumentsError(name, frame.args);
+    }
+    let arg_def;
+    const {values} = frame;
+    for (let index = items_len - 1, adone = values.length - 1; index >= 0; --index) {
+      let arg_name = frame.args.pop();
+      if (typeof arg_name === 'undefined' || !arg_name) {
+        arg_def = cmd_def.args[index];
+        if (!arg_def) {
+          throw new InvalidCommandArgumentValueError(name, values[adone--]);
         }
-        kwargs[arg_name] = arg_def.type === ARG.Flag ? true : values[adone--];
+        arg_name = arg_def[1][1];
+      } else {
+        arg_def = getArgumentInfoByName(cmd_def.args, arg_name);
+        if (!arg_def) {
+          throw new InvalidCommandArgumentValueError(name, values[adone--]);
+        }
       }
+      kwargs[arg_name] = arg_def.type === ARG.Flag ? true : values[adone--];
+    }
 
-      try {
-        kwargs = await validateAndFormatArguments(cmd_def, kwargs, this, opts, frame);
-      } catch (err) {
-        throw new InvalidCommandArgumentFormatError(err.message, name);
-      }
+    try {
+      kwargs = await validateAndFormatArguments(cmd_def, kwargs, this, opts, frame);
+    } catch (err) {
+      throw new InvalidCommandArgumentFormatError(err.message, name);
+    }
+    return kwargs;
+  }
 
+  async #invokeFunction(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef, parse_info: ParseInfo, silent: boolean): Promise<mixed> {
+    let kwargs = {};
+    if (typeof cmd_def !== 'undefined') {
+      kwargs = await this.#genKwargs(opts, frame, name, cmd_def);
       if (cmd_def.type !== FUNCTION_TYPE.Command) {
         if (typeof cmd_def.callback === 'undefined') {
           throw new InvalidCommandDefintionError();
