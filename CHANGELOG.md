@@ -1,5 +1,12 @@
 # Changelog
 
+**11.9.3**
+
+```
+IMP: Minor code refactor
+IMP: Reduce icons size
+```
+
 **11.9.2**
 
 ```
