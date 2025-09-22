@@ -31,7 +31,6 @@ import type {JobMetaInfo} from './shell';
 import type {ExtensionSettings} from '@common/constants';
 import type {CMDAssistantOption} from './core/command_assistant';
 export type TerminalOptions = {
-  commandTimeout: number,
   ...ExtensionSettings,
 };
 
