@@ -9,7 +9,13 @@ export default async function globalSetup(globalConfig) {
     cwd: 'tests/docker/',
     commandOptions: [['--pull', 'missing']],
   });
-  await compose.run('odoo', ['--stop-after-init', '-d', 'postgres', '-r', 'odoo', '-w', 'odoo', '-i', 'base,bus,barcodes,mail', '--with-demo'], {
+  const odoo_ver = process.env.ODOO_VERSION;
+  const odoo_major = Number(odoo_ver.split('.', 1));
+  const odoo_cli_params = ['--stop-after-init', '-d', 'postgres', '-r', 'odoo', '-w', 'odoo', '-i', 'base,bus,barcodes,mail'];
+  if (odoo_major >= 19) {
+    odoo_cli_params.push('--with-demo');
+  }
+  await compose.run('odoo', odoo_cli_params, {
     cwd: 'tests/docker/',
     commandOptions: [['--rm']],
   });
