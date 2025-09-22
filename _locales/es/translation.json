@@ -276,6 +276,14 @@
       "value": "Nombre/Valor/Argumento"
     }
   },
+  "cmdDoc": {
+    "args": {
+      "method": "El nombre del método",
+      "model": "El nombre técnico del modelo"
+    },
+    "definition": "Abre la página de documentación técnica",
+    "detail": "Abre la página de documentación técnica."
+  },
   "cmdEffect": {
     "args": {
       "options": "Las opciones adicionales para usar",

@@ -7,6 +7,7 @@ import cmdEffect from './effect';
 import cmdLang from './lang';
 import cmdSettings from './settings';
 import cmdView from './view';
+import cmdDoc from './doc';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -15,4 +16,5 @@ export default function (vm: VMachine) {
   vm.registerCommand('lang', cmdLang());
   vm.registerCommand('action', cmdAction());
   vm.registerCommand('effect', cmdEffect());
+  vm.registerCommand('doc', cmdDoc());
 }

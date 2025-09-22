@@ -276,6 +276,14 @@
       "value": "Name/Value/Argument"
     }
   },
+  "cmdDoc": {
+    "args": {
+      "method": "The method name",
+      "model": "The model technical name"
+    },
+    "definition": "Open thecnical documentation page",
+    "detail": "Open thecnical documentation page."
+  },
   "cmdEffect": {
     "args": {
       "options": "The extra options to use",
