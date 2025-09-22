@@ -6,7 +6,6 @@ module.exports = {
     dumpio: true,
     headless: process.env.PUPPETEER_HEADLESS !== 'false',
     product: process.env.PUPPETEER_BROWSER || 'chrome',
-    protocol: 'webDriverBiDi',
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',

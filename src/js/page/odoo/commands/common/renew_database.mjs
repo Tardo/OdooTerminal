@@ -20,6 +20,7 @@ async function cmdRenewDatabase(this: Terminal, kwargs: CMDCallbackArgs, ctx: CM
   const createDate = now.toISOString().slice(0, 19).replace('T', ' ');
   const expirationDate = new Date(now);
   expirationDate.setDate(now.getDate() + kwargs.expires_in);
+  expirationDate.setHours(0)
   const formattedExpirationDate = expirationDate.toISOString().slice(0, 19).replace('T', ' ');
 
   const params = [

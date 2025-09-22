@@ -1,6 +1,9 @@
 ![Mozilla Add-on](https://img.shields.io/amo/v/odoo-terminal?style=for-the-badge)
-![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge) &nbsp;&nbsp; ![Chrome Add-on](https://img.shields.io/chrome-web-store/v/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
-![Chrome Add-on](https://img.shields.io/chrome-web-store/users/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge) &nbsp;&nbsp; ![Edge Add-on](https://img.shields.io/badge/dynamic/json?style=for-the-badge&label=edge%20add-on&prefix=v&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Ffhndkkdikhceeojdacifnlmaeoklbogg)
+![Mozilla Add-on](https://img.shields.io/amo/users/odoo-terminal?style=for-the-badge) &nbsp;&nbsp;
+![Chrome Add-on](https://img.shields.io/chrome-web-store/v/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+![Chrome Add-on](https://img.shields.io/chrome-web-store/users/fdidojpjkbpfplcdmeaaehnjfkgpbhad?style=for-the-badge)
+&nbsp;&nbsp;
+![Edge Add-on](https://img.shields.io/badge/dynamic/json?style=for-the-badge&label=edge%20add-on&prefix=v&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Ffhndkkdikhceeojdacifnlmaeoklbogg)
 ![](https://img.shields.io/badge/dynamic/json?style=for-the-badge&label=users&query=%24.activeInstallCount&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Ffhndkkdikhceeojdacifnlmaeoklbogg)
 
 <h1 align="center">
@@ -18,7 +21,7 @@ The BFG10k for Odoo developers
 All the power of Odoo json-rpc in a really easy way!
 </p>
 
-This web extension adds a terminal-like to control Odoo (11 to 18). All implemented commands use the tools provided by
+This web extension adds a terminal-like to control Odoo (11 to 19). All implemented commands use the tools provided by
 the Odoo framework. An unwavering policy when developing this extension is to not modify or alter in any way the Odoo
 classes. This sometimes results in certain commands having reduced/increased capabilities depending on the Odoo version.
 
@@ -26,8 +29,6 @@ The terminal is fully initialized when it is first opened after loading the page
 extension is ~24ms.
 
 **Downloads**
-
-
 
 [<img src="https://www.mozilla.org/media/protocol/img/logos/firefox/browser/logo-lg.3d9087ac44e8.png" width="64">](https://addons.mozilla.org/es/firefox/addon/odoo-terminal/)
 [<img src="https://www.google.com/chrome/static/images/chrome-logo.svg" width="64">](https://chrome.google.com/webstore/detail/odoo-terminal/fdidojpjkbpfplcdmeaaehnjfkgpbhad)

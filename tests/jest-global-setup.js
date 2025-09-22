@@ -9,7 +9,7 @@ export default async function globalSetup(globalConfig) {
     cwd: 'tests/docker/',
     commandOptions: [['--pull', 'missing']],
   });
-  await compose.run('odoo', ['--stop-after-init', '-d', 'postgres', '-r', 'odoo', '-w', 'odoo', '-i', 'base,bus,barcodes,mail'], {
+  await compose.run('odoo', ['--stop-after-init', '-d', 'postgres', '-r', 'odoo', '-w', 'odoo', '-i', 'base,bus,barcodes,mail', '--with-demo'], {
     cwd: 'tests/docker/',
     commandOptions: [['--rm']],
   });

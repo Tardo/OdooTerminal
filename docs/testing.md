@@ -6,6 +6,7 @@
 apt-get install npm
 npm install --global npm
 npm install
+npx puppeteer browsers install chrome
 ```
 
 #### Usage

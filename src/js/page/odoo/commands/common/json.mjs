@@ -25,8 +25,8 @@ export default function (): Partial<CMDDef> {
     detail: i18n.t('cmdJson.detail', "Sends HTTP POST 'application/json' request"),
     args: [
       [ARG.String, ['e', 'endpoint'], true, i18n.t('cmdJson.args.endpoint', 'The endpoint')],
-      [ARG.Any, ['d', 'data'], true, i18n.t('cmdJson.args.data', 'The data to send')],
+      [ARG.Any, ['d', 'data'], false, i18n.t('cmdJson.args.data', 'The data to send')],
     ],
-    example: "-e /web_editor/public_render_template -d {args: ['web.layout']}",
+    example: "-e /web/action/load' -d {'action_id': 'base.paper_format_action'}",
   };
 }

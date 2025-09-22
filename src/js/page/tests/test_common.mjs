@@ -305,15 +305,15 @@ export default class TestCommon extends TerminalTestSuite {
   async test_json() {
     const res =
       await this.terminal.execute(
-        "json -e '/web_editor/get_assets_editor_resources' -d {key:'web.assets_backend'}",
+        "json -e '/web/action/load' -d {'action_id': 'base.paper_format_action'}",
         false,
         true,
       );
-    this.assertIn(res, 'views');
+    this.assertEqual(res.xml_id, 'base.paper_format_action');
   }
 
   async test_depends() {
-    const res = await this.terminal.execute('depends -m mail', false, true);
+    const res = await this.terminal.execute('depends -m base', false, true);
     this.assertNotEmpty(res);
   }
 

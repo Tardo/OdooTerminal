@@ -1,10 +1,14 @@
 # Changelog
 
-**11.9.3**
+**11.10.0**
 
 ```
+ADD: Support Odoo 19.0
+
 IMP: Minor code refactor
 IMP: Reduce icons size
+
+FIX: Command 'json': Don't require 'data' parameter
 ```
 
 **11.9.2**

@@ -8,7 +8,7 @@ import VMachine from '@trash/vmachine';
 import Frame from '@trash/frame';
 import ProcessJobError from './exceptions/process_job_error';
 import Interpreter from '@trash/interpreter';
-import codeArray from '@trash/tl/array';
+import codeArray from '@trash/std/array';
 import type {ParserOptions, ParseInfo} from '@trash/interpreter';
 import type {EvalOptions, ProcessCommandJobOptions} from '@trash/vmachine';
 
@@ -45,10 +45,7 @@ export default class Shell {
   #options: ShellOptions;
 
   constructor(options: ShellOptions) {
-    this.#options = {
-      ...options,
-      commandTimeout: 30000,
-    };
+    this.#options = {...options};
     this.#interpreter = new Interpreter();
     this.#virtMachine = new VMachine({
       processCommandJob: (cmdInfo, silent) => this.#processCommandJob(cmdInfo, silent),

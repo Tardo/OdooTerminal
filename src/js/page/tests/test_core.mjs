@@ -160,11 +160,11 @@ export default class TestCore extends TerminalTestSuite {
 
   async test_commit() {
     await this.terminal.execute("$rs = (read res.partner 8); $rs['name'] = 'Willy Wonka';", false, true);
-    let res = await this.terminal.execute('print $rs', false, true);
+    let res = await this.terminal.execute('$rs', false, true);
     this.assertNotEmpty(res.toWrite());
     res = await this.terminal.execute('commit $rs', false, true);
     this.assertTrue(res);
-    res = await this.terminal.execute('print $rs', false, true);
+    res = await this.terminal.execute('$rs', false, true);
     this.assertEmpty(res.toWrite());
     res = await this.terminal.execute('read res.partner 8 -f name', false, true);
     this.assertEqual(res.name, 'Willy Wonka');
@@ -172,14 +172,14 @@ export default class TestCore extends TerminalTestSuite {
 
   async test_rollback() {
     await this.terminal.execute("$rsb = (read res.partner 8); $rsb['name'] = 'Willy Wonka';", false, true);
-    const res = await this.terminal.execute('print $rsb', false, true);
+    const res = await this.terminal.execute('$rsb', false, true);
     this.assertNotEmpty(res.toWrite());
     await this.terminal.execute('rollback $rsb', false, true);
     this.assertEmpty(res.toWrite());
   }
 
   async test_input() {
-    const red_prom = this.terminal.execute("$ind = (input 'test:'); print $ind;", false, true);
+    const red_prom = this.terminal.execute("$ind = (input 'test:'); $ind;", false, true);
     await asyncSleep(300);
     const input_el = this.terminal.screen.getUserInputEl();
     this.assertFalse(typeof input_el === 'undefined');

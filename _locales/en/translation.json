@@ -33,7 +33,8 @@
     "args": {
       "canvas": "The canvas"
     },
-    "definition": "Destroy 2D Window"
+    "definition": "Destroy 2D Window",
+    "detail": "Destroy 2D Window"
   },
   "cmd2DLine": {
     "args": {
@@ -255,6 +256,8 @@
     "definition": "Know modules that depends on the given module",
     "detail": "Show a list of the modules that depends on the given module",
     "error": {
+      "noModulesFound": "No modules found!",
+      "noWizard": "Can't create wizard record!",
       "notInstalled": "The module '{{module}}' isn't installed"
     }
   },

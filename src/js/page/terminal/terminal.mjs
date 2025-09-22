@@ -72,7 +72,7 @@ export default class Terminal {
 
   #shell: Shell;
 
-  #config: TerminalOptions = {...SETTING_DEFAULTS, commandTimeout: 30000};
+  #config: TerminalOptions = {...SETTING_DEFAULTS};
 
   #rawTerminalTemplate: string = renderTerminal();
 
@@ -102,6 +102,7 @@ export default class Terminal {
       onStartCommand: () => this.#updateJobsInfo(),
       onTimeoutCommand: () => this.#updateJobsInfo(),
       onFinishCommand: () => this.#updateJobsInfo(),
+      commandTimeout: 30000,
     });
     this.screen = new Screen({
       username: i18n.t('terminal.unregisteredUser','Unregistered User'),

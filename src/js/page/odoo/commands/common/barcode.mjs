@@ -67,6 +67,7 @@ function getBarcodeInfo(barcodeService: BarcodeService) {
 
 async function cmdBarcode(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const barcodeService = getOdooService('barcodes.BarcodeEvents', '@barcodes/barcode_service');
+  debugger;
   if (!barcodeService) {
     // Soft-dependency... this don't exists if barcodes module is not installed
     ctx.screen.printError(

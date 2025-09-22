@@ -33,7 +33,8 @@
     "args": {
       "canvas": "El lienzo"
     },
-    "definition": "Destruir ventana 2D"
+    "definition": "Destruir ventana 2D",
+    "detail": "Destruir ventana 2D"
   },
   "cmd2DLine": {
     "args": {
@@ -255,6 +256,8 @@
     "definition": "Conozca los módulos que dependen del módulo dado",
     "detail": "Mostrar una lista de los módulos que depende del módulo dado",
     "error": {
+      "noModulesFound": "No se han encontrado los módulos!",
+      "noWizard": "¡No se ha podido crear el registro del asistente!",
       "notInstalled": "El módulo '{{module}}' no está instalado"
     }
   },
