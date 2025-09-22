@@ -9,7 +9,7 @@ import {InstanceContext, updateContext} from '@shared/context'; // This is the p
 
 type NetVersionInfo = [number, number, string, number];
 
-const ODOO_OBJ: {...} = window.odoo;
+const ODOO_OBJ: {[string]: mixed} = window.odoo;
 
 /**
  * Helper function to sanitize the server version.
@@ -60,6 +60,25 @@ async function getOdooVersionByNetwork(): Promise<{
         server_version: json_res.server_version,
         server_version_info: json_res.server_version_info,
       };
+    } else {
+      const req_data = new URLSearchParams();
+      if (typeof ODOO_OBJ.csrf_token === 'string') {
+        req_data.append('csrf_token', ODOO_OBJ.csrf_token);
+      }
+      const response_b = await fetch('/web/version', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+        body: req_data,
+      });
+      if (response_b.status === 200) {
+        const json_res = (await response_b.json());
+        return {
+          server_version: json_res.version,
+          server_version_info: json_res.version_info,
+        };
+      }
     }
   } catch (_err) {
     // Do nothing

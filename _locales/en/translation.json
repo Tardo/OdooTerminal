@@ -282,7 +282,10 @@
       "model": "The model technical name"
     },
     "definition": "Open thecnical documentation page",
-    "detail": "Open thecnical documentation page."
+    "detail": "Open thecnical documentation page.",
+    "error": {
+      "incompatibleOdooVersion": "This command is only available in Odoo 19.0+"
+    }
   },
   "cmdEffect": {
     "args": {

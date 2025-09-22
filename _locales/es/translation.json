@@ -282,7 +282,10 @@
       "model": "El nombre técnico del modelo"
     },
     "definition": "Abre la página de documentación técnica",
-    "detail": "Abre la página de documentación técnica."
+    "detail": "Abre la página de documentación técnica.",
+    "error": {
+      "incompatibleOdooVersion": "This command is only available in Odoo 19.0+"
+    }
   },
   "cmdEffect": {
     "args": {
