@@ -281,8 +281,8 @@
       "method": "The method name",
       "model": "The model technical name"
     },
-    "definition": "Open thecnical documentation page",
-    "detail": "Open thecnical documentation page.",
+    "definition": "Open technical documentation page",
+    "detail": "Open technical documentation page.",
     "error": {
       "incompatibleOdooVersion": "This command is only available in Odoo 19.0+"
     }
