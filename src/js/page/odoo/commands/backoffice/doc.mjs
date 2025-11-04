@@ -48,10 +48,10 @@ async function getOptions(this: Terminal, arg_name: string) {
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('cmdDoc.definition', 'Open thecnical documentation page'),
+    definition: i18n.t('cmdDoc.definition', 'Open technical documentation page'),
     callback: cmdDoc,
     options: getOptions,
-    detail: i18n.t('cmdDoc.detail', 'Open thecnical documentation page.'),
+    detail: i18n.t('cmdDoc.detail', 'Open technical documentation page.'),
     args: [
       [
         ARG.String,
