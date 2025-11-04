@@ -1,9 +1,16 @@
 # Changelog
 
+**11.10.1**
+
+```
+FIX: Typo in the technical documentation details (by baptiste-n42 - pr #146)
+```
+
 **11.10.0**
 
 ```
 ADD: Support Odoo 19.0
+ADD: Command 'doc': View technical documentation page
 
 IMP: Minor code refactor
 IMP: Reduce icons size
