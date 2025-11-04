@@ -20,11 +20,15 @@ async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
       if (typeof res === 'undefined') {
         return;
       }
-      // $FlowFixMe
-      const depends: $ReadOnlyArray<string> = res.filter(item => item !== kwargs.module);
+      const depends: $ReadOnlyArray<{
+        id: number,
+        display_name: string,
+        // $FlowFixMe
+      }> = res.filter(item => item.id !== modue_infos[0].id);
       if (!isEmpty(depends)) {
+        const depend_name_lines = depends.map(item => `${item.display_name} [<span class='o_terminal_click o_terminal_cmd' data-cmd='view ir.module.module ${item.id}'>#${item.id}</span>]`);
         ctx.screen.print(i18n.t('cmdUninstall.result.willRemoved', 'This operation will remove these modules too:'));
-        ctx.screen.print(depends);
+        ctx.screen.print(depend_name_lines);
         const res_quest = await ctx.screen.showQuestion(
           i18n.t('cmdUninstall.question.continue', 'Do you want to continue?'),
           ['y', 'n'],
