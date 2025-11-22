@@ -309,6 +309,7 @@
       "fieldName": "The field representing the file name",
       "filename": "The filename",
       "format": "The format to use for exporting",
+      "mimetype": "The MIME type of the file",
       "noHeader": "Don't use header",
       "value": "The value to export"
     },

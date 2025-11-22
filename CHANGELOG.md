@@ -9,6 +9,7 @@ ADD: Internal function 'decode': Decode data (base64)
 
 IMP: Command 'exportfile': New format 'raw' to generic binary
 IMP: Command 'exportfile': New format 'zip' to export binary fields
+IMP: Command 'exportfile': New option 'mimetype' to change the MIME type when using 'raw' format
 
 FIX: Command 'exportfile': Incorrect handling of recordset (issue #147)
 ```

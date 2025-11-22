@@ -53,7 +53,7 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
       data = await createZip(zip_values);
     }
   } else if (kwargs.format === 'raw') {
-    mime = 'application/octet-stream';
+    mime = kwargs.mimetype || 'application/octet-stream';
     data = kwargs.value;
   }
   save2file(filename, mime, data);
@@ -75,6 +75,7 @@ export default function (): Partial<CMDDef> {
       [ARG.String, ['d', 'delimiter'], false, i18n.t('cmdExportFile.args.delimiter', 'The delimiter'), ','],
       [ARG.String, ['fname', 'field-name'], false, i18n.t('cmdExportFile.args.fieldName', 'The field representing the file name'), 'filename'],
       [ARG.String, ['fdata', 'field-data'], false, i18n.t('cmdExportFile.args.fieldData', 'The field representing the file data'), 'datas'],
+      [ARG.String, ['m', 'mimetype'], false, i18n.t('cmdExportFile.args.mimetype', 'The MIME type of the file')],
       [ARG.Any, ['v', 'value'], true, i18n.t('cmdExportFile.args.value', 'The value to export')],
     ],
     example: "-c 'search res.partner'",
