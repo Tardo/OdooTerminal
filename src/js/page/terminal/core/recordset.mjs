@@ -159,7 +159,7 @@ export default class Recordset {
     }
   }
 
-  toJSON(): Array<Record> {
+  toJSON(): Array<{...}> {
     return this.#records.map(rec => rec.toJSON());
   }
 
