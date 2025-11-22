@@ -42,14 +42,14 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
     } else if (kwargs.format === 'zip') {
       const field_names = kwargs.value.fieldNames;
       if (!field_names.includes(kwargs.field_name)) {
-        throw new Error(i18n.t('cmdExportFile.invalidFieldName', "Invalid field name: no field named ‘{{fieldName}}’ is found to represent the name", {fieldName: kwargs.field_name}));
+        throw new Error(i18n.t('cmdExportFile.invalidFieldName', "No field named ‘{{fieldName}}’ is found that represent the name", {fieldName: kwargs.field_name}));
       }
       if (!field_names.includes(kwargs.field_data)) {
-        throw new Error(i18n.t('cmdExportFile.invalidFieldData', "Invalid field name: no field named ‘{{fieldData}}’ is found to represent the data", {fieldData: kwargs.field_data}));
+        throw new Error(i18n.t('cmdExportFile.invalidFieldData', "No field named ‘{{fieldData}}’ is found that represent the data", {fieldData: kwargs.field_data}));
       }
 
       mime = 'application/zip';
-      const zip_values = kwargs.value.toJSON().filter(rec => rec[kwargs.field_name] && rec[kwargs.field_data]).map(rec => [rec[kwargs.field_name], rec[kwargs.field_data], {base64: true}]);
+      const zip_values = kwargs.value.toJSON().filter(rec => rec[kwargs.field_data]).map(rec => [rec[kwargs.field_name] || `unnamed_${rec.id}`, rec[kwargs.field_data], {base64: true}]);
       data = await createZip(zip_values);
     }
   } else if (kwargs.format === 'raw') {
