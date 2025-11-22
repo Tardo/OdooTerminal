@@ -15,6 +15,7 @@ import cmdPrint from './print';
 import cmdToggleTerm from './toggle_term';
 import cmdInput from './input';
 import cmdRun from './run';
+import cmdZip from './zip';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -32,4 +33,5 @@ export default function (vm: VMachine) {
   vm.registerCommand('genfile', cmdGenFile());
   vm.registerCommand('input', cmdInput());
   vm.registerCommand('run', cmdRun());
+  vm.registerCommand('zip', cmdZip());
 }

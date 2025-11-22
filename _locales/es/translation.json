@@ -865,6 +865,13 @@
       "connectionEstablished": "[{{url}}] Conexión establecida"
     }
   },
+  "cmdZip": {
+    "args": {
+      "values": "Datos para escribir (debe ser una lista de tuplas [nombre de archivo, datos del archivo])"
+    },
+    "definition": "Crear archivo zip",
+    "detail": "Crear archivo zip"
+  },
   "file2base64": {
     "aborted": "Abortado por el usuario. No se ha proporcionado ningún archivo..."
   },
@@ -889,6 +896,22 @@
     },
     "definition": "Valor absoluto de un numero",
     "detail": "Devuelve el valor absoluto de un número"
+  },
+  "funcDecode": {
+    "args": {
+      "method": "El método para decodificar",
+      "value": "El valor a decodificar"
+    },
+    "definition": "Encode",
+    "detail": "Decodificar datos"
+  },
+  "funcEncode": {
+    "args": {
+      "method": "El método para codificar",
+      "value": "El valor a codificar"
+    },
+    "definition": "Encode",
+    "detail": "Codificar datos"
   },
   "funcFetch": {
     "args": {

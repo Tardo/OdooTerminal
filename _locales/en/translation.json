@@ -865,6 +865,13 @@
       "connectionEstablished": "[{{url}}] Connection established"
     }
   },
+  "cmdZip": {
+    "args": {
+      "values": "Data to write (must be an array of tuples [filename, filedata])"
+    },
+    "definition": "Create zip file",
+    "detail": "Create zip file"
+  },
   "file2base64": {
     "aborted": "Aborted by user. No file given..."
   },
@@ -889,6 +896,22 @@
     },
     "definition": "Absolute value of a number",
     "detail": "Returns the absolute value of a number."
+  },
+  "funcDecode": {
+    "args": {
+      "method": "The method to decode",
+      "value": "The value to decode"
+    },
+    "definition": "Encode",
+    "detail": "Decode data"
+  },
+  "funcEncode": {
+    "args": {
+      "method": "The method to encode",
+      "value": "The value to encode"
+    },
+    "definition": "Encode",
+    "detail": "Encode data"
   },
   "funcFetch": {
     "args": {

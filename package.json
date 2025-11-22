@@ -130,5 +130,8 @@
     "endOfLine": "lf",
     "embeddedLanguageFormatting": "auto",
     "singleAttributePerLine": false
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
   }
 }

@@ -10,8 +10,8 @@ import i18n from 'i18next';
 import HttpApi from 'i18next-http-backend';
 import postMessage from '@common/utils/post_message';
 import logger from '@common/logger';
-import registerBackofficeFuncs from '@odoo/commands/backoffice/__all__';
-import registerCommonFuncs from '@odoo/commands/common/__all__';
+import registerOdooBackofficeCommands from '@odoo/commands/backoffice/__all__';
+import registerOdooCommonCommands from '@odoo/commands/common/__all__';
 import OdooTerminal from '@odoo/terminal';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import getOdooService from '@odoo/utils/get_odoo_service';
@@ -21,7 +21,8 @@ import isBackOffice from '@odoo/utils/is_backoffice';
 import registerMathFuncs from '@trash/core/math/__all__';
 import registerTimeFuncs from '@trash/core/time/__all__';
 import registerNetFuncs from '@trash/core/net/__all__';
-import registerCoreFuncs from '@terminal/commands/__all__';
+import registerEnDeFuncs from '@trash/core/ende/__all__';
+import registerCoreCommands from '@terminal/commands/__all__';
 import registerGraphicsFuncs from '@terminal/libs/graphics/__all__';
 import OdooTerminalTests from '@tests/terminal';
 import type {TerminalOptions} from '@terminal/terminal';
@@ -71,14 +72,15 @@ async function postInitTerminal(term_obj: OdooTerminal, config: TerminalOptions)
 }
 
 function loadVMFunctions(vm: VMachine) {
-  registerCoreFuncs(vm);
   registerMathFuncs(vm);
   registerNetFuncs(vm);
   registerTimeFuncs(vm);
   registerGraphicsFuncs(vm);
-  registerCommonFuncs(vm);
+  registerEnDeFuncs(vm);
+  registerCoreCommands(vm);
+  registerOdooCommonCommands(vm);
   if (isBackOffice()) {
-    registerBackofficeFuncs(vm);
+    registerOdooBackofficeCommands(vm);
   }
 }
 

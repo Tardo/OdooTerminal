@@ -37,6 +37,9 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
       mime = 'text/xml';
       data = await xmlStringify(kwargs.value, await this.getContext());
     }
+  } else if (kwargs.format === 'raw') {
+    mime = 'application/octet-stream';
+    data = kwargs.value;
   }
   save2file(filename, mime, data);
   ctx.screen.print(
@@ -52,7 +55,7 @@ export default function (): Partial<CMDDef> {
     detail: i18n.t('cmdExportFile.detail', 'Exports the command result to a text/json file.'),
     args: [
       [ARG.Flag, ['no-header', 'no-header'], false, i18n.t('cmdExportFile.args.noHeader', "Don't use header"), false],
-      [ARG.String, ['f', 'format'], false, i18n.t('cmdExportFile.args.format', 'The format to use for exporting'), 'json', ['json', 'csv', 'xml']],
+      [ARG.String, ['f', 'format'], false, i18n.t('cmdExportFile.args.format', 'The format to use for exporting'), 'json', ['json', 'csv', 'xml', 'raw']],
       [ARG.String, ['fn', 'filename'], false, i18n.t('cmdExportFile.args.filename', 'The filename')],
       [ARG.String, ['d', 'delimiter'], false, i18n.t('cmdExportFile.args.delimiter', 'The delimiter'), ','],
       [ARG.Any, ['v', 'value'], true, i18n.t('cmdExportFile.args.value', 'The value to export')],
