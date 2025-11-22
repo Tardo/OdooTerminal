@@ -6,7 +6,7 @@
 import JSZip from 'jszip';
 
 
-export default async function(items: $ReadOnlyArray<[string, string | Blob, ?{string: mixed}]>, options: {string: mixed}): Promise<Blob> {
+export default async function(items: $ReadOnlyArray<[string, string | Blob, ?{[string]: mixed}]>, options: {[string]: mixed}): Promise<Blob> {
   const zip = new JSZip();
   for (const [filename, filedata, fileopts] of items) {
     zip.file(filename, filedata, fileopts);

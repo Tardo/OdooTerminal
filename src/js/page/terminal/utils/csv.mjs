@@ -12,7 +12,7 @@ function sanitizeValue(value: string, regex: RegExp): string {
 }
 
 // More Info: https://datatracker.ietf.org/doc/html/rfc4180
-export default function(items: $ReadOnlyArray<{string: mixed}>, use_header: boolean = false, delimiter: string = ','): string {
+export default function(items: $ReadOnlyArray<{[string]: mixed}>, use_header: boolean = false, delimiter: string = ','): string {
   const san_regex = new RegExp(`["\n${delimiter}]`);
   let res = '';
   if (use_header) {
