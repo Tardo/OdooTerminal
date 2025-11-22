@@ -314,8 +314,8 @@
     },
     "definition": "Exports the command result to a text/json file",
     "detail": "Exports the command result to a text/json file.",
-    "invalidFieldData": "Invalid field name: no field named ‘{{fieldData}}’ is found to represent the data",
-    "invalidFieldName": "Invalid field name: no field named ‘{{fieldName}}’ is found to represent the name",
+    "invalidFieldData": "No field named ‘{{fieldName}}’ is found that represent the data",
+    "invalidFieldName": "No field named ‘{{fieldName}}’ is found that represent the name",
     "invalidValue": "Invalid value: must be a recordset with csv and xml",
     "resultExported": "Command result exported to '{{filename}}' file"
   },

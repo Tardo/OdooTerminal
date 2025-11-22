@@ -63,7 +63,7 @@
   },
   "cmdAction": {
     "args": {
-      "action": "La acción a iniciar<br/>Puede ser una cadena, un número o un objeto.",
+      "action": "La acción a iniciar<br/>Puede ser una cadena, un número o un objeto",
       "options": "Las opciones adicionales para usar"
     },
     "definition": "Llamar a una acción"
@@ -78,7 +78,7 @@
     "detail": "Defina pseudónimos para ejecutar comandos fácilmente. <br><b>ADVERTENCIA:</b> Este comando utiliza 'almacenamiento local' para conservar los datos incluso si cierra el navegador. Otros usuarios del ordenador pueden acceder fácilmente a estos datos. No emplee datos sensibles si está utilizando un ordenador compartido.<br><br>Se pueden usar parámetros posicionales ($1,$2,$3,$N...)",
     "example": "-n myalias -c \"imprimir '¡Hola, $1!'\"",
     "invalidAliasName": "Nombre de pseudónimo no válido",
-    "notDefined": "No hay pseudónimos definidos.",
+    "notDefined": "No hay pseudónimos definidos",
     "notExists": "El pseudónimo seleccionado no existe",
     "removed": "Pseudónimo​​ eliminado con éxito"
   },
@@ -124,7 +124,7 @@
   },
   "cmdCam": {
     "args": {
-      "model": "El nombre técnico del modelo.",
+      "model": "El nombre técnico del modelo",
       "operation": "La operación a realizar"
     },
     "definition": "Consultar acceso al modelo",
@@ -138,7 +138,7 @@
     "args": {
       "cmd": "El comando a ejecutar"
     },
-    "definition": "Imprimir el tiempo empleado en ejecutar un comando.",
+    "definition": "Imprimir el tiempo empleado en ejecutar un comando",
     "detail": "Imprime el tiempo transcurrido en segundos para ejecutar un comando. <br/>¡Observe que este tiempo incluye el tiempo para formatear el resultado!",
     "result": {
       "timeElapsed": "Tiempo transcurrido: '{{time_elapsed_secs}}' segundos"
@@ -169,7 +169,7 @@
       "value": "Los valores"
     },
     "definition": "Operaciones con el contexto de sesi̇ón",
-    "detail": "Contexto de sesión.",
+    "detail": "Contexto de sesión",
     "error": {
       "keyNotPresent": "La clave seleccionada no está presente en el contexto del terminal",
       "notSession": "No se puede encontrar información de la sesión",
@@ -210,7 +210,7 @@
   },
   "cmdCreate": {
     "args": {
-      "model": "El nombre técnico del modelo.",
+      "model": "El nombre técnico del modelo",
       "options": "Las opciones",
       "value": "Los valores a escribir"
     },
@@ -282,7 +282,7 @@
       "model": "El nombre técnico del modelo"
     },
     "definition": "Abre la página de documentación técnica",
-    "detail": "Abre la página de documentación técnica.",
+    "detail": "Abre la página de documentación técnica",
     "error": {
       "incompatibleOdooVersion": "This command is only available in Odoo 19.0+"
     }
@@ -304,18 +304,18 @@
   },
   "cmdExportFile": {
     "args": {
-      "delimiter": "The delimiter",
-      "fieldData": "The field representing the file data",
-      "fieldName": "The field representing the file name",
+      "delimiter": "El delimitador",
+      "fieldData": "El campo que representa los datos del archivo",
+      "fieldName": "El campo que representa el nombre del archivo",
       "filename": "El nombre del archivo",
       "format": "El formato a utilizar",
       "noHeader": "No usar cabecera",
       "value": "El valor a exportar"
     },
     "definition": "Exporta el resultado del comando a un archivo de texto/json",
-    "detail": "Exporta el resultado del comando a un archivo de texto/json.",
-    "invalidFieldData": "Invalid field name: no field named ‘{{fieldData}}’ is found to represent the data",
-    "invalidFieldName": "Invalid field name: no field named ‘{{fieldName}}’ is found to represent the name",
+    "detail": "Exporta el resultado del comando a un archivo de texto/json",
+    "invalidFieldData": "No se encuentra ningún campo llamado '{{fieldData}}' que represente los datos",
+    "invalidFieldName": "No se encuentra ningún campo llamado '{{fieldName}}' que represente el nombre",
     "invalidValue": "Valor inválido: se requiere un 'recordset' con csv y xml",
     "resultExported": "Resultado del comando exportado al archivo '{{filename}}'"
   },
@@ -329,7 +329,7 @@
   },
   "cmdFuncTrash": {
     "args": {
-      "name": "The function parameter"
+      "name": "El parámetro de función"
     }
   },
   "cmdGen": {
@@ -347,7 +347,7 @@
       "options": "Las opciones del objeto Archivo"
     },
     "definition": "Generar un objeto de archivo",
-    "detail": "Abra un cuadro de diálogo de archivo del navegador e instancia un objeto Archivo con el contenido del archivo seleccionado."
+    "detail": "Abra un cuadro de diálogo de archivo del navegador e instancia un objeto Archivo con el contenido del archivo seleccionado"
   },
   "cmdHelp": {
     "args": {
@@ -470,13 +470,13 @@
       "database": "La base de datos<br/>Puede ser '*' para usar la base de datos actual",
       "noReload": "Sin recarga",
       "password": "La contraseña",
-      "user": "El inicio de sesión<br/>Puede ir precedido opcionalmente del carácter '#' y también se utilizará como contraseña."
+      "user": "El inicio de sesión<br/>Puede ir precedido opcionalmente del carácter '#' y también se utilizará como contraseña"
     },
     "definition": "Inicia sesión como...",
     "detail": "Inicie sesión como el usuario indicado",
     "error": {
       "notSession": "No se pudo encontrar información de la sesión",
-      "unknownDB": "Base de datos activa desconocida. Intente utilizar el comando '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>'."
+      "unknownDB": "Base de datos activa desconocida. Intente utilizar el comando '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>'"
     },
     "result": {
       "success": "Se ha iniciado sesión correctamente como '{{login}}'"
@@ -611,14 +611,14 @@
   "cmdRenewDatabase": {
     "args": {
       "dbuuid": "Renovar el UUID de la base de datos",
-      "expires_in": "Establecer en días el tiempo antes de la expiración de la base de datos."
+      "expires_in": "Establecer en días el tiempo antes de la expiración de la base de datos"
     },
     "definition": "Renovar la base de datos",
-    "detail": "Re-generar un nuevo UUID y fecha de expiración para tu base de datos de desarrollo.",
+    "detail": "Re-generar un nuevo UUID y fecha de expiración para tu base de datos de desarrollo",
     "result": {
       "success": "Base de datos renovada con éxito",
-      "success_date": "Nueva fecha de expiración: {{formattedExpirationDate}}.",
-      "success_with_uuid": "Nuevo UUID: {{uuid}}."
+      "success_date": "Nueva fecha de expiración: {{formattedExpirationDate}}",
+      "success_with_uuid": "Nuevo UUID: {{uuid}}"
     }
   },
   "cmdRollback": {
@@ -662,7 +662,7 @@
     "detail": "Iniciar consulta de búsqueda de registros de modelo",
     "error": {
       "noMoreResults": "No hay más resultados para imprimir",
-      "resultTruncated": "<strong class='text-warning'>¡Resultado truncado a {{len}} registros!</strong> La consulta es demasiado grande para mostrarse en su totalidad."
+      "resultTruncated": "<strong class='text-warning'>¡Resultado truncado a {{len}} registros!</strong> La consulta es demasiado grande para mostrarse en su totalidad"
     },
     "question": {
       "showMore": "Aún quedan resultados por imprimir ({{len}} registros). ¿Mostrar más?"
@@ -688,11 +688,11 @@
   "cmdSysParam": {
     "args": {
       "key": "Clave del parámetro (requerido para operaciones get/set)",
-      "operation": "Operación a realizar.",
+      "operation": "Operación a realizar",
       "value": "Valor del parámetro (requerido para la operación set)"
     },
     "definition": "Gestionar parámetros del sistema",
-    "detail": "Obtener, establecer o listar parámetros en el modelo ir.config_parameter.",
+    "detail": "Obtener, establecer o listar parámetros en el modelo ir.config_parameter",
     "error": {
       "invalidOperation": "Operación no válida. Use 'get', 'set', o 'list'",
       "listEmpty": "No se encontraron parámetros del sistema",
@@ -731,7 +731,7 @@
     },
     "result": {
       "clean": "Tour '{{name}}' limpio",
-      "empty": "La lista de 'tours' está vacía.",
+      "empty": "La lista de 'tours' está vacía",
       "running": "Ejecutando el 'tour'..."
     }
   },
@@ -842,7 +842,7 @@
       "value": "Los valores a escribir"
     },
     "definition": "Actualizar valores de registro",
-    "detail": "Actualizar valores de registro.",
+    "detail": "Actualizar valores de registro",
     "result": {
       "success": "{{model}} registro actualizado correctamente"
     }
