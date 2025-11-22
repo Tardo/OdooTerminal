@@ -4,18 +4,13 @@
 
 // $FlowIgnore
 import i18n from 'i18next';
-// $FlowIgnore
-import JSZip from 'jszip';
+import createZip from '@terminal/utils/zip';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
 async function cmdZip(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
-  const zip = new JSZip();
-  for (const [filename, data] of kwargs.values) {
-    zip.file(filename, data);
-  }
-  return await zip.generateAsync({type: 'blob'});
+  return await createZip(kwargs.values);
 }
 
 export default function (): Partial<CMDDef> {
@@ -24,7 +19,7 @@ export default function (): Partial<CMDDef> {
     callback: cmdZip,
     detail: i18n.t('cmdZip.detail', 'Create zip file'),
     args: [
-      [ARG.List | ARG.Any, ['v', 'values'], true, i18n.t('cmdZip.args.values', 'Data to write (must be an array of tuples [filename, filedata])')],
+      [ARG.List | ARG.Any, ['v', 'values'], true, i18n.t('cmdZip.args.values', 'Data to write (must be an array of tuples [filename, filedata, fileoptions])')],
     ],
     example: "-v [['phones.txt', '000123456\\n000789012\\n'], ['names.txt', 'Lucia\\nAlex\\n']]",
   };

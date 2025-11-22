@@ -305,6 +305,8 @@
   "cmdExportFile": {
     "args": {
       "delimiter": "The delimiter",
+      "fieldData": "The field representing the file data",
+      "fieldName": "The field representing the file name",
       "filename": "The filename",
       "format": "The format to use for exporting",
       "noHeader": "Don't use header",
@@ -312,6 +314,8 @@
     },
     "definition": "Exports the command result to a text/json file",
     "detail": "Exports the command result to a text/json file.",
+    "invalidFieldData": "Invalid field name: no field named ‘{{fieldData}}’ is found to represent the data",
+    "invalidFieldName": "Invalid field name: no field named ‘{{fieldName}}’ is found to represent the name",
     "invalidValue": "Invalid value: must be a recordset with csv and xml",
     "resultExported": "Command result exported to '{{filename}}' file"
   },

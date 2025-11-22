@@ -1,12 +1,12 @@
 {
   "No": "No",
   "UnknownNameError": {
-    "invalidName": "<Nombre no válido>"
+    "invalidName": "<NombreNoVálido>"
   },
-  "Yes": "Sí",
+  "Yes": "Yes",
   "checkStorageError": {
-    "message": "Borre la <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen' style='color:orange;'>pantalla</strong> o/y <b class='o_terminal_click o_terminal_cmd' data-cmd='clear historial ' style='color:orange;'>el historial</strong> para liberar espacio de almacenamiento. El navegador reporta: <u>Cuota de almacenamiento excedida</u> 😭",
-    "warning": "ADVERTENCIA:"
+    "message": "Borrar la <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>pantalla</strong> o/y <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>historial</strong> para liberar espacio de almacenamiento. Navegador <u>Se ha superado la cuota de almacenamiento</u> 😭",
+    "warning": "ADVERTENCIA: "
   },
   "cmd2DClear": {
     "args": {
@@ -305,6 +305,8 @@
   "cmdExportFile": {
     "args": {
       "delimiter": "The delimiter",
+      "fieldData": "The field representing the file data",
+      "fieldName": "The field representing the file name",
       "filename": "El nombre del archivo",
       "format": "El formato a utilizar",
       "noHeader": "No usar cabecera",
@@ -312,6 +314,8 @@
     },
     "definition": "Exporta el resultado del comando a un archivo de texto/json",
     "detail": "Exporta el resultado del comando a un archivo de texto/json.",
+    "invalidFieldData": "Invalid field name: no field named ‘{{fieldData}}’ is found to represent the data",
+    "invalidFieldName": "Invalid field name: no field named ‘{{fieldName}}’ is found to represent the name",
     "invalidValue": "Valor inválido: se requiere un 'recordset' con csv y xml",
     "resultExported": "Resultado del comando exportado al archivo '{{filename}}'"
   },
@@ -325,7 +329,7 @@
   },
   "cmdFuncTrash": {
     "args": {
-      "name": "El parámetro de función"
+      "name": "The function parameter"
     }
   },
   "cmdGen": {
@@ -962,7 +966,7 @@
   },
   "odoo": {
     "error": {
-      "notRoot": "No se puede encontrar el objeto raíz"
+      "notRoot": "No se encuentra el objeto raíz"
     },
     "longpolling": {
       "error": {
@@ -973,21 +977,21 @@
     },
     "templates": {
       "metadata": {
-        "createDate": "Fecha creación",
-        "createUID": "UID creador",
-        "noUpdate": "Sin actualización",
-        "writeDate": "Escribir fecha",
-        "writeUID": "Escribir UID",
-        "xmlID": "ID-XML"
+        "createDate": "Fecha de creación",
+        "createUID": "Creador UID",
+        "noUpdate": "Sin actualizaciones",
+        "writeDate": "Fecha de escritura",
+        "writeUID": "Escritor UID",
+        "xmlID": "XML-ID"
       },
       "recordCreated": {
-        "sucess": "{{model}} registros creados correctamente: {{- links}}"
+        "sucess": "{{model}} registro(s) creado(s) correctamente: {{- links}}"
       },
       "whoami": {
-        "activeCompany": "Empresa Activa",
-        "inCompanies": "En Empresas",
+        "activeCompany": "Empresa activa",
+        "inCompanies": "En las empresas",
         "inGroups": "En grupos",
-        "login": "Acceso",
+        "login": "Login",
         "partner": "Socio",
         "user": "Usuario"
       }
@@ -999,8 +1003,8 @@
     },
     "cmd": {
       "default": {
-        "definition": "Comando indefinido",
-        "detail": "Este comando no tiene una información adecuadamente detallada"
+        "definition": "Comando no definido",
+        "detail": "Este comando no tiene información detallada definida correctamente"
       }
     },
     "error": {
@@ -1011,10 +1015,10 @@
     },
     "exception": {
       "ElementNotFoundError": "¡Error de elemento no encontrado ({{selector}})!",
-      "ElementNotFoundTemplateError": "¡No se encontraron elementos!",
-      "InvalidElementTemplateError": "¡Elemento no válido en la plantilla!",
-      "ProcessJobError": "Error al ejecutar '{{cmd_name}}'",
-      "TooManyElementsTemplateError": "¡Demasiados elementos en la plantilla para asignarlos a un solo elemento!"
+      "ElementNotFoundTemplateError": "No elements found!",
+      "InvalidElementTemplateError": "Invalid element in template!",
+      "ProcessJobError": "Error executing '{{cmd_name}}'",
+      "TooManyElementsTemplateError": "Too many elements in the template to be assigned to one element!"
     },
     "info": {
       "job": {
@@ -1037,16 +1041,16 @@
     },
     "exception": {
       "invalidCommandArgumentsError": "Argumentos de comando no válidos",
-      "invalidCommandArugmentValueError": "¡Valor '{{arg_value}}' inesperado!",
+      "invalidCommandArugmentValueError": "Valor '{{arg_value}}' inesperado!",
       "invalidCommandDefinition": "¡Definición de comando no válida!",
       "invalidInstructionError": "Instrucción no válida",
       "invalidNameError": "Nombre no válido '{{vname}}' en {{start}}:{{end}}",
       "invalidTokenError": "Token no válido '{{vname}}' en {{start}}:{{end}}",
       "invalidValueError": "Valor no válido '{{value}}'",
-      "notExpectedCommandArgumentError": "El argumento '{{arg_name}}' no se espera en {{start}}:{{end}}",
+      "notExpectedCommandArgumentError": "Argumento '{{arg_name}}' no esperado en {{start}}:{{end}}",
       "unknownCommandError": "Comando desconocido '{{cmd_name}}' en {{start}}:{{end}}",
       "unknownNameError": "Nombre desconocido '{{vname}}' en {{start}}:{{end}}",
-      "unknownStoreValue": "Valor de variable desconocido '{{vname}}'"
+      "unknownStoreValue": "Valor de almacenamiento desconocido '{{vname}}'"
     },
     "vmachine": {
       "func": {

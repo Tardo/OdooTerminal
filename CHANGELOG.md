@@ -8,6 +8,7 @@ ADD: Internal function 'encode': Encode data (base64)
 ADD: Internal function 'decode': Decode data (base64)
 
 IMP: Command 'exportfile': New format 'raw' to generic binary
+IMP: Command 'exportfile': New format 'zip' to export binary fields
 
 FIX: Command 'exportfile': Incorrect handling of recordset (issue #147)
 ```

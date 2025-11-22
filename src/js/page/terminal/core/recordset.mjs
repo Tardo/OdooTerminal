@@ -106,6 +106,8 @@ const RecordsetHandler = {
       return target.ids;
     } else if (prop === 'length') {
       return target.length;
+    } else if (prop === 'fieldNames') {
+      return target.fieldNames;
     } else if (
       prop === 'toWrite' ||
       prop === 'rollback' ||
@@ -205,6 +207,11 @@ export default class Recordset {
   // $FlowFixMe
   get records() {
     return this.#records;
+  }
+
+  // $FlowFixMe
+  get fieldNames() {
+    return Object.keys(this.#records[0]);
   }
 
   // $FlowFixMe
