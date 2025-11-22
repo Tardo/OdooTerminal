@@ -1,11 +1,16 @@
 # Changelog
 
+**11.11.0**
+
+```
+FIX: Command 'exportfile': Wrong object (issue #147)
+```
+
 **11.10.1**
 
 ```
 FIX: Command 'doc': Typo in the technical documentation details (by baptiste-n42 - pr #146)
 FIX: Command 'uninstall': Pretty print and filter affected modules
-
 ```
 
 **11.10.0**

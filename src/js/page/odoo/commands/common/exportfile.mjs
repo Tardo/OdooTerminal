@@ -18,16 +18,21 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
   const filename = kwargs.filename ? kwargs.filename : `${uniqueId('term')}_${new Date().getTime()}.${kwargs.format}`;
   let mime = '';
   let data = '';
+  const is_recordset = kwargs.value instanceof Recordset;
   if (kwargs.format === 'json') {
     mime = 'text/json';
-    data = JSON.stringify(kwargs.value, replacer, 4);
+    if (is_recordset) {
+      data = JSON.stringify(kwargs.value.toJSON(), replacer, 4);
+    } else {
+      data = JSON.stringify(kwargs.value, replacer, 4);
+    }
   } else if (kwargs.format === 'csv' || kwargs.format === 'xml') {
-    if (!(kwargs.value instanceof Recordset)) {
+    if (!is_recordset) {
       throw new Error(i18n.t('cmdExportFile.invalidValue', 'Invalid value: must be a recordset with csv and xml'));
     }
     if (kwargs.format === 'csv') {
       mime = 'text/csv';
-      data = csvStringify(kwargs.value, !kwargs.no_header, kwargs.delimiter);
+      data = csvStringify(kwargs.value.toJSON(), !kwargs.no_header, kwargs.delimiter);
     } else if (kwargs.format === 'xml') {
       mime = 'text/xml';
       data = await xmlStringify(kwargs.value, await this.getContext());

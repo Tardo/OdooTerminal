@@ -160,7 +160,7 @@ export default class Recordset {
   }
 
   toJSON(): Array<Record> {
-    return this.#records;
+    return this.#records.map(rec => rec.toJSON());
   }
 
   toWrite(): $ReadOnlyArray<[number, {[string]: mixed}]> {
