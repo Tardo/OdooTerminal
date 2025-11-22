@@ -872,6 +872,7 @@
   },
   "cmdZip": {
     "args": {
+      "options": "Las opciones a aplicar al archivo zip",
       "values": "Datos para escribir (debe ser una lista de tuplas [nombre de archivo, datos del archivo, ?opciones del archivo])"
     },
     "definition": "Crear archivo zip",

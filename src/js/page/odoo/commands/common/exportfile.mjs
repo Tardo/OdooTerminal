@@ -50,7 +50,7 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
 
       mime = 'application/zip';
       const zip_values = kwargs.value.toJSON().filter(rec => rec[kwargs.field_data]).map(rec => [rec[kwargs.field_name] || `unnamed_${rec.id}`, rec[kwargs.field_data], {base64: true}]);
-      data = await createZip(zip_values);
+      data = await createZip(zip_values, {type: 'blob'});
     }
   } else if (kwargs.format === 'raw') {
     mime = kwargs.mimetype || 'application/octet-stream';

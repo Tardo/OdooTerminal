@@ -872,6 +872,7 @@
   },
   "cmdZip": {
     "args": {
+      "options": "The options to apply to the zip file",
       "values": "Data to write (must be an array of tuples [filename, filedata, ?fileoptions])"
     },
     "definition": "Create zip file",

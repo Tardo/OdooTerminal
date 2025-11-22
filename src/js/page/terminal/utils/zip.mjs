@@ -6,10 +6,10 @@
 import JSZip from 'jszip';
 
 
-export default async function(items: $ReadOnlyArray<[string, string | Blob, ?{string: mixed}]>): Promise<Blob> {
+export default async function(items: $ReadOnlyArray<[string, string | Blob, ?{string: mixed}]>, options: {string: mixed}): Promise<Blob> {
   const zip = new JSZip();
-  for (const [filename, data, options] of items) {
-    zip.file(filename, data, options);
+  for (const [filename, filedata, fileopts] of items) {
+    zip.file(filename, filedata, fileopts);
   }
-  return await zip.generateAsync({type: 'blob'});
+  return await zip.generateAsync(options);
 }
