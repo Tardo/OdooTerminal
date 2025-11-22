@@ -314,7 +314,7 @@
     },
     "definition": "Exports the command result to a text/json file",
     "detail": "Exports the command result to a text/json file.",
-    "invalidFieldData": "No field named ‘{{fieldName}}’ is found that represent the data",
+    "invalidFieldData": "No field named ‘{{fieldData}}’ is found that represent the data",
     "invalidFieldName": "No field named ‘{{fieldName}}’ is found that represent the name",
     "invalidValue": "Invalid value: must be a recordset with csv and xml",
     "resultExported": "Command result exported to '{{filename}}' file"
@@ -871,10 +871,10 @@
   },
   "cmdZip": {
     "args": {
-      "values": "Data to write (must be an array of tuples [filename, filedata])"
+      "values": "Data to write (must be an array of tuples [filename, filedata, ?fileoptions])"
     },
     "definition": "Create zip file",
-    "detail": "Create zip file"
+    "detail": "To learn about the available options, check out the JSZip help: https://stuk.github.io/jszip"
   },
   "file2base64": {
     "aborted": "Aborted by user. No file given..."

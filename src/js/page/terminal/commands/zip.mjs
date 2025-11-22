@@ -17,7 +17,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdZip.definition', 'Create zip file'),
     callback: cmdZip,
-    detail: i18n.t('cmdZip.detail', 'Create zip file'),
+    detail: i18n.t('cmdZip.detail', 'To learn about the available options, check out the JSZip help: https://stuk.github.io/jszip'),
     args: [
       [ARG.List | ARG.Any, ['v', 'values'], true, i18n.t('cmdZip.args.values', 'Data to write (must be an array of tuples [filename, filedata, fileoptions])')],
     ],

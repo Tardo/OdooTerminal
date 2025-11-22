@@ -871,10 +871,10 @@
   },
   "cmdZip": {
     "args": {
-      "values": "Datos para escribir (debe ser una lista de tuplas [nombre de archivo, datos del archivo])"
+      "values": "Datos para escribir (debe ser una lista de tuplas [nombre de archivo, datos del archivo, ?opciones del archivo])"
     },
     "definition": "Crear archivo zip",
-    "detail": "Crear archivo zip"
+    "detail": "Para conocer las opciones disponibles,  consulta la ayuda de JSZip: https://stuk.github.io/jszip"
   },
   "file2base64": {
     "aborted": "Abortado por el usuario. No se ha proporcionado ningún archivo..."
