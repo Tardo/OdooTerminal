@@ -69,6 +69,7 @@ export default function (): Partial<CMDDef> {
     callback: cmdExportFile,
     detail: i18n.t('cmdExportFile.detail', 'Exports the command result to a text/json file.'),
     args: [
+      [ARG.Any, ['v', 'value'], true, i18n.t('cmdExportFile.args.value', 'The value to export')],
       [ARG.Flag, ['no-header', 'no-header'], false, i18n.t('cmdExportFile.args.noHeader', "Don't use header"), false],
       [ARG.String, ['f', 'format'], false, i18n.t('cmdExportFile.args.format', 'The format to use for exporting'), 'json', ['json', 'csv', 'xml', 'zip', 'raw']],
       [ARG.String, ['fn', 'filename'], false, i18n.t('cmdExportFile.args.filename', 'The filename')],
@@ -76,7 +77,6 @@ export default function (): Partial<CMDDef> {
       [ARG.String, ['fname', 'field-name'], false, i18n.t('cmdExportFile.args.fieldName', 'The field representing the file name'), 'filename'],
       [ARG.String, ['fdata', 'field-data'], false, i18n.t('cmdExportFile.args.fieldData', 'The field representing the file data'), 'datas'],
       [ARG.String, ['m', 'mimetype'], false, i18n.t('cmdExportFile.args.mimetype', 'The MIME type of the file')],
-      [ARG.Any, ['v', 'value'], true, i18n.t('cmdExportFile.args.value', 'The value to export')],
     ],
     example: "-c 'search res.partner'",
   };
