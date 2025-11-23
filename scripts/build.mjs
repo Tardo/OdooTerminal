@@ -5,32 +5,20 @@ import {execSync} from 'child_process';
 import AdmZip from 'adm-zip';
 import {rimraf} from 'rimraf';
 
-const ZIP_NAME = 'OdooTerminal';
 
-function removeDist() {
-  rimraf.sync('./dist');
-}
+// Remove 'dist' folder
+rimraf.sync('./dist');
+// Generate 'dist' files
+execSync('rollup -c');
+// Create Zip
+const zip = new AdmZip();
+zip.addLocalFolder('./src/html', './src/html');
+zip.addLocalFolder('./src/img', './src/img');
+zip.addLocalFolder('./dist', './dist');
+zip.addLocalFolder('./_locales', './_locales');
+zip.addLocalFolder('./themes', './themes');
+zip.addLocalFile('manifest.json');
+zip.addLocalFile('README.md');
+zip.writeZip("OdooTerminal.zip");
 
-function execRollup() {
-  execSync('rollup -c');
-}
-
-function createZipArchive() {
-  const zip = new AdmZip();
-  const outputFile = `${ZIP_NAME}.zip`;
-
-  zip.addLocalFolder('./src/html', './src/html');
-  zip.addLocalFolder('./src/img', './src/img');
-  zip.addLocalFolder('./dist', './dist');
-  zip.addLocalFolder('./_locales', './_locales');
-  zip.addLocalFolder('./themes', './themes');
-  zip.addLocalFile('manifest.json');
-  zip.addLocalFile('README.md');
-  zip.writeZip(outputFile);
-}
-
-removeDist();
-execRollup();
-createZipArchive();
-
-console.log(`Build ${ZIP_NAME} successfully completed`);
+console.log("Build successfully completed");
