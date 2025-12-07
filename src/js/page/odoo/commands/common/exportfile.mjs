@@ -78,6 +78,6 @@ export default function (): Partial<CMDDef> {
       [ARG.String, ['fdata', 'field-data'], false, i18n.t('cmdExportFile.args.fieldData', 'The field representing the file data'), 'datas'],
       [ARG.String, ['m', 'mimetype'], false, i18n.t('cmdExportFile.args.mimetype', 'The MIME type of the file')],
     ],
-    example: "-c 'search res.partner'",
+    example: "-v (search res.partner)",
   };
 }

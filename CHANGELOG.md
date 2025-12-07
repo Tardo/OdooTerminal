@@ -1,5 +1,11 @@
 # Changelog
 
+**11.11.1**
+
+```
+FIX: Command 'exportfile': Incorrect example (issue #147)
+```
+
 **11.11.0**
 
 ```
