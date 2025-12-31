@@ -209,3 +209,5 @@ Example:
 Copyright Alexandre Díaz & contributors
 
 AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+**This project is not affiliated with, endorsed by, or sponsored by Odoo S.A. Odoo is a trademark of Odoo S.A.**
