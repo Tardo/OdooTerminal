@@ -209,6 +209,7 @@ export default class Interpreter {
               (char === SYMBOLS.VARIABLE && prev_char !== SYMBOLS.VARIABLE) ||
               (char === SYMBOLS.ASSIGNMENT && prev_char !== SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length) ||
               (char === SYMBOLS.NOT && prev_char !== SYMBOLS.NOT) ||
+              (char === SYMBOLS.ARGUMENT && SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length ) ||
               (SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length && !value.startsWith(SYMBOLS.ARGUMENT)) ||
               prev_char === SYMBOLS.EOC ||
               prev_char === SYMBOLS.EOL ||
