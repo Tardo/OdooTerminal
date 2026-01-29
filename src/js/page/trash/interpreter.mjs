@@ -417,8 +417,6 @@ export default class Interpreter {
         ttype = LEXER.Divide;
       } else if (token_san === SYMBOLS.MODULO) {
         ttype = LEXER.Modulo;
-      } else if (token_san === SYMBOLS.POW) {
-        ttype = LEXER.Pow;
       }
     }
 
@@ -466,6 +464,7 @@ export default class Interpreter {
     return res_str;
   }
 
+  // FIXME: Hate this so much... A sane person would use the shunting yard algorithm
   #prioritizer(tokens: Array<LexerInfo>): Array<LexerInfo> {
     const tokens_math_oper = tokens.filter(item => LEXER_MATH_OPER.includes(item[0]));
     if (tokens_math_oper.length <= 1) {
@@ -830,10 +829,6 @@ export default class Interpreter {
         case LEXER.Modulo:
           ignore_instr_eoi = true;
           to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.MODULO, index, level));
-          break;
-        case LEXER.Pow:
-          ignore_instr_eoi = true;
-          to_append_eoi.instructions.push(new Instruction(INSTRUCTION_TYPE.POW, index, level));
           break;
         case LEXER.And:
           ignore_instr_eoi = true;

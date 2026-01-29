@@ -1,9 +1,13 @@
 # Changelog
 
-**11.11.1**
+**12.0.0**
 
 ```
+ADD: Internal function 'pow'
+
 FIX: Command 'exportfile': Incorrect example (issue #147)
+
+DEL: Pow operator
 ```
 
 **11.11.0**

@@ -5,6 +5,7 @@ import funcFloor from './floor';
 import funcFixed from './fixed';
 import funcRand from './rand';
 import funcAbs from './abs';
+import funcPow from './pow';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -12,4 +13,5 @@ export default function (vm: VMachine) {
   vm.registerCommand('fixed', funcFixed());
   vm.registerCommand('rand', funcRand());
   vm.registerCommand('abs', funcAbs());
+  vm.registerCommand('pow', funcPow());
 }

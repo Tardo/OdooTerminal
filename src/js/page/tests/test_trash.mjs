@@ -136,6 +136,14 @@ export default class TestTrash extends TerminalTestSuite {
       "$data = {numA: 4, numB:9, numC: [23,2]}; ($data['numA']    * $data['numB'] + $data['numC'][1] +    4  )  * -2   ",
     );
     this.assertEqual(results, -84);
+    results = await this.terminal.getShell().eval('$a = [1,2]; $b = 3; $a[0] * -$b');
+    this.assertEqual(results, -3);
+    results = await this.terminal.getShell().eval("$obj = {x: -4}; $arr = [2]; $arr[0] * -$obj['x']");
+    this.assertEqual(results, 8);
+    results = await this.terminal.getShell().eval('$n = -2; 1 - -$n');
+    this.assertEqual(results, -1);
+    results = await this.terminal.getShell().eval('$a = 2; $b = 3; $c = 4; $a + $b * -$c');
+    this.assertEqual(results, -10);
   }
 
   async test_trash_logic() {

@@ -945,6 +945,14 @@
     "definition": "High resolution timestamp in milliseconds",
     "detail": "High resolution timestamp in milliseconds."
   },
+  "funcPow": {
+    "args": {
+      "base": "Base",
+      "exponent": "Exponent"
+    },
+    "definition": "Calculate the exponent value of x raised to the power of y",
+    "detail": "Calculate the exponent value of x raised to the power of y"
+  },
   "funcRand": {
     "args": {
       "max": "Max. value",

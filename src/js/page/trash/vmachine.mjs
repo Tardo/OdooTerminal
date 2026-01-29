@@ -260,7 +260,6 @@ export default class VMachine {
         case INSTRUCTION_TYPE.MULTIPLY:
         case INSTRUCTION_TYPE.DIVIDE:
         case INSTRUCTION_TYPE.MODULO:
-        case INSTRUCTION_TYPE.POW:
           {
             const valB = last_frame.values.pop();
             const valA = last_frame.values.pop();
@@ -278,8 +277,6 @@ export default class VMachine {
               last_frame.values.push(valA / valB);
             } else if (instr.type === INSTRUCTION_TYPE.MODULO) {
               last_frame.values.push(valA % valB);
-            } else if (instr.type === INSTRUCTION_TYPE.POW) {
-              last_frame.values.push(Math.pow(valA, valB));
             }
           }
           break;

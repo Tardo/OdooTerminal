@@ -945,6 +945,14 @@
     "definition": "Marca de tiempo de alta resolución en milisegundos",
     "detail": "Marca de tiempo de alta resolución en milisegundos"
   },
+  "funcPow": {
+    "args": {
+      "base": "Base",
+      "exponent": "Exponente"
+    },
+    "definition": "Calcula el valor del exponente de x elevado a la potencia de y",
+    "detail": "Calcula el valor del exponente de x elevado a la potencia de y"
+  },
   "funcRand": {
     "args": {
       "max": "Máx. valor",
