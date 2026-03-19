@@ -60,6 +60,7 @@ You can toggle terminal using one of these options:
 | View 'res.partner' records _(only backend)_         | `view -m res.partner`                                                 |
 | View selected 'res.partner' record _(only backend)_ | `view -m res.partner -i 4`                                            |
 | Install module                                      | `install -m mymodule`                                                 |
+| Update Apps List                                    | `update_apps_list`                                                    |
 | Create alias                                        | `alias -n myalias -c "print 'My name is: $1'"`                        |
 
 > Notice that a list is an string of values separated by commas. Example: "5, 15, 8" (quotes included) or can use array

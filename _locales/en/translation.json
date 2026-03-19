@@ -791,6 +791,12 @@
       "success": "{{model}} record deleted successfully"
     }
   },
+  "cmdUpdateAppsList": {
+    "definition": "Update apps list",
+    "detail": "Refresh available modules list.",
+    "error": "Failed to update apps list",
+    "success": "Apps list successfully updated"
+  },
   "cmdUpgrade": {
     "args": {
       "module": "The module technical name"

@@ -39,6 +39,7 @@ import cmdUhg from './uhg';
 import cmdUninstall from './uninstall';
 import cmdUnlink from './unlink';
 import cmdUpgrade from './upgrade';
+import cmdUpdateAppsList from './update_apps_list';
 import cmdVersion from './version';
 import cmdWhoami from './whoami';
 import cmdWrite from './write';
@@ -58,6 +59,7 @@ export default function (vm: VMachine) {
   vm.registerCommand('search', cmdSearch());
   vm.registerCommand('call', cmdCall());
   vm.registerCommand('upgrade', cmdUpgrade());
+  vm.registerCommand('update_apps_list', cmdUpdateAppsList());
   vm.registerCommand('install', cmdInstall());
   vm.registerCommand('uninstall', cmdUninstall());
   vm.registerCommand('reload', cmdReload());
