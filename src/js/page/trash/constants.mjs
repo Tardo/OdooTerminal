@@ -282,7 +282,7 @@ export const SYMBOLS_MATH_OPER_COMPLEX = [
   SYMBOLS.LESS_THAN_CLOSED,
 ];
 
-export const SYMBOLS_MATH_OPER = [
+export const SYMBOLS_MATH_OPER: $ReadOnlyArray<string> = [
   SYMBOLS.ADD,
   SYMBOLS.SUBSTRACT,
   SYMBOLS.MULTIPLY,
