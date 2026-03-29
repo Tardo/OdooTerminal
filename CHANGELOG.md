@@ -7,6 +7,7 @@ ADD: Internal function 'pow'
 
 FIX: Command 'exportfile': Incorrect example (issue #147)
 FIX: TraSH tokenizer: Incorrect handling of math operations with negative numbers
+FIX: Assistant Panel: Show only in single-line mode
 
 DEL: Pow operator
 ```

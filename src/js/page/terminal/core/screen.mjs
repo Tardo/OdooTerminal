@@ -230,7 +230,7 @@ export default class Screen {
     selected_option_index: number,
     total_options_count: number,
   ) {
-    if (!this.#wasStart) {
+    if (!this.#wasStart || this.#options.inputMode === 'multi') {
       return;
     }
 
