@@ -16,6 +16,13 @@ export type CachedSearchReadMapCallback = (item: Object) => Array<mixed>;
 
 // $FlowFixMe
 const cache: {[string]: Array<Object>} = {};
+
+export function clearCache() {
+  for (const key in cache) {
+    delete cache[key];
+  }
+}
+
 export default async function (
   cache_name: string,
   model: string,

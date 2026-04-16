@@ -151,6 +151,14 @@
     "definition": "Clean terminal section",
     "detail": "Clean the selected section"
   },
+  "cmdClearCache": {
+    "definition": "Clear internal caches",
+    "detail": "Clears all internal caches used by the terminal. This is useful when cached data becomes stale, especially after Odoo upgrades or when working with Odoo 18+.",
+    "result": {
+      "info": "The following caches have been cleared:",
+      "success": "<strong>Cache cleared successfully</strong>"
+    }
+  },
   "cmdCommit": {
     "args": {
       "recordset": "The Recordset"
