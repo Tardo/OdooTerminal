@@ -195,6 +195,7 @@ Example:
 
 # More resources!
 
+- [Installation & Updates](INSTALLATION.md) - How to install and update the extension
 - [CHANGELOG](CHANGELOG.md)
 - [Contributing](./docs/contributing.md)
 - [Developing](./docs/developing.md)

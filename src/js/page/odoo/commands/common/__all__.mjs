@@ -6,6 +6,7 @@ import cmdBarcode from './barcode';
 import cmdCaf from './caf';
 import cmdCall from './call';
 import cmdCam from './cam';
+import cmdClearCache from './clearcache';
 import cmdCommit from './commit';
 import cmdContext from './context';
 import cmdCopy from './copy';
@@ -66,6 +67,7 @@ export default function (vm: VMachine) {
   vm.registerCommand('whoami', cmdWhoami());
   vm.registerCommand('caf', cmdCaf());
   vm.registerCommand('cam', cmdCam());
+  vm.registerCommand('clearcache', cmdClearCache());
   vm.registerCommand('lastseen', cmdLastSeen());
   vm.registerCommand('read', cmdRead());
   vm.registerCommand('context', cmdContext());

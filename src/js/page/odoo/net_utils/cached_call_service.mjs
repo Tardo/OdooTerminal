@@ -13,6 +13,13 @@ export type CachedCallServiceOptions = {
 export type MapCallback = (item: mixed) => mixed;
 
 const cache: {[string]: OdooService} = {};
+
+export function clearCache() {
+  for (const key in cache) {
+    delete cache[key];
+  }
+}
+
 export default async function (
   cache_name: string,
   service: string,
