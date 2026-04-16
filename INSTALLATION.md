@@ -157,6 +157,8 @@ npm run dev:rollup:watch
 
 > **Windows Path Note:** The extension files will be in the `dist` folder at `C:\Users\YourUsername\Documents\OdooTerminal\dist` (adjust path based on where you cloned the repository).
 
+> **Note:** All npm scripts in this project use `cross-env` for cross-platform compatibility, so they work identically on Windows, macOS, and Linux.
+
 #### Loading the Extension in Browsers on Windows 11
 
 **Microsoft Edge (Native to Windows 11):**
