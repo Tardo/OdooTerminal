@@ -13,6 +13,7 @@ import {
   LEXER_MATH_OPER,
   MATH_OPER_PRIORITIES,
   SYMBOLS,
+  SYMBOLS_MATH_OPER_COMPLEX,
   SYMBOLS_MATH_OPER,
   ARG,
 } from './constants';
@@ -141,6 +142,7 @@ export default class Interpreter {
   /**
    * Split the input data into usable tokens
    * FIXME: This is getting a lot of complexity... need be refactored!
+   * Someday this will use AST...
    * @param {String} data
    * @returns {Array}
    */
@@ -209,8 +211,7 @@ export default class Interpreter {
               (char === SYMBOLS.VARIABLE && prev_char !== SYMBOLS.VARIABLE) ||
               (char === SYMBOLS.ASSIGNMENT && prev_char !== SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length) ||
               (char === SYMBOLS.NOT && prev_char !== SYMBOLS.NOT) ||
-              (char === SYMBOLS.ARGUMENT && SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length ) ||
-              (SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length && !value.startsWith(SYMBOLS.ARGUMENT)) ||
+              (SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && !SYMBOLS_MATH_OPER_COMPLEX.filter(item => item.startsWith(prev_char)).length && !value.startsWith(SYMBOLS.ARGUMENT)) ||
               prev_char === SYMBOLS.EOC ||
               prev_char === SYMBOLS.EOL ||
               (char !== SYMBOLS.ASSIGNMENT && prev_char === SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.includes(value)) ||
@@ -465,7 +466,9 @@ export default class Interpreter {
     return res_str;
   }
 
-  // FIXME: Hate this so much... A sane person would use the shunting yard algorithm
+  /**
+   * Maybe one day 'Shunting Yard Algorithm' will be used here... :/
+   */
   #prioritizer(tokens: Array<LexerInfo>): Array<LexerInfo> {
     const tokens_math_oper = tokens.filter(item => LEXER_MATH_OPER.includes(item[0]));
     if (tokens_math_oper.length <= 1) {
