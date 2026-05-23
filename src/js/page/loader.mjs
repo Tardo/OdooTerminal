@@ -2,11 +2,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
+// $FlowFixMe[cannot-resolve-module]
 import '@css/terminal.css';
-// $FlowIgnore
 import i18n from 'i18next';
-// $FlowIgnore
 import HttpApi from 'i18next-http-backend';
 import postMessage from '@common/utils/post_message';
 import logger from '@common/logger';
@@ -41,7 +39,7 @@ function getTerminalObj(): OdooTerminal | void {
     return terminal;
   }
 
-  // $FlowIgnore: 'webdriver' is used by automated browsers
+  // $FlowFixMe[prop-missing]
   const load_tests = window.__OdooTerminal?.load_tests || navigator.webdriver;
   if (load_tests) {
     logger.info('loader', i18n.t('loader.testsEnabled', 'Tests Enabled'));
@@ -131,7 +129,10 @@ function onWindowMessage(ev: MessageEvent) {
 
   if (ev.data !== null && typeof ev.data === 'object') {
     if (ev.data.type === 'ODOO_TERM_CONFIG') {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-use]
+      // $FlowFixMe[incompatible-use]
+      // $FlowFixMe[incompatible-use]
       initTranslations(ev.data.langpath, ev.data.config.language).then(() => initTerminal(ev.data.config, ev.data.info));
     }
   }

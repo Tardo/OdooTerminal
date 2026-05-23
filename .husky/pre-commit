@@ -1,1 +1,2 @@
-npx lint-staged
+pnpm run dev:eslint
+pnpm run dev:flowcheck

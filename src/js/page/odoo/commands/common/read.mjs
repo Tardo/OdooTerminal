@@ -2,26 +2,28 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import searchRead from '@odoo/orm/search_read';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+// $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
+// $FlowFixMe[unclear-type]
+export type FieldDefinition = {[string]: Object};
+
 async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const search_all_fields = kwargs.field[0] === '*';
   let fields = kwargs.field;
-  let fieldDefs = {};
+  let fieldDefs: FieldDefinition = {};
 
   // Due to possible problems with binary fields it is necessary to filter them out
   if (search_all_fields) {
     if (!kwargs.read_binary) {
-      // $FlowFixMe
-      fieldDefs = await callModel<{[string]: Object}>(
+      fieldDefs = await callModel<FieldDefinition>(
         kwargs.model,
         'fields_get',
         [],

@@ -32,7 +32,7 @@ function onWindowMessage(event: MessageEvent) {
   if (event.source !== window || event.data === null || typeof event.data !== 'object') {
     return;
   }
-  // $FlowFixMe
+  // $FlowFixMe[unclear-type]
   const ev_data: Object = {...event.data};
   if (ev_data.type === 'ODOO_TERM_INIT') {
     const info = ev_data.instance_info;
@@ -59,16 +59,12 @@ function onWindowMessage(event: MessageEvent) {
     setStorageSync({
       terminal_copy_data: ev_data.values,
     }).then(() => {
-      postMessage('ODOO_TERM_COPY_DONE', {
-        values: ev_data.values,
-      });
+      postMessage('ODOO_TERM_COPY_DONE', ev_data.values);
     });
   } else if (ev_data.type === 'ODOO_TERM_PASTE') {
     // User by 'paste' command
     getStorageSync(['terminal_copy_data']).then(items => {
-      postMessage('ODOO_TERM_PASTE_DONE', {
-        values: items.terminal_copy_data,
-      });
+      postMessage('ODOO_TERM_PASTE_DONE', items.terminal_copy_data);
     });
   }
 }

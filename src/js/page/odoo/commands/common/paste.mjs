@@ -2,89 +2,105 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import postMessage from '@common/utils/post_message';
 import searchCount from '@odoo/orm/search_count';
 import createRecord from '@odoo/orm/create_record';
 import writeRecord from '@odoo/orm/write_record';
+// $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset.mjs';
 import isEmpty from '@trash/utils/is_empty';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
-import type Terminal from '@odoo/terminal';
+import type {RecordDef} from '@terminal/core/recordset.mjs';
+import type Terminal from '@terminal/terminal';
+import type {MessageListenerData} from '@terminal/terminal';
 
-async function copyModelRecords(this: Terminal, model: string, data: $ReadOnlyArray<OdooSearchRecord>) {
+
+// $FlowFixMe[value-as-type]
+async function copyModelRecords(this: Terminal, model: string, data: $ReadOnlyArray<RecordDef>) {
   const records_vals = data.map(item => {
+    // $FlowFixMe[cannot-write]
     delete item.id;
+    // $FlowFixMe[prop-missing]
     delete item.display_name;
     return item;
   });
+  // $FlowFixMe[incompatible-type]
   const result = await createRecord(model, records_vals, await this.getContext());
   const records = result.map((nid, index) => {
-    return Object.assign({}, records_vals[index], {id: nid});
+    return {
+      ...records_vals[index],
+      id: nid,
+    };
   });
+  // $FlowFixMe[incompatible-type]
   return Recordset.make(model, records);
 }
 
-async function mergeModelRecords(this: Terminal, model: string, data: $ReadOnlyArray<OdooSearchRecord>) {
-  const records_vals = data.map(item => {
+// $FlowFixMe[value-as-type]
+async function mergeModelRecords(this: Terminal, model: string, data: $ReadOnlyArray<RecordDef>) {
+  const records_vals: Array<RecordDef> = data.map(item => {
+    // $FlowFixMe[prop-missing]
     delete item.display_name;
     return item;
   });
   const tasks = [];
   for (const vals of records_vals) {
-    // $FlowFixMe
-    const num_recs = await searchCount(model, [['id', '=', vals.id]], this.getContext());
+    // $FlowFixMe[incompatible-type]
+    const num_recs = await searchCount(model, [['id', '=', vals.id]], await this.getContext());
 
     if (num_recs === 0) {
+      // $FlowFixMe[cannot-write]
       delete vals.id;
-      // $FlowFixMe
-      tasks.push(createRecord(model, vals, this.getContext()));
+      // $FlowFixMe[incompatible-type]
+      tasks.push(createRecord(model, [vals], await this.getContext()));
     } else {
-      // $FlowFixMe
-      tasks.push(writeRecord(model, vals.id, vals, this.getContext()));
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[class-object-subtyping]
+      tasks.push(writeRecord(model, [vals.id], vals, await this.getContext()));
     }
   }
   const results = await Promise.all(tasks);
   results.forEach((item, index) => {
-    // $FlowFixMe
-    if (item.constructor === Number && !records_vals[index].id) {
+    // $FlowFixMe[sketchy-null-number]
+    if (typeof item === 'number' && !records_vals[index].id) {
+      // $FlowFixMe[cannot-write]
       records_vals[index].id = item;
     }
   });
 
+  // $FlowFixMe[incompatible-type]
   return Recordset.make(model, records_vals);
 }
 
 function onMessagePasteDone(
   this: Terminal,
   ctx: CMDCallbackContext,
-  // $FlowFixMe
-  resolve: Object,
-  // $FlowFixMe
-  reject: Object,
+  resolve: (mixed) => void,
+  reject: (string) => void,
   merge: boolean,
   no_questions: boolean,
-  vals: {[string]: mixed},
+  values: MessageListenerData,
 ): Promise<> {
   // This is necessary due to 'bound' function usage
   this.removeMessageListener(
     'ODOO_TERM_PASTE_DONE',
-    onMessagePasteDone.bind(this, ctx.screen, resolve, reject, merge, no_questions, vals),
+    onMessagePasteDone.bind(this, ctx.screen, resolve, reject, merge, no_questions, values),
   );
-  const msg_vals = vals.values;
-  // $FlowFixMe
-  if (isEmpty(msg_vals) || isEmpty(msg_vals.data)) {
+  if (isEmpty(values) || isEmpty(values.data)) {
     ctx.screen.printError(i18n.t('cmdPaste.error.noData', 'No data to copy!'));
+    // $FlowFixMe[incompatible-type]
     return resolve();
   }
 
-  // $FlowFixMe
-  const {type, data, model} = vals.values;
+  const {type, data, model} = values;
+  // $FlowFixMe[incompatible-type]
   const data_parsed = JSON.parse(data);
   if (type === 'model') {
+    // $FlowFixMe[sketchy-null-mixed]
     if (!model) {
+      // $FlowFixMe[incompatible-type]
       return reject(i18n.t('cmdPaste.error.invalidData', 'Invalid data to paste! No model defined'));
     }
     let prom = null;
@@ -101,8 +117,10 @@ function onMessagePasteDone(
       .then(res => {
         if (res === 'y') {
           if (merge) {
+            // $FlowFixMe[incompatible-type]
             return mergeModelRecords.bind(this)(model, data_parsed);
           }
+          // $FlowFixMe[incompatible-type]
           return copyModelRecords.bind(this)(model, data_parsed);
         }
       })
@@ -114,6 +132,7 @@ function onMessagePasteDone(
       });
   }
 
+  // $FlowFixMe[incompatible-type]
   return resolve(data_parsed);
 }
 

@@ -4,22 +4,36 @@
 
 - Required system tools:
   ```
-  apt-get install npm
-  npm install --global npm
+  apt-get install nodejs npm
+  npm install --global pnpm
   ```
 - Project Dependencies:
   ```
-  npm install
+  pnpm install
   ```
-  \*\* This will also prepare the project
+  \*\* This will also prepare the project (husky hooks, etc.)
 
 ### Usage
 
 Initialize development tools... This will build the extension as the code is modified:
 
 ```
-npm run dev:rollup:watch
+pnpm run dev:rollup:watch
 ```
+
+### Available Scripts
+
+| Script | Description |
+|---|---|
+| `pnpm run dev:rollup` | Build extension (development mode) |
+| `pnpm run dev:rollup:watch` | Build and watch for changes |
+| `pnpm run dev:eslint` | Run ESLint |
+| `pnpm run dev:flowcheck` | Run Flow type checker |
+| `pnpm run dev:flow-typed` | Install/update Flow type stubs for dependencies |
+| `pnpm run dev:web-ext` | Lint extension with web-ext |
+| `pnpm run prod:build` | Build extension (production mode) |
+| `pnpm run test` | Run integration tests |
+| `pnpm run release` | Create a release |
 
 ### Load Extension
 
@@ -40,13 +54,13 @@ npm run dev:rollup:watch
 
 - Chromium:
   ```sh
-  npm run start:chromium
+  pnpm run start:chromium
   ```
 - Chrome:
   ```sh
-  npm run start:chrome
+  pnpm run start:chrome
   ```
 - Firefox:
   ```sh
-  npm run start:firefox
+  pnpm run start:firefox
   ```

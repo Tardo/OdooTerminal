@@ -2,9 +2,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import save2file from '@terminal/utils/save2file';
+// $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
 import csvStringify from '@terminal/utils/csv';
 import replacer from '@terminal/utils/stringify_replacer';
@@ -49,8 +49,21 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
       }
 
       mime = 'application/zip';
-      const zip_values = kwargs.value.toJSON().filter(rec => rec[kwargs.field_data]).map(rec => [rec[kwargs.field_name] || `unnamed_${rec.id}`, rec[kwargs.field_data], {base64: true}]);
-      data = await createZip(zip_values, {type: 'blob'});
+      const seen_names: {[string]: number} = {};
+      const zip_values = kwargs.value.toJSON().filter(rec => rec[kwargs.field_data]).map(rec => {
+        let name = String(rec[kwargs.field_name] || `unnamed_${String(rec.id)}`);
+        if (seen_names[name] !== undefined) {
+          seen_names[name]++;
+          const ext_idx = name.lastIndexOf('.');
+          name = ext_idx !== -1
+            ? `${name.slice(0, ext_idx)} (${seen_names[name]})${name.slice(ext_idx)}`
+            : `${name} (${seen_names[name]})`;
+        } else {
+          seen_names[name] = 0;
+        }
+        return [name, rec[kwargs.field_data], {base64: true}];
+      });
+      data = await createZip(zip_values);
     }
   } else if (kwargs.format === 'raw') {
     mime = kwargs.mimetype || 'application/octet-stream';

@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
@@ -48,11 +47,11 @@ async function cmdLongpolling(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDC
       ctx.screen.printError(i18n.t('cmdLongpolling.error.invalidSubscription', 'Invalid subscription name'));
     }
     if (kwargs.operation === 'subscribe') {
-      // $FlowIgnore
+      // $FlowFixMe[incompatible-use]
       this.longpolling.subscribe(subs_name);
       ctx.screen.print(i18n.t('cmdLongpolling.result.subscribe', "Subscribed to '{{subscription}}'"), {subscription: subs_name});
     } else {
-      // $FlowIgnore
+      // $FlowFixMe[incompatible-use]
       this.longpolling.unsubscribe(subs_name);
       ctx.screen.print(i18n.t('cmdLongpolling.result.unsubscribe', "Unsubscribed from '{{subscription}}'"), {subscription: subs_name});
     }

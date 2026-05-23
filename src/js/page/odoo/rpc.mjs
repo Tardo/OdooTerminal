@@ -60,7 +60,10 @@ function buildQuery(options: Partial<BuildQueryOptions>): BuildQuery {
     params.args = options.args || [];
     params.model = options.model;
     params.method = options.method;
-    params.kwargs = Object.assign(params.kwargs || {}, options.kwargs);
+    params.kwargs = {
+      ...(params.kwargs || {}),
+      ...options.kwargs,
+    }
     params.kwargs.context = options.context || params.context || params.kwargs.context;
 
     // Compatibility with Odoo 12.0-

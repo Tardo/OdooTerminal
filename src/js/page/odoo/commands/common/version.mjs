@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import getOdooVersionInfo from '@odoo/utils/get_odoo_version_info';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';

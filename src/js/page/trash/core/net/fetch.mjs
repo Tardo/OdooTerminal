@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
@@ -13,8 +12,11 @@ async function funcFetch(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<R
   if (typeof kwargs.timeout !== 'undefined') {
     const prom = fetch(
       kwargs.url,
-      // $FlowFixMe
-      Object.assign({signal: AbortSignal.timeout(kwargs.timeout)}, kwargs.options),
+      {
+        // $FlowFixMe[prop-missing]
+        signal: AbortSignal.timeout(kwargs.timeout),
+        ...kwargs.options,
+      },
     );
     let res;
     try {

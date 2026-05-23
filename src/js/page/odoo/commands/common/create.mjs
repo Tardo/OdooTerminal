@@ -2,11 +2,11 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+// $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
 import renderRecordCreated from '@odoo/templates/record_created';
 import {ARG} from '@trash/constants';
@@ -30,7 +30,10 @@ async function cmdCreateModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
 
   const records = [];
   kwargs.value.forEach((item, index) => {
-    records.push(Object.assign({}, item, {id: results[index]}));
+    records.push({
+      ...item,
+      id: results[index],
+    });
   });
   return Recordset.make(kwargs.model, records);
 }

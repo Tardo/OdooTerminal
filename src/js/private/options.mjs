@@ -2,14 +2,14 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowFixMe
+// $FlowFixMe[cannot-resolve-module]
 import '@css/options.css';
 import processKeybind from '@common/utils/process_keybind';
 import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
 import {IGNORED_KEYS, SETTING_DEFAULTS, SETTING_NAMES, SETTING_TYPES, THEMES} from '../common/constants.mjs';
 
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 export type EventCallback = (ev: any) => Promise<void> | void;
 
 let unique_counter: number = 1;
@@ -25,7 +25,7 @@ async function loadThemeValues(theme: string): Promise<{[string]: mixed}> {
           reader.onerror = reject;
           reader.onabort = reject;
           reader.onloadend = readerEvent => {
-            // $FlowFixMe
+            // $FlowFixMe[prop-missing]
             resolve(JSON.parse(readerEvent.target.result));
           };
           reader.readAsText(file);
@@ -126,7 +126,7 @@ function renderColorDomainTable() {
 function saveOptions() {
   const data: {[string]: mixed} = {};
   for (const name of SETTING_NAMES) {
-    // $FlowFixMe
+    // $FlowFixMe[invalid-computed-prop]
     const type = SETTING_TYPES[name];
     if (type === 'manual') {
       continue;
@@ -175,7 +175,7 @@ function saveOptions() {
 function applyInputValues(values: {[string]: mixed}) {
   const cmd_names = Object.keys(values);
   for (const name of cmd_names) {
-    // $FlowFixMe
+    // $FlowFixMe[invalid-computed-prop]
     const type = SETTING_TYPES[name];
     if (type === 'manual') {
       continue;
@@ -200,15 +200,18 @@ function applyInputValues(values: {[string]: mixed}) {
         }
       } else if (elm instanceof HTMLSelectElement) {
         if (type === 'option') {
-          // $FlowIgnore
+          // $FlowFixMe[sketchy-null-mixed]
+          // $FlowFixMe[invalid-computed-prop]
           elm.value = values[name] || SETTING_DEFAULTS[name];
         }
       }
     }
   }
-  // $FlowFixMe
+  // $FlowFixMe[sketchy-null-mixed]
+  // $FlowFixMe[incompatible-type]
   shortcuts_defs = values.shortcuts || {};
-  // $FlowFixMe
+  // $FlowFixMe[sketchy-null-mixed]
+  // $FlowFixMe[incompatible-type]
   color_domain_defs = values.colors_domain || {};
   renderShortcutTable();
   renderColorDomainTable();
@@ -290,7 +293,7 @@ async function onClickResetSettings() {
 }
 
 async function onChangeThemePreset(ev: Event) {
-  // $FlowFixMe
+  // $FlowFixMe[prop-missing]
   const theme_preset = ev.target.value;
   try {
     const theme_values = await loadThemeValues(theme_preset);

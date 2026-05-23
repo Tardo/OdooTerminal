@@ -6,7 +6,8 @@ export default function replacer(key: string, value: mixed): mixed {
   let svalue = value;
   if (value instanceof Array) {
     for (const i in value) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-use]
+      // $FlowFixMe[incompatible-type]
       svalue[i] = replacer(key, value[i]);
     }
   }

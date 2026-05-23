@@ -5,6 +5,8 @@
 import callModelMulti from '@odoo/osv/call_model_multi';
 import callModel from '@odoo/osv/call_model';
 import isNumber from '@trash/utils/is_number';
+// $FlowFixMe[untyped-type-import]
+// $FlowFixMe[value-as-type]
 import type Recordset from '@terminal/core/recordset';
 
 const IGNORED_FIELDS = [
@@ -26,7 +28,8 @@ function getFieldIds(field_data: $ReadOnlyArray<$ReadOnlyArray<number> | [number
   } else if (field_data.length) {
     field_ids.push(field_data[0]);
   }
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type]
   return field_ids;
 }
 
@@ -47,8 +50,9 @@ async function getXMLIds(model: string, ids: $ReadOnlyArray<number>, context: ?{
   );
   const xmlIds = Object.fromEntries(metadatas.map((item) => [item.id, item.xmlid]));
   for (const id of ids) {
+    // $FlowFixMe[invalid-compare]
     if (typeof xmlIds[id] === 'undefined' || xmlIds[id] === false) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       xmlIds[id] = id;
     }
   }
@@ -69,13 +73,14 @@ function createRecordField(model: string, field_name: string, value: mixed, fiel
     if (!(value instanceof Array)) {
       return;
     }
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-use]
+    // $FlowFixMe[incompatible-type]
     const xmlids: {[number]: string} = field_xmlids[field_name];
     if (!xmlids) {
       return;
     }
     const field_ids = getFieldIds(value, field_info);
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     const xmlids_ids = Object.keys(xmlids).filter((item) => field_ids.includes(Number(item))).map((item) => xmlids[item]);
     if (xmlids_ids.length === 1 && field_info.type !== 'many2many' && field_info.type !== 'one2many') {
       return `\t\t<field name="${field_name}" ref="${xmlids_ids[0]}"/>\n`;
@@ -92,6 +97,7 @@ function createRecordField(model: string, field_name: string, value: mixed, fiel
 
 export default async function(items: Recordset, context: ?{[string]: mixed}): Promise<string> {
   const model = items.model;
+  // $FlowFixMe[incompatible-type]
   const main_xml_ids = await getXMLIds(model, items.ids, context);
   const field_infos: {[string]: {[string]: string | number}} = await callModel(
     model,
@@ -104,26 +110,26 @@ export default async function(items: Recordset, context: ?{[string]: mixed}): Pr
   const field_infos_entries = Object.entries(field_infos);
   const field_xmlids = field_infos_entries.filter(([_field_name, field_info]) => field_info.relation).map(([field_name, field_info]) => {
     const field_ids: Array<number> = [];
-    // $FlowFixMe
     for (const item of items) {
+      // $FlowFixMe[prop-missing]
       const field_data = item[field_name];
       if (typeof field_data !== 'undefined') {
         field_ids.push(...getFieldIds(field_data, field_info));
       }
     }
     if (field_ids.length) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       return getXMLIds(field_info.relation, field_ids, context).then((res_xml_ids) => [field_name, res_xml_ids]);
     }
     return Promise.resolve();
   });
   const xmlids_result = (await Promise.all(field_xmlids)).filter((item) => item);
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-type]
   const xmlids_result_obj = Object.fromEntries(xmlids_result);
 
   let res = '<?xml version="1.0" encoding="utf-8" ?>\n<odoo>\n';
-  // $FlowFixMe
   for (const item of items) {
+    // $FlowFixMe[prop-missing]
     res += `\t<record id="${main_xml_ids[item.id]}" model="${model}">\n`;
     const fields = Object.entries(item);
     for (const [field, value] of fields) {
@@ -131,7 +137,7 @@ export default async function(items: Recordset, context: ?{[string]: mixed}): Pr
       if (!field_info.store || (field_info.type !== 'boolean' && value === false) || IGNORED_FIELDS.includes(field)) {
         continue;
       }
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       const record = createRecordField(model, field, value, field_info, xmlids_result_obj);
       if (typeof record !== 'undefined') {
         res += record;

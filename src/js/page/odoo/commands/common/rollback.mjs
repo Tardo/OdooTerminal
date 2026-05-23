@@ -2,8 +2,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
+// $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';

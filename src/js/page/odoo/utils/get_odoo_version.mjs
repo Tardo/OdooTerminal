@@ -12,11 +12,12 @@ export type OdooVersionInfo = {
   minor: number,
 };
 
-const cache: Partial<OdooVersionInfo> = {};
+let cache: Partial<OdooVersionInfo> = {};
 export default function (type: 'raw' | 'major' | 'minor' = 'raw'): string | number | void {
   if (isEmpty(cache)) {
     let raw: string;
     const odoo_sess_ver = getOdooSession()?.server_version;
+    // $FlowFixMe[invalid-compare]
     if (odoo_sess_ver !== null && typeof odoo_sess_ver === 'string') {
       raw = odoo_sess_ver;
     } else {
@@ -27,17 +28,19 @@ export default function (type: 'raw' | 'major' | 'minor' = 'raw'): string | numb
     }
     const raw_split = sanitizeOdooVersion(raw)?.split('.');
     if (raw_split) {
-      Object.assign(cache, {
+      cache = {
+        ...cache,
         raw: raw,
         major: Number(raw_split[0]),
         minor: Number(raw_split[1]),
-      });
+      };
     } else {
-      Object.assign(cache, {
+      cache = {
+        ...cache,
         raw: raw,
         major: -1,
         minor: -1,
-      });
+      };
     }
   }
   return cache[type];

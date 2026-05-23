@@ -3,7 +3,7 @@
   "UnknownNameError": {
     "invalidName": "<NombreNoVálido>"
   },
-  "Yes": "Yes",
+  "Yes": "Sí",
   "checkStorageError": {
     "message": "Borrar la <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>pantalla</strong> o/y <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>historial</strong> para liberar espacio de almacenamiento. Navegador <u>Se ha superado la cuota de almacenamiento</u> 😭",
     "warning": "ADVERTENCIA: "
@@ -284,7 +284,7 @@
     "definition": "Abre la página de documentación técnica",
     "detail": "Abre la página de documentación técnica",
     "error": {
-      "incompatibleOdooVersion": "This command is only available in Odoo 19.0+"
+      "incompatibleOdooVersion": "Este comando solo está disponible en Odoo 19.0+"
     }
   },
   "cmdEffect": {
@@ -872,7 +872,6 @@
   },
   "cmdZip": {
     "args": {
-      "options": "Las opciones a aplicar al archivo zip",
       "values": "Datos para escribir (debe ser una lista de tuplas [nombre de archivo, datos del archivo, ?opciones del archivo])"
     },
     "definition": "Crear archivo zip",
@@ -887,7 +886,7 @@
   "func2DText": {
     "args": {
       "canvas": "El lienzo",
-      "color": "The text color",
+      "color": "El color del texto",
       "font": "La fuente del texto",
       "text": "El texto",
       "x": "El punto X del texto",
@@ -908,7 +907,7 @@
       "method": "El método para decodificar",
       "value": "El valor a decodificar"
     },
-    "definition": "Encode",
+    "definition": "Decodificar",
     "detail": "Decodificar datos"
   },
   "funcEncode": {
@@ -916,7 +915,7 @@
       "method": "El método para codificar",
       "value": "El valor a codificar"
     },
-    "definition": "Encode",
+    "definition": "Codificar",
     "detail": "Codificar datos"
   },
   "funcFetch": {
@@ -1025,10 +1024,10 @@
     },
     "exception": {
       "ElementNotFoundError": "¡Error de elemento no encontrado ({{selector}})!",
-      "ElementNotFoundTemplateError": "No elements found!",
-      "InvalidElementTemplateError": "Invalid element in template!",
-      "ProcessJobError": "Error executing '{{cmd_name}}'",
-      "TooManyElementsTemplateError": "Too many elements in the template to be assigned to one element!"
+      "ElementNotFoundTemplateError": "¡No se encontraron elementos!",
+      "InvalidElementTemplateError": "¡Elemento inválido en la plantilla!",
+      "ProcessJobError": "Error al ejecutar '{{cmd_name}}'",
+      "TooManyElementsTemplateError": "¡Demasiados elementos en la plantilla para asignar a uno solo!"
     },
     "info": {
       "job": {

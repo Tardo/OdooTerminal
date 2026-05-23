@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from './constants';
 import difference from './utils/difference';
@@ -107,7 +106,6 @@ export async function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[stri
   const args_infos_map: Array<[string, ArgInfo]> = cmd_def.args
     .map(x => getArgumentInfo(x))
     .filter(x => x !== null)
-    // $FlowFixMe
     .map(x => [x.names.long, x]);
   const args_infos = Object.fromEntries(args_infos_map);
 
@@ -130,7 +128,7 @@ export async function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[stri
     if (typeof arg_def.default_value !== 'undefined') {
       let def_val: ParseInfo | mixed = arg_def.default_value;
       if (cmd_def.type === FUNCTION_TYPE.Native) {
-        // $FlowIgnore
+        // $FlowFixMe[incompatible-type]
         def_val = await vmachine.execute(def_val, opts, aframe);
       }
       default_values_map.push([arg_name, [def_val, true]]);
@@ -141,7 +139,7 @@ export async function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[stri
   }
   // Apply default values
   const default_values = default_values_map.length === 0 ? {} : Object.fromEntries(default_values_map);
-  full_kwargs = Object.assign(default_values, full_kwargs);
+  full_kwargs = {...default_values, ...full_kwargs};
 
   if (Object.keys(full_kwargs).length === 0) {
     return full_kwargs;
@@ -163,11 +161,12 @@ export async function validateAndFormatArguments(cmd_def: CMDDef, kwargs: {[stri
   const new_kwargs: {[string]: mixed} = {};
   for (const arg_name of arg_names) {
     const arg_info = args_infos[arg_name];
+    // $FlowFixMe[incompatible-use]
+    // $FlowFixMe[incompatible-use]
     const [arg_value, is_default] = full_kwargs[arg_name];
     const arg_long_name = arg_info.names.long;
     const s_arg_long_name = arg_long_name.replaceAll('-', '_');
     if (!is_default && !checkArgumentValueType(arg_value, arg_info.type)) {
-      // $FlowFixMe
       const value_type = isFalsy(arg_value) ? 'null/undefined' : arg_value.constructor?.name;
       throw new Error(
         i18n.t(

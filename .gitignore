@@ -16,3 +16,19 @@ OdooTerminal.zip
 # Byte-compiled / optimized
 __pycache__/
 *.py[cod]
+
+# AI Tools
+.claude/
+.claudeignore
+claude.json
+CLAUDE.md
+.cursor/
+.cursorignore
+.windsurf/
+.copilot/
+.github/copilot.yml
+.vscode/ai-*
+.idea/ai-*
+**/*.ai
+**/*.prompt
+prompts/

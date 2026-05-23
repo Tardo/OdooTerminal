@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import rpcQuery from '@odoo/rpc';
 import callService from '@odoo/osv/call_service';
@@ -75,12 +74,11 @@ async function cmdShowDBList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
   };
 
   // Check if using deferred jquery or native promises
-  // $FlowFixMe
-  const prom = callService('db', 'list', {});
+  // $FlowFixMe[underconstrained-implicit-instantiation]
+  const prom = callService('db', 'list', []);
   if ('catch' in prom) {
     return prom.then(_onSuccess).catch(_onError);
   }
-  // $FlowIgnore
   return prom.then(_onSuccess).fail(_onError);
 }
 

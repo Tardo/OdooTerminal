@@ -34,7 +34,7 @@ function updateBrowserAction(icon: string, text: string | null, bg_color: string
   }
 }
 
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 function onInternalMessage(request: Object, sender: Object) {
   if (request.message === 'update_terminal_badge_info') {
     const {context} = request;
@@ -49,6 +49,7 @@ function onInternalMessage(request: Object, sender: Object) {
       } else {
         color = 'normal';
       }
+      // $FlowFixMe[invalid-computed-prop]
       updateBrowserAction('terminal-16', ver_clean, VERSION_COLOR[color]);
     } else {
       ubrowser.action.disable(sender.tab.id);
@@ -59,11 +60,12 @@ function onInternalMessage(request: Object, sender: Object) {
 
 function onInstalled() {
   getStorageSync(SETTING_NAMES).then(items => {
-    // $FlowFixMe
+    // $FlowFixMe[unclear-type]
     const to_update: Object = {};
     for (const setting_name of SETTING_NAMES) {
-      // $FlowFixMe
+      // $FlowFixMe[invalid-computed-prop]
       if (typeof items[setting_name] === 'undefined' && typeof SETTING_DEFAULTS[setting_name] !== 'undefined') {
+        // $FlowFixMe[invalid-computed-prop]
         to_update[setting_name] = SETTING_DEFAULTS[setting_name];
       }
     }
@@ -71,7 +73,7 @@ function onInstalled() {
   });
 }
 
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 function onTabUpdated(tab_id: number, change_info: Object) {
   if (change_info.status === 'complete') {
     // Request Odoo Info, wait 'idle' delay
@@ -81,7 +83,7 @@ function onTabUpdated(tab_id: number, change_info: Object) {
   }
 }
 
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 function onTabActivated(active_info: Object) {
   // Because the script may be unavailable, we always assume
   // that the page is not compatible with the extension.
@@ -90,7 +92,7 @@ function onTabActivated(active_info: Object) {
   sendInternalMessage(active_info.tabId, 'update_odoo_terminal_info');
 }
 
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 function onClickBrowserAction(tab: Object) {
   sendInternalMessage(tab.id, 'toggle_terminal');
 }

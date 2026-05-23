@@ -9,7 +9,7 @@ If you want collaborate, you need this to make octocat happy.
 `husky` need be initialized:
 
 ```
-npm install
+pnpm install
 ```
 
 #### Usage

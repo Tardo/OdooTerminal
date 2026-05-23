@@ -28,5 +28,6 @@ export const InstanceContext: Context = {
 };
 
 export function updateContext(...values: Array<{...}>) {
+  // $FlowFixMe[unsafe-object-assign]
   Object.assign(InstanceContext, ...values);
 }

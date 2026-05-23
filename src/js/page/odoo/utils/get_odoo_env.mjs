@@ -5,7 +5,7 @@
 import getOdooRoot from './get_odoo_root';
 
 const defSymbol = Symbol.for('default');
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 export default function (): Object {
   const root = getOdooRoot();
   if (Object.hasOwn(root, 'env')) {

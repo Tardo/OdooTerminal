@@ -17,7 +17,7 @@ export default class OdooTerminalTests extends OdooTerminal {
    */
   createTerminal() {
     super.createTerminal();
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     this.el.addEventListener('start_terminal_tests', this.onStartTests.bind(this));
   }
 
@@ -29,8 +29,8 @@ export default class OdooTerminalTests extends OdooTerminal {
     });
   }
 
-  // $FlowFixMe
-  #getTestMethods(obj: Object) {
+  // $FlowFixMe[unclear-type]
+  #getTestMethods(obj: Object): Array<string> {
     const names = new Set<string>();
     let it_obj = obj;
     do {
@@ -41,8 +41,8 @@ export default class OdooTerminalTests extends OdooTerminal {
     return [...names];
   }
 
-  async #runTests(test_names: $ReadOnlyArray<String>): Promise<{[string]: mixed} | void> {
-    const errors = {};
+  async #runTests(test_names: $ReadOnlyArray<string>): Promise<{[string]: mixed} | void> {
+    const errors: {[string]: mixed} = {};
     for (const TestClass of TestSuites) {
       const test_suit = new TestClass(this);
       let names = this.#getTestMethods(test_suit);
@@ -56,6 +56,7 @@ export default class OdooTerminalTests extends OdooTerminal {
           this.screen.print(`${name}... `, true);
           await test_suit.onBeforeTest(name);
           try {
+            // $FlowFixMe[prop-missing]
             await test_suit[name]();
             this.screen.print('OK');
             // Ensure that the terminal remains open

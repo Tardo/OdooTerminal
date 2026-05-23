@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import renderPromptCmd from '@terminal/templates/prompt_command';
 import renderPromptCmdHiddenArgs from '@terminal/templates/prompt_command_hidden_args';
@@ -42,8 +41,7 @@ export type Question = {
   question: string,
   values: $ReadOnlyArray<string>,
   def_value: string | number | void,
-  // $FlowFixMe
-  defer: Object,
+  defer: {resolve: (mixed) => void, reject: (string) => void},
 };
 
 export type OnCleanScreenCallback = (content: string) => void;
@@ -104,7 +102,7 @@ export default class Screen {
     this.updateInputInfo(inputInfo);
   }
 
-  // $FlowIgnore
+  // $FlowFixMe[unsafe-getters-setters]
   get maxLines(): number {
     return this.#max_lines;
   }
@@ -202,7 +200,7 @@ export default class Screen {
       return;
     }
     this.#input_el.selectionStart = start;
-    this.#input_el.selectionEnd = end !== null && typeof end !== 'undefined' ? end : start;
+    this.#input_el.selectionEnd = end ?? start;
   }
 
   updateShadowInput(str: string) {
@@ -268,7 +266,8 @@ export default class Screen {
       return;
     }
     const isCKey = ev && (ev.ctrlKey || ev.altKey);
-    if (isCKey === null || typeof isCKey === 'undefined' || !isCKey) {
+    // $FlowFixMe[sketchy-null-bool]
+    if (!isCKey) {
       this.focus();
     }
   }
@@ -371,7 +370,8 @@ export default class Screen {
         error.data.arguments && JSON.stringify(error.data.arguments),
         error.data.debug && encodeHTML(error.data.debug),
       );
-    } else if (typeof error === 'object' && Object.hasOwn(error, 'status') && error.status !== '200') {
+    // $FlowFixMe[incompatible-use]
+    } else if (typeof error === 'object' && Object.hasOwn(error, 'status') && String(error.status) !== '200') {
       // It's an Odoo/jQuery error report
       error_msg = renderErrorMessage(
         encodeHTML(error.statusText),
@@ -403,7 +403,10 @@ export default class Screen {
   }
 
   updateInputInfo(info?: Partial<InputInfo>) {
-    Object.assign(this.#input_info, info);
+    this.#input_info = {
+      ...this.#input_info,
+      ...info,
+    };
     if (!this.#wasStart) {
       return;
     }
@@ -412,6 +415,7 @@ export default class Screen {
       if (prompt_el) {
         prompt_el.textContent = this.#input_info.username;
         prompt_el.setAttribute('title', this.#input_info.username);
+        // $FlowFixMe[prop-missing]
         this.#assistant_el.style.bottom = (prompt_el.offsetHeight + 4) + 'px';
       }
     }
@@ -424,7 +428,6 @@ export default class Screen {
     }
     if (
       Object.hasOwn(this.#input_info, 'host') &&
-      this.#input_info.host !== null &&
       typeof this.#input_info.host !== 'undefined'
     ) {
       const info_host_el = this.#userInput_el.querySelector('#terminal-prompt-info-host');
@@ -435,15 +438,11 @@ export default class Screen {
       // Custom color indicator per host
       if (this.#input_info.host.startsWith('localhost') || this.#input_info.host.startsWith('127.0.0.1')) {
         for (const container_el of this.#promptContainer_els) {
-          Object.assign(container_el.style, {
-            backgroundColor: '#adb5bd',
-            color: 'black',
-          });
+          container_el.style.backgroundColor = '#adb5bd';
+          container_el.style.color = 'black';
         }
-        Object.assign(this.#promptInfoContainer_el.style, {
-          backgroundColor: '#828587',
-          color: 'black',
-        });
+        this.#promptInfoContainer_el.style.backgroundColor = '#828587';
+        this.#promptInfoContainer_el.style.color = 'black';
       } else {
         let main_rgb: RGB = [0, 0, 0];
         if (Object.hasOwn(this.#options.inputColors, this.#input_info.host)) {
@@ -453,19 +452,15 @@ export default class Screen {
           main_rgb = genColorFromString(this.#input_info.host);
         }
         for (const container_el of this.#promptContainer_els) {
-          Object.assign(container_el.style, {
-            backgroundColor: `rgb(${main_rgb[0]},${main_rgb[1]},${main_rgb[2]})`,
-            color: getColorGrayValue(main_rgb) < 0.5 ? '#000' : '#fff',
-          });
+          container_el.style.backgroundColor = `rgb(${main_rgb[0]},${main_rgb[1]},${main_rgb[2]})`;
+          container_el.style.color = getColorGrayValue(main_rgb) < 0.5 ? '#000' : '#fff';
         }
 
         const hsl = rgb2hsl(main_rgb);
         hsl[2] = Math.max(hsl[2] - 0.2, 0.0);
         const secondary_rgb = hsl2rgb(hsl);
-        Object.assign(this.#promptInfoContainer_el.style, {
-          backgroundColor: `rgb(${secondary_rgb[0]},${secondary_rgb[1]},${secondary_rgb[2]})`,
-          color: getColorGrayValue(secondary_rgb) < 0.5 ? '#000' : '#fff',
-        });
+        this.#promptInfoContainer_el.style.backgroundColor = `rgb(${secondary_rgb[0]},${secondary_rgb[1]},${secondary_rgb[2]})`
+        this.#promptInfoContainer_el.style.color = getColorGrayValue(secondary_rgb) < 0.5 ? '#000' : '#fff';
       }
     }
   }
@@ -492,6 +487,8 @@ export default class Screen {
       question: question,
       values: values || [],
       def_value: def_value,
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-type]
       defer: _defer,
     });
     this.updateQuestions();
@@ -505,9 +502,9 @@ export default class Screen {
       }
       this.#question_active = this.#questions.shift();
       if (this.#question_active?.values) {
-        const values = this.#question_active.values.map(item => {
-          // $FlowFixMe
-          if (item === this.#question_active.def_value) {
+        const active_q = this.#question_active;
+        const values = active_q.values.map(item => {
+          if (item === active_q.def_value) {
             return item.toUpperCase();
           }
           return item;
@@ -533,7 +530,8 @@ export default class Screen {
   }
 
   responseQuestion(question: Question, response: string) {
-    // $FlowIgnore
+    // $FlowFixMe[sketchy-null-string]
+    // $FlowFixMe[sketchy-null-number]
     question.defer.resolve((!response && question.def_value) || response);
     this.updateQuestions();
     this.cleanInput();
@@ -546,9 +544,9 @@ export default class Screen {
   }
 
   applyStyle(name: string, value: string) {
-    Object.assign(this.#screen_el.style, {
-      [name]: value,
-    });
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[prop-missing]
+    this.#screen_el.style[name] = value;
   }
 
   replaceUserInputToken(input_str: string, cur_token: TokenInfo, str: string) {
@@ -610,18 +608,21 @@ export default class Screen {
 
     let elm = this.#assistant_el.querySelector('#terminal_assistant_args');
     if (elm) {
+      // $FlowFixMe[incompatible-type]
       this.#assistant_args_el = elm;
     } else {
       throw new ElementNotFoundError('#terminal_assistant_args');
     }
     elm = this.#assistant_el.querySelector('#terminal_assistant_args_info');
     if (elm) {
+      // $FlowFixMe[incompatible-type]
       this.#assistant_args_info_el = elm;
     } else {
       throw new ElementNotFoundError('#terminal_assistant_args_info');
     }
     elm = this.#assistant_el.querySelector('#terminal_assistant_desc');
     if (elm) {
+      // $FlowFixMe[incompatible-type]
       this.#assistant_desc_el = elm;
     } else {
       throw new ElementNotFoundError('#terminal_assistant_desc');
@@ -634,52 +635,56 @@ export default class Screen {
     this.#container_el.append(this.#userInput_el)
     const elms = this.#userInput_el.querySelectorAll('.terminal-prompt-container');
     if (elms) {
+      // $FlowFixMe[incompatible-type]
       this.#promptContainer_els = elms;
     } else {
       throw new ElementNotFoundError('.terminal-prompt-container');
     }
     let elm = this.#userInput_el.querySelector('.terminal-prompt-container.terminal-prompt-interactive');
     if (elm) {
+      // $FlowFixMe[incompatible-type]
       this.#interactiveContainer_el = elm;
     } else {
       throw new ElementNotFoundError('.terminal-prompt-container.terminal-prompt-interactive');
     }
     elm = this.#userInput_el.querySelector('.terminal-prompt');
     if (elm) {
+      // $FlowFixMe[incompatible-type]
       this.#prompt_el = elm;
     } else {
       throw new ElementNotFoundError('.terminal-prompt');
     }
     elm = this.#userInput_el.querySelector('.terminal-prompt-container.terminal-prompt-info');
     if (elm) {
+      // $FlowFixMe[incompatible-type]
       this.#promptInfoContainer_el = elm;
     } else {
       throw new ElementNotFoundError('.terminal-prompt-container.terminal-prompt-info');
     }
     elm = this.#userInput_el.querySelector('#terminal_input');
     if (elm) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       this.#input_el = elm;
     } else {
       throw new ElementNotFoundError('#terminal_input');
     }
     elm = this.#userInput_el.querySelector('#terminal_shadow_input');
     if (elm) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       this.#shadowInput_el = elm;
     } else {
       throw new ElementNotFoundError('#terminal_shadow_input');
     }
     elm = this.#userInput_el.querySelector('#terminal_input_multi');
     if (elm) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       this.#inputMulti_el = elm;
     } else {
       throw new ElementNotFoundError('#terminal_input_multi');
     }
     elm = this.#userInput_el.querySelector('#terminal_input_multi_info');
     if (elm) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       this.#inputMultiInfo_el = elm;
     } else {
       throw new ElementNotFoundError('#terminal_input_multi_info');
@@ -698,10 +703,10 @@ export default class Screen {
       ev.preventDefault();
     }
     // Only allow valid responses to questions
-    if (ev.keyCode !== 8 && typeof this.#question_active !== 'undefined' && this.#question_active.values.length) {
+    if (ev.keyCode !== 8 && typeof this.#question_active !== 'undefined' && this.#question_active?.values?.length) {
       const cur_value = this.#input_el.value;
       const next_value = `${cur_value}${String.fromCharCode(ev.keyCode)}`.toLowerCase();
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-use]
       const is_invalid = this.#question_active.values.filter(item => item.startsWith(next_value)).length === 0;
       if (is_invalid) {
         ev.preventDefault();

@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import createRecord from '@odoo/orm/create_record';
 import searchRead from '@odoo/orm/search_read';
@@ -37,7 +36,7 @@ async function cmdModuleDepends(
 
   // Create wizard record
   const OdooVerMajor = getOdooVersion('major');
-  let create_params = {};
+  let create_params: {[string]: mixed} = {};
   if (typeof OdooVerMajor === 'number') {
     if (OdooVerMajor >= 19) {
       create_params = {
@@ -54,6 +53,7 @@ async function cmdModuleDepends(
   const wizard_id = (
     await createRecord(
       'base.module.uninstall',
+      // $FlowFixMe[incompatible-type]
       [create_params],
       await this.getContext(),
     )

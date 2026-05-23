@@ -5,6 +5,6 @@
 import getOdooSession from './get_odoo_session';
 
 export default function (): string | void {
-  // $FlowIgnore
+  // $FlowFixMe[incompatible-type]
   return getOdooSession()?.user_context?.tz || luxon?.Settings?.defaultZoneName;
 }

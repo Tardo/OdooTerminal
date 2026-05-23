@@ -5,6 +5,10 @@
 ```
 ADD: Internal function 'pow'
 
+IMP: Make Flow happy (using Claude Code)
+
+UPD: Project dependencies
+
 FIX: Command 'exportfile': Incorrect example (issue #147)
 FIX: TraSH tokenizer: Incorrect handling of math operations with negative numbers
 FIX: Assistant Panel: Show only in single-line mode

@@ -13,42 +13,32 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/cache@v3
-        with:
-          path: |
-            .venv
-            .cache
-            .npm
-            node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - run: git checkout ${{ env.BRANCH }}
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '*'
           check-latest: true
 
-      - run: |
-          npm ci --cache .npm --prefer-offline
-          npm install --global npm
-          npm install
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
 
       - name: flowjs
-        run: npx flow check
+        run: pnpm run dev:flowcheck
 
       - name: eslint
-        run: npx eslint --color .
+        run: pnpm run dev:eslint
 
       - name: Build dist/ files
-        run: npm run prod:build
+        run: pnpm run prod:build
 
       - name: web-ext
-        run: npx -c "web-ext lint --ignore-files=src/js/**"
+        run: pnpm run dev:web-ext
 
   jest-puppeteer:
     name: Jest-Puppeteer Tests
@@ -62,32 +52,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/cache@v3
-        with:
-          path: |
-            .venv
-            .cache
-            .npm
-            node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Switch to current branch
         run: git checkout ${{ env.BRANCH }}
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '*'
           check-latest: true
 
-      - name: Install dependencies
-        run: |
-          npm ci --cache .npm --prefer-offline
-          npm install --global npm
-          npm install
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
 
       - name: Install browser firefox
         run: npx @puppeteer/browsers install firefox
@@ -99,7 +78,7 @@ jobs:
 
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})
         id: jest
-        run: npm run test
+        run: pnpm run test
         env:
           ODOO_VERSION: "${{ matrix.instance }}"
           PUPPETEER_BROWSER: "${{ matrix.browser }}"

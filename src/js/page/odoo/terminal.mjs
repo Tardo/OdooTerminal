@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import logger from '@common/logger';
 import Terminal from '@terminal/terminal';
@@ -50,7 +49,10 @@ export default class OdooTerminal extends Terminal {
   async getContext(extra_context: ?{[string]: mixed}): Promise<OdooSessionInfoUserContext> {
     const context = await super.getContext(arguments);
     const sess_user_ctx = getOdooSession()?.user_context ?? (await getSessionInfo())?.user_context ?? {};
-    return Object.assign({}, sess_user_ctx, context);
+    return {
+      ...sess_user_ctx,
+      ...context,
+    };
   }
 
   /**

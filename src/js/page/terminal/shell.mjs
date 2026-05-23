@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import VMachine from '@trash/vmachine';
 import Frame from '@trash/frame';
@@ -90,7 +89,8 @@ export default class Shell {
     return this.#interpreter.parse(data, parse_options, level);
   }
 
-  async eval(code: string, options?: Partial<EvalOptions>, isolated_frame?: boolean = false): Promise<mixed> {
+  // $FlowFixMe[unclear-type]
+  async eval(code: string, options?: Partial<EvalOptions>, isolated_frame?: boolean = false): Promise<any> {
     if (code?.constructor !== String) {
       throw new Error('Invalid input!');
     }

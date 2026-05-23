@@ -2,11 +2,11 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import searchRead from '@odoo/orm/search_read';
 import getFieldsInfo from '@odoo/orm/get_fields_info';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+// $FlowFixMe[untyped-import]
 import {default as Recordset} from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
@@ -52,9 +52,10 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   }
 
   // Due to possible problems with binary fields it is necessary to filter them out
-  let fieldDefs = {};
+  let fieldDefs: {[string]: mixed} = {};
   if (search_all_fields) {
       if (!kwargs.read_binary) {
+      // $FlowFixMe[incompatible-indexer]
       fieldDefs = await getFieldsInfo(kwargs.model, false, await this.getContext(), kwargs.options);
 
       fields = [];
@@ -68,16 +69,18 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     }
   }
 
-  const result = await searchRead(kwargs.model, kwargs.domain, fields, await this.getContext(), Object.assign({}, kwargs.options, {
+  const result = await searchRead(kwargs.model, kwargs.domain, fields, await this.getContext(), {
+    ...kwargs.options,
     limit: kwargs.limit,
     offset: kwargs.offset,
     orderBy: kwargs.order,
-  }));
+  });
 
   if (search_all_fields) {
     if (!kwargs.read_binary) {
       const def_fields = Object.keys(fieldDefs);
       for (const field of def_fields) {
+        // $FlowFixMe[incompatible-type]
         if (fieldDefs[field].type === 'binary') {
           for (const record of result) {
             record[field] = null;
@@ -97,6 +100,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
     };
     sresult = sresult.slice(0, lines_total);
   }
+  // $FlowFixMe[incompatible-type]
   const recordset = Recordset.make(kwargs.model, sresult, fieldDefs);
   ctx.screen.print(recordset);
   ctx.screen.print(i18n.t("cmdSearch.result.count", "Records count: {{count}}", {count: sresult.length}));

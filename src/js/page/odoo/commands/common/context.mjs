@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import getSessionInfo from '@odoo/net_utils/get_session_info';
 import getOdooSession from '@odoo/utils/get_odoo_session';
@@ -42,6 +41,7 @@ async function cmdContextOperation(kwargs: CMDCallbackArgs, ctx: CMDCallbackCont
       }
     }
   } else if (kwargs.operation === 'write') {
+    // $FlowFixMe[unsafe-object-assign]
     Object.assign(user_context, kwargs.value);
   } else if (kwargs.operation === 'delete') {
     if (Object.hasOwn(user_context, kwargs.value)) {

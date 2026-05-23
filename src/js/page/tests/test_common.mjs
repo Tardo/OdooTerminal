@@ -116,16 +116,19 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertTrue(typeof OdooVerMajor === 'number');
 
     let res = await this.terminal.execute('action -a 5', false, true);
-    // $FlowIgnore
+    // $FlowFixMe[invalid-compare]
+    // $FlowFixMe[invalid-compare]
     if (OdooVerMajor >= 17) {
       this.assertTrue(res !== null && typeof res !== 'undefined');
     } else {
       this.assertEqual(res.id, 5);
     }
-    // $FlowIgnore
+    // $FlowFixMe[invalid-compare]
+    // $FlowFixMe[invalid-compare]
     if (OdooVerMajor >= 14) {
       res = await this.terminal.execute('action -a base.action_res_company_form', false, true);
-      // $FlowIgnore
+      // $FlowFixMe[invalid-compare]
+      // $FlowFixMe[invalid-compare]
       if (OdooVerMajor >= 17) {
         this.assertTrue(res !== null && typeof res !== 'undefined');
       } else {
@@ -194,7 +197,8 @@ export default class TestCommon extends TerminalTestSuite {
     // At the moment operations with the context are not possible in legacy mode
     const OdooVerMajor = getOdooVersion('major');
     this.assertTrue(typeof OdooVerMajor === 'number');
-    // $FlowIgnore
+    // $FlowFixMe[invalid-compare]
+    // $FlowFixMe[invalid-compare]
     if (OdooVerMajor < 15) {
       res = await this.terminal.execute("context -o write -v {test_key: 'test_value'}", false, true);
       this.assertIn(res, 'test_key');
@@ -368,7 +372,8 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertNotEmpty(res);
     const OdooVerMajor = getOdooVersion('major');
     this.assertTrue(typeof OdooVerMajor === 'number');
-    // $FlowIgnore
+    // $FlowFixMe[invalid-compare]
+    // $FlowFixMe[invalid-compare]
     if (OdooVerMajor < 18) {
       res = await this.terminal.execute('url -s hash -k model', false, true);
       this.assertNotEmpty(res);

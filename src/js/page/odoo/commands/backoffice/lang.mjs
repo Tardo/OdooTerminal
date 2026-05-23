@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
@@ -19,7 +18,7 @@ import type Terminal from '@terminal/terminal';
 
 async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
   const filtered_kwargs = Object.fromEntries(
-    Object.entries(kwargs).filter(([key]) => key !== 'operation' || key !== 'format'),
+    Object.entries(kwargs).filter(([key]) => key !== 'operation' && key !== 'format'),
   );
   const is_empty_args = isEmpty(filtered_kwargs);
   if (kwargs.operation === 'export') {

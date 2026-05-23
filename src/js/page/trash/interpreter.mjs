@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {
   INSTRUCTION_TYPE,
@@ -42,10 +41,10 @@ export type ArgInfo = {
   raw: ArgDef,
 }
 
-// $FlowFixMe
-export type CMDCallbackContext = {[string]: Any};
-// $FlowFixMe
-export type CMDCallbackArgs = {[string]: Any};
+// $FlowFixMe[unclear-type]
+export type CMDCallbackContext = {[string]: any};
+// $FlowFixMe[unclear-type]
+export type CMDCallbackArgs = {[string]: any};
 export type CMDCallback = (kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) => Promise<mixed>;
 export type CMDCallbackInternal = (vmachine: VMachine, kwargs: {[string]: mixed}, frame: Frame, opts: EvalOptions) => Promise<mixed>;
 export type CMDOptionsCallback = (arg_name: string) => Promise<$ReadOnlyArray<string>>;
@@ -130,7 +129,6 @@ export default class Interpreter {
 
     const entries = Object.entries(registered_cmds);
     for (const [cname, cmd_def] of entries) {
-      // $FlowFixMe
       if (cmd_def.aliases.indexOf(cmd_name) !== -1) {
         return cname;
       }
@@ -149,8 +147,7 @@ export default class Interpreter {
   tokenize(data: string, options: ParserOptions): Array<TokenInfo> {
     // Remove comments
     const clean_data = data.replaceAll(this.#regexComments, '').replaceAll(SYMBOLS.ESCAPE, "\\");
-    // $FlowIgnore
-    const delimiter = options.delimiter || SYMBOLS.ITEM_DELIMITER;
+    const delimiter = options.delimiter ?? SYMBOLS.ITEM_DELIMITER;
     let tokens = [];
     let value = '';
     let in_string = '';
@@ -289,8 +286,7 @@ export default class Interpreter {
       const rsepcount = countBy(rstr, char => char === ':').true;
       return rsepcount !== sepcount;
     };
-    // $FlowIgnore
-    const delimiter = options.delimiter || SYMBOLS.ITEM_DELIMITER;
+    const delimiter = options.delimiter ?? SYMBOLS.ITEM_DELIMITER;
     let token_san = token.trim();
     let ttype = LEXER.String;
     if (!token_san) {
@@ -522,7 +518,7 @@ export default class Interpreter {
       active_value = token_active.value.trim();
       if (active_value.length > 0) {
         fun_args = active_value.split(',')
-          .map(item => ([ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]: ArgDef));
+          .map(item => [ARG.Any, [item.trim(), item.trim()], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), undefined]);
       }
     } else {
       fun_name = active_value;
@@ -539,7 +535,7 @@ export default class Interpreter {
             let [varass, vardef] = item.split('=');
             vardef = vardef && vardef.trim();
             if (vardef) {
-              // $FlowIgnore
+              // $FlowFixMe[incompatible-type]
               vardef = this.parse(vardef, options);
             }
             let [varname, vartype] = varass.split(':');
@@ -558,7 +554,7 @@ export default class Interpreter {
             if (svartype === 0) {
               svartype = ARG.Any;
             }
-            return ([svartype, [varname, varname], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), vardef]: ArgDef);
+            return [svartype, [varname, varname], false, i18n.t('cmdFuncTrash.args.name', 'The function parameter'), vardef];
           });
       }
     }

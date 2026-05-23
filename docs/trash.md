@@ -92,3 +92,39 @@ Left to Right
 12. LESS_THAN_CLOSED: <=
 13. AND: &&
 14. OR: ||
+
+## Built-in Internal Functions
+
+### Math
+
+| Function | Description |
+|---|---|
+| `abs(x)` | Absolute value of a number |
+| `fixed(x, decimals)` | Rounds a number UP to the nearest integer |
+| `floor(x)` | Rounds a number DOWN to the nearest integer |
+| `pow(x, y)` | Calculate the exponent value of x raised to the power of y |
+| `rand(min, max)` | Generate random integers |
+
+### Time
+
+| Function | Description |
+|---|---|
+| `sleep(ms)` | Sleep (time in ms) |
+| `pnow()` | High resolution timestamp in milliseconds |
+
+### Encoding
+
+| Function | Description |
+|---|---|
+| `encode(data, format)` | Encode data (e.g. base64) |
+| `decode(data, format)` | Decode data (e.g. base64) |
+
+### Network
+
+| Function | Description |
+|---|---|
+| `fetch(url, options)` | HTTP requests |
+
+## Standard Library (Array Helpers)
+
+Available via built-in TraSH array functions: `arr_clone`, `arr_append`, `arr_prepend`, `arr_reduce`, and others.

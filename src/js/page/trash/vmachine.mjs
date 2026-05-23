@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {validateAndFormatArguments, getArgumentInputCount, getArgumentInfoByName} from './argument';
 import {INSTRUCTION_TYPE, ARG, LEXER} from './constants';
@@ -129,7 +128,7 @@ export default class VMachine {
   }
 
   async #invokeFunction(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef, parse_info: ParseInfo, silent: boolean): Promise<mixed> {
-    let kwargs = {};
+    let kwargs: {[string]: mixed} = {};
     if (typeof cmd_def !== 'undefined') {
       kwargs = await this.#genKwargs(opts, frame, name, cmd_def);
       if (cmd_def.type !== FUNCTION_TYPE.Command) {
@@ -138,8 +137,10 @@ export default class VMachine {
         }
         let internal_res;
         try {
-          // $FlowFixMe
-          internal_res = await cmd_def.callback(this, kwargs, frame, opts);
+          const internal_cb = cmd_def.callback;
+          // $FlowFixMe[extra-arg]
+          // $FlowFixMe[class-object-subtyping]
+          internal_res = await internal_cb(this, kwargs, frame, opts);
         } catch (err) {
           if (!silent) {
             throw err;
@@ -288,10 +289,10 @@ export default class VMachine {
             const valB = last_frame.values.pop();
             const valA = last_frame.values.pop();
             if (instr.type === INSTRUCTION_TYPE.AND) {
-              // $FlowIgnore
+              // $FlowFixMe[sketchy-null-mixed]
               last_frame.values.push(valA && valB);
             } else if (instr.type === INSTRUCTION_TYPE.OR) {
-              // $FlowIgnore
+              // $FlowFixMe[sketchy-null-mixed]
               last_frame.values.push(valA || valB);
             } else if (instr.type === INSTRUCTION_TYPE.EQUAL) {
               last_frame.values.push(valA === valB);
@@ -336,14 +337,13 @@ export default class VMachine {
         case INSTRUCTION_TYPE.CALL_FUNCTION:
           {
             const frame = frames.pop();
-            // Subframes are executed in silent mode
             if (typeof frame?.cmd !== 'undefined') {
               const frame_cmd = frame.cmd;
               let cmd_def = this.#registeredCmds[frame_cmd];
               if (typeof cmd_def === 'undefined') {
                 // FIXME: Done in this way to support 'aliases'
                 if (!(frame_cmd in opts.aliases) && typeof frame.values[0] === 'object') {
-                  // $FlowFixMe
+                  // $FlowFixMe[incompatible-type]
                   cmd_def = frame.values.shift();
                 }
               }
@@ -352,7 +352,7 @@ export default class VMachine {
                 opts,
                 frame,
                 frame_cmd,
-                // $FlowFixMe
+                // $FlowFixMe[incompatible-type]
                 cmd_def,
                 parse_info,
                 instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
@@ -391,17 +391,17 @@ export default class VMachine {
                 }
 
                 if (token.type === LEXER.AssignmentAdd) {
-                  // $FlowFixMe
-                  stored_value += vvalue;
+                  // $FlowFixMe[unsafe-addition]
+                  stored_value = stored_value + vvalue;
                 } else if (token.type === LEXER.AssignmentSubstract) {
-                  // $FlowFixMe
-                  stored_value -= vvalue;
+                  // $FlowFixMe[unsafe-arithmetic]
+                  stored_value = stored_value - vvalue;
                 } else if (token.type === LEXER.AssignmentMultiply) {
-                  // $FlowFixMe
-                  stored_value *= vvalue;
+                  // $FlowFixMe[unsafe-arithmetic]
+                  stored_value = stored_value * vvalue;
                 } else if (token.type === LEXER.AssignmentDivide) {
-                  // $FlowFixMe
-                  stored_value /= vvalue;
+                  // $FlowFixMe[unsafe-arithmetic]
+                  stored_value = stored_value / vvalue;
                 }
                 last_frame.setStoreValue(vname, stored_value);
               } else {
@@ -417,21 +417,22 @@ export default class VMachine {
             const attr_name = last_frame.values.pop();
             const data = last_frame.values.pop();
             try {
+              // $FlowFixMe[incompatible-type]
+              const data_obj: {[mixed]: mixed} = data;
               if (token.type === LEXER.AssignmentAdd) {
-                // $FlowFixMe
-                data[attr_name] += attr_value;
+                // $FlowFixMe[unsafe-addition]
+                data_obj[attr_name] = data_obj[attr_name] + attr_value;
               } else if (token.type === LEXER.AssignmentSubstract) {
-                // $FlowFixMe
-                data[attr_name] -= attr_value;
+                // $FlowFixMe[unsafe-arithmetic]
+                data_obj[attr_name] = data_obj[attr_name] - attr_value;
               } else if (token.type === LEXER.AssignmentMultiply) {
-                // $FlowFixMe
-                data[attr_name] *= attr_value;
+                // $FlowFixMe[unsafe-arithmetic]
+                data_obj[attr_name] = data_obj[attr_name] * attr_value;
               } else if (token.type === LEXER.AssignmentDivide) {
-                // $FlowFixMe
-                data[attr_name] /= attr_value;
+                // $FlowFixMe[unsafe-arithmetic]
+                data_obj[attr_name] = data_obj[attr_name] / attr_value;
               } else {
-                // $FlowFixMe
-                data[attr_name] = attr_value;
+                data_obj[attr_name] = attr_value;
               }
               // last_frame.setStoreValue(vname, data);
             } catch (err) {
@@ -451,7 +452,8 @@ export default class VMachine {
 
             let res_value = null;
             try {
-              // $FlowFixMe
+              // $FlowFixMe[incompatible-use]
+              // $FlowFixMe[prop-missing]
               res_value = value[attr_name];
             } catch (_err) {
               // Do nothing
@@ -505,12 +507,17 @@ export default class VMachine {
             const args = last_frame.values.pop();
             const code = last_frame.values.pop();
             if (args instanceof Array && code !== null && typeof code === 'object') {
-              // $FlowFixMe
+              // $FlowFixMe[incompatible-indexer]
+              // $FlowFixMe[incompatible-variance]
+              // $FlowFixMe[incompatible-type]
               const trash_func = new FunctionTrash(args, code);
-              const cmd_def = {
-                // $FlowFixMe
-                callback: trash_func.exec.bind(trash_func),
+              // $FlowFixMe[method-unbinding]
+              const exec_bound = trash_func.exec.bind(trash_func);
+              const cmd_def: Partial<CMDDef> = {
+                // $FlowFixMe[incompatible-type]
+                callback: exec_bound,
                 type: FUNCTION_TYPE.Native,
+                // $FlowFixMe[incompatible-type]
                 args: args,
                 definition: i18n.t('trash.vmachine.func.definition', 'Internal function'),
                 detail: i18n.t('trash.vmachine.func.detail', 'Internal function'),

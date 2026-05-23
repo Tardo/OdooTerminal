@@ -13,22 +13,21 @@ export default function <T>(
   context: ?{[string]: mixed},
   extra_options: ?{[string]: mixed},
 ): Promise<T> {
-  const skwargs = Object.assign(
-    {
-      context: context,
-    },
-    kwargs,
-  );
+  // $FlowFixMe[cannot-spread-indexer]
+  const skwargs = {
+    context: context,
+    ...kwargs,
+  };
   const sargs = [ids, ...(args || [])];
   return rpcQuery<T>(
-    Object.assign(
-      {
-        method: method,
-        model: model,
-        args: sargs,
-        kwargs: skwargs,
-      },
-      extra_options,
-    ),
+    // $FlowFixMe[cannot-spread-indexer]
+    {
+      method: method,
+      model: model,
+      args: sargs,
+      // $FlowFixMe[incompatible-type]
+      kwargs: skwargs,
+      ...extra_options,
+    }
   );
 }

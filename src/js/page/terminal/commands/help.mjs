@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {getArgumentInfo} from '@trash/argument';
 import {ARG} from '@trash/constants';
@@ -30,6 +29,7 @@ async function printHelpDetailed(screen: Screen, cmd: string, cmd_def: CMDDef) {
     const arg_symbols = arg_info.is_required ? ['<', '>'] : ['[', ']'];
     arg_info_str += `${arg_symbols[0]}${lnames.join(', ')} [${ARG.getHumanType(arg_info.type)}`;
     if (
+      // $FlowFixMe[invalid-compare]
       arg_info.strict_values === null ||
       typeof arg_info.strict_values === 'undefined' ||
       arg_info.strict_values.length === 0

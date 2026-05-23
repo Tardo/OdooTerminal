@@ -1,4 +1,5 @@
 [ignore]
+<PROJECT_ROOT>/node_modules/.*
 
 [include]
 
@@ -8,7 +9,12 @@ src/js/flow-typed
 [lints]
 
 [options]
+module.system=node
 module.system.node.resolve_dirname=node_modules
+module.file_ext=.js
+module.file_ext=.mjs
+module.file_ext=.json
+
 module.name_mapper='^@common' -> '<PROJECT_ROOT>/src/js/common'
 module.name_mapper='^@shared' -> '<PROJECT_ROOT>/src/js/shared'
 module.name_mapper='^@odoo' -> '<PROJECT_ROOT>/src/js/page/odoo'

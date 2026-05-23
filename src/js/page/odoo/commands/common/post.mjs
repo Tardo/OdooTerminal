@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import {ARG} from '@trash/constants';
@@ -17,13 +16,16 @@ async function cmdPostData(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
         return result;
       });
     }
-    // $FlowIgnore
-    return $.post(kwargs.endpoint, Object.assign({}, kwargs.data, {csrf_token: odoo.csrf_token}), (result: mixed) => {
+    // $FlowFixMe[prop-missing]
+    return $.post(kwargs.endpoint, {
+      ...kwargs.data,
+      csrf_token: odoo.csrf_token,
+    }, (result: mixed) => {
       ctx.screen.eprint(result, false, 'line-pre');
       return result;
     });
   }
-  // $FlowIgnore
+  // $FlowFixMe[prop-missing]
   return $.post(kwargs.endpoint, kwargs.data, (result: mixed) => {
     ctx.screen.eprint(result, false, 'line-pre');
     return result;

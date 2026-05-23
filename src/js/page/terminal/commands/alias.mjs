@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {getStorageItem, setStorageItem} from '@terminal/core/storage/local';
 import isEmpty from '@trash/utils/is_empty';
@@ -17,7 +16,7 @@ async function cmdAlias(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbac
       ctx.screen.print(i18n.t('cmdAlias.notDefined', 'No aliases defined.'));
     } else {
       for (const alias_name in aliases) {
-        // $FlowFixMe
+        // $FlowFixMe[invalid-computed-prop]
         ctx.screen.print(` - ${alias_name}  <small class="text-muted"><i>${aliases[alias_name]}</i></small>`);
       }
     }

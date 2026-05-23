@@ -16,13 +16,11 @@ export default function(items: $ReadOnlyArray<{[string]: mixed}>, use_header: bo
   const san_regex = new RegExp(`["\n${delimiter}]`);
   let res = '';
   if (use_header) {
-    // $FlowFixMe
     const headers = Object.keys(items[0]).map((value) => sanitizeValue(new String(value).toString(), san_regex));
     if (headers.length > 0) {
       res += `${headers.join(delimiter)}\n`;
     }
   }
-  // $FlowFixMe
   for (const item of items) {
     const san_values = Object.values(item).map((value) => sanitizeValue(new String(value).toString(), san_regex));
     res += `${san_values.join(delimiter)}\n`;

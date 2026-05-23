@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
+// $FlowFixMe[cannot-resolve-module]
 import hash from 'object-hash';
 import callService from '@odoo/osv/call_service';
 

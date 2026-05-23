@@ -14,17 +14,18 @@ export default async function <T>(
   extra_params: ?{[string]: mixed},
   options: ?{[string]: mixed},
 ): Promise<T> {
-  const skwargs = Object.assign(
-    {
-      context: context,
-    },
-    kwargs,
-  );
+  // $FlowFixMe[cannot-spread-indexer]
+  const skwargs = {
+    context: context,
+    ...kwargs,
+  };
   const params: Partial<BuildQueryOptions> = {
     method: method,
     model: model,
     args: args || [],
+    // $FlowFixMe[incompatible-type]
     kwargs: skwargs,
   };
-  return await rpcQuery<T>(Object.assign(params, extra_params), options);
+  // $FlowFixMe[cannot-spread-indexer]
+  return await rpcQuery<T>({...params, ...extra_params}, options);
 }

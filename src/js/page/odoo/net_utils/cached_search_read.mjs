@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
+// $FlowFixMe[cannot-resolve-module]
 import hash from 'object-hash';
 import searchRead from '@odoo/orm/search_read';
 import type {SearchReadOptions} from '@odoo/orm/search_read';
@@ -11,10 +11,10 @@ export type CacheSearchReadOptions = {
   force: boolean,
 };
 
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 export type CachedSearchReadMapCallback = (item: Object) => Array<mixed>;
 
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 const cache: {[string]: Array<Object>} = {};
 export default async function (
   cache_name: string,
@@ -25,7 +25,7 @@ export default async function (
   options: ?CacheSearchReadOptions,
   extra_params: ?Partial<SearchReadOptions>,
   map_func: ?CachedSearchReadMapCallback,
-  // $FlowFixMe
+// $FlowFixMe[unclear-type]
 ): Promise<Array<Object>> {
   const cache_hash = hash(Array.from(arguments).slice(0, 6));
   if (options?.force === true || !Object.hasOwn(cache, cache_hash)) {

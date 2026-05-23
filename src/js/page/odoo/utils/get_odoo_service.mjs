@@ -9,9 +9,7 @@ function getOrigService(serv_name: string) {
   return odoo.loader.modules.get(serv_name);
 }
 
-// $FlowFixMe
 const service_cache: {[Array<string>]: OdooService} = {};
-// $FlowFixMe
 export default function (...service_names: Array<string>): OdooService | void {
   const service_names_set = Array.from(new Set(service_names));
   if (Object.hasOwn(service_cache, service_names_set)) {

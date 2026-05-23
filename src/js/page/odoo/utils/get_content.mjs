@@ -36,13 +36,15 @@ function getFilenameFromContentDisposition(content_disposition: string | null): 
 }
 
 export default async function (data_opts: {[string]: mixed}, onerror: GetContentOnErrorCallback): Promise<boolean | void> {
-  const data = Object.assign({}, data_opts, {
+  const data = {
+    ...data_opts,
     csrf_token: odoo.csrf_token,
     download: true,
     data: getOdooService('web.utils')?.is_bin_size(data_opts.data) ? null : data_opts.data,
-  });
+  };
   const search_data = new URLSearchParams();
   for (const [key, value] of Object.entries(data)) {
+    // $FlowFixMe[incompatible-type]
     search_data.append(key, value);
   }
 
@@ -53,7 +55,8 @@ export default async function (data_opts: {[string]: mixed}, onerror: GetContent
     });
     const filename = getFilenameFromContentDisposition(response.headers.get('Content-Disposition'));
     const mime = response.headers.get("content-type") || 'text/plain';
-    // $FlowFixMe
+    // $FlowFixMe[sketchy-null-string]
+    // $FlowFixMe[prop-missing]
     return save2file(filename || 'unnamed', mime, await response.bytes());
   } catch (err) {
     onerror(err);

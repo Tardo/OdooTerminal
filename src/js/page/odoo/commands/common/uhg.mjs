@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import callModelMulti from '@odoo/osv/call_model_multi';
@@ -39,8 +38,10 @@ async function getOptions(this: Terminal, arg_name: string) {
       [['model', '=', 'res.groups']],
       ['name', 'module'],
       await this.getContext({active_test: true}),
-      // $FlowFixMe
-      item => `${item.module}.${item.name}`,
+      null,
+      null,
+      // $FlowFixMe[incompatible-type]
+      (item: {module: string, name: string, ...}) => `${item.module}.${item.name}`,
     );
   }
   return [];

@@ -8,7 +8,10 @@ import doTrigger from './do_trigger';
 
 export default function (type: string, options: {[string]: mixed}) {
   const OdooVerMajor = getOdooVersion('major');
-  const payload = Object.assign({}, options, {type: type});
+  const payload = {
+    ...options,
+    type: type,
+  };
   if (typeof OdooVerMajor === 'number') {
     if (OdooVerMajor < 15) {
       // Not supported
@@ -18,5 +21,6 @@ export default function (type: string, options: {[string]: mixed}) {
       return;
     }
   }
+  // $FlowFixMe[incompatible-type]
   doTrigger('show-effect', payload);
 }

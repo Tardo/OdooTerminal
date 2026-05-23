@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
@@ -16,7 +15,10 @@ async function cmdTerminalContextOperation(
   if (kwargs.operation === 'set') {
     this.userContext = kwargs.value;
   } else if (kwargs.operation === 'write') {
-    Object.assign(this.userContext, kwargs.value);
+    this.userContext = {
+      ...this.userContext,
+      ...kwargs.value,
+    };
   } else if (kwargs.operation === 'delete') {
     if (Object.hasOwn(this.userContext, kwargs.value)) {
       delete this.userContext[kwargs.value];
@@ -34,10 +36,10 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdContextTerm.definition', 'Operations over terminal context dictionary'),
     callback: cmdTerminalContextOperation,
-    detail: (i18n.t(
+    detail: i18n.t(
       'cmdContextTerm.detail',
       'Operations over terminal context dictionary. This context only affects to the terminal operations.',
-    ): string),
+    ),
     args: [
       [
         ARG.String,

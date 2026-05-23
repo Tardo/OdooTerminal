@@ -8,7 +8,7 @@ import getOwlVersionMajor from './get_owl_version_major';
 import getOdooService from './get_odoo_service';
 import getOdooRoot from './get_odoo_root';
 
-// $FlowFixMe
+// $FlowFixMe[unclear-type]
 export default function (): Object {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number') {
@@ -17,12 +17,10 @@ export default function (): Object {
       const owl_compat_obj = getOdooService('web.OwlCompatibility');
       if (typeof owl_compat_obj !== 'undefined') {
         if (owl_ver === 1) {
-          // $FlowIgnore
           const {Component} = owl;
           const {ComponentAdapter} = owl_compat_obj;
           return new ComponentAdapter(null, {Component});
         } else if (owl_ver === 2) {
-          // $FlowIgnore
           const {Component} = owl;
           const {standaloneAdapter} = owl_compat_obj;
           return standaloneAdapter({Component});

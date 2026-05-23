@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
@@ -23,7 +22,8 @@ async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
       const depends: $ReadOnlyArray<{
         id: number,
         display_name: string,
-        // $FlowFixMe
+      // $FlowFixMe[incompatible-use]
+      // $FlowFixMe[missing-local-annot]
       }> = res.filter(item => item.id !== modue_infos[0].id);
       if (!isEmpty(depends)) {
         const depend_name_lines = depends.map(item => `${item.display_name} [<span class='o_terminal_click o_terminal_cmd' data-cmd='view ir.module.module ${item.id}'>#${item.id}</span>]`);

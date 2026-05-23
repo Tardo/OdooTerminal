@@ -2,19 +2,20 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
 function updateLocationSearch(data: {[string]: string | number}) {
-  const search = Object.fromEntries(
-    window.location.search
-      .substr(1)
-      .split('&')
-      .map(item => item.split('=')),
-  );
-  Object.assign(search, data);
+  const search = {
+    ...Object.fromEntries(
+      window.location.search
+        .substr(1)
+        .split('&')
+        .map(item => item.split('=')),
+      ),
+    ...data,
+  };
   window.location.search = Object.entries(search)
     .map(item => item.join('='))
     .join('&');

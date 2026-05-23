@@ -16,7 +16,7 @@ export function getStorageItem<T>(item: string, def_value: T): T {
 
 export function setStorageItem(item: string, value: mixed, on_error?: LocalStorageSetItemError): boolean {
   try {
-    // $FlowIgnore
+    // $FlowFixMe[incompatible-type]
     localStorage.setItem(item, JSON.stringify(value));
   } catch (err) {
     const err_check = checkStorageError(err);

@@ -183,8 +183,10 @@ export default class TestCore extends TerminalTestSuite {
     await asyncSleep(300);
     const input_el = this.terminal.screen.getUserInputEl();
     this.assertFalse(typeof input_el === 'undefined');
+    // $FlowFixMe[incompatible-use]
     input_el.value = "testing!";
     this.terminal.screen.focus();
+    // $FlowFixMe[incompatible-use]
     input_el.dispatchEvent(new KeyboardEvent('keyup', {
       key: 'Enter',
       keyCode: keyCode.ENTER,

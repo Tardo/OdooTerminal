@@ -10,7 +10,7 @@ import getUserTZ from './utils/get_user_tz';
  * This class is used to generate values for terminal command parameters.
  */
 export default class ParameterGenerator {
-  // $FlowFixMe
+  // $FlowFixMe[missing-local-annot]
   #rndLetter = {
     [Symbol.iterator]: function* () {
       const characters = 'bcdfghjklmnpqrstvwxyz ';

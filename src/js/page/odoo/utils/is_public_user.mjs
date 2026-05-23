@@ -6,6 +6,7 @@ import getOdooSession from './get_odoo_session';
 
 export default function (): boolean {
   const is_web_user = getOdooSession()?.is_website_user;
+  // $FlowFixMe[invalid-compare]
   if (is_web_user === null || typeof is_web_user !== 'boolean') {
     return false;
   }

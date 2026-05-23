@@ -20,8 +20,8 @@ export default class TerminalTestSuite {
     this.#terminal = terminal;
   }
 
-  // $FlowIgnore
-  get terminal() {
+  // $FlowFixMe[unsafe-getters-setters]
+  get terminal(): OdooTerminal {
     return this.#terminal;
   }
 
@@ -71,12 +71,14 @@ export default class TerminalTestSuite {
   }
 
   getModalOpen(): HTMLElement | null {
+    // $FlowFixMe[incompatible-type]
     return document.querySelector('.modal.show,.modal.in,.modal.o_technical_modal');
   }
   isModalType(modal_el: HTMLElement | null, type: string): boolean {
     return modal_el !== null && modal_el.querySelector(`.o_${type}_view`) !== null;
   }
   closeModal(modal_el: HTMLElement | null) {
+    // $FlowFixMe[prop-missing]
     modal_el?.querySelector('.close,.btn-close')?.click();
   }
 

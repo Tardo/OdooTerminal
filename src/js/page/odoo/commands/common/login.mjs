@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import cachedCallService from '@odoo/net_utils/cached_call_service';
@@ -27,6 +26,7 @@ async function cmdLoginAs(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
     passwd = login;
   }
   if (db === '*') {
+    // $FlowFixMe[invalid-compare]
     if (session.db === null || typeof session.db === 'undefined' || !session.db) {
       throw new Error(
         i18n.t(

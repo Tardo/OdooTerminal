@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import { LP_SUBSCRIPTIONS } from './constants';
 import {getStorageItem, removeStorageItem, setStorageItem} from '@terminal/core/storage/local';
@@ -21,18 +20,18 @@ export default class Longpolling {
     let has_listener = false;
     if (typeof OdooVerMajor === 'number') {
       if (OdooVerMajor <= 11) {
-        // $FlowFixMe
+        // $FlowFixMe[method-unbinding]
         this.#getBusService().on('notification', this, this.#onBusNotification.bind(this, undefined));
         has_listener = true;
       } else if (OdooVerMajor >= 18) {
         const bus_serv = this.#getBusService();
         for (const subscription of LP_SUBSCRIPTIONS) {
-          // $FlowFixMe
+          // $FlowFixMe[method-unbinding]
           bus_serv.subscribe(subscription, this.#onBusNotification.bind(this, subscription));
         }
         has_listener = true;
       } else if (OdooVerMajor >= 16) {
-        // $FlowFixMe
+        // $FlowFixMe[method-unbinding]
         this.#busServ('addEventListener', 'notification', this.#onBusNotification.bind(this, undefined));
         has_listener = true;
       }

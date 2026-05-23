@@ -1,0 +1,4 @@
+allowBuilds:
+  puppeteer: true
+  spawn-sync: true
+  unrs-resolver: true

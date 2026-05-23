@@ -224,8 +224,8 @@ export const ARG: {
     } else if (atype === ARG.List && !(val_typeof instanceof Array)) {
       return [val];
     } else if (atype === ARG.Dictionary && val_typeof !== 'object') {
-      // $FlowIgnore
-      return Object.fromEntries((val: Array<[mixed, mixed]>));
+      // $FlowFixMe[incompatible-type]
+      return Object.fromEntries(val);
     }
     return val;
   },

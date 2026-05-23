@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import logger from '@common/logger';
 import processKeybind from '@common/utils/process_keybind';
@@ -25,7 +24,6 @@ import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 import parseHTML from './utils/parse_html';
-// $FlowIgnore
 import {Mutex} from 'async-mutex';
 import type {JobMetaInfo} from './shell';
 import type {ExtensionSettings} from '@common/constants';
@@ -35,7 +33,8 @@ export type TerminalOptions = {
 };
 
 //
-export type MessageListenerCallback = (data: {[string]: mixed}) => Promise<mixed>;
+export type MessageListenerData = {[string]: mixed};
+export type MessageListenerCallback = (data: MessageListenerData) => Promise<mixed>;
 
 const ALLOWED_FUNCS = ['eprint', 'print', 'printError', 'printTable', 'updateInputInfo', 'showQuestion', 'clean'];
 const ALLOWED_SILENT_FUNCS = ['updateInputInfo', 'showQuestion', 'clean'];
@@ -44,16 +43,32 @@ const dummyCall = () => {
   // Do nothing
 };
 export const ScreenCommandHandler = {
-  silent: false,
-
-  // $FlowFixMe
-  get<T>(this: T, target: Object, prop: mixed): mixed {
+  get(target: {[string]: mixed}, prop: mixed): mixed {
+    if (typeof prop !== 'string') {
+      // $FlowFixMe[incompatible-type]
+      return target[prop];
+    }
     const ref = target[prop];
     if (typeof ref === 'function' && ALLOWED_FUNCS.includes(prop)) {
-      // $FlowFixMe
-      if (this.silent && !ALLOWED_SILENT_FUNCS.includes(prop)) {
+      // $FlowFixMe[incompatible-use]
+      return ref.bind(target);
+    }
+    return target[prop];
+  },
+};
+export const ScreenCommandSilentHandler = {
+  get(target: {[string]: mixed}, prop: mixed): mixed {
+    if (typeof prop !== 'string') {
+      // $FlowFixMe[incompatible-type]
+      return target[prop];
+    }
+    const ref = target[prop];
+    if (typeof ref === 'function' && ALLOWED_FUNCS.includes(prop)) {
+      // $FlowFixMe[incompatible-use]
+      if (!ALLOWED_SILENT_FUNCS.includes(prop)) {
         return dummyCall;
       }
+      // $FlowFixMe[incompatible-use]
       return ref.bind(target);
     }
     return target[prop];
@@ -93,7 +108,7 @@ export default class Terminal {
 
   #messageListeners: {[string]: Array<MessageListenerCallback>} = {};
 
-  #mutexAvailableOptions: AMutex = new Mutex();
+  #mutexAvailableOptions: Mutex = new Mutex();
 
   constructor() {
     this.#shell = new Shell({
@@ -155,24 +170,24 @@ export default class Terminal {
 
     this.#applyTheme();
 
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     window.addEventListener('message', this.#onWindowMessage.bind(this), false);
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     window.addEventListener('keydown', this.#onCoreKeyDown.bind(this));
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     window.addEventListener('click', this.onCoreClick.bind(this));
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     window.addEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
-    // $FlowFixMe
-    this.el.querySelector('.terminal-screen-icon-maximize').addEventListener('click', this.#onClickToggleMaximize.bind(this));
-    // $FlowFixMe
-    this.el.querySelector('.terminal-screen-icon-pin').addEventListener('click', this.#onClickToggleScreenPin.bind(this));
-    // $FlowFixMe
-    this.el.querySelector('.terminal-multiline').addEventListener('click', this.#onClickToggleMultiline.bind(this));
-    // $FlowFixMe
-    this.el.querySelector('.terminal-screen-icon-reload-shell').addEventListener('click', this.#onClickReloadShell.bind(this));
+    // $FlowFixMe[method-unbinding]
+    this.el.querySelector('.terminal-screen-icon-maximize')?.addEventListener('click', this.#onClickToggleMaximize.bind(this));
+    // $FlowFixMe[method-unbinding]
+    this.el.querySelector('.terminal-screen-icon-pin')?.addEventListener('click', this.#onClickToggleScreenPin.bind(this));
+    // $FlowFixMe[method-unbinding]
+    this.el.querySelector('.terminal-multiline')?.addEventListener('click', this.#onClickToggleMultiline.bind(this));
+    // $FlowFixMe[method-unbinding]
+    this.el.querySelector('.terminal-screen-icon-reload-shell')?.addEventListener('click', this.#onClickReloadShell.bind(this));
     // Custom Events
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     this.el.addEventListener('toggle', this.#onTerminalToggle.bind(this));
 
     if (!isEmpty(this.#config.init_cmds)) {
@@ -184,7 +199,7 @@ export default class Terminal {
    * This is necessary to prevent terminal issues in Odoo EE
    */
   #initGuard() {
-    if (this.#observer === null && document.body) {
+    if (typeof this.#observer === 'undefined' && document.body) {
       const target = document.body;
       this.#observer = new MutationObserver(() => {
         this.#injectTerminal();
@@ -231,6 +246,7 @@ export default class Terminal {
     if (!elm) {
       throw new ElementNotFoundError('#terminal_running_cmd_count');
     }
+    // $FlowFixMe[incompatible-type]
     this.runningCmdCount_el = elm;
     this.#commandAssistant = new CommandAssistant(this);
     this.screen.start(this.el, {
@@ -259,13 +275,13 @@ export default class Terminal {
     if (typeof this.#observer !== 'undefined') {
       this.#observer.disconnect();
     }
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     window.removeEventListener('keydown', this.#onCoreKeyDown.bind(this));
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     window.removeEventListener('click', this.onCoreClick.bind(this));
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     window.removeEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
-    // $FlowFixMe
+    // $FlowFixMe[method-unbinding]
     this.el.removeEventListener('toggle', this.#onTerminalToggle.bind(this));
   }
 
@@ -317,7 +333,8 @@ export default class Terminal {
     return undefined;
   }
 
-  async execute(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false): Promise<mixed> {
+  // $FlowFixMe[unclear-type]
+  async execute(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false): Promise<any> {
     if (!silent) {
       this.screen.printCommand(code);
     }
@@ -375,12 +392,17 @@ export default class Terminal {
       throw new InvalidCommandDefintionError();
     }
 
+    // $FlowFixMe[class-object-subtyping]
     const call_ctx = {
-      screen: new Proxy(this.screen, {...ScreenCommandHandler, silent: meta.silent}),
       meta: meta,
+      // $FlowFixMe[class-object-subtyping]
+      // $FlowFixMe[incompatible-variance]
+      // $FlowFixMe[incompatible-type]
+      screen: meta.silent ? new Proxy(this.screen, ScreenCommandSilentHandler) : new Proxy(this.screen, ScreenCommandHandler),
     };
-    // $FlowIgnore
-    return await meta.info.cmdDef.callback.call(this, meta.info.kwargs, call_ctx);
+    const cb = meta.info.cmdDef.callback;
+    // $FlowFixMe[incompatible-type]
+    return await cb.call(this, meta.info.kwargs, call_ctx);
   }
 
   /* VISIBILIY */
@@ -414,8 +436,8 @@ export default class Terminal {
     this.#initGuard();
   }
 
-  async getContext(extra_context: ?{[string]: mixed}): Promise<OdooSessionInfoUserContext> {
-    return Object.assign({}, this.userContext, extra_context);
+  async getContext(extra_context: ?{[string]: mixed}): Promise<{[string]: mixed}> {
+    return {...this.userContext, ...extra_context};
   }
 
   /* PRIVATE METHODS*/
@@ -489,9 +511,12 @@ export default class Terminal {
   }
 
   #applySettings(config: TerminalOptions) {
-    Object.assign(this.#config, config);
+    this.#config = {
+      ...this.#config,
+      ...config,
+    }
     this.#config.term_context = this.#config.term_context || {};
-    this.userContext = Object.assign({}, this.#config.term_context, this.userContext);
+    this.userContext = {...this.#config.term_context, ...this.userContext};
   }
 
   updateAssistantoptions() {
@@ -501,6 +526,7 @@ export default class Terminal {
       .runExclusive(async () => {
         const user_input = this.screen.getUserInput();
         if (typeof user_input === 'undefined' || user_input.length === 0) {
+          // $FlowFixMe[missing-empty-array-annot]
           return [];
         }
         return await this.#commandAssistant.getAvailableOptions(
@@ -529,14 +555,17 @@ export default class Terminal {
 
   addMessageListener(type: string, callback: MessageListenerCallback) {
     if (!Object.hasOwn(this.#messageListeners, type)) {
-      Object.assign(this.#messageListeners, {[type]: []});
+      this.#messageListeners = {
+        ...this.#messageListeners,
+        [type]: [],
+      };
     }
     if (this.#messageListeners[type].filter(item => item.name === callback.name).length === 0) {
       this.#messageListeners[type].push(callback);
     }
   }
   removeMessageListener(type: string, callback: MessageListenerCallback) {
-    if (!callback) {
+    if (typeof callback === 'undefined') {
       delete this.#messageListeners[type];
     } else {
       this.#messageListeners[type] = this.#messageListeners[type].filter(item => item.name !== callback.name);
@@ -547,9 +576,11 @@ export default class Terminal {
     if (ev.source !== window) {
       return;
     }
-    // $FlowFixMe
-    const ev_data: Object = {...event.data};
+    // $FlowFixMe[incompatible-type]
+    const ev_data: {[string]: mixed} = {...ev.data};
+    // $FlowFixMe[incompatible-type]
     if (Object.hasOwn(this.#messageListeners, ev_data.type)) {
+      // $FlowFixMe[incompatible-type]
       this.#messageListeners[ev_data.type].forEach((callback: MessageListenerCallback) => callback.bind(this)(ev_data));
     }
   }
@@ -645,7 +676,7 @@ export default class Terminal {
       this.#searchHistoryQuery = this.screen.getUserInput();
     }
     const found_hist = this.#doSearchPrevHistory();
-    if (found_hist !== null && typeof found_hist !== 'undefined' && found_hist !== '') {
+    if (typeof found_hist !== 'undefined' && found_hist !== '') {
       this.screen.updateInput(found_hist);
     }
   }
@@ -654,7 +685,7 @@ export default class Terminal {
       this.#searchHistoryQuery = this.screen.getUserInput();
     }
     const found_hist = this.#doSearchNextHistory();
-    if (found_hist !== null && typeof found_hist !== 'undefined' && found_hist !== '') {
+    if (typeof found_hist !== 'undefined' && found_hist !== '') {
       this.screen.updateInput(found_hist);
     } else {
       this.#searchHistoryQuery = '';
@@ -685,7 +716,7 @@ export default class Terminal {
       parse_info,
       this.screen.getInputCaretStartPos(),
     );
-    if (sel_cmd_index === null) {
+    if (typeof sel_cmd_index === 'undefined') {
       return;
     }
     const cur_token = parse_info.inputTokens[sel_level][sel_token_index];
@@ -778,7 +809,7 @@ export default class Terminal {
     ) {
       this.doHide();
     } else if (ev.target instanceof HTMLElement && ev.target.classList.contains('o_terminal_cmd')) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       this.#onClickTerminalCommand(ev.target);
     }
   }

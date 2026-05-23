@@ -2,7 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-// $FlowIgnore
 import i18n from 'i18next';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import getOdooService from '@odoo/utils/get_odoo_service';
@@ -28,7 +27,6 @@ async function cmdNow(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
       }
     } else {
       if (kwargs.tz) {
-        // $FlowIgnore
         res = moment().format(time.getLangDatetimeFormat());
       } else {
         res = time.datetime_to_str(new Date());
@@ -43,7 +41,6 @@ async function cmdNow(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
       }
     } else {
       if (kwargs.tz) {
-        // $FlowIgnore
         res = moment().format(time.getLangDateFormat());
       } else {
         res = time.date_to_str(new Date());
@@ -58,7 +55,6 @@ async function cmdNow(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
       }
     } else {
       if (kwargs.tz) {
-        // $FlowIgnore
         res = moment().format(time.getLangTimeFormat());
       } else {
         res = time.time_to_str(new Date());
