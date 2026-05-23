@@ -6,6 +6,8 @@
 ADD: Internal function 'pow'
 
 IMP: Make Flow happy (using Claude Code)
+IMP: Use pnpm
+IMP: package.json: multi-os support (thanks to @killday)
 
 UPD: Project dependencies
 
