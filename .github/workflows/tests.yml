@@ -24,9 +24,14 @@ jobs:
           node-version: '*'
           check-latest: true
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
         with:
-          run_install: true
+          version: latest
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install
 
       - name: flowjs
         run: pnpm run dev:flowcheck
@@ -64,9 +69,14 @@ jobs:
           node-version: '*'
           check-latest: true
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
         with:
-          run_install: true
+          version: latest
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Install browser firefox
         run: npx @puppeteer/browsers install firefox
