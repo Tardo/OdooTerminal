@@ -30,7 +30,6 @@
     "@rollup/plugin-eslint": "^9.2",
     "@rollup/plugin-node-resolve": "^16.0",
     "@rollup/plugin-terser": "^1.0",
-    "@zip.js/zip.js": "^2.8.26",
     "adm-zip": "^0.5",
     "autoprefixer": "^10.4",
     "babel-jest": "^30.3",
@@ -137,9 +136,9 @@
     "singleAttributePerLine": false
   },
   "dependencies": {
+    "@zip.js/zip.js": "^2.8.26",
     "i18next": "^26.0",
     "i18next-http-backend": "^4.0.0",
-    "jszip": "^3.10.1",
     "async-mutex": "^0.5"
   }
 }
