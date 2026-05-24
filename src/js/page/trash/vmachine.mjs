@@ -460,11 +460,9 @@ export default class VMachine {
             }
             if (res_value === null || typeof res_value === 'undefined') {
               if (typeof attr_name === 'string' && !isNumber(attr_name) && value instanceof Array) {
-                res_value = pluck(value, attr_name);
-                if (res_value.every(item => typeof item === 'undefined')) {
-                  res_value = undefined;
-                } else {
-                  res_value = res_value.join(',');
+                const plucked = pluck(value, attr_name);
+                if (!plucked.every(item => typeof item === 'undefined')) {
+                  res_value = plucked;
                 }
               }
             }

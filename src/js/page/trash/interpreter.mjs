@@ -17,7 +17,6 @@ import {
   ARG,
 } from './constants';
 import Instruction from './instruction';
-import countBy from './utils/count_by';
 import isFalsy from './utils/is_falsy';
 import isNumber from './utils/is_number';
 import InvalidTokenError from './exceptions/invalid_token_error';
@@ -273,18 +272,33 @@ export default class Interpreter {
    * @param {Array} tokens
    */
   #lexer(token: string, next_char: string | void, prev_token_info: LexerInfo | void, prev_token_info_no_space: LexerInfo | void, options: ParserOptions): LexerInfo {
-    // FIXME: New level of ugly implementation here... but works :/
     const isDict = (stoken: string) => {
-      const sepcount = countBy(stoken, char => char === ':').true;
-      const dtokens = this.tokenize(stoken, {isData: true});
-      let rstr = '';
-      for (const tok of dtokens) {
-        if (tok.type !== LEXER.Delimiter) {
-          rstr += tok.raw;
+      let depth = 0;
+      let inStr = '';
+      let prevChar = '';
+      const slen = stoken.length;
+      for (let i = 0; i < slen; ++i) {
+        const ch = stoken[i];
+        if (prevChar !== SYMBOLS.ESCAPE) {
+          if (ch === SYMBOLS.STRING || ch === SYMBOLS.STRING_SIMPLE) {
+            if (inStr === ch) {
+              inStr = '';
+            } else if (!inStr) {
+              inStr = ch;
+            }
+          } else if (!inStr) {
+            if (ch === SYMBOLS.BLOCK_START || ch === SYMBOLS.ARRAY_START || ch === SYMBOLS.LOGIC_BLOCK_START) {
+              ++depth;
+            } else if (ch === SYMBOLS.BLOCK_END || ch === SYMBOLS.ARRAY_END || ch === SYMBOLS.LOGIC_BLOCK_END) {
+              --depth;
+            } else if (ch === SYMBOLS.DICTIONARY_SEPARATOR && depth === 0) {
+              return true;
+            }
+          }
         }
+        prevChar = ch;
       }
-      const rsepcount = countBy(rstr, char => char === ':').true;
-      return rsepcount !== sepcount;
+      return false;
     };
     const delimiter = options.delimiter ?? SYMBOLS.ITEM_DELIMITER;
     let token_san = token.trim();
@@ -472,6 +486,9 @@ export default class Interpreter {
     }
     let tokens_no_spaces = tokens.filter(item => item[0] !== LEXER.Space);
     for (const tok_prio of MATH_OPER_PRIORITIES) {
+      if (!tokens_no_spaces.some(t => t[1] === tok_prio)) {
+        continue;
+      }
       const ntokens: Array<LexerInfo> = [];
       const tokens_len = tokens_no_spaces.length;
       for (let token_index = 0; token_index < tokens_len; ++token_index) {
