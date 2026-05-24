@@ -14,15 +14,7 @@
  */
 
 declare module 'async-mutex' {
-  declare class Mutex {
-    acquire(): Promise<() => void>;
-    runExclusive<T>(callback: () => Promise<T> | T): Promise<T>;
-    isLocked(): boolean;
-    waitForUnlock(): Promise<void>;
-    release(): void;
-    cancel(): void;
-  }
-  declare module.exports: {Mutex: typeof Mutex, ...};
+  declare module.exports: any;
 }
 
 /**

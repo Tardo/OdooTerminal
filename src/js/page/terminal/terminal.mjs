@@ -110,7 +110,7 @@ export default class Terminal {
 
   #boundDisableModalFocusTrap: () => void;
 
-  #mutexAvailableOptions: Mutex = new Mutex();
+  #mutexAvailableOptions: AMutex = new Mutex();
 
   constructor() {
     // $FlowFixMe[method-unbinding]

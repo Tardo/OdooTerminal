@@ -1,5 +1,11 @@
 # Changelog
 
+**12.1.0**
+
+```
+IMP: Always on-top (using Claude Code)
+```
+
 **12.0.0**
 
 ```
