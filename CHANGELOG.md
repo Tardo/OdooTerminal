@@ -4,6 +4,9 @@
 
 ```
 IMP: Always on-top (using Claude Code)
+IMP: TraSH interpreter (using Claude Code)
+
+FIX: package.json: Dependencies section
 ```
 
 **12.0.0**
