@@ -108,9 +108,13 @@ export default class Terminal {
 
   #messageListeners: {[string]: Array<MessageListenerCallback>} = {};
 
+  #boundDisableModalFocusTrap: () => void;
+
   #mutexAvailableOptions: Mutex = new Mutex();
 
   constructor() {
+    // $FlowFixMe[method-unbinding]
+    this.#boundDisableModalFocusTrap = this.#disableModalFocusTrap.bind(this);
     this.#shell = new Shell({
       invokeExternalCommand: meta => this.#invokeExternalCommand(meta),
       onStartCommand: () => this.#updateJobsInfo(),
@@ -412,10 +416,28 @@ export default class Terminal {
     }
     // Only start the terminal if needed
     await this.#wakeUp();
+    // Re-disable the trap if a new modal opens while the terminal is visible.
+    // Bootstrap 5 fires native DOM events; Bootstrap 4 fires only jQuery events.
+    document.addEventListener('shown.bs.modal', this.#boundDisableModalFocusTrap);
+    try {
+      // $FlowFixMe[prop-missing]
+      window.$(document).on('shown.bs.modal', this.#boundDisableModalFocusTrap);
+    } catch (_err) {
+      // jQuery not available
+    }
+    this.#disableModalFocusTrap();
     this.screen.show();
   }
 
   async doHide() {
+    document.removeEventListener('shown.bs.modal', this.#boundDisableModalFocusTrap);
+    try {
+      // $FlowFixMe[prop-missing]
+      window.$(document).off('shown.bs.modal', this.#boundDisableModalFocusTrap);
+    } catch (_err) {
+      // jQuery not available
+    }
+    this.#enableModalFocusTrap();
     this.screen.hide();
   }
 
@@ -587,6 +609,61 @@ export default class Terminal {
 
   #onTerminalToggle() {
     this.doToggle();
+  }
+
+  #disableModalFocusTrap() {
+    // Bootstrap 4: remove jQuery focus trap and patch the instance so Odoo
+    // can't re-attach it by calling _enforceFocus() again after shown.bs.modal
+    try {
+      // $FlowFixMe[prop-missing]
+      window.$(document).off('focusin.bs.modal');
+      document.querySelectorAll('.modal.show').forEach(el => {
+        // $FlowFixMe[prop-missing]
+        const instance = window.$(el).data('bs.modal');
+        if (instance && typeof instance._enforceFocus === 'function' && !instance.__origEnforceFocus) {
+          instance.__origEnforceFocus = instance._enforceFocus;
+          instance._enforceFocus = () => undefined;
+        }
+      });
+    } catch (_err) {
+      // jQuery or Bootstrap 4 not available
+    }
+    // Bootstrap 5: internal FocusTrap instance
+    document.querySelectorAll('.modal.show').forEach(el => {
+      try {
+        // $FlowFixMe[prop-missing]
+        const instance = window.bootstrap?.Modal?.getInstance(el);
+        // $FlowFixMe[prop-missing]
+        instance?._focustrap?.deactivate();
+      } catch (_err) {
+        // Instance or method not available
+      }
+    });
+  }
+
+  #enableModalFocusTrap() {
+    document.querySelectorAll('.modal.show').forEach(el => {
+      try {
+        // Bootstrap 5
+        // $FlowFixMe[prop-missing]
+        const bs5 = window.bootstrap?.Modal?.getInstance(el);
+        if (bs5) {
+          // $FlowFixMe[prop-missing]
+          bs5._focustrap?.activate();
+          return;
+        }
+        // Bootstrap 4: restore patched _enforceFocus and re-apply trap
+        // $FlowFixMe[prop-missing]
+        const bs4 = window.$(el).data('bs.modal');
+        if (bs4?.__origEnforceFocus) {
+          bs4._enforceFocus = bs4.__origEnforceFocus;
+          delete bs4.__origEnforceFocus;
+          bs4._enforceFocus();
+        }
+      } catch (_err) {
+        // Instance or method not available
+      }
+    });
   }
 
   #onClickTerminalCommand(target: HTMLElement) {
