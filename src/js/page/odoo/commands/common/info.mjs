@@ -7,6 +7,7 @@ import getOdooRoot from '@odoo/utils/get_odoo_root';
 import getUrlInfo from '@odoo/utils/get_url_info';
 import getUID from '@odoo/net_utils/get_uid';
 import getUserName from '@odoo/net_utils/get_username';
+import getActiveModalInfo from '@odoo/utils/get_active_modal_info';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -14,12 +15,17 @@ import type Terminal from '@odoo/terminal';
 async function cmdInfo(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<string | number | void> {
   let res;
   if (kwargs.active_id || kwargs.active_model) {
-    const activeProps = getOdooRoot()?.actionService?.currentController?.props;
-    const hasProps = typeof activeProps !== 'undefined';
-    if (kwargs.active_id) {
-      res = Number(hasProps ? activeProps.resId : getUrlInfo('hash', 'id'));
-    } else if (kwargs.active_model) {
-      res = hasProps ? activeProps.resModel : getUrlInfo('hash', 'model');
+    const modalInfo = getActiveModalInfo();
+    if (modalInfo) {
+      res = kwargs.active_model ? modalInfo.model : modalInfo.id;
+    } else {
+      const activeProps = getOdooRoot()?.actionService?.currentController?.props;
+      const hasProps = typeof activeProps !== 'undefined';
+      if (kwargs.active_id) {
+        res = Number(hasProps ? activeProps.resId : getUrlInfo('hash', 'id'));
+      } else if (kwargs.active_model) {
+        res = hasProps ? activeProps.resModel : getUrlInfo('hash', 'model');
+      }
     }
   } else if (kwargs.user_id) {
     res = await getUID(true);
