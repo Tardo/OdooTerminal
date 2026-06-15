@@ -22,14 +22,4 @@ __pycache__/
 .claudeignore
 claude.json
 CLAUDE.md
-.cursor/
-.cursorignore
-.windsurf/
-.copilot/
-.github/copilot.yml
-.vscode/ai-*
-.idea/ai-*
-**/*.ai
-**/*.prompt
-prompts/
 AGENTS.md

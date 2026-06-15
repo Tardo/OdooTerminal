@@ -59,6 +59,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdCreate.definition', 'Create new record'),
     callback: cmdCreateModelRecord,
     options: getOptions,
+    unsafe: true,
     detail: i18n.t('cmdCreate.detail', 'Open new model record in form view or directly.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdCreate.args.model', 'The model technical name')],

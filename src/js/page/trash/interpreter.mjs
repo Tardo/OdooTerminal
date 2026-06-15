@@ -81,6 +81,7 @@ export type CMDDef = {
   detail: string,
   args: $ReadOnlyArray<ArgDef>,
   secured: boolean,
+  unsafe: boolean,
   aliases: $ReadOnlyArray<string>,
   example: string,
   type: number,

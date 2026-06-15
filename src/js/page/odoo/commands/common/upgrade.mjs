@@ -65,6 +65,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdUpgrade.definition', 'Upgrade a module'),
     callback: cmdUpgradeModule,
     options: getOptions,
+    unsafe: true,
     detail: i18n.t('cmdUpgrade.detail', 'Launch upgrade module process.'),
     args: [[ARG.List | ARG.String, ['m', 'module'], true, i18n.t('cmdUpgrade.args.module', 'The module technical name')]],
     example: '-m contacts',

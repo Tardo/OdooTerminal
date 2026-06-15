@@ -22,6 +22,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdUal.definition', 'Update apps list'),
     callback: cmdUpdateAppList,
+    unsafe: true,
     detail: i18n.t('cmdUal.detail', 'Update apps list'),
   };
 }

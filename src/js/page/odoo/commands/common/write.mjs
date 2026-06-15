@@ -41,6 +41,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdWrite.definition', 'Update record values'),
     callback: cmdWriteModelRecord,
     options: getOptions,
+    unsafe: true,
     detail: i18n.t('cmdWrite.detail', 'Update record values.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdWrite.args.model', 'The model technical name')],

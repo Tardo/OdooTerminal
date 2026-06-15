@@ -66,6 +66,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdInstall.definition', 'Install a module'),
     callback: cmdInstallModule,
     options: getOptions,
+    unsafe: true,
     detail: i18n.t('cmdInstall.detail', 'Launch module installation process.'),
     args: [[ARG.List | ARG.String, ['m', 'module'], true, i18n.t('cmdInstall.args.module', 'The module technical name')]],
     example: '-m contacts',

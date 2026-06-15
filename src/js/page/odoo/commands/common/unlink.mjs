@@ -41,6 +41,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdUnlink.definition', 'Unlink record'),
     callback: cmdUnlinkModelRecord,
     options: getOptions,
+    unsafe: true,
     detail: i18n.t('cmdUnlink.detail', 'Delete a record.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdUnlink.args.model', 'The model technical name')],

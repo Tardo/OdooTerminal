@@ -45,6 +45,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdCall.definition', 'Call model method'),
     callback: cmdCallModelMethod,
     options: getOptions,
+    unsafe: true,
     detail: i18n.t(
       'cmdCall.detail',
       "Call model method. Remember: Methods with @api.model decorator doesn't need the id.",

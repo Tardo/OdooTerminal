@@ -36,12 +36,13 @@ export type TerminalOptions = {
 export type MessageListenerData = {[string]: mixed};
 export type MessageListenerCallback = (data: MessageListenerData) => Promise<mixed>;
 
-const ALLOWED_FUNCS = ['eprint', 'print', 'printError', 'printTable', 'updateInputInfo', 'showQuestion', 'clean'];
+const ALLOWED_FUNCS = ['eprint', 'print', 'printError', 'printTable', 'updateInputInfo', 'showQuestion', 'clean', 'printLive'];
 const ALLOWED_SILENT_FUNCS = ['updateInputInfo', 'showQuestion', 'clean'];
 
 const dummyCall = () => {
   // Do nothing
 };
+const dummyLive = () => ({update: dummyCall});
 export const ScreenCommandHandler = {
   get(target: {[string]: mixed}, prop: mixed): mixed {
     if (typeof prop !== 'string') {
@@ -66,7 +67,7 @@ export const ScreenCommandSilentHandler = {
     if (typeof ref === 'function' && ALLOWED_FUNCS.includes(prop)) {
       // $FlowFixMe[incompatible-use]
       if (!ALLOWED_SILENT_FUNCS.includes(prop)) {
-        return dummyCall;
+        return prop === 'printLive' ? dummyLive : dummyCall;
       }
       // $FlowFixMe[incompatible-use]
       return ref.bind(target);
@@ -338,12 +339,14 @@ export default class Terminal {
   }
 
   // $FlowFixMe[unclear-type]
-  async execute(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false): Promise<any> {
+  async execute(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false, update_input: boolean = true): Promise<any> {
     if (!silent) {
       this.screen.printCommand(code);
     }
-    this.screen.cleanInput();
-    this.updateAssistantoptions();
+    if (update_input) {
+      this.screen.cleanInput();
+      this.updateAssistantoptions();
+    }
     if (store) {
       this.#storeUserInput(code);
     }

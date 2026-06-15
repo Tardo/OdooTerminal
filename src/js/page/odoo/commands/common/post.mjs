@@ -36,6 +36,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdPost.definition', 'Send POST request'),
     callback: cmdPostData,
+    unsafe: true,
     detail: i18n.t('cmdPost.detail', 'Send POST request to selected endpoint'),
     args: [
       [ARG.String, ['e', 'endpoint'], true, i18n.t('cmdPost.args.endpoit', 'The endpoint')],

@@ -68,6 +68,10 @@ export default [
             replacement: path.resolve('src/js/shared'),
           },
           {
+            find: '@ai',
+            replacement: path.resolve('src/js/page/ai'),
+          },
+          {
             find: '@odoo',
             replacement: path.resolve('src/js/page/odoo'),
           },

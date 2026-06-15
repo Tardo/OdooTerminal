@@ -86,6 +86,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdUninstall.definition', 'Uninstall a module'),
     callback: cmdUninstallModule,
     options: getOptions,
+    unsafe: true,
     detail: i18n.t('cmdUninstall.detail', 'Launch module deletion process.'),
     args: [
       [ARG.String, ['m', 'module'], true, i18n.t('cmdUninstall.args.module', 'The module technical name')],

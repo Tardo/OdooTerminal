@@ -1,65 +1,140 @@
 {
   "No": "No",
   "UnknownNameError": {
-    "invalidName": "<NombreNoVálido>"
+    "invalidName": "<InvalidName>"
   },
-  "Yes": "Sí",
+  "Yes": "Yes",
+  "ai": {
+    "utils": {
+      "network": {
+        "error": {
+          "aborted": "Request cancelled.",
+          "httpError": "HTTP error {{status}}",
+          "noStream": "Server did not return a streaming response"
+        }
+      }
+    }
+  },
   "checkStorageError": {
-    "message": "Borrar la <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>pantalla</strong> o/y <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>historial</strong> para liberar espacio de almacenamiento. Navegador <u>Se ha superado la cuota de almacenamiento</u> 😭",
-    "warning": "ADVERTENCIA: "
+    "message": "Clear the <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>screen</strong> or/and <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>history</strong> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
+    "warning": "WARNING: "
   },
   "cmd2DClear": {
     "args": {
-      "canvas": "El lienzo",
-      "from-x": "El punto X del rectángulo",
-      "from-y": "El punto Y del rectángulo",
-      "height": "La altura del rectángulo",
-      "width": "El ancho del rectángulo"
+      "canvas": "The canvas",
+      "from-x": "The rect X point",
+      "from-y": "The rect Y point",
+      "height": "The rect height",
+      "width": "The rect width"
     },
-    "definition": "Limpiar lienzo",
-    "detail": "Limpia la zona de un lienzo"
+    "definition": "Clear canvas",
+    "detail": "Clear canvas"
   },
   "cmd2DCreateWindow": {
     "args": {
-      "height": "La altura del lienzo",
-      "posx": "La posición del lienzo X",
-      "posy": "La posición del lienzo Y",
-      "width": "El ancho del lienzo"
+      "height": "The canvas height",
+      "posx": "The canvas position X",
+      "posy": "The canvas position Y",
+      "width": "The canvas width"
     },
-    "definition": "Crear ventana 2D",
-    "detail": "Crear ventana 2D"
+    "definition": "Create 2D Window",
+    "detail": "Create 2D Window"
   },
   "cmd2DDestroyWindow": {
     "args": {
-      "canvas": "El lienzo"
+      "canvas": "The canvas"
     },
-    "definition": "Destruir ventana 2D",
-    "detail": "Destruir ventana 2D"
+    "definition": "Destroy 2D Window",
+    "detail": "Destroy 2D Window"
   },
   "cmd2DLine": {
     "args": {
-      "canvas": "El lienzo",
-      "color": "El color de la línea",
-      "from-x": "El punto Desde-X de la línea",
-      "from-y": "El punto Desde-Y de la línea",
-      "to-x": "El punto Hasta-X de la línea",
-      "to-y": "El punto Hasta-Y de la línea",
-      "width": "El grosor de la línea"
+      "canvas": "The canvas",
+      "color": "The line color",
+      "from-x": "The line from X point",
+      "from-y": "The line from Y point",
+      "to-x": "The line to X point",
+      "to-y": "The line to Y point",
+      "width": "The line width"
     },
-    "definition": "Dibuja una línea",
-    "detail": "Dibuja una línea"
+    "definition": "Draw a line",
+    "detail": "Draw a line"
   },
   "cmd2DRect": {
     "args": {
-      "canvas": "El lienzo",
-      "color": "El color del rectágulo",
-      "height": "La altura del rectángulo",
-      "width": "El ancho del rectángulo",
-      "x": "El punto X del rectángulo",
-      "y": "El punto Y del rectángulo"
+      "canvas": "The canvas",
+      "color": "The rect color",
+      "height": "The rect height",
+      "width": "The rect width",
+      "x": "The rect X point",
+      "y": "The rect Y point"
     },
-    "definition": "Dibujar un rectágulo",
-    "detail": "Dibujar un rectágulo"
+    "definition": "Draw a rect",
+    "detail": "Draw a rect"
+  },
+  "cmdAI": {
+    "agent": {
+      "error": {
+        "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
+        "notConfigured": "No conectado. Usa \"ai connect\" primero",
+        "requestFailed": "La petición ha fallado: "
+      },
+      "result": {
+        "cmdReason": "[Agente] {{reason}}",
+        "header": "--- Agente ---",
+        "lastVerifyReason": "[Agente] Last verification reason: {{reason}}",
+        "maxSteps": "El agente ha alcanzado el númerp de intentos sin una respuesta final.",
+        "maxVerifications": "[Agente] Número máximo de verificaciones alcanzado. Última respuesta:",
+        "noReturnValue": "(command executed, no return value)",
+        "running": "[Agente] Ejecutando: <code>{{cmd}}</code>",
+        "thinking": "[Agente] Pensando... (paso {{step}}/{{max}})",
+        "verifyFailed": "[Agente] La respuesta se puede mejorar...",
+        "verifying": "[Agente] Verificando..."
+      },
+      "unsafe": {
+        "question": "[Agent] Unsafe command: {{cmd}} — Execute?",
+        "questionWithReason": "[Agent] {{reason}} — Unsafe command: {{cmd}} — Execute?",
+        "rejected": "Command rejected by user: {{cmd}}"
+      }
+    },
+    "args": {
+      "apiKey": "API key for authentication",
+      "maxSteps": "Máx. iteraciones del agente (solo agente, por defecto 15)",
+      "maxVerifications": "Máx. reintentos de verificación (solo agente, por defecto 3)",
+      "model": "Model name to use",
+      "operation": "operation: connect, chat or exec",
+      "prompt": "The prompt or natural language request to send",
+      "timeout": "Max seconds to wait for a response (0 = no limit)",
+      "url": "AI server URL (e.g. http://localhost:8080/v1)"
+    },
+    "chat": {
+      "error": {
+        "noPrompt": "No prompt provided. Use: ai chat -p \"your prompt\"",
+        "notConfigured": "Not connected. Use \"ai connect\" first",
+        "requestFailed": "Request failed: "
+      },
+      "result": {
+        "sending": "Sending request..."
+      }
+    },
+    "connect": {
+      "error": {
+        "noUrl": "No URL provided. Use: ai connect -u <url>"
+      },
+      "result": {
+        "connected": "AI Server connected"
+      }
+    },
+    "definition": "AI assistant (connect, chat & exec)",
+    "detail": "Connect to an AI server (OpenAI-compatible API) and chat with it or translate natural language into terminal commands.",
+    "error": {
+      "noSubcommand": "Usage: ai connect|chat|exec|stop ...",
+      "unknownOperation": "Unknown operation: {{sub}}",
+      "usage": "Usage: ai connect|chat|exec|stop ..."
+    },
+    "stop": {
+      "noRequest": "No active AI request to stop."
+    }
   },
   "cmdAction": {
     "args": {
@@ -330,7 +405,7 @@
   },
   "cmdFuncTrash": {
     "args": {
-      "name": "El parámetro de función"
+      "name": "The function parameter"
     }
   },
   "cmdGen": {
@@ -681,10 +756,10 @@
   },
   "cmdSleep": {
     "args": {
-      "time": "El tiempo para dormir (en ms)"
+      "time": "The time to sleep (in ms)"
     },
-    "definition": "Dormir",
-    "detail": "Dormir (tiempo en ms)"
+    "definition": "Sleep",
+    "detail": "Sleep (time in ms)"
   },
   "cmdSysParam": {
     "args": {
@@ -878,90 +953,90 @@
     "detail": "Para conocer las opciones disponibles,  consulta la ayuda de JSZip: https://stuk.github.io/jszip"
   },
   "file2base64": {
-    "aborted": "Abortado por el usuario. No se ha proporcionado ningún archivo..."
+    "aborted": "Aborted by user. No file given..."
   },
   "file2file": {
-    "aborted": "Abortado por el usuario. No se ha proporcionado ningún archivo..."
+    "aborted": "Aborted by user. No file given..."
   },
   "func2DText": {
     "args": {
-      "canvas": "El lienzo",
-      "color": "El color del texto",
-      "font": "La fuente del texto",
-      "text": "El texto",
-      "x": "El punto X del texto",
-      "y": "El punto Y del texto"
+      "canvas": "The canvas",
+      "color": "The text color",
+      "font": "The text font",
+      "text": "The text",
+      "x": "The text X point",
+      "y": "The text Y point"
     },
-    "definition": "Dibujar un texto",
-    "detail": "Dibujar un texto"
+    "definition": "Draw a text",
+    "detail": "Draw a text"
   },
   "funcAbs": {
     "args": {
-      "num": "El numero"
+      "num": "The number"
     },
-    "definition": "Valor absoluto de un numero",
-    "detail": "Devuelve el valor absoluto de un número"
+    "definition": "Absolute value of a number",
+    "detail": "Returns the absolute value of a number."
   },
   "funcDecode": {
     "args": {
-      "method": "El método para decodificar",
-      "value": "El valor a decodificar"
+      "method": "The method to decode",
+      "value": "The value to decode"
     },
-    "definition": "Decodificar",
-    "detail": "Decodificar datos"
+    "definition": "Encode",
+    "detail": "Decode data"
   },
   "funcEncode": {
     "args": {
-      "method": "El método para codificar",
-      "value": "El valor a codificar"
+      "method": "The method to encode",
+      "value": "The value to encode"
     },
-    "definition": "Codificar",
-    "detail": "Codificar datos"
+    "definition": "Encode",
+    "detail": "Encode data"
   },
   "funcFetch": {
     "args": {
-      "timeout": "El tiempo de espera",
-      "url": "Las opciones de la petición"
+      "timeout": "The timeout",
+      "url": "The fetch options"
     },
-    "definition": "Solicitudes HTTP",
-    "detail": "Interfaz para realizar solicitudes HTTP y procesar las respuestas"
+    "definition": "HTTP requests",
+    "detail": "Interface for making HTTP requests and processing the responses."
   },
   "funcFixed": {
     "args": {
-      "num": "El numero de decimales"
+      "num": "The number of decimals"
     },
-    "definition": "Redondea un número hacia ARRIBA al entero más cercano",
-    "detail": "Redondea un número hacia ARRIBA al entero más cercano"
+    "definition": "Rounds a number UP to the nearest integer",
+    "detail": "Rounds a number UP to the nearest integer"
   },
   "funcFloor": {
     "args": {
-      "num": "el numero"
+      "num": "The number"
     },
-    "definition": "Redondea un número hacia ABAJO al entero más cercano",
-    "detail": "Redondea un número hacia ABAJO al entero más cercano"
+    "definition": "Rounds a number DOWN to the nearest integer",
+    "detail": "Rounds a number DOWN to the nearest integer"
   },
   "funcPNow": {
-    "definition": "Marca de tiempo de alta resolución en milisegundos",
-    "detail": "Marca de tiempo de alta resolución en milisegundos"
+    "definition": "High resolution timestamp in milliseconds",
+    "detail": "High resolution timestamp in milliseconds."
   },
   "funcPow": {
     "args": {
       "base": "Base",
-      "exponent": "Exponente"
+      "exponent": "Exponent"
     },
-    "definition": "Calcula el valor del exponente de x elevado a la potencia de y",
-    "detail": "Calcula el valor del exponente de x elevado a la potencia de y"
+    "definition": "Calculate the exponent value of x raised to the power of y",
+    "detail": "Calculate the exponent value of x raised to the power of y"
   },
   "funcRand": {
     "args": {
-      "max": "Máx. valor",
-      "min": "Mín. valor"
+      "max": "Max. value",
+      "min": "Min. value"
     },
-    "definition": "Generar números enteros aleatorios",
-    "detail": "Devuelve enteros aleatorios"
+    "definition": "Generate random integers",
+    "detail": "Return random integers"
   },
   "getOdooEnvService": {
-    "error": "El servicio '{{service_name}}' no está disponible"
+    "error": "Service '{{service_name}}' is not available"
   },
   "loader": {
     "cantInitTerm": "No se puede inicializar el terminal",
@@ -975,7 +1050,7 @@
   },
   "odoo": {
     "error": {
-      "notRoot": "No se encuentra el objeto raíz"
+      "notRoot": "Cannot find root object"
     },
     "longpolling": {
       "error": {
@@ -986,23 +1061,23 @@
     },
     "templates": {
       "metadata": {
-        "createDate": "Fecha de creación",
-        "createUID": "Creador UID",
-        "noUpdate": "Sin actualizaciones",
-        "writeDate": "Fecha de escritura",
-        "writeUID": "Escritor UID",
+        "createDate": "Create Date",
+        "createUID": "Create UID",
+        "noUpdate": "No Update",
+        "writeDate": "Write Date",
+        "writeUID": "Write UID",
         "xmlID": "XML-ID"
       },
       "recordCreated": {
-        "sucess": "{{model}} registro(s) creado(s) correctamente: {{- links}}"
+        "sucess": "{{model}} record(s) created successfully: {{- links}}"
       },
       "whoami": {
-        "activeCompany": "Empresa activa",
-        "inCompanies": "En las empresas",
-        "inGroups": "En grupos",
+        "activeCompany": "Active Company",
+        "inCompanies": "In Companies",
+        "inGroups": "In Groups",
         "login": "Login",
-        "partner": "Socio",
-        "user": "Usuario"
+        "partner": "Partner",
+        "user": "User"
       }
     }
   },
@@ -1012,22 +1087,22 @@
     },
     "cmd": {
       "default": {
-        "definition": "Comando no definido",
-        "detail": "Este comando no tiene información detallada definida correctamente"
+        "definition": "Undefined command",
+        "detail": "This command hasn't a properly detailed information"
       }
     },
     "error": {
-      "invalidHTTPRequest": "Solicitud HTTP no válida",
-      "notInitJob": "Error inesperado: ¡no se puede inicializar el trabajo!",
+      "invalidHTTPRequest": "Invalid HTTP Request",
+      "notInitJob": "Unexpected error: can't initialize the job!",
       "notLoaded": "Terminal no cargada",
-      "unknown": "[!] ¡Ups! ¡Error desconocido! (no se proporciona ningún mensaje de error detallado :/)"
+      "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
     },
     "exception": {
-      "ElementNotFoundError": "¡Error de elemento no encontrado ({{selector}})!",
-      "ElementNotFoundTemplateError": "¡No se encontraron elementos!",
-      "InvalidElementTemplateError": "¡Elemento inválido en la plantilla!",
-      "ProcessJobError": "Error al ejecutar '{{cmd_name}}'",
-      "TooManyElementsTemplateError": "¡Demasiados elementos en la plantilla para asignar a uno solo!"
+      "ElementNotFoundError": "Element not found error ({{selector}})!",
+      "ElementNotFoundTemplateError": "No elements found!",
+      "InvalidElementTemplateError": "Invalid element in template!",
+      "ProcessJobError": "Error executing '{{cmd_name}}'",
+      "TooManyElementsTemplateError": "Too many elements in the template to be assigned to one element!"
     },
     "info": {
       "job": {
@@ -1044,33 +1119,33 @@
   },
   "trash": {
     "argument": {
-      "invalid": "Tipo de valor del argumento '{{arg_long_name}}' no válido: {{value_type}} no es {{arg_type}}",
-      "noExist": "El argumento '{{arg_name}}' no existe",
-      "requiredNotSet": "¡Los argumentos obligatorios no están establecidos! ({{required_not_set}})"
+      "invalid": "Invalid argument '{{arg_long_name}}' value type: {{value_type}} is not {{arg_type}}",
+      "noExist": "The argument '{{arg_name}}' does not exist",
+      "requiredNotSet": "Required arguments not set! ({{required_not_set}})"
     },
     "exception": {
-      "invalidCommandArgumentsError": "Argumentos de comando no válidos",
-      "invalidCommandArugmentValueError": "Valor '{{arg_value}}' inesperado!",
-      "invalidCommandDefinition": "¡Definición de comando no válida!",
-      "invalidInstructionError": "Instrucción no válida",
-      "invalidNameError": "Nombre no válido '{{vname}}' en {{start}}:{{end}}",
-      "invalidTokenError": "Token no válido '{{vname}}' en {{start}}:{{end}}",
-      "invalidValueError": "Valor no válido '{{value}}'",
-      "notExpectedCommandArgumentError": "Argumento '{{arg_name}}' no esperado en {{start}}:{{end}}",
-      "unknownCommandError": "Comando desconocido '{{cmd_name}}' en {{start}}:{{end}}",
-      "unknownNameError": "Nombre desconocido '{{vname}}' en {{start}}:{{end}}",
-      "unknownStoreValue": "Valor de almacenamiento desconocido '{{vname}}'"
+      "invalidCommandArgumentsError": "Invalid command arguments",
+      "invalidCommandArugmentValueError": "Unexpected '{{arg_value}}' value!",
+      "invalidCommandDefinition": "Invalid command definition!",
+      "invalidInstructionError": "Invalid instruction",
+      "invalidNameError": "Invalid name '{{vname}}' at {{start}}:{{end}}",
+      "invalidTokenError": "Invalid token '{{vname}}' at {{start}}:{{end}}",
+      "invalidValueError": "Invalid value '{{value}}'",
+      "notExpectedCommandArgumentError": "Argument '{{arg_name}}' not expected at {{start}}:{{end}}",
+      "unknownCommandError": "Unknown Command '{{cmd_name}}' at {{start}}:{{end}}",
+      "unknownNameError": "Unknown name '{{vname}}' at {{start}}:{{end}}",
+      "unknownStoreValue": "Unknown store value '{{vname}}'"
     },
     "vmachine": {
       "func": {
-        "definition": "Función interna",
-        "detail": "Función interna"
+        "definition": "Internal function",
+        "detail": "Internal function"
       }
     }
   },
   "utilInjectResource": {
     "error": {
-      "invalidType": "Tipo de recurso no válido"
+      "invalidType": "Invalid resource type"
     }
   }
 }

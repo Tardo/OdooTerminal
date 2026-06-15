@@ -146,6 +146,87 @@
   content: '- ';
 }
 
+@keyframes o-terminal-thinking {
+  0%, 100% {
+    color: var(--terminal-color-info);
+    text-shadow: 0 0 6px var(--terminal-color-info);
+  }
+  50% {
+    color: var(--terminal-color-white);
+    text-shadow: 0 0 14px var(--terminal-color-info), 0 0 28px var(--terminal-color-info);
+  }
+}
+@keyframes o-terminal-verifying {
+  0%, 100% {
+    color: var(--terminal-color-warning);
+    text-shadow: 0 0 6px var(--terminal-color-warning);
+  }
+  50% {
+    color: var(--terminal-color-white);
+    text-shadow: 0 0 14px var(--terminal-color-warning), 0 0 28px var(--terminal-color-warning);
+  }
+}
+.o_terminal div#terminal_screen .agent-thinking {
+  color: var(--terminal-color-info);
+}
+.o_terminal div#terminal_screen .agent-thinking:last-child {
+  animation: o-terminal-thinking 1.8s ease-in-out infinite;
+}
+.o_terminal div#terminal_screen .agent-thinking:last-child:hover {
+  animation-play-state: paused;
+}
+.o_terminal div#terminal_screen .agent-verifying {
+  color: var(--terminal-color-warning);
+}
+.o_terminal div#terminal_screen .agent-verifying:last-child {
+  animation: o-terminal-verifying 1s ease-in-out infinite;
+}
+.o_terminal div#terminal_screen .agent-verifying:last-child:hover {
+  animation-play-state: paused;
+}
+.o_terminal div#terminal_screen .agent-elapsed {
+  opacity: 0.55;
+  font-size: 0.85em;
+}
+.o_terminal div#terminal_screen .agent-stop {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.o_terminal div#terminal_screen span:hover > .agent-stop {
+  opacity: 1;
+}
+
+.o_terminal div#terminal_screen .agent-think {
+  border-left: 2px solid var(--terminal-color-muted);
+  color: var(--terminal-color-muted);
+  font-style: italic;
+  margin: 0.2em 0;
+  padding-left: 0.5em;
+  white-space: normal;
+}
+.o_terminal div#terminal_screen .agent-think summary {
+  cursor: pointer;
+  user-select: none;
+}
+.o_terminal div#terminal_screen .agent-think pre {
+  color: var(--terminal-color-muted);
+  font-family: inherit;
+  font-size: inherit;
+  font-style: normal;
+  margin: 0.3em 0 0;
+  white-space: pre-wrap;
+}
+
+.o_terminal div#terminal_screen think {
+  border-left: 2px solid var(--terminal-color-muted);
+  color: var(--terminal-color-muted);
+  display: block;
+  font-style: italic;
+  margin: 0.2em 0;
+  padding-left: 0.5em;
+  white-space: pre-wrap;
+}
+
 .o_terminal div#terminal_assistant {
   font-size: var(--terminal-font-size-ca);
   position: absolute;

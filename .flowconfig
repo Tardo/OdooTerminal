@@ -17,6 +17,7 @@ module.file_ext=.json
 
 module.name_mapper='^@common' -> '<PROJECT_ROOT>/src/js/common'
 module.name_mapper='^@shared' -> '<PROJECT_ROOT>/src/js/shared'
+module.name_mapper='^@ai' -> '<PROJECT_ROOT>/src/js/page/ai'
 module.name_mapper='^@odoo' -> '<PROJECT_ROOT>/src/js/page/odoo'
 module.name_mapper='^@terminal' -> '<PROJECT_ROOT>/src/js/page/terminal'
 module.name_mapper='^@trash' -> '<PROJECT_ROOT>/src/js/page/trash'

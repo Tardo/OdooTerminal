@@ -18,7 +18,7 @@ async function funcEncode(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('funcEncode.definition', 'Encode'),
+    definition: i18n.t('funcEncode.definition', 'Encode data'),
     callback: funcEncode,
     type: FUNCTION_TYPE.Internal,
     detail: i18n.t('funcEncode.detail', 'Encode data'),

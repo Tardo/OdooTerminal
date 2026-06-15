@@ -126,6 +126,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdSysParam.definition', 'Manage system parameters'),
     callback: cmdSysParam,
     options: getOptions,
+    unsafe: true,
     detail: i18n.t('cmdSysParam.detail', 'Get, set, or list parameters in ir.config_parameter model.'),
     args: [
       [ARG.String, ['o', 'operation'], true, i18n.t('cmdSysParam.args.operation', "Operation to perform."), 'get', ['get', 'set', 'list']],

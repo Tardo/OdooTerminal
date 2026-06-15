@@ -21,6 +21,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdRollback.definition', 'Revert recordset changes'),
     callback: cmdRollback,
+    unsafe: true,
     detail: i18n.t('cmdRollback.detail', 'Undo recordset changes'),
     args: [[ARG.Any, ['r', 'recordset'], true, i18n.t('cmdRollback.args.recordset', 'The Recordset')]],
     example: '-r $recordset',

@@ -56,6 +56,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdRenewDatabase.definition', 'Renew the database'),
     callback: cmdRenewDatabase,
+    unsafe: true,
     detail: i18n.t(
       'cmdRenewDatabase.detail',
       'Re-generate a new uuid and expiration date for your development database.',

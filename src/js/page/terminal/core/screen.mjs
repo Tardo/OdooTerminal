@@ -402,6 +402,23 @@ export default class Screen {
     this.print(renderTable(columns, rows, cls));
   }
 
+  printLive(cls?: string): {update: (html: string) => void} {
+    const el = document.createElement('span');
+    el.className = cls !== undefined ? `line-text line-br ${cls}` : 'line-text line-br';
+    if (this.#wasStart) {
+      this.#screen_el.append(el);
+      this.scrollDown();
+    }
+    return {
+      update: (html: string) => {
+        el.innerHTML = html;
+        if (this.#wasStart) {
+          this.scrollDown();
+        }
+      },
+    };
+  }
+
   updateInputInfo(info?: Partial<InputInfo>) {
     this.#input_info = {
       ...this.#input_info,

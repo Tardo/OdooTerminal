@@ -4,6 +4,17 @@
     "invalidName": "<InvalidName>"
   },
   "Yes": "Yes",
+  "ai": {
+    "utils": {
+      "network": {
+        "error": {
+          "aborted": "Request cancelled.",
+          "httpError": "HTTP error {{status}}",
+          "noStream": "Server did not return a streaming response"
+        }
+      }
+    }
+  },
   "checkStorageError": {
     "message": "Clear the <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>screen</strong> or/and <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>history</strong> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
     "warning": "WARNING: "
@@ -60,6 +71,70 @@
     },
     "definition": "Draw a rect",
     "detail": "Draw a rect"
+  },
+  "cmdAI": {
+    "agent": {
+      "error": {
+        "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
+        "notConfigured": "Not connected. Use \"ai connect\" first",
+        "requestFailed": "Request failed: "
+      },
+      "result": {
+        "cmdReason": "[Agent] {{reason}}",
+        "header": "--- Agent ---",
+        "lastVerifyReason": "[Agent] Last verification reason: {{reason}}",
+        "maxSteps": "Agent reached maximum steps without a final answer.",
+        "maxVerifications": "[Agent] Max verifications reached. Last response:",
+        "noReturnValue": "(command executed, no return value)",
+        "running": "[Agent] Running: <code>{{cmd}}</code>",
+        "thinking": "[Agent] Thinking... (step {{step}}/{{max}})",
+        "verifyFailed": "[Agent] The answer can be improved...",
+        "verifying": "[Agent] Verifying..."
+      },
+      "unsafe": {
+        "question": "[Agent] Unsafe command: {{cmd}} — Execute?",
+        "questionWithReason": "[Agent] {{reason}} — Unsafe command: {{cmd}} — Execute?",
+        "rejected": "Command rejected by user: {{cmd}}"
+      }
+    },
+    "args": {
+      "apiKey": "API key for authentication",
+      "maxSteps": "Max agent iterations (agent only, default 15)",
+      "maxVerifications": "Max verification retries (agent only, default 3)",
+      "model": "Model name to use",
+      "operation": "operation: connect, chat or exec",
+      "prompt": "The prompt or natural language request to send",
+      "timeout": "Max seconds to wait for a response (0 = no limit)",
+      "url": "AI server URL (e.g. http://localhost:8080/v1)"
+    },
+    "chat": {
+      "error": {
+        "noPrompt": "No prompt provided. Use: ai chat -p \"your prompt\"",
+        "notConfigured": "Not connected. Use \"ai connect\" first",
+        "requestFailed": "Request failed: "
+      },
+      "result": {
+        "sending": "Sending request..."
+      }
+    },
+    "connect": {
+      "error": {
+        "noUrl": "No URL provided. Use: ai connect -u <url>"
+      },
+      "result": {
+        "connected": "AI Server connected"
+      }
+    },
+    "definition": "AI assistant (connect, chat & exec)",
+    "detail": "Connect to an AI server (OpenAI-compatible API) and chat with it or translate natural language into terminal commands.",
+    "error": {
+      "noSubcommand": "Usage: ai connect|chat|exec|stop ...",
+      "unknownOperation": "Unknown operation: {{sub}}",
+      "usage": "Usage: ai connect|chat|exec|stop ..."
+    },
+    "stop": {
+      "noRequest": "No active AI request to stop."
+    }
   },
   "cmdAction": {
     "args": {

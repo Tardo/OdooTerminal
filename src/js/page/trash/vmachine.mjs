@@ -66,6 +66,7 @@ export default class VMachine {
       detail: i18n.t('terminal.cmd.default.detail', "This command hasn't a properly detailed information"),
       args: [],
       secured: false,
+      unsafe: false,
       aliases: [],
       example: '',
       type: FUNCTION_TYPE.Command,

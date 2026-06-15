@@ -48,6 +48,7 @@ import cmdInfo from './info';
 import cmdNotify from './notify';
 import cmdExportFile from './exportfile';
 import cmdRenewDatabase from './renew_database';
+import cmdAI from './ai';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -97,4 +98,5 @@ export default function (vm: VMachine) {
   vm.registerCommand('exportfile', cmdExportFile());
   vm.registerCommand('sysparam', cmdSysParam());
   vm.registerCommand('renew_database', cmdRenewDatabase());
+  vm.registerCommand('ai', cmdAI());
 }

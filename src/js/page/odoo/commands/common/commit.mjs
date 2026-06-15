@@ -43,6 +43,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdCommit.definition', 'Commit recordset changes'),
     callback: cmdCommit,
+    unsafe: true,
     detail: i18n.t('cmdCommit.detail', 'Write recordset changes'),
     args: [[ARG.Any, ['r', 'recordset'], true, i18n.t('cmdCommit.args.recordset', 'The Recordset')]],
     example: '-r $recordset',
