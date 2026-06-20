@@ -403,6 +403,22 @@
     "detail": "Exports the command result to a browser console variable.",
     "resultExported": "Command result exported! now you can use '{{varname}}' variable in the browser console"
   },
+  "cmdForm": {
+    "args": {
+      "field": "The field technical name",
+      "operation": "The operation to perform"
+    },
+    "definition": "Form view utilities",
+    "detail": "Perform operations on the current form view fields.",
+    "error": {
+      "fieldNotFound": "No form field '{{field}}' found in the current view",
+      "fieldRequired": "A field name is required for the highlight operation"
+    },
+    "result": {
+      "cleared": "Field highlights cleared",
+      "highlighted": "Highlighted {{count}} field(s) '{{field}}'"
+    }
+  },
   "cmdFuncTrash": {
     "args": {
       "name": "The function parameter"
