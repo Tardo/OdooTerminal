@@ -7,6 +7,7 @@ import {ARG} from '@trash/constants';
 import {streamRequest, startRequest, handleAbort} from '@ai/utils/network';
 import buildMainAgentPrompt from '@ai/agents/main';
 import buildVerifyAgentPrompt from '@ai/agents/verify';
+import SKILLS from '@ai/skills/__all__';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -112,6 +113,7 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
   let verifyAttempts = 0;
   let lastDoneAnswer = '';
   let cmdCount = 0;
+  const loadedSkills: Set<string> = new Set();
 
   const stopLink = "<span class='agent-stop o_terminal_click o_terminal_cmd' data-cmd='ai stop'>stop</span>";
 
@@ -214,7 +216,7 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
     // Normalize: if model skipped CMD:/DONE:/DONE_SKIP: protocol, infer intent.
     // REASON:+CMD: two-line protocol is valid — extract CMD: line from it.
     // Prefer the LAST occurrence so reasoning text before the decision is ignored.
-    if (!response.startsWith('CMD:') && !response.startsWith('DONE:') && !response.startsWith('DONE_SKIP:')) {
+    if (!response.startsWith('CMD:') && !response.startsWith('DONE:') && !response.startsWith('DONE_SKIP:') && !response.startsWith('SKILL:')) {
       const cmdMatches = [...response.matchAll(/^CMD:\s*(.+)$/gm)];
       const cmdLine = cmdMatches.length > 0 ? cmdMatches[cmdMatches.length - 1][1] : undefined;
       const doneSkipPos = response.lastIndexOf('DONE_SKIP:');
@@ -298,6 +300,41 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
       // print/eprint route through a requestAnimationFrame buffer, while printLive
       // appends synchronously. Awaiting one rAF here ensures any command output or
       // error printed by execute() lands in the DOM before the next "Pensando" element.
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
+      if (step + 1 < maxSteps) {
+        startThinking(step + 2);
+      }
+    } else if (response.startsWith('SKILL:')) {
+      const skillName = response.slice(6).split('\n')[0].trim();
+      const skill = SKILLS.find(s => s.name === skillName);
+
+      if (skill === undefined) {
+        messages.push({
+          role: 'user',
+          content: i18n.t('cmdAI.agent.skill.unknown', 'Skill not found: {{name}}. Available: {{list}}', {
+            name: skillName,
+            list: SKILLS.map(s => s.name).join(', '),
+          }),
+        });
+      } else if (loadedSkills.has(skillName)) {
+        messages.push({
+          role: 'user',
+          content: i18n.t('cmdAI.agent.skill.alreadyLoaded', 'Skill already loaded: {{name}}', {name: skillName}),
+        });
+      } else {
+        loadedSkills.add(skillName);
+        ctx.screen.print(
+          i18n.t('cmdAI.agent.skill.loading', '[Agent] Loading skill: {{name}}', {name: skillName}),
+          false,
+        );
+        const major = Number(getOdooVersion('major') ?? -1);
+        messages.push({
+          role: 'user',
+          content: `Skill loaded: ${skillName}\n${skill.content(major)}`,
+        });
+      }
+
       await new Promise(resolve => requestAnimationFrame(resolve));
 
       if (step + 1 < maxSteps) {

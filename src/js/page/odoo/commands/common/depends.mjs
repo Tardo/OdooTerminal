@@ -85,10 +85,10 @@ async function cmdModuleDepends(
 
   // Get module names
   const impacted_modules = (
-    await searchRead('ir.module.module', [['id', 'in', impacted_module_ids]], ['display_name'], await this.getContext())
+    await searchRead('ir.module.module', [['id', 'in', impacted_module_ids]], ['display_name', 'name'], await this.getContext())
   );
 
-  const html_depends_items = impacted_modules.map(item => renderDependsItem(item.display_name, item.id));
+  const html_depends_items = impacted_modules.map(item => renderDependsItem(item.display_name, item.name, item.id));
   ctx.screen.print(html_depends_items);
   return impacted_modules;
 }

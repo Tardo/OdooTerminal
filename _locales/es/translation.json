@@ -91,6 +91,11 @@
         "verifyFailed": "[Agente] La respuesta se puede mejorar...",
         "verifying": "[Agente] Verificando..."
       },
+      "skill": {
+        "alreadyLoaded": "Skill already loaded: {{name}}",
+        "loading": "[Agent] Loading skill: {{name}}",
+        "unknown": "Skill not found: {{name}}. Available: {{list}}"
+      },
       "unsafe": {
         "question": "[Agent] Unsafe command: {{cmd}} — Execute?",
         "questionWithReason": "[Agent] {{reason}} — Unsafe command: {{cmd}} — Execute?",

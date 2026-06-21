@@ -4,8 +4,29 @@
 
 import buildTraSHPrompt from '@ai/prompts/trash';
 import buildHtmlFormatPrompt from '@ai/prompts/html_format';
+import SKILLS from '@ai/skills/__all__';
 import type Terminal from '@odoo/terminal';
 
+
+function buildSkillsSection(): string {
+  if (SKILLS.length === 0) {
+    return '';
+  }
+  const catalog = SKILLS.map(s => `  - ${s.name}: ${s.description}`).join('\n');
+  return (
+    '# SKILLS — ON-DEMAND DOMAIN KNOWLEDGE\n' +
+    'You have access to skill modules that provide detailed domain guidance. Skills are NOT loaded by default.\n' +
+    'To load a skill, output EXACTLY:\n' +
+    'SKILL: <name>\n' +
+    'You will receive the skill content as a message. Then continue your work.\n' +
+    '- Load a skill ONLY when you need domain-specific field names or query patterns you are unsure about.\n' +
+    '- Do NOT load a skill if you already have the required knowledge from prior context.\n' +
+    '- You may load at most one skill per step.\n' +
+    '\n' +
+    'Available skills:\n' +
+    catalog + '\n'
+  );
+}
 
 export default function (terminal: Terminal, odoo_ver: string, maxSteps: number): string {
   return (
@@ -35,6 +56,8 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '- Prefer one well-targeted command over two exploratory ones. Do not chain a search + view when view alone accepts a domain filter.\n' +
     '\n' +
     buildHtmlFormatPrompt() + "\n" +
+    '\n' +
+    buildSkillsSection() +
     '\n' +
     '# GROUNDING RULES (STRICT)\n' +
     '- NEVER assert facts about the Odoo instance from prior knowledge or training data.\n' +
