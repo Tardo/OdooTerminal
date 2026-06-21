@@ -441,6 +441,21 @@
     "definition": "Generar un objeto de archivo",
     "detail": "Abra un cuadro de diálogo de archivo del navegador e instancia un objeto Archivo con el contenido del archivo seleccionado"
   },
+  "cmdGraph": {
+    "args": {
+      "domain": "El filtro de dominio",
+      "groupby": "Campos para agrupar",
+      "measure": "El campo de medida",
+      "model": "El nombre técnico del modelo",
+      "name": "El título de la vista",
+      "type": "El tipo de gráfico"
+    },
+    "definition": "Abrir vista de gráfico",
+    "detail": "Abre una vista de gráfico personalizada para un modelo.",
+    "result": {
+      "name": "Vista de Gráfico"
+    }
+  },
   "cmdHelp": {
     "args": {
       "all": "Mostrar todos los comandos",

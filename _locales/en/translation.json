@@ -441,6 +441,21 @@
     "definition": "Generate a File object",
     "detail": "Open a browser file dialog and instanciates a File object with the content of the selected file"
   },
+  "cmdGraph": {
+    "args": {
+      "domain": "The domain filter",
+      "groupby": "Fields to group by",
+      "measure": "The measure field",
+      "model": "The model technical name",
+      "name": "The view title",
+      "type": "The chart type"
+    },
+    "definition": "Open graph view",
+    "detail": "Open a customized graph view for a model.",
+    "result": {
+      "name": "Graph View"
+    }
+  },
   "cmdHelp": {
     "args": {
       "all": "Show all commands",
