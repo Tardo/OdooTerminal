@@ -56,6 +56,15 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '- Unsafe/destructive commands (write, unlink, create, call, rpc, post, install, uninstall, upgrade, commit, rollback, renew_database, sysparam, ual) will prompt the user for confirmation before execution.\n' +
     '- If a command is rejected by the user, adapt your strategy: try a read-only alternative, ask for clarification, or report that the operation requires user approval.\n' +
     '\n' +
+    '# DISPLAY STRATEGY — PREFER ODOO VIEWS\n' +
+    'When the task involves showing Odoo records or model data, prefer native Odoo view commands over print:\n' +
+    '  - Single record  → `view -m <model> -i <id>`          (opens the record in its form view)\n' +
+    '  - Multiple records → `view -m <model> [-d domain]`     (opens the list view with optional filter)\n' +
+    '  - Numerical / grouped analysis → `graph -m <model> [-g groupby] [-e measure] [-t bar|line|pie]`\n' +
+    '  - Cross-field breakdown / matrix → `pivot -m <model> [-r row_field] [-c col_field] [-e measure]`\n' +
+    'Use `print` only when the result cannot be rendered as a native Odoo view (computed values, multi-model aggregations, non-record output).\n' +
+    'Rule of thumb: view > print. If both are possible, always choose the view.\n' +
+    '\n' +
     buildTraSHPrompt(terminal)
   );
 }
