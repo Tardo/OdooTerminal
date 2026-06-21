@@ -657,6 +657,21 @@
       "continue": "Esto modificará el modelo '{{model}}'. ¿Continuar?"
     }
   },
+  "cmdPivot": {
+    "args": {
+      "col": "Campos para agrupar en columnas",
+      "domain": "El filtro de dominio",
+      "measure": "Campos a usar como medidas",
+      "model": "El nombre técnico del modelo",
+      "name": "El título de la vista",
+      "row": "Campos para agrupar en filas"
+    },
+    "definition": "Abrir vista pivot",
+    "detail": "Abre una vista pivot personalizada para un modelo.",
+    "result": {
+      "name": "Vista Pivot"
+    }
+  },
   "cmdPost": {
     "args": {
       "data": "Los datos",

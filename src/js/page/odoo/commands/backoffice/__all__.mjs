@@ -6,6 +6,7 @@ import cmdAction from './action';
 import cmdEffect from './effect';
 import cmdForm from './form';
 import cmdLang from './lang';
+import cmdPivot from './pivot';
 import cmdSettings from './settings';
 import cmdView from './view';
 import cmdDoc from './doc';
@@ -19,4 +20,5 @@ export default function (vm: VMachine) {
   vm.registerCommand('effect', cmdEffect());
   vm.registerCommand('doc', cmdDoc());
   vm.registerCommand('form', cmdForm());
+  vm.registerCommand('pivot', cmdPivot());
 }

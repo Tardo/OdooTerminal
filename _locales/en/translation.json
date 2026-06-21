@@ -657,6 +657,21 @@
       "continue": "This will modify the '{{model}}' model. Continue?"
     }
   },
+  "cmdPivot": {
+    "args": {
+      "col": "Fields to group by in columns",
+      "domain": "The domain filter",
+      "measure": "Fields to use as measures",
+      "model": "The model technical name",
+      "name": "The view title",
+      "row": "Fields to group by in rows"
+    },
+    "definition": "Open pivot view",
+    "detail": "Open a customized pivot view for a model.",
+    "result": {
+      "name": "Pivot View"
+    }
+  },
   "cmdPost": {
     "args": {
       "data": "The data",
