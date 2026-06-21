@@ -10,11 +10,12 @@ import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdPivot(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
-  const context = this.getContext({
-    pivot_row_groupby: kwargs.row.length ? kwargs.row : undefined,
-    pivot_column_groupby: kwargs.col.length ? kwargs.col : undefined,
-    pivot_measures: kwargs.measure.length ? kwargs.measure : undefined,
-  });
+  const context = {
+    ...(await this.getContext()),
+    ...(kwargs.row.length && {pivot_row_groupby: kwargs.row}),
+    ...(kwargs.col.length && {pivot_column_groupby: kwargs.col}),
+    ...(kwargs.measure.length && {pivot_measures: kwargs.measure}),
+  };
   return doAction({
     type: 'ir.actions.act_window',
     name: kwargs.name || i18n.t('cmdPivot.result.name', 'Pivot View'),

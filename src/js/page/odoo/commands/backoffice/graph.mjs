@@ -10,11 +10,12 @@ import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdGraph(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
-  const context = this.getContext({
-    graph_groupbys: kwargs.groupby.length ? kwargs.groupby : undefined,
-    graph_measure: kwargs.measure || undefined,
-    graph_mode: kwargs.type || undefined,
-  });
+  const context = {
+    ...(await this.getContext()),
+    ...(kwargs.groupby.length && {graph_groupbys: kwargs.groupby}),
+    ...(kwargs.measure && {graph_measure: kwargs.measure}),
+    ...(kwargs.type && {graph_mode: kwargs.type}),
+  };
   return doAction({
     type: 'ir.actions.act_window',
     name: kwargs.name || i18n.t('cmdGraph.result.name', 'Graph View'),
