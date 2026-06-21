@@ -402,7 +402,7 @@ export default class Screen {
     this.print(renderTable(columns, rows, cls));
   }
 
-  printLive(cls?: string): {update: (html: string) => void} {
+  printLive(cls?: string): {update: (html: string) => void, el: HTMLSpanElement} {
     const el = document.createElement('span');
     el.className = cls !== undefined ? `line-text line-br ${cls}` : 'line-text line-br';
     if (this.#wasStart) {
@@ -410,6 +410,7 @@ export default class Screen {
       this.scrollDown();
     }
     return {
+      el,
       update: (html: string) => {
         el.innerHTML = html;
         if (this.#wasStart) {

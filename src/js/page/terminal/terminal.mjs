@@ -42,7 +42,7 @@ const ALLOWED_SILENT_FUNCS = ['updateInputInfo', 'showQuestion', 'clean'];
 const dummyCall = () => {
   // Do nothing
 };
-const dummyLive = () => ({update: dummyCall});
+const dummyLive = () => ({update: dummyCall, el: document.createElement('span')});
 export const ScreenCommandHandler = {
   get(target: {[string]: mixed}, prop: mixed): mixed {
     if (typeof prop !== 'string') {

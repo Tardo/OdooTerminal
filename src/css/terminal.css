@@ -134,6 +134,10 @@
   white-space: pre;
 }
 
+.o_terminal div#terminal_screen .line-warning {
+  color: var(--terminal-color-warning);
+}
+
 .o_terminal div#terminal_screen .line-br::after {
   content: '\A';
   white-space: pre;
@@ -146,6 +150,29 @@
   content: '- ';
 }
 
+@keyframes o-terminal-skill-char {
+  0% {
+    filter: blur(4px);
+    opacity: 0;
+    transform: scale(2.4);
+    color: var(--terminal-color-primary);
+    text-shadow: 0 0 12px var(--terminal-color-primary);
+  }
+  55% {
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(0.9);
+    color: var(--terminal-color-white);
+    text-shadow: 0 0 6px var(--terminal-color-info);
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1);
+    color: var(--terminal-color-info);
+    text-shadow: none;
+  }
+}
 @keyframes o-terminal-thinking {
   0%, 100% {
     color: var(--terminal-color-info);
@@ -183,6 +210,10 @@
 }
 .o_terminal div#terminal_screen .agent-verifying:last-child:hover {
   animation-play-state: paused;
+}
+.o_terminal div#terminal_screen .agent-skill-loading .agent-skill-char {
+  display: inline-block;
+  animation: o-terminal-skill-char 0.38s cubic-bezier(0.2, 0, 0.3, 1) 1 both;
 }
 .o_terminal div#terminal_screen .agent-elapsed {
   opacity: 0.55;

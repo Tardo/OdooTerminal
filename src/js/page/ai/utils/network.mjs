@@ -10,10 +10,11 @@ export async function streamRequest(
   url: string,
   apiKey: ?string,
   model: string,
-  messages: Array<{role: string, content: string}>,
+  messages: Array<AIMessage>,
   signal: AbortSignal,
   onDelta: (delta: string) => void,
-): Promise<string> {
+  stop?: ?Array<string>,
+): Promise<{text: string, usage: ?TokenUsage}> {
   const headers: {[string]: string} = {
     'Content-Type': 'application/json',
   };
@@ -21,10 +22,15 @@ export async function streamRequest(
     headers['Authorization'] = `Bearer ${apiKey}`;
   }
 
+  const body: {[string]: mixed} = {model, messages, stream: true, stream_options: {include_usage: true}, max_tokens: 4000};
+  if (stop !== null && stop !== undefined && stop.length > 0) {
+    body.stop = stop;
+  }
+
   const response = await fetch(`${url}/chat/completions`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({model, messages, stream: true}),
+    body: JSON.stringify(body),
     signal,
   });
 
@@ -45,6 +51,7 @@ export async function streamRequest(
   const decoder = new TextDecoder();
   let fullResponse = '';
   let buffer = '';
+  let usage: ?TokenUsage = null;
 
   while (true) {
     const {done, value} = await reader.read();
@@ -69,6 +76,9 @@ export async function streamRequest(
 
       try {
         const data = JSON.parse(trimmed.slice(6));
+        if (data.usage) {
+          usage = data.usage;
+        }
         const delta = data.choices?.[0]?.delta?.content;
         if (delta) {
           fullResponse += delta;
@@ -80,7 +90,7 @@ export async function streamRequest(
     }
   }
 
-  return fullResponse;
+  return {text: fullResponse, usage};
 }
 
 export function startRequest(timeoutSecs: ?number): AbortController {

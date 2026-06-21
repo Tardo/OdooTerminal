@@ -68,106 +68,10 @@ export function buildCommandPrompt(cmd: string, cmd_def: CMDDef): string {
   return result;
 }
 
-export default function(terminal: Terminal): string {
-  const cmds = terminal.getShell().getVM().getRegisteredCmds();
-  const lines = Object.entries(cmds).map(([name, def]) => {
-    return buildCommandPrompt(name, def);
-  });
-
+// Sections §10–§13: loaded on-demand via the 'trash-syntax' skill.
+// Contains control flow, functions, stdlib catalog, and complete examples.
+export function buildScriptingPrompt(): string {
   return (
-    'TraSH scripting language — follow strictly:\n' +
-    '\n' +
-    '!!! FUNDAMENTAL RULES — READ BEFORE ANYTHING ELSE !!!\n' +
-    '\n' +
-    '[RULE 1 — ONE RESULT PER SCRIPT]\n' +
-    'A CMD script returns ONE value: the output of its LAST statement. ALL prior outputs are discarded.\n' +
-    '"cmd1; cmd2; cmd3" → you SEE only cmd3. cmd1 and cmd2 executed but their outputs are gone forever.\n' +
-    'You CANNOT observe multiple command outputs by chaining them. There is no way around this.\n' +
-    'Pattern to display N pieces of data in one CMD:\n' +
-    '  $a = (cmd1); $b = (cmd2); ...; print -m <expr using $a, $b, ...>\n' +
-    'Every CMD that needs to surface data to you MUST end with a print or a single expression.\n' +
-    '\n' +
-    '[RULE 2 — NO TERNARY OPERATOR — SYNTAX ERROR]\n' +
-    'TraSH does NOT have a ternary operator. "condition ? a : b" is a SYNTAX ERROR — it will ALWAYS fail.\n' +
-    'FORBIDDEN (crashes):  $val = ($x > 5) ? "big" : "small"\n' +
-    'FORBIDDEN (crashes):  $val = $flag ? 1 : 0\n' +
-    'REQUIRED alternative: if ($x > 5) { $val = "big" } else { $val = "small" }\n' +
-    'Every time you feel the urge to write "?", write an if/else block instead.\n' +
-    '\n' +
-    '=== 1. SYNTAX BASICS ===\n' +
-    '  * Statement separators: ";" and newline (\\n) are equivalent — both end a statement.\n' +
-    '    $a = 1; $b = 2   ←→   $a = 1\\n$b = 2   (identical)\n' +
-    '  * Comments: // single line comment   /* multi-line comment */\n' +
-    '  * Keywords (reserved, cannot be used as names): true false null for function return if elif else silent continue break\n' +
-    '\n' +
-    '=== 2. LITERALS ===\n' +
-    '  * Numbers:     42   -7   3.14   -2.5\n' +
-    '  * Strings:     "hello world"  or  \'hello world\'  (both quote styles work)\n' +
-    '  * Booleans:    true   false\n' +
-    '  * Null:        null\n' +
-    '  * Arrays:      [1, 2, 3]   ["a", "b"]   [1, [2, 3], "x"]   (nesting allowed)\n' +
-    '  * Dicts:       {key: "val", num: 42}   {key: {nested: [1,2]}}   (nesting allowed)\n' +
-    '  * Dict keys can be expressions:  {"key" + $suffix: $val}   {(cmd ...): $val}\n' +
-    '  * Subcommands inside literals:   {name: (gen -mi 1 -ma 4)}   [1, (rand -mi 0 -ma 9), 3]\n' +
-    '\n' +
-    '=== 3. VARIABLES ===\n' +
-    '  * Declare & assign:    $var = value\n' +
-    '  * Capture cmd output:  $var = (command ...)\n' +
-    '  * Array element:       $arr[2] = 42\n' +
-    '  * Dict key:            $obj["key"] = "new value"\n' +
-    '  * Nested:              $arr[1][0] += 5\n' +
-    '  * Compound operators:  += -= *= /=\n' +
-    '    Example: $n = 2; $n += 5; $n -= 1; $n *= 2; $n /= 2   → $n == 6\n' +
-    '\n' +
-    '=== 4. OPERATORS ===\n' +
-    '  * Arithmetic:  +  -  *  /  %  (standard math precedence: * / % before + -)\n' +
-    '  * Unary minus: $a = 2; $b = 3; $a * -$b   → -6\n' +
-    '  * Comparison:  ==  !=  >  <  >=  <=\n' +
-    '  * Logic:       &&  ||  !  (short-circuit: right side skipped if left decides result)\n' +
-    '    Short-circuit example: $x = false; if ($x && $x["key"]) { ... }  ← safe, no error on false["key"]\n' +
-    '  * Grouping:    (expr)  — use parentheses to override precedence\n' +
-    '    Example: (((5+5)*2))  → 20\n' +
-    '  * NO ternary operator (condition ? a : b) — use if/else blocks instead.\n' +
-    '\n' +
-    '=== 5. STRINGS & CONCATENATION ===\n' +
-    '  * "+" concatenates strings and mixed types (numbers auto-coerce to string).\n' +
-    '  * Explicit "+" is MANDATORY — spaces between tokens do NOT concatenate.\n' +
-    '    CORRECT: print -m "ID: " + $rec["id"]\n' +
-    '    WRONG:   print -m "ID: " $rec["id"]\n' +
-    '  * Mixed concat: $a = "blabla"; $b = 1234; $a + "---" + $b   → "blabla---1234"\n' +
-    '  * From array/dict: $a[0]["name"] + " | " + $b["total"]\n' +
-    '\n' +
-    '=== 6. ARGUMENT MAPPING (NAMED & UNNAMED) ===\n' +
-    '  * Unnamed (positional) args fill in the order the command defines them.\n' +
-    '    Example: create res.partner {name: "Test", street: "Main St"}\n' +
-    '  * Named flags: search -m res.partner -d [["active","=",true]]\n' +
-    '  * Mix allowed as long as positional order is preserved.\n' +
-    '\n' +
-    '=== 7. SYSTEM HELPERS ($$RMOD, $$RID, $$UID, $$UNAME) ===\n' +
-    '  * Use ONLY as standalone arguments — never quote them.\n' +
-    '  * NEVER embed inside arrays, dicts, or domain literals.\n' +
-    '    CORRECT:   search $$RMOD -d [["active","=",true]]\n' +
-    '    FORBIDDEN: [["partner_id","=",$$RID]]\n' +
-    '    WORKAROUND: $id = $$RID; search sale.order -d [["partner_id","=",$id]]\n' +
-    '\n' +
-    '=== 8. SUBCOMMAND CALLS & NESTING ===\n' +
-    '  * Wrap in ():  $val = (search res.partner -l 1)\n' +
-    '  * Chain access directly: (search res.partner -f name)[0]["name"]\n' +
-    '  * Inline in args: read res.users -i (search res.users -f id)[0]["id"]\n' +
-    '  * Inside literals: {count: (search res.partner)["length"]}\n' +
-    '\n' +
-    '=== 9. RECORDSETS (SINGLETON VS MULTI-RECORD) ===\n' +
-    '  * SINGLETON (create, read <single-id>, search -l 1):\n' +
-    '    - Access field: $res["field_name"]\n' +
-    '    - NEVER index: $res[0]["field"]  ← WRONG on a singleton\n' +
-    '  * MULTI-RECORD (search without -l 1):\n' +
-    '    - Count: $res["length"]   (never $res["ids"]["length"])\n' +
-    '    - Access item: $res[0]["field"], $res[1]["field"]\n' +
-    '    - IDs only: $res["ids"]  (plain number array, no field access here)\n' +
-    '  * NEVER print a full recordset — always extract specific fields:\n' +
-    '    WRONG:   print -m "x: " + $rs\n' +
-    '    CORRECT: print -m "x: " + $rs["name"]\n' +
-    '\n' +
     '=== 10. CONTROL FLOW ===\n' +
     '  * BRACES ARE MANDATORY for all blocks. Omitting braces is a syntax error.\n' +
     '\n' +
@@ -182,10 +86,11 @@ export default function(terminal: Terminal): string {
     '    → silent before commands inside loops suppresses output clutter.\n' +
     '\n' +
     '  Nested loops — break exits only the INNER loop:\n' +
+    '    $n = 0\n' +
     '    for ($i=0; $i<2; $i+=1) {\n' +
     '      for ($e=0; $e<10; $e+=1) { if ($e==5) { break }; $n += 1 }\n' +
     '      $n += 1\n' +
-    '    }  → $n == 12\n' +
+    '    }\n' +
     '\n' +
     '  return: exits current function (or script) and returns a value.\n' +
     '    if ($x > 0) { return "positive" }\n' +
@@ -222,7 +127,7 @@ export default function(terminal: Terminal): string {
     '\n' +
     '  Math:\n' +
     '    floor -n 12.9       → 12\n' +
-    '    fixed -n 12.567 -d 2 → 12  (rounds to N decimals, returns integer)\n' +
+    '    fixed -n 12.567 -d 2 → 12  (applies .toFixed(d) rounding then truncates to integer)\n' +
     '    abs -n -5           → 5\n' +
     '    pow -b 2 -e 5       → 32\n' +
     '    rand -mi 1 -ma 10   → random integer in [1, 10]\n' +
@@ -239,32 +144,20 @@ export default function(terminal: Terminal): string {
     '    $res = (fetch -u "/web/dataset/call_kw" -o {method:"POST"} -t 5000)\n' +
     '    → returns a Response object (or null on timeout). Use with caution.\n' +
     '\n' +
-    '=== 13. SEMICOLON CHAINING ===\n' +
-    '  ALL statements execute but ONLY the last value is returned (see FUNDAMENTAL RULE).\n' +
-    '  Capture intermediate results into variables before the next statement:\n' +
-    '    $r = (create res.partner -v {name:"Test"}); print -m "ID: " + $r["id"]\n' +
-    '  Multiple outputs: collect into variables, end with print:\n' +
-    '    $a = (search res.partner -l 1 -f name); $b = (search res.users -l 1 -f name)\n' +
-    '    print -m "Partner: " + $a["name"] + " | User: " + $b["name"]\n' +
-    '\n' +
-    '=== 14. COMPLETE EXAMPLES ===\n' +
+    '=== 13. COMPLETE EXAMPLES ===\n' +
     '  // Sum all sale order totals\n' +
     '  $rows = (search sale.order -f amount_total -all)\n' +
     '  $total = 0\n' +
     '  for ($i = 0; $i < $rows["length"]; $i += 1) { $total += $rows[$i]["amount_total"] }\n' +
     '  print -m "Total: " + $total\n' +
     '\n' +
-    '  // Collect only company partners using a function\n' +
-    '  function getCompanies() {\n' +
-    '    $res = []\n' +
-    '    $partners = (search res.partner -f is_company)\n' +
-    '    for ($i = 0; $i < $partners["length"]; $i += 1) {\n' +
-    '      if ($partners[$i]["is_company"]) { arr_append $res $partners[$i] }\n' +
-    '    }\n' +
-    '    return $res\n' +
+    '  // Count sale orders per state — shows array literal + loop + count + domain variable\n' +
+    '  $states = ["draft", "sale", "done", "cancel"]\n' +
+    '  for ($i = 0; $i < $states["length"]; $i += 1) {\n' +
+    '    $s = $states[$i]\n' +
+    '    $n = (count -m sale.order -d [["state","=",$s]])\n' +
+    '    print -m $s + ": " + $n\n' +
     '  }\n' +
-    '  $companies = (getCompanies)\n' +
-    '  print -m "Companies: " + $companies["length"]\n' +
     '\n' +
     '  // Collect odd numbers 1–99 using continue\n' +
     '  $arr = []\n' +
@@ -289,8 +182,132 @@ export default function(terminal: Terminal): string {
     '  $nums = (arr_filter $nums (function (item) { return $item != 4 }))\n' +
     '  $sum = (arr_reduce $nums 0 (function (a, b) { return $a + $b }))\n' +
     '  print -m "Sum: " + $sum\n' +
+    '\n'
+  );
+}
+
+export default function(terminal: Terminal): string {
+  const cmds = terminal.getShell().getVM().getRegisteredCmds();
+  const lines = Object.entries(cmds).map(([name, def]) => {
+    return buildCommandPrompt(name, def);
+  });
+
+  return (
+    'TraSH scripting language — follow strictly:\n' +
     '\n' +
-    '=== 15. AVAILABLE COMMANDS (SYNTAX NOTATION) ===\n' +
+    '!!! FUNDAMENTAL RULES — READ BEFORE ANYTHING ELSE !!!\n' +
+    '\n' +
+    '[RULE 1 — ONE RESULT PER SCRIPT]\n' +
+    'A CMD script returns ONE value: the output of its LAST statement. ALL prior outputs are discarded.\n' +
+    '"cmd1; cmd2; cmd3" → you SEE only cmd3. cmd1 and cmd2 executed but their outputs are gone forever.\n' +
+    'You CANNOT observe multiple command outputs by chaining them. There is no way around this.\n' +
+    '\n' +
+    'WRONG — you will only see the count, the search result is lost:\n' +
+    '  CMD: search res.partner -f name -l 5\n' +
+    '  CMD: count -m res.partner\n' +
+    'WRONG — same problem even in one line with semicolons:\n' +
+    '  CMD: search res.partner -f name -l 5; count -m res.partner\n' +
+    '\n' +
+    'To get N values in a single CMD, use one of these patterns:\n' +
+    '  Pattern A — print:  $a = (cmd1); $b = (cmd2); print -m "a=" + $a + " b=" + $b\n' +
+    '  Pattern B — dict:   $r = {}; $r["val1"] = (cmd1); $r["val2"] = (cmd2); $r\n' +
+    'The last statement ($r or print) is the ONE result you will receive.\n' +
+    'Every CMD that needs to surface multiple values MUST use one of these patterns.\n' +
+    '\n' +
+    '[RULE 2 — NO TERNARY OPERATOR — SYNTAX ERROR]\n' +
+    '"condition ? a : b" is a SYNTAX ERROR in TraSH. ALWAYS use if/else instead.\n' +
+    'FORBIDDEN: $val = ($x > 5) ? "big" : "small"\n' +
+    'REQUIRED:  if ($x > 5) { $val = "big" } else { $val = "small" }\n' +
+    '\n' +
+    '=== 1. SYNTAX BASICS ===\n' +
+    '  * Statement separators: ";" and newline (\\n) are equivalent — both end a statement.\n' +
+    '    $a = 1; $b = 2   ←→   $a = 1\\n$b = 2   (identical)\n' +
+    '  * Comments: // single line comment   /* multi-line comment */\n' +
+    '  * Keywords (reserved, cannot be used as names): true false null for function return if elif else silent continue break\n' +
+    '\n' +
+    '=== 2. LITERALS ===\n' +
+    '  * Numbers:     42   -7   3.14   -2.5\n' +
+    '  * Strings:     "hello world"  or  \'hello world\'  (both quote styles work)\n' +
+    '  * Booleans:    true   false\n' +
+    '  * Null:        null\n' +
+    '  * Arrays:      [1, 2, 3]   ["a", "b"]   [1, [2, 3], "x"]   (nesting allowed)\n' +
+    '  * Dicts:       {key: "val", num: 42}   {key: {nested: [1,2]}}   (nesting allowed)\n' +
+    '  * Dict keys can be expressions:  {"key" + $suffix: $val}   {(cmd ...): $val}\n' +
+    '  * Subcommands inside literals:   {name: (gen -mi 1 -ma 4)}   [1, (rand -mi 0 -ma 9), 3]\n' +
+    '\n' +
+    '=== 3. VARIABLES ===\n' +
+    '  * Declare & assign:    $var = value\n' +
+    '  * Capture cmd output:  $var = (command ...)\n' +
+    '  * Array element:       $arr[2] = 42\n' +
+    '  * Dict key:            $obj["key"] = "new value"\n' +
+    '  * Nested:              $arr[1][0] += 5\n' +
+    '  * Compound operators:  += -= *= /=\n' +
+    '    Example: $n = 2; $n += 5; $n -= 1; $n *= 2; $n /= 2   → $n == 6\n' +
+    '\n' +
+    '=== 4. OPERATORS ===\n' +
+    '  * Arithmetic:  +  -  *  /  %  (standard math precedence: * / % before + -)\n' +
+    '  * Unary minus: $a = 2; $b = 3; $a * -$b   → -6\n' +
+    '  * Comparison:  ==  !=  >  <  >=  <=\n' +
+    '  * Logic:       &&  ||  !  (short-circuit: right side skipped if left decides result)\n' +
+    '    Short-circuit example: $x = false; if ($x && $x["key"]) { ... }  ← safe, no error on false["key"]\n' +
+    '  * Grouping:    (expr)  — use parentheses to override precedence\n' +
+    '    Example: (((5+5)*2))  → 20\n' +
+    '\n' +
+    '=== 5. STRINGS & CONCATENATION ===\n' +
+    '  * "+" concatenates strings and mixed types (numbers auto-coerce to string).\n' +
+    '  * Explicit "+" is MANDATORY — spaces between tokens do NOT concatenate.\n' +
+    '    CORRECT: print -m "ID: " + $rec["id"]\n' +
+    '    WRONG:   print -m "ID: " $rec["id"]\n' +
+    '  * Mixed concat: $a = "blabla"; $b = 1234; $a + "---" + $b   → "blabla---1234"\n' +
+    '  * From array/dict: $a[0]["name"] + " | " + $b["total"]\n' +
+    '\n' +
+    '=== 6. ARGUMENT MAPPING (NAMED & UNNAMED) ===\n' +
+    '  * Unnamed (positional) args fill in the order the command defines them.\n' +
+    '    Example: create res.partner {name: "Test", street: "Main St"}\n' +
+    '  * Named flags: search -m res.partner -d [["active","=",true]]\n' +
+    '  * Mix allowed as long as positional order is preserved.\n' +
+    '  * QUOTING (MANDATORY): ANY argument value that contains one or more spaces MUST be wrapped in double or single quotes.\n' +
+    '    CORRECT:   print -m "hello world"\n' +
+    '    CORRECT:   search res.partner -d [["name","=","John Doe"]]\n' +
+    '    CORRECT:   search res.partner -o "id DESC, name"    ← order value has spaces, must be quoted\n' +
+    '    WRONG:     search res.partner -o id DESC, name      ← "id" is the order value, "DESC," becomes a 3rd arg\n' +
+    '    This applies to every command and every argument type (strings, model names, field values, etc.).\n' +
+    '  * LIST ARGUMENTS: two equivalent forms are accepted.\n' +
+    '    Comma-separated:  name,display_name,phone         (items without spaces need no quotes)\n' +
+    '    Array literal:    [name, display_name, phone]     (bare words are strings; variables require $ prefix)\n' +
+    '    CORRECT:   search res.partner -f name,display_name\n' +
+    '    CORRECT:   search res.partner -f [name, display_name]\n' +
+    '    WRONG:     search res.partner -f name,display name ← space makes "display" a 3rd positional arg\n' +
+    '\n' +
+    '=== 7. SYSTEM HELPERS ($$RMOD, $$RID, $$UID, $$UNAME) ===\n' +
+    '  * Use ONLY as standalone arguments — never quote them.\n' +
+    '  * NEVER embed inside arrays, dicts, or domain literals.\n' +
+    '    CORRECT:   search $$RMOD -d [["active","=",true]]\n' +
+    '    FORBIDDEN: [["partner_id","=",$$RID]]\n' +
+    '    WORKAROUND: $id = $$RID; search sale.order -d [["partner_id","=",$id]]\n' +
+    '\n' +
+    '=== 8. SUBCOMMAND CALLS & NESTING ===\n' +
+    '  * Wrap in ():  $val = (search res.partner -l 1)\n' +
+    '  * Chain access directly: (search res.partner -f name)[0]["name"]\n' +
+    '  * Inline in args: read res.users -i (search res.users -f id)[0]["id"]\n' +
+    '  * Inside literals: {total: (count -m res.partner)}\n' +
+    '\n' +
+    '=== 9. RECORDSETS (SINGLETON VS MULTI-RECORD) ===\n' +
+    '  * SINGLETON (create, read <single-id>, search -l 1):\n' +
+    '    - Access field: $res["field_name"]\n' +
+    '    - NEVER index: $res[0]["field"]  ← WRONG on a singleton\n' +
+    '  * MULTI-RECORD (search without -l 1):\n' +
+    '    - Count: $res["length"]   (never $res["ids"]["length"])\n' +
+    '    - Access item: $res[0]["field"], $res[1]["field"]\n' +
+    '    - IDs only: $res["ids"]  (plain number array, no field access here)\n' +
+    '  * NEVER pass a full recordset to print — always extract specific fields:\n' +
+    '    WRONG:                print -m "x: " + $rs\n' +
+    '    CORRECT (singleton):  print -m "x: " + $rec["name"]\n' +
+    '    CORRECT (multi):      print -m "x: " + $rs[0]["name"]  ← or iterate with a for loop\n' +
+    '\n' +
+    '(§10–§13: control flow, functions, stdlib, examples → load skill "trash-syntax" before writing scripts with loops, functions, or stdlib calls)\n' +
+    '\n' +
+    '=== AVAILABLE COMMANDS (SYNTAX NOTATION) ===\n' +
     'Notation: <-flag/name type=default> required, [-flag/name type=default] optional\n' +
     'Types: str, num, flag, dict, any, [x]=list of x, str(a|b)=enum\n' +
     'Only use the following registered commands:\n' +

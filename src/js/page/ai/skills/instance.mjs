@@ -19,7 +19,7 @@ const content: string =
   '$me = (whoami)\n' +
   'print -m "User: " + $me["display_name"] + " | Company: " + $me["company"][1]\n' +
   '```\n' +
-  'System helpers (standalone args only, never inside arrays/dicts):\n' +
+  'System helpers:\n' +
   '- `$$UID` — current user ID (number)\n' +
   '- `$$UNAME` — current username/login (string)\n' +
   '\n' +

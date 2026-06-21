@@ -2,8 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import buildHtmlFormatPrompt from '@ai/prompts/html_format';
-
 export default function (): string {
   return (
     'Review the conversation above.\n' +
@@ -22,8 +20,6 @@ export default function (): string {
     '  VERIFIED — the task is complete and correct\n' +
     '  NOT_VERIFIED: <specific gap or issue and what the agent must still do>\n' +
     '\n' +
-    'Do not add any other text.\n' +
-    '\n' +
-    buildHtmlFormatPrompt()
+    'Do not add any other text.\n'
   );
 }

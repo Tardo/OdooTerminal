@@ -4,6 +4,7 @@
 
 import accountingSkill from './accounting';
 import instanceSkill from './instance';
+import trashSyntaxSkill from './trash_syntax';
 
 
 export type SkillDef = {
@@ -13,6 +14,7 @@ export type SkillDef = {
 };
 
 const SKILLS: $ReadOnlyArray<SkillDef> = [
+  trashSyntaxSkill,
   instanceSkill,
   accountingSkill,
 ];

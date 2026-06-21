@@ -139,6 +139,11 @@
     },
     "stop": {
       "noRequest": "No active AI request to stop."
+    },
+    "tokens": {
+      "cache": " · Cache: {{read}} leídos / {{created}} creados",
+      "cacheReadOnly": " · Cache: {{read}} ahorrados",
+      "usage": "Tokens: {{prompt}} in / {{completion}} out ({{total}} total)"
     }
   },
   "cmdAction": {

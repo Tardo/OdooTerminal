@@ -3,7 +3,6 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import buildTraSHPrompt from '@ai/prompts/trash';
-import buildHtmlFormatPrompt from '@ai/prompts/html_format';
 import SKILLS from '@ai/skills/__all__';
 import type Terminal from '@odoo/terminal';
 
@@ -19,7 +18,8 @@ function buildSkillsSection(): string {
     'To load a skill, output EXACTLY:\n' +
     'SKILL: <name>\n' +
     'You will receive the skill content as a message. Then continue your work.\n' +
-    '- Load a skill ONLY when you need domain-specific field names or query patterns you are unsure about.\n' +
+    '- Load `trash-syntax` before writing any script that uses control flow (if/for/break/continue), functions, or stdlib (arr_*, floor, encode, sleep, etc.). Skip if you only need a single plain command.\n' +
+    '- Load domain skills (instance, accounting, …) only when you need field names or query patterns you are unsure about.\n' +
     '- Do NOT load a skill if you already have the required knowledge from prior context.\n' +
     '- You may load at most one skill per step.\n' +
     '\n' +
@@ -43,29 +43,26 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '  A. The last CMD was a display command (view, graph, pivot, form) and returned "(command executed, no return value)" — the task was to show data, the view is open, done.\n' +
     '  B. At least one CMD was executed AND your answer is a direct restatement of command output (a count, a single field value, an ID) with zero inference or added claims.\n' +
     '  When in doubt, use DONE: (not DONE_SKIP:).\n' +
+    '  <final_answer> MUST be raw HTML (allowed tags: <b>, <ul>, <li>, <code>, <br>; Bootstrap classes allowed). Never use markdown fences or <pre>.\n' +
     '- NEVER mix CMD and DONE/DONE_SKIP. NEVER output multiple CMD lines.\n' +
     '\n' +
     '# ACTION-FIRST MANDATE (NON-NEGOTIABLE)\n' +
     '- You MUST execute at least one CMD before outputting DONE for any task that involves Odoo data.\n' +
     '- Your default response to any request is CMD, not DONE. Only switch to DONE once you have command evidence.\n' +
-    '- If you feel tempted to answer from memory or training knowledge: STOP. Run a verification command first.\n' +
-    '- A DONE with zero preceding CMDs is ALWAYS wrong for tasks involving live instance data. The verifier will reject it.\n' +
     '- When you know the model and field names with confidence, act directly — skip discovery steps.\n' +
     '- When the task is ambiguous or model/field names are uncertain, run ONE discovery command (`fields`, `search -l 1`) and then act.\n' +
     '- For display tasks ("show me X", "open X", "list X"): a single view/graph/pivot command is sufficient. Execute it and use DONE_SKIP immediately after.\n' +
     '- Prefer one well-targeted command over two exploratory ones. Do not chain a search + view when view alone accepts a domain filter.\n' +
-    '\n' +
-    buildHtmlFormatPrompt() + "\n" +
     '\n' +
     buildSkillsSection() +
     '\n' +
     '# GROUNDING RULES (STRICT)\n' +
     '- NEVER assert facts about the Odoo instance from prior knowledge or training data.\n' +
     '- ALL claims about models, fields, records, IDs, counts, or configurations MUST be derived from command outputs in this session.\n' +
-    '- Before using any field name, model name, or record ID, verify it exists by running a command (e.g. `fields`, `search`, `read`).\n' +
     '- Your DONE answer must ONLY contain information obtained from actual command outputs. Do not infer, extrapolate, or assume anything not confirmed by a command result.\n' +
     '- If unsure whether a field or model exists, query the instance first.\n' +
     '\n' +
+ +
     '# EXECUTION RULES\n' +
     '- After each CMD, you will receive the result as JSON or an error.\n' +
     '- If a command fails, change strategy. Use literal values from past output; do not repeat failed patterns.\n' +
@@ -81,6 +78,7 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '  - Cross-field breakdown / matrix → `pivot -m <model> [-r row_field] [-c col_field] [-e measure]`\n' +
     'Use `print` only when the result cannot be rendered as a native Odoo view (computed values, multi-model aggregations, non-record output).\n' +
     'Rule of thumb: view > print. If both are possible, always choose the view.\n' +
+    'IMPORTANT — `graph` and `pivot` share the same view slot in the Odoo client: running one after the other replaces the previous view. The user will only see the LAST one opened. Never run both for the same task; pick the one that best fits the request.\n' +
     '\n' +
     buildTraSHPrompt(terminal)
   );

@@ -69,10 +69,21 @@ async function cmdAIChat(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   ctx.screen.print('--- AI Response (' + model + ') ---', false);
 
   try {
-    await streamRequest(url, aiState.apiKey, model, [{role: 'user', content: prompt}], chatController.signal, delta => {
+    const {usage} = await streamRequest(url, aiState.apiKey, model, [{role: 'user', content: prompt}], chatController.signal, delta => {
       ctx.screen.print(delta, true);
     });
     ctx.screen.print('');
+    if (usage !== null && usage !== undefined) {
+      ctx.screen.print(
+        i18n.t('cmdAI.tokens.usage', 'Tokens: {{prompt}} in / {{completion}} out ({{total}} total)', {
+          prompt: usage.prompt_tokens,
+          completion: usage.completion_tokens,
+          total: usage.total_tokens,
+        }),
+        false,
+        'agent-token-usage',
+      );
+    }
   } catch (err) {
     if (!handleAbort(err, ctx)) {
       ctx.screen.eprint(i18n.t('cmdAI.chat.error.requestFailed', 'Request failed: ') + err.message);
@@ -105,8 +116,17 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
       ? kwargs.max_verifications
       : DEFAULT_MAX_VERIFICATIONS;
 
-  const messages: Array<{role: string, content: string}> = [
-    {role: 'system', content: buildMainAgentPrompt(this, String(getOdooVersion() ?? ''), maxSteps)},
+  const messages: Array<AIMessage> = [
+    {
+      role: 'system',
+      content: [
+        {
+          type: 'text',
+          text: buildMainAgentPrompt(this, String(getOdooVersion() ?? ''), maxSteps),
+          cache_control: {type: 'ephemeral'},
+        },
+      ],
+    },
     {role: 'user', content: prompt},
   ];
 
@@ -114,6 +134,37 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
   let lastDoneAnswer = '';
   let cmdCount = 0;
   const loadedSkills: Set<string> = new Set();
+  let totalPromptTokens = 0;
+  let totalCompletionTokens = 0;
+
+  let totalCacheCreationTokens = 0;
+  let totalCacheReadTokens = 0;
+
+  const printTokenUsage = () => {
+    if (totalPromptTokens === 0 && totalCompletionTokens === 0) {
+      return;
+    }
+    const effectivePromptTokens = totalPromptTokens - totalCacheReadTokens;
+    let usageText = i18n.t('cmdAI.tokens.usage', 'Tokens: {{prompt}} in / {{completion}} out ({{total}} total)', {
+      prompt: effectivePromptTokens,
+      completion: totalCompletionTokens,
+      total: effectivePromptTokens + totalCompletionTokens,
+    });
+    if (totalCacheCreationTokens > 0) {
+      usageText += i18n.t(
+        'cmdAI.tokens.cache',
+        ' · Cache: {{read}} read / {{created}} created',
+        {read: totalCacheReadTokens, created: totalCacheCreationTokens},
+      );
+    } else if (totalCacheReadTokens > 0) {
+      usageText += i18n.t(
+        'cmdAI.tokens.cacheReadOnly',
+        ' · Cache: {{read}} saved',
+        {read: totalCacheReadTokens},
+      );
+    }
+    ctx.screen.print(usageText, false, 'agent-token-usage');
+  };
 
   const stopLink = "<span class='agent-stop o_terminal_click o_terminal_cmd' data-cmd='ai stop'>stop</span>";
 
@@ -136,13 +187,19 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
     const live = ctx.screen.printLive('agent-thinking');
     thinkLive = live;
     live.update(`${thinkingBaseMsg} <span class="agent-elapsed">(0.0s)</span> ${stopLink}`);
+    const elapsedEl = live.el.querySelector('.agent-elapsed');
     thinkTimer = setInterval(() => {
       const elapsed = ((Date.now() - thinkStart) / 1000).toFixed(1);
-      live.update(`${thinkingBaseMsg} <span class="agent-elapsed">(${elapsed}s)</span> ${stopLink}`);
+      if (elapsedEl !== null && elapsedEl instanceof HTMLElement) {
+        elapsedEl.textContent = `(${elapsed}s)`;
+      }
     }, 100);
   };
 
-  // Show "Pensando paso 1" immediately after the user's command
+  // Flush the command-line echo (printCommand routes through a rAF buffer) before
+  // showing the thinking indicator (printLive appends synchronously), so the prompt
+  // line always appears above the thinking indicator in the DOM.
+  await new Promise(resolve => requestAnimationFrame(resolve));
   startThinking(1);
 
   for (let step = 0; step < maxSteps; step++) {
@@ -153,7 +210,7 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
 
     let response = '';
     try {
-      response = await streamRequest(
+      const {text, usage} = await streamRequest(
         url,
         aiState.apiKey,
         model,
@@ -161,6 +218,13 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
         currentController.signal,
         () => undefined,
       );
+      response = text;
+      if (usage !== null && usage !== undefined) {
+        totalPromptTokens += usage.prompt_tokens;
+        totalCompletionTokens += usage.completion_tokens;
+        totalCacheCreationTokens += usage.cache_creation_input_tokens ?? 0;
+        totalCacheReadTokens += usage.cache_read_input_tokens ?? usage.prompt_tokens_details?.cached_tokens ?? 0;
+      }
     } catch (err) {
       if (!handleAbort(err, ctx)) {
         ctx.screen.eprint(i18n.t('cmdAI.agent.error.requestFailed', 'Request failed: ') + err.message);
@@ -292,6 +356,10 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
         outputStr = err.message;
       }
 
+      const MAX_CMD_OUTPUT_CHARS = 6000;
+      if (outputStr.length > MAX_CMD_OUTPUT_CHARS) {
+        outputStr = outputStr.slice(0, MAX_CMD_OUTPUT_CHARS) + `\n[output truncated — ${outputStr.length} chars total, showing first ${MAX_CMD_OUTPUT_CHARS}]`;
+      }
       messages.push({
         role: 'user',
         content: cmdFailed ? `Command failed:\n${outputStr}` : `Command output:\n${outputStr}`,
@@ -324,10 +392,14 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
         });
       } else {
         loadedSkills.add(skillName);
-        ctx.screen.print(
-          i18n.t('cmdAI.agent.skill.loading', '[Agent] Loading skill: {{name}}', {name: skillName}),
-          false,
-        );
+        const skillLabel = i18n.t('cmdAI.agent.skill.loading', '[Agent] Loading skill: {{name}}', {name: skillName});
+        const skillHtml = Array.from(skillLabel)
+          .map((ch, i) => {
+            const safe = ch === '&' ? '&amp;' : ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === ' ' ? '&nbsp;' : ch;
+            return `<span class="agent-skill-char" style="animation-delay:${i * 38}ms">${safe}</span>`;
+          })
+          .join('');
+        ctx.screen.print(skillHtml, false, 'agent-skill-loading');
         const major = Number(getOdooVersion('major') ?? -1);
         messages.push({
           role: 'user',
@@ -344,6 +416,7 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
       const answer = response.slice(10).trim();
       ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
       ctx.screen.print(answer, false);
+      printTokenUsage();
       return;
     } else if (response.startsWith('DONE:') || response.startsWith('DONE_SKIP:')) {
       // DONE_SKIP: with 0 CMDs falls through to full verification (anti-hallucination floor)
@@ -354,12 +427,15 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
       const verifyingBaseMsg = i18n.t('cmdAI.agent.result.verifying', '[Agent] Verifying...');
       const verifyLive = ctx.screen.printLive('agent-verifying');
       verifyLive.update(`${verifyingBaseMsg} <span class="agent-elapsed">(0.0s)</span> ${stopLink}`);
+      const verifyElapsedEl = verifyLive.el.querySelector('.agent-elapsed');
       const verifyTimer: IntervalID = setInterval(() => {
         const elapsed = ((Date.now() - verifyStart) / 1000).toFixed(1);
-        verifyLive.update(`${verifyingBaseMsg} <span class="agent-elapsed">(${elapsed}s)</span> ${stopLink}`);
+        if (verifyElapsedEl !== null && verifyElapsedEl instanceof HTMLElement) {
+          verifyElapsedEl.textContent = `(${elapsed}s)`;
+        }
       }, 100);
 
-      const verifyMessages = [
+      const verifyMessages: Array<AIMessage> = [
         ...messages.slice(1),
         {role: 'user', content: buildVerifyAgentPrompt()},
       ];
@@ -367,14 +443,22 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
       currentController = startRequest(timeoutSecs);
       let verifyResponse = '';
       try {
-        verifyResponse = await streamRequest(
+        const {text: verifyText, usage: verifyUsage} = await streamRequest(
           url,
           aiState.apiKey,
           model,
           verifyMessages,
           currentController.signal,
           () => undefined,
+          ['\n'],
         );
+        verifyResponse = verifyText;
+        if (verifyUsage !== null && verifyUsage !== undefined) {
+          totalPromptTokens += verifyUsage.prompt_tokens;
+          totalCompletionTokens += verifyUsage.completion_tokens;
+          totalCacheCreationTokens += verifyUsage.cache_creation_input_tokens ?? 0;
+          totalCacheReadTokens += verifyUsage.cache_read_input_tokens ?? verifyUsage.prompt_tokens_details?.cached_tokens ?? 0;
+        }
       } catch (err) {
         if (!handleAbort(err, ctx)) {
           ctx.screen.eprint(i18n.t('cmdAI.agent.error.requestFailed', 'Request failed: ') + err.message);
@@ -393,6 +477,7 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
       if (verifyResponse.startsWith('VERIFIED')) {
         ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
         ctx.screen.print(answer, false);
+        printTokenUsage();
         return;
       }
 
@@ -405,6 +490,7 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
       ctx.screen.eprint(
         i18n.t('cmdAI.agent.result.verifyFailed', '[Agent] The answer can be improved...'),
         false,
+        'line-warning',
       );
 
       if (verifyAttempts >= maxVerifications) {
@@ -417,6 +503,7 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
           i18n.t('cmdAI.agent.result.lastVerifyReason', '[Agent] Last verification reason: {{reason}}', {reason: verifyReason}),
           false,
         );
+        printTokenUsage();
         return;
       }
 
@@ -443,6 +530,7 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
   ctx.screen.print(
     i18n.t('cmdAI.agent.result.maxSteps', 'Agent reached maximum steps without a final answer.'),
   );
+  printTokenUsage();
 }
 
 function cmdAIStop(ctx: CMDCallbackContext) {
