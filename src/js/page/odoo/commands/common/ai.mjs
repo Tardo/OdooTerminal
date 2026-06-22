@@ -131,7 +131,6 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
   ];
 
   let verifyAttempts = 0;
-  let lastDoneAnswer = '';
   let cmdCount = 0;
   const loadedSkills: Set<string> = new Set();
   let totalPromptTokens = 0;
@@ -282,11 +281,18 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
     // Prefer the LAST occurrence so reasoning text before the decision is ignored.
     if (!response.startsWith('CMD:') && !response.startsWith('DONE:') && !response.startsWith('DONE_SKIP:') && !response.startsWith('SKILL:')) {
       const cmdMatches = [...response.matchAll(/^CMD:\s*(.+)$/gm)];
-      const cmdLine = cmdMatches.length > 0 ? cmdMatches[cmdMatches.length - 1][1] : undefined;
+      const rawCmdLine = cmdMatches.length > 0 ? cmdMatches[cmdMatches.length - 1][1].trim() : undefined;
+      // Detect "CMD: SKILL: name" — model confused CMD: with SKILL: prefix
+      const skillMatches = [...response.matchAll(/^SKILL:\s*\S+/gm)];
+      const skillLine = skillMatches.length > 0 ? skillMatches[skillMatches.length - 1][0] : undefined;
       const doneSkipPos = response.lastIndexOf('DONE_SKIP:');
       const donePos = response.lastIndexOf('DONE:');
-      if (cmdLine !== undefined) {
-        response = 'CMD: ' + cmdLine;
+      if (rawCmdLine !== undefined && rawCmdLine.startsWith('SKILL:')) {
+        response = rawCmdLine;
+      } else if (skillLine !== undefined) {
+        response = skillLine;
+      } else if (rawCmdLine !== undefined) {
+        response = 'CMD: ' + rawCmdLine;
       } else if (doneSkipPos !== -1 && doneSkipPos > donePos) {
         response = response.slice(doneSkipPos);
       } else if (donePos !== -1) {
@@ -421,7 +427,6 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
     } else if (response.startsWith('DONE:') || response.startsWith('DONE_SKIP:')) {
       // DONE_SKIP: with 0 CMDs falls through to full verification (anti-hallucination floor)
       const answer = (response.startsWith('DONE_SKIP:') ? response.slice(10) : response.slice(5)).trim();
-      lastDoneAnswer = answer;
 
       const verifyStart = Date.now();
       const verifyingBaseMsg = i18n.t('cmdAI.agent.result.verifying', '[Agent] Verifying...');
@@ -494,14 +499,12 @@ async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
       );
 
       if (verifyAttempts >= maxVerifications) {
+        ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
+        ctx.screen.print(answer, false);
         ctx.screen.print(
-          i18n.t('cmdAI.agent.result.maxVerifications', '[Agent] Max verifications reached. Last response:'),
+          i18n.t('cmdAI.agent.result.maxVerificationsNote', '[Agent] (max verifications reached — showing last response)'),
           false,
-        );
-        ctx.screen.print(lastDoneAnswer, false);
-        ctx.screen.print(
-          i18n.t('cmdAI.agent.result.lastVerifyReason', '[Agent] Last verification reason: {{reason}}', {reason: verifyReason}),
-          false,
+          'line-warning',
         );
         printTokenUsage();
         return;

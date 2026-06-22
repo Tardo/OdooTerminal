@@ -40,7 +40,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdEffect.definition', 'Show effect'),
     callback: cmdShowEffect,
-    detail: i18n.t('cmdEffect.detail', 'Show effect'),
+    detail: i18n.t('cmdEffect.detail', 'Play a visual UI effect. Without -t, lists all registered effect names. With -t, plays that effect. Available in Odoo 15.0+.'),
     args: [
       [ARG.String, ['t', 'type'], false, i18n.t('cmdEffect.args.type', 'The type of the effect')],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdEffect.args.options', 'The extra options to use')],

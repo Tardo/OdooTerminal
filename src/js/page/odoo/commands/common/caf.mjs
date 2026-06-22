@@ -76,10 +76,10 @@ async function getOptions(this: Terminal, arg_name: string) {
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('cmdCaf.definition', 'Check model fields access'),
+    definition: i18n.t('cmdCaf.definition', 'Show field definitions for a model'),
     callback: cmdCheckFieldAccess,
     options: getOptions,
-    detail: i18n.t('cmdCaf.detail', 'Show readable/writeable fields of the selected model'),
+    detail: i18n.t('cmdCaf.detail', 'Return field metadata for the model: type, required, readonly, label, selection values, relation target, etc. To check create/read/write/unlink access rights instead, use cam.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdCaf.args.model', 'The model technical name')],
       [ARG.List | ARG.String, ['f', 'field'], false, i18n.t('cmdCaf.args.field', 'The field names to request'), ['*']],

@@ -16,7 +16,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdAction.definition', 'Call action'),
     callback: cmdCallAction,
-    detail: i18n.t('cmdAction.definition', 'Call action'),
+    detail: i18n.t('cmdAction.detail', 'Launch any Odoo action by numeric ID, XML-ID string, or action dict. Does not return data.'),
     args: [
       [
         ARG.Any,

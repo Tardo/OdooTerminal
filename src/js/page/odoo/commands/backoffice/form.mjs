@@ -56,9 +56,9 @@ async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('cmdForm.definition', 'Form view utilities'),
+    definition: i18n.t('cmdForm.definition', 'Highlight or clear field highlights on the current form view'),
     callback: cmdForm,
-    detail: i18n.t('cmdForm.detail', 'Perform operations on the current form view fields.'),
+    detail: i18n.t('cmdForm.detail', 'highlight: visually marks a field in the open form view, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given). Does not return data.'),
     args: [
       [
         ARG.String,

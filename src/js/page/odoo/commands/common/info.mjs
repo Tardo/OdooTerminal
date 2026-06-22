@@ -40,7 +40,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdInfo.definition', 'Get session information'),
     callback: cmdInfo,
-    detail: i18n.t('cmdInfo.detail', 'Obtains various information from the session'),
+    detail: i18n.t('cmdInfo.detail', 'Return one piece of current session/page data. Use exactly one flag: --user-id (numeric user ID), --user-login (login name), --active-id (record ID from the current view), --active-model (model from the current view).'),
     args: [
       [ARG.Flag, ['ui', 'user-id'], false, i18n.t('cmdInfo.args.userId', 'The user id')],
       [ARG.Flag, ['ul', 'user-login'], false, i18n.t('cmdInfo.args.userLogin', 'The user login')],

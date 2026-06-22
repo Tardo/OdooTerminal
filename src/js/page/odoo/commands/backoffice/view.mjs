@@ -102,7 +102,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdView.definition', 'View model record/s'),
     callback: cmdViewModelRecord,
     options: getOptions,
-    detail: i18n.t('cmdView.detail', 'Open model record in form view or records in list view.'),
+    detail: i18n.t('cmdView.detail', 'With -i: opens that record in its form view. Without -i: shows a record picker dialog. Does not return data.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdView.args.model', 'The model technical name')],
       [ARG.Number, ['i', 'id'], false, i18n.t('cmdView.args.id', 'The record id')],

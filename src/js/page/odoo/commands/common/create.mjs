@@ -60,7 +60,7 @@ export default function (): Partial<CMDDef> {
     callback: cmdCreateModelRecord,
     options: getOptions,
     unsafe: true,
-    detail: i18n.t('cmdCreate.detail', 'Open new model record in form view or directly.'),
+    detail: i18n.t('cmdCreate.detail', 'Without -v: opens an empty form view for the model. With -v: creates records directly in the database and returns a Recordset with the new IDs. -v accepts a list of value dicts.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdCreate.args.model', 'The model technical name')],
       [ARG.List | ARG.Dictionary, ['v', 'value'], false, i18n.t('cmdCreate.args.value', 'The values to write')],

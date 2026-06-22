@@ -43,7 +43,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdSettings.definition', 'Open settings page'),
     callback: cmdOpenSettings,
     options: getOptions,
-    detail: i18n.t('cmdSettings.detail', 'Open settings page.'),
+    detail: i18n.t('cmdSettings.detail', 'Open the Odoo Settings form view for the specified module. Does not return data.'),
     args: [
       [
         ARG.String,

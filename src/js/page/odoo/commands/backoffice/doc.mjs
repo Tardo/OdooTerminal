@@ -50,7 +50,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdDoc.definition', 'Open technical documentation page'),
     callback: cmdDoc,
     options: getOptions,
-    detail: i18n.t('cmdDoc.detail', 'Open technical documentation page.'),
+    detail: i18n.t('cmdDoc.detail', 'Open the built-in technical documentation page (Odoo 19.0+ only). Without -m opens the index. With -m, opens docs for that model. With -me, anchors to that method.'),
     args: [
       [
         ARG.String,

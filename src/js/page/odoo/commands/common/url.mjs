@@ -27,7 +27,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdURL.definition', 'Get URL parameters'),
     callback: cmdURL,
-    detail: i18n.t('cmdURL.detail', 'Get URL parameters'),
+    detail: i18n.t('cmdURL.detail', 'Extract a component from the current page URL. Use -s href for the full URL, -s hash -k model to read the model in the hash, -s search -k <param> for query string values.'),
     args: [
       [
         ARG.String,

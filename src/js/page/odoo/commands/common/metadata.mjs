@@ -61,7 +61,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdMetadata.definition', 'View record metadata'),
     callback: cmdMetadata,
     options: getOptions,
-    detail: i18n.t('cmdMetadata.detail', 'View record metadata'),
+    detail: i18n.t('cmdMetadata.detail', 'Show ORM metadata for a record: create_uid, create_date, write_uid, write_date, noupdate flag, and XML ID.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdMetadata.args.model', 'The record model')],
       [ARG.Number, ['i', 'id'], true, i18n.t('cmdMetadata.args.id', 'The record id')],

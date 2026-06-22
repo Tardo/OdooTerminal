@@ -177,7 +177,7 @@ export default function (): Partial<CMDDef> {
         false,
         i18n.t(
           'cmdSearch.args.order',
-          "The order<br/>A list of orders separated by comma (Example: 'age DESC, email')",
+          'The sort order. MUST be quoted because it contains spaces: -o "name ASC" or -o "id DESC, name"',
         ),
       ],
       [ARG.Flag, ['more', 'more'], false, i18n.t('cmdSearch.args.more', 'Flag to indicate that show more results')],
@@ -185,6 +185,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Flag, ['rb', 'read-binary'], false, i18n.t('cmdSearch.args.readBinary', "Don't filter binary fields")],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdSearch.args.options', 'The options')],
     ],
-    example: "-m res.partner -f * -l 100 -of 5 -o 'id DESC, name'",
+    example: '-m res.partner -f name,email -l 100 -of 5 -o "id DESC, name"',
   };
 }

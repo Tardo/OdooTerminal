@@ -80,10 +80,10 @@ async function getOptions(this: Terminal, arg_name: string) {
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('cmdRead.definition', 'Search model record'),
+    definition: i18n.t('cmdRead.definition', 'Fetch records by ID'),
     callback: cmdSearchModelRecordId,
     options: getOptions,
-    detail: i18n.t('cmdRead.detail', 'Launch orm search query.'),
+    detail: i18n.t('cmdRead.detail', 'Fetch one or more records by known ID(s) and return a Recordset. Use when you already have the record ID(s). Use search to find records by domain filter instead.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdRead.args.model', 'The model technical name')],
       [ARG.List | ARG.Number, ['i', 'id'], true, i18n.t('cmdRead.args.id', "The record id's")],

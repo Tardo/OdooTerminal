@@ -175,7 +175,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdLang.definition', 'Operations over translations'),
     callback: cmdLang,
     options: getOptions,
-    detail: i18n.t('cmdLang.detail', 'Operations over translations.'),
+    detail: i18n.t('cmdLang.detail', 'export: downloads a .po/.csv translation file for a module. import: uploads a translation file from disk. list: prints installed language codes and names. Without extra args, export/import open the Odoo wizard instead.'),
     args: [
       [
         ARG.String,
