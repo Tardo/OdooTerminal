@@ -462,6 +462,9 @@
     },
     "definition": "Open graph view",
     "detail": "Open a customized graph view for a model. To retrieve grouped data without opening a view, use the read_group command instead.",
+    "error": {
+      "measurePrefix": "Measure field must be a plain field name (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')"
+    },
     "result": {
       "name": "Graph View"
     }
@@ -693,6 +696,9 @@
     },
     "definition": "Open pivot view",
     "detail": "Open a customized pivot view for a model. To retrieve aggregated data without opening a view, use the read_group command instead.",
+    "error": {
+      "measurePrefix": "Measure fields must be plain field names (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')"
+    },
     "result": {
       "name": "Pivot View"
     }

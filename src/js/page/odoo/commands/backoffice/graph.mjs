@@ -10,6 +10,14 @@ import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdGraph(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
+  if (typeof kwargs.measure === 'string' && kwargs.measure.includes(':')) {
+    throw new Error(
+      i18n.t(
+        'cmdGraph.error.measurePrefix',
+        "Measure field must be a plain field name (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
+      ),
+    );
+  }
   const context = {
     ...(await this.getContext()),
     ...(kwargs.groupby.length && {graph_groupbys: kwargs.groupby}),
@@ -58,7 +66,7 @@ export default function (): Partial<CMDDef> {
         i18n.t('cmdGraph.args.groupby', 'Fields to group by'),
         [],
       ],
-      [ARG.String, ['e', 'measure'], false, i18n.t('cmdGraph.args.measure', 'The measure field')],
+      [ARG.String, ['e', 'measure'], false, i18n.t('cmdGraph.args.measure', 'The measure field (plain field name, e.g. amount_total — NOT sum:amount_total)')],
       [
         ARG.String,
         ['t', 'type'],

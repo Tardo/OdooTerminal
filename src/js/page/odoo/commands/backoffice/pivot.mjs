@@ -10,6 +10,16 @@ import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdPivot(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
+  for (const m of kwargs.measure) {
+    if (typeof m === 'string' && m.includes(':')) {
+      throw new Error(
+        i18n.t(
+          'cmdPivot.error.measurePrefix',
+          "Measure fields must be plain field names (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
+        ),
+      );
+    }
+  }
   const context = {
     ...(await this.getContext()),
     ...(kwargs.row.length && {pivot_row_groupby: kwargs.row}),
@@ -69,7 +79,7 @@ export default function (): Partial<CMDDef> {
         ARG.List | ARG.String,
         ['e', 'measure'],
         false,
-        i18n.t('cmdPivot.args.measure', 'Fields to use as measures'),
+        i18n.t('cmdPivot.args.measure', 'Fields to use as measures (plain field names, e.g. amount_total — NOT sum:amount_total)'),
         [],
       ],
       [ARG.List | ARG.Any, ['d', 'domain'], false, i18n.t('cmdPivot.args.domain', 'The domain filter'), []],
