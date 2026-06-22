@@ -48,7 +48,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdPivot.definition', 'Open pivot view'),
     callback: cmdPivot,
     options: getOptions,
-    detail: i18n.t('cmdPivot.detail', 'Open a customized pivot view for a model.'),
+    detail: i18n.t('cmdPivot.detail', 'Open a customized pivot view for a model. To retrieve aggregated data without opening a view, use the read_group command instead.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdPivot.args.model', 'The model technical name')],
       [

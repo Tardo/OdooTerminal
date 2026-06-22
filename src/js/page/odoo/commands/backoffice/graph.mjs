@@ -48,7 +48,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdGraph.definition', 'Open graph view'),
     callback: cmdGraph,
     options: getOptions,
-    detail: i18n.t('cmdGraph.detail', 'Open a customized graph view for a model.'),
+    detail: i18n.t('cmdGraph.detail', 'Open a customized graph view for a model. To retrieve grouped data without opening a view, use the read_group command instead.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdGraph.args.model', 'The model technical name')],
       [
