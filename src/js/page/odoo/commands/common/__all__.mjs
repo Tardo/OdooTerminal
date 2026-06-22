@@ -27,6 +27,7 @@ import cmdPaste from './paste';
 import cmdNow from './now';
 import cmdPost from './post';
 import cmdRead from './read';
+import cmdReadGroup from './read_group';
 import cmdRef from './ref';
 import cmdReload from './reload';
 import cmdRollback from './rollback';
@@ -69,6 +70,7 @@ export default function (vm: VMachine) {
   vm.registerCommand('cam', cmdCam());
   vm.registerCommand('lastseen', cmdLastSeen());
   vm.registerCommand('read', cmdRead());
+  vm.registerCommand('read_group', cmdReadGroup());
   vm.registerCommand('context', cmdContext());
   vm.registerCommand('copy', cmdCopy());
   vm.registerCommand('version', cmdVersion());

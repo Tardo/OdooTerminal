@@ -460,8 +460,8 @@
       "name": "El título de la vista",
       "type": "El tipo de gráfico"
     },
-    "definition": "Abrir vista de gráfico",
-    "detail": "Abre una vista de gráfico personalizada para un modelo.",
+    "definition": "Open graph view",
+    "detail": "Open a customized graph view for a model. To retrieve grouped data without opening a view, use the read_group command instead.",
     "result": {
       "name": "Vista de Gráfico"
     }
@@ -691,8 +691,8 @@
       "name": "El título de la vista",
       "row": "Campos para agrupar en filas"
     },
-    "definition": "Abrir vista pivot",
-    "detail": "Abre una vista pivot personalizada para un modelo.",
+    "definition": "Open pivot view",
+    "detail": "Open a customized pivot view for a model. To retrieve aggregated data without opening a view, use the read_group command instead.",
     "result": {
       "name": "Vista Pivot"
     }
@@ -1203,5 +1203,15 @@
     "error": {
       "invalidType": "Invalid resource type"
     }
+  },
+  "cmdReadGroup": {
+    "args": {
+      "domain": "The domain filter",
+      "field": "Fields to aggregate (measures). Omit to get only counts.",
+      "groupby": "Fields to group by",
+      "model": "The model technical name"
+    },
+    "definition": "Fetch grouped and aggregated data from a model",
+    "detail": "Run an ORM read_group on a model and return the aggregated results. Each result row contains the groupby field values, the aggregated measure values, and __count. Use this instead of search when you need sums, counts, or averages per group."
   }
 }
