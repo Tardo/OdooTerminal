@@ -199,20 +199,26 @@ export default function(terminal: Terminal): string {
     '\n' +
     '[RULE 1 — ONE RESULT PER SCRIPT]\n' +
     'A CMD script returns ONE value: the output of its LAST statement. ALL prior outputs are discarded.\n' +
-    '"cmd1; cmd2; cmd3" → you SEE only cmd3. cmd1 and cmd2 executed but their outputs are gone forever.\n' +
+    '"cmd1; cmd2; cmd3" → you SEE only cmd3. cmd1 and cmd2 ran but their outputs are gone forever.\n' +
     'You CANNOT observe multiple command outputs by chaining them. There is no way around this.\n' +
     '\n' +
-    'WRONG — you will only see the count, the search result is lost:\n' +
+    'WRONG — assignment is the last statement; assignment returns nothing → "(command executed, no return value)":\n' +
+    '  CMD: $products = (search -m product.product -f name,lst_price -l 10)\n' +
+    'CORRECT — when you only need one command output, run it directly as the last (and only) statement:\n' +
+    '  CMD: search -m product.product -f name,lst_price -l 10\n' +
+    'CORRECT — if you must assign first, end with the variable to return its value:\n' +
+    '  CMD: $products = (search -m product.product -f name,lst_price -l 10); $products\n' +
+    '\n' +
+    'WRONG — two CMD lines; you will only see the second result:\n' +
     '  CMD: search res.partner -f name -l 5\n' +
     '  CMD: count -m res.partner\n' +
-    'WRONG — same problem even in one line with semicolons:\n' +
+    'WRONG — same problem in one line with semicolons:\n' +
     '  CMD: search res.partner -f name -l 5; count -m res.partner\n' +
     '\n' +
-    'To get N values in a single CMD, use one of these patterns:\n' +
+    'To surface N values in ONE CMD, use one of these patterns:\n' +
     '  Pattern A — print:  $a = (cmd1); $b = (cmd2); print -m "a=" + $a + " b=" + $b\n' +
     '  Pattern B — dict:   $r = {}; $r["val1"] = (cmd1); $r["val2"] = (cmd2); $r\n' +
     'The last statement ($r or print) is the ONE result you will receive.\n' +
-    'Every CMD that needs to surface multiple values MUST use one of these patterns.\n' +
     '\n' +
     '[RULE 2 — NO TERNARY OPERATOR — SYNTAX ERROR]\n' +
     '"condition ? a : b" is a SYNTAX ERROR in TraSH. ALWAYS use if/else instead.\n' +

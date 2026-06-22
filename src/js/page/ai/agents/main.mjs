@@ -62,7 +62,6 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '- Your DONE answer must ONLY contain information obtained from actual command outputs. Do not infer, extrapolate, or assume anything not confirmed by a command result.\n' +
     '- If unsure whether a field or model exists, query the instance first.\n' +
     '\n' +
- +
     '# EXECUTION RULES\n' +
     '- After each CMD, you will receive the result as JSON or an error.\n' +
     '- If a command fails, change strategy. Use literal values from past output; do not repeat failed patterns.\n' +
