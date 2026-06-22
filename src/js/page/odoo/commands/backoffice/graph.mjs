@@ -5,9 +5,41 @@
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import getFieldsInfo from '@odoo/orm/get_fields_info';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
+
+async function assertFieldsExist(
+  model: string,
+  fields: $ReadOnlyArray<mixed>,
+  argLabel: string,
+  context: ?{[string]: mixed},
+) {
+  const names: Array<string> = [];
+  for (const f of fields) {
+    if (typeof f === 'string' && f.length > 0) {
+      const base = f.split(':')[0];
+      if (base.length > 0) {
+        names.push(base);
+      }
+    }
+  }
+  if (names.length === 0) {
+    return;
+  }
+  const defs = await getFieldsInfo(model, names, context, null);
+  const missing = names.filter(n => !Object.hasOwn(defs, n));
+  if (missing.length > 0) {
+    throw new Error(
+      i18n.t(
+        'cmdGraph.error.unknownFields',
+        "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields.",
+        {arg: argLabel, model, fields: missing.join(', ')},
+      ),
+    );
+  }
+}
 
 async function cmdGraph(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
   if (typeof kwargs.measure === 'string' && kwargs.measure.includes(':')) {
@@ -18,8 +50,13 @@ async function cmdGraph(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed>
       ),
     );
   }
-  const context = {
-    ...(await this.getContext()),
+  const context = await this.getContext();
+  await assertFieldsExist(kwargs.model, kwargs.groupby, '-g/--groupby', context);
+  if (typeof kwargs.measure === 'string' && kwargs.measure.length > 0) {
+    await assertFieldsExist(kwargs.model, [kwargs.measure], '-e/--measure', context);
+  }
+  const actionContext = {
+    ...context,
     ...(kwargs.groupby.length && {graph_groupbys: kwargs.groupby}),
     ...(kwargs.measure && {graph_measure: kwargs.measure}),
     ...(kwargs.type && {graph_mode: kwargs.type}),
@@ -31,7 +68,7 @@ async function cmdGraph(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed>
     domain: kwargs.domain,
     views: [[false, 'graph']],
     target: 'current',
-    context: context,
+    context: actionContext,
   }).then(() => this.doHide());
 }
 

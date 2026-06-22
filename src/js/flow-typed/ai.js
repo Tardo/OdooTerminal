@@ -3,6 +3,7 @@ declare type AIState = {
   apiKey: ?string,
   model: ?string,
   timeout: ?number,
+  provider: ?string,
 };
 
 declare type TokenUsage = {
@@ -23,4 +24,8 @@ declare type AIContentBlock = {
 declare type AIMessage = {
   role: string,
   content: string | Array<AIContentBlock>,
+};
+
+declare type AIRuntime = {
+  controller: ?AbortController,
 };

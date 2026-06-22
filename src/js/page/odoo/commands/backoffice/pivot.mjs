@@ -5,9 +5,41 @@
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import getFieldsInfo from '@odoo/orm/get_fields_info';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
+
+async function assertFieldsExist(
+  model: string,
+  fields: $ReadOnlyArray<mixed>,
+  argLabel: string,
+  context: ?{[string]: mixed},
+) {
+  const names: Array<string> = [];
+  for (const f of fields) {
+    if (typeof f === 'string' && f.length > 0) {
+      const base = f.split(':')[0];
+      if (base.length > 0) {
+        names.push(base);
+      }
+    }
+  }
+  if (names.length === 0) {
+    return;
+  }
+  const defs = await getFieldsInfo(model, names, context, null);
+  const missing = names.filter(n => !Object.hasOwn(defs, n));
+  if (missing.length > 0) {
+    throw new Error(
+      i18n.t(
+        'cmdPivot.error.unknownFields',
+        "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields.",
+        {arg: argLabel, model, fields: missing.join(', ')},
+      ),
+    );
+  }
+}
 
 async function cmdPivot(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
   for (const m of kwargs.measure) {
@@ -20,8 +52,12 @@ async function cmdPivot(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed>
       );
     }
   }
-  const context = {
-    ...(await this.getContext()),
+  const context = await this.getContext();
+  await assertFieldsExist(kwargs.model, kwargs.row, '-r/--row', context);
+  await assertFieldsExist(kwargs.model, kwargs.col, '-c/--col', context);
+  await assertFieldsExist(kwargs.model, kwargs.measure, '-e/--measure', context);
+  const actionContext = {
+    ...context,
     ...(kwargs.row.length && {pivot_row_groupby: kwargs.row}),
     ...(kwargs.col.length && {pivot_column_groupby: kwargs.col}),
     ...(kwargs.measure.length && {pivot_measures: kwargs.measure}),
@@ -33,7 +69,7 @@ async function cmdPivot(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed>
     domain: kwargs.domain,
     views: [[false, 'pivot']],
     target: 'current',
-    context: context,
+    context: actionContext,
   }).then(() => this.doHide());
 }
 

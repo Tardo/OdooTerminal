@@ -49,9 +49,11 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '# ACTION-FIRST MANDATE (NON-NEGOTIABLE)\n' +
     '- You MUST execute at least one CMD before outputting DONE for any task that involves Odoo data.\n' +
     '- Your default response to any request is CMD, not DONE. Only switch to DONE once you have command evidence.\n' +
-    '- When you know the model and field names with confidence, act directly — skip discovery steps.\n' +
-    '- When the task is ambiguous or model/field names are uncertain, run ONE discovery command (`fields`, `search -l 1`) and then act.\n' +
-    '- For display tasks ("show me X", "open X", "list X"): a single view/graph/pivot command is sufficient. Execute it and use DONE_SKIP immediately after.\n' +
+    '- Field names vary by Odoo version and installed modules. NEVER assume a specific field exists from prior training knowledge.\n' +
+    '  * Before using any field name in `pivot`, `graph`, or any command that would crash on an unknown field: verify with `caf -m <model> -f [<field>]`. If the result is empty, the field does not exist — discover the correct name first.\n' +
+    '  * For `read`/`search`/`write`: standard meta-fields (id, name, active, create_date, write_date) are safe to assume. All domain-specific fields (amounts, dates, states, relations) must be verified from the instance first, unless you obtained them from a command output earlier in this session.\n' +
+    '- When the model itself is unknown or ambiguous, run ONE discovery command (`caf -m <model>`, `search -m ir.model -d [["model","like","<keyword>"]] -f model,name -l 10`) and then act.\n' +
+    '- For display tasks ("show me X", "open X", "list X"): a single view/graph/pivot command is sufficient once fields are confirmed. Execute it and use DONE_SKIP immediately after.\n' +
     '- Prefer one well-targeted command over two exploratory ones. Do not chain a search + view when view alone accepts a domain filter.\n' +
     '\n' +
     buildSkillsSection() +
@@ -78,6 +80,17 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     'Use `print` only when the result cannot be rendered as a native Odoo view (computed values, multi-model aggregations, non-record output).\n' +
     'Rule of thumb: view > print. If both are possible, always choose the view.\n' +
     'IMPORTANT — `graph` and `pivot` share the same view slot in the Odoo client: running one after the other replaces the previous view. The user will only see the LAST one opened. Never run both for the same task; pick the one that best fits the request.\n' +
+    '\n' +
+    '# FORM COMMAND — HARD PREREQUISITE (NON-NEGOTIABLE)\n' +
+    '`form -o highlight` reads the DOM of the form view currently rendered in the browser.\n' +
+    'CALLING `form -o highlight` WITHOUT A FORM OPEN IN THE BROWSER WILL ALWAYS FAIL — it finds zero fields and does nothing.\n' +
+    'You MUST run `view -m <model> -i <id>` in a prior CMD step. `view -m <model>` (list view) is NOT sufficient.\n' +
+    'MANDATORY sequence — no exceptions:\n' +
+    '  Step 1 — open a form view:\n' +
+    '    If the user specified a record: `view -m <model> -i <known_id>`\n' +
+    '    If no record is specified: `view -m <model> -i (search -m <model> -l 1)[0]["id"]`  (opens first available)\n' +
+    '  Step 2 — highlight the field: `form -o highlight -f <field>`\n' +
+    'These are always two separate CMD steps. Never combine them in a single CMD.\n' +
     '\n' +
     buildTraSHPrompt(terminal)
   );

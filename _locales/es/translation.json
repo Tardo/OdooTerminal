@@ -83,11 +83,11 @@
         "cmdReason": "[Agente] {{reason}}",
         "header": "--- Agente ---",
         "maxSteps": "El agente ha alcanzado el númerp de intentos sin una respuesta final.",
-        "maxVerificationsNote": "[Agent] (max verifications reached — showing last response)",
+        "maxVerificationsNote": "[Agente] (max verifications reached — showing last response)",
         "noReturnValue": "(command executed, no return value)",
         "running": "[Agente] Ejecutando: <code>{{cmd}}</code>",
         "thinking": "[Agente] Pensando... (paso {{step}}/{{max}})",
-        "verifyFailed": "[Agente] La respuesta se puede mejorar...",
+        "verifyFailed": "[Agente] La respuesta se puede mejorar: {{reason}}",
         "verifying": "[Agente] Verificando..."
       },
       "skill": {
@@ -108,6 +108,7 @@
       "model": "Model name to use",
       "operation": "operation: connect, chat or exec",
       "prompt": "The prompt or natural language request to send",
+      "provider": "AI provider: openai (default) or anthropic",
       "timeout": "Max seconds to wait for a response (0 = no limit)",
       "url": "AI server URL (e.g. http://localhost:8080/v1)"
     },
@@ -463,7 +464,8 @@
     "definition": "Open graph view",
     "detail": "Open a customized graph view for a model. To retrieve grouped data without opening a view, use the read_group command instead.",
     "error": {
-      "measurePrefix": "Measure field must be a plain field name (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')"
+      "measurePrefix": "Measure field must be a plain field name (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
+      "unknownFields": "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields."
     },
     "result": {
       "name": "Vista de Gráfico"
@@ -697,7 +699,8 @@
     "definition": "Open pivot view",
     "detail": "Open a customized pivot view for a model. To retrieve aggregated data without opening a view, use the read_group command instead.",
     "error": {
-      "measurePrefix": "Measure fields must be plain field names (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')"
+      "measurePrefix": "Measure fields must be plain field names (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
+      "unknownFields": "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields."
     },
     "result": {
       "name": "Vista Pivot"
