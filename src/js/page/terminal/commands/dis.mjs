@@ -12,20 +12,20 @@ type RowInfo = [string, number, string, number, number, string];
 async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<Array<RowInfo>> {
   const parse_info = this.getShell().parse(kwargs.code);
   const rows: Array<RowInfo> = [];
-  const {stack} = parse_info;
-  for (const instr of stack.instructions) {
+  const {program} = parse_info;
+  for (const instr of program.instructions) {
     let lvalue: string = '';
     switch (instr.type) {
       case INSTRUCTION_TYPE.LOAD_NAME:
       case INSTRUCTION_TYPE.LOAD_GLOBAL:
       case INSTRUCTION_TYPE.STORE_NAME:
       case INSTRUCTION_TYPE.STORE_SUBSCR: {
-        const rec_name = stack.names[instr.level][instr.meta];
+        const rec_name = program.names[instr.level][instr.operand];
         lvalue = new String(rec_name).toString();
         break;
       }
       case INSTRUCTION_TYPE.LOAD_CONST: {
-        const rec_value = stack.values[instr.level][instr.meta];
+        const rec_value = program.values[instr.level][instr.operand];
         lvalue = new String(rec_value).toString();
         break;
       }
@@ -36,7 +36,7 @@ async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
       humanType,
       instr.type,
       lvalue,
-      instr.meta,
+      instr.operand,
       instr.level,
       instr.level >= 0 ? parse_info.inputTokens[instr.level][instr.inputTokenIndex]?.raw || '' : '',
     ]);

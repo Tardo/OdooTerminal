@@ -6,12 +6,12 @@ export default class {
   type: number;
   inputTokenIndex: number;
   level: number;
-  meta: number;
+  operand: number;
 
-  constructor(type: number, input_token_index: number, level: number, meta: number = -1) {
+  constructor(type: number, input_token_index: number, level: number, operand: number = -1) {
     this.type = type;
     this.inputTokenIndex = input_token_index;
     this.level = level;
-    this.meta = meta;
+    this.operand = operand;
   }
 }

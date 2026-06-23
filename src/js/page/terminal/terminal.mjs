@@ -737,7 +737,7 @@ export default class Terminal {
   #onClickReloadShell() {
     this.screen.refresh();
     this.cleanInputHistory();
-    this.#shell.getVM().cleanNames();
+    this.#shell.getVM().cleanGlobals();
     this.#updateJobsInfo();
     this.updateAssistantoptions();
     this.printWelcomeMessage();

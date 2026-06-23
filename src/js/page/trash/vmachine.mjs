@@ -43,7 +43,7 @@ export type EvalOptions = {
 
 export default class VMachine {
   #registeredCmds: RegisteredCMD = {};
-  #registeredNames: {[string]: mixed} = {};
+  #globals: {[string]: mixed} = {};
   options: VMachineOptions;
 
   constructor(options: VMachineOptions) {
@@ -74,8 +74,8 @@ export default class VMachine {
     };
   }
 
-  cleanNames() {
-    this.#registeredNames = {};
+  cleanGlobals() {
+    this.#globals = {};
   }
 
   registerCommand(cmd: string, cmd_def: Partial<CMDDef>): CMDDef {
@@ -97,27 +97,27 @@ export default class VMachine {
     if (getArgumentInputCount(arg_defs) > frame.args.length) {
       throw new InvalidCommandArgumentsError(name, frame.args);
     }
-    const items_len = Math.max(frame.values.length, frame.args.length);
+    const items_len = Math.max(frame.stack.length, frame.args.length);
     if (getArgumentInputCount(arg_defs, true) > items_len) {
       throw new InvalidCommandArgumentsError(name, frame.args);
     }
     let arg_def;
-    const {values} = frame;
-    for (let index = items_len - 1, adone = values.length - 1; index >= 0; --index) {
+    const {stack} = frame;
+    for (let index = items_len - 1, adone = stack.length - 1; index >= 0; --index) {
       let arg_name = frame.args.pop();
       if (typeof arg_name === 'undefined' || !arg_name) {
         arg_def = cmd_def.args[index];
         if (!arg_def) {
-          throw new InvalidCommandArgumentValueError(name, values[adone--]);
+          throw new InvalidCommandArgumentValueError(name, stack[adone--]);
         }
         arg_name = arg_def[1][1];
       } else {
         arg_def = getArgumentInfoByName(cmd_def.args, arg_name);
         if (!arg_def) {
-          throw new InvalidCommandArgumentValueError(name, values[adone--]);
+          throw new InvalidCommandArgumentValueError(name, stack[adone--]);
         }
       }
-      kwargs[arg_name] = arg_def.type === ARG.Flag ? true : values[adone--];
+      kwargs[arg_name] = arg_def.type === ARG.Flag ? true : stack[adone--];
     }
 
     try {
@@ -158,25 +158,25 @@ export default class VMachine {
         cmdName: name,
         cmdDef: cmd_def,
         kwargs: kwargs,
-        args: frame.values.map(item => new String(item).toString()),
+        args: frame.stack.map(item => new String(item).toString()),
       },
       silent,
     );
   }
 
   async execute(parse_info: ParseInfo, opts: EvalOptions, aframe?: Frame): Promise<mixed> {
-    const {stack} = parse_info;
-    const stack_instr_len = stack.instructions.length;
-    let root_frame = aframe;
-    if (typeof root_frame === 'undefined') {
-      root_frame = new Frame();
-      root_frame.store = this.#registeredNames;
+    const {program} = parse_info;
+    const instrLen = program.instructions.length;
+    let rootFrame = aframe;
+    if (typeof rootFrame === 'undefined') {
+      rootFrame = new Frame();
+      rootFrame.locals = this.#globals;
     }
-    const frames = [];
+    const callStack = [];
     let eoe = false;
-    let last_frame = root_frame;
-    for (let index = 0; !eoe && index < stack_instr_len; ++index) {
-      const instr = stack.instructions[index];
+    let activeFrame = rootFrame;
+    for (let index = 0; !eoe && index < instrLen; ++index) {
+      const instr = program.instructions[index];
       const token =
         instr.inputTokenIndex >= 0
           ? parse_info.inputTokens[instr.level][instr.inputTokenIndex]
@@ -189,15 +189,15 @@ export default class VMachine {
         case INSTRUCTION_TYPE.LOAD_NAME_CALLEABLE:
         case INSTRUCTION_TYPE.LOAD_NAME:
           {
-            const var_name = stack.names[instr.level][instr.meta] || '';
+            const var_name = program.names[instr.level][instr.operand] || '';
             if (instr.type === INSTRUCTION_TYPE.LOAD_NAME_CALLEABLE) {
-              last_frame = new Frame('__anon__', last_frame);
-              frames.push(last_frame);
+              activeFrame = new Frame('__anon__', activeFrame);
+              callStack.push(activeFrame);
             }
-            // Check stores
+            // Check locals
             try {
-              const store_val = last_frame.getStoreValue(var_name);
-              last_frame.values.push(store_val);
+              const local_val = activeFrame.getLocal(var_name);
+              activeFrame.stack.push(local_val);
             } catch (_err) {
               throw new UnknownNameError(var_name, token.start, token.end);
             }
@@ -205,12 +205,12 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.LOAD_GLOBAL:
           {
-            const cmd_name = stack.names[instr.level][instr.meta];
+            const cmd_name = program.names[instr.level][instr.operand];
             if (cmd_name === null || typeof cmd_name === 'undefined') {
               throw new UnknownNameError(i18n.t('UnknownNameError.invalidName', '<InvalidName>'), token.start, token.end)
             } else if (Object.hasOwn(this.#registeredCmds, cmd_name) || cmd_name in opts.aliases) {
-              last_frame = new Frame(cmd_name, last_frame);
-              frames.push(last_frame);
+              activeFrame = new Frame(cmd_name, activeFrame);
+              callStack.push(activeFrame);
             } else {
               throw new UnknownCommandError(cmd_name, token.start, token.end);
             }
@@ -218,18 +218,18 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.LOAD_CONST:
           {
-            const value = stack.values[instr.level][instr.meta];
-            last_frame.values.push(value);
+            const value = program.values[instr.level][instr.operand];
+            activeFrame.stack.push(value);
           }
           break;
         case INSTRUCTION_TYPE.LOAD_ARG:
           {
             const arg_name = token.value;
-            if (!last_frame) {
+            if (!activeFrame) {
               throw new NotExpectedCommandArgumentError(arg_name, token.start, token.end);
             }
             if (typeof arg_name === 'string') {
-              last_frame.args.push(arg_name);
+              activeFrame.args.push(arg_name);
             } else {
               throw new InvalidValueError(arg_name);
             }
@@ -237,9 +237,9 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.UNITARY_NEGATIVE:
           {
-            const val = last_frame.values.pop();
+            const val = activeFrame.stack.pop();
             if (typeof val === 'number') {
-              last_frame.values.push(val * -1);
+              activeFrame.stack.push(val * -1);
             } else {
               throw new InvalidValueError(val);
             }
@@ -247,15 +247,15 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.ADD:
           {
-            const valB = last_frame.values.pop();
-            const valA = last_frame.values.pop();
+            const valB = activeFrame.stack.pop();
+            const valA = activeFrame.stack.pop();
             if (typeof valB !== 'number' && typeof valB !== 'string') {
               throw new InvalidValueError(valB);
             }
             if (typeof valA !== 'number' && typeof valA !== 'string') {
               throw new InvalidValueError(valA);
             }
-            last_frame.values.push(valA + valB);
+            activeFrame.stack.push(valA + valB);
           }
           break;
         case INSTRUCTION_TYPE.SUBSTRACT:
@@ -263,8 +263,8 @@ export default class VMachine {
         case INSTRUCTION_TYPE.DIVIDE:
         case INSTRUCTION_TYPE.MODULO:
           {
-            const valB = last_frame.values.pop();
-            const valA = last_frame.values.pop();
+            const valB = activeFrame.stack.pop();
+            const valA = activeFrame.stack.pop();
             if (typeof valB !== 'number') {
               throw new InvalidValueError(valB);
             }
@@ -272,13 +272,13 @@ export default class VMachine {
               throw new InvalidValueError(valA);
             }
             if (instr.type === INSTRUCTION_TYPE.SUBSTRACT) {
-              last_frame.values.push(valA - valB);
+              activeFrame.stack.push(valA - valB);
             } else if (instr.type === INSTRUCTION_TYPE.MULTIPLY) {
-              last_frame.values.push(valA * valB);
+              activeFrame.stack.push(valA * valB);
             } else if (instr.type === INSTRUCTION_TYPE.DIVIDE) {
-              last_frame.values.push(valA / valB);
+              activeFrame.stack.push(valA / valB);
             } else if (instr.type === INSTRUCTION_TYPE.MODULO) {
-              last_frame.values.push(valA % valB);
+              activeFrame.stack.push(valA % valB);
             }
           }
           break;
@@ -287,18 +287,18 @@ export default class VMachine {
         case INSTRUCTION_TYPE.EQUAL:
         case INSTRUCTION_TYPE.NOT_EQUAL:
           {
-            const valB = last_frame.values.pop();
-            const valA = last_frame.values.pop();
+            const valB = activeFrame.stack.pop();
+            const valA = activeFrame.stack.pop();
             if (instr.type === INSTRUCTION_TYPE.AND) {
               // $FlowFixMe[sketchy-null-mixed]
-              last_frame.values.push(valA && valB);
+              activeFrame.stack.push(valA && valB);
             } else if (instr.type === INSTRUCTION_TYPE.OR) {
               // $FlowFixMe[sketchy-null-mixed]
-              last_frame.values.push(valA || valB);
+              activeFrame.stack.push(valA || valB);
             } else if (instr.type === INSTRUCTION_TYPE.EQUAL) {
-              last_frame.values.push(valA === valB);
+              activeFrame.stack.push(valA === valB);
             } else if (instr.type === INSTRUCTION_TYPE.NOT_EQUAL) {
-              last_frame.values.push(valA !== valB);
+              activeFrame.stack.push(valA !== valB);
             }
           }
           break;
@@ -307,8 +307,8 @@ export default class VMachine {
         case INSTRUCTION_TYPE.GREATER_THAN_CLOSED:
         case INSTRUCTION_TYPE.LESS_THAN_CLOSED:
           {
-            const valB = last_frame.values.pop();
-            const valA = last_frame.values.pop();
+            const valB = activeFrame.stack.pop();
+            const valA = activeFrame.stack.pop();
 
             if (typeof valB !== 'number') {
               throw new InvalidValueError(valB);
@@ -318,34 +318,34 @@ export default class VMachine {
             }
 
             if (instr.type === INSTRUCTION_TYPE.GREATER_THAN_OPEN) {
-              last_frame.values.push(valA > valB);
+              activeFrame.stack.push(valA > valB);
             } else if (instr.type === INSTRUCTION_TYPE.LESS_THAN_OPEN) {
-              last_frame.values.push(valA < valB);
+              activeFrame.stack.push(valA < valB);
             } else if (instr.type === INSTRUCTION_TYPE.GREATER_THAN_CLOSED) {
-              last_frame.values.push(valA >= valB);
+              activeFrame.stack.push(valA >= valB);
             } else if (instr.type === INSTRUCTION_TYPE.LESS_THAN_CLOSED) {
-              last_frame.values.push(valA <= valB);
+              activeFrame.stack.push(valA <= valB);
             }
           }
           break;
         case INSTRUCTION_TYPE.NOT:
           {
-            const val = last_frame.values.pop();
-            last_frame.values.push(!val);
+            const val = activeFrame.stack.pop();
+            activeFrame.stack.push(!val);
           }
           break;
         case INSTRUCTION_TYPE.CALL_FUNCTION_SILENT:
         case INSTRUCTION_TYPE.CALL_FUNCTION:
           {
-            const frame = frames.pop();
+            const frame = callStack.pop();
             if (typeof frame?.cmd !== 'undefined') {
               const frame_cmd = frame.cmd;
               let cmd_def = this.#registeredCmds[frame_cmd];
               if (typeof cmd_def === 'undefined') {
                 // FIXME: Done in this way to support 'aliases'
-                if (!(frame_cmd in opts.aliases) && typeof frame.values[0] === 'object') {
+                if (!(frame_cmd in opts.aliases) && typeof frame.stack[0] === 'object') {
                   // $FlowFixMe[incompatible-type]
-                  cmd_def = frame.values.shift();
+                  cmd_def = frame.stack.shift();
                 }
               }
               // Subframes are executed in silent mode
@@ -358,35 +358,35 @@ export default class VMachine {
                 parse_info,
                 instr.type === INSTRUCTION_TYPE.CALL_FUNCTION_SILENT || opts.silent === true,
               );
-              last_frame = frames.at(-1) || root_frame;
-              last_frame.values.push(ret);
+              activeFrame = callStack.at(-1) || rootFrame;
+              activeFrame.stack.push(ret);
             }
           }
           break;
         case INSTRUCTION_TYPE.RETURN_VALUE:
           {
-            const frame = frames.pop() || root_frame;
-            last_frame = frames.at(-1) || root_frame;
-            last_frame.values.push(frame.values.pop());
+            const frame = callStack.pop() || rootFrame;
+            activeFrame = callStack.at(-1) || rootFrame;
+            activeFrame.stack.push(frame.stack.pop());
             eoe = true;
           }
           break;
         case INSTRUCTION_TYPE.STORE_NAME:
           {
-            const vname = stack.names[instr.level][instr.meta];
-            const vvalue = last_frame.values.pop();
+            const vname = program.names[instr.level][instr.operand];
+            const vvalue = activeFrame.stack.pop();
             if (vname === null || typeof vname === 'undefined') {
               if (!token) {
                 throw new InvalidInstructionError();
               }
               throw new InvalidNameError(token.value, token.start, token.end);
             } else if (typeof vvalue === 'undefined') {
-              const value_instr = stack.instructions[index - 1];
+              const value_instr = program.instructions[index - 1];
               const value_token = parse_info.inputTokens[value_instr.level][value_instr.inputTokenIndex] || {};
               throw new InvalidTokenError(value_token.value, value_token.start, value_token.end);
             } else {
               if (token.type === LEXER.AssignmentAdd || token.type === LEXER.AssignmentSubstract || token.type === LEXER.AssignmentMultiply || token.type === LEXER.AssignmentDivide) {
-                let stored_value = last_frame.getStoreValue(vname);
+                let stored_value = activeFrame.getLocal(vname);
                 if (typeof stored_value === 'undefined') {
                   throw new InvalidNameError(vname, token.start, token.end);
                 }
@@ -404,19 +404,19 @@ export default class VMachine {
                   // $FlowFixMe[unsafe-arithmetic]
                   stored_value = stored_value / vvalue;
                 }
-                last_frame.setStoreValue(vname, stored_value);
+                activeFrame.setLocal(vname, stored_value);
               } else {
-                last_frame.setStoreValue(vname, vvalue);
+                activeFrame.setLocal(vname, vvalue);
               }
             }
           }
           break;
         case INSTRUCTION_TYPE.STORE_SUBSCR:
           {
-            // const vname = stack.names[instr.level][instr.meta];
-            const attr_value = last_frame.values.pop();
-            const attr_name = last_frame.values.pop();
-            const data = last_frame.values.pop();
+            // const vname = program.names[instr.level][instr.operand];
+            const attr_value = activeFrame.stack.pop();
+            const attr_name = activeFrame.stack.pop();
+            const data = activeFrame.stack.pop();
             try {
               // $FlowFixMe[incompatible-type]
               const data_obj: {[mixed]: mixed} = data;
@@ -435,7 +435,7 @@ export default class VMachine {
               } else {
                 data_obj[attr_name] = attr_value;
               }
-              // last_frame.setStoreValue(vname, data);
+              // activeFrame.setLocal(vname, data);
             } catch (err) {
               throw new InvalidInstructionError(err.message);
             }
@@ -443,9 +443,9 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.LOAD_DATA_ATTR:
           {
-            const attr_name = last_frame.values.pop();
-            const index_value = last_frame.values.length - 1;
-            const value = last_frame.values[index_value];
+            const attr_name = activeFrame.stack.pop();
+            const index_value = activeFrame.stack.length - 1;
+            const value = activeFrame.stack[index_value];
 
             if (value === null || typeof value === 'undefined') {
               throw new InvalidValueError(typeof attr_name === 'string' ? attr_name : 'Unknown');
@@ -467,44 +467,44 @@ export default class VMachine {
                 }
               }
             }
-            last_frame.values[index_value] = res_value;
+            activeFrame.stack[index_value] = res_value;
           }
           break;
         case INSTRUCTION_TYPE.BUILD_LIST:
           {
-            const iter_count = instr.meta;
+            const iter_count = instr.operand;
             const value = [];
             for (let i = 0; i < iter_count; ++i) {
-              value.push(last_frame.values.pop());
+              value.push(activeFrame.stack.pop());
             }
-            last_frame.values.push(value.reverse());
+            activeFrame.stack.push(value.reverse());
           }
           break;
         case INSTRUCTION_TYPE.BUILD_MAP:
           {
-            const iter_count = instr.meta;
+            const iter_count = instr.operand;
             const value: {[mixed]: mixed} = {};
             for (let i = 0; i < iter_count; ++i) {
-              const val = last_frame.values.pop();
-              const key = last_frame.values.pop();
+              const val = activeFrame.stack.pop();
+              const key = activeFrame.stack.pop();
               value[key] = val;
             }
-            last_frame.values.push(value);
+            activeFrame.stack.push(value);
           }
           break;
         case INSTRUCTION_TYPE.PUSH_FRAME:
-          last_frame = new Frame(undefined, last_frame);
-          frames.push(last_frame);
+          activeFrame = new Frame(undefined, activeFrame);
+          callStack.push(activeFrame);
           break;
         case INSTRUCTION_TYPE.POP_FRAME:
-          frames.pop();
-          last_frame = frames.at(-1) || root_frame;
+          callStack.pop();
+          activeFrame = callStack.at(-1) || rootFrame;
           break;
         case INSTRUCTION_TYPE.MAKE_FUNCTION:
           {
-            const name = last_frame.values.pop();
-            const args = last_frame.values.pop();
-            const code = last_frame.values.pop();
+            const name = activeFrame.stack.pop();
+            const args = activeFrame.stack.pop();
+            const code = activeFrame.stack.pop();
             if (args instanceof Array && code !== null && typeof code === 'object') {
               // $FlowFixMe[incompatible-indexer]
               // $FlowFixMe[incompatible-variance]
@@ -524,36 +524,36 @@ export default class VMachine {
               if (typeof name === 'string') {
                 this.registerCommand(name, cmd_def)
               }
-              last_frame.values.push(cmd_def);
+              activeFrame.stack.push(cmd_def);
             }
           }
           break;
         case INSTRUCTION_TYPE.JUMP_IF_FALSE:
           {
-            last_frame.lastFlowCheck = last_frame.values.at(-1);
-            const num_to_skip = instr.meta;
-            if (typeof last_frame.lastFlowCheck === 'undefined' || last_frame.lastFlowCheck === null || !last_frame.lastFlowCheck) {
+            activeFrame.lastFlowCheck = activeFrame.stack.at(-1);
+            const num_to_skip = instr.operand;
+            if (typeof activeFrame.lastFlowCheck === 'undefined' || activeFrame.lastFlowCheck === null || !activeFrame.lastFlowCheck) {
               index += num_to_skip;
             }
           }
           break;
         case INSTRUCTION_TYPE.JUMP_IF_TRUE:
           {
-            const num_to_skip = instr.meta;
-            if (typeof last_frame.lastFlowCheck !== 'undefined' && last_frame.lastFlowCheck !== null && last_frame.lastFlowCheck) {
+            const num_to_skip = instr.operand;
+            if (typeof activeFrame.lastFlowCheck !== 'undefined' && activeFrame.lastFlowCheck !== null && activeFrame.lastFlowCheck) {
               index += num_to_skip;
             }
           }
           break;
         case INSTRUCTION_TYPE.JUMP_BACKWARD:
           {
-            const num_to_back = instr.meta;
+            const num_to_back = instr.operand;
             index -= num_to_back + 1;
           }
           break;
         case INSTRUCTION_TYPE.JUMP_FORWARD:
           {
-            const num_to_adv = instr.meta;
+            const num_to_adv = instr.operand;
             if (num_to_adv > 0) {
               index += num_to_adv;
             }
@@ -561,6 +561,6 @@ export default class VMachine {
           break;
       }
     }
-    return last_frame.values.pop();
+    return activeFrame.stack.pop();
   }
 }

@@ -152,8 +152,8 @@ export default class CommandAssistant {
   }
 
   getSelectedParameterIndex(parse_info: ParseInfo, caret_pos: number): [number, number, number, number, number] {
-    const {stack} = parse_info;
-    if (!stack.instructions.length) {
+    const {program} = parse_info;
+    if (!program.instructions.length) {
       return [-1, -1, -1, 0, 0];
     }
     let sel_token_index = -1;
@@ -162,10 +162,10 @@ export default class CommandAssistant {
     let sel_level = 0;
     let end_i = -1;
     const total_args: {[number]: number} = {};
-    const instr_count = stack.instructions.length;
+    const instr_count = program.instructions.length;
     // Found selected token and EOC/EOL
     for (let index = instr_count - 1; index >= 0 ; --index) {
-      const instr = stack.instructions[index];
+      const instr = program.instructions[index];
       if (instr.level === -1) {
         continue;
       }
@@ -198,7 +198,7 @@ export default class CommandAssistant {
     if (end_i === -1) {
       const pend = instr_count - 3;
       if (pend >= 0) {
-        const instr = stack.instructions[pend];
+        const instr = program.instructions[pend];
         if (instr.type === INSTRUCTION_TYPE.LOAD_ARG || instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL) {
           sel_token_index = -1;
           sel_level = 0;
@@ -208,7 +208,7 @@ export default class CommandAssistant {
     }
 
     for (let cindex = end_i; cindex >= 0; --cindex) {
-      const instr = stack.instructions[cindex];
+      const instr = program.instructions[cindex];
       if (instr.level !== sel_level) {
         continue;
       }
