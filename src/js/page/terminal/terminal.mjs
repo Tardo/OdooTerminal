@@ -20,6 +20,7 @@ import {
   setStorageItem as setStorageSessionItem,
 } from './core/storage/session';
 import renderTerminal from './templates/terminal';
+import renderBusyTooltip from './templates/busy_tooltip';
 import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
@@ -84,6 +85,7 @@ export default class Terminal {
   screen: Screen;
   el: HTMLElement;
   runningCmdCount_el: HTMLElement;
+  busyTooltip_el: HTMLElement | void;
 
   #shell: Shell;
 
@@ -221,6 +223,17 @@ export default class Terminal {
     } else if (terms_elms.length === 0) {
       this.el = parseHTML(this.#rawTerminalTemplate);
       document.body?.append(this.el);
+    }
+    const existing_tooltip = document.getElementById('terminal_busy_tooltip');
+    if (!existing_tooltip) {
+      const body = document.body;
+      if (body) {
+        const tooltip_el = parseHTML(renderBusyTooltip());
+        body.append(tooltip_el);
+        this.busyTooltip_el = tooltip_el;
+      }
+    } else if (existing_tooltip instanceof HTMLElement) {
+      this.busyTooltip_el = existing_tooltip;
     }
   }
 
@@ -430,6 +443,7 @@ export default class Terminal {
     }
     this.#disableModalFocusTrap();
     this.screen.show();
+    this.#updateJobsInfo();
   }
 
   async doHide() {
@@ -442,6 +456,7 @@ export default class Terminal {
     }
     this.#enableModalFocusTrap();
     this.screen.hide();
+    this.#updateJobsInfo();
   }
 
   doToggle(show: boolean | void): Promise<> {
@@ -529,9 +544,29 @@ export default class Terminal {
       str_info += '...';
       this.runningCmdCount_el.textContent = str_info;
       this.runningCmdCount_el.classList.remove('hidden');
+      const tooltip = this.busyTooltip_el;
+      if (tooltip) {
+        const text_el = tooltip.querySelector('.o_terminal-busy-tooltip-text');
+        if (text_el instanceof HTMLElement) {
+          const tooltip_text =
+            count === 1
+              ? `${active_jobs[0].cmdInfo.cmdName}...`
+              : str_info;
+          text_el.textContent = tooltip_text;
+        }
+        if (!this.#isTerminalVisible()) {
+          tooltip.classList.add('active');
+        } else {
+          tooltip.classList.remove('active');
+        }
+      }
     } else {
       this.runningCmdCount_el.classList.add('hidden');
       this.runningCmdCount_el.textContent = '';
+      const tooltip = this.busyTooltip_el;
+      if (tooltip) {
+        tooltip.classList.remove('active');
+      }
     }
   }
 
@@ -878,8 +913,16 @@ export default class Terminal {
   }
 
   onCoreClick(ev: MouseEvent) {
-    // Auto-Hide
     if (
+      this.busyTooltip_el &&
+      ev.target instanceof HTMLElement &&
+      (this.busyTooltip_el === ev.target || this.busyTooltip_el.contains(ev.target))
+    ) {
+      this.doShow().catch(() => {
+        // Do nothing
+      });
+    } else if (
+      // Auto-Hide
       this.el &&
       ev.target instanceof HTMLElement &&
       !this.el.contains(ev.target) &&
