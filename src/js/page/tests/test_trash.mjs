@@ -36,6 +36,10 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results[1][3][2][1], 'oops');
     this.assertEqual(results[1][3][2][2], 251);
     this.assertEqual(results[1][3][2][3].key, 'the value');
+    results = await this.terminal.getShell().eval(
+      "$var = []; arr_append $var 'value'",
+    );
+    this.assertEqual(results[0], 'value');
   }
 
   async test_trash_dictionary() {
@@ -59,6 +63,10 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results.keyD.keyB[1], 33);
     this.assertEqual(results.keyD.keyB[2], 4);
     this.assertEqual(results.keyD.keyC.keyA, 'the, value');
+    results = await this.terminal.getShell().eval(
+      "$var = {}; $var['key'] = 'value'",
+    );
+    this.assertEqual(results.key, 'value');
   }
 
   async test_trash_assigments() {

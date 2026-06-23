@@ -278,6 +278,9 @@ export default class Interpreter {
       let inStr = '';
       let prevChar = '';
       const slen = stoken.length;
+      if (slen === 0) {
+        return true;
+      }
       for (let i = 0; i < slen; ++i) {
         const ch = stoken[i];
         if (prevChar !== SYMBOLS.ESCAPE) {

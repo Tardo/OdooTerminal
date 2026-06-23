@@ -55,7 +55,6 @@ function getLegacyDialogInfo(): ActiveModalInfo | null {
   try {
     const root = getOdooRoot();
     // $FlowFixMe[prop-missing]
-    debugger;
     const widget = root.action_manager?.currentDialogController?.widget;
     if (!widget) {
       return null;
