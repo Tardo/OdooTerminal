@@ -108,6 +108,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Number, ['i', 'id'], false, i18n.t('cmdView.args.id', 'The record id')],
       [ARG.String, ['r', 'ref'], false, i18n.t('cmdView.args.ref', 'The view reference name')],
     ],
-    example: '-m res.partner -i 10 -r base.view_partner_simple_form',
+    example: '-m res.partner -i 10 -r "base.view_partner_simple_form"',
   };
 }

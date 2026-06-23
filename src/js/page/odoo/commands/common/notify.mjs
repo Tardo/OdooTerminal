@@ -51,5 +51,6 @@ export default function (): Partial<CMDDef> {
       [ARG.List | ARG.String, ['b', 'buttons'], false, i18n.t('cmdNotify.args.buttons', 'The buttons')],
       [ARG.String, ['cn', 'className'], false, i18n.t('cmdNotify.args.className', 'The className')],
     ],
+    example: '-m "Hello World!" -ty success',
   };
 }

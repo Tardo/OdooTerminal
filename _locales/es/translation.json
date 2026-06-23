@@ -193,7 +193,8 @@
     "args": {
       "field": "Los nombres de los campos a solicitar",
       "filter": "El filtro a aplicar",
-      "model": "El nombre técnico del modelo"
+      "model": "El nombre técnico del modelo",
+      "property": "The field properties to display"
     },
     "definition": "Mostrar definiciones de campos de un modelo",
     "detail": "Devuelve metadatos de campos del modelo: tipo, requerido, solo-lectura, etiqueta, valores de selección, modelo relacionado, etc. Para comprobar derechos de acceso (crear/leer/escribir/eliminar) usa cam en su lugar."

@@ -66,6 +66,6 @@ export default function (): Partial<CMDDef> {
       [ARG.List | ARG.Dictionary, ['v', 'value'], false, i18n.t('cmdCreate.args.value', 'The values to write')],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdCreate.args.options', 'The options')],
     ],
-    example: "-m res.partner -v {name: 'Poldoore'}",
+    example: '-m res.partner -v {name: "Poldoore"}',
   };
 }

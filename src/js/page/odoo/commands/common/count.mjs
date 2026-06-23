@@ -43,6 +43,6 @@ export default function (): Partial<CMDDef> {
       [ARG.List | ARG.Any, ['d', 'domain'], false, i18n.t('cmdCount.args.domain', 'The domain'), []],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdCount.args.options', 'The options')],
     ],
-    example: "-m res.partner -d [['name', '=ilike', 'A%']]",
+    example: '-m res.partner -d [["name", "=ilike", "A%"]]',
   };
 }

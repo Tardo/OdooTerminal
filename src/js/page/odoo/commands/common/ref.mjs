@@ -66,6 +66,6 @@ export default function (): Partial<CMDDef> {
     callback: cmdRef,
     detail: i18n.t('cmdRef.detail', "Show the referenced model and id of the given xmlid's"),
     args: [[ARG.List | ARG.String, ['x', 'xmlid'], true, i18n.t('cmdRef.args.xmlid', 'The XML-ID')]],
-    example: '-x base.main_company,base.model_res_partner',
+    example: '-x ["base.main_company", "base.model_res_partner"]',
   };
 }

@@ -45,6 +45,6 @@ export default function (): Partial<CMDDef> {
       [ARG.String, ['t', 'type'], false, i18n.t('cmdEffect.args.type', 'The type of the effect')],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdEffect.args.options', 'The extra options to use')],
     ],
-    example: "-t rainbow_man -o {message: 'Hello world!'}",
+    example: '-t rainbow_man -o {message: "Hello world!"}',
   };
 }

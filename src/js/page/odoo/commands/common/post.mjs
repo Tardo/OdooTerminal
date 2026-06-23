@@ -43,6 +43,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Any, ['d', 'data'], true, i18n.t('cmdPost.args.data', 'The data')],
       [ARG.String, ['m', 'mode'], false, i18n.t('cmdPost.args.mode', 'The mode'), 'odoo', ['odoo', 'raw']],
     ],
-    example: '-e /web/endpoint -d {the_example: 42}',
+    example: '-e "/web/endpoint" -d {the_example: 42}',
   };
 }

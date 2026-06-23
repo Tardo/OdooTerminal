@@ -10,6 +10,9 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
+
+const AVAILABLE_PROPERTIES = ['type', 'string', 'relation', 'required', 'readonly', 'searchable', 'store', 'exportable', 'groupable', 'sortable', 'translate', 'company_dependent', 'currency_field', 'depends', 'groups', 'help'];
+
 async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const fields = kwargs.field[0] === '*' ? false : kwargs.field;
   const result: {[string]: {[string]: string | number}} = await callModel(
@@ -35,7 +38,6 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
     }
   }
   const s_keys = Object.keys(s_result).sort();
-  const fieldParams = ['type', 'string', 'relation', 'required', 'readonly', 'searchable', 'translate', 'depends'];
   const rows: Array<Array<string>> = [];
   const len = s_keys.length;
   for (let x = 0; x < len; ++x) {
@@ -47,14 +49,14 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
     } else {
       rows[row_index].push(field);
     }
-    const l2 = fieldParams.length;
+    const l2 = kwargs.property.length;
     for (let x2 = 0; x2 < l2; ++x2) {
-      const value = fieldDef[fieldParams[x2]] ?? '';
+      const value = fieldDef[kwargs.property[x2]] ?? '';
       rows[row_index].push(new String(value).toString());
     }
   }
-  fieldParams.unshift('field');
-  ctx.screen.printTable(fieldParams, rows);
+  kwargs.property.unshift('field');
+  ctx.screen.printTable(kwargs.property, rows);
   return s_result;
 }
 
@@ -83,8 +85,9 @@ export default function (): Partial<CMDDef> {
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdCaf.args.model', 'The model technical name')],
       [ARG.List | ARG.String, ['f', 'field'], false, i18n.t('cmdCaf.args.field', 'The field names to request'), ['*']],
-      [ARG.Dictionary, ['fi', 'filter'], false, i18n.t('cmdCaf.args.filter', 'The filter to apply')],
+      [ARG.Dictionary, ['fi', 'filter'], false, i18n.t('cmdCaf.args.filter', 'The filter to apply. Example: -fi {required: true}')],
+      [ARG.List | ARG.String, ['p', 'property'], false, i18n.t('cmdCaf.args.property', 'The field properties to display'), AVAILABLE_PROPERTIES, AVAILABLE_PROPERTIES],
     ],
-    example: '-m res.partner -f name,street',
+    example: '-m res.partner -f ["name", "street"]',
   };
 }

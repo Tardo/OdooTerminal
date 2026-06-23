@@ -48,6 +48,6 @@ export default function (): Partial<CMDDef> {
       [ARG.List | ARG.Number, ['i', 'id'], true, i18n.t('cmdUnlink.args.id', "The record id's")],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdUnlink.args.options', 'The options')],
     ],
-    example: '-m res.partner -i 10,4,2',
+    example: '-m res.partner -i [10, 4, 2]',
   };
 }

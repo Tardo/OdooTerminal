@@ -64,6 +64,6 @@ export default function (): Partial<CMDDef> {
         ),
       ],
     ],
-    example: '-g base.group_user',
+    example: '-g "base.group_user"',
   };
 }

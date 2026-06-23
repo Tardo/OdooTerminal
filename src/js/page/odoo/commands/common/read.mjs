@@ -97,6 +97,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Flag, ['rb', 'read-binary'], false, i18n.t('cmdRead.args.readBinary', "Don't filter binary fields")],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdRead.args.options', 'The options')],
     ],
-    example: '-m res.partner -i 10,4,2 -f name,street',
+    example: '-m res.partner -i [10, 4, 2] -f ["name", "street"]',
   };
 }

@@ -185,6 +185,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Flag, ['rb', 'read-binary'], false, i18n.t('cmdSearch.args.readBinary', "Don't filter binary fields")],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdSearch.args.options', 'The options')],
     ],
-    example: '-m res.partner -f name,email -l 100 -of 5 -o "id DESC, name"',
+    example: '-m res.partner -f ["name", "email"] -l 100 -of 5 -o "id DESC, name"',
   };
 }

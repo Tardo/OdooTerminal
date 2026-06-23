@@ -133,6 +133,6 @@ export default function (): Partial<CMDDef> {
       [ARG.String, ['k', 'key'], false, i18n.t('cmdSysParam.args.key', 'Parameter key (required for get/set operations)')],
       [ARG.String | ARG.Number | ARG.Flag, ['v', 'value'], false, i18n.t('cmdSysParam.args.value', 'Parameter value (required for set operation)')],
     ],
-    example: '-o set -k account_online_synchronization.proxy_mode -v sandbox',
+    example: '-o set -k "account_online_synchronization.proxy_mode" -v sandbox',
   };
 }

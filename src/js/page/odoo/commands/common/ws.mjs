@@ -86,6 +86,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Any, ['d', 'data'], false, i18n.t('cmdWs.args.data', 'The data')],
       [ARG.Flag, ['no-tls', 'no-tls'], false, i18n.t('cmdWs.args.noTls', "Don't use TLS")],
     ],
-    example: '-o open -e /websocket',
+    example: '-o open -e "/websocket"',
   };
 }

@@ -20,6 +20,6 @@ export default function (): Partial<CMDDef> {
     unsafe: true,
     detail: i18n.t('cmdRpc.detail', 'Execute raw rpc'),
     args: [[ARG.Dictionary, ['o', 'options'], true, i18n.t('cmdRpc.args.options', 'The rpc query options')]],
-    example: "-o {route: '/jsonrpc', method: 'server_version', params: {service: 'db'}}",
+    example: '-o {route: "/jsonrpc", method: "server_version", params: {service: "db"}}',
   };
 }

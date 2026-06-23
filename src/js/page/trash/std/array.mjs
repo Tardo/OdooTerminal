@@ -2,6 +2,7 @@
 
 export default `
 function arr_clone(arr: List | Any) {
+  # Clone an array
   $res = []
   $len = $arr['length']
   for ($i = 0; $i < $len; $i += 1) {

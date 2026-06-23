@@ -26,6 +26,6 @@ export default function (): Partial<CMDDef> {
       [ARG.String, ['e', 'endpoint'], true, i18n.t('cmdJson.args.endpoint', 'The endpoint')],
       [ARG.Any, ['d', 'data'], false, i18n.t('cmdJson.args.data', 'The data to send')],
     ],
-    example: "-e /web/action/load' -d {'action_id': 'base.paper_format_action'}",
+    example: '-e "/web/action/load" -d {action_id: "base.paper_format_action"}',
   };
 }

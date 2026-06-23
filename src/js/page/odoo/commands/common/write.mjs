@@ -49,6 +49,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Dictionary, ['v', 'value'], true, i18n.t('cmdWrite.args.value', 'The values to write')],
       [ARG.Dictionary, ['o', 'options'], false, i18n.t('cmdWrite.args.options', 'The options')],
     ],
-    example: "-m res.partner -i 10,4,2 -v {street: 'Diagon Alley'}",
+    example: '-m res.partner -i [10, 4, 2] -v {street: "Diagon Alley"}',
   };
 }

@@ -193,7 +193,8 @@
     "args": {
       "field": "The field names to request",
       "filter": "The filter to apply",
-      "model": "The model technical name"
+      "model": "The model technical name",
+      "property": "The field properties to display"
     },
     "definition": "Show field definitions for a model",
     "detail": "Return field metadata for the model: type, required, readonly, label, selection values, relation target, etc. To check create/read/write/unlink access rights instead, use cam."
