@@ -42,6 +42,9 @@ export default class Shell {
   #interpreter: Interpreter;
   #jobs: Array<JobInfo> = [];
   #options: ShellOptions;
+  // When true, errors in silent commands are still thrown (used by evalAll so
+  // callers like the AI agent can distinguish failure from "no return value").
+  #throwSilentErrors: boolean = false;
 
   constructor(options: ShellOptions) {
     this.#options = {...options};
@@ -122,7 +125,12 @@ export default class Shell {
       isData: opts.isData,
     });
     const root_frame = isolated_frame ? new Frame() : undefined;
-    return await this.#virtMachine.execute(parse_info, opts, root_frame, true);
+    this.#throwSilentErrors = true;
+    try {
+      return await this.#virtMachine.execute(parse_info, opts, root_frame, true);
+    } finally {
+      this.#throwSilentErrors = false;
+    }
   }
 
   async #processCommandJob(command_info: ProcessCommandJobOptions, silent: boolean = false): Promise<mixed> {
@@ -144,7 +152,7 @@ export default class Shell {
     } finally {
       this.onFinishCommand(job_index);
     }
-    if (is_failed && !silent) {
+    if (is_failed && (!silent || this.#throwSilentErrors)) {
       throw new ProcessJobError(command_info.cmdName, error);
     }
     return result;

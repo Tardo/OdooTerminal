@@ -3,7 +3,6 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import rpcQuery from '@odoo/rpc';
 import callService from '@odoo/osv/call_service';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import {ARG} from '@trash/constants';
@@ -55,22 +54,9 @@ async function cmdShowDBList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
     if (!kwargs.only_active) {
       throw err;
     }
-    // Heuristic way to determine the database name
-    return rpcQuery<{[string]: mixed}>({
-      route: '/websocket/peek_notifications',
-      params: [
-        ['channels', []],
-        ['last', 9999999],
-        ['is_first_poll', true],
-      ],
-    }).then(result => {
-      if (result.channels instanceof Array && result.channels[0]) {
-        const dbname = result.channels[0][0];
-        ctx.screen.eprint(dbname);
-        return dbname;
-      }
-      return false;
-    });
+    // Fall back to the session db name (always available)
+    ctx.screen.eprint(session.db);
+    return session.db;
   };
 
   // Check if using deferred jquery or native promises

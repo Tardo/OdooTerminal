@@ -1223,8 +1223,8 @@
     "ai": {
       "experimentalWarning": "Este modo es experimental, úsalo con extremo cuidado",
       "newConversation": "Nueva conversación",
-      "privacyWarning": "Aviso de privacidad: las conversaciones se almacenan en el almacenamiento del navegador y pueden ser leídas por cualquier persona con acceso a este ordenador.",
-      "notConnected": "IA no conectada. Usa \"ai connect\" primero."
+      "notConnected": "IA no conectada. Usa \"ai connect\" primero.",
+      "privacyWarning": "Aviso de privacidad: las conversaciones se almacenan en el almacenamiento del navegador y pueden ser leídas por cualquier persona con acceso a este ordenador."
     },
     "close": {
       "prevented": "El terminal ha impedido que la pestaña actual se cierre debido a tareas inacabadas:"
