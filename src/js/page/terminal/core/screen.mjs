@@ -141,7 +141,8 @@ export default class Screen {
     if (!this.#wasStart) {
       return;
     }
-    this.#screen_el.innerHTML = html;
+    const wrapper = parseHTML(`<div>${html}</div>`);
+    this.#screen_el.replaceChildren(...Array.from(wrapper.childNodes));
     this.scrollDown();
   }
 
@@ -420,7 +421,8 @@ export default class Screen {
     return {
       el,
       update: (html: string) => {
-        el.innerHTML = html;
+        const wrapper = parseHTML(`<span>${html}</span>`);
+        el.replaceChildren(...Array.from(wrapper.childNodes));
         if (this.#wasStart) {
           this.scrollDown();
         }

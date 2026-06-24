@@ -1104,11 +1104,7 @@ export default class Terminal {
       return;
     }
     const convs = this.#getConversations();
-    if (convs.length === 0) {
-      listEl.innerHTML = '';
-      return;
-    }
-    listEl.innerHTML = convs.map(c => renderAIConvItem(c.id, c.name, c.id === this.#activeConvId)).join('');
+    listEl.replaceChildren(...convs.map(c => parseHTML(renderAIConvItem(c.id, c.name, c.id === this.#activeConvId))));
   }
 
   #onClickToggleAIMode(ev: MouseEvent) {
