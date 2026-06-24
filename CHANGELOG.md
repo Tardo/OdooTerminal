@@ -1,12 +1,29 @@
 # Changelog
 
-**12.1.0**
+**13.0.0**
 
 ```
-IMP: Always on-top (using Claude Code)
-IMP: TraSH interpreter (using Claude Code)
+ADD: Command 'ai': LLM integration with chat and agent modes
+ADD: Command 'form': Manipulate form view
+ADD: Command 'pivot': Display pivot views
+ADD: Command 'graph': Display graph views
+ADD: Command 'read_group': Execute read_group operations
+ADD: Command 'describe': Describe model
+ADD: Command 'daterange': Date range helper
+ADD: Command 'diff': Compare records
+ADD: Busy tooltip
+ADD: AI mode
+ADD: 'executeAll': Return all results from commands
 
+IMP: Command 'view'
+IMP: Command 'call' and 'dblist'
+IMP: TraSH interpreter
+IMP: Always on-top
+
+FIX: Don't use innerHTML
 FIX: package.json: Dependencies section
+
+UPD: Options
 ```
 
 **12.0.0**
