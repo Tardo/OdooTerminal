@@ -57,6 +57,7 @@ async function cmdViewModelRecord(this: Terminal, kwargs: CMDCallbackArgs): Prom
   const context = this.getContext({
     form_view_ref: kwargs.ref || false,
   });
+  const domain: $ReadOnlyArray<OdooDomainTuple> = kwargs.domain || [];
   if (kwargs.id) {
     return doAction({
       type: 'ir.actions.act_window',
@@ -68,7 +69,7 @@ async function cmdViewModelRecord(this: Terminal, kwargs: CMDCallbackArgs): Prom
       context: context,
     }).then(() => this.doHide());
   }
-  return openSelectCreateDialog(kwargs.model, i18n.t('cmdView.result.selectRecord', 'Select a record'), [], (records) => {
+  return openSelectCreateDialog(kwargs.model, i18n.t('cmdView.result.selectRecord', 'Select a record'), domain, (records) => {
     doAction({
       type: 'ir.actions.act_window',
       name: i18n.t('cmdView.result.viewRecord', 'View Record'),
@@ -102,11 +103,12 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdView.definition', 'View model record/s'),
     callback: cmdViewModelRecord,
     options: getOptions,
-    detail: i18n.t('cmdView.detail', 'With -i: opens that record in its form view. Without -i: shows a record picker dialog. Does not return data.'),
+    detail: i18n.t('cmdView.detail', 'With -i: opens that record in its form view. Without -i: shows a record picker dialog filtered by -d domain. Does not return data.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdView.args.model', 'The model technical name')],
       [ARG.Number, ['i', 'id'], false, i18n.t('cmdView.args.id', 'The record id')],
       [ARG.String, ['r', 'ref'], false, i18n.t('cmdView.args.ref', 'The view reference name')],
+      [ARG.List | ARG.Any, ['d', 'domain'], false, i18n.t('cmdView.args.domain', 'The domain filter for the record picker'), []],
     ],
     example: '-m res.partner -i 10 -r "base.view_partner_simple_form"',
   };

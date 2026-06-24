@@ -1026,6 +1026,7 @@
   },
   "cmdView": {
     "args": {
+      "domain": "The domain filter for the record picker",
       "id": "El 'id' del registro",
       "model": "El nombre técnico del modelo",
       "ref": "El nombre de referencia de la vista"
