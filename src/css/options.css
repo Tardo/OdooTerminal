@@ -96,3 +96,12 @@ body {
 .optsection .ai_models_btn_zone input#ai_model_timeout {
   width: 8%;
 }
+
+.warning_text {
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 0.5em 0.8em;
+  margin: 0.5em 0 0;
+}

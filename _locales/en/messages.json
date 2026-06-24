@@ -140,6 +140,9 @@
   "optionsTitleAIModelsDescription": {
     "message": "Define AI model profiles to use in AI mode. Select the active model from the dropdown in the AI sidebar."
   },
+  "optionsWarningAIModelsKeys": {
+    "message": "Warning: API keys are stored in browser storage and can be read by anyone with access to this computer."
+  },
   "optionsTitleAIModelsName": {
     "message": "Name"
   },

@@ -1228,6 +1228,11 @@ export default class Terminal {
       false,
       'line-warning',
     );
+    this.screen.print(
+      i18n.t('terminal.ai.privacyWarning', 'Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.'),
+      false,
+      'line-warning',
+    );
     this.screen.preventLostInputFocus();
   }
 

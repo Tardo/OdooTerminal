@@ -1223,6 +1223,7 @@
     "ai": {
       "experimentalWarning": "Este modo es experimental, usalo con extremo cuidado",
       "newConversation": "New conversation",
+      "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.",
       "notConnected": "AI not connected. Use \"ai connect\" first."
     },
     "close": {

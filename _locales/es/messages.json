@@ -144,6 +144,9 @@
   "optionsTitleAIModelsDescription": {
     "message": "Define perfiles de modelos de IA para usar en el modo IA. Selecciona el modelo activo desde el desplegable en la barra lateral de IA."
   },
+  "optionsWarningAIModelsKeys": {
+    "message": "Advertencia: las claves de API se almacenan en el almacenamiento del navegador y pueden ser leídas por cualquier persona con acceso a este ordenador."
+  },
   "optionsTitleAIModelsName": {
     "message": "Nombre"
   },
