@@ -137,17 +137,17 @@ export default function (): Partial<CMDDef> {
         ARG.Number,
         ['n', 'max-steps'],
         false,
-        i18n.t('cmdAI.args.maxSteps', `Max agent iterations (agent only, default ${DEFAULT_MAX_STEPS})`),
+        i18n.t('cmdAI.args.maxSteps', `Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})`, {DEFAULT_MAX_STEPS}),
         DEFAULT_MAX_STEPS,
       ],
       [
         ARG.Number,
         ['v', 'max-verifications'],
         false,
-        i18n.t('cmdAI.args.maxVerifications', `Max verification retries (agent only, default ${DEFAULT_MAX_VERIFICATIONS})`),
+        i18n.t('cmdAI.args.maxVerifications', `Max verification retries (agent only, default {{DEFAULT_MAX_VERIFICATIONS}})`, {DEFAULT_MAX_VERIFICATIONS}),
         DEFAULT_MAX_VERIFICATIONS,
       ],
     ],
-    example: 'connect -u https://api.anthropic.com -pr anthropic -ak sk-ant-... -m claude-opus-4-8',
+    example: 'connect -u "https://api.anthropic.com" -pr anthropic -ak "sk-ant-..." -m "claude-opus-4-8"',
   };
 }
