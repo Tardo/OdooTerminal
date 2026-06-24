@@ -164,7 +164,7 @@ export default class VMachine {
     );
   }
 
-  async execute(parse_info: ParseInfo, opts: EvalOptions, aframe?: Frame): Promise<mixed> {
+  async execute(parse_info: ParseInfo, opts: EvalOptions, aframe?: Frame, collectAll?: boolean): Promise<mixed> {
     const {program} = parse_info;
     const instrLen = program.instructions.length;
     let rootFrame = aframe;
@@ -585,6 +585,9 @@ export default class VMachine {
           }
           break;
       }
+    }
+    if (collectAll === true && activeFrame.stack.length > 1) {
+      return [...activeFrame.stack];
     }
     return activeFrame.stack.pop();
   }

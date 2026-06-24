@@ -107,6 +107,24 @@ export default class Shell {
     return await this.#virtMachine.execute(parse_info, opts, root_frame);
   }
 
+  // $FlowFixMe[unclear-type]
+  async evalAll(code: string, options?: Partial<EvalOptions>, isolated_frame?: boolean = false): Promise<any> {
+    if (code?.constructor !== String) {
+      throw new Error('Invalid input!');
+    }
+    const opts: EvalOptions = {
+      aliases: {},
+      isData: false,
+      silent: false,
+      ...options,
+    };
+    const parse_info = this.parse(code, {
+      isData: opts.isData,
+    });
+    const root_frame = isolated_frame ? new Frame() : undefined;
+    return await this.#virtMachine.execute(parse_info, opts, root_frame, true);
+  }
+
   async #processCommandJob(command_info: ProcessCommandJobOptions, silent: boolean = false): Promise<mixed> {
     const job_index = this.onStartCommand(command_info);
     if (job_index === -1) {

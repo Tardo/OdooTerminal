@@ -472,6 +472,52 @@ export default class Terminal {
     return cmd_res;
   }
 
+  // $FlowFixMe[unclear-type]
+  async executeAll(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false, update_input: boolean = true): Promise<any> {
+    if (!silent) {
+      this.screen.printCommand(code);
+    }
+    if (update_input) {
+      this.screen.cleanInput();
+      this.updateAssistantoptions();
+    }
+    if (store) {
+      this.#storeUserInput(code);
+    }
+
+    let cmd_res: mixed;
+    try {
+      cmd_res = await this.#shell.evalAll(code, {
+        silent: silent,
+        aliases: getStorageLocalItem('terminal_aliases', {}),
+      }, isolated_frame);
+    } catch (err) {
+      this.screen.printError(`${err.name}: ${err.message}`);
+      let err_msg = err.data;
+      if (err.constructor === UnknownCommandError) {
+        const similar_cmd = this.#commandAssistant.searchSimiliarCommand(err.cmd_name);
+        if (typeof similar_cmd !== 'undefined') {
+          err_msg = i18n.t(
+            'terminal.unknownCommand',
+            "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
+            {
+              org_cmd: err.cmd_name,
+              start: err.start,
+              end: err.end,
+              cmd: similar_cmd,
+            },
+          );
+        }
+      }
+      this.screen.printError(err_msg, true);
+      if (this.#config.devmode_console_errors) {
+        logger.error('core', err);
+      }
+      throw err;
+    }
+    return cmd_res;
+  }
+
   async #invokeExternalCommand(meta: JobMetaInfo): Promise<mixed> {
     const aliases = getStorageLocalItem('terminal_aliases', {});
     if (meta.info.cmdName in aliases) {

@@ -261,7 +261,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       let cmdFailed = false;
       try {
         // $FlowFixMe[incompatible-type]
-        const result: mixed = await this.execute(cmd, false, true, false, false);
+        const result: mixed = await this.executeAll(cmd, false, true, false, false);
         if (result !== null && result !== undefined) {
           try {
             const serialized = JSON.stringify(result);
