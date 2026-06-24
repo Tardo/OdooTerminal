@@ -979,7 +979,7 @@ export default class Interpreter {
                 res,
                 to_append,
               );
-              const ref_if_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, -1));
+              const ref_if_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE_POP, index, level, -1));
 
               // Code
               const parsed_if_block = this.#appendParse(
@@ -1018,7 +1018,7 @@ export default class Interpreter {
                   res,
                   to_append,
                 );
-                const ref_elif_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE, index, level, -1));
+                const ref_elif_instr_index = to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.JUMP_IF_FALSE_POP, index, level, -1));
 
                 // Code
                 const parsed_elif_block = this.#appendParse(

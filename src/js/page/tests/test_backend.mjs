@@ -9,13 +9,13 @@ export default class TestBackend extends TerminalTestSuite {
   async test_pivot() {
     await this.terminal.execute('pivot -m res.partner', false, true);
     await asyncSleep(2500);
-    this.assertNotEqual(document.querySelector('.o_pivot_view'), null);
+    this.assertNotEqual(document.querySelector('.o_pivot_view, .o_pivot'), null);
   }
 
   async test_graph() {
     await this.terminal.execute('graph -m res.partner', false, true);
     await asyncSleep(2500);
-    this.assertNotEqual(document.querySelector('.o_graph_view'), null);
+    this.assertNotEqual(document.querySelector('.o_graph_view, .o_graph'), null);
   }
 
   async test_form() {

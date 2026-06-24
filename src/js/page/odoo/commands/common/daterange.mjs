@@ -45,7 +45,7 @@ async function cmdDateRange(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
     );
   }
 
-  const domain = kwargs.domain ?? [];
+  const domain = [[kwargs.field, '!=', false], ...(kwargs.domain ?? [])];
   const orderField = `${kwargs.field} `;
   const [oldest, newest] = await Promise.all([
     searchRead(kwargs.model, domain, [kwargs.field], context, {limit: 1, orderBy: orderField + 'ASC'}),

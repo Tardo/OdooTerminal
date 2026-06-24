@@ -436,6 +436,7 @@ export default class VMachine {
                 data_obj[attr_name] = attr_value;
               }
               // activeFrame.setLocal(vname, data);
+              activeFrame.stack.push(data);
             } catch (err) {
               throw new InvalidInstructionError(err.message);
             }
@@ -522,15 +523,25 @@ export default class VMachine {
                 detail: i18n.t('trash.vmachine.func.detail', 'Internal function'),
               };
               if (typeof name === 'string') {
-                this.registerCommand(name, cmd_def)
+                this.registerCommand(name, cmd_def);
+              } else {
+                activeFrame.stack.push(cmd_def);
               }
-              activeFrame.stack.push(cmd_def);
             }
           }
           break;
         case INSTRUCTION_TYPE.JUMP_IF_FALSE:
           {
             activeFrame.lastFlowCheck = activeFrame.stack.at(-1);
+            const num_to_skip = instr.operand;
+            if (typeof activeFrame.lastFlowCheck === 'undefined' || activeFrame.lastFlowCheck === null || !activeFrame.lastFlowCheck) {
+              index += num_to_skip;
+            }
+          }
+          break;
+        case INSTRUCTION_TYPE.JUMP_IF_FALSE_POP:
+          {
+            activeFrame.lastFlowCheck = activeFrame.stack.pop();
             const num_to_skip = instr.operand;
             if (typeof activeFrame.lastFlowCheck === 'undefined' || activeFrame.lastFlowCheck === null || !activeFrame.lastFlowCheck) {
               index += num_to_skip;
@@ -561,7 +572,6 @@ export default class VMachine {
           break;
       }
     }
-    const results = activeFrame.stack.splice(0);
-    return results.length <= 1 ? results[0] : results;
+    return activeFrame.stack.pop();
   }
 }
