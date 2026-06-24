@@ -1,140 +1,140 @@
 {
   "No": "No",
   "UnknownNameError": {
-    "invalidName": "<InvalidName>"
+    "invalidName": "<NombreNoVálido>"
   },
-  "Yes": "Yes",
+  "Yes": "Sí",
   "ai": {
     "utils": {
       "network": {
         "error": {
-          "aborted": "Request cancelled.",
-          "httpError": "HTTP error {{status}}",
-          "noStream": "Server did not return a streaming response"
+          "aborted": "Solicitud cancelada.",
+          "httpError": "Error HTTP {{status}}",
+          "noStream": "El servidor no devolvió una respuesta en streaming"
         }
       }
     }
   },
   "checkStorageError": {
-    "message": "Clear the <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>screen</strong> or/and <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>history</strong> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
-    "warning": "WARNING: "
+    "message": "Borra la <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>pantalla</strong> y/o el <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>historial</strong> para liberar espacio de almacenamiento. <u>Cuota de almacenamiento del navegador superada</u> 😭",
+    "warning": "ADVERTENCIA: "
   },
   "cmd2DClear": {
     "args": {
-      "canvas": "The canvas",
-      "from-x": "The rect X point",
-      "from-y": "The rect Y point",
-      "height": "The rect height",
-      "width": "The rect width"
+      "canvas": "El lienzo",
+      "from-x": "El punto X del rect",
+      "from-y": "El punto Y del rect",
+      "height": "El alto del rect",
+      "width": "El ancho del rect"
     },
-    "definition": "Clear canvas",
-    "detail": "Clear canvas"
+    "definition": "Limpiar lienzo",
+    "detail": "Limpiar lienzo"
   },
   "cmd2DCreateWindow": {
     "args": {
-      "height": "The canvas height",
-      "posx": "The canvas position X",
-      "posy": "The canvas position Y",
-      "width": "The canvas width"
+      "height": "El alto del lienzo",
+      "posx": "La posición X del lienzo",
+      "posy": "La posición Y del lienzo",
+      "width": "El ancho del lienzo"
     },
-    "definition": "Create 2D Window",
-    "detail": "Create 2D Window"
+    "definition": "Crear ventana 2D",
+    "detail": "Crear ventana 2D"
   },
   "cmd2DDestroyWindow": {
     "args": {
-      "canvas": "The canvas"
+      "canvas": "El lienzo"
     },
-    "definition": "Destroy 2D Window",
-    "detail": "Destroy 2D Window"
+    "definition": "Destruir ventana 2D",
+    "detail": "Destruir ventana 2D"
   },
   "cmd2DLine": {
     "args": {
-      "canvas": "The canvas",
-      "color": "The line color",
-      "from-x": "The line from X point",
-      "from-y": "The line from Y point",
-      "to-x": "The line to X point",
-      "to-y": "The line to Y point",
-      "width": "The line width"
+      "canvas": "El lienzo",
+      "color": "El color de la línea",
+      "from-x": "El punto X de inicio de la línea",
+      "from-y": "El punto Y de inicio de la línea",
+      "to-x": "El punto X de fin de la línea",
+      "to-y": "El punto Y de fin de la línea",
+      "width": "El ancho de la línea"
     },
-    "definition": "Draw a line",
-    "detail": "Draw a line"
+    "definition": "Dibujar una línea",
+    "detail": "Dibujar una línea"
   },
   "cmd2DRect": {
     "args": {
-      "canvas": "The canvas",
-      "color": "The rect color",
-      "height": "The rect height",
-      "width": "The rect width",
-      "x": "The rect X point",
-      "y": "The rect Y point"
+      "canvas": "El lienzo",
+      "color": "El color del rect",
+      "height": "El alto del rect",
+      "width": "El ancho del rect",
+      "x": "El punto X del rect",
+      "y": "El punto Y del rect"
     },
-    "definition": "Draw a rect",
-    "detail": "Draw a rect"
+    "definition": "Dibujar un rectángulo",
+    "detail": "Dibujar un rectángulo"
   },
   "cmdAI": {
     "agent": {
       "error": {
-        "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
+        "noPrompt": "No se proporcionó ningún prompt. Usa: ai agent -p \"tu solicitud\"",
         "notConfigured": "No conectado. Usa \"ai connect\" primero",
         "requestFailed": "La petición ha fallado: "
       },
       "result": {
         "cmdReason": "[Agente] {{reason}}",
         "header": "--- Agente ---",
-        "maxSteps": "El agente ha alcanzado el númerp de intentos sin una respuesta final.",
-        "noReturnValue": "(command executed, no return value)",
+        "maxSteps": "El agente ha alcanzado el número máximo de pasos sin una respuesta final.",
+        "noReturnValue": "(comando ejecutado, sin valor de retorno)",
         "running": "[Agente] Ejecutando: <code>{{cmd}}</code>",
         "thinking": "[Agente] Pensando... (paso {{step}}/{{max}})"
       },
       "skill": {
-        "alreadyLoaded": "Skill already loaded: {{name}}",
-        "loading": "[Agent] Loading skill: {{name}}",
-        "unknown": "Skill not found: {{name}}. Available: {{list}}"
+        "alreadyLoaded": "Habilidad ya cargada: {{name}}",
+        "loading": "[Agente] Cargando habilidad: {{name}}",
+        "unknown": "Habilidad no encontrada: {{name}}. Disponibles: {{list}}"
       },
       "unsafe": {
-        "question": "[Agent] Unsafe command: {{cmd}} — Execute?",
-        "questionWithReason": "[Agent] {{reason}} — Unsafe command: {{cmd}} — Execute?",
-        "rejected": "Command rejected by user: {{cmd}}"
+        "question": "[Agente] Comando no seguro: {{cmd}} — ¿Ejecutar?",
+        "questionWithReason": "[Agente] {{reason}} — Comando no seguro: {{cmd}} — ¿Ejecutar?",
+        "rejected": "Comando rechazado por el usuario: {{cmd}}"
       }
     },
     "args": {
-      "apiKey": "API key for authentication",
-      "maxSteps": "Máx. iteraciones del agente (solo agente, por defecto 15)",
-      "model": "Model name to use",
-      "operation": "operation: connect, chat or exec",
-      "prompt": "The prompt or natural language request to send",
-      "provider": "AI provider: openai (default) or anthropic",
-      "timeout": "Max seconds to wait for a response (0 = no limit)",
-      "url": "AI server URL (e.g. http://localhost:8080/v1)"
+      "apiKey": "Clave API para autenticación",
+      "maxSteps": "Máx. iteraciones del agente (solo agente, por defecto {{DEFAULT_MAX_STEPS}})",
+      "model": "Nombre del modelo a usar",
+      "operation": "operación: connect, chat o exec",
+      "prompt": "El prompt o solicitud en lenguaje natural",
+      "provider": "Proveedor de IA: openai (por defecto) o anthropic",
+      "timeout": "Máx. segundos a esperar respuesta (0 = sin límite)",
+      "url": "URL del servidor de IA (ej. http://localhost:8080/v1)"
     },
     "chat": {
       "error": {
-        "noPrompt": "No prompt provided. Use: ai chat -p \"your prompt\"",
-        "notConfigured": "Not connected. Use \"ai connect\" first",
-        "requestFailed": "Request failed: "
+        "noPrompt": "No se proporcionó ningún prompt. Usa: ai chat -p \"tu prompt\"",
+        "notConfigured": "No conectado. Usa \"ai connect\" primero",
+        "requestFailed": "La petición ha fallado: "
       },
       "result": {
-        "sending": "Sending request..."
+        "sending": "Enviando solicitud..."
       }
     },
     "connect": {
       "error": {
-        "noUrl": "No URL provided. Use: ai connect -u <url>"
+        "noUrl": "No se proporcionó URL. Usa: ai connect -u <url>"
       },
       "result": {
-        "connected": "AI Server connected"
+        "connected": "Servidor de IA conectado"
       }
     },
-    "definition": "AI assistant (connect, chat & exec)",
-    "detail": "Connect to an AI server (OpenAI-compatible API) and chat with it or translate natural language into terminal commands.",
+    "definition": "Asistente de IA (connect, chat & exec)",
+    "detail": "Conecta con un servidor de IA (API compatible con OpenAI) para chatear con él o traducir lenguaje natural en comandos de terminal.",
     "error": {
-      "noSubcommand": "Usage: ai connect|chat|exec|stop ...",
-      "unknownOperation": "Unknown operation: {{sub}}",
-      "usage": "Usage: ai connect|chat|exec|stop ..."
+      "noSubcommand": "Uso: ai connect|chat|exec|stop ...",
+      "unknownOperation": "Operación desconocida: {{sub}}",
+      "usage": "Uso: ai connect|chat|exec|stop ..."
     },
     "stop": {
-      "noRequest": "No active AI request to stop."
+      "noRequest": "No hay ninguna solicitud de IA activa para detener."
     },
     "tokens": {
       "cache": " · Cache: {{read}} leídos / {{created}} creados",
@@ -155,20 +155,20 @@
       "cmd": "El comando para ejecutar",
       "name": "El nombre del pseudónimo"
     },
-    "created": "Pseudónimo ​​creado exitosamente",
+    "created": "Pseudónimo creado exitosamente",
     "definition": "Crear pseudónimos",
     "detail": "Defina pseudónimos para ejecutar comandos fácilmente. <br><b>ADVERTENCIA:</b> Este comando utiliza 'almacenamiento local' para conservar los datos incluso si cierra el navegador. Otros usuarios del ordenador pueden acceder fácilmente a estos datos. No emplee datos sensibles si está utilizando un ordenador compartido.<br><br>Se pueden usar parámetros posicionales ($1,$2,$3,$N...)",
     "example": "-n myalias -c \"imprimir '¡Hola, $1!'\"",
     "invalidAliasName": "Nombre de pseudónimo no válido",
     "notDefined": "No hay pseudónimos definidos",
     "notExists": "El pseudónimo seleccionado no existe",
-    "removed": "Pseudónimo​​ eliminado con éxito"
+    "removed": "Pseudónimo eliminado con éxito"
   },
   "cmdBarcode": {
     "args": {
       "barcodeDelay": "El retraso entre lecturas de códigos de barras (en ms)",
       "data": "Los datos a enviar",
-      "operation": "La operacion",
+      "operation": "La operación",
       "pressDelay": "El retraso entre eventos de pulsación de tecla (en ms)"
     },
     "definition": "Operaciones con el código de barras",
@@ -176,7 +176,7 @@
     "error": {
       "invalidOperation": "¡Operación no válida!",
       "moudeNotAvailable": "El módulo 'código de barras' no está instalado/disponible",
-      "noData": "¡No se dan datos!"
+      "noData": "¡No se proporcionaron datos!"
     },
     "result": {
       "acceptScan": "¿Actualmente acepta escaneo de códigos de barras? {{isAcceptingScan}}",
@@ -190,7 +190,7 @@
       "field": "Los nombres de los campos a solicitar",
       "filter": "El filtro a aplicar",
       "model": "El nombre técnico del modelo",
-      "property": "The field properties to display"
+      "property": "Las propiedades del campo a mostrar"
     },
     "definition": "Mostrar definiciones de campos de un modelo",
     "detail": "Devuelve metadatos de campos del modelo: tipo, requerido, solo-lectura, etiqueta, valores de selección, modelo relacionado, etc. Para comprobar derechos de acceso (crear/leer/escribir/eliminar) usa cam en su lugar."
@@ -251,8 +251,8 @@
       "operation": "La operación a realizar",
       "value": "Los valores"
     },
-    "definition": "Operaciones con el contexto de sesi̇ón",
-    "detail": "Contexto de sesión",
+    "definition": "Operaciones con el contexto de sesión",
+    "detail": "Operaciones con el diccionario de contexto de sesión.",
     "error": {
       "keyNotPresent": "La clave seleccionada no está presente en el contexto del terminal",
       "notSession": "No se puede encontrar información de la sesión",
@@ -262,7 +262,7 @@
   "cmdContextTerm": {
     "args": {
       "operation": "La operación a realizar",
-      "value": "el valor"
+      "value": "El valor"
     },
     "definition": "Operaciones con el contexto del terminal",
     "detail": "Operaciones con el contexto del terminal. Este contexto sólo afecta a las operaciones del terminal",
@@ -316,21 +316,21 @@
   },
   "cmdDateRange": {
     "args": {
-      "domain": "Optional domain filter",
-      "field": "The date or datetime field name",
-      "model": "The model technical name"
+      "domain": "Filtro de dominio opcional",
+      "field": "El nombre del campo de fecha o fecha/hora",
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "Show min/max values for a date or datetime field",
-    "detail": "Returns the minimum and maximum values of a date or datetime field on a model, optionally filtered by a domain. Validates that the field actually exists and is a date/datetime type before querying. Useful to avoid building graphs or reports over an empty or unexpected date range.",
+    "definition": "Mostrar valores mín/máx de un campo fecha o fecha/hora",
+    "detail": "Devuelve los valores mínimo y máximo de un campo de fecha o fecha/hora en un modelo, con filtro de dominio opcional. Valida que el campo exista y sea de tipo fecha/fecha-hora antes de consultar. Útil para evitar construir gráficos o informes sobre un rango de fechas vacío o inesperado.",
     "error": {
-      "notDateField": "Field '{{field}}' is of type '{{type}}', expected date or datetime",
-      "unknownField": "Field '{{field}}' not found in model '{{model}}'"
+      "notDateField": "El campo '{{field}}' es de tipo '{{type}}', se esperaba date o datetime",
+      "unknownField": "El campo '{{field}}' no se encontró en el modelo '{{model}}'"
     },
     "result": {
       "header": "<strong>{{model}}.{{field}}</strong> ({{label}})",
-      "max": "Max: <strong>{{max}}</strong>",
-      "min": "Min: <strong>{{min}}</strong>",
-      "noData": "No data found for <strong>{{model}}.{{field}}</strong>"
+      "max": "Máx: <strong>{{max}}</strong>",
+      "min": "Mín: <strong>{{min}}</strong>",
+      "noData": "No se encontraron datos para <strong>{{model}}.{{field}}</strong>"
     }
   },
   "cmdDebug": {
@@ -355,56 +355,56 @@
       "module": "El nombre técnico del módulo",
       "section": "La sección de URL"
     },
-    "definition": "Conozca los módulos que dependen del módulo dado",
-    "detail": "Mostrar una lista de los módulos que depende del módulo dado",
+    "definition": "Conocer los módulos que dependen del módulo dado",
+    "detail": "Mostrar una lista de los módulos que dependen del módulo dado",
     "error": {
-      "noModulesFound": "No se han encontrado los módulos!",
+      "noModulesFound": "¡No se han encontrado módulos!",
       "noWizard": "¡No se ha podido crear el registro del asistente!",
       "notInstalled": "El módulo '{{module}}' no está instalado"
     }
   },
   "cmdDescribe": {
     "args": {
-      "model": "The model technical name"
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "Model profile: count, date range, key fields and selection values",
-    "detail": "Returns a combined profile of the model in one shot: total record count, create_date range (oldest→newest), and a table of key fields (required fields, stored relational fields, selection fields with their possible values). Replaces 3–4 separate commands (caf + count + read_group).",
+    "definition": "Perfil del modelo: contador, rango de fechas, campos clave y valores de selección",
+    "detail": "Devuelve un perfil combinado del modelo en una sola llamada: total de registros, rango de create_date (más antiguo→más reciente) y tabla de campos clave (requeridos, relacionales almacenados, de selección con sus valores). Reemplaza 3–4 comandos separados (caf + count + read_group).",
     "result": {
-      "count": "Total records: <strong>{{count}}</strong>",
-      "dateRange": "Date range: {{min}} → {{max}}",
-      "header": "<strong>Model profile: {{model}}</strong>"
+      "count": "Total de registros: <strong>{{count}}</strong>",
+      "dateRange": "Rango de fechas: {{min}} → {{max}}",
+      "header": "<strong>Perfil del modelo: {{model}}</strong>"
     },
     "table": {
-      "extra": "Relation / Values",
-      "field": "Field",
-      "label": "Label",
+      "extra": "Relación / Valores",
+      "field": "Campo",
+      "label": "Etiqueta",
       "required": "Req",
-      "type": "Type"
+      "type": "Tipo"
     }
   },
   "cmdDiff": {
     "args": {
-      "all": "Show all fields, including those that are identical",
-      "field": "Fields to compare (default: all non-binary). Use '*' for all.",
-      "id": "Two record IDs to compare (e.g. [10, 20])",
-      "model": "The model technical name",
-      "options": "Extra options"
+      "all": "Mostrar todos los campos, incluidos los idénticos",
+      "field": "Campos a comparar (por defecto: todos los no binarios). Usa '*' para todos.",
+      "id": "Dos IDs de registro a comparar (ej. [10, 20])",
+      "model": "El nombre técnico del modelo",
+      "options": "Opciones adicionales"
     },
-    "definition": "Compare two records field by field",
-    "detail": "Fetches two records of the same model and compares every field value. By default shows only fields that differ. Use --all to include matching fields too. Many2one fields are compared by stored ID (not display name) to avoid false positives from renamed related records. Binary fields are excluded.",
+    "definition": "Comparar dos registros campo a campo",
+    "detail": "Obtiene dos registros del mismo modelo y compara cada campo. Por defecto muestra solo los que difieren. Usa --all para incluir también los iguales. Los campos Many2one se comparan por ID almacenado (no por nombre de visualización) para evitar falsos positivos. Los campos binarios se excluyen.",
     "error": {
-      "exactlyTwo": "Exactly two record IDs are required",
-      "notFound": "Record {{id}} not found in '{{model}}'"
+      "exactlyTwo": "Se requieren exactamente dos IDs de registro",
+      "notFound": "Registro {{id}} no encontrado en '{{model}}'"
     },
     "result": {
       "header": "<strong>Diff {{model}}: #{{id_a}} vs #{{id_b}}</strong>",
-      "identical": "Records are <strong>identical</strong> for the requested fields",
-      "summary": "Differing fields: <strong>{{diff}}</strong> / Total: <strong>{{total}}</strong>"
+      "identical": "Los registros son <strong>idénticos</strong> para los campos solicitados",
+      "summary": "Campos distintos: <strong>{{diff}}</strong> / Total: <strong>{{total}}</strong>"
     },
     "table": {
-      "field": "Field",
-      "label": "Label",
-      "type": "Type",
+      "field": "Campo",
+      "label": "Etiqueta",
+      "type": "Tipo",
       "valA": "#{{id}}",
       "valB": "#{{id}}"
     }
@@ -478,23 +478,23 @@
   },
   "cmdForm": {
     "args": {
-      "field": "The field technical name",
-      "operation": "The operation to perform"
+      "field": "El nombre técnico del campo",
+      "operation": "La operación a realizar"
     },
     "definition": "Resaltar o limpiar resaltados en el formulario actual",
     "detail": "highlight: marca visualmente un campo en el formulario abierto, activando su pestaña si está oculto. clear: elimina los resaltados (todos o solo -f si se indica). No devuelve datos.",
     "error": {
-      "fieldNotFound": "No form field '{{field}}' found in the current view",
-      "fieldRequired": "A field name is required for the highlight operation"
+      "fieldNotFound": "No se encontró el campo '{{field}}' en la vista actual",
+      "fieldRequired": "Se requiere un nombre de campo para la operación highlight"
     },
     "result": {
-      "cleared": "Field highlights cleared",
-      "highlighted": "Highlighted {{count}} field(s) '{{field}}'"
+      "cleared": "Resaltados de campos eliminados",
+      "highlighted": "{{count}} campo(s) '{{field}}' resaltados"
     }
   },
   "cmdFuncTrash": {
     "args": {
-      "name": "The function parameter"
+      "name": "El parámetro de la función"
     }
   },
   "cmdGen": {
@@ -523,11 +523,11 @@
       "name": "El título de la vista",
       "type": "El tipo de gráfico"
     },
-    "definition": "Open graph view",
-    "detail": "Open a customized graph view for a model. To retrieve grouped data without opening a view, use the read_group command instead.",
+    "definition": "Abrir vista gráfica",
+    "detail": "Abre una vista de gráfico personalizada para un modelo. Para obtener datos agrupados sin abrir una vista, usa el comando read_group.",
     "error": {
-      "measurePrefix": "Measure field must be a plain field name (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
-      "unknownFields": "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields."
+      "measurePrefix": "El campo de medida debe ser un nombre de campo simple (ej. 'amount_total'), no con prefijo de agregación (ej. 'sum:amount_total')",
+      "unknownFields": "{{arg}}: campo(s) no encontrado(s) en '{{model}}': {{fields}}. Usa 'caf -m {{model}}' para listar los campos disponibles."
     },
     "result": {
       "name": "Vista de Gráfico"
@@ -554,7 +554,7 @@
   "cmdInfo": {
     "args": {
       "activeId": "El 'id' del registro activo",
-      "activeModel": "El nombre técnido del modelo del registro activo",
+      "activeModel": "El nombre técnico del modelo del registro activo",
       "userId": "El 'id' del usuario",
       "userLogin": "El nombre de inicio de sesión del usuario"
     },
@@ -568,7 +568,7 @@
       "question": "La pregunta"
     },
     "definition": "Solicita datos de entrada al usuario",
-    "detail": "Devuelve los datos ingresados ​​por el usuario"
+    "detail": "Devuelve los datos ingresados por el usuario"
   },
   "cmdInstall": {
     "args": {
@@ -596,7 +596,7 @@
     "definition": "Mostrar trabajos en ejecución",
     "detail": "Mostrar trabajos en ejecución",
     "result": {
-      "timeout": "Este trabajo esta tomando mucho tiempo"
+      "timeout": "Este trabajo está tomando mucho tiempo"
     }
   },
   "cmdJson": {
@@ -614,7 +614,7 @@
       "module": "El nombre técnico del módulo",
       "name": "El nombre del idioma",
       "noOverwrite": "Marcar para indicar que no se sobrescriban las traducciones actuales",
-      "operation": "La operacion"
+      "operation": "La operación"
     },
     "definition": "Operaciones con las traducciones",
     "detail": "export: descarga un archivo .po/.csv de traducción para un módulo. import: sube un archivo de traducción. list: muestra los códigos e idiomas instalados. Sin argumentos adicionales, export/import abren el asistente de Odoo.",
@@ -678,25 +678,25 @@
   },
   "cmdLongpolling": {
     "args": {
-      "operation": "La operación a realizar<br>- verbose > Imprime las notificaciones entrantes<br>- off > Detener modo 'verbose''<br>- add_channel > Agregar un canal para escuchar<br>- del_channel > Eliminar un canal de la escucha<br>- start > Iniciar servicio de 'longpolling' del cliente<br> - stop > Detener el servicio de 'longpolling' del cliente",
+      "operation": "La operación a realizar<br>- verbose > Imprime las notificaciones entrantes<br>- off > Detener modo 'verbose'<br>- add_channel > Agregar un canal para escuchar<br>- del_channel > Eliminar un canal de la escucha<br>- start > Iniciar servicio de 'longpolling' del cliente<br> - stop > Detener el servicio de 'longpolling' del cliente",
       "param": "El parámetro"
     },
     "definition": "Operaciones de 'longpolling'",
     "detail": "Operaciones de 'longpolling'",
     "error": {
       "invalidChannel": "Nombre de canal no válido",
-      "invalidSubscription": "Nombre de subscripción no válida",
+      "invalidSubscription": "Nombre de suscripción no válido",
       "notAvailable": "No se puede utilizar el 'longpolling', el módulo 'bus' no está instalado"
     },
     "result": {
       "join": "Se unió al canal '{{channel_name}}'",
       "leave": "Abandonar el canal '{{channel_name}}'",
-      "start": "Comenzó la encuesta larga",
-      "stop": "Se detuvo la votación larga",
-      "subscribe": "Subscrito a '{{subscription}}'",
-      "unsubscribe": "Dado de baja de la subscripción '{{subscription}}'",
-      "verboseDisabled": "Ahora el modo detallado de sondeo largo está deshabilitado",
-      "verboseEnabled": "Ahora el sondeo largo está en modo detallado"
+      "start": "Longpolling iniciado",
+      "stop": "Longpolling detenido",
+      "subscribe": "Suscrito a '{{subscription}}'",
+      "unsubscribe": "Dado de baja de '{{subscription}}'",
+      "verboseDisabled": "El modo detallado de longpolling está ahora deshabilitado",
+      "verboseEnabled": "El longpolling está ahora en modo detallado"
     }
   },
   "cmdMetadata": {
@@ -715,7 +715,7 @@
       "buttons": "Los botones",
       "className": "El nombre de clase",
       "message": "El mensaje",
-      "sticky": "Es pegajoso",
+      "sticky": "Es persistente",
       "subtitle": "El subtítulo",
       "title": "El título",
       "type": "El tipo"
@@ -758,11 +758,11 @@
       "name": "El título de la vista",
       "row": "Campos para agrupar en filas"
     },
-    "definition": "Open pivot view",
-    "detail": "Open a customized pivot view for a model. To retrieve aggregated data without opening a view, use the read_group command instead.",
+    "definition": "Abrir vista pivot",
+    "detail": "Abre una vista pivot personalizada para un modelo. Para obtener datos agregados sin abrir una vista, usa el comando read_group.",
     "error": {
-      "measurePrefix": "Measure fields must be plain field names (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
-      "unknownFields": "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields."
+      "measurePrefix": "Los campos de medida deben ser nombres de campo simples (ej. 'amount_total'), no con prefijo de agregación (ej. 'sum:amount_total')",
+      "unknownFields": "{{arg}}: campo(s) no encontrado(s) en '{{model}}': {{fields}}. Usa 'caf -m {{model}}' para listar los campos disponibles."
     },
     "result": {
       "name": "Vista Pivot"
@@ -797,13 +797,13 @@
   },
   "cmdReadGroup": {
     "args": {
-      "domain": "The domain filter",
-      "field": "Fields to aggregate (measures). Omit to get only counts.",
-      "groupby": "Fields to group by",
-      "model": "The model technical name"
+      "domain": "El filtro de dominio",
+      "field": "Campos a agregar (medidas). Omitir para obtener solo conteos.",
+      "groupby": "Campos para agrupar",
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "Fetch grouped and aggregated data from a model",
-    "detail": "Run an ORM read_group on a model and return the aggregated results. Each result row contains the groupby field values, the aggregated measure values, and __count. Use this instead of search when you need sums, counts, or averages per group."
+    "definition": "Obtener datos agrupados y agregados de un modelo",
+    "detail": "Ejecuta un read_group ORM sobre un modelo y devuelve los resultados agregados. Cada fila contiene los valores de los campos de agrupación, los valores de medidas agregadas y __count. Úsalo en lugar de search cuando necesitas sumas, conteos o medias por grupo."
   },
   "cmdRef": {
     "args": {
@@ -855,8 +855,8 @@
     "detail": "Ejecutar rpc sin formato"
   },
   "cmdRun": {
-    "definition": "Ejecutar un script TrasH",
-    "detail": "Ejecutar un script TrasH"
+    "definition": "Ejecutar un script TraSH",
+    "detail": "Ejecutar un script TraSH"
   },
   "cmdSearch": {
     "args": {
@@ -868,7 +868,7 @@
       "more": "Marcar para indicar que se muestran más resultados",
       "offset": "El desplazamiento (desde)<br/>Puede ser cero (sin límite)",
       "options": "Las opciones",
-      "order": "The sort order. MUST be quoted because it contains spaces: -o \"name ASC\" or -o \"id DESC, name\"",
+      "order": "El orden de clasificación. DEBE ir entre comillas porque contiene espacios: -o \"name ASC\" o -o \"id DESC, name\"",
       "readBinary": "No filtrar campos binarios"
     },
     "definition": "Buscar registro/s de modelo",
@@ -893,10 +893,10 @@
   },
   "cmdSleep": {
     "args": {
-      "time": "The time to sleep (in ms)"
+      "time": "El tiempo de espera (en ms)"
     },
-    "definition": "Sleep",
-    "detail": "Sleep (time in ms)"
+    "definition": "Esperar",
+    "detail": "Esperar (tiempo en ms)"
   },
   "cmdSysParam": {
     "args": {
@@ -938,7 +938,7 @@
     "definition": "Lanzar 'tours'",
     "detail": "Ejecuta el 'tour' seleccionado. Si no se proporciona ningún 'tour', imprime todos los 'tours' disponibles",
     "error": {
-      "notAccesible": "tour no accesible! No se puede usar en este momento",
+      "notAccesible": "¡Tour no accesible! No se puede usar en este momento",
       "notAvailable": "Esto no está disponible en Odoo <17.0",
       "notExist": "¡El 'tour' indicado no existe!"
     },
@@ -1026,7 +1026,7 @@
   },
   "cmdView": {
     "args": {
-      "domain": "The domain filter for the record picker",
+      "domain": "El filtro de dominio para el selector de registros",
       "id": "El 'id' del registro",
       "model": "El nombre técnico del modelo",
       "ref": "El nombre de referencia de la vista"
@@ -1034,7 +1034,7 @@
     "definition": "Ver registros de modelo",
     "detail": "Con -i: abre ese registro en su vista de formulario. Sin -i: muestra un diálogo selector de registros. No devuelve datos.",
     "error": {
-      "notViewDialogsService": "No se pudo encontrar el servicio visualización de diálogo"
+      "notViewDialogsService": "No se pudo encontrar el servicio de visualización de diálogo"
     },
     "result": {
       "selectRecord": "Seleccione un registro",
@@ -1066,7 +1066,7 @@
       "data": "Los datos",
       "endpoint": "El 'endpoint'",
       "noTls": "No usar TLS",
-      "operation": "La operacion",
+      "operation": "La operación",
       "websocket": "El objeto websocket"
     },
     "definition": "Abrir un socket web",
@@ -1074,12 +1074,12 @@
     "error": {
       "invalidOperation": "Operación no válida",
       "noEndpoint": "Se necesita un 'endpoint' para conectarse",
-      "noWebsocket": "Se necesita un websocket para conectar"
+      "noWebsocket": "Se necesita un websocket para operar"
     },
     "result": {
       "connectionClosed": "[{{url}}] Conexión cerrada limpiamente, código={{code}} motivo={{reason}}",
-      "connectionDied": "[{{url}}] La conexión murió",
-      "connectionError": "Necesita un websocket para conectar",
+      "connectionDied": "[{{url}}] La conexión se ha perdido",
+      "connectionError": "Se necesita un websocket para operar",
       "connectionEstablished": "[{{url}}] Conexión establecida"
     }
   },
@@ -1088,93 +1088,93 @@
       "values": "Datos para escribir (debe ser una lista de tuplas [nombre de archivo, datos del archivo, ?opciones del archivo])"
     },
     "definition": "Crear archivo zip",
-    "detail": "Para conocer las opciones disponibles,  consulta la ayuda de JSZip: https://stuk.github.io/jszip"
+    "detail": "Para conocer las opciones disponibles, consulta la ayuda de JSZip: https://stuk.github.io/jszip"
   },
   "file2base64": {
-    "aborted": "Aborted by user. No file given..."
+    "aborted": "Cancelado por el usuario. No se proporcionó ningún archivo..."
   },
   "file2file": {
-    "aborted": "Aborted by user. No file given..."
+    "aborted": "Cancelado por el usuario. No se proporcionó ningún archivo..."
   },
   "func2DText": {
     "args": {
-      "canvas": "The canvas",
-      "color": "The text color",
-      "font": "The text font",
-      "text": "The text",
-      "x": "The text X point",
-      "y": "The text Y point"
+      "canvas": "El lienzo",
+      "color": "El color del texto",
+      "font": "La fuente del texto",
+      "text": "El texto",
+      "x": "El punto X del texto",
+      "y": "El punto Y del texto"
     },
-    "definition": "Draw a text",
-    "detail": "Draw a text"
+    "definition": "Dibujar un texto",
+    "detail": "Dibujar un texto"
   },
   "funcAbs": {
     "args": {
-      "num": "The number"
+      "num": "El número"
     },
-    "definition": "Absolute value of a number",
-    "detail": "Returns the absolute value of a number."
+    "definition": "Valor absoluto de un número",
+    "detail": "Devuelve el valor absoluto de un número."
   },
   "funcDecode": {
     "args": {
-      "method": "The method to decode",
-      "value": "The value to decode"
+      "method": "El método de decodificación",
+      "value": "El valor a decodificar"
     },
-    "definition": "Encode",
-    "detail": "Decode data"
+    "definition": "Decodificar",
+    "detail": "Decodificar datos"
   },
   "funcEncode": {
     "args": {
-      "method": "The method to encode",
-      "value": "The value to encode"
+      "method": "El método de codificación",
+      "value": "El valor a codificar"
     },
-    "definition": "Encode",
-    "detail": "Encode data"
+    "definition": "Codificar",
+    "detail": "Codificar datos"
   },
   "funcFetch": {
     "args": {
-      "timeout": "The timeout",
-      "url": "The fetch options"
+      "timeout": "El tiempo de espera",
+      "url": "Las opciones de fetch"
     },
-    "definition": "HTTP requests",
-    "detail": "Interface for making HTTP requests and processing the responses."
+    "definition": "Solicitudes HTTP",
+    "detail": "Interfaz para realizar solicitudes HTTP y procesar respuestas."
   },
   "funcFixed": {
     "args": {
-      "num": "The number of decimals"
+      "num": "El número de decimales"
     },
-    "definition": "Rounds a number UP to the nearest integer",
-    "detail": "Rounds a number UP to the nearest integer"
+    "definition": "Redondea un número HACIA ARRIBA al entero más cercano",
+    "detail": "Redondea un número HACIA ARRIBA al entero más cercano"
   },
   "funcFloor": {
     "args": {
-      "num": "The number"
+      "num": "El número"
     },
-    "definition": "Rounds a number DOWN to the nearest integer",
-    "detail": "Rounds a number DOWN to the nearest integer"
+    "definition": "Redondea un número HACIA ABAJO al entero más cercano",
+    "detail": "Redondea un número HACIA ABAJO al entero más cercano"
   },
   "funcPNow": {
-    "definition": "High resolution timestamp in milliseconds",
-    "detail": "High resolution timestamp in milliseconds."
+    "definition": "Marca de tiempo de alta resolución en milisegundos",
+    "detail": "Marca de tiempo de alta resolución en milisegundos."
   },
   "funcPow": {
     "args": {
       "base": "Base",
-      "exponent": "Exponent"
+      "exponent": "Exponente"
     },
-    "definition": "Calculate the exponent value of x raised to the power of y",
-    "detail": "Calculate the exponent value of x raised to the power of y"
+    "definition": "Calcula el valor de x elevado a la potencia y",
+    "detail": "Calcula el valor de x elevado a la potencia y"
   },
   "funcRand": {
     "args": {
-      "max": "Max. value",
-      "min": "Min. value"
+      "max": "Valor máx.",
+      "min": "Valor mín."
     },
-    "definition": "Generate random integers",
-    "detail": "Return random integers"
+    "definition": "Generar enteros aleatorios",
+    "detail": "Devuelve enteros aleatorios"
   },
   "getOdooEnvService": {
-    "error": "Service '{{service_name}}' is not available"
+    "error": "El servicio '{{service_name}}' no está disponible"
   },
   "loader": {
     "cantInitTerm": "No se puede inicializar el terminal",
@@ -1188,7 +1188,7 @@
   },
   "odoo": {
     "error": {
-      "notRoot": "Cannot find root object"
+      "notRoot": "No se puede encontrar el objeto raíz"
     },
     "longpolling": {
       "error": {
@@ -1199,53 +1199,53 @@
     },
     "templates": {
       "metadata": {
-        "createDate": "Create Date",
-        "createUID": "Create UID",
-        "noUpdate": "No Update",
-        "writeDate": "Write Date",
-        "writeUID": "Write UID",
+        "createDate": "Fecha de creación",
+        "createUID": "UID de creación",
+        "noUpdate": "Sin actualización",
+        "writeDate": "Fecha de escritura",
+        "writeUID": "UID de escritura",
         "xmlID": "XML-ID"
       },
       "recordCreated": {
-        "sucess": "{{model}} record(s) created successfully: {{- links}}"
+        "sucess": "{{model}} registro(s) creado(s) correctamente: {{- links}}"
       },
       "whoami": {
-        "activeCompany": "Active Company",
-        "inCompanies": "In Companies",
-        "inGroups": "In Groups",
-        "login": "Login",
-        "partner": "Partner",
-        "user": "User"
+        "activeCompany": "Empresa activa",
+        "inCompanies": "En empresas",
+        "inGroups": "En grupos",
+        "login": "Inicio de sesión",
+        "partner": "Contacto",
+        "user": "Usuario"
       }
     }
   },
   "terminal": {
     "ai": {
-      "experimentalWarning": "Este modo es experimental, usalo con extremo cuidado",
-      "newConversation": "New conversation",
-      "notConnected": "AI not connected. Use \"ai connect\" first."
+      "experimentalWarning": "Este modo es experimental, úsalo con extremo cuidado",
+      "newConversation": "Nueva conversación",
+      "notConnected": "IA no conectada. Usa \"ai connect\" primero."
     },
     "close": {
       "prevented": "El terminal ha impedido que la pestaña actual se cierre debido a tareas inacabadas:"
     },
     "cmd": {
       "default": {
-        "definition": "Undefined command",
-        "detail": "This command hasn't a properly detailed information"
+        "definition": "Comando no definido",
+        "detail": "Este comando no tiene información detallada"
       }
     },
     "error": {
-      "invalidHTTPRequest": "Invalid HTTP Request",
-      "notInitJob": "Unexpected error: can't initialize the job!",
+      "invalidHTTPRequest": "Solicitud HTTP no válida",
+      "notInitJob": "Error inesperado: ¡no se puede inicializar el trabajo!",
       "notLoaded": "Terminal no cargada",
-      "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
+      "unknown": "[!] ¡Vaya! ¡Error desconocido! (no se proporcionó mensaje de error detallado :/)"
     },
     "exception": {
-      "ElementNotFoundError": "Element not found error ({{selector}})!",
-      "ElementNotFoundTemplateError": "No elements found!",
-      "InvalidElementTemplateError": "Invalid element in template!",
-      "ProcessJobError": "Error executing '{{cmd_name}}'",
-      "TooManyElementsTemplateError": "Too many elements in the template to be assigned to one element!"
+      "ElementNotFoundError": "Error: elemento no encontrado ({{selector}})!",
+      "ElementNotFoundTemplateError": "¡No se encontraron elementos!",
+      "InvalidElementTemplateError": "¡Elemento no válido en la plantilla!",
+      "ProcessJobError": "Error al ejecutar '{{cmd_name}}'",
+      "TooManyElementsTemplateError": "¡Demasiados elementos en la plantilla para asignar a uno solo!"
     },
     "info": {
       "job": {
@@ -1262,33 +1262,33 @@
   },
   "trash": {
     "argument": {
-      "invalid": "Invalid argument '{{arg_long_name}}' value type: {{value_type}} is not {{arg_type}}",
-      "noExist": "The argument '{{arg_name}}' does not exist",
-      "requiredNotSet": "Required arguments not set! ({{required_not_set}})"
+      "invalid": "Tipo de valor no válido para el argumento '{{arg_long_name}}': {{value_type}} no es {{arg_type}}",
+      "noExist": "El argumento '{{arg_name}}' no existe",
+      "requiredNotSet": "¡Argumentos requeridos no establecidos! ({{required_not_set}})"
     },
     "exception": {
-      "invalidCommandArgumentsError": "Invalid command arguments",
-      "invalidCommandArugmentValueError": "Unexpected '{{arg_value}}' value!",
-      "invalidCommandDefinition": "Invalid command definition!",
-      "invalidInstructionError": "Invalid instruction",
-      "invalidNameError": "Invalid name '{{vname}}' at {{start}}:{{end}}",
-      "invalidTokenError": "Invalid token '{{vname}}' at {{start}}:{{end}}",
-      "invalidValueError": "Invalid value '{{value}}'",
-      "notExpectedCommandArgumentError": "Argument '{{arg_name}}' not expected at {{start}}:{{end}}",
-      "unknownCommandError": "Unknown Command '{{cmd_name}}' at {{start}}:{{end}}",
-      "unknownNameError": "Unknown name '{{vname}}' at {{start}}:{{end}}",
-      "unknownStoreValue": "Unknown store value '{{vname}}'"
+      "invalidCommandArgumentsError": "Argumentos de comando no válidos",
+      "invalidCommandArugmentValueError": "¡Valor inesperado '{{arg_value}}'!",
+      "invalidCommandDefinition": "¡Definición de comando no válida!",
+      "invalidInstructionError": "Instrucción no válida",
+      "invalidNameError": "Nombre no válido '{{vname}}' en {{start}}:{{end}}",
+      "invalidTokenError": "Token no válido '{{vname}}' en {{start}}:{{end}}",
+      "invalidValueError": "Valor no válido '{{value}}'",
+      "notExpectedCommandArgumentError": "Argumento '{{arg_name}}' no esperado en {{start}}:{{end}}",
+      "unknownCommandError": "Comando desconocido '{{cmd_name}}' en {{start}}:{{end}}",
+      "unknownNameError": "Nombre desconocido '{{vname}}' en {{start}}:{{end}}",
+      "unknownStoreValue": "Valor de almacenamiento desconocido '{{vname}}'"
     },
     "vmachine": {
       "func": {
-        "definition": "Internal function",
-        "detail": "Internal function"
+        "definition": "Función interna",
+        "detail": "Función interna"
       }
     }
   },
   "utilInjectResource": {
     "error": {
-      "invalidType": "Invalid resource type"
+      "invalidType": "Tipo de recurso no válido"
     }
   }
 }

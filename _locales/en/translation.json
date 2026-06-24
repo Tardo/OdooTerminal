@@ -100,7 +100,7 @@
     },
     "args": {
       "apiKey": "API key for authentication",
-      "maxSteps": "Max agent iterations (agent only, default 15)",
+      "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
       "model": "Model name to use",
       "operation": "operation: connect, chat or exec",
       "prompt": "The prompt or natural language request to send",
@@ -413,7 +413,7 @@
     "args": {
       "code": "TraSH Code"
     },
-    "definition": "Dissasembler bytecode",
+    "definition": "Disassembler bytecode",
     "detail": "Shows the bytecode generated for the input",
     "table": {
       "instrCode": "Instr. Code",
@@ -1120,7 +1120,7 @@
       "method": "The method to decode",
       "value": "The value to decode"
     },
-    "definition": "Encode",
+    "definition": "Decode",
     "detail": "Decode data"
   },
   "funcEncode": {
@@ -1177,7 +1177,7 @@
     "error": "Service '{{service_name}}' is not available"
   },
   "loader": {
-    "cantInitTerm": "Can't initilize terminal",
+    "cantInitTerm": "Can't initialize terminal",
     "testsEnabled": "Tests Enabled"
   },
   "longpolling": {
@@ -1192,7 +1192,7 @@
     },
     "longpolling": {
       "error": {
-        "init": "Can't initilize longpolling: ",
+        "init": "Can't initialize longpolling: ",
         "read": "** Reading Error! **"
       },
       "new": "New Longpolling Notification:"
