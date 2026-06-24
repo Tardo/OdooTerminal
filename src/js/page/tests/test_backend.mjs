@@ -6,6 +6,28 @@ import asyncSleep from '@terminal/utils/async_sleep';
 import TerminalTestSuite from './tests';
 
 export default class TestBackend extends TerminalTestSuite {
+  async test_pivot() {
+    await this.terminal.execute('pivot -m res.partner', false, true);
+    await asyncSleep(2500);
+    this.assertNotEqual(document.querySelector('.o_pivot_view'), null);
+  }
+
+  async test_graph() {
+    await this.terminal.execute('graph -m res.partner', false, true);
+    await asyncSleep(2500);
+    this.assertNotEqual(document.querySelector('.o_graph_view'), null);
+  }
+
+  async test_form() {
+    await this.terminal.execute('view -m res.company -i 1', false, true);
+    await asyncSleep(2500);
+    this.assertTrue(this.isFormOpen());
+    await this.terminal.execute('form -o highlight -f name', false, true);
+    this.assertNotEqual(document.getElementById('oterm-highlight-f-name'), null);
+    await this.terminal.execute('form -o clear', false, true);
+    this.assertEqual(document.getElementById('oterm-highlight-f-name'), null);
+  }
+
   async test_settings() {
     await this.terminal.execute('settings', false, true);
     await asyncSleep(2000);

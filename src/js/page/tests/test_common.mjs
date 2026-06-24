@@ -476,6 +476,26 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertTrue(res === false, 'Invalid operation should return false');
   }
 
+  async test_read_group() {
+    const res = await this.terminal.execute('read_group -m res.partner -g country_id', false, true);
+    this.assertTrue(Array.isArray(res));
+    this.assertTrue(res.length > 0);
+  }
+
+  async test_describe() {
+    const res = await this.terminal.execute('describe -m res.partner', false, true);
+    this.assertTrue(res.count > 0);
+    this.assertNotEmpty(res.key_fields);
+  }
+
+  async test_daterange() {
+    const res = await this.terminal.execute('daterange -m res.partner -f create_date', false, true);
+    this.assertEqual(res.model, 'res.partner');
+    this.assertEqual(res.field, 'create_date');
+    this.assertNotEmpty(res.min);
+    this.assertNotEmpty(res.max);
+  }
+
   async test_renew_database() {
     // Test with default parameters
     let res = await this.terminal.execute('renew_database', false, true);
