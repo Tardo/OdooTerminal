@@ -101,9 +101,21 @@ export function buildScriptingPrompt(): string {
     '    function myFunc(a, b) { $c = $b - $a; return $c }\n' +
     '    myFunc 10 2   → -8\n' +
     '\n' +
-    '  * Anonymous function (stored in variable, call with $$):\n' +
+    '  * Anonymous function stored in variable:\n' +
     '    $fn = function(a, b) { return $b - $a }\n' +
-    '    $$fn 10 2   → -8\n' +
+    '    $$fn 10 2          → -8   (call at COMMAND position: $$ + name + args)\n' +
+    '    ($$fn 10 2)        → -8   (call inside a subexpression)\n' +
+    '\n' +
+    '  * $$ call rules — position matters:\n' +
+    '    COMMAND position (first token of a statement or after ;):\n' +
+    '      $$fn arg1 arg2   → tokens after $$ are collected as arguments, call fires at end-of-statement\n' +
+    '    ARGUMENT position (NOT the first token) — behaviour depends on the function signature:\n' +
+    '      - Function with 0 parameters: called immediately, result used as the argument value\n' +
+    '          silent print "user: " + $$UNAME      → "user: admin"  (UNAME called, result concatenated)\n' +
+    '      - Function with ≥1 parameters: reference passed, NOT called\n' +
+    '          arr_map [1,2,3] $$sq                 → sq itself becomes the mapper callback\n' +
+    '    To force a call at argument position regardless of signature, use a LogicBlock:\n' +
+    '          silent print "val: " + ($$fn 5)      → fn(5) called, result concatenated\n' +
     '\n' +
     '  * Typed parameters with optional defaults:\n' +
     '    function calc(x: Number, label: String, factor: Number = 42) { return $x * $factor }\n' +
@@ -111,10 +123,16 @@ export function buildScriptingPrompt(): string {
     '    calc 5 "test" 10     → 50   (overrides default)\n' +
     '    → Default can be a variable: function f(a: Number, b: String = $globalVar) { ... }\n' +
     '\n' +
-    '  * Pass anonymous function as argument (higher-order):\n' +
-    '    $doubled = (arr_map $nums (function (item) { return $item * 2 }))\n' +
-    '    $evens   = (arr_filter $nums (function (item) { return $item % 2 == 0 }))\n' +
-    '    $sum     = (arr_reduce $nums 0 (function (a, b) { return $a + $b }))\n' +
+    '  * Pass function as callback to higher-order functions:\n' +
+    '    Inline anonymous (always correct):\n' +
+    '      $doubled = (arr_map $nums (function (item) { return $item * 2 }))\n' +
+    '      $evens   = (arr_filter $nums (function (item) { return $item % 2 == 0 }))\n' +
+    '      $sum     = (arr_reduce $nums 0 (function (a, b) { return $a + $b }))\n' +
+    '    Variable reference with $  (always correct):\n' +
+    '      $sq = function (x) { return $x * $x }\n' +
+    '      $res = (arr_map [1,2,3,4,5] $sq)         → [1,4,9,16,25]\n' +
+    '    Variable reference with $$ (correct when function has ≥1 parameters):\n' +
+    '      $res = (arr_map [1,2,3,4,5] $$sq)        → [1,4,9,16,25]  (same result)\n' +
     '\n' +
     '=== 12. BUILT-IN STDLIB ===\n' +
     '  Array operations (mutate in-place):\n' +
@@ -146,7 +164,7 @@ export function buildScriptingPrompt(): string {
     '\n' +
     '=== 13. COMPLETE EXAMPLES ===\n' +
     '  // Sum all sale order totals\n' +
-    '  $rows = (search sale.order -f amount_total -all)\n' +
+    '  $rows = (search -m sale.order -f amount_total -all)\n' +
     '  $total = 0\n' +
     '  for ($i = 0; $i < $rows["length"]; $i += 1) { $total += $rows[$i]["amount_total"] }\n' +
     '  print -m "Total: " + $total\n' +
@@ -172,7 +190,7 @@ export function buildScriptingPrompt(): string {
     '  view res.partner -i $r["id"]\n' +
     '\n' +
     '  // Update a field and commit\n' +
-    '  $p = (search res.product.product -l 1)\n' +
+    '  $p = (search -m res.product.product -l 1)\n' +
     '  $p["lst_price"] = $p["lst_price"] * 1.1\n' +
     '  commit $p\n' +
     '\n' +
@@ -220,7 +238,7 @@ export default function(terminal: Terminal): string {
     '  → receives the array of products\n' +
     '\n' +
     'WRONG — multiple CMD lines violate the response protocol (one CMD per turn):\n' +
-    '  CMD: search res.partner -f name -l 5\n' +
+    '  CMD: search -m res.partner -f name -l 5\n' +
     '  CMD: count -m res.partner\n' +
     'CORRECT — combine in a single CMD to get both results at once:\n' +
     '  CMD: search -m res.partner -f name -l 5; count -m res.partner\n' +
@@ -280,35 +298,37 @@ export default function(terminal: Terminal): string {
     '  * Mix allowed as long as positional order is preserved.\n' +
     '  * QUOTING (MANDATORY): ANY argument value that contains one or more spaces MUST be wrapped in double or single quotes.\n' +
     '    CORRECT:   print -m "hello world"\n' +
-    '    CORRECT:   search res.partner -d [["name","=","John Doe"]]\n' +
-    '    CORRECT:   search res.partner -o "id DESC, name"    ← order value has spaces, must be quoted\n' +
-    '    WRONG:     search res.partner -o id DESC, name      ← "id" is the order value, "DESC," becomes a 3rd arg\n' +
+    '    CORRECT:   search -m res.partner -d [["name","=","John Doe"]]\n' +
+    '    CORRECT:   search -m res.partner -o "id DESC, name"    ← order value has spaces, must be quoted\n' +
+    '    WRONG:     search -m res.partner -o id DESC, name      ← "id" is the order value, "DESC," becomes a 3rd arg\n' +
     '    This applies to every command and every argument type (strings, model names, field values, etc.).\n' +
     '  * LIST ARGUMENTS: two equivalent forms are accepted.\n' +
     '    Comma-separated:  name,display_name,phone         (items without spaces need no quotes)\n' +
     '    Array literal:    [name, display_name, phone]     (bare words are strings; variables require $ prefix)\n' +
-    '    CORRECT:   search res.partner -f name,display_name\n' +
-    '    CORRECT:   search res.partner -f [name, display_name]\n' +
-    '    WRONG:     search res.partner -f name,display name ← space makes "display" a 3rd positional arg\n' +
+    '    CORRECT:   search -m res.partner -f name,display_name\n' +
+    '    CORRECT:   search -m res.partner -f [name, display_name]\n' +
+    '    WRONG:     search -m res.partner -f name,display name ← space makes "display" a 3rd positional arg\n' +
     '\n' +
     '=== 7. SYSTEM HELPERS ($$RMOD, $$RID, $$UID, $$UNAME) ===\n' +
-    '  * Use ONLY as standalone arguments — never quote them.\n' +
-    '  * NEVER embed inside arrays, dicts, or domain literals.\n' +
-    '    CORRECT:   search $$RMOD -d [["active","=",true]]\n' +
+    '  * These are zero-parameter functions. When used as arguments they are called\n' +
+    '    automatically and their return value is passed to the command.\n' +
+    '  * NEVER quote them, and NEVER embed inside arrays, dicts, or domain literals.\n' +
+    '    CORRECT:   search -m $$RMOD -d [["active","=",true]]\n' +
+    '    CORRECT:   print -m "user: " + $$UNAME\n' +
     '    FORBIDDEN: [["partner_id","=",$$RID]]\n' +
-    '    WORKAROUND: $id = $$RID; search sale.order -d [["partner_id","=",$id]]\n' +
+    '    WORKAROUND: $id = $$RID; search -m sale.order -d [["partner_id","=",$id]]\n' +
     '\n' +
     '=== 8. SUBCOMMAND CALLS & NESTING ===\n' +
-    '  * Wrap in ():  $val = (search res.partner -l 1)\n' +
-    '  * Chain access directly: (search res.partner -f name)[0]["name"]\n' +
-    '  * Inline in args: read res.users -i (search res.users -f id)[0]["id"]\n' +
+    '  * Wrap in ():  $val = (search -m res.partner -l 1)\n' +
+    '  * Chain access directly: (search -m res.partner -f name)[0]["name"]\n' +
+    '  * Inline in args: read res.users -i (search -m res.users -f id)[0]["id"]\n' +
     '  * Inside literals: {total: (count -m res.partner)}\n' +
     '\n' +
     '=== 9. RECORDSETS (SINGLETON VS MULTI-RECORD) ===\n' +
     '  * SINGLETON (create, read <single-id>, search -l 1):\n' +
     '    - Access field: $res["field_name"]\n' +
     '    - NEVER index: $res[0]["field"]  ← WRONG on a singleton\n' +
-    '  * MULTI-RECORD (search without -l 1):\n' +
+    '  * MULTI-RECORD (search -m without -l 1):\n' +
     '    - Count: $res["length"]   (never $res["ids"]["length"])\n' +
     '    - Access item: $res[0]["field"], $res[1]["field"]\n' +
     '    - IDs only: $res["ids"]  (plain number array, no field access here)\n' +

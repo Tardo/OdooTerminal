@@ -343,7 +343,21 @@ export default class VMachine {
               let cmd_def = this.#registeredCmds[frame_cmd];
               if (typeof cmd_def === 'undefined') {
                 // FIXME: Done in this way to support 'aliases'
-                if (!(frame_cmd in opts.aliases) && typeof frame.stack[0] === 'object') {
+                if (!(frame_cmd in opts.aliases) && frame.stack[0] !== null && typeof frame.stack[0] === 'object') {
+                  // When $$var fires at argument position (no args on the frame yet) and the
+                  // referenced function expects arguments, treat it as a reference pass so
+                  // higher-order patterns like `arr_map [1,2,3] $$sq` work correctly.
+                  // Zero-arg functions ($$RMOD, $$mop, etc.) are still called immediately.
+                  if (frame.stack.length === 1 && frame.args.length === 0) {
+                    // $FlowFixMe[incompatible-use]
+                    // $FlowFixMe[prop-missing]
+                    const fn_args_len: number = frame.stack[0]?.args?.length ?? 0;
+                    if (fn_args_len > 0) {
+                      activeFrame = callStack.at(-1) || rootFrame;
+                      activeFrame.stack.push(frame.stack[0]);
+                      break;
+                    }
+                  }
                   // $FlowFixMe[incompatible-type]
                   cmd_def = frame.stack.shift();
                 }

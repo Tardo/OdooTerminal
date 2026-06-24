@@ -19,9 +19,7 @@ const content: string =
   '$me = (whoami)\n' +
   'print -m "User: " + $me["display_name"] + " | Company: " + $me["company"][1]\n' +
   '```\n' +
-  'System helpers:\n' +
-  '- `$$UID` — current user ID (number)\n' +
-  '- `$$UNAME` — current username/login (string)\n' +
+  'System helpers: `$$UID`, `$$UNAME`, `$$RMOD`, `$$RID` — see §7 of the base prompt.\n' +
   '\n' +
   '## Odoo Version — `version`\n' +
   'Returns an array: [major, minor, patch, release_type, serial].\n' +
@@ -42,11 +40,11 @@ const content: string =
   '```\n' +
   'To check if a specific module is installed:\n' +
   '```\n' +
-  'search ir.module.module -d [["name","=","sale"],["state","=","installed"]] -f name,display_name,installed_version\n' +
+  'search -m ir.module.module -d [["name","=","sale"],["state","=","installed"]] -f name,display_name,installed_version\n' +
   '```\n' +
   'Full module list with details:\n' +
   '```\n' +
-  'search ir.module.module -d [["state","=","installed"]] -f name,display_name,summary,installed_version\n' +
+  'search -m ir.module.module -d [["state","=","installed"]] -f name,display_name,summary,installed_version\n' +
   '```\n' +
   '\n' +
   '## Module Details — `ir.module.module`\n' +
@@ -54,14 +52,14 @@ const content: string =
   'States: `installed`, `uninstalled`, `to install`, `to upgrade`, `to remove`.\n' +
   '```\n' +
   '// Full info for one module\n' +
-  'search ir.module.module -d [["name","=","account"]] -f name,display_name,summary,installed_version,state,author\n' +
+  'search -m ir.module.module -d [["name","=","account"]] -f name,display_name,summary,installed_version,state,author\n' +
   '// All installed modules by category\n' +
-  'search ir.module.module -d [["state","=","installed"]] -f name,category_id,installed_version\n' +
+  'search -m ir.module.module -d [["state","=","installed"]] -f name,category_id,installed_version\n' +
   '```\n' +
   '\n' +
   '## Company Info — `res.company`\n' +
   '```\n' +
-  'search res.company -f name,partner_id,currency_id,country_id,email,phone,vat\n' +
+  'search -m res.company -f name,partner_id,currency_id,country_id,email,phone,vat\n' +
   '```\n' +
   'Active company ID comes from `whoami` → `company` field.\n' +
   '\n' +
@@ -77,12 +75,12 @@ const content: string =
   '\n' +
   '## Active Languages — `res.lang`\n' +
   '```\n' +
-  'search res.lang -d [["active","=",true]] -f name,code\n' +
+  'search -m res.lang -d [["active","=",true]] -f name,code\n' +
   '```\n' +
   '\n' +
   '## Active Currencies — `res.currency`\n' +
   '```\n' +
-  'search res.currency -d [["active","=",true]] -f name,symbol,rate\n' +
+  'search -m res.currency -d [["active","=",true]] -f name,symbol,rate\n' +
   '```\n' +
   '\n' +
   '## Tips\n' +

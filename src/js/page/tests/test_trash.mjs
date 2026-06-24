@@ -188,6 +188,17 @@ export default class TestTrash extends TerminalTestSuite {
     `;
     results = await this.terminal.getShell().eval(code);
     this.assertEqual(results, 8);
+    // $$var in argument position should pass the function reference (not call it immediately)
+    const code2 = `
+      $sq = function (x) { return ($x * $x) }
+      arr_map [1, 2, 3, 4, 5] $$sq
+    `;
+    results = await this.terminal.getShell().eval(code2);
+    this.assertEqual(results[0], 1);
+    this.assertEqual(results[1], 4);
+    this.assertEqual(results[2], 9);
+    this.assertEqual(results[3], 16);
+    this.assertEqual(results[4], 25);
   }
 
   async test_trash_if() {
