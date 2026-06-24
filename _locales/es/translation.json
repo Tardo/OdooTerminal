@@ -386,6 +386,33 @@
       "type": "Type"
     }
   },
+  "cmdDiff": {
+    "args": {
+      "all": "Show all fields, including those that are identical",
+      "field": "Fields to compare (default: all non-binary). Use '*' for all.",
+      "id": "Two record IDs to compare (e.g. [10, 20])",
+      "model": "The model technical name",
+      "options": "Extra options"
+    },
+    "definition": "Compare two records field by field",
+    "detail": "Fetches two records of the same model and compares every field value. By default shows only fields that differ. Use --all to include matching fields too. Many2one fields are compared by stored ID (not display name) to avoid false positives from renamed related records. Binary fields are excluded.",
+    "error": {
+      "exactlyTwo": "Exactly two record IDs are required",
+      "notFound": "Record {{id}} not found in '{{model}}'"
+    },
+    "result": {
+      "header": "<strong>Diff {{model}}: #{{id_a}} vs #{{id_b}}</strong>",
+      "identical": "Records are <strong>identical</strong> for the requested fields",
+      "summary": "Differing fields: <strong>{{diff}}</strong> / Total: <strong>{{total}}</strong>"
+    },
+    "table": {
+      "field": "Field",
+      "label": "Label",
+      "type": "Type",
+      "valA": "#{{id}}",
+      "valB": "#{{id}}"
+    }
+  },
   "cmdDis": {
     "args": {
       "code": "Código de TraSH"

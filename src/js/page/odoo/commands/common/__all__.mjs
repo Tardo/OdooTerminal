@@ -52,6 +52,7 @@ import cmdRenewDatabase from './renew_database';
 import cmdAI from './ai';
 import cmdDescribe from './describe';
 import cmdDateRange from './daterange';
+import cmdDiff from './diff';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -105,4 +106,5 @@ export default function (vm: VMachine) {
   vm.registerCommand('ai', cmdAI());
   vm.registerCommand('describe', cmdDescribe());
   vm.registerCommand('daterange', cmdDateRange());
+  vm.registerCommand('diff', cmdDiff());
 }
