@@ -43,6 +43,8 @@ extension is ready to use in the current page.
 
 Few commands aren't available on the frontend, use command 'help' to know the available commands.
 
+The terminal also includes an **AI mode** (autonomous agent) accessible via the AI button in the terminal toolbar.
+
 You can toggle terminal using one of these options:
 
 - Press CTRL + , (by default)
