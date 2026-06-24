@@ -302,6 +302,15 @@ export default class Screen {
     return this.getUserInputEl()?.value ?? '';
   }
 
+  setInputDisabled(disabled: boolean) {
+    if (!this.#wasStart) {
+      return;
+    }
+    this.#input_el.disabled = disabled;
+    this.#inputMulti_el.disabled = disabled;
+    this.#userInput_el.classList.toggle('terminal-input-disabled', disabled);
+  }
+
   /* PRINT */
   flush() {
     if (!this.#flushing) {

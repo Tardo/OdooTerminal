@@ -290,6 +290,9 @@
   color: var(--terminal-color-light);
   display: flex;
 }
+.o_terminal .terminal-user-input.terminal-input-disabled {
+  display: none;
+}
 
 .o_terminal .terminal-user-input > .terminal-prompt-container {
   padding: 2px 3px;
@@ -840,6 +843,34 @@
 }
 .o_terminal .terminal-ai-conv-delete:hover {
   color: color-mix(in srgb, var(--terminal-color-danger), white 20%);
+}
+
+.o_terminal .terminal-ai-conv-empty-hint {
+  color: var(--terminal-color-muted);
+  display: flex;
+  flex-direction: column;
+  font-size: x-small;
+  gap: 8px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.o_terminal .terminal-ai-conv-empty-hint .terminal-ai-conv-empty-arrow {
+  animation: terminal-ai-hint-bounce 1.2s ease-in-out infinite;
+  color: var(--terminal-color-warning);
+  font-size: 1.2em;
+}
+@keyframes terminal-ai-hint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.o_terminal .terminal-ai-conv-empty-hint .terminal-ai-conv-empty-options {
+  color: var(--terminal-color-secondary);
+  font-style: italic;
 }
 
 /* === AI Mode button === */

@@ -1224,6 +1224,8 @@
     "ai": {
       "experimentalWarning": "Este modo es experimental, úsalo con extremo cuidado",
       "newConversation": "Nueva conversación",
+      "noConversationsHint": "Create a new conversation to start",
+      "noModelsHint": "Configure AI models in the extension options",
       "notConnected": "IA no conectada. Usa \"ai connect\" primero.",
       "privacyWarning": "Aviso de privacidad: las conversaciones se almacenan en el almacenamiento del navegador y pueden ser leídas por cualquier persona con acceso a este ordenador."
     },

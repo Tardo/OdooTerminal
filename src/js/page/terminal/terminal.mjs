@@ -329,6 +329,9 @@ export default class Terminal {
         this.#onInput();
       },
     });
+    if (this.#isAIMode && this.#activeConvId === null) {
+      this.screen.setInputDisabled(true);
+    }
     this.onStart();
   }
 
@@ -1174,7 +1177,18 @@ export default class Terminal {
       return;
     }
     const convs = this.#getConversations();
-    listEl.replaceChildren(...convs.map(c => parseHTML(renderAIConvItem(c.id, c.name, c.id === this.#activeConvId))));
+    if (convs.length === 0) {
+      const hint = parseHTML(
+        "<div class='terminal-ai-conv-empty-hint'>" +
+          "<span class='terminal-ai-conv-empty-arrow'>&#8593;</span>" +
+          `<span>${i18n.t('terminal.ai.noConversationsHint', 'Create a new conversation to start')}</span>` +
+          `<span class='terminal-ai-conv-empty-options'>${i18n.t('terminal.ai.noModelsHint', 'Configure AI models in the extension options')}</span>` +
+          '</div>',
+      );
+      listEl.replaceChildren(hint);
+    } else {
+      listEl.replaceChildren(...convs.map(c => parseHTML(renderAIConvItem(c.id, c.name, c.id === this.#activeConvId))));
+    }
   }
 
   #onClickToggleAIMode(ev: MouseEvent) {
@@ -1201,6 +1215,7 @@ export default class Terminal {
           this.#searchHistoryIter = 0;
           this.#searchHistoryQuery = '';
         }
+        this.screen.setInputDisabled(activeId === null);
       } else {
         this.el.classList.remove('terminal-ai-mode');
         target.classList.remove('btn-light');
@@ -1212,6 +1227,7 @@ export default class Terminal {
         if (snap.length > 0) {
           this.screen.setContent(snap);
         }
+        this.screen.setInputDisabled(false);
       }
     }
     setStorageSessionItem('terminal_ai_mode', this.#isAIMode, err => this.screen.printError(err));
@@ -1288,6 +1304,7 @@ export default class Terminal {
           this.#searchHistoryIter = 0;
           this.#searchHistoryQuery = '';
         }
+        this.screen.setInputDisabled(nextId === null);
       }
       this.#renderAIConvList();
     } else if (convId !== this.#activeConvId) {
@@ -1335,6 +1352,7 @@ export default class Terminal {
     this.#activeConvId = id;
     setStorageSessionItem('terminal_ai_active_conv', id, err => this.screen.printError(err));
     this.#renderAIConvList();
+    this.screen.setInputDisabled(false);
     return id;
   }
 
