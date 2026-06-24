@@ -348,6 +348,25 @@
       "notInstalled": "El módulo '{{module}}' no está instalado"
     }
   },
+  "cmdDescribe": {
+    "args": {
+      "model": "The model technical name"
+    },
+    "definition": "Model profile: count, date range, key fields and selection values",
+    "detail": "Returns a combined profile of the model in one shot: total record count, create_date range (oldest→newest), and a table of key fields (required fields, stored relational fields, selection fields with their possible values). Replaces 3–4 separate commands (caf + count + read_group).",
+    "result": {
+      "count": "Total records: <strong>{{count}}</strong>",
+      "dateRange": "Date range: {{min}} → {{max}}",
+      "header": "<strong>Model profile: {{model}}</strong>"
+    },
+    "table": {
+      "extra": "Relation / Values",
+      "field": "Field",
+      "label": "Label",
+      "required": "Req",
+      "type": "Type"
+    }
+  },
   "cmdDis": {
     "args": {
       "code": "Código de TraSH"
