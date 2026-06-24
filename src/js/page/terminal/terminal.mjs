@@ -240,6 +240,7 @@ export default class Terminal {
       }
       this.#renderAIConvList();
     }
+    this.#updateAIIdleEffect();
 
     if (!isEmpty(this.#config.init_cmds)) {
       this.#wakeUp();
@@ -1231,6 +1232,7 @@ export default class Terminal {
       }
     }
     setStorageSessionItem('terminal_ai_mode', this.#isAIMode, err => this.screen.printError(err));
+    this.#updateAIIdleEffect();
     this.screen.preventLostInputFocus();
   }
 
@@ -1305,6 +1307,7 @@ export default class Terminal {
           this.#searchHistoryQuery = '';
         }
         this.screen.setInputDisabled(nextId === null);
+        this.#updateAIIdleEffect();
       }
       this.#renderAIConvList();
     } else if (convId !== this.#activeConvId) {
@@ -1318,6 +1321,7 @@ export default class Terminal {
         this.screen.setContent(snap);
       }
       this.#renderAIConvList();
+      this.#updateAIIdleEffect();
       this.screen.preventLostInputFocus();
     }
   }
@@ -1344,6 +1348,14 @@ export default class Terminal {
     }
   }
 
+  #updateAIIdleEffect() {
+    if (this.#isAIMode && this.#activeConvId === null) {
+      this.el.classList.add('terminal-ai-no-conv');
+    } else {
+      this.el.classList.remove('terminal-ai-no-conv');
+    }
+  }
+
   createAIConversation(name: string): string {
     const id = `conv_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
     const convs = this.#getConversations();
@@ -1353,6 +1365,7 @@ export default class Terminal {
     setStorageSessionItem('terminal_ai_active_conv', id, err => this.screen.printError(err));
     this.#renderAIConvList();
     this.screen.setInputDisabled(false);
+    this.#updateAIIdleEffect();
     return id;
   }
 

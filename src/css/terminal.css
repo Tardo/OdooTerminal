@@ -953,3 +953,101 @@
   animation-delay: 0.9s;
   animation-duration: 1.4s;
 }
+
+/* AI IDLE OVERLAY */
+.o_terminal .terminal-ai-idle-overlay {
+  align-items: center;
+  background-color: var(--terminal-color-dark);
+  display: none;
+  justify-content: center;
+  opacity: var(--terminal-screen-opacity);
+  pointer-events: none;
+}
+.o_terminal.terminal-ai-mode .terminal-ai-idle-overlay {
+  grid-column: 2;
+  grid-row: 1;
+}
+.o_terminal.terminal-ai-mode.terminal-ai-no-conv .terminal-ai-idle-overlay {
+  display: flex;
+}
+
+.o_terminal .terminal-ai-idle-orb {
+  align-items: center;
+  display: flex;
+  height: 90px;
+  justify-content: center;
+  position: relative;
+  width: 90px;
+}
+.o_terminal .terminal-ai-idle-orb::before {
+  animation: terminal-ai-idle-glow 2.5s ease-in-out infinite;
+  background: radial-gradient(ellipse at center, rgba(109, 40, 217, 0.18) 0%, rgba(59, 130, 246, 0.07) 50%, transparent 70%);
+  border-radius: 50%;
+  content: '';
+  height: 220px;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+}
+@keyframes terminal-ai-idle-glow {
+  0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
+}
+
+.o_terminal .terminal-ai-idle-icon {
+  animation: terminal-ai-idle-wand 3s ease-in-out infinite;
+  color: #fff;
+  font-size: 2.2rem;
+  position: relative;
+  text-shadow: 0 0 18px rgba(109, 40, 217, 0.9), 0 0 36px rgba(59, 130, 246, 0.5);
+  z-index: 2;
+}
+@keyframes terminal-ai-idle-wand {
+  0%, 100% { transform: rotate(-10deg) scale(1); text-shadow: 0 0 18px rgba(109, 40, 217, 0.9), 0 0 36px rgba(59, 130, 246, 0.5); }
+  50% { transform: rotate(10deg) scale(1.1); text-shadow: 0 0 28px rgba(109, 40, 217, 1), 0 0 55px rgba(59, 130, 246, 0.8), 0 0 90px rgba(124, 58, 237, 0.4); }
+}
+
+.o_terminal .terminal-ai-idle-ring {
+  border-radius: 50%;
+  position: absolute;
+}
+.o_terminal .terminal-ai-idle-ring-inner {
+  animation: terminal-ai-idle-spin 5s linear infinite;
+  border: 2px solid transparent;
+  border-right-color: rgba(59, 130, 246, 0.55);
+  border-top-color: rgba(109, 40, 217, 0.75);
+  height: 64px;
+  width: 64px;
+}
+.o_terminal .terminal-ai-idle-ring-outer {
+  animation: terminal-ai-idle-spin 9s linear infinite reverse;
+  border: 1px dashed rgba(124, 58, 237, 0.25);
+  height: 90px;
+  width: 90px;
+}
+@keyframes terminal-ai-idle-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.o_terminal .terminal-ai-idle-spark {
+  animation: terminal-ai-idle-spark-drift 3s ease-in-out infinite;
+  font-size: 11px;
+  opacity: 0;
+  position: absolute;
+}
+.o_terminal .terminal-ai-idle-spark-1 { color: #c084fc; top: -22px; left: 38px; animation-delay: 0s; }
+.o_terminal .terminal-ai-idle-spark-2 { color: #60a5fa; top: 8px; right: -22px; animation-delay: 0.5s; }
+.o_terminal .terminal-ai-idle-spark-3 { color: #f0abfc; bottom: -20px; right: 15px; animation-delay: 1s; }
+.o_terminal .terminal-ai-idle-spark-4 { color: #818cf8; bottom: 8px; left: -22px; animation-delay: 1.5s; }
+.o_terminal .terminal-ai-idle-spark-5 { color: #a78bfa; top: 25px; left: -25px; animation-delay: 2s; }
+.o_terminal .terminal-ai-idle-spark-6 { color: #e879f9; top: -18px; right: -18px; animation-delay: 2.5s; }
+@keyframes terminal-ai-idle-spark-drift {
+  0%, 100% { opacity: 0; transform: scale(0.4) translateY(0); }
+  25% { opacity: 1; transform: scale(1.5) translateY(-5px); }
+  60% { opacity: 0.5; transform: scale(1) translateY(-10px); }
+  90% { opacity: 0; transform: scale(0.3) translateY(-15px); }
+}

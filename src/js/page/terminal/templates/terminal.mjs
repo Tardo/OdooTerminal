@@ -5,6 +5,19 @@
 export default function (): string {
   return (
     "<div id='terminal' class='o_terminal'>" +
+    "<div id='terminal_ai_idle' class='terminal-ai-idle-overlay'>" +
+    "<div class='terminal-ai-idle-orb'>" +
+    "<div class='terminal-ai-idle-ring terminal-ai-idle-ring-outer'></div>" +
+    "<div class='terminal-ai-idle-ring terminal-ai-idle-ring-inner'></div>" +
+    "<i class='fa fa-magic terminal-ai-idle-icon' aria-hidden='true'></i>" +
+    "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-1' aria-hidden='true'>✦</span>" +
+    "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-2' aria-hidden='true'>✦</span>" +
+    "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-3' aria-hidden='true'>✦</span>" +
+    "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-4' aria-hidden='true'>✦</span>" +
+    "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-5' aria-hidden='true'>✦</span>" +
+    "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-6' aria-hidden='true'>✦</span>" +
+    "</div>" +
+    "</div>" +
     "<div id='terminal_ai_sidebar' class='terminal-ai-sidebar'>" +
     "<div class='terminal-ai-sidebar-header'>" +
     "<span class='terminal-ai-sidebar-title'>AI</span>" +
