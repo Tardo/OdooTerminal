@@ -74,3 +74,25 @@ body {
 .optsection .color_domain_btn_zone input#color_domain_color {
   width: 18%;
 }
+
+.optsection .ai_models_btn_zone {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em;
+  margin-top: 1em;
+}
+.optsection .ai_models_btn_zone input#ai_model_name {
+  width: 15%;
+}
+.optsection .ai_models_btn_zone input#ai_model_url {
+  flex-grow: 1;
+}
+.optsection .ai_models_btn_zone input#ai_model_api_key {
+  width: 20%;
+}
+.optsection .ai_models_btn_zone input#ai_model_model {
+  width: 20%;
+}
+.optsection .ai_models_btn_zone input#ai_model_timeout {
+  width: 8%;
+}

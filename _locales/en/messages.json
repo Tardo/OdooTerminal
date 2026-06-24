@@ -134,6 +134,24 @@
   "optionsTitleDeveloperZoneModeConsoleErrors": {
     "message": "Show errors in the browser console"
   },
+  "optionsTitleAIModels": {
+    "message": "AI Models"
+  },
+  "optionsTitleAIModelsDescription": {
+    "message": "Define AI model profiles to use in AI mode. Select the active model from the dropdown in the AI sidebar."
+  },
+  "optionsTitleAIModelsName": {
+    "message": "Name"
+  },
+  "optionsTitleAIModelsProvider": {
+    "message": "Provider"
+  },
+  "optionsTitleAIModelsModel": {
+    "message": "Model"
+  },
+  "optionsTitleAIModelsAdd": {
+    "message": "Add"
+  },
   "optionsReset": {
     "message": "Reset"
   },

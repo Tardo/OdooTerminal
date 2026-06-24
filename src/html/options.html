@@ -204,6 +204,36 @@
       </div>
 
       <div class="optsection">
+        <h4 id="title_ai_models">AI Models</h4>
+        <p id="desc_ai_models">
+          Define AI model profiles to use in AI mode. Select the active model from the dropdown in the AI sidebar.
+        </p>
+        <table class="fullwidth" id="ai_models_table">
+          <thead>
+            <tr>
+              <th style="width: 30%" id="column_ai_models_name">Name</th>
+              <th style="width: 20%" id="column_ai_models_provider">Provider</th>
+              <th style="width: 35%" id="column_ai_models_model">Model</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="ai_models_btn_zone">
+          <input type="edit" id="ai_model_name" name="ai_model_name" placeholder="Name" />
+          <select id="ai_model_provider" name="ai_model_provider">
+            <option value="openai">openai</option>
+            <option value="anthropic">anthropic</option>
+          </select>
+          <input type="edit" id="ai_model_url" name="ai_model_url" placeholder="URL" />
+          <input type="password" id="ai_model_api_key" name="ai_model_api_key" placeholder="API Key" />
+          <input type="edit" id="ai_model_model" name="ai_model_model" placeholder="Model name" />
+          <input type="number" id="ai_model_timeout" name="ai_model_timeout" placeholder="Timeout (s)" min="0" value="900" />
+          <button id="add_ai_model">Add</button>
+        </div>
+      </div>
+
+      <div class="optsection">
         <h4 id="title_init_commands">Init Commands</h4>
         <p id="desc_init_commands">
           Run these commands when initialize the terminal (one per line). Be careful! changes here can cause unwanted

@@ -12,6 +12,11 @@ export default function (): string {
     "<i class='fa fa-plus'></i>" +
     '</div>' +
     '</div>' +
+    "<div class='terminal-ai-model-selector'>" +
+    "<select id='terminal_ai_model_select' class='terminal-ai-model-select'>" +
+    "<option value=''>-- No model --</option>" +
+    '</select>' +
+    '</div>' +
     "<div id='terminal_ai_conv_list' class='terminal-ai-conv-list'></div>" +
     '</div>' +
     "<div class='terminal-screen-info-zone'>" +

@@ -138,6 +138,24 @@
   "optionsTitleDeveloperZoneModeConsoleErrors": {
     "message": "Mostrar errores en la consola del navegador"
   },
+  "optionsTitleAIModels": {
+    "message": "Modelos de IA"
+  },
+  "optionsTitleAIModelsDescription": {
+    "message": "Define perfiles de modelos de IA para usar en el modo IA. Selecciona el modelo activo desde el desplegable en la barra lateral de IA."
+  },
+  "optionsTitleAIModelsName": {
+    "message": "Nombre"
+  },
+  "optionsTitleAIModelsProvider": {
+    "message": "Proveedor"
+  },
+  "optionsTitleAIModelsModel": {
+    "message": "Modelo"
+  },
+  "optionsTitleAIModelsAdd": {
+    "message": "Añadir"
+  },
   "optionsReset": {
     "message": "Reestablecer"
   },

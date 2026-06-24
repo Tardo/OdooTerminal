@@ -777,6 +777,22 @@
   color: var(--terminal-color-white);
 }
 
+.o_terminal .terminal-ai-model-selector {
+  border-bottom: 1px solid var(--terminal-color-secondary);
+  flex-shrink: 0;
+  padding: 4px 6px;
+}
+
+.o_terminal .terminal-ai-model-select {
+  background-color: var(--terminal-color-dark);
+  border: 1px solid var(--terminal-color-secondary);
+  border-radius: 3px;
+  color: var(--terminal-color-light);
+  font-size: x-small;
+  padding: 2px 4px;
+  width: 100%;
+}
+
 .o_terminal .terminal-ai-conv-list {
   flex: 1;
   overflow-y: auto;

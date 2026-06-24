@@ -27,6 +27,7 @@ import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 import parseHTML from './utils/parse_html';
 import {Mutex} from 'async-mutex';
+import {aiState} from '@ai/state';
 import type {JobMetaInfo} from './shell';
 import type {ExtensionSettings} from '@common/constants';
 import type {CMDAssistantOption} from './core/command_assistant';
@@ -119,6 +120,7 @@ export default class Terminal {
   #isAIMode: boolean = false;
   #activeConvId: string | null = null;
   #aiConvList_el: HTMLElement | void;
+  #aiModelSelect_el: HTMLSelectElement | void;
   #aiInputHistory: Array<string> = [];
 
   constructor() {
@@ -216,6 +218,13 @@ export default class Terminal {
     if (aiConvListEl instanceof HTMLElement) {
       this.#aiConvList_el = aiConvListEl;
     }
+    const aiModelSelectEl = this.el.querySelector('#terminal_ai_model_select');
+    if (aiModelSelectEl instanceof HTMLSelectElement) {
+      this.#aiModelSelect_el = aiModelSelectEl;
+      // $FlowFixMe[method-unbinding]
+      aiModelSelectEl.addEventListener('change', this.#onChangeAIModel.bind(this));
+    }
+    this.#populateAIModelSelector();
     this.#isAIMode = getStorageSessionItem('terminal_ai_mode', false);
     this.#activeConvId = getStorageSessionItem('terminal_ai_active_conv', null);
     if (this.#isAIMode) {
@@ -1028,6 +1037,56 @@ export default class Terminal {
         ev.preventDefault();
       }
     }
+  }
+
+  /* AI MODEL SELECTOR */
+  #populateAIModelSelector() {
+    const selectEl = this.#aiModelSelect_el;
+    if (!selectEl) {
+      return;
+    }
+    const models = this.#config.ai_models || [];
+    while (selectEl.options.length > 1) {
+      selectEl.remove(1);
+    }
+    for (const m of models) {
+      const opt = document.createElement('option');
+      opt.value = m.name;
+      opt.textContent = m.name;
+      selectEl.appendChild(opt);
+    }
+    const activeModelName: string | null = getStorageLocalItem('terminal_ai_active_model', null);
+    if (activeModelName !== null) {
+      selectEl.value = activeModelName;
+      this.#applyAIModel(activeModelName);
+    }
+  }
+
+  #applyAIModel(name: string) {
+    const models = this.#config.ai_models || [];
+    const found = models.find(m => m.name === name);
+    if (found) {
+      aiState.url = found.url;
+      aiState.apiKey = found.api_key || null;
+      aiState.model = found.model || null;
+      aiState.provider = found.provider || null;
+      aiState.timeout = found.timeout > 0 ? found.timeout : null;
+    } else {
+      aiState.url = null;
+      aiState.apiKey = null;
+      aiState.model = null;
+      aiState.provider = null;
+      aiState.timeout = null;
+    }
+  }
+
+  #onChangeAIModel(ev: Event) {
+    if (!(ev.target instanceof HTMLSelectElement)) {
+      return;
+    }
+    const name = ev.target.value;
+    setStorageLocalItem('terminal_ai_active_model', name || null, err => this.screen.printError(err));
+    this.#applyAIModel(name);
   }
 
   /* AI CONVERSATIONS */

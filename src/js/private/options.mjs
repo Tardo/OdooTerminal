@@ -15,6 +15,7 @@ export type EventCallback = (ev: any) => Promise<void> | void;
 let unique_counter: number = 1;
 let shortcuts_defs: {[string]: string} = {};
 let color_domain_defs: {[string]: string} = {};
+let ai_models_defs: Array<{name: string, url: string, api_key: string, model: string, provider: string, timeout: number}> = [];
 
 async function loadThemeValues(theme: string): Promise<{[string]: mixed}> {
   return new Promise((resolve, reject) => {
@@ -54,6 +55,18 @@ function onClickColorDomainRemove(e: MouseEvent) {
     row?.parentNode?.removeChild(row);
     const {domain} = el_target.dataset;
     delete color_domain_defs[domain];
+  }
+}
+
+function onClickAIModelRemove(e: MouseEvent) {
+  if (e.target instanceof HTMLElement) {
+    const el_target = e.target;
+    const row_target_id = el_target.dataset.target;
+    const row = document.getElementById(row_target_id);
+    row?.parentNode?.removeChild(row);
+    const idx = Number(el_target.dataset.idx);
+    ai_models_defs.splice(idx, 1);
+    renderAIModelsTable();
   }
 }
 
@@ -108,6 +121,41 @@ function renderColorDomainTableItem(tbody: HTMLTableSectionElement, domain: stri
   elm_link_remove.dataset.domain = domain;
   new_cell_options.appendChild(elm_link_remove);
   elm_link_remove.addEventListener('click', onClickColorDomainRemove, false);
+}
+
+function renderAIModelsTableItem(tbody: HTMLTableSectionElement, idx: number, entry: {name: string, url: string, api_key: string, model: string, provider: string, timeout: number}) {
+  const row_id = `ai-model-${unique_counter++}`;
+  const new_row = tbody.insertRow();
+  const new_cell_name = new_row.insertCell(0);
+  const new_cell_provider = new_row.insertCell(1);
+  const new_cell_model = new_row.insertCell(2);
+  const new_cell_options = new_row.insertCell(3);
+  new_row.setAttribute('id', row_id);
+  new_cell_name.innerText = entry.name;
+  new_cell_provider.innerText = entry.provider;
+  new_cell_model.innerText = entry.model;
+  const elm_link_remove = document.createElement('a');
+  elm_link_remove.id = `${row_id}-remove`;
+  elm_link_remove.innerText = 'Remove';
+  elm_link_remove.href = '#';
+  elm_link_remove.classList.add('ai_model_remove');
+  elm_link_remove.dataset.target = row_id;
+  elm_link_remove.dataset.idx = String(idx);
+  new_cell_options.appendChild(elm_link_remove);
+  elm_link_remove.addEventListener('click', onClickAIModelRemove, false);
+}
+
+function renderAIModelsTable() {
+  const elm_table = document.getElementById('ai_models_table');
+  const tbody = elm_table?.getElementsByTagName('tbody')[0];
+  if (tbody && tbody instanceof HTMLTableSectionElement) {
+    while (tbody.rows.length > 0) {
+      tbody.deleteRow(0);
+    }
+    for (let i = 0; i < ai_models_defs.length; i++) {
+      renderAIModelsTableItem(tbody, i, ai_models_defs[i]);
+    }
+  }
 }
 
 function renderColorDomainTable() {
@@ -169,6 +217,7 @@ function saveOptions() {
   }
   data.shortcuts = shortcuts_defs;
   data.colors_domain = color_domain_defs;
+  data.ai_models = ai_models_defs;
   setStorageSync(data);
 }
 
@@ -213,8 +262,12 @@ function applyInputValues(values: {[string]: mixed}) {
   // $FlowFixMe[sketchy-null-mixed]
   // $FlowFixMe[incompatible-type]
   color_domain_defs = values.colors_domain || {};
+  // $FlowFixMe[sketchy-null-mixed]
+  // $FlowFixMe[incompatible-type]
+  ai_models_defs = values.ai_models || [];
   renderShortcutTable();
   renderColorDomainTable();
+  renderAIModelsTable();
 }
 
 function onSubmitForm(e: Event) {
@@ -287,6 +340,41 @@ function onClickColorDomainAdd() {
   }
 }
 
+function onClickAIModelAdd() {
+  const elm_name = document.getElementById('ai_model_name');
+  const elm_provider = document.getElementById('ai_model_provider');
+  const elm_url = document.getElementById('ai_model_url');
+  const elm_api_key = document.getElementById('ai_model_api_key');
+  const elm_model = document.getElementById('ai_model_model');
+  const elm_timeout = document.getElementById('ai_model_timeout');
+  if (
+    elm_name instanceof HTMLInputElement &&
+    elm_name.value &&
+    elm_provider instanceof HTMLSelectElement &&
+    elm_url instanceof HTMLInputElement &&
+    elm_url.value &&
+    elm_api_key instanceof HTMLInputElement &&
+    elm_model instanceof HTMLInputElement &&
+    elm_model.value &&
+    elm_timeout instanceof HTMLInputElement
+  ) {
+    ai_models_defs.push({
+      name: elm_name.value,
+      url: elm_url.value,
+      api_key: elm_api_key.value,
+      model: elm_model.value,
+      provider: elm_provider.value,
+      timeout: Number(elm_timeout.value) || 900,
+    });
+    renderAIModelsTable();
+    elm_name.value = '';
+    elm_url.value = '';
+    elm_api_key.value = '';
+    elm_model.value = '';
+    elm_timeout.value = '900';
+  }
+}
+
 async function onClickResetSettings() {
   setStorageSync(SETTING_DEFAULTS);
   applyInputValues(await getStorageSync(SETTING_NAMES));
@@ -351,6 +439,13 @@ function i18n() {
   _apply_i18n("label[for='cmd_assistant_match_mode']", 'optionsTitleCommandAssistantMatchMode');
   _apply_i18n("label[for='cmd_assistant_max_results']", 'optionsTitleCommandAssistantMaxResults');
 
+  _apply_i18n('#title_ai_models', 'optionsTitleAIModels');
+  _apply_i18n('#desc_ai_models', 'optionsTitleAIModelsDescription');
+  _apply_i18n('#column_ai_models_name', 'optionsTitleAIModelsName');
+  _apply_i18n('#column_ai_models_provider', 'optionsTitleAIModelsProvider');
+  _apply_i18n('#column_ai_models_model', 'optionsTitleAIModelsModel');
+  _apply_i18n('#add_ai_model', 'optionsTitleAIModelsAdd');
+
   _apply_i18n('#title_init_commands', 'optionsTitleInitCommands');
   _apply_i18n('#desc_init_commands', 'optionsTitleInitCommandsDescription');
 
@@ -382,6 +477,7 @@ async function onDOMLoaded() {
   _add_event_listener('#shortcut_keybind', 'keyup', onKeyUpShortcut);
   _add_event_listener('#add_shortcut', 'click', onClickShortcutAdd);
   _add_event_listener('#add_color_domain', 'click', onClickColorDomainAdd);
+  _add_event_listener('#add_ai_model', 'click', onClickAIModelAdd);
   _add_event_listener('.reset_settings', 'click', onClickResetSettings);
   _add_event_listener('#theme_preset', 'change', onChangeThemePreset);
   i18n();
