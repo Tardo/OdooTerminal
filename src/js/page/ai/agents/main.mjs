@@ -37,12 +37,9 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '- To run a command, output EXACTLY two lines in this order:\n' +
     'REASON: <one-line description of what this command achieves>\n' +
     'CMD: <script>\n' +
-    '- When done, output EXACTLY one line using one of:\n' +
-    'DONE: <final_answer>        ← default; a verifier will check your answer\n' +
-    'DONE_SKIP: <final_answer>   ← skip verification; use when ANY of these apply:\n' +
-    '  A. The last CMD was a display command (view, graph, pivot, form) and returned "(command executed, no return value)" — the task was to show data, the view is open, done.\n' +
-    '  B. At least one CMD was executed AND your answer is a direct restatement of command output (a count, a single field value, an ID) with zero inference or added claims.\n' +
-    '  When in doubt, use DONE: (not DONE_SKIP:).\n' +
+    '- When done, output EXACTLY:\n' +
+    'DONE: <final_answer>\n' +
+    '  <final_answer> is the LITERAL content displayed to the user on screen — write the actual answer the user should read, NOT a description or summary of what you did. Never write phrases like "response delivered", "greeting sent", "data shown", or any meta-commentary about your own action. If the user asked a question, answer it directly. If the user asked for data, state the data.\n' +
     '  <final_answer> MUST be raw HTML (allowed tags: <b>, <ul>, <li>, <code>, <br>; Bootstrap classes allowed). Never use markdown fences or <pre>.\n' +
     '- NEVER mix CMD and DONE/DONE_SKIP. NEVER output multiple CMD lines.\n' +
     '\n' +

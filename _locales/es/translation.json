@@ -83,12 +83,9 @@
         "cmdReason": "[Agente] {{reason}}",
         "header": "--- Agente ---",
         "maxSteps": "El agente ha alcanzado el númerp de intentos sin una respuesta final.",
-        "maxVerificationsNote": "[Agente] (max verifications reached — showing last response)",
         "noReturnValue": "(command executed, no return value)",
         "running": "[Agente] Ejecutando: <code>{{cmd}}</code>",
-        "thinking": "[Agente] Pensando... (paso {{step}}/{{max}})",
-        "verifyFailed": "[Agente] La respuesta se puede mejorar: {{reason}}",
-        "verifying": "[Agente] Verificando..."
+        "thinking": "[Agente] Pensando... (paso {{step}}/{{max}})"
       },
       "skill": {
         "alreadyLoaded": "Skill already loaded: {{name}}",
@@ -104,7 +101,6 @@
     "args": {
       "apiKey": "API key for authentication",
       "maxSteps": "Máx. iteraciones del agente (solo agente, por defecto 15)",
-      "maxVerifications": "Máx. reintentos de verificación (solo agente, por defecto 3)",
       "model": "Model name to use",
       "operation": "operation: connect, chat or exec",
       "prompt": "The prompt or natural language request to send",

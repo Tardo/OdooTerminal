@@ -8,7 +8,7 @@ import cmdAIConnect from '@ai/operations/connect';
 import cmdAIChat from '@ai/operations/chat';
 import cmdAIAgent from '@ai/operations/agent';
 import cmdAIStop from '@ai/operations/stop';
-import {DEFAULT_MAX_STEPS, DEFAULT_MAX_VERIFICATIONS} from '@ai/constants';
+import {DEFAULT_MAX_STEPS} from '@ai/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -59,7 +59,7 @@ async function cmdAI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackCo
       if (prompt === null || prompt === undefined || prompt === '') {
         throw new Error(i18n.t('cmdAI.agent.error.noPrompt', 'No prompt provided. Use: ai agent -p "your request"'));
       }
-      await cmdAIAgent.call(this, {prompt, model: kwargs.model, timeout: kwargs.timeout, max_steps: kwargs.max_steps, max_verifications: kwargs.max_verifications}, ctx);
+      await cmdAIAgent.call(this, {prompt, model: kwargs.model, timeout: kwargs.timeout, max_steps: kwargs.max_steps}, ctx);
       break;
     }
     case 'stop': {
@@ -139,13 +139,6 @@ export default function (): Partial<CMDDef> {
         false,
         i18n.t('cmdAI.args.maxSteps', `Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})`, {DEFAULT_MAX_STEPS}),
         DEFAULT_MAX_STEPS,
-      ],
-      [
-        ARG.Number,
-        ['v', 'max-verifications'],
-        false,
-        i18n.t('cmdAI.args.maxVerifications', `Max verification retries (agent only, default {{DEFAULT_MAX_VERIFICATIONS}})`, {DEFAULT_MAX_VERIFICATIONS}),
-        DEFAULT_MAX_VERIFICATIONS,
       ],
     ],
     example: 'connect -u "https://api.anthropic.com" -pr anthropic -ak "sk-ant-..." -m "claude-opus-4-8"',

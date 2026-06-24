@@ -7,10 +7,9 @@ import {aiState, aiRuntime} from '@ai/state';
 import {streamRequest} from '@ai/providers';
 import {startRequest, handleAbort} from '@ai/utils/network';
 import buildMainAgentPrompt from '@ai/agents/main';
-import buildVerifyAgentPrompt from '@ai/agents/verify';
 import SKILLS from '@ai/skills/__all__';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
-import {DEFAULT_MAX_STEPS, DEFAULT_MAX_VERIFICATIONS} from '@ai/constants';
+import {DEFAULT_MAX_STEPS} from '@ai/constants';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -32,11 +31,6 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     kwargs.timeout !== null && kwargs.timeout !== undefined ? kwargs.timeout : aiState.timeout;
   const maxSteps: number =
     kwargs.max_steps !== null && kwargs.max_steps !== undefined ? kwargs.max_steps : DEFAULT_MAX_STEPS;
-  const maxVerifications: number =
-    kwargs.max_verifications !== null && kwargs.max_verifications !== undefined
-      ? kwargs.max_verifications
-      : DEFAULT_MAX_VERIFICATIONS;
-
   // $FlowFixMe[incompatible-type]
   const initialMessages: Array<AIMessage> = Array.isArray(kwargs.initial_messages) ? kwargs.initial_messages : [];
 
@@ -55,8 +49,6 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     {role: 'user', content: prompt},
   ];
 
-  let verifyAttempts = 0;
-  let cmdCount = 0;
   const loadedSkills: Set<string> = new Set();
   let totalPromptTokens = 0;
   let totalCompletionTokens = 0;
@@ -260,7 +252,6 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         }
       }
 
-      cmdCount++;
       ctx.screen.print(
         i18n.t('cmdAI.agent.result.running', '[Agent] Running: <code>{{cmd}}</code>', {cmd}),
         false,
@@ -342,116 +333,12 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       if (step + 1 < maxSteps) {
         startThinking(step + 2);
       }
-    } else if (response.startsWith('DONE_SKIP:') && cmdCount > 0) {
-      const answer = response.slice(10).trim();
+    } else if (response.startsWith('DONE:') || response.startsWith('DONE_SKIP:')) {
+      const answer = (response.startsWith('DONE_SKIP:') ? response.slice(10) : response.slice(5)).trim();
       ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
       ctx.screen.print(answer, false);
       printTokenUsage();
       return messages.slice(1);
-    } else if (response.startsWith('DONE:') || response.startsWith('DONE_SKIP:')) {
-      // DONE_SKIP: with 0 CMDs falls through to full verification (anti-hallucination floor)
-      const answer = (response.startsWith('DONE_SKIP:') ? response.slice(10) : response.slice(5)).trim();
-
-      const verifyStart = Date.now();
-      const verifyingBaseMsg = i18n.t('cmdAI.agent.result.verifying', '[Agent] Verifying...');
-      const verifyLive = ctx.screen.printLive('agent-verifying');
-      verifyLive.update(`${verifyingBaseMsg} <span class="agent-elapsed">(0.0s)</span> ${stopLink}`);
-      const verifyElapsedEl = verifyLive.el.querySelector('.agent-elapsed');
-      const verifyTimer: IntervalID = setInterval(() => {
-        const elapsed = ((Date.now() - verifyStart) / 1000).toFixed(1);
-        if (verifyElapsedEl !== null && verifyElapsedEl instanceof HTMLElement) {
-          verifyElapsedEl.textContent = `(${elapsed}s)`;
-        }
-      }, 100);
-
-      const verifyMessages: Array<AIMessage> = [
-        ...messages.slice(1),
-        {role: 'user', content: buildVerifyAgentPrompt()},
-      ];
-
-      aiRuntime.controller = startRequest(timeoutSecs);
-      let verifyResponse = '';
-      try {
-        const {text: verifyText, usage: verifyUsage} = await streamRequest(
-          url,
-          aiState.apiKey,
-          model,
-          verifyMessages,
-          aiRuntime.controller.signal,
-          () => undefined,
-        );
-        verifyResponse = verifyText;
-        if (verifyUsage !== null && verifyUsage !== undefined) {
-          totalPromptTokens += verifyUsage.prompt_tokens;
-          totalCompletionTokens += verifyUsage.completion_tokens;
-          totalCacheCreationTokens += verifyUsage.cache_creation_input_tokens ?? 0;
-          totalCacheReadTokens += verifyUsage.cache_read_input_tokens ?? verifyUsage.prompt_tokens_details?.cached_tokens ?? 0;
-        }
-      } catch (err) {
-        if (!handleAbort(err, ctx)) {
-          ctx.screen.eprint(i18n.t('cmdAI.agent.error.requestFailed', 'Request failed: ') + err.message);
-          throw err;
-        }
-        return messages.slice(1);
-      } finally {
-        aiRuntime.controller = null;
-        clearInterval(verifyTimer);
-        const verifyElapsed = ((Date.now() - verifyStart) / 1000).toFixed(1);
-        verifyLive.update(`${verifyingBaseMsg} <span class="agent-elapsed">(${verifyElapsed}s)</span>`);
-      }
-
-      verifyResponse = verifyResponse.trim();
-      verifyResponse = verifyResponse.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-      verifyResponse = verifyResponse.replace(/<\/?think>/g, '').trim();
-
-      if (verifyResponse.startsWith('VERIFIED')) {
-        ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
-        ctx.screen.print(answer, false);
-        printTokenUsage();
-        return messages.slice(1);
-      }
-
-      verifyAttempts++;
-
-      const verifyReason = verifyResponse.startsWith('NOT_VERIFIED:')
-        ? verifyResponse.slice(13).trim()
-        : verifyResponse;
-
-      ctx.screen.eprint(
-        i18n.t('cmdAI.agent.result.verifyFailed', '[Agent] The answer can be improved: {{reason}}', {reason: verifyReason}),
-        false,
-        'line-warning',
-      );
-
-      if (verifyAttempts >= maxVerifications) {
-        ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
-        ctx.screen.print(answer, false);
-        ctx.screen.print(
-          i18n.t('cmdAI.agent.result.maxVerificationsNote', '[Agent] (max verifications reached — showing last response)'),
-          false,
-          'line-warning',
-        );
-        printTokenUsage();
-        return messages.slice(1);
-      }
-
-      step = -1;
-      cmdCount = 0;
-
-      const thinkContext =
-        thinkBlocks.length > 0
-          ? `\nYour previous reasoning before concluding:\n${thinkBlocks.join('\n---\n')}`
-          : '';
-
-      messages.push({
-        role: 'user',
-        content: `Verification failed: ${verifyReason}${thinkContext}\nPlease continue and fix the remaining issues.`,
-      });
-
-      // Flush buffered DOM writes before showing "Pensando paso 1" for the retry.
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      // step is -1 here; after loop increment it becomes 0 → paso 1
-      startThinking(step + 2);
     }
   }
 
