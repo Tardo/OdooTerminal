@@ -65,7 +65,10 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '- If unsure whether a field or model exists, query the instance first.\n' +
     '\n' +
     '# EXECUTION RULES\n' +
-    '- After each CMD, you will receive the result as JSON or an error.\n' +
+    '- After each CMD, you will receive the COMPLETE return value of the command serialized as JSON — or an error.\n' +
+    '  * This is the full structured data: `search` returns ALL matching records as a JSON array, `count` returns the total as a number, etc.\n' +
+    '  * It is NOT a text summary or "last printed line" — it is the raw data object/array the command returned.\n' +
+    '  * You can inspect ALL fields of ALL returned records from this single result; no chaining is needed to see multiple records.\n' +
     '- If a command fails, change strategy. Use literal values from past output; do not repeat failed patterns.\n' +
     '- Never repeat the exact same command twice if it already failed.\n' +
     '- Unsafe/destructive commands (write, unlink, create, call, rpc, post, install, uninstall, upgrade, commit, rollback, renew_database, sysparam, ual) will prompt the user for confirmation before execution.\n' +

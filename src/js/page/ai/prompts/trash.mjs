@@ -198,9 +198,10 @@ export default function(terminal: Terminal): string {
     '!!! FUNDAMENTAL RULES — READ BEFORE ANYTHING ELSE !!!\n' +
     '\n' +
     '[RULE 1 — ONE RESULT PER SCRIPT]\n' +
-    'A CMD script returns ONE value: the output of its LAST statement. ALL prior outputs are discarded.\n' +
-    '"cmd1; cmd2; cmd3" → you SEE only cmd3. cmd1 and cmd2 ran but their outputs are gone forever.\n' +
-    'You CANNOT observe multiple command outputs by chaining them. There is no way around this.\n' +
+    'A CMD script returns ONE value: the COMPLETE return value of its LAST statement — which may be an array of many records, a dict, a number, etc.\n' +
+    '"ONE result" does NOT mean one text line. `search -l 10` returns a JSON array of 10 full records — you see ALL of them at once.\n' +
+    '"cmd1; cmd2; cmd3" → the agent receives ONLY cmd3\'s complete return value. cmd1 and cmd2 ran but their results are gone forever.\n' +
+    'You CANNOT observe multiple command return values by chaining them. There is no way around this.\n' +
     '\n' +
     'WRONG — assignment is the last statement; assignment returns nothing → "(command executed, no return value)":\n' +
     '  CMD: $products = (search -m product.product -f name,lst_price -l 10)\n' +
