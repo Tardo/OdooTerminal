@@ -139,8 +139,10 @@ export default class Terminal {
     // Cached content
     const cachedScreen = getStorageSessionItem('terminal_screen');
     if (typeof cachedScreen === 'undefined') {
-      this.printWelcomeMessage();
-      this.screen.print('');
+      if (!getStorageSessionItem('terminal_ai_mode', false)) {
+        this.printWelcomeMessage();
+        this.screen.print('');
+      }
     } else {
       this.screen.print(cachedScreen);
       // RequestAnimationFrame(() => this.screen.scrollDown());
@@ -881,12 +883,13 @@ export default class Terminal {
         return;
       }
       this.screen.printCommand(input);
-      this.#storeAIInput(input);
-      this.screen.cleanInput();
-      this.updateAssistantoptions();
       if (this.#activeConvId === null) {
         this.createAIConversation(input.slice(0, 40) || i18n.t('terminal.ai.newConversation', 'New conversation'));
       }
+      this.#storeAIInput(input);
+      this.#searchHistoryQuery = '';
+      this.screen.cleanInput();
+      this.updateAssistantoptions();
       this.onAIModeInput(input).catch(() => {
         // Do nothing
       });
@@ -1253,6 +1256,7 @@ export default class Terminal {
     }
   }
   #onCoreBeforeUnload(ev: BeforeUnloadEvent) {
+    this.#saveCurrentScreenSnapshot();
     const jobs = this.#shell.getActiveJobs();
     if (jobs.length) {
       if (jobs.length === 1 && (!jobs[0] || ['reload', 'login'].indexOf(jobs[0].cmdInfo.cmdName) !== -1)) {

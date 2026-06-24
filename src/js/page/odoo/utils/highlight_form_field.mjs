@@ -39,6 +39,7 @@ function injectFieldHighlight(fieldName: string): void {
   style.textContent = `
     .o_field_widget[name="${fieldName}"] {
       position: relative !important;
+      z-index: 0 !important;
     }
     .o_field_widget[name="${fieldName}"]::before {
       content: '' !important;
