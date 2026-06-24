@@ -11,7 +11,7 @@ export type FieldHighlightGenerator = (fieldName: string) => string;
 // e.g. 'many2one', 'many2many', 'one2many', 'char'). Falls back to 'default'.
 export const FIELD_HIGHLIGHT_GENERATORS: {[string]: FieldHighlightGenerator} = {
   default: fieldName => `
-    .o_cell:has(.o_field_widget[name="${fieldName}"]) {
+    .o_cell:has(.o_field_widget[name="${fieldName}"]), td > .o_field_widget[name="${fieldName}"] {
       border: 3px solid #f0ad4e !important;
       border-radius: 4px !important;
       box-sizing: border-box !important;

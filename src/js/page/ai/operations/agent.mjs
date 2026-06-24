@@ -14,6 +14,33 @@ import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 
+const AGENT_TOOLS: Array<AIToolDef> = [
+  {
+    name: 'run_command',
+    description: 'Execute a TraSH command in OdooTerminal. Returns the serialized output or error.',
+    parameters: {
+      type: 'object',
+      properties: {
+        reason: {type: 'string', description: 'One-line description of what this command achieves'},
+        cmd: {type: 'string', description: 'TraSH command to execute'},
+      },
+      required: ['cmd'],
+    },
+  },
+  {
+    name: 'load_skill',
+    description: 'Load a skill module to access domain-specific knowledge about Odoo (field names, query patterns, TraSH syntax). Use before writing complex scripts or when uncertain about model fields.',
+    parameters: {
+      type: 'object',
+      properties: {
+        name: {type: 'string', description: 'Skill name to load'},
+      },
+      required: ['name'],
+    },
+  },
+];
+
+
 export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<Array<AIMessage>> {
   if (aiState.url === null || aiState.url === undefined) {
     throw new Error(i18n.t('cmdAI.agent.error.notConfigured', 'Not connected. Use "ai connect" first'));
@@ -54,7 +81,6 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
   let cmdSuccessCount = 0;
   let totalPromptTokens = 0;
   let totalCompletionTokens = 0;
-
   let totalCacheCreationTokens = 0;
   let totalCacheReadTokens = 0;
 
@@ -120,14 +146,13 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
   startThinking(1);
 
   for (let step = 0; step < maxSteps; step++) {
-    // thinkLive/thinkTimer are already running (set by startThinking before the loop
-    // or at the end of the previous CMD iteration after flushing the DOM buffer)
-
     aiRuntime.controller = startRequest(timeoutSecs);
 
-    let response = '';
+    let text = '';
+    let toolCalls: Array<AIToolCall> = [];
+
     try {
-      const {text, usage} = await streamRequest(
+      const result = await streamRequest(
         url,
         aiState.apiKey,
         model,
@@ -136,8 +161,11 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         () => undefined,
         null,
         aiState.maxTokens,
+        AGENT_TOOLS,
       );
-      response = text;
+      text = result.text;
+      toolCalls = result.toolCalls;
+      const {usage} = result;
       if (usage !== null && usage !== undefined) {
         totalPromptTokens += usage.prompt_tokens;
         totalCompletionTokens += usage.completion_tokens;
@@ -160,196 +188,24 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       thinkLive?.update(`${thinkingBaseMsg} <span class="agent-elapsed">(${thinkElapsed}s)</span>`);
     }
 
-    response = response
-      .trim()
-      .replace(/^```[\w]*\n?/, '')
-      .replace(/\n?```$/, '')
-      .trim();
-
-    // Extract <think>...</think> blocks emitted by reasoning models, display them, then strip
-    const thinkMatches = [...response.matchAll(/<think>([\s\S]*?)<\/think>/g)];
-    const thinkBlocks: Array<string> = thinkMatches.map(m => m[1].trim());
-    response = response.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-    response = response.replace(/<\/?think>/g, '').trim();
-
-    for (const thinkContent of thinkBlocks) {
-      const escaped = thinkContent
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      ctx.screen.print(
-        `<details class="agent-think"><summary>Thinking...</summary><pre>${escaped}</pre></details>`,
-        false,
-      );
+    // Build assistant message with both text and tool_use blocks
+    const assistantContent: Array<AIContentBlock> = [];
+    if (text) {
+      assistantContent.push({type: 'text', text});
     }
-
-    messages.push({role: 'assistant', content: response});
-
-    // Extract REASON: description that precedes a CMD: (works for both strict protocol and embedded text)
-    let cmdReason = '';
-    const lastCmdPos = response.lastIndexOf('CMD:');
-    if (lastCmdPos !== -1) {
-      const lastReasonPos = response.lastIndexOf('REASON:');
-      if (lastReasonPos !== -1 && lastReasonPos < lastCmdPos) {
-        const reasonLineEnd = response.indexOf('\n', lastReasonPos);
-        cmdReason = response.slice(lastReasonPos + 7, reasonLineEnd !== -1 ? reasonLineEnd : undefined).trim();
-      }
+    for (const tc of toolCalls) {
+      assistantContent.push({type: 'tool_use', id: tc.id, name: tc.name, input: tc.input});
     }
+    messages.push({role: 'assistant', content: assistantContent});
 
-    // Normalize: if model skipped CMD:/DONE:/DONE_SKIP: protocol, infer intent.
-    // REASON:+CMD: two-line protocol is valid — extract CMD: line from it.
-    // Prefer the LAST occurrence so reasoning text before the decision is ignored.
-    if (!response.startsWith('CMD:') && !response.startsWith('DONE:') && !response.startsWith('DONE_SKIP:') && !response.startsWith('SKILL:')) {
-      const cmdMatches = [...response.matchAll(/^CMD:\s*(.+)$/gm)];
-      const rawCmdLine = cmdMatches.length > 0 ? cmdMatches[cmdMatches.length - 1][1].trim() : undefined;
-      // Detect "CMD: SKILL: name" — model confused CMD: with SKILL: prefix
-      const skillMatches = [...response.matchAll(/^SKILL:\s*\S+/gm)];
-      const skillLine = skillMatches.length > 0 ? skillMatches[skillMatches.length - 1][0] : undefined;
-      const doneSkipPos = response.lastIndexOf('DONE_SKIP:');
-      const donePos = response.lastIndexOf('DONE:');
-      if (rawCmdLine !== undefined && rawCmdLine.startsWith('SKILL:')) {
-        response = rawCmdLine;
-      } else if (skillLine !== undefined) {
-        response = skillLine;
-      } else if (rawCmdLine !== undefined) {
-        response = 'CMD: ' + rawCmdLine;
-      } else if (doneSkipPos !== -1 && doneSkipPos > donePos) {
-        response = response.slice(doneSkipPos);
-      } else if (donePos !== -1) {
-        response = response.slice(donePos);
-      } else {
-        response = 'DONE: ' + response;
-      }
-    }
-
-    if (response.startsWith('CMD:')) {
-      // Take only the first line — models sometimes emit reasoning after the command.
-      // Strip surrounding backticks (inline code markers some models add).
-      const cmd = response.slice(4).split('\n')[0].trim().replace(/^`+|`+$/g, '');
-
-      if (cmdReason) {
-        ctx.screen.print(
-          i18n.t('cmdAI.agent.result.cmdReason', '[Agent] {{reason}}', {reason: cmdReason}),
-          false,
-        );
-      }
-
-      const registeredCmds = this.getShell().getVM().getRegisteredCmds();
-      const isUnsafe = cmd.split(';').map(part => part.trim().split(/\s+/)[0]).filter(Boolean)
-        .some(name => registeredCmds[name]?.unsafe);
-
-      if (isUnsafe) {
-        const question = cmdReason
-          ? i18n.t('cmdAI.agent.unsafe.questionWithReason', '[Agent] {{reason}} — Unsafe command: {{cmd}} — Execute?', {reason: cmdReason, cmd})
-          : i18n.t('cmdAI.agent.unsafe.question', '[Agent] Unsafe command: {{cmd}} — Execute?', {cmd});
-        const answer = await ctx.screen.showQuestion(question, ['y', 'n'], 'n');
-        if (answer?.toLowerCase() !== 'y') {
-          messages.push({
-            role: 'user',
-            content: i18n.t('cmdAI.agent.unsafe.rejected', 'Command rejected by user: {{cmd}}', {cmd}),
-          });
-          await new Promise(resolve => requestAnimationFrame(resolve));
-          if (step + 1 < maxSteps) {
-            startThinking(step + 2);
-          }
-          continue;
-        }
-      }
-
-      ctx.screen.print(
-        i18n.t('cmdAI.agent.result.running', '[Agent] Running: <code>{{cmd}}</code>', {cmd}),
-        false,
-      );
-
-      let outputStr = '';
-      let cmdFailed = false;
-      try {
-        // $FlowFixMe[incompatible-type]
-        const result: mixed = await this.executeAll(cmd, false, true, false, false);
-        if (result !== null && result !== undefined) {
-          try {
-            const serialized = JSON.stringify(result);
-            outputStr = serialized !== undefined ? serialized : String(result);
-          } catch (_) {
-            outputStr = String(result);
-          }
-        } else {
-          outputStr = i18n.t('cmdAI.agent.result.noReturnValue', '(command executed, no return value)');
-        }
-      } catch (err) {
-        cmdFailed = true;
-        outputStr = err.message;
-      }
-
-      cmdExecutedCount++;
-      if (!cmdFailed) {
-        cmdSuccessCount++;
-      }
-
-      const MAX_CMD_OUTPUT_CHARS = 6000;
-      if (outputStr.length > MAX_CMD_OUTPUT_CHARS) {
-        outputStr = outputStr.slice(0, MAX_CMD_OUTPUT_CHARS) + `\n[output truncated — ${outputStr.length} chars total, showing first ${MAX_CMD_OUTPUT_CHARS}]`;
-      }
-      messages.push({
-        role: 'user',
-        content: cmdFailed ? `Command failed:\n${outputStr}` : `Command output:\n${outputStr}`,
-      });
-
-      // print/eprint route through a requestAnimationFrame buffer, while printLive
-      // appends synchronously. Awaiting one rAF here ensures any command output or
-      // error printed by execute() lands in the DOM before the next "Pensando" element.
-      await new Promise(resolve => requestAnimationFrame(resolve));
-
-      if (step + 1 < maxSteps) {
-        startThinking(step + 2);
-      }
-    } else if (response.startsWith('SKILL:')) {
-      const skillName = response.slice(6).split('\n')[0].trim();
-      const skill = SKILLS.find(s => s.name === skillName);
-
-      if (skill === undefined) {
-        messages.push({
-          role: 'user',
-          content: i18n.t('cmdAI.agent.skill.unknown', 'Skill not found: {{name}}. Available: {{list}}', {
-            name: skillName,
-            list: SKILLS.map(s => s.name).join(', '),
-          }),
-        });
-      } else if (loadedSkills.has(skillName)) {
-        messages.push({
-          role: 'user',
-          content: i18n.t('cmdAI.agent.skill.alreadyLoaded', 'Skill already loaded: {{name}}', {name: skillName}),
-        });
-      } else {
-        loadedSkills.add(skillName);
-        const skillLabel = i18n.t('cmdAI.agent.skill.loading', '[Agent] Loading skill: {{name}}', {name: skillName});
-        const skillHtml = Array.from(skillLabel)
-          .map((ch, i) => {
-            const safe = ch === '&' ? '&amp;' : ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === ' ' ? '&nbsp;' : ch;
-            return `<span class="agent-skill-char" style="animation-delay:${i * 38}ms">${safe}</span>`;
-          })
-          .join('');
-        ctx.screen.print(skillHtml, false, 'agent-skill-loading');
-        const major = Number(getOdooVersion('major') ?? -1);
-        messages.push({
-          role: 'user',
-          content: `Skill loaded: ${skillName}\n${skill.content(major)}`,
-        });
-      }
-
-      await new Promise(resolve => requestAnimationFrame(resolve));
-
-      if (step + 1 < maxSteps) {
-        startThinking(step + 2);
-      }
-    } else if (response.startsWith('DONE:') || response.startsWith('DONE_SKIP:')) {
-      // Enforce: at least one CMD must have been executed before concluding
+    // No tool calls → final answer
+    if (toolCalls.length === 0) {
       if (cmdExecutedCount === 0) {
         messages.push({
           role: 'user',
           content:
-            'PROTOCOL VIOLATION: You output DONE without executing any CMD. ' +
-            'You MUST run at least one CMD and use its output to ground your answer. Execute a CMD now.',
+            'You must call run_command at least once before providing a final answer for tasks involving Odoo data. ' +
+            'Execute a command now.',
         });
         await new Promise(resolve => requestAnimationFrame(resolve));
         if (step + 1 < maxSteps) {
@@ -357,15 +213,13 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         }
         continue;
       }
-      // Enforce: do not claim success when every CMD so far has failed
       if (cmdSuccessCount === 0) {
         messages.push({
           role: 'user',
           content:
-            'PROTOCOL VIOLATION: All your CMDs have failed. ' +
-            'You must not fabricate results. Either try a different CMD approach or report the failure honestly.',
+            'All your commands have failed. You must not fabricate results. ' +
+            'Either try a different command approach or report the failure honestly.',
         });
-        // Reset so the model can DONE after this nudge (honest failure report)
         cmdSuccessCount = -1;
         await new Promise(resolve => requestAnimationFrame(resolve));
         if (step + 1 < maxSteps) {
@@ -373,11 +227,158 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         }
         continue;
       }
-      const answer = (response.startsWith('DONE_SKIP:') ? response.slice(10) : response.slice(5)).trim();
-      ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
-      ctx.screen.print(answer, false);
+
+      // Strip and display <think> blocks from final answer
+      let finalText = text.trim();
+      const thinkMatches = [...finalText.matchAll(/<think>([\s\S]*?)<\/think>/g)];
+      const thinkBlocks: Array<string> = thinkMatches.map(m => m[1].trim());
+      finalText = finalText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+      finalText = finalText.replace(/<\/?think>/g, '').trim();
+      for (const thinkContent of thinkBlocks) {
+        const escaped = thinkContent
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        ctx.screen.print(
+          `<details class="agent-think"><summary>Thinking...</summary><pre>${escaped}</pre></details>`,
+          false,
+        );
+      }
+
+      if (finalText) {
+        ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
+        ctx.screen.print(finalText, false);
+      }
       printTokenUsage();
       return messages.slice(1);
+    }
+
+    // Process tool calls
+    const toolResults: Array<AIContentBlock> = [];
+
+    for (const tc of toolCalls) {
+      if (tc.name === 'run_command') {
+        const cmd = String(tc.input.cmd ?? '').trim();
+        const reason = String(tc.input.reason ?? '');
+
+        if (reason) {
+          ctx.screen.print(
+            i18n.t('cmdAI.agent.result.cmdReason', '[Agent] {{reason}}', {reason}),
+            false,
+          );
+        }
+
+        const registeredCmds = this.getShell().getVM().getRegisteredCmds();
+        const isUnsafe = cmd.split(';').map(part => part.trim().split(/\s+/)[0]).filter(Boolean)
+          .some(name => registeredCmds[name]?.unsafe);
+
+        if (isUnsafe) {
+          const question = reason
+            ? i18n.t('cmdAI.agent.unsafe.questionWithReason', '[Agent] {{reason}} — Unsafe command: {{cmd}} — Execute?', {reason, cmd})
+            : i18n.t('cmdAI.agent.unsafe.question', '[Agent] Unsafe command: {{cmd}} — Execute?', {cmd});
+          const answer = await ctx.screen.showQuestion(question, ['y', 'n'], 'n');
+          if (answer?.toLowerCase() !== 'y') {
+            toolResults.push({
+              type: 'tool_result',
+              tool_use_id: tc.id,
+              content: i18n.t('cmdAI.agent.unsafe.rejected', 'Command rejected by user: {{cmd}}', {cmd}),
+            });
+            continue;
+          }
+        }
+
+        ctx.screen.print(
+          i18n.t('cmdAI.agent.result.running', '[Agent] Running: <code>{{cmd}}</code>', {cmd}),
+          false,
+        );
+
+        let outputStr = '';
+        let cmdFailed = false;
+        try {
+          // $FlowFixMe[incompatible-type]
+          const result: mixed = await this.executeAll(cmd, false, true, false, false);
+          if (result !== null && result !== undefined) {
+            try {
+              const serialized = JSON.stringify(result);
+              outputStr = serialized !== undefined ? serialized : String(result);
+            } catch (_) {
+              outputStr = String(result);
+            }
+          } else {
+            outputStr = i18n.t('cmdAI.agent.result.noReturnValue', '(command executed, no return value)');
+          }
+        } catch (err) {
+          cmdFailed = true;
+          outputStr = err.message;
+        }
+
+        cmdExecutedCount++;
+        if (!cmdFailed) {
+          cmdSuccessCount++;
+        }
+
+        const MAX_CMD_OUTPUT_CHARS = 6000;
+        if (outputStr.length > MAX_CMD_OUTPUT_CHARS) {
+          outputStr = outputStr.slice(0, MAX_CMD_OUTPUT_CHARS) + `\n[output truncated — ${outputStr.length} chars total, showing first ${MAX_CMD_OUTPUT_CHARS}]`;
+        }
+
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: tc.id,
+          content: cmdFailed ? `Command failed:\n${outputStr}` : `Command output:\n${outputStr}`,
+        });
+
+      } else if (tc.name === 'load_skill') {
+        const skillName = String(tc.input.name ?? '').trim();
+        const skill = SKILLS.find(s => s.name === skillName);
+
+        let skillContent = '';
+
+        if (skill === undefined) {
+          skillContent = i18n.t('cmdAI.agent.skill.unknown', 'Skill not found: {{name}}. Available: {{list}}', {
+            name: skillName,
+            list: SKILLS.map(s => s.name).join(', '),
+          });
+        } else if (loadedSkills.has(skillName)) {
+          skillContent = i18n.t('cmdAI.agent.skill.alreadyLoaded', 'Skill already loaded: {{name}}', {name: skillName});
+        } else {
+          loadedSkills.add(skillName);
+          const skillLabel = i18n.t('cmdAI.agent.skill.loading', '[Agent] Loading skill: {{name}}', {name: skillName});
+          const skillHtml = Array.from(skillLabel)
+            .map((ch, i) => {
+              const safe = ch === '&' ? '&amp;' : ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === ' ' ? '&nbsp;' : ch;
+              return `<span class="agent-skill-char" style="animation-delay:${i * 38}ms">${safe}</span>`;
+            })
+            .join('');
+          ctx.screen.print(skillHtml, false, 'agent-skill-loading');
+          const major = Number(getOdooVersion('major') ?? -1);
+          skillContent = `Skill loaded: ${skillName}\n${skill.content(major)}`;
+        }
+
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: tc.id,
+          content: skillContent,
+        });
+
+      } else {
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: tc.id,
+          content: `Unknown tool: ${tc.name}`,
+        });
+      }
+    }
+
+    messages.push({role: 'user', content: toolResults});
+
+    // print/eprint route through a requestAnimationFrame buffer, while printLive
+    // appends synchronously. Awaiting one rAF here ensures any command output or
+    // error printed by execute() lands in the DOM before the next thinking element.
+    await new Promise(resolve => requestAnimationFrame(resolve));
+
+    if (step + 1 < maxSteps) {
+      startThinking(step + 2);
     }
   }
 

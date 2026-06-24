@@ -16,15 +16,32 @@ declare type TokenUsage = {
   prompt_tokens_details?: {cached_tokens?: number},
 };
 
-declare type AIContentBlock = {
-  type: 'text',
-  text: string,
-  cache_control?: {type: 'ephemeral'},
+declare type AIToolCall = {
+  id: string,
+  name: string,
+  input: {[string]: mixed},
 };
+
+declare type AIToolDef = {
+  name: string,
+  description: string,
+  parameters: {[string]: mixed},
+};
+
+declare type AIContentBlock =
+  | {type: 'text', text: string, cache_control?: {type: 'ephemeral'}}
+  | {type: 'tool_use', id: string, name: string, input: {[string]: mixed}}
+  | {type: 'tool_result', tool_use_id: string, content: string};
 
 declare type AIMessage = {
   role: string,
   content: string | Array<AIContentBlock>,
+};
+
+declare type AIStreamResult = {
+  text: string,
+  toolCalls: Array<AIToolCall>,
+  usage: ?TokenUsage,
 };
 
 declare type AIRuntime = {

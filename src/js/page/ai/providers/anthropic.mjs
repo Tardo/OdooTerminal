@@ -15,7 +15,8 @@ export default async function streamRequestAnthropic(
   onDelta: (delta: string) => void,
   stop?: ?Array<string>,
   maxTokens?: ?number,
-): Promise<{text: string, usage: ?TokenUsage}> {
+  tools?: ?Array<AIToolDef>,
+): Promise<AIStreamResult> {
   const headers: {[string]: string} = {
     'Content-Type': 'application/json',
     'anthropic-version': '2023-06-01',
@@ -43,6 +44,15 @@ export default async function streamRequestAnthropic(
 
   if (stop !== null && stop !== undefined && stop.length > 0) {
     body.stop_sequences = stop;
+  }
+
+  if (tools !== null && tools !== undefined && tools.length > 0) {
+    body.tools = tools.map(t => ({
+      name: t.name,
+      description: t.description,
+      input_schema: t.parameters,
+    }));
+    body.tool_choice = {type: 'auto', disable_parallel_tool_use: true};
   }
 
   const response = await fetch(`${url}/v1/messages`, {
@@ -74,6 +84,9 @@ export default async function streamRequestAnthropic(
   let outputTokens = 0;
   let cacheCreationTokens = 0;
   let cacheReadTokens = 0;
+
+  const toolCalls: Array<AIToolCall> = [];
+  const pendingToolCalls: Map<number, {id: string, name: string, jsonAccum: string}> = new Map();
 
   while (true) {
     const {done, value} = await reader.read();
@@ -113,11 +126,39 @@ export default async function streamRequestAnthropic(
             cacheCreationTokens = msgUsage.cache_creation_input_tokens ?? 0;
             cacheReadTokens = msgUsage.cache_read_input_tokens ?? 0;
           }
-        } else if (currentEvent === 'content_block_delta' && data.delta?.type === 'text_delta') {
-          const delta: string = data.delta.text ?? '';
-          if (delta) {
-            fullResponse += delta;
-            onDelta(delta);
+        } else if (currentEvent === 'content_block_start' && data.content_block?.type === 'tool_use') {
+          const idx: number = data.index ?? 0;
+          pendingToolCalls.set(idx, {
+            id: data.content_block.id ?? '',
+            name: data.content_block.name ?? '',
+            jsonAccum: '',
+          });
+        } else if (currentEvent === 'content_block_delta') {
+          if (data.delta?.type === 'text_delta') {
+            const delta: string = data.delta.text ?? '';
+            if (delta) {
+              fullResponse += delta;
+              onDelta(delta);
+            }
+          } else if (data.delta?.type === 'input_json_delta') {
+            const idx: number = data.index ?? 0;
+            const pending = pendingToolCalls.get(idx);
+            if (pending !== undefined) {
+              pending.jsonAccum += data.delta.partial_json ?? '';
+            }
+          }
+        } else if (currentEvent === 'content_block_stop') {
+          const idx: number = data.index ?? 0;
+          const pending = pendingToolCalls.get(idx);
+          if (pending !== undefined) {
+            try {
+              // $FlowFixMe[incompatible-type]
+              const input: {[string]: mixed} = JSON.parse(pending.jsonAccum || '{}');
+              toolCalls.push({id: pending.id, name: pending.name, input});
+            } catch (_) {
+              toolCalls.push({id: pending.id, name: pending.name, input: {}});
+            }
+            pendingToolCalls.delete(idx);
           }
         } else if (currentEvent === 'message_delta') {
           outputTokens = data.usage?.output_tokens ?? 0;
@@ -136,5 +177,5 @@ export default async function streamRequestAnthropic(
     cache_read_input_tokens: cacheReadTokens,
   };
 
-  return {text: fullResponse, usage};
+  return {text: fullResponse, toolCalls, usage};
 }
