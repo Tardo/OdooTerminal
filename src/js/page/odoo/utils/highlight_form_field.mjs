@@ -2,57 +2,45 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-const BASE_STYLE_ID = 'oterm-form-highlight-base';
 const FIELD_STYLE_PREFIX = 'oterm-highlight-f-';
 
-function ensureBaseStyle(): void {
-  if (document.getElementById(BASE_STYLE_ID)) {
-    return;
-  }
-  const style = document.createElement('style');
-  style.id = BASE_STYLE_ID;
-  style.textContent = `
-    @keyframes oterm-field-pulse {
-      0%, 100% { border-color: #f0ad4e; }
-      50%       { border-color: #e8690b; }
+// Generator receives the field name and returns the CSS string to inject into <head>.
+export type FieldHighlightGenerator = (fieldName: string) => string;
+
+// Registry keyed by the Odoo field type (the part of the widget class after 'o_field_',
+// e.g. 'many2one', 'many2many', 'one2many', 'char'). Falls back to 'default'.
+export const FIELD_HIGHLIGHT_GENERATORS: {[string]: FieldHighlightGenerator} = {
+  default: fieldName => `
+    .o_cell:has(.o_field_widget[name="${fieldName}"]) {
+      border: 3px solid #f0ad4e !important;
+      border-radius: 4px !important;
+      box-sizing: border-box !important;
+      animation: oterm-field-pulse 1s ease-in-out 4 !important;
     }
-  `;
-  document.head?.appendChild(style);
+  `,
+};
+
+// Extracts the Odoo field type from the widget element's class list.
+// Returns the part after 'o_field_' (e.g. 'many2one'), or 'default' if not found.
+function getFieldType(el: Element): string {
+  const typeClass = Array.from(el.classList).find(
+    cls => cls.startsWith('o_field_') && cls !== 'o_field_widget',
+  );
+  return typeClass !== undefined ? typeClass.slice('o_field_'.length) : 'default';
 }
 
-// Injects a per-field <style> into <head> that creates a ::before pseudo-element
-// overlay on top of the widget's content (z-index: 9999). This sidesteps three
-// common failure modes for o2m/m2m fields:
-//   - `outline` and `box-shadow` are painted below the widget's own content
-//     (sticky table headers, child stacking contexts) and can be invisible.
-//   - Odoo may reset `outline: none !important` on field types.
-//   - OWL re-patches the component subtree but never touches <head>, so the
-//     style tag survives re-renders intact.
-function injectFieldHighlight(fieldName: string): void {
-  ensureBaseStyle();
+// Injects a per-field <style> into <head> using the generator registered for the
+// detected field type (falls back to 'default'). The <head> injection is immune to
+// OWL re-patching the component subtree.
+function injectFieldHighlight(fieldName: string, fieldType: string): void {
   const id = `${FIELD_STYLE_PREFIX}${fieldName}`;
   if (document.getElementById(id)) {
     return;
   }
+  const generator = FIELD_HIGHLIGHT_GENERATORS[fieldType] ?? FIELD_HIGHLIGHT_GENERATORS.default;
   const style = document.createElement('style');
   style.id = id;
-  style.textContent = `
-    .o_field_widget[name="${fieldName}"] {
-      position: relative !important;
-      z-index: 0 !important;
-    }
-    .o_field_widget[name="${fieldName}"]::before {
-      content: '' !important;
-      position: absolute !important;
-      inset: 0 !important;
-      border: 3px solid #f0ad4e !important;
-      border-radius: 4px !important;
-      pointer-events: none !important;
-      z-index: 9999 !important;
-      box-sizing: border-box !important;
-      animation: oterm-field-pulse 1s ease-in-out 4 !important;
-    }
-  `;
+  style.textContent = generator(fieldName);
   document.head?.appendChild(style);
 }
 
@@ -128,7 +116,8 @@ export async function highlightFormFields(fieldName: string): Promise<number> {
     await new Promise<void>(resolve => setTimeout(resolve, 200));
   }
 
-  injectFieldHighlight(fieldName);
+  const fieldType = getFieldType(els[0]);
+  injectFieldHighlight(fieldName, fieldType);
 
   els[0].scrollIntoView({behavior: 'smooth', block: 'center'});
   return count;

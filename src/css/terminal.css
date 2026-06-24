@@ -1051,3 +1051,7 @@
   60% { opacity: 0.5; transform: scale(1) translateY(-10px); }
   90% { opacity: 0; transform: scale(0.3) translateY(-15px); }
 }
+@keyframes oterm-field-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(240, 173, 78, 0.4); }
+  50%       { box-shadow: 0 0 8px 4px rgba(232, 105, 11, 0.7); }
+}
