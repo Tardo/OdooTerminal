@@ -8,7 +8,7 @@ import cmdAIConnect from '@ai/operations/connect';
 import cmdAIChat from '@ai/operations/chat';
 import cmdAIAgent from '@ai/operations/agent';
 import cmdAIStop from '@ai/operations/stop';
-import {DEFAULT_MAX_STEPS} from '@ai/constants';
+import {DEFAULT_MAX_STEPS, DEFAULT_MAX_TOKENS} from '@ai/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -34,6 +34,7 @@ async function cmdAI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackCo
           model: kwargs.model,
           timeout: kwargs.timeout,
           provider: kwargs.provider,
+          max_tokens: kwargs.max_tokens,
         },
         ctx,
       );
@@ -139,6 +140,14 @@ export default function (): Partial<CMDDef> {
         false,
         i18n.t('cmdAI.args.maxSteps', `Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})`, {DEFAULT_MAX_STEPS}),
         DEFAULT_MAX_STEPS,
+      ],
+      // safety options
+      [
+        ARG.Number,
+        ['mt', 'max-tokens'],
+        false,
+        i18n.t('cmdAI.args.maxTokens', 'Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})', {DEFAULT_MAX_TOKENS}),
+        DEFAULT_MAX_TOKENS,
       ],
     ],
     example: 'connect -u "https://api.anthropic.com" -pr anthropic -ak "sk-ant-..." -m "claude-opus-4-8"',

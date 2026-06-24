@@ -13,12 +13,14 @@ export default async function cmdAIConnect(kwargs: CMDCallbackArgs, ctx: CMDCall
   const model: ?string = kwargs.model;
   const timeout: ?number = kwargs.timeout;
   const provider: ?string = kwargs.provider;
+  const maxTokens: ?number = kwargs.max_tokens;
 
   aiState.url = url;
   aiState.apiKey = apiKey;
   aiState.model = model;
   aiState.timeout = timeout !== null && timeout !== undefined && timeout > 0 ? timeout : null;
   aiState.provider = provider !== null && provider !== undefined && provider !== '' ? provider : null;
+  aiState.maxTokens = maxTokens !== null && maxTokens !== undefined && maxTokens > 0 ? maxTokens : null;
 
   const info = [
     `URL: ${url}`,
@@ -26,6 +28,7 @@ export default async function cmdAIConnect(kwargs: CMDCallbackArgs, ctx: CMDCall
     model !== null && model !== undefined ? `Model: ${model}` : 'Model: (default)',
     aiState.timeout !== null && aiState.timeout !== undefined ? `Timeout: ${aiState.timeout}s` : 'Timeout: (none)',
     aiState.provider !== null && aiState.provider !== undefined ? `Provider: ${aiState.provider}` : 'Provider: openai',
+    aiState.maxTokens !== null && aiState.maxTokens !== undefined ? `Max tokens: ${aiState.maxTokens}` : 'Max tokens: (default)',
   ].join('\n');
 
   ctx.screen.print(i18n.t('cmdAI.connect.result.connected', 'AI Server connected'));

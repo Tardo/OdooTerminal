@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
+import {DEFAULT_MAX_TOKENS} from '@ai/constants';
 
 
 export default async function streamRequestAnthropic(
@@ -13,6 +14,7 @@ export default async function streamRequestAnthropic(
   signal: AbortSignal,
   onDelta: (delta: string) => void,
   stop?: ?Array<string>,
+  maxTokens?: ?number,
 ): Promise<{text: string, usage: ?TokenUsage}> {
   const headers: {[string]: string} = {
     'Content-Type': 'application/json',
@@ -29,7 +31,7 @@ export default async function streamRequestAnthropic(
 
   const body: {[string]: mixed} = {
     model,
-    max_tokens: 4000,
+    max_tokens: maxTokens !== null && maxTokens !== undefined ? maxTokens : DEFAULT_MAX_TOKENS,
     messages: chatMessages,
     stream: true,
   };

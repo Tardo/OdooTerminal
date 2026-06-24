@@ -15,7 +15,7 @@ export type EventCallback = (ev: any) => Promise<void> | void;
 let unique_counter: number = 1;
 let shortcuts_defs: {[string]: string} = {};
 let color_domain_defs: {[string]: string} = {};
-let ai_models_defs: Array<{name: string, url: string, api_key: string, model: string, provider: string, timeout: number}> = [];
+let ai_models_defs: Array<{name: string, url: string, api_key: string, model: string, provider: string, timeout: number, max_tokens: number}> = [];
 
 async function loadThemeValues(theme: string): Promise<{[string]: mixed}> {
   return new Promise((resolve, reject) => {
@@ -123,17 +123,19 @@ function renderColorDomainTableItem(tbody: HTMLTableSectionElement, domain: stri
   elm_link_remove.addEventListener('click', onClickColorDomainRemove, false);
 }
 
-function renderAIModelsTableItem(tbody: HTMLTableSectionElement, idx: number, entry: {name: string, url: string, api_key: string, model: string, provider: string, timeout: number}) {
+function renderAIModelsTableItem(tbody: HTMLTableSectionElement, idx: number, entry: {name: string, url: string, api_key: string, model: string, provider: string, timeout: number, max_tokens: number}) {
   const row_id = `ai-model-${unique_counter++}`;
   const new_row = tbody.insertRow();
   const new_cell_name = new_row.insertCell(0);
   const new_cell_provider = new_row.insertCell(1);
   const new_cell_model = new_row.insertCell(2);
-  const new_cell_options = new_row.insertCell(3);
+  const new_cell_max_tokens = new_row.insertCell(3);
+  const new_cell_options = new_row.insertCell(4);
   new_row.setAttribute('id', row_id);
   new_cell_name.innerText = entry.name;
   new_cell_provider.innerText = entry.provider;
   new_cell_model.innerText = entry.model;
+  new_cell_max_tokens.innerText = entry.max_tokens > 0 ? String(entry.max_tokens) : '-';
   const elm_link_remove = document.createElement('a');
   elm_link_remove.id = `${row_id}-remove`;
   elm_link_remove.innerText = 'Remove';
@@ -347,6 +349,7 @@ function onClickAIModelAdd() {
   const elm_api_key = document.getElementById('ai_model_api_key');
   const elm_model = document.getElementById('ai_model_model');
   const elm_timeout = document.getElementById('ai_model_timeout');
+  const elm_max_tokens = document.getElementById('ai_model_max_tokens');
   if (
     elm_name instanceof HTMLInputElement &&
     elm_name.value &&
@@ -356,7 +359,8 @@ function onClickAIModelAdd() {
     elm_api_key instanceof HTMLInputElement &&
     elm_model instanceof HTMLInputElement &&
     elm_model.value &&
-    elm_timeout instanceof HTMLInputElement
+    elm_timeout instanceof HTMLInputElement &&
+    elm_max_tokens instanceof HTMLInputElement
   ) {
     ai_models_defs.push({
       name: elm_name.value,
@@ -365,6 +369,7 @@ function onClickAIModelAdd() {
       model: elm_model.value,
       provider: elm_provider.value,
       timeout: Number(elm_timeout.value) || 900,
+      max_tokens: Number(elm_max_tokens.value) || 0,
     });
     renderAIModelsTable();
     elm_name.value = '';
@@ -372,6 +377,7 @@ function onClickAIModelAdd() {
     elm_api_key.value = '';
     elm_model.value = '';
     elm_timeout.value = '900';
+    elm_max_tokens.value = '0';
   }
 }
 
@@ -445,6 +451,10 @@ function i18n() {
   _apply_i18n('#column_ai_models_name', 'optionsTitleAIModelsName');
   _apply_i18n('#column_ai_models_provider', 'optionsTitleAIModelsProvider');
   _apply_i18n('#column_ai_models_model', 'optionsTitleAIModelsModel');
+  _apply_i18n('#column_ai_models_max_tokens', 'optionsTitleAIModelsMaxTokens');
+  _apply_i18n('#ai_model_advanced_toggle', 'optionsTitleAIModelsAdvanced');
+  _apply_i18n('#label_ai_model_timeout', 'optionsTitleAIModelsTimeout');
+  _apply_i18n('#label_ai_model_max_tokens', 'optionsTitleAIModelsMaxTokensLabel');
   _apply_i18n('#add_ai_model', 'optionsTitleAIModelsAdd');
 
   _apply_i18n('#title_init_commands', 'optionsTitleInitCommands');

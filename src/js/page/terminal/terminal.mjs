@@ -1139,12 +1139,14 @@ export default class Terminal {
       aiState.model = found.model || null;
       aiState.provider = found.provider || null;
       aiState.timeout = found.timeout > 0 ? found.timeout : null;
+      aiState.maxTokens = found.max_tokens > 0 ? found.max_tokens : null;
     } else {
       aiState.url = null;
       aiState.apiKey = null;
       aiState.model = null;
       aiState.provider = null;
       aiState.timeout = null;
+      aiState.maxTokens = null;
     }
   }
 

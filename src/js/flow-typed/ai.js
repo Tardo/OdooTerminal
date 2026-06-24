@@ -4,6 +4,7 @@ declare type AIState = {
   model: ?string,
   timeout: ?number,
   provider: ?string,
+  maxTokens: ?number,
 };
 
 declare type TokenUsage = {
@@ -43,4 +44,5 @@ declare type AIModelConfig = {
   model: string,
   provider: string,
   timeout: number,
+  max_tokens: number,
 };

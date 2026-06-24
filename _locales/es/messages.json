@@ -156,6 +156,18 @@
   "optionsTitleAIModelsModel": {
     "message": "Modelo"
   },
+  "optionsTitleAIModelsMaxTokens": {
+    "message": "Máx. tokens"
+  },
+  "optionsTitleAIModelsAdvanced": {
+    "message": "Opciones avanzadas"
+  },
+  "optionsTitleAIModelsTimeout": {
+    "message": "Tiempo límite (s):"
+  },
+  "optionsTitleAIModelsMaxTokensLabel": {
+    "message": "Máx. tokens (0 = por defecto):"
+  },
   "optionsTitleAIModelsAdd": {
     "message": "Añadir"
   },

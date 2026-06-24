@@ -101,6 +101,7 @@
     "args": {
       "apiKey": "API key for authentication",
       "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
+      "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
       "model": "Model name to use",
       "operation": "operation: connect, chat or exec",
       "prompt": "The prompt or natural language request to send",

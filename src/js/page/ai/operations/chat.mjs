@@ -33,7 +33,7 @@ export default async function cmdAIChat(kwargs: CMDCallbackArgs, ctx: CMDCallbac
   try {
     const {usage} = await streamRequest(url, aiState.apiKey, model, [{role: 'user', content: prompt}], chatController.signal, delta => {
       ctx.screen.print(delta, true);
-    });
+    }, null, aiState.maxTokens);
     ctx.screen.print('');
     if (usage !== null && usage !== undefined) {
       ctx.screen.print(

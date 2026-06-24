@@ -8,6 +8,7 @@ export const aiState: AIState = {
   model: null,
   timeout: null,
   provider: null,
+  maxTokens: null,
 };
 
 export const aiRuntime: AIRuntime = {

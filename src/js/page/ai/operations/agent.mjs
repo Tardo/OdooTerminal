@@ -50,6 +50,8 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
   ];
 
   const loadedSkills: Set<string> = new Set();
+  let cmdExecutedCount = 0;
+  let cmdSuccessCount = 0;
   let totalPromptTokens = 0;
   let totalCompletionTokens = 0;
 
@@ -132,6 +134,8 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         messages,
         aiRuntime.controller.signal,
         () => undefined,
+        null,
+        aiState.maxTokens,
       );
       response = text;
       if (usage !== null && usage !== undefined) {
@@ -277,6 +281,11 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         outputStr = err.message;
       }
 
+      cmdExecutedCount++;
+      if (!cmdFailed) {
+        cmdSuccessCount++;
+      }
+
       const MAX_CMD_OUTPUT_CHARS = 6000;
       if (outputStr.length > MAX_CMD_OUTPUT_CHARS) {
         outputStr = outputStr.slice(0, MAX_CMD_OUTPUT_CHARS) + `\n[output truncated — ${outputStr.length} chars total, showing first ${MAX_CMD_OUTPUT_CHARS}]`;
@@ -334,6 +343,36 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         startThinking(step + 2);
       }
     } else if (response.startsWith('DONE:') || response.startsWith('DONE_SKIP:')) {
+      // Enforce: at least one CMD must have been executed before concluding
+      if (cmdExecutedCount === 0) {
+        messages.push({
+          role: 'user',
+          content:
+            'PROTOCOL VIOLATION: You output DONE without executing any CMD. ' +
+            'You MUST run at least one CMD and use its output to ground your answer. Execute a CMD now.',
+        });
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        if (step + 1 < maxSteps) {
+          startThinking(step + 2);
+        }
+        continue;
+      }
+      // Enforce: do not claim success when every CMD so far has failed
+      if (cmdSuccessCount === 0) {
+        messages.push({
+          role: 'user',
+          content:
+            'PROTOCOL VIOLATION: All your CMDs have failed. ' +
+            'You must not fabricate results. Either try a different CMD approach or report the failure honestly.',
+        });
+        // Reset so the model can DONE after this nudge (honest failure report)
+        cmdSuccessCount = -1;
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        if (step + 1 < maxSteps) {
+          startThinking(step + 2);
+        }
+        continue;
+      }
       const answer = (response.startsWith('DONE_SKIP:') ? response.slice(10) : response.slice(5)).trim();
       ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
       ctx.screen.print(answer, false);

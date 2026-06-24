@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
+import {DEFAULT_MAX_TOKENS} from '@ai/constants';
 
 
 export default async function streamRequestOpenAI(
@@ -13,6 +14,7 @@ export default async function streamRequestOpenAI(
   signal: AbortSignal,
   onDelta: (delta: string) => void,
   stop?: ?Array<string>,
+  maxTokens?: ?number,
 ): Promise<{text: string, usage: ?TokenUsage}> {
   const headers: {[string]: string} = {
     'Content-Type': 'application/json',
@@ -21,7 +23,7 @@ export default async function streamRequestOpenAI(
     headers['Authorization'] = `Bearer ${apiKey}`;
   }
 
-  const body: {[string]: mixed} = {model, messages, stream: true, stream_options: {include_usage: true}, max_tokens: 4000};
+  const body: {[string]: mixed} = {model, messages, stream: true, stream_options: {include_usage: true}, max_tokens: maxTokens !== null && maxTokens !== undefined ? maxTokens : DEFAULT_MAX_TOKENS};
   if (stop !== null && stop !== undefined && stop.length > 0) {
     body.stop = stop;
   }

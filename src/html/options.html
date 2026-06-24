@@ -214,9 +214,10 @@
         <table class="fullwidth" id="ai_models_table">
           <thead>
             <tr>
-              <th style="width: 30%" id="column_ai_models_name">Name</th>
-              <th style="width: 20%" id="column_ai_models_provider">Provider</th>
+              <th style="width: 25%" id="column_ai_models_name">Name</th>
+              <th style="width: 15%" id="column_ai_models_provider">Provider</th>
               <th style="width: 35%" id="column_ai_models_model">Model</th>
+              <th style="width: 15%" id="column_ai_models_max_tokens">Max tokens</th>
               <th></th>
             </tr>
           </thead>
@@ -231,9 +232,17 @@
           <input type="edit" id="ai_model_url" name="ai_model_url" placeholder="URL" />
           <input type="password" id="ai_model_api_key" name="ai_model_api_key" placeholder="API Key" />
           <input type="edit" id="ai_model_model" name="ai_model_model" placeholder="Model name" />
-          <input type="number" id="ai_model_timeout" name="ai_model_timeout" placeholder="Timeout (s)" min="0" value="900" />
           <button id="add_ai_model">Add</button>
         </div>
+        <details class="ai_model_advanced">
+          <summary id="ai_model_advanced_toggle">Advanced options</summary>
+          <div class="ai_model_advanced_fields">
+            <label for="ai_model_timeout" id="label_ai_model_timeout">Timeout (s):</label>
+            <input type="number" id="ai_model_timeout" name="ai_model_timeout" min="0" value="900" />
+            <label for="ai_model_max_tokens" id="label_ai_model_max_tokens">Max tokens:</label>
+            <input type="number" id="ai_model_max_tokens" name="ai_model_max_tokens" min="0" value="0" />
+          </div>
+        </details>
       </div>
 
       <div class="optsection">

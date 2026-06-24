@@ -93,8 +93,25 @@ body {
 .optsection .ai_models_btn_zone input#ai_model_model {
   width: 20%;
 }
-.optsection .ai_models_btn_zone input#ai_model_timeout {
-  width: 8%;
+.optsection details.ai_model_advanced {
+  margin-top: 0.4em;
+  font-size: 0.85em;
+  color: #555;
+}
+.optsection details.ai_model_advanced summary {
+  cursor: pointer;
+  color: #3093fd;
+  user-select: none;
+}
+.optsection details.ai_model_advanced .ai_model_advanced_fields {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: 0.4em;
+  flex-wrap: wrap;
+}
+.optsection details.ai_model_advanced .ai_model_advanced_fields input {
+  width: 8em;
 }
 
 .warning_text {

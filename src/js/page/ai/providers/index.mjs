@@ -15,9 +15,10 @@ export function streamRequest(
   signal: AbortSignal,
   onDelta: (delta: string) => void,
   stop?: ?Array<string>,
+  maxTokens?: ?number,
 ): Promise<{text: string, usage: ?TokenUsage}> {
   if (aiState.provider === 'anthropic') {
-    return streamRequestAnthropic(url, apiKey, model, messages, signal, onDelta, stop);
+    return streamRequestAnthropic(url, apiKey, model, messages, signal, onDelta, stop, maxTokens);
   }
-  return streamRequestOpenAI(url, apiKey, model, messages, signal, onDelta, stop);
+  return streamRequestOpenAI(url, apiKey, model, messages, signal, onDelta, stop, maxTokens);
 }
