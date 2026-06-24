@@ -88,6 +88,7 @@ export default class Terminal {
   el: HTMLElement;
   runningCmdCount_el: HTMLElement;
   busyTooltip_el: HTMLElement | void;
+  _isAIWorking: boolean = false;
 
   #shell: Shell;
 
@@ -674,6 +675,11 @@ export default class Terminal {
     return hist[this.#searchHistoryIter];
   }
 
+  _setAIWorking(value: boolean) {
+    this._isAIWorking = value;
+    this.#updateJobsInfo();
+  }
+
   #updateJobsInfo() {
     if (!this.#wasStart) {
       return;
@@ -698,6 +704,22 @@ export default class Terminal {
               ? `${active_jobs[0].cmdInfo.cmdName}...`
               : str_info;
           text_el.textContent = tooltip_text;
+        }
+        if (!this.#isTerminalVisible()) {
+          tooltip.classList.add('active');
+        } else {
+          tooltip.classList.remove('active');
+        }
+      }
+    } else if (this._isAIWorking) {
+      const str_info = i18n.t('terminal.info.ai.waiting', 'AI thinking...');
+      this.runningCmdCount_el.textContent = str_info;
+      this.runningCmdCount_el.classList.remove('hidden');
+      const tooltip = this.busyTooltip_el;
+      if (tooltip) {
+        const text_el = tooltip.querySelector('.o_terminal-busy-tooltip-text');
+        if (text_el instanceof HTMLElement) {
+          text_el.textContent = str_info;
         }
         if (!this.#isTerminalVisible()) {
           tooltip.classList.add('active');

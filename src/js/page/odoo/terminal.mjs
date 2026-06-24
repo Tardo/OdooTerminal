@@ -110,6 +110,7 @@ export default class OdooTerminal extends Terminal {
     const isFirstMessage = history.length === 0;
 
     let updatedHistory: Array<AIMessage>;
+    this._setAIWorking(true);
     try {
       // $FlowFixMe[class-object-subtyping]
       updatedHistory = await cmdAIAgent.call(
@@ -123,6 +124,8 @@ export default class OdooTerminal extends Terminal {
         this.screen.printError(msg);
       }
       return;
+    } finally {
+      this._setAIWorking(false);
     }
 
     this.saveConvMessages(convId, updatedHistory);

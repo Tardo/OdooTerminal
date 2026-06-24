@@ -1248,6 +1248,9 @@
       "TooManyElementsTemplateError": "¡Demasiados elementos en la plantilla para asignar a uno solo!"
     },
     "info": {
+      "ai": {
+        "waiting": "AI thinking..."
+      },
       "job": {
         "running": "Ejecutando {{count}} comando(s)",
         "unhealthy": "({{count_unhealthy}} no saludable)"

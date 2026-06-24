@@ -1248,6 +1248,9 @@
       "TooManyElementsTemplateError": "Too many elements in the template to be assigned to one element!"
     },
     "info": {
+      "ai": {
+        "waiting": "AI thinking..."
+      },
       "job": {
         "running": "Running {{count}} command(s)",
         "unhealthy": " ({{count_unhealthy}} unhealthy)"
