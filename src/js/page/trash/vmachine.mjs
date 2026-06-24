@@ -561,6 +561,7 @@ export default class VMachine {
           break;
       }
     }
-    return activeFrame.stack.pop();
+    const results = activeFrame.stack.splice(0);
+    return results.length <= 1 ? results[0] : results;
   }
 }

@@ -318,6 +318,25 @@
       "activeDatabase": "<strong>{{database}}</strong> (base de datos activa)"
     }
   },
+  "cmdDateRange": {
+    "args": {
+      "domain": "Optional domain filter",
+      "field": "The date or datetime field name",
+      "model": "The model technical name"
+    },
+    "definition": "Show min/max values for a date or datetime field",
+    "detail": "Returns the minimum and maximum values of a date or datetime field on a model, optionally filtered by a domain. Validates that the field actually exists and is a date/datetime type before querying. Useful to avoid building graphs or reports over an empty or unexpected date range.",
+    "error": {
+      "notDateField": "Field '{{field}}' is of type '{{type}}', expected date or datetime",
+      "unknownField": "Field '{{field}}' not found in model '{{model}}'"
+    },
+    "result": {
+      "header": "<strong>{{model}}.{{field}}</strong> ({{label}})",
+      "max": "Max: <strong>{{max}}</strong>",
+      "min": "Min: <strong>{{min}}</strong>",
+      "noData": "No data found for <strong>{{model}}.{{field}}</strong>"
+    }
+  },
   "cmdDebug": {
     "args": {
       "mode": "El modo<br>- 0: Deshabilitado<br>- 1: Habilitado<br>- 2: Habilitado con Activos"

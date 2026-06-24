@@ -197,29 +197,34 @@ export default function(terminal: Terminal): string {
     '\n' +
     '!!! FUNDAMENTAL RULES — READ BEFORE ANYTHING ELSE !!!\n' +
     '\n' +
-    '[RULE 1 — ONE RESULT PER SCRIPT]\n' +
-    'A CMD script returns ONE value: the COMPLETE return value of its LAST statement — which may be an array of many records, a dict, a number, etc.\n' +
-    '"ONE result" does NOT mean one text line. `search -l 10` returns a JSON array of 10 full records — you see ALL of them at once.\n' +
-    '"cmd1; cmd2; cmd3" → the agent receives ONLY cmd3\'s complete return value. cmd1 and cmd2 ran but their results are gone forever.\n' +
-    'You CANNOT observe multiple command return values by chaining them. There is no way around this.\n' +
+    '[RULE 1 — SCRIPT RESULTS]\n' +
+    'A CMD script returns the result of EACH top-level statement.\n' +
+    '  • ONE top-level statement  → you receive its value directly.\n' +
+    '  • TWO OR MORE top-level statements → you receive a JSON array, one entry per statement, in order.\n' +
+    '"Top-level" means not nested inside an assignment, subcommand (), or block {}.\n' +
+    'Assignments ($var = ...) contribute NOTHING to the result — they execute but return no value.\n' +
     '\n' +
-    'WRONG — assignment is the last statement; assignment returns nothing → "(command executed, no return value)":\n' +
-    '  CMD: $products = (search -m product.product -f name,lst_price -l 10)\n' +
-    'CORRECT — when you only need one command output, run it directly as the last (and only) statement:\n' +
+    'EXAMPLE — single command (one result, not wrapped):\n' +
     '  CMD: search -m product.product -f name,lst_price -l 10\n' +
-    'CORRECT — if you must assign first, end with the variable to return its value:\n' +
-    '  CMD: $products = (search -m product.product -f name,lst_price -l 10); $products\n' +
+    '  → receives the array of matching records\n' +
     '\n' +
-    'WRONG — two CMD lines; you will only see the second result:\n' +
+    'EXAMPLE — two commands in one CMD (both results returned):\n' +
+    '  CMD: search -m res.partner -f name -l 5; count -m res.partner\n' +
+    '  → receives [<array of 5 partners>, <total count>]\n' +
+    '\n' +
+    'WRONG — assignment is a top-level statement but returns nothing:\n' +
+    '  CMD: $products = (search -m product.product -f name,lst_price -l 10)\n' +
+    '  → receives "(command executed, no return value)"\n' +
+    'CORRECT — read the variable back to surface its value:\n' +
+    '  CMD: $products = (search -m product.product -f name,lst_price -l 10); $products\n' +
+    '  → receives the array of products\n' +
+    '\n' +
+    'WRONG — multiple CMD lines violate the response protocol (one CMD per turn):\n' +
     '  CMD: search res.partner -f name -l 5\n' +
     '  CMD: count -m res.partner\n' +
-    'WRONG — same problem in one line with semicolons:\n' +
-    '  CMD: search res.partner -f name -l 5; count -m res.partner\n' +
-    '\n' +
-    'To surface N values in ONE CMD, use one of these patterns:\n' +
-    '  Pattern A — print:  $a = (cmd1); $b = (cmd2); print -m "a=" + $a + " b=" + $b\n' +
-    '  Pattern B — dict:   $r = {}; $r["val1"] = (cmd1); $r["val2"] = (cmd2); $r\n' +
-    'The last statement ($r or print) is the ONE result you will receive.\n' +
+    'CORRECT — combine in a single CMD to get both results at once:\n' +
+    '  CMD: search -m res.partner -f name -l 5; count -m res.partner\n' +
+    '  → receives [<partners array>, <count number>]\n' +
     '\n' +
     '[RULE 2 — NO TERNARY OPERATOR — SYNTAX ERROR]\n' +
     '"condition ? a : b" is a SYNTAX ERROR in TraSH. ALWAYS use if/else instead.\n' +
