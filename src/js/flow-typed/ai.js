@@ -29,3 +29,9 @@ declare type AIMessage = {
 declare type AIRuntime = {
   controller: ?AbortController,
 };
+
+declare type AIConversation = {
+  id: string,
+  name: string,
+  createdAt: number,
+};

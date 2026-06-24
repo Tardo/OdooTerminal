@@ -12,6 +12,7 @@ import renderWelcome from './templates/welcome';
 import getOdooSession from './utils/get_odoo_session';
 import getSessionInfo from './net_utils/get_session_info';
 import codeHelpers from './base/helpers';
+import cmdAIAgent from '@ai/operations/agent';
 
 export default class OdooTerminal extends Terminal {
   parameterGenerator: ParameterGenerator;
@@ -93,6 +94,40 @@ export default class OdooTerminal extends Terminal {
     const target = ev.target;
     if (target instanceof HTMLElement && target.classList.contains('o_terminal_read_bin_field')) {
       this.#onTryReadBinaryField(target);
+    }
+  }
+
+  /**
+   * @override
+   */
+  async onAIModeInput(input: string): Promise<> {
+    const convId = this.getActiveConvId();
+    if (convId === null) {
+      return;
+    }
+
+    const history: Array<AIMessage> = this.getConvMessages(convId);
+    const isFirstMessage = history.length === 0;
+
+    let updatedHistory: Array<AIMessage>;
+    try {
+      // $FlowFixMe[class-object-subtyping]
+      updatedHistory = await cmdAIAgent.call(
+        this,
+        {prompt: input, model: null, timeout: null, max_steps: null, max_verifications: null, initial_messages: history},
+        {screen: this.screen},
+      );
+    } catch (err) {
+      if (!(err instanceof Error) || err.name !== 'AbortError') {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.screen.printError(msg);
+      }
+      return;
+    }
+
+    this.saveConvMessages(convId, updatedHistory);
+    if (isFirstMessage) {
+      this.updateConvName(convId, input.slice(0, 40) || i18n.t('terminal.ai.newConversation', 'New conversation'));
     }
   }
 

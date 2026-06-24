@@ -5,6 +5,15 @@
 export default function (): string {
   return (
     "<div id='terminal' class='o_terminal'>" +
+    "<div id='terminal_ai_sidebar' class='terminal-ai-sidebar'>" +
+    "<div class='terminal-ai-sidebar-header'>" +
+    "<span class='terminal-ai-sidebar-title'>AI</span>" +
+    "<div class='btn btn-sm terminal-ai-new-conv p-1' role='button' title='New conversation'>" +
+    "<i class='fa fa-plus'></i>" +
+    '</div>' +
+    '</div>' +
+    "<div id='terminal_ai_conv_list' class='terminal-ai-conv-list'></div>" +
+    '</div>' +
     "<div class='terminal-screen-info-zone'>" +
     "<span class='terminal-screen-running-cmds' id='terminal_running_cmd_count'></span>" +
     "<div class='btn btn-sm btn-dark border-warning mr-5 me-5 terminal-screen-icon-reload-shell p-2' role='button' title='Reload Shell'>" +
@@ -16,8 +25,14 @@ export default function (): string {
     "<div class='btn btn-sm btn-dark terminal-screen-icon-pin p-2 rounded-0' role='button' title='Pin'>" +
     "<i class='fa fa-map-pin'></i>" +
     '</div>' +
-    "<div class='btn btn-sm btn-dark terminal-multiline p-2 rounded-right' role='button' title='Multi-line'>" +
+    "<div class='btn btn-sm btn-dark terminal-multiline p-2 rounded-0' role='button' title='Multi-line'>" +
     "<i class='fa fa-code'></i>" +
+    '</div>' +
+    "<div class='btn btn-sm btn-dark terminal-screen-icon-ai-mode p-2 rounded-right' role='button' title='AI Mode'>" +
+    "<span class='terminal-ai-btn-sparkle' aria-hidden='true'>✦</span>" +
+    "<span class='terminal-ai-btn-sparkle' aria-hidden='true'>✦</span>" +
+    "<span class='terminal-ai-btn-sparkle' aria-hidden='true'>✦</span>" +
+    "<i class='fa fa-magic'></i>" +
     '</div>' +
     '</div>' +
     '</div>'

@@ -15,7 +15,7 @@ import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 
-export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<void> {
+export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<Array<AIMessage>> {
   if (aiState.url === null || aiState.url === undefined) {
     throw new Error(i18n.t('cmdAI.agent.error.notConfigured', 'Not connected. Use "ai connect" first'));
   }
@@ -37,6 +37,9 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       ? kwargs.max_verifications
       : DEFAULT_MAX_VERIFICATIONS;
 
+  // $FlowFixMe[incompatible-type]
+  const initialMessages: Array<AIMessage> = Array.isArray(kwargs.initial_messages) ? kwargs.initial_messages : [];
+
   const messages: Array<AIMessage> = [
     {
       role: 'system',
@@ -48,6 +51,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         },
       ],
     },
+    ...initialMessages,
     {role: 'user', content: prompt},
   ];
 
@@ -149,7 +153,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         ctx.screen.eprint(i18n.t('cmdAI.agent.error.requestFailed', 'Request failed: ') + err.message);
         throw err;
       }
-      return;
+      return messages.slice(1);
     } finally {
       aiRuntime.controller = null;
       if (thinkTimer !== null) {
@@ -343,7 +347,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
       ctx.screen.print(answer, false);
       printTokenUsage();
-      return;
+      return messages.slice(1);
     } else if (response.startsWith('DONE:') || response.startsWith('DONE_SKIP:')) {
       // DONE_SKIP: with 0 CMDs falls through to full verification (anti-hallucination floor)
       const answer = (response.startsWith('DONE_SKIP:') ? response.slice(10) : response.slice(5)).trim();
@@ -388,7 +392,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
           ctx.screen.eprint(i18n.t('cmdAI.agent.error.requestFailed', 'Request failed: ') + err.message);
           throw err;
         }
-        return;
+        return messages.slice(1);
       } finally {
         aiRuntime.controller = null;
         clearInterval(verifyTimer);
@@ -404,7 +408,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
         ctx.screen.print(answer, false);
         printTokenUsage();
-        return;
+        return messages.slice(1);
       }
 
       verifyAttempts++;
@@ -428,7 +432,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
           'line-warning',
         );
         printTokenUsage();
-        return;
+        return messages.slice(1);
       }
 
       step = -1;
@@ -455,4 +459,5 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     i18n.t('cmdAI.agent.result.maxSteps', 'Agent reached maximum steps without a final answer.'),
   );
   printTokenUsage();
+  return messages.slice(1);
 }

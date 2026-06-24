@@ -137,6 +137,14 @@ export default class Screen {
     return this.#screen_el.innerHTML;
   }
 
+  setContent(html: string) {
+    if (!this.#wasStart) {
+      return;
+    }
+    this.#screen_el.innerHTML = html;
+    this.scrollDown();
+  }
+
   scrollDown() {
     if (!this.#wasStart) {
       return;

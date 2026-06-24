@@ -1158,6 +1158,11 @@
     }
   },
   "terminal": {
+    "ai": {
+      "experimentalWarning": "Este modo es experimental, usalo con extremo cuidado",
+      "newConversation": "New conversation",
+      "notConnected": "AI not connected. Use \"ai connect\" first."
+    },
     "close": {
       "prevented": "El terminal ha impedido que la pestaña actual se cierre debido a tareas inacabadas:"
     },

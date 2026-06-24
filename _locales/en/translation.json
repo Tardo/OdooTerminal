@@ -1158,6 +1158,11 @@
     }
   },
   "terminal": {
+    "ai": {
+      "experimentalWarning": "Este modo es experimental, usalo con extremo cuidado",
+      "newConversation": "New conversation",
+      "notConnected": "AI not connected. Use \"ai connect\" first."
+    },
     "close": {
       "prevented": "The terminal has prevented the current tab from closing due to unfinished tasks:"
     },

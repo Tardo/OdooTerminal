@@ -13,13 +13,14 @@ import InvalidCommandDefintionError from '@trash/exceptions/invalid_command_defi
 import isEmpty from '@trash/utils/is_empty';
 import CommandAssistant from './core/command_assistant';
 import Screen from './core/screen';
-import {getStorageItem as getStorageLocalItem} from './core/storage/local';
+import {getStorageItem as getStorageLocalItem, setStorageItem as setStorageLocalItem, removeStorageItem as removeStorageLocalItem} from './core/storage/local';
 import {
   getStorageItem as getStorageSessionItem,
   removeStorageItem as removeStorageSessionItem,
   setStorageItem as setStorageSessionItem,
 } from './core/storage/session';
 import renderTerminal from './templates/terminal';
+import renderAIConvItem from './templates/ai_conv_item';
 import renderBusyTooltip from './templates/busy_tooltip';
 import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
@@ -115,6 +116,11 @@ export default class Terminal {
 
   #mutexAvailableOptions: AMutex = new Mutex();
 
+  #isAIMode: boolean = false;
+  #activeConvId: string | null = null;
+  #aiConvList_el: HTMLElement | void;
+  #aiInputHistory: Array<string> = [];
+
   constructor() {
     // $FlowFixMe[method-unbinding]
     this.#boundDisableModalFocusTrap = this.#disableModalFocusTrap.bind(this);
@@ -193,9 +199,35 @@ export default class Terminal {
     this.el.querySelector('.terminal-multiline')?.addEventListener('click', this.#onClickToggleMultiline.bind(this));
     // $FlowFixMe[method-unbinding]
     this.el.querySelector('.terminal-screen-icon-reload-shell')?.addEventListener('click', this.#onClickReloadShell.bind(this));
+    // $FlowFixMe[method-unbinding]
+    this.el.querySelector('.terminal-screen-icon-ai-mode')?.addEventListener('click', this.#onClickToggleAIMode.bind(this));
+    // $FlowFixMe[method-unbinding]
+    this.el.querySelector('.terminal-ai-new-conv')?.addEventListener('click', this.#onClickNewAIConv.bind(this));
+    // $FlowFixMe[method-unbinding]
+    this.el.querySelector('#terminal_ai_conv_list')?.addEventListener('click', this.#onClickAIConvList.bind(this));
     // Custom Events
     // $FlowFixMe[method-unbinding]
     this.el.addEventListener('toggle', this.#onTerminalToggle.bind(this));
+
+    // AI sidebar state
+    const aiConvListEl = this.el.querySelector('#terminal_ai_conv_list');
+    if (aiConvListEl instanceof HTMLElement) {
+      this.#aiConvList_el = aiConvListEl;
+    }
+    this.#isAIMode = getStorageSessionItem('terminal_ai_mode', false);
+    this.#activeConvId = getStorageSessionItem('terminal_ai_active_conv', null);
+    if (this.#isAIMode) {
+      this.el.classList.add('terminal-ai-mode');
+      const aiModeBtn = this.el.querySelector('.terminal-screen-icon-ai-mode');
+      if (aiModeBtn) {
+        aiModeBtn.classList.remove('btn-dark');
+        aiModeBtn.classList.add('btn-light');
+      }
+      if (this.#activeConvId !== null) {
+        this.#loadAIHistory(this.#activeConvId);
+      }
+      this.#renderAIConvList();
+    }
 
     if (!isEmpty(this.#config.init_cmds)) {
       this.#wakeUp();
@@ -313,12 +345,43 @@ export default class Terminal {
     removeStorageSessionItem('terminal_screen');
   }
 
+  #saveCurrentScreenSnapshot() {
+    if (this.#isAIMode && this.#activeConvId !== null) {
+      setStorageSessionItem(
+        `terminal_ai_screen_${this.#activeConvId}`,
+        this.screen.getContent(),
+        err => this.screen.printError(err),
+      );
+    } else if (!this.#isAIMode) {
+      setStorageSessionItem(
+        'terminal_ai_normal_screen',
+        this.screen.getContent(),
+        err => this.screen.printError(err),
+      );
+    }
+  }
+
   async #wakeUp(): Promise<> {
     if (this.#wasLoaded) {
       if (!this.#wasStart) {
         await this.start();
         this.#wasStart = true;
         this.screen.flush();
+
+        // On first start in AI mode, replace buffered normal screen with the active conv screen
+        if (this.#isAIMode) {
+          const activeId = this.#activeConvId;
+          if (activeId !== null) {
+            const snap: string = getStorageSessionItem(`terminal_ai_screen_${activeId}`, '');
+            if (snap.length > 0) {
+              this.screen.setContent(snap);
+            } else {
+              this.screen.clean();
+            }
+          } else {
+            this.screen.clean();
+          }
+        }
 
         // Init commands
         if (!this.#hasExecInitCmds) {
@@ -481,6 +544,10 @@ export default class Terminal {
   }
 
   /* PRIVATE METHODS*/
+  #getActiveHistory(): Array<string> {
+    return this.#isAIMode ? this.#aiInputHistory : this.#inputHistory;
+  }
+
   #storeUserInput(strInput: string) {
     if (this.#inputHistory.at(-1) === strInput) {
       return;
@@ -488,6 +555,25 @@ export default class Terminal {
     this.#inputHistory.push(strInput);
     setStorageSessionItem('terminal_history', this.#inputHistory, err => this.screen.printError(err, true));
     this.#searchHistoryIter = this.#inputHistory.length;
+  }
+
+  #storeAIInput(strInput: string) {
+    const convId = this.#activeConvId;
+    if (convId === null) {
+      return;
+    }
+    if (this.#aiInputHistory.at(-1) === strInput) {
+      return;
+    }
+    this.#aiInputHistory.push(strInput);
+    setStorageLocalItem(`terminal_ai_history_${convId}`, this.#aiInputHistory, err => this.screen.printError(err));
+    this.#searchHistoryIter = this.#aiInputHistory.length;
+  }
+
+  #loadAIHistory(convId: string) {
+    this.#aiInputHistory = getStorageLocalItem(`terminal_ai_history_${convId}`, []);
+    this.#searchHistoryIter = this.#aiInputHistory.length;
+    this.#searchHistoryQuery = '';
   }
 
   #isTerminalVisible(): boolean {
@@ -499,9 +585,10 @@ export default class Terminal {
   }
 
   #doSearchPrevHistory(): string | void {
+    const hist = this.#getActiveHistory();
     const orig_iter = this.#searchHistoryIter;
-    const last_str = this.#inputHistory[this.#searchHistoryIter];
-    this.#searchHistoryIter = this.#inputHistory.findLastIndex((item, i) => {
+    const last_str = hist[this.#searchHistoryIter];
+    this.#searchHistoryIter = hist.findLastIndex((item, i) => {
       if (this.#searchHistoryQuery) {
         return item !== last_str && item.indexOf(this.#searchHistoryQuery) === 0 && i <= this.#searchHistoryIter;
       }
@@ -511,22 +598,23 @@ export default class Terminal {
       this.#searchHistoryIter = orig_iter;
       return undefined;
     }
-    return this.#inputHistory[this.#searchHistoryIter];
+    return hist[this.#searchHistoryIter];
   }
 
   #doSearchNextHistory(): string | void {
-    const last_str = this.#inputHistory[this.#searchHistoryIter];
-    this.#searchHistoryIter = this.#inputHistory.findIndex((item, i) => {
+    const hist = this.#getActiveHistory();
+    const last_str = hist[this.#searchHistoryIter];
+    this.#searchHistoryIter = hist.findIndex((item, i) => {
       if (this.#searchHistoryQuery) {
         return item !== last_str && item.indexOf(this.#searchHistoryQuery) === 0 && i >= this.#searchHistoryIter;
       }
       return i > this.#searchHistoryIter;
     });
     if (this.#searchHistoryIter === -1) {
-      this.#searchHistoryIter = this.#inputHistory.length;
+      this.#searchHistoryIter = hist.length;
       return undefined;
     }
-    return this.#inputHistory[this.#searchHistoryIter];
+    return hist[this.#searchHistoryIter];
   }
 
   #updateJobsInfo() {
@@ -580,6 +668,12 @@ export default class Terminal {
   }
 
   updateAssistantoptions() {
+    if (this.#isAIMode) {
+      this.#assistantOptions = [];
+      this.#assistantOptionsTotalCount = 0;
+      this.screen.updateAssistantPanelOptions([], -1, 0);
+      return;
+    }
     this.#mutexAvailableOptions.cancel();
     this.#mutexAvailableOptions.release();
     this.#mutexAvailableOptions
@@ -775,10 +869,30 @@ export default class Terminal {
     this.#shell.getVM().cleanGlobals();
     this.#updateJobsInfo();
     this.updateAssistantoptions();
-    this.printWelcomeMessage();
+    if (!this.#isAIMode) {
+      this.printWelcomeMessage();
+    }
   }
 
   #onKeyEnter() {
+    if (this.#isAIMode) {
+      const input = this.screen.getUserInput();
+      if (!input.trim()) {
+        return;
+      }
+      this.screen.printCommand(input);
+      this.#storeAIInput(input);
+      this.screen.cleanInput();
+      this.updateAssistantoptions();
+      if (this.#activeConvId === null) {
+        this.createAIConversation(input.slice(0, 40) || i18n.t('terminal.ai.newConversation', 'New conversation'));
+      }
+      this.onAIModeInput(input).catch(() => {
+        // Do nothing
+      });
+      this.screen.preventLostInputFocus();
+      return;
+    }
     this.execute(this.screen.getUserInput()).catch(() => {
       // Do nothing
     });
@@ -810,11 +924,12 @@ export default class Terminal {
   #onKeyArrowRight(ev: KeyboardEvent) {
     const user_input = this.screen.getUserInput();
     if (user_input && ev.target instanceof HTMLInputElement && ev.target.selectionStart === user_input.length) {
+      const histLen = this.#getActiveHistory().length;
       this.#searchHistoryQuery = user_input;
-      this.#searchHistoryIter = this.#inputHistory.length;
+      this.#searchHistoryIter = histLen;
       this.#onKeyArrowUp();
       this.#searchHistoryQuery = user_input;
-      this.#searchHistoryIter = this.#inputHistory.length;
+      this.#searchHistoryIter = histLen;
     }
     this.updateAssistantoptions();
   }
@@ -912,6 +1027,189 @@ export default class Terminal {
     }
   }
 
+  /* AI CONVERSATIONS */
+  #getConversations(): Array<AIConversation> {
+    return getStorageLocalItem('terminal_ai_conversations', []);
+  }
+
+  #saveConversations(convs: Array<AIConversation>) {
+    setStorageLocalItem('terminal_ai_conversations', convs, err => this.screen.printError(err));
+  }
+
+  #renderAIConvList() {
+    const listEl = this.#aiConvList_el;
+    if (!listEl) {
+      return;
+    }
+    const convs = this.#getConversations();
+    if (convs.length === 0) {
+      listEl.innerHTML = '';
+      return;
+    }
+    listEl.innerHTML = convs.map(c => renderAIConvItem(c.id, c.name, c.id === this.#activeConvId)).join('');
+  }
+
+  #onClickToggleAIMode(ev: MouseEvent) {
+    this.#saveCurrentScreenSnapshot();
+    this.#isAIMode = !this.#isAIMode;
+    this.screen.clean();
+    if (ev.currentTarget instanceof HTMLElement) {
+      const target = ev.currentTarget;
+      if (this.#isAIMode) {
+        this.el.classList.add('terminal-ai-mode');
+        target.classList.remove('btn-dark');
+        target.classList.add('btn-light');
+        this.#renderAIConvList();
+        this.updateAssistantoptions();
+        const activeId = this.#activeConvId;
+        if (activeId !== null) {
+          this.#loadAIHistory(activeId);
+          const snap: string = getStorageSessionItem(`terminal_ai_screen_${activeId}`, '');
+          if (snap.length > 0) {
+            this.screen.setContent(snap);
+          }
+        } else {
+          this.#aiInputHistory = [];
+          this.#searchHistoryIter = 0;
+          this.#searchHistoryQuery = '';
+        }
+      } else {
+        this.el.classList.remove('terminal-ai-mode');
+        target.classList.remove('btn-light');
+        target.classList.add('btn-dark');
+        this.updateAssistantoptions();
+        this.#searchHistoryIter = this.#inputHistory.length;
+        this.#searchHistoryQuery = '';
+        const snap: string = getStorageSessionItem('terminal_ai_normal_screen', '');
+        if (snap.length > 0) {
+          this.screen.setContent(snap);
+        }
+      }
+    }
+    setStorageSessionItem('terminal_ai_mode', this.#isAIMode, err => this.screen.printError(err));
+    this.screen.preventLostInputFocus();
+  }
+
+  #onClickNewAIConv() {
+    this.#saveCurrentScreenSnapshot();
+    this.screen.clean();
+    this.#aiInputHistory = [];
+    this.#searchHistoryIter = 0;
+    this.#searchHistoryQuery = '';
+    this.createAIConversation(i18n.t('terminal.ai.newConversation', 'New conversation'));
+    this.screen.print(
+      i18n.t('terminal.ai.experimentalWarning', 'This mode is experimental; use it with extreme caution.'),
+      false,
+      'line-warning',
+    );
+    this.screen.preventLostInputFocus();
+  }
+
+  #onClickAIConvList(ev: MouseEvent) {
+    if (!(ev.target instanceof HTMLElement)) {
+      return;
+    }
+    const target: HTMLElement = ev.target;
+    let isDelete = false;
+    let convEl: HTMLElement | null = null;
+    let cur: HTMLElement | null = target;
+    while (cur && !cur.classList.contains('terminal-ai-conv-list')) {
+      if (cur.classList.contains('terminal-ai-conv-delete')) {
+        isDelete = true;
+      }
+      if (cur.classList.contains('terminal-ai-conv-item')) {
+        convEl = cur;
+        break;
+      }
+      // $FlowFixMe[incompatible-type]
+      cur = cur.parentElement;
+    }
+    if (!convEl) {
+      return;
+    }
+    const convId = convEl.dataset['convId'];
+    if (!convId) {
+      return;
+    }
+    if (isDelete) {
+      ev.stopPropagation();
+      let convs = this.#getConversations();
+      convs = convs.filter(c => c.id !== convId);
+      this.#saveConversations(convs);
+      removeStorageLocalItem(`terminal_ai_conv_${convId}`);
+      removeStorageLocalItem(`terminal_ai_history_${convId}`);
+      removeStorageSessionItem(`terminal_ai_screen_${convId}`);
+      if (this.#activeConvId === convId) {
+        const nextId = convs.length > 0 ? convs[0].id : null;
+        this.#activeConvId = nextId;
+        setStorageSessionItem('terminal_ai_active_conv', nextId, err => this.screen.printError(err));
+        this.screen.clean();
+        if (nextId !== null) {
+          this.#loadAIHistory(nextId);
+          const snap: string = getStorageSessionItem(`terminal_ai_screen_${nextId}`, '');
+          if (snap.length > 0) {
+            this.screen.setContent(snap);
+          }
+        } else {
+          this.#aiInputHistory = [];
+          this.#searchHistoryIter = 0;
+          this.#searchHistoryQuery = '';
+        }
+      }
+      this.#renderAIConvList();
+    } else if (convId !== this.#activeConvId) {
+      this.#saveCurrentScreenSnapshot();
+      this.#activeConvId = convId;
+      setStorageSessionItem('terminal_ai_active_conv', convId, err => this.screen.printError(err));
+      this.#loadAIHistory(convId);
+      this.screen.clean();
+      const snap: string = getStorageSessionItem(`terminal_ai_screen_${convId}`, '');
+      if (snap.length > 0) {
+        this.screen.setContent(snap);
+      }
+      this.#renderAIConvList();
+      this.screen.preventLostInputFocus();
+    }
+  }
+
+  getActiveConvId(): string | null {
+    return this.#activeConvId;
+  }
+
+  getConvMessages(id: string): Array<AIMessage> {
+    return getStorageLocalItem(`terminal_ai_conv_${id}`, []);
+  }
+
+  saveConvMessages(id: string, messages: Array<AIMessage>) {
+    setStorageLocalItem(`terminal_ai_conv_${id}`, messages, err => this.screen.printError(err));
+  }
+
+  updateConvName(id: string, name: string) {
+    const convs = this.#getConversations();
+    const conv = convs.find(c => c.id === id);
+    if (conv) {
+      conv.name = name;
+      this.#saveConversations(convs);
+      this.#renderAIConvList();
+    }
+  }
+
+  createAIConversation(name: string): string {
+    const id = `conv_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+    const convs = this.#getConversations();
+    convs.unshift({id, name, createdAt: Date.now()});
+    this.#saveConversations(convs);
+    this.#activeConvId = id;
+    setStorageSessionItem('terminal_ai_active_conv', id, err => this.screen.printError(err));
+    this.#renderAIConvList();
+    return id;
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  async onAIModeInput(input: string): Promise<> {
+    this.screen.printError(i18n.t('terminal.ai.notConnected', 'AI not connected. Use "ai connect" first.'));
+  }
+
   onCoreClick(ev: MouseEvent) {
     if (
       this.busyTooltip_el &&
@@ -922,10 +1220,10 @@ export default class Terminal {
         // Do nothing
       });
     } else if (
-      // Auto-Hide
+      // Auto-Hide: use composedPath() so DOM mutations in earlier handlers don't
+      // cause ev.target to appear detached and falsely trigger hide.
       this.el &&
-      ev.target instanceof HTMLElement &&
-      !this.el.contains(ev.target) &&
+      !ev.composedPath().includes(this.el) &&
       this.#isTerminalVisible() &&
       !this.#config.maximized &&
       !this.#config.pinned
