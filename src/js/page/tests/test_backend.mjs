@@ -59,6 +59,11 @@ export default class TestBackend extends TerminalTestSuite {
       discardBtn.click();
       await asyncSleep(500);
     }
+
+    // Save test: form is clean after discard; OWL records skip the write when
+    // not dirty, legacy forms may reload in-place — both should succeed.
+    await this.terminal.execute('form -o save', false, true);
+    await asyncSleep(1500);
   }
 
   async test_settings() {

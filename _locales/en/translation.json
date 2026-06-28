@@ -483,8 +483,8 @@
       "operation": "The operation to perform",
       "value": "The field values to set (for the edit operation)"
     },
-    "definition": "Interact with the current form view (get, edit, highlight, clear)",
-    "detail": "get: returns in-memory field values. edit: sets field values in the open form in-memory record (fires onchanges, does not save). highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).",
+    "definition": "Interact with the current form view (get, edit, save, highlight, clear)",
+    "detail": "get: returns in-memory field values. edit: sets field values in the open form in-memory record (fires onchanges, does not save). save: persists the current form record to the database. highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).",
     "error": {
       "fieldNotFound": "No form field '{{field}}' found in the current view",
       "fieldRequired": "A field name is required for the highlight operation",
@@ -495,7 +495,8 @@
     "result": {
       "cleared": "Field highlights cleared",
       "edited": "Updated {{count}} field(s) in the current form",
-      "highlighted": "Highlighted {{count}} field(s) '{{field}}'"
+      "highlighted": "Highlighted {{count}} field(s) '{{field}}'",
+      "saved": "Form record saved"
     }
   },
   "cmdFuncTrash": {

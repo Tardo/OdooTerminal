@@ -104,6 +104,7 @@ async function enrichMany2oneValues(
 
 export type FormRecordAdapter = {
   read(fields: $ReadOnlyArray<string>): {[string]: mixed},
+  save(): Promise<void>,
   update(changes: {[string]: mixed}, context: {[string]: mixed}): Promise<void>,
 };
 
@@ -125,6 +126,15 @@ export default function getFormRecord(): FormRecordAdapter | null {
             result[f] = data[f];
           }
           return result;
+        },
+        save: async () => {
+          // $FlowFixMe[prop-missing]
+          const result: mixed = record.save();
+          // $FlowFixMe[prop-missing]
+          if (result !== null && result !== undefined && typeof result.then === 'function') {
+            // $FlowFixMe[incompatible-call]
+            await result;
+          }
         },
         update: async (changes, context) => {
           // $FlowFixMe[prop-missing]
@@ -160,6 +170,21 @@ export default function getFormRecord(): FormRecordAdapter | null {
             result[f] = data[f];
           }
           return result;
+        },
+        save: async () => {
+          // FormController.saveRecord() persists the record to the server.
+          // It takes no arguments and uses its own this.handle internally.
+          // Returns a jQuery Deferred in Odoo 11-14, a Promise in 15.
+          // $FlowFixMe[prop-missing]
+          if (typeof widget.saveRecord === 'function') {
+            // $FlowFixMe[prop-missing]
+            const result: mixed = widget.saveRecord();
+            // $FlowFixMe[prop-missing]
+            if (result !== null && result !== undefined && typeof result.then === 'function') {
+              // $FlowFixMe[incompatible-call]
+              await result;
+            }
+          }
         },
         update: async (changes, context) => {
           // Switch to edit mode if the form is currently read-only.

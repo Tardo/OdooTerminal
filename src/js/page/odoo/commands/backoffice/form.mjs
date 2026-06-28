@@ -94,6 +94,16 @@ async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
     ctx.screen.print(
       i18n.t('cmdForm.result.highlighted', "Highlighted {{count}} field(s) '{{field}}'", {count, field}),
     );
+  } else if (operation === 'save') {
+    const adapter = getFormRecord();
+    if (adapter === null) {
+      ctx.screen.printError(
+        i18n.t('cmdForm.error.noFormView', 'No editable form view found in the current page'),
+      );
+      return;
+    }
+    await adapter.save();
+    ctx.screen.print(i18n.t('cmdForm.result.saved', 'Form record saved'));
   } else if (operation === 'clear') {
     clearFormFieldHighlights(field.length > 0 ? field : undefined);
     ctx.screen.print(i18n.t('cmdForm.result.cleared', 'Field highlights cleared'));
@@ -102,11 +112,11 @@ async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('cmdForm.definition', 'Interact with the current form view (get, edit, highlight, clear)'),
+    definition: i18n.t('cmdForm.definition', 'Interact with the current form view (get, edit, save, highlight, clear)'),
     callback: cmdForm,
     detail: i18n.t(
       'cmdForm.detail',
-      'get: returns in-memory field values. edit: sets field values in the open form in-memory record (fires onchanges, does not save). highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).',
+      'get: returns in-memory field values. edit: sets field values in the open form in-memory record (fires onchanges, does not save). save: persists the current form record to the database. highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).',
     ),
     args: [
       [
@@ -115,7 +125,7 @@ export default function (): Partial<CMDDef> {
         true,
         i18n.t('cmdForm.args.operation', 'The operation to perform'),
         undefined,
-        ['get', 'edit', 'highlight', 'clear'],
+        ['get', 'edit', 'save', 'highlight', 'clear'],
       ],
       [
         ARG.List | ARG.String,
