@@ -38,10 +38,10 @@ extension is ~24ms.
 
 # Usage
 
-When you visit a Odoo website, the browser action icon of the extension turn to enabled state. This indicates that the
-extension is ready to use in the current page.
+When you visit an Odoo website, the browser action icon of the extension switches to the enabled state, indicating
+that the extension is ready to use on the current page.
 
-Few commands aren't available on the frontend, use command 'help' to know the available commands.
+Some commands are not available on the frontend. Use the `help` command to see what is available in the current context.
 
 The terminal also includes an **AI mode** (autonomous agent) accessible via the AI button in the terminal toolbar.
 
@@ -64,23 +64,22 @@ You can toggle terminal using one of these options:
 | Install module                                      | `install -m mymodule`                                                 |
 | Create alias                                        | `alias -n myalias -c "print 'My name is: $1'"`                        |
 
-> Notice that a list is an string of values separated by commas. Example: "5, 15, 8" (quotes included) or can use array
-> notation [5, 15, 8]
+> A list is a string of values separated by commas, e.g. `"5, 15, 8"` (quotes included), or the array notation
+> `[5, 15, 8]`.
 
-> Notice that can call commands without 'named arguments', for example:
-> `create res.partner {name: 'Hipcut', street: 'Mystery street'}`. The rule is that 'unnamed arguments' fill values
-> following the order of the command arguments definition. So mix 'unnamed' with 'named' arguments can be done as long
-> as the order is maintained.
+> Commands can be called without named arguments, e.g.:
+> `create res.partner {name: 'Hipcut', street: 'Mystery street'}`. Positional arguments fill values in the order
+> they are defined. Mixing positional and named arguments is supported as long as the declaration order is respected.
 
 ## Notes
 
-- This extension have a "preferences" page where you can add commands to run on every session. This is useful for
-  example to load a remote script to extend the 'terminal' features or declare custom aliases.
-- This extension uses an internal context to extend the 'user context'. This 'terminal context' has by default the key
-  'active_test' = false (see issue #14 to get more information). This context only affects to terminal operations.
-- The maximum buffered screen lines is set to 750. So, you can't see more than 749 records in the same query. This is
-  necessary to avoid have a lot of nodes... One of the problems of use HTML elements to render the output :/
-- Can remap preferred key combination at chrome://extensions/shortcuts
+- The extension includes a **Preferences** page where you can add commands to run on every session. This is useful
+  for loading remote scripts or declaring custom aliases.
+- The extension uses an internal terminal context that extends the user context. By default it sets `active_test =
+  false` (see issue #14 for details). This context only affects terminal operations.
+- The screen buffer is capped at 750 lines. Queries returning more than 749 records will be truncated. This limit
+  exists to prevent excessive DOM node accumulation when rendering output as HTML.
+- Keyboard shortcuts can be remapped at `chrome://extensions/shortcuts`.
 
 ---
 
@@ -195,7 +194,7 @@ Example:
 
 ---
 
-# More resources!
+# More Resources
 
 - [CHANGELOG](CHANGELOG.md)
 - [Contributing](./docs/contributing.md)

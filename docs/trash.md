@@ -1,97 +1,128 @@
 # TraSH
 
-TraSH is the language used in the Terminal. It is necessary to circumvent the use of 'eval' (necessary to pass the
-extension store checks) and not have the limitations of JSON. This is my own implementation simply because I felt like
-doing something like this... but maybe it's not the best of my ideas... at least it seems to work and meet expectations.
+TraSH (Terminal Shell) is the scripting language built into OdooTerminal. It was designed to avoid the use of `eval`
+(required to pass browser extension store checks) while remaining more expressive than plain JSON. It is interpreted
+by a custom pipeline:
 
-## Components
+- **Interpreter** (`src/js/page/trash/interpreter.mjs`): tokenises and compiles input into pseudo-bytecode.
+- **VMachine** (`src/js/page/trash/vmachine.mjs`): executes the pseudo-bytecode.
 
-- Interpreter: Compile input string into pseudo-bytecode
-- VMachine: Runs the pseudo-bytecode
-
-# FAST REFERENCE
+---
 
 ## Variables
 
-Variables in TraSH do not have a type. Function parameters can be typed. The interpreter will try to convert and
-validate the types.
+Variables in TraSH are dynamically typed. Function parameters may be optionally typed; the interpreter will attempt
+to coerce and validate values to the declared type.
 
-To declare a variable: `$var = 'value'` To retrieve the value: `$var`
+```
+$var = 'value'   # declare and assign
+$var             # retrieve the value
+```
 
-If the variable is of type 'function', it is used `$$` to invoke: `$$mifunc paramA paramB`
+If a variable holds a function, use `$$` to invoke it:
+
+```
+$$myfunc paramA paramB
+```
+
+---
 
 ## Functions
 
 There are three families of functions:
 
-- Native functions: Are executed entirely by the TraSH vm (ofc js vm is used internally).
+### Native Functions (TraSH)
 
-  - Normal (named):
-    ```
-    function myfun(paramA: Number, paramB: String) { print 'Hello World: ' + $paramA + ' -- ' + $paramB }
-    ```
-    ```
-    myfunc 10 'Yo'
-    ```
-  - Anonymous:
-    ```
-    $myfunc = function(paramA: Number, paramB: String) { print 'Hello World: ' + $paramA + ' -- ' + $paramB }
-    ```
-    ```
-    $$myfunc 10 'Yo'
-    ```
+Executed entirely within the TraSH VM.
 
-- Internal functions: Are executed by the JavaScript vm
-
-  **In JavaScript (flow typed)**
-
-  ```js
-  async function funcMy(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<number> { return 42; }
-  ```
-
-- Commands: Are executed by the shell and the JavaScript vm
-
-  **In JavaScript (flow typed)**
-
-  ```js
-  async function cmdMy(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<number> { ctx.screen.print('O_o 42!'); return 42; }
-  ```
-
-## If-Elif-Else
+**Named:**
 
 ```
-  if ($a > 10) {
-    print 'a'
-  } elif ($a > 5) {
-    print 'b'
-  } else {
-    print 'c'
-  }
+function myfun(paramA: Number, paramB: String) {
+  print 'Hello: ' + $paramA + ' -- ' + $paramB
+}
+myfun 10 'world'
 ```
 
-## Associativity & Order of Evaluation
+**Anonymous:**
 
-Left to Right
+```
+$myfunc = function(paramA: Number, paramB: String) {
+  print 'Hello: ' + $paramA + ' -- ' + $paramB
+}
+$$myfunc 10 'world'
+```
 
-- \*\* Increment/Decrement can be 'Right to Left'
-- \*\* 'Simple assigment' is 'Right to Left'
+### Internal Functions (JavaScript)
 
-## Operators Precedence
+Registered in the VM and executed by the JavaScript engine.
 
-1. POW: ^
-2. DIVIDE: /
-3. MULTIPLY: \*
-4. MODULO: %
-5. SUBSTRACT: -
-6. ADD: +
-7. EQUAL: ==
-8. NOT_EQUAL: !=
-9. GREATER_THAN_OPEN: >
-10. LESS_THAN_OPEN: <
-11. GREATER_THAN_CLOSED: >=
-12. LESS_THAN_CLOSED: <=
-13. AND: &&
-14. OR: ||
+```js
+async function funcMy(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<number> {
+  return 42;
+}
+```
+
+### Commands (Shell + JavaScript)
+
+Dispatched through the shell and executed by the JavaScript engine.
+
+```js
+async function cmdMy(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<number> {
+  ctx.screen.print('42');
+  return 42;
+}
+```
+
+---
+
+## Control Flow
+
+### If / Elif / Else
+
+```
+if ($a > 10) {
+  print 'a'
+} elif ($a > 5) {
+  print 'b'
+} else {
+  print 'c'
+}
+```
+
+---
+
+## Associativity and Order of Evaluation
+
+Evaluation is left to right, with two exceptions:
+
+- Increment/Decrement operators may evaluate right to left.
+- Simple assignment (`=`) is right to left.
+
+---
+
+## Operator Precedence
+
+Operators are listed from highest to lowest precedence:
+
+| Precedence | Operator | Symbol |
+|---|---|---|
+| 1 | Power | `^` |
+| 2 | Divide | `/` |
+| 3 | Multiply | `*` |
+| 4 | Modulo | `%` |
+| 5 | Subtract | `-` |
+| 6 | Add | `+` |
+| 7 | Equal | `==` |
+| 8 | Not Equal | `!=` |
+| 9 | Greater Than | `>` |
+| 10 | Less Than | `<` |
+| 11 | Greater Than or Equal | `>=` |
+| 12 | Less Than or Equal | `<=` |
+| 13 | Logical And | `&&` |
+| 14 | Logical Or | `\|\|` |
+
+---
 
 ## Built-in Internal Functions
 
@@ -100,31 +131,44 @@ Left to Right
 | Function | Description |
 |---|---|
 | `abs(x)` | Absolute value of a number |
-| `fixed(x, decimals)` | Rounds a number UP to the nearest integer |
-| `floor(x)` | Rounds a number DOWN to the nearest integer |
-| `pow(x, y)` | Calculate the exponent value of x raised to the power of y |
-| `rand(min, max)` | Generate random integers |
+| `fixed(x, decimals)` | Rounds a number to the nearest integer |
+| `floor(x)` | Rounds a number down to the nearest integer |
+| `pow(x, y)` | Raises `x` to the power of `y` |
+| `rand(min, max)` | Returns a random integer between `min` and `max` (inclusive) |
 
 ### Time
 
 | Function | Description |
 |---|---|
-| `sleep(ms)` | Sleep (time in ms) |
-| `pnow()` | High resolution timestamp in milliseconds |
+| `sleep(ms)` | Pauses execution for `ms` milliseconds |
+| `pnow()` | Returns a high-resolution timestamp in milliseconds |
 
 ### Encoding
 
 | Function | Description |
 |---|---|
-| `encode(data, format)` | Encode data (e.g. base64) |
-| `decode(data, format)` | Decode data (e.g. base64) |
+| `encode(data, format)` | Encodes data (e.g. `base64`) |
+| `decode(data, format)` | Decodes data (e.g. `base64`) |
 
 ### Network
 
 | Function | Description |
 |---|---|
-| `fetch(url, options)` | HTTP requests |
+| `fetch(url, options, timeout)` | Performs an HTTP request; returns a `Response` object or `null` on timeout |
 
-## Standard Library (Array Helpers)
+---
 
-Available via built-in TraSH array functions: `arr_clone`, `arr_append`, `arr_prepend`, `arr_reduce`, and others.
+## Standard Library
+
+The standard library provides helper functions implemented in TraSH itself. They are loaded automatically.
+
+### Array Helpers
+
+| Function | Description |
+|---|---|
+| `arr_clone(arr)` | Returns a shallow copy of an array |
+| `arr_append(arr, item)` | Appends `item` to the end of `arr` |
+| `arr_prepend(arr, item)` | Inserts `item` at the beginning of `arr` |
+| `arr_reduce(arr, initial, reducer)` | Reduces `arr` to a single value using the `reducer` function |
+| `arr_map(arr, mapper)` | Returns a new array with `mapper` applied to each element |
+| `arr_filter(arr, filter)` | Returns a new array containing only elements for which `filter` returns true |

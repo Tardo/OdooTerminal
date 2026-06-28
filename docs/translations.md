@@ -1,19 +1,22 @@
-# Modify an existing language
+# Translations
 
-Go to `_locales` folder, select the language and edit the `.json` files.
+## Modifying an Existing Language
 
-# Add a new language
+Navigate to the `_locales/` folder, select the language directory, and edit the `.json` files directly.
 
-1. Edit `package.json / babel / plugins / "i18next-extract" / locales` to include the new language tag.
-2. Edit `src / js / page / loader.mjs / function initTranslations / supportedLngs` to include the new language tag.
-3. Edit `src / html / options.hml` to include the new language tag.
-4. Run `pnpm install` (If the project is already installed, skip this step.)
-5. Run `pnpm run dev:rollup`
-6. Edit `_locales / <NEW LANGUAGE TAG> / *.json` files
+## Adding a New Language
 
-\*\* You can use https://r12a.github.io/app-subtags/ to `check` if the new language tag is valid.
+1. Add the new language tag to `package.json` under `babel > plugins > "i18next-extract" > locales`.
+2. Add the new language tag to the `supportedLngs` array in `src/js/page/loader.mjs` inside `initTranslations`.
+3. Add the new language option to `src/html/options.html`.
+4. Run `pnpm install` (skip if dependencies are already installed).
+5. Run `pnpm run dev:rollup` to trigger the translation key extraction.
+6. Edit the generated `_locales/<NEW_LANGUAGE_TAG>/*.json` files with the translated strings.
 
-**IMPORTANT:** Hyphen-separated tags must use 'underscore' (ex. en-US --must be--> en_US).
+Language tags can be validated at [r12a.github.io/app-subtags](https://r12a.github.io/app-subtags/).
 
-**MORE IMPORTANT:** Do not rely on the translation export system. ALWAYS work with a backup file (you can use the
-'backups' folder of the project). You take the risk of losing the entire translation.
+> **Note:** Hyphen-separated tags must use underscores (e.g. `en-US` must be written as `en_US`).
+
+> **Important:** Do not rely solely on the translation export system. Always keep a backup copy of your translation
+> files (the `backups/` folder is a suitable location). There is a risk of losing the entire translation if the
+> export overwrites existing content.

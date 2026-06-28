@@ -1,27 +1,29 @@
-## Developing
+# Developing
 
-### Installation
+## Installation
 
-- Required system tools:
-  ```
-  apt-get install nodejs npm
-  npm install --global pnpm
-  ```
-- Project Dependencies:
-  ```
-  pnpm install
-  ```
-  \*\* This will also prepare the project (husky hooks, etc.)
+Required system tools:
 
-### Usage
-
-Initialize development tools... This will build the extension as the code is modified:
-
+```sh
+apt-get install nodejs npm
+npm install --global pnpm
 ```
+
+Project dependencies (also sets up Husky hooks):
+
+```sh
+pnpm install
+```
+
+## Building
+
+Start the watch mode to rebuild the extension automatically as files change:
+
+```sh
 pnpm run dev:rollup:watch
 ```
 
-### Available Scripts
+## Available Scripts
 
 | Script | Description |
 |---|---|
@@ -35,32 +37,27 @@ pnpm run dev:rollup:watch
 | `pnpm run test` | Run integration tests |
 | `pnpm run release` | Create a release |
 
-### Load Extension
+## Loading the Extension
 
-#### Using Custom Environment
+### Manual (unpacked)
 
-- Chromium/Chrome:
-  1. Go to `chrome://extensions/`.
-  2. At the top right, turn on `Developer mode`.
-  3. Click `Load unpacked`.
-  4. Find and select the app or extension folder.
-  5. Open a new tab in Chrome > click `Apps` > click the app or extension. Make sure it loads and works correctly.
-- Firefox:
-  1. Open the `about:debugging` page
-  2. Click the `This Firefox` option
-  3. click the `Load Temporary Add-on` button, then select any file in the extension directory.
+**Chromium / Chrome:**
 
-#### Using Web-Ext Environment
+1. Go to `chrome://extensions/`.
+2. Enable **Developer mode** (top-right toggle).
+3. Click **Load unpacked** and select the `dist/` folder.
+4. Open a new tab and verify the extension loads correctly.
 
-- Chromium:
-  ```sh
-  pnpm run start:chromium
-  ```
-- Chrome:
-  ```sh
-  pnpm run start:chrome
-  ```
-- Firefox:
-  ```sh
-  pnpm run start:firefox
-  ```
+**Firefox:**
+
+1. Open `about:debugging`.
+2. Click **This Firefox**.
+3. Click **Load Temporary Add-on** and select any file inside the `dist/` folder.
+
+### Using web-ext (recommended for development)
+
+```sh
+pnpm run start:chromium   # launch Chromium with the extension loaded
+pnpm run start:chrome     # launch Chrome with the extension loaded
+pnpm run start:firefox    # launch Firefox with the extension loaded
+```

@@ -7,10 +7,10 @@ assignees: ''
 
 ---
 
-First of all, check that you are using the latest version.
+Before opening a bug report, please verify that you are using the latest version of the extension.
 
-**Basic Info. (please complete the following information):**
- - Odoo version: [e.g. 13.0]
+**Environment (please complete all fields):**
+ - Odoo version: [e.g. 18.0]
  - Browser: [e.g. chrome, firefox]
  - Command: `[e.g. call -m res.currency -c foo]`
 

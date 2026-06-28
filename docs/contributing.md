@@ -1,21 +1,42 @@
 # Contributing
 
-## Husky
+## Prerequisites
 
-If you want collaborate, you need this to make octocat happy.
+Before contributing, make sure the project dependencies and Husky git hooks are installed:
 
-#### Installation
-
-`husky` need be initialized:
-
-```
+```sh
 pnpm install
 ```
 
-#### Usage
+This command installs all dependencies and sets up the pre-commit hooks automatically.
 
-After install, when you do a commit all linters, prettiers, etc.. will run
-automatically ;)
+## Pre-commit Hooks
 
-If one step fails the commit will be cancelled, try do it again (surely husky
-was changed some files, no problem, it's his job, add them again).
+This project uses [Husky](https://typicode.github.io/husky/) to run quality checks before every commit. The hooks
+execute ESLint (with the Hermes parser) and Prettier on staged files.
+
+If a hook fails, the commit is cancelled. Husky may have auto-fixed some files during the run — re-stage those
+files and commit again.
+
+## Workflow
+
+1. Fork the repository and create a feature branch.
+2. Make your changes following the code conventions described in [Developing](./developing.md).
+3. Run the linter and type checker locally to catch issues early:
+   ```sh
+   pnpm run dev:eslint
+   pnpm run dev:flowcheck
+   ```
+4. Commit your changes. The pre-commit hooks will run automatically.
+5. Open a pull request against the `master` branch.
+
+## Code Conventions
+
+- All source files must include `// @flow strict` at the top.
+- Use `.mjs` for ES modules.
+- Follow the Prettier config defined in `package.json` (`printWidth: 120`, single quotes, trailing commas).
+- Use `i18n.t('key', 'default')` for any user-facing string in command files.
+
+## Running Tests
+
+See [Testing](./testing.md) for instructions on running integration and unit tests before submitting a pull request.

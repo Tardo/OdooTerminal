@@ -1,5 +1,9 @@
 # Changelog
 
+Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `UPD` update/dependency — `DEL` removal.
+
+---
+
 **13.0.0**
 
 ```
