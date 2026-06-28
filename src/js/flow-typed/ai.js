@@ -31,7 +31,7 @@ declare type AIToolDef = {
 declare type AIContentBlock =
   | {type: 'text', text: string, cache_control?: {type: 'ephemeral'}}
   | {type: 'tool_use', id: string, name: string, input: {[string]: mixed}}
-  | {type: 'tool_result', tool_use_id: string, content: string};
+  | {type: 'tool_result', tool_use_id: string, content: string, cache_control?: {type: 'ephemeral'}};
 
 declare type AIMessage = {
   role: string,

@@ -10,6 +10,7 @@ import buildMainAgentPrompt from '@ai/agents/main';
 import SKILLS from '@ai/skills/__all__';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {DEFAULT_MAX_STEPS} from '@ai/constants';
+import {computeContextSize, shouldCompress, compressHistory} from '@ai/utils/compress_history';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -83,6 +84,9 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
   let totalCompletionTokens = 0;
   let totalCacheCreationTokens = 0;
   let totalCacheReadTokens = 0;
+  let lastContextSize = 0;
+  // Index of the messages[] entry that carries the rolling Anthropic cache breakpoint.
+  let rollingBreakpointMsgIdx = -1;
 
   const printTokenUsage = () => {
     if (totalPromptTokens === 0 && totalCompletionTokens === 0) {
@@ -171,6 +175,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         totalCompletionTokens += usage.completion_tokens;
         totalCacheCreationTokens += usage.cache_creation_input_tokens ?? 0;
         totalCacheReadTokens += usage.cache_read_input_tokens ?? usage.prompt_tokens_details?.cached_tokens ?? 0;
+        lastContextSize = computeContextSize(usage, aiState.provider);
       }
     } catch (err) {
       if (!handleAbort(err, ctx)) {
@@ -370,7 +375,60 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       }
     }
 
+    // Rolling cache breakpoint for Anthropic: clear the previous breakpoint from the
+    // message that held it, then mark the last content block of the new user message.
+    // This keeps [system_cached ... last_tool_result_cached] as the stable prefix,
+    // so the next request reads most of the context from cache.
+    if (aiState.provider === 'anthropic') {
+      if (rollingBreakpointMsgIdx >= 0) {
+        const prev = messages[rollingBreakpointMsgIdx];
+        if (Array.isArray(prev.content) && prev.content.length > 0) {
+          const prevContent = prev.content;
+          const last = prevContent[prevContent.length - 1];
+          let stripped: AIContentBlock;
+          if (last.type === 'text') {
+            stripped = {type: 'text', text: last.text};
+          } else if (last.type === 'tool_result') {
+            stripped = {type: 'tool_result', tool_use_id: last.tool_use_id, content: last.content};
+          } else {
+            stripped = last;
+          }
+          messages[rollingBreakpointMsgIdx] = {
+            role: prev.role,
+            content: [...prevContent.slice(0, -1), stripped],
+          };
+        }
+      }
+
+      if (toolResults.length > 0) {
+        const lastTR = toolResults[toolResults.length - 1];
+        const marked: AIContentBlock =
+          lastTR.type === 'tool_result'
+            ? {
+                type: 'tool_result',
+                tool_use_id: lastTR.tool_use_id,
+                content: lastTR.content,
+                cache_control: {type: 'ephemeral'},
+              }
+            : lastTR;
+        toolResults[toolResults.length - 1] = marked;
+      }
+    }
+
     messages.push({role: 'user', content: toolResults});
+
+    if (aiState.provider === 'anthropic') {
+      rollingBreakpointMsgIdx = messages.length - 1;
+    }
+
+    // Compress history when approaching the provider's context window limit.
+    if (shouldCompress(lastContextSize, aiState.provider)) {
+      const compressed = compressHistory(messages);
+      messages.splice(0, messages.length, ...compressed);
+      if (aiState.provider === 'anthropic') {
+        rollingBreakpointMsgIdx = messages.length - 1;
+      }
+    }
 
     // print/eprint route through a requestAnimationFrame buffer, while printLive
     // appends synchronously. Awaiting one rAF here ensures any command output or
