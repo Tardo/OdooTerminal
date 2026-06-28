@@ -1228,7 +1228,7 @@
   },
   "terminal": {
     "ai": {
-      "experimentalWarning": "Este modo es experimental, usalo con extremo cuidado",
+      "experimentalWarning": "This mode is experimental, use it with extreme caution",
       "newConversation": "New conversation",
       "noConversationsHint": "Create a new conversation to start",
       "noModelsHint": "Configure AI models in the extension options",
