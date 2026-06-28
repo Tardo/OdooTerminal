@@ -5,6 +5,7 @@
 import i18n from 'i18next';
 import {highlightFormFields, clearFormFieldHighlights, activateNotebookPath} from '@odoo/utils/highlight_form_field';
 import {getFormViewArch, findFieldNotebookPath} from '@odoo/utils/get_form_view_arch';
+import getFormRecord from '@odoo/utils/get_form_record';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
@@ -13,7 +14,29 @@ async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
   const operation: mixed = kwargs.operation;
   const field: mixed = kwargs.field;
 
-  if (operation === 'highlight') {
+  if (operation === 'edit') {
+    const values: mixed = kwargs.value;
+    if (typeof values !== 'object' || values === null || Array.isArray(values)) {
+      ctx.screen.printError(
+        i18n.t('cmdForm.error.valuesRequired', 'Values dict is required for the edit operation (use -v {field: value, ...})'),
+      );
+      return;
+    }
+    const adapter = getFormRecord();
+    if (adapter === null) {
+      ctx.screen.printError(
+        i18n.t('cmdForm.error.noFormView', 'No editable form view found in the current page'),
+      );
+      return;
+    }
+    // $FlowFixMe[incompatible-variance]
+    await adapter.update(values, await this.getContext());
+    // $FlowFixMe[incompatible-use]
+    const count: number = Object.keys(values).length;
+    ctx.screen.print(
+      i18n.t('cmdForm.result.edited', 'Updated {{count}} field(s) in the current form', {count}),
+    );
+  } else if (operation === 'highlight') {
     if (typeof field !== 'string' || field.length === 0) {
       ctx.screen.printError(
         i18n.t('cmdForm.error.fieldRequired', 'A field name is required for the highlight operation'),
@@ -56,9 +79,12 @@ async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('cmdForm.definition', 'Highlight or clear field highlights on the current form view'),
+    definition: i18n.t('cmdForm.definition', 'Interact with the current form view (highlight, clear, edit)'),
     callback: cmdForm,
-    detail: i18n.t('cmdForm.detail', 'highlight: visually marks a field in the open form view, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given). Does not return data.'),
+    detail: i18n.t(
+      'cmdForm.detail',
+      'edit: sets field values in the open form in-memory record (fires onchanges, does not save). highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).',
+    ),
     args: [
       [
         ARG.String,
@@ -66,7 +92,7 @@ export default function (): Partial<CMDDef> {
         true,
         i18n.t('cmdForm.args.operation', 'The operation to perform'),
         undefined,
-        ['highlight', 'clear'],
+        ['edit', 'highlight', 'clear'],
       ],
       [
         ARG.String,
@@ -74,7 +100,13 @@ export default function (): Partial<CMDDef> {
         false,
         i18n.t('cmdForm.args.field', 'The field technical name'),
       ],
+      [
+        ARG.Dictionary,
+        ['v', 'value'],
+        false,
+        i18n.t('cmdForm.args.value', 'The field values to set (for the edit operation)'),
+      ],
     ],
-    example: '-o highlight -f partner_id',
+    example: '-o edit -v {partner_id: 5, phone: "555-1234"}',
   };
 }

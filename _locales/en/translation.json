@@ -480,16 +480,20 @@
   "cmdForm": {
     "args": {
       "field": "The field technical name",
-      "operation": "The operation to perform"
+      "operation": "The operation to perform",
+      "value": "The field values to set (for the edit operation)"
     },
-    "definition": "Highlight or clear field highlights on the current form view",
-    "detail": "highlight: visually marks a field in the open form view, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given). Does not return data.",
+    "definition": "Interact with the current form view (highlight, clear, edit)",
+    "detail": "edit: sets field values in the open form in-memory record (fires onchanges, does not save). highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).",
     "error": {
       "fieldNotFound": "No form field '{{field}}' found in the current view",
-      "fieldRequired": "A field name is required for the highlight operation"
+      "fieldRequired": "A field name is required for the highlight operation",
+      "noFormView": "No editable form view found in the current page",
+      "valuesRequired": "Values dict is required for the edit operation (use -v {field: value, ...})"
     },
     "result": {
       "cleared": "Field highlights cleared",
+      "edited": "Updated {{count}} field(s) in the current form",
       "highlighted": "Highlighted {{count}} field(s) '{{field}}'"
     }
   },

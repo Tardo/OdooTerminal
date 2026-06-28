@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import asyncSleep from '@terminal/utils/async_sleep';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import TerminalTestSuite from './tests';
 
 export default class TestBackend extends TerminalTestSuite {
@@ -26,6 +27,31 @@ export default class TestBackend extends TerminalTestSuite {
     this.assertNotEqual(document.getElementById('oterm-highlight-f-name'), null);
     await this.terminal.execute('form -o clear', false, true);
     this.assertEqual(document.getElementById('oterm-highlight-f-name'), null);
+
+    // The command enters edit mode automatically if needed, then sets the value
+    // in-memory (fires onchanges, does not save to DB).
+    await this.terminal.execute('form -o edit -v {phone: "test-form-edit-555"}', false, true);
+    await asyncSleep(1000);
+
+    // In Odoo 14+, the phone field renders as an <input> in the DOM when in edit
+    // mode. In Odoo 11-13 the field may live in an inactive notebook tab that is
+    // never added to the DOM, so we only assert the visible input for 14+.
+    const odooMajor = getOdooVersion('major');
+    if (typeof odooMajor === 'number' && odooMajor >= 14) {
+      const phoneInput = document.querySelector('.o_field_widget[name="phone"] input');
+      this.assertNotEqual(phoneInput, null);
+      // $FlowFixMe[prop-missing]
+      this.assertEqual(phoneInput?.value, 'test-form-edit-555');
+    }
+
+    // Discard so the DB record is not modified
+    const discardBtn = document.querySelector(
+      '.o_form_button_cancel, .o_form_discard_button, .o_form_button_cancel.btn',
+    );
+    if (discardBtn instanceof HTMLElement) {
+      discardBtn.click();
+      await asyncSleep(500);
+    }
   }
 
   async test_settings() {
