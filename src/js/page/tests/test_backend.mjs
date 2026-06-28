@@ -28,6 +28,13 @@ export default class TestBackend extends TerminalTestSuite {
     await this.terminal.execute('form -o clear', false, true);
     this.assertEqual(document.getElementById('oterm-highlight-f-name'), null);
 
+    // get: read current in-memory field values from the open form.
+    const getResult: mixed = await this.terminal.execute('form -o get -f [name]', false, true);
+    this.assertNotEqual(getResult, null);
+    this.assertTrue(typeof getResult === 'object' && !Array.isArray(getResult));
+    // $FlowFixMe[invalid-in-rhs]
+    this.assertTrue('name' in getResult);
+
     // The command enters edit mode automatically if needed, then sets the value
     // in-memory (fires onchanges, does not save to DB).
     await this.terminal.execute('form -o edit -v {phone: "test-form-edit-555"}', false, true);

@@ -479,15 +479,16 @@
   },
   "cmdForm": {
     "args": {
-      "field": "El nombre técnico del campo",
+      "field": "El/los nombre(s) técnico(s) del campo",
       "operation": "La operación a realizar",
       "value": "Los valores de campo a establecer (para la operación edit)"
     },
-    "definition": "Interactuar con el formulario actual (highlight, clear, edit)",
-    "detail": "edit: establece valores en el registro en memoria del formulario abierto (ejecuta onchanges, no guarda). highlight: marca visualmente un campo, activando su pestaña si está oculto. clear: elimina los resaltados (todos o solo -f si se indica).",
+    "definition": "Interactuar con el formulario actual (get, edit, highlight, clear)",
+    "detail": "get: devuelve los valores actuales en memoria de los campos indicados. edit: establece valores en el registro en memoria del formulario abierto (ejecuta onchanges, no guarda). highlight: marca visualmente un campo, activando su pestaña si está oculto. clear: elimina los resaltados (todos o solo -f si se indica).",
     "error": {
       "fieldNotFound": "No se encontró el campo '{{field}}' en la vista actual",
       "fieldRequired": "Se requiere un nombre de campo para la operación highlight",
+      "fieldsRequired": "Se requiere al menos un nombre de campo para la operación get (usa -f [campo1, campo2])",
       "noFormView": "No se encontró un formulario editable en la página actual",
       "valuesRequired": "Se requiere un diccionario de valores para la operación edit (usa -v {campo: valor, ...})"
     },

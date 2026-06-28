@@ -10,11 +10,34 @@ import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<void> {
+async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<{[string]: mixed} | void> {
   const operation: mixed = kwargs.operation;
-  const field: mixed = kwargs.field;
+  // -f is ARG.List | ARG.String: always arrives as an array (may be empty/undefined).
+  const fieldArg: mixed = kwargs.field;
+  const fields: $ReadOnlyArray<string> = Array.isArray(fieldArg)
+    ? fieldArg.filter(x => typeof x === 'string')
+    : [];
+  // For operations that need exactly one field name, take the first element.
+  const field: string = fields.length > 0 ? fields[0] : '';
 
-  if (operation === 'edit') {
+  if (operation === 'get') {
+    if (fields.length === 0) {
+      ctx.screen.printError(
+        i18n.t('cmdForm.error.fieldsRequired', 'At least one field name is required for the get operation (use -f [field1, field2])'),
+      );
+      return;
+    }
+    const adapter = getFormRecord();
+    if (adapter === null) {
+      ctx.screen.printError(
+        i18n.t('cmdForm.error.noFormView', 'No editable form view found in the current page'),
+      );
+      return;
+    }
+    const values = adapter.read(fields);
+    ctx.screen.print(JSON.stringify(values, null, 2));
+    return values;
+  } else if (operation === 'edit') {
     const values: mixed = kwargs.value;
     if (typeof values !== 'object' || values === null || Array.isArray(values)) {
       ctx.screen.printError(
@@ -37,7 +60,7 @@ async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
       i18n.t('cmdForm.result.edited', 'Updated {{count}} field(s) in the current form', {count}),
     );
   } else if (operation === 'highlight') {
-    if (typeof field !== 'string' || field.length === 0) {
+    if (field.length === 0) {
       ctx.screen.printError(
         i18n.t('cmdForm.error.fieldRequired', 'A field name is required for the highlight operation'),
       );
@@ -72,18 +95,18 @@ async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
       i18n.t('cmdForm.result.highlighted', "Highlighted {{count}} field(s) '{{field}}'", {count, field}),
     );
   } else if (operation === 'clear') {
-    clearFormFieldHighlights(typeof field === 'string' && field.length > 0 ? field : undefined);
+    clearFormFieldHighlights(field.length > 0 ? field : undefined);
     ctx.screen.print(i18n.t('cmdForm.result.cleared', 'Field highlights cleared'));
   }
 }
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('cmdForm.definition', 'Interact with the current form view (highlight, clear, edit)'),
+    definition: i18n.t('cmdForm.definition', 'Interact with the current form view (get, edit, highlight, clear)'),
     callback: cmdForm,
     detail: i18n.t(
       'cmdForm.detail',
-      'edit: sets field values in the open form in-memory record (fires onchanges, does not save). highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).',
+      'get: returns in-memory field values. edit: sets field values in the open form in-memory record (fires onchanges, does not save). highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).',
     ),
     args: [
       [
@@ -92,13 +115,13 @@ export default function (): Partial<CMDDef> {
         true,
         i18n.t('cmdForm.args.operation', 'The operation to perform'),
         undefined,
-        ['edit', 'highlight', 'clear'],
+        ['get', 'edit', 'highlight', 'clear'],
       ],
       [
-        ARG.String,
+        ARG.List | ARG.String,
         ['f', 'field'],
         false,
-        i18n.t('cmdForm.args.field', 'The field technical name'),
+        i18n.t('cmdForm.args.field', 'The field technical name(s)'),
       ],
       [
         ARG.Dictionary,
@@ -107,6 +130,6 @@ export default function (): Partial<CMDDef> {
         i18n.t('cmdForm.args.value', 'The field values to set (for the edit operation)'),
       ],
     ],
-    example: '-o edit -v {partner_id: 5, phone: "555-1234"}',
+    example: '-o get -f [name, phone]',
   };
 }

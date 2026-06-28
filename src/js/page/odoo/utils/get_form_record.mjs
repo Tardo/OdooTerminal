@@ -103,11 +103,12 @@ async function enrichMany2oneValues(
 }
 
 export type FormRecordAdapter = {
+  read(fields: $ReadOnlyArray<string>): {[string]: mixed},
   update(changes: {[string]: mixed}, context: {[string]: mixed}): Promise<void>,
 };
 
-// Returns an adapter to edit the currently open form view's in-memory record,
-// or null if no editable form is found.
+// Returns an adapter to read/edit the currently open form view's in-memory
+// record, or null if no form is found.
 // OWL path (Odoo 16+) is tried first; then the legacy BasicModel path (11–15).
 export default function getFormRecord(): FormRecordAdapter | null {
   // OWL path (Odoo 16+)
@@ -116,6 +117,15 @@ export default function getFormRecord(): FormRecordAdapter | null {
     const record = findOwlFormRoot(root, 0);
     if (record !== null) {
       return {
+        read: fields => {
+          // $FlowFixMe[prop-missing]
+          const data: {[string]: mixed} = record.data ?? {};
+          const result: {[string]: mixed} = {};
+          for (const f of fields) {
+            result[f] = data[f];
+          }
+          return result;
+        },
         update: async (changes, context) => {
           // $FlowFixMe[prop-missing]
           const fields: {[string]: FieldDef} = record.fields ?? {};
@@ -140,6 +150,17 @@ export default function getFormRecord(): FormRecordAdapter | null {
     }
     if (widget?.model && typeof widget.handle === 'string') {
       return {
+        read: fields => {
+          // $FlowFixMe[prop-missing]
+          const localRecord = widget.model.localData?.[widget.handle];
+          // $FlowFixMe[prop-missing]
+          const data: {[string]: mixed} = localRecord?.data ?? {};
+          const result: {[string]: mixed} = {};
+          for (const f of fields) {
+            result[f] = data[f];
+          }
+          return result;
+        },
         update: async (changes, context) => {
           // Switch to edit mode if the form is currently read-only.
           // Odoo 11-13 uses mode 'view'; Odoo 14-15 uses 'readonly'.
