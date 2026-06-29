@@ -1148,8 +1148,17 @@
   }
 }
 .o_terminal .terminal-ai-conv-empty-hint .terminal-ai-conv-empty-options {
+  background: none;
+  border: none;
   color: var(--terminal-color-secondary);
+  cursor: pointer;
+  font-size: inherit;
   font-style: italic;
+  padding: 0;
+  text-decoration: underline;
+}
+.o_terminal .terminal-ai-conv-empty-hint .terminal-ai-conv-empty-options:hover {
+  color: var(--terminal-color-primary);
 }
 
 /* === AI Mode button === */

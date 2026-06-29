@@ -170,6 +170,30 @@
   "optionsTitleAIModelsAdd": {
     "message": "Add"
   },
+  "optionsTitleAIModelsLoad": {
+    "message": "Load models"
+  },
+  "optionsAIModelsLoadLoading": {
+    "message": "Loading..."
+  },
+  "optionsAIModelsLoadError": {
+    "message": "Error loading models"
+  },
+  "optionsAIModelsLoadMissingURL": {
+    "message": "Enter URL first"
+  },
+  "optionsAIModelsLoadEmpty": {
+    "message": "No models found"
+  },
+  "optionsAIModelsLoadSuccess": {
+    "message": "$COUNT$ models loaded",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
   "optionsReset": {
     "message": "Reset"
   },

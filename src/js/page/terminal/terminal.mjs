@@ -26,6 +26,7 @@ import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 import parseHTML from './utils/parse_html';
+import postMessage from '@common/utils/post_message';
 import file2attachment from './utils/file2attachment';
 import elementPicker from './utils/element_picker';
 import captureScreenshot from '@ai/utils/capture_screenshot';
@@ -1217,9 +1218,12 @@ export default class Terminal {
         "<div class='terminal-ai-conv-empty-hint'>" +
           "<span class='terminal-ai-conv-empty-arrow'>&#8593;</span>" +
           `<span>${i18n.t('terminal.ai.noConversationsHint', 'Create a new conversation to start')}</span>` +
-          `<span class='terminal-ai-conv-empty-options'>${i18n.t('terminal.ai.noModelsHint', 'Configure AI models in the extension options')}</span>` +
+          `<button class='terminal-ai-conv-empty-options'>${i18n.t('terminal.ai.noModelsHint', 'Configure AI models in the extension options')}</button>` +
           '</div>',
       );
+      hint.querySelector('.terminal-ai-conv-empty-options')?.addEventListener('click', () => {
+        postMessage('ODOO_TERM_OPEN_OPTIONS', {});
+      });
       listEl.replaceChildren(hint);
     } else {
       listEl.replaceChildren(...convs.map(c => parseHTML(renderAIConvItem(c.id, c.name, c.id === this.#activeConvId))));

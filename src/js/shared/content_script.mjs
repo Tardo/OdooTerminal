@@ -68,6 +68,8 @@ function onWindowMessage(event: MessageEvent) {
     });
   } else if (ev_data.type === 'ODOO_TERM_SCREENSHOT_REQ') {
     ubrowser.runtime.sendMessage({message: 'capture_screenshot'});
+  } else if (ev_data.type === 'ODOO_TERM_OPEN_OPTIONS') {
+    ubrowser.runtime.sendMessage({message: 'open_options_page'});
   }
 }
 

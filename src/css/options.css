@@ -93,6 +93,19 @@ body {
 .optsection .ai_models_btn_zone input#ai_model_model {
   width: 20%;
 }
+.optsection .ai_models_btn_zone .ai_model_load_status {
+  align-self: center;
+  font-size: 0.85em;
+}
+.optsection .ai_models_btn_zone .ai_model_load_status.ai_model_load_ok {
+  color: #155724;
+}
+.optsection .ai_models_btn_zone .ai_model_load_status.ai_model_load_error {
+  color: #721c24;
+}
+.optsection .ai_models_btn_zone .ai_model_load_status.ai_model_load_warning {
+  color: #856404;
+}
 .optsection details.ai_model_advanced {
   margin-top: 0.4em;
   font-size: 0.85em;

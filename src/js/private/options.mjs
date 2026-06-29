@@ -58,6 +58,101 @@ function onClickColorDomainRemove(e: MouseEvent) {
   }
 }
 
+const PROVIDER_DEFAULT_URLS: {[string]: string} = {
+  openai: 'https://api.openai.com/v1',
+  anthropic: 'https://api.anthropic.com',
+};
+
+function onChangeAIModelProvider(e: Event) {
+  const target = e.target;
+  if (!(target instanceof HTMLSelectElement)) {
+    return;
+  }
+  const elm_url = document.getElementById('ai_model_url');
+  if (!(elm_url instanceof HTMLInputElement)) {
+    return;
+  }
+  const defaultUrl = PROVIDER_DEFAULT_URLS[target.value];
+  if (defaultUrl && (!elm_url.value || Object.values(PROVIDER_DEFAULT_URLS).includes(elm_url.value))) {
+    elm_url.value = defaultUrl;
+  }
+}
+
+async function fetchAvailableModels(provider: string, url: string, apiKey: string): Promise<Array<string>> {
+  const isAnthropic = provider === 'anthropic';
+  const headers: {[string]: string} = {'Content-Type': 'application/json'};
+  if (isAnthropic) {
+    headers['anthropic-version'] = '2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
+    if (apiKey) {
+      headers['x-api-key'] = apiKey;
+    }
+  } else if (apiKey) {
+    headers['Authorization'] = `Bearer ${apiKey}`;
+  }
+  const endpoint = isAnthropic ? `${url}/v1/models` : `${url}/models`;
+  const response = await fetch(endpoint, {headers});
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  // $FlowFixMe[incompatible-type]
+  const json: {data: Array<{id: string}>} = await response.json();
+  const items = json.data || [];
+  return items.map(m => m.id).filter(Boolean).sort();
+}
+
+async function onClickLoadAIModels() {
+  const elm_provider = document.getElementById('ai_model_provider');
+  const elm_url = document.getElementById('ai_model_url');
+  const elm_api_key = document.getElementById('ai_model_api_key');
+  const elm_status = document.getElementById('ai_model_load_status');
+  const elm_datalist = document.getElementById('ai_model_model_list');
+
+  if (
+    !(elm_provider instanceof HTMLSelectElement) ||
+    !(elm_url instanceof HTMLInputElement) ||
+    !(elm_api_key instanceof HTMLInputElement) ||
+    !elm_status ||
+    !elm_datalist
+  ) {
+    return;
+  }
+
+  if (!elm_url.value) {
+    elm_status.textContent = ubrowser.i18n.getMessage('optionsAIModelsLoadMissingURL');
+    elm_status.setAttribute('class', 'ai_model_load_status ai_model_load_error');
+    return;
+  }
+
+  elm_status.textContent = ubrowser.i18n.getMessage('optionsAIModelsLoadLoading');
+  elm_status.setAttribute('class', 'ai_model_load_status');
+
+  try {
+    const models = await fetchAvailableModels(elm_provider.value, elm_url.value, elm_api_key.value);
+
+    while (elm_datalist.firstChild) {
+      elm_datalist.removeChild(elm_datalist.firstChild);
+    }
+    for (const modelId of models) {
+      const option = document.createElement('option');
+      option.value = modelId;
+      elm_datalist.appendChild(option);
+    }
+
+    if (models.length === 0) {
+      elm_status.textContent = ubrowser.i18n.getMessage('optionsAIModelsLoadEmpty');
+      elm_status.setAttribute('class', 'ai_model_load_status ai_model_load_warning');
+    } else {
+      elm_status.textContent = ubrowser.i18n.getMessage('optionsAIModelsLoadSuccess', [String(models.length)]);
+      elm_status.setAttribute('class', 'ai_model_load_status ai_model_load_ok');
+    }
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    elm_status.textContent = `${ubrowser.i18n.getMessage('optionsAIModelsLoadError')}: ${errMsg}`;
+    elm_status.setAttribute('class', 'ai_model_load_status ai_model_load_error');
+  }
+}
+
 function onClickAIModelRemove(e: MouseEvent) {
   if (e.target instanceof HTMLElement) {
     const el_target = e.target;
@@ -457,6 +552,7 @@ function i18n() {
   _apply_i18n('#label_ai_model_timeout', 'optionsTitleAIModelsTimeout');
   _apply_i18n('#label_ai_model_max_tokens', 'optionsTitleAIModelsMaxTokensLabel');
   _apply_i18n('#add_ai_model', 'optionsTitleAIModelsAdd');
+  _apply_i18n('#load_ai_models', 'optionsTitleAIModelsLoad');
 
   _apply_i18n('#title_init_commands', 'optionsTitleInitCommands');
   _apply_i18n('#desc_init_commands', 'optionsTitleInitCommandsDescription');
@@ -490,6 +586,9 @@ async function onDOMLoaded() {
   _add_event_listener('#add_shortcut', 'click', onClickShortcutAdd);
   _add_event_listener('#add_color_domain', 'click', onClickColorDomainAdd);
   _add_event_listener('#add_ai_model', 'click', onClickAIModelAdd);
+  _add_event_listener('#load_ai_models', 'click', onClickLoadAIModels);
+  _add_event_listener('#ai_model_provider', 'change', onChangeAIModelProvider);
+  document.getElementById('ai_model_provider')?.dispatchEvent(new Event('change'));
   _add_event_listener('.reset_settings', 'click', onClickResetSettings);
   _add_event_listener('#theme_preset', 'change', onChangeThemePreset);
   i18n();

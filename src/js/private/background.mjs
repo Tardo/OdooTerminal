@@ -55,6 +55,8 @@ function onInternalMessage(request: Object, sender: Object) {
       ubrowser.action.disable(sender.tab.id);
       updateBrowserAction('terminal-disabled-16', ver_clean, VERSION_COLOR.disabled);
     }
+  } else if (request.message === 'open_options_page') {
+    ubrowser.runtime.openOptionsPage();
   } else if (request.message === 'capture_screenshot') {
     const tabId: number = sender.tab.id;
     // $FlowFixMe[prop-missing]
