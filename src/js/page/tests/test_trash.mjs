@@ -5,6 +5,24 @@
 import TerminalTestSuite from './tests';
 
 export default class TestTrash extends TerminalTestSuite {
+  async test_trash_escape_sequences() {
+    // \" inside double-quoted string
+    let results = await this.terminal.getShell().eval(String.raw`"say \"hi\""`);
+    this.assertEqual(results, 'say "hi"');
+    // \' inside single-quoted string
+    results = await this.terminal.getShell().eval(String.raw`'it\'s working'`);
+    this.assertEqual(results, "it's working");
+    // \\ → single backslash (the closing " must not be swallowed by the escaped backslash)
+    results = await this.terminal.getShell().eval(String.raw`"a\\"`);
+    this.assertEqual(results, 'a\\');
+    // \n → newline character
+    results = await this.terminal.getShell().eval(String.raw`"line1\nline2"`);
+    this.assertEqual(results, 'line1\nline2');
+    // unknown escape sequence is kept as-is
+    results = await this.terminal.getShell().eval(String.raw`"C:\Users"`);
+    this.assertEqual(results, 'C:\\Users');
+  }
+
   async test_trash_array() {
     let results = await this.terminal.getShell().eval('[1,    2    , 3,     4     ]');
     this.assertEqual(results[0], 1);

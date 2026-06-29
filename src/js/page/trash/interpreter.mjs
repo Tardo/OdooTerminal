@@ -157,13 +157,16 @@ export default class Interpreter {
     let do_cut = false;
     let do_skip = false;
     let prev_char = '';
+    let escape_next = false;
     let prev_token: LexerInfo | void;
     let prev_token_no_space: LexerInfo | void;
     const clean_data_len = clean_data.length;
     for (let char_index = 0; char_index < clean_data_len; ++char_index) {
       const char = clean_data[char_index];
       const in_data_type = in_array || in_block || in_lblock;
-      if (prev_char !== SYMBOLS.ESCAPE) {
+      const is_escaped = escape_next;
+      escape_next = char === SYMBOLS.ESCAPE && !is_escaped && Boolean(in_string);
+      if (!is_escaped) {
         if (char === SYMBOLS.STRING || char === SYMBOLS.STRING_SIMPLE) {
           if (in_string && char === in_string) {
             in_string = '';
@@ -276,14 +279,16 @@ export default class Interpreter {
     const isDict = (stoken: string) => {
       let depth = 0;
       let inStr = '';
-      let prevChar = '';
+      let escapeNext = false;
       const slen = stoken.length;
       if (slen === 0) {
         return true;
       }
       for (let i = 0; i < slen; ++i) {
         const ch = stoken[i];
-        if (prevChar !== SYMBOLS.ESCAPE) {
+        const isEscaped = escapeNext;
+        escapeNext = ch === SYMBOLS.ESCAPE && !isEscaped && Boolean(inStr);
+        if (!isEscaped) {
           if (ch === SYMBOLS.STRING || ch === SYMBOLS.STRING_SIMPLE) {
             if (inStr === ch) {
               inStr = '';
@@ -300,7 +305,6 @@ export default class Interpreter {
             }
           }
         }
-        prevChar = ch;
       }
       return false;
     };
@@ -440,7 +444,7 @@ export default class Interpreter {
       if (typeof prev_token_info !== 'undefined' && LEXERDATA_EXTENDED.includes(prev_token_info[0])) {
         ttype = LEXER.Unknown;
       }
-      token_san = this.#trimQuotes(token_san);
+      token_san = this.#unescapeString(this.#trimQuotes(token_san));
     }
     return [ttype, token_san, token];
   }
@@ -1364,6 +1368,44 @@ export default class Interpreter {
     }
 
     return res;
+  }
+
+  #unescapeString(str: string): string {
+    let result = '';
+    let i = 0;
+    const len = str.length;
+    while (i < len) {
+      if (str[i] === SYMBOLS.ESCAPE && i + 1 < len) {
+        const next = str[i + 1];
+        switch (next) {
+          case '"':
+          case "'":
+          case SYMBOLS.ESCAPE:
+            result += next;
+            i += 2;
+            break;
+          case 'n':
+            result += '\n';
+            i += 2;
+            break;
+          case 't':
+            result += '\t';
+            i += 2;
+            break;
+          case 'r':
+            result += '\r';
+            i += 2;
+            break;
+          default:
+            result += str[i];
+            i++;
+        }
+      } else {
+        result += str[i];
+        i++;
+      }
+    }
+    return result;
   }
 
   #trimQuotes(str: string): string {
