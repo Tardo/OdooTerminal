@@ -53,6 +53,8 @@ import cmdAI from './ai';
 import cmdDescribe from './describe';
 import cmdDateRange from './daterange';
 import cmdDiff from './diff';
+import cmdClick from './click';
+import cmdInspect from './inspect';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -107,4 +109,6 @@ export default function (vm: VMachine) {
   vm.registerCommand('describe', cmdDescribe());
   vm.registerCommand('daterange', cmdDateRange());
   vm.registerCommand('diff', cmdDiff());
+  vm.registerCommand('click', cmdClick());
+  vm.registerCommand('inspect', cmdInspect());
 }

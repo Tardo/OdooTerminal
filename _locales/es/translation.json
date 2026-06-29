@@ -248,6 +248,26 @@
     "definition": "Limpiar una sección del terminal",
     "detail": "Limpiar la sección indicada"
   },
+  "cmdClick": {
+    "args": {
+      "index": "Index of the match to click, 0-based (default: 0)",
+      "list": "List all matches without clicking",
+      "selector": "CSS selector (default: button)",
+      "text": "Button text to match (case-insensitive, partial)"
+    },
+    "definition": "Click a button or element in the current view",
+    "detail": "Finds and clicks a button or element by visible text or CSS selector. -t matches any button whose text contains the given string (case-insensitive). -s overrides the element selector (default: button). -n picks the nth match (0-based). --list shows all matches without clicking.",
+    "error": {
+      "indexOutOfRange": "Index {{index}} out of range ({{count}} match(es) found)",
+      "noRoot": "Cannot find Odoo content area",
+      "notFound": "No element found for selector \"{{selector}}\"",
+      "notFoundText": "No button found matching \"{{text}}\"",
+      "notHtmlElement": "Matched element is not clickable"
+    },
+    "result": {
+      "clicked": "Clicked: {{label}}"
+    }
+  },
   "cmdCommit": {
     "args": {
       "recordset": "El conjunto de registros"
@@ -589,6 +609,71 @@
     },
     "definition": "Solicita datos de entrada al usuario",
     "detail": "Devuelve los datos ingresados por el usuario"
+  },
+  "cmdInspect": {
+    "args": {
+      "typeElement": "Element type to inspect"
+    },
+    "breadcrumb": {
+      "none": "No breadcrumb navigation found"
+    },
+    "button": {
+      "none": "No buttons found in the current view"
+    },
+    "definition": "Inspect interactive elements on the current page",
+    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nTypes:\n  page (default) — context overview: model, record id, view type, element counts\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)",
+    "dialog": {
+      "buttons": "<em>Buttons:</em>",
+      "fields": "<em>Fields:</em>",
+      "none": "No dialog is currently open",
+      "title": "Dialog: <strong>{{title}}</strong>"
+    },
+    "error": {
+      "noRoot": "Cannot find Odoo content area",
+      "unknownType": "Unknown element type: {{type}}"
+    },
+    "field": {
+      "none": "No form fields found in the current view"
+    },
+    "menu": {
+      "none": "No menu items found"
+    },
+    "page": {
+      "breadcrumb": "Breadcrumb: {{path}}",
+      "counts": "Elements — buttons: {{b}}, fields: {{f}}, tabs: {{t}}, statusbar states: {{s}}",
+      "model": "Model: <strong>{{model}}</strong>",
+      "pageTitle": "Title: <em>{{title}}</em>",
+      "recordId": "Record ID: <strong>{{id}}</strong>",
+      "title": "Page Overview",
+      "url": "URL: {{url}}",
+      "viewType": "View type: {{type}}"
+    },
+    "record": {
+      "none": "No form record found in the current view"
+    },
+    "statusbar": {
+      "none": "No status bar found in the current view"
+    },
+    "tab": {
+      "none": "No notebook tabs found in the current view"
+    },
+    "table": {
+      "active": "Active",
+      "clickCmd": "click command",
+      "current": "Current",
+      "disabled": "Dis.",
+      "formCmd": "form command",
+      "index": "#",
+      "label": "Label",
+      "name": "Field",
+      "required": "Req",
+      "text": "Text",
+      "type": "Type",
+      "value": "Value"
+    },
+    "view": {
+      "none": "No view switcher found (may be single-view action)"
+    }
   },
   "cmdInstall": {
     "args": {
