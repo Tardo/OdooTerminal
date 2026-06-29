@@ -568,6 +568,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
 
         try {
           const base64 = await captureScreenshot(this, selector);
+          ctx.screen.printAttachments([{name: 'screenshot.png', media_type: 'image/png', data: base64}]);
           const captureLabel =
             selector !== null
               ? `Screenshot captured (cropped to: ${selector}).`

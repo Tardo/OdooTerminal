@@ -670,6 +670,15 @@ export default class Screen {
     this.#screen_el = parseHTML(renderScreen());
     this.#container_el.append(this.#screen_el);
     this.#screen_el.addEventListener('keydown', ev => this.preventLostInputFocus(ev));
+    this.#screen_el.addEventListener('click', ev => {
+      const target = ev.target;
+      if (target instanceof HTMLImageElement && target.classList.contains('terminal-attach-thumb')) {
+        if (this.#attachLightbox_el && this.#attachLightboxImg_el) {
+          this.#attachLightboxImg_el.src = target.src;
+          this.#attachLightbox_el.classList.remove('d-none', 'hidden');
+        }
+      }
+    });
   }
 
   #buildAttachMenu(): HTMLElement {
