@@ -147,6 +147,9 @@
   "optionsWarningAIModelsKeys": {
     "message": "Advertencia: las claves de API se almacenan en el almacenamiento del navegador y pueden ser leídas por cualquier persona con acceso a este ordenador."
   },
+  "optionsTipAIModelsCapabilities": {
+    "message": "Consejo: Para mejores resultados, utiliza un modelo que soporte uso de herramientas (necesario para el modo agente), visión (para analizar capturas de pantalla), procesamiento de archivos (PDFs e imágenes de adjuntos de Odoo) y razonamiento extendido (para tareas complejas de múltiples pasos)."
+  },
   "optionsTitleAIModelsName": {
     "message": "Nombre"
   },

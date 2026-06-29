@@ -448,6 +448,7 @@ function i18n() {
   _apply_i18n('#title_ai_models', 'optionsTitleAIModels');
   _apply_i18n('#desc_ai_models', 'optionsTitleAIModelsDescription');
   _apply_i18n('#warning_ai_models', 'optionsWarningAIModelsKeys');
+  _apply_i18n('#tip_ai_models', 'optionsTipAIModelsCapabilities');
   _apply_i18n('#column_ai_models_name', 'optionsTitleAIModelsName');
   _apply_i18n('#column_ai_models_provider', 'optionsTitleAIModelsProvider');
   _apply_i18n('#column_ai_models_model', 'optionsTitleAIModelsModel');

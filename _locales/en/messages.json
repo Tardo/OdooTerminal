@@ -143,6 +143,9 @@
   "optionsWarningAIModelsKeys": {
     "message": "Warning: API keys are stored in browser storage and can be read by anyone with access to this computer."
   },
+  "optionsTipAIModelsCapabilities": {
+    "message": "Tip: For best results, use a model that supports tool use (required for agent mode), vision (to analyze screenshots), file processing (PDFs and images from Odoo attachments), and extended thinking (for complex multi-step tasks)."
+  },
   "optionsTitleAIModelsName": {
     "message": "Name"
   },

@@ -122,3 +122,11 @@ body {
   padding: 0.5em 0.8em;
   margin: 0.5em 0 0;
 }
+.tip_text {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  border-radius: 4px;
+  padding: 0.5em 0.8em;
+  margin: 0.5em 0 0;
+}

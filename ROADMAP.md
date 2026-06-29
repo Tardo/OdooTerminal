@@ -9,4 +9,3 @@ Planned improvements and known limitations:
 - Introduce mock support to enable automated testing of the remaining untested commands (see the
   [Untested Commands](docs/testing.md#untested-commands) section).
 - Formalise the terminal state machine by explicitly defining all states and transitions.
-- Upload Screenshots in AI mode
