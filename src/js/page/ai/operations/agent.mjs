@@ -12,6 +12,7 @@ import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {DEFAULT_MAX_STEPS} from '@ai/constants';
 import {computeContextSize, shouldCompress, compressHistory} from '@ai/utils/compress_history';
 import searchRead from '@odoo/orm/search_read';
+import captureScreenshot from '@ai/utils/capture_screenshot';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -38,6 +39,27 @@ const AGENT_TOOLS: Array<AIToolDef> = [
         name: {type: 'string', description: 'Skill name to load'},
       },
       required: ['name'],
+    },
+  },
+  {
+    name: 'take_screenshot',
+    description:
+      'Capture a screenshot of the current browser page (visible viewport only — off-screen content is not included). ' +
+      'The user must confirm before the screenshot is taken. ' +
+      'Optionally crop to a specific DOM element by providing a CSS selector. ' +
+      'The screenshot is injected as an image so you can visually inspect the page. ' +
+      'Use this tool when you need to see what is currently displayed in the browser, verify UI elements, or analyse the page state visually. ' +
+      'Requires a vision-capable model.',
+    parameters: {
+      type: 'object',
+      properties: {
+        reason: {type: 'string', description: 'One-line description of why you need the screenshot'},
+        selector: {
+          type: 'string',
+          description: 'Optional CSS selector to crop the screenshot to a specific DOM element. Omit to capture the full visible viewport.',
+        },
+      },
+      required: [],
     },
   },
   {
@@ -494,6 +516,47 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
           } catch (err) {
             toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Error fetching attachment: ${err.message}`});
           }
+        }
+
+      } else if (tc.name === 'take_screenshot') {
+        const reason = String(tc.input.reason ?? '');
+        const rawSelector = tc.input.selector;
+        const selector: string | null =
+          rawSelector !== null && rawSelector !== undefined ? String(rawSelector) : null;
+        const selectorLabel = selector !== null ? ` of "${selector}"` : '';
+
+        const question = reason
+          ? i18n.t('cmdAI.agent.screenshot.questionWithReason', '[Agent] {{reason}} — Take screenshot{{sel}} — Allow?', {reason, sel: selectorLabel})
+          : i18n.t('cmdAI.agent.screenshot.question', '[Agent] Take screenshot{{sel}} — Allow?', {sel: selectorLabel});
+        const answer = await ctx.screen.showQuestion(question, ['y', 'n'], 'n');
+        if (answer?.toLowerCase() !== 'y') {
+          toolResults.push({
+            type: 'tool_result',
+            tool_use_id: tc.id,
+            content: i18n.t('cmdAI.agent.screenshot.rejected', 'Screenshot rejected by user.'),
+          });
+          continue;
+        }
+
+        ctx.screen.print(
+          i18n.t('cmdAI.agent.screenshot.capturing', '[Agent] Capturing screenshot...'),
+          false,
+        );
+
+        try {
+          const base64 = await captureScreenshot(this, selector);
+          const captureLabel =
+            selector !== null
+              ? `Screenshot captured (cropped to: ${selector}).`
+              : 'Screenshot captured (full viewport).';
+          toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: captureLabel + ' The image follows.'});
+          siblingDocBlocks.push({type: 'image', source: {type: 'base64', media_type: 'image/png', data: base64}});
+        } catch (err) {
+          toolResults.push({
+            type: 'tool_result',
+            tool_use_id: tc.id,
+            content: `Screenshot failed: ${err.message}`,
+          });
         }
 
       } else {

@@ -66,6 +66,8 @@ function onWindowMessage(event: MessageEvent) {
     getStorageSync(['terminal_copy_data']).then(items => {
       postMessage('ODOO_TERM_PASTE_DONE', items.terminal_copy_data);
     });
+  } else if (ev_data.type === 'ODOO_TERM_SCREENSHOT_REQ') {
+    ubrowser.runtime.sendMessage({message: 'capture_screenshot'});
   }
 }
 
@@ -73,7 +75,7 @@ function onWindowMessage(event: MessageEvent) {
  * Listen message from extension context
  * @param {Object} request
  */
-function onInternalMessage(request: {message: string}) {
+function onInternalMessage(request: {message: string, dataUrl?: string, error?: string}) {
   if (request.message === 'update_odoo_terminal_info') {
     if (InstanceContext.isLoaded) {
       updateInstanceContext();
@@ -88,6 +90,11 @@ function onInternalMessage(request: {message: string}) {
     if (InstanceContext.isCompatible) {
       document.getElementById('terminal')?.dispatchEvent(new Event('toggle'));
     }
+  } else if (request.message === 'screenshot_result') {
+    postMessage('ODOO_TERM_SCREENSHOT_DONE', {
+      dataUrl: request.dataUrl !== undefined ? request.dataUrl : null,
+      error: request.error !== undefined ? request.error : null,
+    });
   }
 }
 

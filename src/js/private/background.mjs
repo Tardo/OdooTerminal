@@ -55,6 +55,16 @@ function onInternalMessage(request: Object, sender: Object) {
       ubrowser.action.disable(sender.tab.id);
       updateBrowserAction('terminal-disabled-16', ver_clean, VERSION_COLOR.disabled);
     }
+  } else if (request.message === 'capture_screenshot') {
+    const tabId: number = sender.tab.id;
+    // $FlowFixMe[prop-missing]
+    ubrowser.tabs.captureVisibleTab(null, {format: 'png'})
+      .then((dataUrl: string) => {
+        ubrowser.tabs.sendMessage(tabId, {message: 'screenshot_result', dataUrl});
+      })
+      .catch((err: Error) => {
+        ubrowser.tabs.sendMessage(tabId, {message: 'screenshot_result', error: String(err.message || err)});
+      });
   }
 }
 

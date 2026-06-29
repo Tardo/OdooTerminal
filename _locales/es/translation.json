@@ -92,6 +92,12 @@
         "running": "[Agente] Ejecutando: <code>{{cmd}}</code>",
         "thinking": "[Agente] Pensando... (paso {{step}}/{{max}})"
       },
+      "screenshot": {
+        "capturing": "[Agent] Capturing screenshot...",
+        "question": "[Agent] Take screenshot{{sel}} — Allow?",
+        "questionWithReason": "[Agent] {{reason}} — Take screenshot{{sel}} — Allow?",
+        "rejected": "Screenshot rejected by user."
+      },
       "skill": {
         "alreadyLoaded": "Habilidad ya cargada: {{name}}",
         "loading": "[Agente] Cargando habilidad: {{name}}",
@@ -1332,6 +1338,10 @@
     "ai": {
       "attachExpand": "Clic para ampliar",
       "attachRemove": "Eliminar adjunto",
+      "attachScreenshot": "Screenshot",
+      "attachScreenshotPick": "Select element",
+      "attachScreenshotViewport": "Full viewport",
+      "attachUpload": "Upload file",
       "experimentalWarning": "Este modo es experimental, úsalo con extremo cuidado",
       "helpTip1": "Un tema por conversación — empieza una nueva para cada tarea.",
       "helpTip2": "El historial se comprime automáticamente cuando se llena el contexto, pero las conversaciones cortas siempre cuestan menos tokens.",

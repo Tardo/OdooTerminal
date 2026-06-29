@@ -78,6 +78,14 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     'Rule of thumb: view > print. If both are possible, always choose the view.\n' +
     'IMPORTANT — `graph` and `pivot` share the same view slot in the Odoo client: running one after the other replaces the previous view. The user will only see the LAST one opened. Never run both for the same task; pick the one that best fits the request.\n' +
     '\n' +
+    '# TAKING SCREENSHOTS\n' +
+    'Use `take_screenshot` to capture the current visible viewport (the terminal is hidden automatically before capture).\n' +
+    '- Full page: call `take_screenshot` with no `selector`.\n' +
+    '- Specific element: call `take_screenshot` with `selector` set to a CSS selector (e.g. `.o_form_view`, `#some_id`).\n' +
+    '- Only the visible viewport is captured — elements scrolled out of view are NOT included.\n' +
+    '- The user must confirm each capture before it is taken.\n' +
+    '- Requires a vision-capable model.\n' +
+    '\n' +
     '# READING ODOO ATTACHMENTS\n' +
     'To read a file attached to an Odoo record, use the `get_attachment` tool:\n' +
     '  Step 1 — discover attachments:\n' +

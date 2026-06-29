@@ -50,6 +50,8 @@ export type onInputCallback = (ev: InputEvent) => void;
 export type onInputKeyUpCallback = (ev: KeyboardEvent) => void;
 export type onAttachFileCallback = () => void;
 export type onRemoveAttachmentCallback = (index: number) => void;
+export type onScreenshotViewportCallback = () => void;
+export type onScreenshotPickCallback = () => void;
 
 export type ScreenOptions = {
   inputColors: {[string]: string},
@@ -60,6 +62,8 @@ export type ScreenOptions = {
   onInputKeyUp: onInputKeyUpCallback,
   onAttachFile?: onAttachFileCallback,
   onRemoveAttachment?: onRemoveAttachmentCallback,
+  onScreenshotViewport?: onScreenshotViewportCallback,
+  onScreenshotPick?: onScreenshotPickCallback,
 };
 
 export const PROMPT = '>';
@@ -100,6 +104,8 @@ export default class Screen {
   #assistant_args_info_el: HTMLElement;
 
   #attachBtn_el: HTMLElement | void;
+  #attachMenu_el: HTMLElement | void;
+  #menuCloseHandler: ((e: MouseEvent) => void) | null = null;
   #attachPreview_el: HTMLElement | void;
   #attachLightbox_el: HTMLElement | void;
   #attachLightboxImg_el: HTMLImageElement | void;
@@ -650,6 +656,103 @@ export default class Screen {
     this.#screen_el.addEventListener('keydown', ev => this.preventLostInputFocus(ev));
   }
 
+  #buildAttachMenu(): HTMLElement {
+    const menu = document.createElement('div');
+    menu.className = 'terminal-ai-attach-submenu';
+
+    // Upload file item
+    const uploadBtn = document.createElement('button');
+    uploadBtn.className = 'terminal-ai-attach-submenu-item';
+    uploadBtn.type = 'button';
+    uploadBtn.innerHTML = "<i class='fa fa-upload'></i> " + i18n.t('terminal.ai.attachUpload', 'Upload file');
+    uploadBtn.addEventListener('click', () => {
+      this.#closeAttachMenu();
+      if (Object.hasOwn(this.#options, 'onAttachFile') && typeof this.#options.onAttachFile === 'function') {
+        this.#options.onAttachFile();
+      }
+    });
+    menu.append(uploadBtn);
+
+    // Screenshot group
+    const screenshotGroup = document.createElement('div');
+    screenshotGroup.className = 'terminal-ai-attach-submenu-group';
+
+    const groupHeader = document.createElement('div');
+    groupHeader.className = 'terminal-ai-attach-submenu-group-header';
+    groupHeader.innerHTML = "<i class='fa fa-camera'></i> " + i18n.t('terminal.ai.attachScreenshot', 'Screenshot') + " <i class='fa fa-caret-left'></i>";
+    screenshotGroup.append(groupHeader);
+
+    const subMenu = document.createElement('div');
+    subMenu.className = 'terminal-ai-attach-submenu-sub';
+
+    const viewportBtn = document.createElement('button');
+    viewportBtn.className = 'terminal-ai-attach-submenu-item';
+    viewportBtn.type = 'button';
+    viewportBtn.innerHTML = "<i class='fa fa-desktop'></i> " + i18n.t('terminal.ai.attachScreenshotViewport', 'Full viewport');
+    viewportBtn.addEventListener('click', () => {
+      this.#closeAttachMenu();
+      if (Object.hasOwn(this.#options, 'onScreenshotViewport') && typeof this.#options.onScreenshotViewport === 'function') {
+        this.#options.onScreenshotViewport();
+      }
+    });
+    subMenu.append(viewportBtn);
+
+    const pickBtn = document.createElement('button');
+    pickBtn.className = 'terminal-ai-attach-submenu-item';
+    pickBtn.type = 'button';
+    pickBtn.innerHTML = "<i class='fa fa-crosshairs'></i> " + i18n.t('terminal.ai.attachScreenshotPick', 'Select element');
+    pickBtn.addEventListener('click', () => {
+      this.#closeAttachMenu();
+      if (Object.hasOwn(this.#options, 'onScreenshotPick') && typeof this.#options.onScreenshotPick === 'function') {
+        this.#options.onScreenshotPick();
+      }
+    });
+    subMenu.append(pickBtn);
+
+    screenshotGroup.append(subMenu);
+    menu.append(screenshotGroup);
+
+    return menu;
+  }
+
+  #toggleAttachMenu() {
+    const menu = this.#attachMenu_el;
+    if (!menu) {
+      return;
+    }
+    if (menu.classList.contains('active')) {
+      this.#closeAttachMenu();
+    } else {
+      menu.classList.add('active');
+      const closeHandler = (e: MouseEvent) => {
+        const target = e.target;
+        if (
+          target instanceof Node &&
+          !this.#attachBtn_el?.contains(target) &&
+          !menu.contains(target)
+        ) {
+          this.#closeAttachMenu();
+        }
+      };
+      this.#menuCloseHandler = closeHandler;
+      setTimeout(() => {
+        document.addEventListener('click', closeHandler, true);
+      }, 0);
+    }
+  }
+
+  #closeAttachMenu() {
+    const menu = this.#attachMenu_el;
+    if (!menu) {
+      return;
+    }
+    menu.classList.remove('active');
+    if (this.#menuCloseHandler !== null) {
+      document.removeEventListener('click', this.#menuCloseHandler, true);
+      this.#menuCloseHandler = null;
+    }
+  }
+
   #createAttachPreview(): void {
     const preview = document.createElement('div');
     preview.id = 'terminal_ai_attach_preview';
@@ -854,11 +957,10 @@ export default class Screen {
     const attachBtn = this.#userInput_el.querySelector('#terminal_ai_attach_btn');
     if (attachBtn instanceof HTMLElement) {
       this.#attachBtn_el = attachBtn;
-      attachBtn.addEventListener('click', () => {
-        if (Object.hasOwn(this.#options, 'onAttachFile') && typeof this.#options.onAttachFile === 'function') {
-          this.#options.onAttachFile();
-        }
-      });
+      const menu = this.#buildAttachMenu();
+      attachBtn.insertAdjacentElement('afterend', menu);
+      this.#attachMenu_el = menu;
+      attachBtn.addEventListener('click', () => this.#toggleAttachMenu());
     }
     this.#updateInputMode(this.#options.inputMode);
   }

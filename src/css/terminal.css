@@ -314,6 +314,97 @@
   color: var(--terminal-color-info);
 }
 
+/* Attach submenu */
+.o_terminal .terminal-ai-attach-submenu {
+  background-color: rgba(30, 34, 40, 0.98);
+  border: 1px solid var(--terminal-color-muted);
+  border-radius: 4px;
+  bottom: calc(100% + 4px);
+  display: none;
+  flex-direction: column;
+  min-width: 154px;
+  position: absolute;
+  right: 0;
+  z-index: 50;
+}
+.o_terminal .terminal-ai-attach-submenu.active {
+  display: flex;
+}
+.o_terminal .terminal-ai-attach-submenu-item {
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--terminal-color-light);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--terminal-font-size);
+  gap: 6px;
+  padding: 5px 10px;
+  text-align: left;
+  white-space: nowrap;
+  width: 100%;
+}
+.o_terminal .terminal-ai-attach-submenu-item:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: var(--terminal-color-info);
+}
+.o_terminal .terminal-ai-attach-submenu-group {
+  position: relative;
+}
+.o_terminal .terminal-ai-attach-submenu-group-header {
+  align-items: center;
+  color: var(--terminal-color-light);
+  display: flex;
+  gap: 6px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+.o_terminal .terminal-ai-attach-submenu-group:hover > .terminal-ai-attach-submenu-group-header {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: var(--terminal-color-info);
+}
+.o_terminal .terminal-ai-attach-submenu-sub {
+  background-color: rgba(30, 34, 40, 0.98);
+  border: 1px solid var(--terminal-color-muted);
+  border-radius: 4px;
+  display: none;
+  flex-direction: column;
+  min-width: 140px;
+  position: absolute;
+  right: 100%;
+  top: 0;
+  z-index: 51;
+}
+.o_terminal .terminal-ai-attach-submenu-group:hover > .terminal-ai-attach-submenu-sub {
+  display: flex;
+}
+
+/* Element picker highlight overlay */
+.terminal-element-picker-highlight {
+  border: 2px solid rgba(0, 120, 215, 0.9);
+  background-color: rgba(0, 120, 215, 0.12);
+  box-sizing: border-box;
+  pointer-events: none;
+  position: fixed;
+  transition: top 0.05s, left 0.05s, width 0.05s, height 0.05s;
+  z-index: 2147483645;
+}
+.terminal-element-picker-label {
+  background-color: rgba(0, 120, 215, 0.85);
+  border-radius: 2px;
+  color: #fff;
+  font-family: monospace;
+  font-size: 11px;
+  max-width: 300px;
+  overflow: hidden;
+  padding: 1px 5px;
+  pointer-events: none;
+  position: fixed;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 2147483646;
+}
+
 /* Attachment preview bubbles */
 .o_terminal .terminal-ai-attach-preview {
   bottom: 30px;

@@ -27,6 +27,8 @@ import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 import parseHTML from './utils/parse_html';
 import file2attachment from './utils/file2attachment';
+import elementPicker from './utils/element_picker';
+import captureScreenshot from '@ai/utils/capture_screenshot';
 import {Mutex} from 'async-mutex';
 import {aiState} from '@ai/state';
 import type {JobMetaInfo} from './shell';
@@ -343,6 +345,12 @@ export default class Terminal {
       },
       onRemoveAttachment: (index: number) => {
         this.#removeAttachmentAt(index);
+      },
+      onScreenshotViewport: () => {
+        this.#onScreenshotViewport();
+      },
+      onScreenshotPick: () => {
+        this.#onScreenshotPick();
       },
     });
     if (this.#isAIMode && this.#activeConvId === null) {
@@ -1445,6 +1453,40 @@ export default class Terminal {
         this.doShow().then(() => this.screen.preventLostInputFocus());
       })
       .catch(() => {
+        this.doShow().then(() => this.screen.preventLostInputFocus());
+      });
+  }
+
+  #onScreenshotViewport() {
+    if (!this.#isAIMode) {
+      return;
+    }
+    captureScreenshot(this, null)
+      .then(base64 => {
+        const att: AIAttachment = {name: 'screenshot.png', media_type: 'image/png', data: base64};
+        this.addPendingAttachment(att);
+        this.doShow().then(() => this.screen.preventLostInputFocus());
+      })
+      .catch(() => {
+        this.doShow().then(() => this.screen.preventLostInputFocus());
+      });
+  }
+
+  #onScreenshotPick() {
+    if (!this.#isAIMode) {
+      return;
+    }
+    this.el.style.visibility = 'hidden';
+    elementPicker()
+      .then(element => captureScreenshot(this, element))
+      .then(base64 => {
+        this.el.style.visibility = '';
+        const att: AIAttachment = {name: 'screenshot.png', media_type: 'image/png', data: base64};
+        this.addPendingAttachment(att);
+        this.doShow().then(() => this.screen.preventLostInputFocus());
+      })
+      .catch(() => {
+        this.el.style.visibility = '';
         this.doShow().then(() => this.screen.preventLostInputFocus());
       });
   }
