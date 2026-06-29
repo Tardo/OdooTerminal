@@ -36,15 +36,33 @@ function toOpenAIMessages(messages: Array<AIMessage>): Array<{[string]: mixed}> 
       }
     } else if (role === 'user') {
       const textParts: Array<string> = [];
+      const imageParts: Array<{[string]: mixed}> = [];
       for (const block of content) {
         if (block.type === 'tool_result') {
           result.push({role: 'tool', tool_call_id: block.tool_use_id, content: block.content});
         } else if (block.type === 'text') {
           textParts.push(block.text);
+        } else if (block.type === 'image') {
+          imageParts.push({
+            type: 'image_url',
+            image_url: {url: `data:${block.source.media_type};base64,${block.source.data}`},
+          });
+        } else if (block.type === 'document') {
+          // OpenAI chat API has no native inline document block; include as text notice
+          textParts.push(`[PDF document attached — inline PDF is not supported by this provider]`);
         }
       }
-      if (textParts.length > 0) {
-        result.push({role: 'user', content: textParts.join('')});
+      if (textParts.length > 0 || imageParts.length > 0) {
+        if (imageParts.length === 0) {
+          result.push({role: 'user', content: textParts.join('')});
+        } else {
+          const parts: Array<{[string]: mixed}> = [];
+          if (textParts.length > 0) {
+            parts.push({type: 'text', text: textParts.join('')});
+          }
+          parts.push(...imageParts);
+          result.push({role: 'user', content: parts});
+        }
       }
     } else {
       // system and other roles: extract text content

@@ -98,9 +98,39 @@ export default class OdooTerminal extends Terminal {
   }
 
   /**
+   * Replace image/document binary data with a text placeholder before persisting.
+   * This prevents re-sending large base64 payloads on every subsequent conversation turn.
+   */
+  #stripAttachmentData(messages: Array<AIMessage>): Array<AIMessage> {
+    return messages.map(msg => {
+      if (typeof msg.content === 'string') {
+        return msg;
+      }
+      const stripped: Array<AIContentBlock> = msg.content.map(block => {
+        if (block.type === 'image') {
+          const placeholder: AIContentBlock = {
+            type: 'text',
+            text: `[Image attached: ${block.source.media_type}]`,
+          };
+          return placeholder;
+        }
+        if (block.type === 'document') {
+          const placeholder: AIContentBlock = {
+            type: 'text',
+            text: `[Document attached: ${block.source.media_type}]`,
+          };
+          return placeholder;
+        }
+        return block;
+      });
+      return {role: msg.role, content: stripped};
+    });
+  }
+
+  /**
    * @override
    */
-  async onAIModeInput(input: string): Promise<> {
+  async onAIModeInput(input: string, attachments: Array<AIAttachment>): Promise<> {
     const convId = this.getActiveConvId();
     if (convId === null) {
       return;
@@ -115,7 +145,7 @@ export default class OdooTerminal extends Terminal {
       // $FlowFixMe[class-object-subtyping]
       updatedHistory = await cmdAIAgent.call(
         this,
-        {prompt: input, model: null, timeout: null, max_steps: null, max_verifications: null, initial_messages: history},
+        {prompt: input, model: null, timeout: null, max_steps: null, max_verifications: null, initial_messages: history, attachments},
         {screen: this.screen},
       );
     } catch (err) {
@@ -128,7 +158,7 @@ export default class OdooTerminal extends Terminal {
       this._setAIWorking(false);
     }
 
-    this.saveConvMessages(convId, updatedHistory);
+    this.saveConvMessages(convId, this.#stripAttachmentData(updatedHistory));
     if (isFirstMessage) {
       this.updateConvName(convId, input.slice(0, 40) || i18n.t('terminal.ai.newConversation', 'New conversation'));
     }

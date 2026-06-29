@@ -11,6 +11,7 @@ import SKILLS from '@ai/skills/__all__';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {DEFAULT_MAX_STEPS} from '@ai/constants';
 import {computeContextSize, shouldCompress, compressHistory} from '@ai/utils/compress_history';
+import searchRead from '@odoo/orm/search_read';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -39,6 +40,22 @@ const AGENT_TOOLS: Array<AIToolDef> = [
       required: ['name'],
     },
   },
+  {
+    name: 'get_attachment',
+    description:
+      'Fetch a binary attachment from Odoo (ir.attachment) by id and inject its content into the conversation for reading. ' +
+      'For PDFs and images, the full file content is injected directly (Anthropic provider only). ' +
+      'For text files, the decoded text is returned. Other formats return a description. ' +
+      'IMPORTANT: Use run_command to search ir.attachment first (e.g. search -m ir.attachment -f [[\'res_model\',\'=\',\'sale.order\'],[\'res_id\',\'=\',<id>]] -fi id,name,mimetype) to discover available attachments and their IDs. ' +
+      'If multiple attachments match, present the list as your final answer and wait for the user to select one — do NOT auto-pick.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: {type: 'number', description: 'The ir.attachment record id to fetch'},
+      },
+      required: ['id'],
+    },
+  },
 ];
 
 
@@ -61,6 +78,49 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     kwargs.max_steps !== null && kwargs.max_steps !== undefined ? kwargs.max_steps : DEFAULT_MAX_STEPS;
   // $FlowFixMe[incompatible-type]
   const initialMessages: Array<AIMessage> = Array.isArray(kwargs.initial_messages) ? kwargs.initial_messages : [];
+  // $FlowFixMe[incompatible-type]
+  const attachments: Array<AIAttachment> = Array.isArray(kwargs.attachments) ? kwargs.attachments : [];
+
+  const hasAttachments = attachments.length > 0;
+
+  const userContent: string | Array<AIContentBlock> = (() => {
+    if (!hasAttachments) {
+      return prompt;
+    }
+    const blocks: Array<AIContentBlock> = [];
+    if (prompt) {
+      blocks.push({type: 'text', text: prompt});
+    }
+    for (const att of attachments) {
+      if (att.media_type.startsWith('image/')) {
+        blocks.push({type: 'image', source: {type: 'base64', media_type: att.media_type, data: att.data}});
+      } else if (att.media_type === 'application/pdf') {
+        blocks.push({type: 'document', source: {type: 'base64', media_type: att.media_type, data: att.data}});
+      } else if (att.media_type.startsWith('text/')) {
+        let text: string;
+        try {
+          text = decodeURIComponent(escape(atob(att.data)));
+        } catch (_) {
+          text = att.data;
+        }
+        blocks.push({type: 'text', text: `[File: ${att.name}]\n${text}`});
+      } else {
+        blocks.push({type: 'text', text: `[File: ${att.name} (${att.media_type})]`});
+      }
+    }
+    // Mark last block so Anthropic caches the system+user prefix across agent steps
+    if (aiState.provider === 'anthropic' && blocks.length > 0) {
+      const last = blocks[blocks.length - 1];
+      if (last.type === 'text') {
+        blocks[blocks.length - 1] = {type: 'text', text: last.text, cache_control: {type: 'ephemeral'}};
+      } else if (last.type === 'image') {
+        blocks[blocks.length - 1] = {type: 'image', source: last.source, cache_control: {type: 'ephemeral'}};
+      } else if (last.type === 'document') {
+        blocks[blocks.length - 1] = {type: 'document', source: last.source, cache_control: {type: 'ephemeral'}};
+      }
+    }
+    return blocks;
+  })();
 
   const messages: Array<AIMessage> = [
     {
@@ -74,7 +134,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       ],
     },
     ...initialMessages,
-    {role: 'user', content: prompt},
+    {role: 'user', content: userContent},
   ];
 
   const loadedSkills: Set<string> = new Set();
@@ -260,6 +320,8 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
 
     // Process tool calls
     const toolResults: Array<AIContentBlock> = [];
+    // document/image blocks fetched by get_attachment, appended as siblings in the same user message
+    const siblingDocBlocks: Array<AIContentBlock> = [];
 
     for (const tc of toolCalls) {
       if (tc.name === 'run_command') {
@@ -366,6 +428,74 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
           content: skillContent,
         });
 
+      } else if (tc.name === 'get_attachment') {
+        const attachId = tc.input.id !== null && tc.input.id !== undefined ? Number(tc.input.id) : NaN;
+        if (isNaN(attachId)) {
+          toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: 'Error: id parameter is required'});
+        } else {
+          const question = i18n.t(
+            'cmdAI.agent.attachment.question',
+            '[Agent] Read attachment {{id}} and send its content to the AI — Allow?',
+            {id: attachId},
+          );
+          const answer = await ctx.screen.showQuestion(question, ['y', 'n'], 'n');
+          if (answer?.toLowerCase() !== 'y') {
+            toolResults.push({
+              type: 'tool_result',
+              tool_use_id: tc.id,
+              content: i18n.t('cmdAI.agent.attachment.rejected', 'Attachment access rejected by user.'),
+            });
+            continue;
+          }
+          ctx.screen.print(
+            i18n.t('cmdAI.agent.result.fetchingAttachment', '[Agent] Fetching attachment {{id}}', {id: attachId}),
+            false,
+          );
+          try {
+            const context = await this.getContext();
+            const records = await searchRead(
+              'ir.attachment',
+              [['id', '=', attachId]],
+              ['name', 'mimetype', 'datas'],
+              context,
+            );
+            if (!records || records.length === 0) {
+              toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Attachment ${attachId} not found.`});
+            } else {
+              const rec = records[0];
+              const attName = String(rec.name || `attachment_${attachId}`);
+              const mimetype = String(rec.mimetype || 'application/octet-stream');
+              const data = String(rec.datas || '');
+              if (!data) {
+                toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Attachment "${attName}" has no binary data.`});
+              } else if (aiState.provider === 'anthropic' && mimetype === 'application/pdf') {
+                toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Fetched PDF "${attName}" (id=${attachId}). The document follows — read it to complete the task.`});
+                siblingDocBlocks.push({type: 'document', source: {type: 'base64', media_type: mimetype, data}});
+              } else if (aiState.provider === 'anthropic' && mimetype.startsWith('image/')) {
+                toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Fetched image "${attName}" (id=${attachId}). The image follows.`});
+                siblingDocBlocks.push({type: 'image', source: {type: 'base64', media_type: mimetype, data}});
+              } else if (mimetype.startsWith('text/')) {
+                let fileText;
+                try {
+                  fileText = decodeURIComponent(escape(atob(data)));
+                } catch (_) {
+                  fileText = data;
+                }
+                const truncated = fileText.length > 6000 ? fileText.slice(0, 6000) + `\n[truncated — ${fileText.length} chars total]` : fileText;
+                toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `File "${attName}":\n${truncated}`});
+              } else {
+                toolResults.push({
+                  type: 'tool_result',
+                  tool_use_id: tc.id,
+                  content: `Attachment "${attName}" (${mimetype}) — binary content cannot be read inline. For PDFs and images, use the Anthropic provider.`,
+                });
+              }
+            }
+          } catch (err) {
+            toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Error fetching attachment: ${err.message}`});
+          }
+        }
+
       } else {
         toolResults.push({
           type: 'tool_result',
@@ -375,9 +505,12 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       }
     }
 
+    // Build the full user-turn content: tool results first, then any fetched binaries as siblings.
+    const userMsgContent: Array<AIContentBlock> = [...toolResults, ...siblingDocBlocks];
+
     // Rolling cache breakpoint for Anthropic: clear the previous breakpoint from the
     // message that held it, then mark the last content block of the new user message.
-    // This keeps [system_cached ... last_tool_result_cached] as the stable prefix,
+    // This keeps [system_cached ... last_tool_result_or_doc_cached] as the stable prefix,
     // so the next request reads most of the context from cache.
     if (aiState.provider === 'anthropic') {
       if (rollingBreakpointMsgIdx >= 0) {
@@ -390,6 +523,10 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
             stripped = {type: 'text', text: last.text};
           } else if (last.type === 'tool_result') {
             stripped = {type: 'tool_result', tool_use_id: last.tool_use_id, content: last.content};
+          } else if (last.type === 'document') {
+            stripped = {type: 'document', source: last.source};
+          } else if (last.type === 'image') {
+            stripped = {type: 'image', source: last.source};
           } else {
             stripped = last;
           }
@@ -400,22 +537,23 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         }
       }
 
-      if (toolResults.length > 0) {
-        const lastTR = toolResults[toolResults.length - 1];
-        const marked: AIContentBlock =
-          lastTR.type === 'tool_result'
-            ? {
-                type: 'tool_result',
-                tool_use_id: lastTR.tool_use_id,
-                content: lastTR.content,
-                cache_control: {type: 'ephemeral'},
-              }
-            : lastTR;
-        toolResults[toolResults.length - 1] = marked;
+      if (userMsgContent.length > 0) {
+        const lastBlock = userMsgContent[userMsgContent.length - 1];
+        let marked: AIContentBlock;
+        if (lastBlock.type === 'tool_result') {
+          marked = {type: 'tool_result', tool_use_id: lastBlock.tool_use_id, content: lastBlock.content, cache_control: {type: 'ephemeral'}};
+        } else if (lastBlock.type === 'document') {
+          marked = {type: 'document', source: lastBlock.source, cache_control: {type: 'ephemeral'}};
+        } else if (lastBlock.type === 'image') {
+          marked = {type: 'image', source: lastBlock.source, cache_control: {type: 'ephemeral'}};
+        } else {
+          marked = lastBlock;
+        }
+        userMsgContent[userMsgContent.length - 1] = marked;
       }
     }
 
-    messages.push({role: 'user', content: toolResults});
+    messages.push({role: 'user', content: userMsgContent});
 
     if (aiState.provider === 'anthropic') {
       rollingBreakpointMsgIdx = messages.length - 1;

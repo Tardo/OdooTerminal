@@ -48,6 +48,8 @@ export type OnCleanScreenCallback = (content: string) => void;
 export type onSaveScreenCallback = (content: string) => void;
 export type onInputCallback = (ev: InputEvent) => void;
 export type onInputKeyUpCallback = (ev: KeyboardEvent) => void;
+export type onAttachFileCallback = () => void;
+export type onRemoveAttachmentCallback = (index: number) => void;
 
 export type ScreenOptions = {
   inputColors: {[string]: string},
@@ -56,6 +58,8 @@ export type ScreenOptions = {
   onSaveScreen: onSaveScreenCallback,
   onInput: onInputCallback,
   onInputKeyUp: onInputKeyUpCallback,
+  onAttachFile?: onAttachFileCallback,
+  onRemoveAttachment?: onRemoveAttachmentCallback,
 };
 
 export const PROMPT = '>';
@@ -95,6 +99,11 @@ export default class Screen {
   #assistant_args_el: HTMLElement;
   #assistant_args_info_el: HTMLElement;
 
+  #attachBtn_el: HTMLElement | void;
+  #attachPreview_el: HTMLElement | void;
+  #attachLightbox_el: HTMLElement | void;
+  #attachLightboxImg_el: HTMLImageElement | void;
+
   #wasStart = false;
   #flushing = false;
 
@@ -111,6 +120,7 @@ export default class Screen {
     this.#options = options;
     this.#container_el = container;
     this.#createScreen();
+    this.#createAttachPreview();
     this.#createUserInput();
     this.#createAssistantPanel();
     this.#wasStart = true;
@@ -640,6 +650,116 @@ export default class Screen {
     this.#screen_el.addEventListener('keydown', ev => this.preventLostInputFocus(ev));
   }
 
+  #createAttachPreview(): void {
+    const preview = document.createElement('div');
+    preview.id = 'terminal_ai_attach_preview';
+    preview.className = 'terminal-ai-attach-preview';
+    this.#attachPreview_el = preview;
+    this.#container_el.append(preview);
+
+    const lightbox = document.createElement('div');
+    lightbox.id = 'terminal_ai_attach_lightbox';
+    lightbox.className = 'terminal-ai-attach-lightbox d-none hidden';
+    lightbox.addEventListener('click', () => this.#closeLightbox());
+    const img = document.createElement('img');
+    img.className = 'terminal-ai-attach-lightbox-img';
+    img.alt = '';
+    lightbox.append(img);
+    this.#attachLightbox_el = lightbox;
+    this.#attachLightboxImg_el = img;
+    this.#container_el.append(lightbox);
+  }
+
+  #closeLightbox() {
+    if (this.#attachLightbox_el) {
+      this.#attachLightbox_el.classList.add('d-none', 'hidden');
+      if (this.#attachLightboxImg_el) {
+        this.#attachLightboxImg_el.src = '';
+      }
+    }
+  }
+
+  #mimeToIcon(mediaType: string): string {
+    if (mediaType.startsWith('image/')) {
+      return 'fa-file-image-o';
+    }
+    if (mediaType === 'application/pdf') {
+      return 'fa-file-pdf-o';
+    }
+    if (mediaType.startsWith('text/') || mediaType === 'application/json') {
+      return 'fa-file-text-o';
+    }
+    if (mediaType.startsWith('audio/')) {
+      return 'fa-file-audio-o';
+    }
+    if (mediaType.startsWith('video/')) {
+      return 'fa-file-video-o';
+    }
+    if (mediaType === 'application/zip' || mediaType === 'application/gzip' || mediaType === 'application/x-tar') {
+      return 'fa-file-archive-o';
+    }
+    return 'fa-file-o';
+  }
+
+  addAttachmentPreview(att: AIAttachment, index: number) {
+    const preview = this.#attachPreview_el;
+    if (!preview) {
+      return;
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'terminal-attach-bubble';
+    bubble.dataset.attachIndex = String(index);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'terminal-attach-remove';
+    removeBtn.type = 'button';
+    removeBtn.title = i18n.t('terminal.ai.attachRemove', 'Remove attachment');
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (Object.hasOwn(this.#options, 'onRemoveAttachment') && typeof this.#options.onRemoveAttachment === 'function') {
+        this.#options.onRemoveAttachment(index);
+      }
+    });
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'terminal-attach-name';
+    nameEl.textContent = att.name;
+
+    if (att.media_type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.className = 'terminal-attach-thumb';
+      img.alt = att.name;
+      img.src = `data:${att.media_type};base64,${att.data}`;
+      img.title = i18n.t('terminal.ai.attachExpand', 'Click to enlarge');
+      img.addEventListener('click', () => {
+        if (this.#attachLightbox_el && this.#attachLightboxImg_el) {
+          this.#attachLightboxImg_el.src = img.src;
+          this.#attachLightbox_el.classList.remove('d-none', 'hidden');
+        }
+      });
+      bubble.append(img, removeBtn, nameEl);
+    } else {
+      const icon = document.createElement('i');
+      icon.className = `fa ${this.#mimeToIcon(att.media_type)} terminal-attach-icon`;
+      bubble.append(icon, removeBtn, nameEl);
+    }
+
+    preview.append(bubble);
+    preview.classList.remove('d-none', 'hidden');
+  }
+
+  clearAttachmentPreviews() {
+    const preview = this.#attachPreview_el;
+    if (!preview) {
+      return;
+    }
+    preview.textContent = '';
+    preview.classList.add('d-none', 'hidden');
+    this.#closeLightbox();
+  }
+
   #createAssistantPanel(): void {
     this.#assistant_el = parseHTML(renderAssistantPanel());
 
@@ -730,6 +850,16 @@ export default class Screen {
     this.#input_el.addEventListener('keydown', ev => this.#onInputKeyDown(ev));
     this.#input_el.addEventListener('input', ev => this.#options.onInput(ev));
     this.#inputMulti_el.addEventListener('keyup', ev => this.#options.onInputKeyUp(ev));
+
+    const attachBtn = this.#userInput_el.querySelector('#terminal_ai_attach_btn');
+    if (attachBtn instanceof HTMLElement) {
+      this.#attachBtn_el = attachBtn;
+      attachBtn.addEventListener('click', () => {
+        if (Object.hasOwn(this.#options, 'onAttachFile') && typeof this.#options.onAttachFile === 'function') {
+          this.#options.onAttachFile();
+        }
+      });
+    }
     this.#updateInputMode(this.#options.inputMode);
   }
 

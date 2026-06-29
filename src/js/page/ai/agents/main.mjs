@@ -78,6 +78,16 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     'Rule of thumb: view > print. If both are possible, always choose the view.\n' +
     'IMPORTANT — `graph` and `pivot` share the same view slot in the Odoo client: running one after the other replaces the previous view. The user will only see the LAST one opened. Never run both for the same task; pick the one that best fits the request.\n' +
     '\n' +
+    '# READING ODOO ATTACHMENTS\n' +
+    'To read a file attached to an Odoo record, use the `get_attachment` tool:\n' +
+    '  Step 1 — discover attachments:\n' +
+    '    `search -m ir.attachment -f [[\'res_model\',\'=\',\'<model>\'],[\'res_id\',\'=\',<id>]] -fi id,name,mimetype`\n' +
+    '  Step 2 — fetch and inject:\n' +
+    '    If exactly ONE attachment matches, call `get_attachment` with its id.\n' +
+    '    If MULTIPLE attachments match, list them (id, name, type) as your final answer and wait for the user to choose — do NOT auto-pick.\n' +
+    '    If NO attachment is found, tell the user and stop.\n' +
+    'Notes: PDFs and images are injected as readable content (Anthropic only). Text files are decoded inline. Other formats are not supported.\n' +
+    '\n' +
     '# FORM COMMAND — HARD PREREQUISITE (NON-NEGOTIABLE)\n' +
     '`form -o highlight` reads the DOM of the form view currently rendered in the browser.\n' +
     'CALLING `form -o highlight` WITHOUT A FORM OPEN IN THE BROWSER WILL ALWAYS FAIL — it finds zero fields and does nothing.\n' +

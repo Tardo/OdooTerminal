@@ -74,6 +74,10 @@
   },
   "cmdAI": {
     "agent": {
+      "attachment": {
+        "question": "[Agent] Read attachment {{id}} and send its content to the AI — Allow?",
+        "rejected": "Attachment access rejected by user."
+      },
       "error": {
         "noPrompt": "No se proporcionó ningún prompt. Usa: ai agent -p \"tu solicitud\"",
         "notConfigured": "No conectado. Usa \"ai connect\" primero",
@@ -81,6 +85,7 @@
       },
       "result": {
         "cmdReason": "[Agente] {{reason}}",
+        "fetchingAttachment": "[Agent] Fetching attachment {{id}}",
         "header": "--- Agente ---",
         "maxSteps": "El agente ha alcanzado el número máximo de pasos sin una respuesta final.",
         "noReturnValue": "(comando ejecutado, sin valor de retorno)",
@@ -100,6 +105,7 @@
     },
     "args": {
       "apiKey": "Clave API para autenticación",
+      "attachId": "ir.attachment ID to queue as AI input attachment (attach operation)",
       "maxSteps": "Máx. iteraciones del agente (solo agente, por defecto {{DEFAULT_MAX_STEPS}})",
       "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
       "model": "Nombre del modelo a usar",
@@ -108,6 +114,13 @@
       "provider": "Proveedor de IA: openai (por defecto) o anthropic",
       "timeout": "Máx. segundos a esperar respuesta (0 = sin límite)",
       "url": "URL del servidor de IA (ej. http://localhost:8080/v1)"
+    },
+    "attach": {
+      "error": {
+        "noData": "Attachment {{id}} has no binary data",
+        "noId": "No attachment id provided. Use: ai attach -i <id>",
+        "notFound": "Attachment {{id}} not found"
+      }
     },
     "chat": {
       "error": {
@@ -1097,6 +1110,10 @@
     "definition": "Crear archivo zip",
     "detail": "Para conocer las opciones disponibles, consulta la ayuda de JSZip: https://stuk.github.io/jszip"
   },
+  "file2attachment": {
+    "aborted": "Aborted by user. No file given...",
+    "noFile": "No file selected"
+  },
   "file2base64": {
     "aborted": "Cancelado por el usuario. No se proporcionó ningún archivo..."
   },
@@ -1228,6 +1245,8 @@
   },
   "terminal": {
     "ai": {
+      "attachExpand": "Clic para ampliar",
+      "attachRemove": "Eliminar adjunto",
       "experimentalWarning": "Este modo es experimental, úsalo con extremo cuidado",
       "newConversation": "Nueva conversación",
       "noConversationsHint": "Create a new conversation to start",

@@ -16,6 +16,11 @@ export default function (PROMPT: string): string {
       <input type='edit' id='terminal_input' autocomplete='off' spellcheck="false" autocapitalize="off" />
       <textarea id='terminal_input_multi' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" rows="8"></textarea>
     </div>
+    <div class='terminal-ai-attach-zone'>
+      <button id='terminal_ai_attach_btn' class='terminal-ai-attach-btn' type='button' title='Attach file'>
+        <i class='fa fa-paperclip'></i>
+      </button>
+    </div>
     <div class="terminal-prompt-container terminal-prompt-info">
       <span id="terminal-prompt-info-version" class='terminal-prompt-info'></span>
     </div>

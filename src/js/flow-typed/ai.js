@@ -28,10 +28,18 @@ declare type AIToolDef = {
   parameters: {[string]: mixed},
 };
 
+declare type AIAttachment = {
+  name: string,
+  media_type: string,
+  data: string,
+};
+
 declare type AIContentBlock =
   | {type: 'text', text: string, cache_control?: {type: 'ephemeral'}}
   | {type: 'tool_use', id: string, name: string, input: {[string]: mixed}}
-  | {type: 'tool_result', tool_use_id: string, content: string, cache_control?: {type: 'ephemeral'}};
+  | {type: 'tool_result', tool_use_id: string, content: string, cache_control?: {type: 'ephemeral'}}
+  | {type: 'image', source: {type: 'base64', media_type: string, data: string}, cache_control?: {type: 'ephemeral'}}
+  | {type: 'document', source: {type: 'base64', media_type: string, data: string}, cache_control?: {type: 'ephemeral'}};
 
 declare type AIMessage = {
   role: string,

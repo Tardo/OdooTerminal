@@ -74,6 +74,10 @@
   },
   "cmdAI": {
     "agent": {
+      "attachment": {
+        "question": "[Agent] Read attachment {{id}} and send its content to the AI — Allow?",
+        "rejected": "Attachment access rejected by user."
+      },
       "error": {
         "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
         "notConfigured": "Not connected. Use \"ai connect\" first",
@@ -81,6 +85,7 @@
       },
       "result": {
         "cmdReason": "[Agent] {{reason}}",
+        "fetchingAttachment": "[Agent] Fetching attachment {{id}}",
         "header": "--- Agent ---",
         "maxSteps": "Agent reached maximum steps without a final answer.",
         "noReturnValue": "(command executed, no return value)",
@@ -100,6 +105,7 @@
     },
     "args": {
       "apiKey": "API key for authentication",
+      "attachId": "ir.attachment ID to queue as AI input attachment (attach operation)",
       "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
       "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
       "model": "Model name to use",
@@ -108,6 +114,13 @@
       "provider": "AI provider: openai (default) or anthropic",
       "timeout": "Max seconds to wait for a response (0 = no limit)",
       "url": "AI server URL (e.g. http://localhost:8080/v1)"
+    },
+    "attach": {
+      "error": {
+        "noData": "Attachment {{id}} has no binary data",
+        "noId": "No attachment id provided. Use: ai attach -i <id>",
+        "notFound": "Attachment {{id}} not found"
+      }
     },
     "chat": {
       "error": {
@@ -1097,6 +1110,10 @@
     "definition": "Create zip file",
     "detail": "To learn about the available options, check out the JSZip help: https://stuk.github.io/jszip"
   },
+  "file2attachment": {
+    "aborted": "Aborted by user. No file given...",
+    "noFile": "No file selected"
+  },
   "file2base64": {
     "aborted": "Aborted by user. No file given..."
   },
@@ -1228,6 +1245,8 @@
   },
   "terminal": {
     "ai": {
+      "attachExpand": "Click to enlarge",
+      "attachRemove": "Remove attachment",
       "experimentalWarning": "This mode is experimental, use it with extreme caution",
       "newConversation": "New conversation",
       "noConversationsHint": "Create a new conversation to start",

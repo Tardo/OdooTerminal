@@ -8,6 +8,7 @@ import cmdAIConnect from '@ai/operations/connect';
 import cmdAIChat from '@ai/operations/chat';
 import cmdAIAgent from '@ai/operations/agent';
 import cmdAIStop from '@ai/operations/stop';
+import searchRead from '@odoo/orm/search_read';
 import {DEFAULT_MAX_STEPS, DEFAULT_MAX_TOKENS} from '@ai/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -67,11 +68,36 @@ async function cmdAI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackCo
       cmdAIStop(ctx);
       break;
     }
+    case 'attach': {
+      const attachId: ?number = kwargs.id;
+      if (attachId === null || attachId === undefined) {
+        throw new Error(i18n.t('cmdAI.attach.error.noId', 'No attachment id provided. Use: ai attach -i <id>'));
+      }
+      const context = await this.getContext();
+      const records = await searchRead(
+        'ir.attachment',
+        [['id', '=', attachId]],
+        ['name', 'mimetype', 'datas'],
+        context,
+      );
+      if (!records || records.length === 0) {
+        throw new Error(i18n.t('cmdAI.attach.error.notFound', 'Attachment {{id}} not found', {id: attachId}));
+      }
+      const rec = records[0];
+      const name: string = String(rec.name || `attachment_${attachId}`);
+      const media_type: string = String(rec.mimetype || 'application/octet-stream');
+      const data: string = String(rec.datas || '');
+      if (!data) {
+        throw new Error(i18n.t('cmdAI.attach.error.noData', 'Attachment {{id}} has no binary data', {id: attachId}));
+      }
+      this.addPendingAttachment({name, media_type, data});
+      break;
+    }
     default: {
       ctx.screen.print(
         i18n.t('cmdAI.error.unknownOperation', 'Unknown operation: {{sub}}', {sub: operation}) +
           '\n' +
-          i18n.t('cmdAI.error.usage', 'Usage: ai connect|chat|agent|stop ...'),
+          i18n.t('cmdAI.error.usage', 'Usage: ai connect|chat|agent|attach|stop ...'),
       );
     }
   }
@@ -90,7 +116,7 @@ export default function (): Partial<CMDDef> {
         ARG.String,
         ['o', 'operation'],
         true,
-        i18n.t('cmdAI.args.operation', 'operation: connect, chat or agent'),
+        i18n.t('cmdAI.args.operation', 'operation: connect, chat, agent, attach or stop'),
       ],
       // connect options
       [
@@ -148,6 +174,13 @@ export default function (): Partial<CMDDef> {
         false,
         i18n.t('cmdAI.args.maxTokens', 'Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})', {DEFAULT_MAX_TOKENS}),
         DEFAULT_MAX_TOKENS,
+      ],
+      // attach options
+      [
+        ARG.Number,
+        ['i', 'id'],
+        false,
+        i18n.t('cmdAI.args.attachId', 'ir.attachment ID to queue as AI input attachment (attach operation)'),
       ],
     ],
     example: 'connect -u "https://api.anthropic.com" -pr anthropic -ak "sk-ant-..." -m "claude-opus-4-8"',

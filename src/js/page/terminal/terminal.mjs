@@ -26,6 +26,7 @@ import renderWelcome from './templates/welcome';
 import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 import parseHTML from './utils/parse_html';
+import file2attachment from './utils/file2attachment';
 import {Mutex} from 'async-mutex';
 import {aiState} from '@ai/state';
 import type {JobMetaInfo} from './shell';
@@ -123,6 +124,7 @@ export default class Terminal {
   #aiConvList_el: HTMLElement | void;
   #aiModelSelect_el: HTMLSelectElement | void;
   #aiInputHistory: Array<string> = [];
+  #pendingAttachments: Array<AIAttachment> = [];
 
   constructor() {
     // $FlowFixMe[method-unbinding]
@@ -328,6 +330,12 @@ export default class Terminal {
       },
       onInput: () => {
         this.#onInput();
+      },
+      onAttachFile: () => {
+        this.#onClickAttachFile();
+      },
+      onRemoveAttachment: (index: number) => {
+        this.#removeAttachmentAt(index);
       },
     });
     if (this.#isAIMode && this.#activeConvId === null) {
@@ -960,18 +968,26 @@ export default class Terminal {
   #onKeyEnter() {
     if (this.#isAIMode) {
       const input = this.screen.getUserInput();
-      if (!input.trim()) {
+      const hasPendingAttachments = this.#pendingAttachments.length > 0;
+      if (!input.trim() && !hasPendingAttachments) {
         return;
       }
-      this.screen.printCommand(input);
-      if (this.#activeConvId === null) {
-        this.createAIConversation(input.slice(0, 40) || i18n.t('terminal.ai.newConversation', 'New conversation'));
+      if (input.trim()) {
+        this.screen.printCommand(input);
       }
-      this.#storeAIInput(input);
+      if (this.#activeConvId === null) {
+        const convName = input.slice(0, 40) || i18n.t('terminal.ai.newConversation', 'New conversation');
+        this.createAIConversation(convName);
+      }
+      if (input.trim()) {
+        this.#storeAIInput(input);
+      }
       this.#searchHistoryQuery = '';
       this.screen.cleanInput();
       this.updateAssistantoptions();
-      this.onAIModeInput(input).catch(() => {
+      const attachments = this.#pendingAttachments.slice();
+      this.#clearPendingAttachments();
+      this.onAIModeInput(input, attachments).catch(() => {
         // Do nothing
       });
       this.screen.preventLostInputFocus();
@@ -1369,8 +1385,40 @@ export default class Terminal {
     return id;
   }
 
+  addPendingAttachment(att: AIAttachment) {
+    const index = this.#pendingAttachments.push(att) - 1;
+    this.screen.addAttachmentPreview(att, index);
+  }
+
+  #removeAttachmentAt(index: number) {
+    this.#pendingAttachments.splice(index, 1);
+    this.screen.clearAttachmentPreviews();
+    this.#pendingAttachments.forEach((att, i) => {
+      this.screen.addAttachmentPreview(att, i);
+    });
+  }
+
+  #clearPendingAttachments() {
+    this.#pendingAttachments = [];
+    this.screen.clearAttachmentPreviews();
+  }
+
+  #onClickAttachFile() {
+    if (!this.#isAIMode) {
+      return;
+    }
+    file2attachment()
+      .then(att => {
+        this.addPendingAttachment(att);
+        this.doShow().then(() => this.screen.preventLostInputFocus());
+      })
+      .catch(() => {
+        this.doShow().then(() => this.screen.preventLostInputFocus());
+      });
+  }
+
   // eslint-disable-next-line no-unused-vars
-  async onAIModeInput(input: string): Promise<> {
+  async onAIModeInput(input: string, attachments: Array<AIAttachment>): Promise<> {
     this.screen.printError(i18n.t('terminal.ai.notConnected', 'AI not connected. Use "ai connect" first.'));
   }
 
