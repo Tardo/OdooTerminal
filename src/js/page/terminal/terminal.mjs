@@ -990,6 +990,9 @@ export default class Terminal {
       if (input.trim()) {
         this.screen.printCommand(input);
       }
+      if (this.#pendingAttachments.length > 0) {
+        this.screen.printAttachments(this.#pendingAttachments);
+      }
       if (this.#activeConvId === null) {
         const convName = input.slice(0, 40) || i18n.t('terminal.ai.newConversation', 'New conversation');
         this.createAIConversation(convName);

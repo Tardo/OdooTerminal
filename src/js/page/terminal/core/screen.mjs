@@ -383,6 +383,22 @@ export default class Screen {
     this.eprint(secured ? renderPromptCmdHiddenArgs(PROMPT, cmd) : renderPromptCmd(PROMPT, cmd));
   }
 
+  printAttachments(attachments: $ReadOnlyArray<AIAttachment>) {
+    if (!attachments.length) {
+      return;
+    }
+    const parts = attachments.map(att => {
+      const escapedName = encodeHTML(att.name);
+      if (att.media_type.startsWith('image/')) {
+        const src = `data:${encodeHTML(att.media_type)};base64,${att.data}`;
+        return `<span class="terminal-attach-bubble terminal-attach-sent"><img class="terminal-attach-thumb" alt="${escapedName}" src="${src}" /><span class="terminal-attach-name">${escapedName}</span></span>`;
+      }
+      const icon = this.#mimeToIcon(att.media_type);
+      return `<span class="terminal-attach-bubble terminal-attach-sent"><i class="fa ${icon} terminal-attach-icon"></i><span class="terminal-attach-name">${escapedName}</span></span>`;
+    });
+    this.print(`<span class="terminal-ai-sent-attachments">${parts.join('')}</span>`);
+  }
+
   printError(error: string, internal: boolean = false) {
     if (!error) {
       return;

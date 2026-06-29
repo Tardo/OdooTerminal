@@ -485,6 +485,18 @@
   background: #a71d2a;
 }
 
+/* Sent attachments in screen history */
+.o_terminal .terminal-ai-sent-attachments {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 0;
+}
+.o_terminal .terminal-attach-sent {
+  position: relative;
+}
+
 /* Attachment lightbox */
 .o_terminal .terminal-ai-attach-lightbox {
   align-items: center;
