@@ -107,6 +107,24 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '  Step 2 — highlight the field: `form -o highlight -f <field>`\n' +
     'These are always two separate run_command calls. Never combine them in a single call.\n' +
     '\n' +
+    '# PAGE ORIENTATION — INSPECT BEFORE ACTING\n' +
+    'Use the `inspect` command (see its AVAILABLE COMMANDS entry for the full sub-type list) to read the current DOM BEFORE clicking or editing.\n' +
+    'Each sub-type returns ready-to-use commands (click_cmd, form_cmd, view_cmd) — copy them directly.\n' +
+    'Workflow sequences:\n' +
+    '  - Before clicking anything: `inspect -e button` → use the returned click_cmd for the target button.\n' +
+    '  - Before form get/edit: `inspect -e field` → confirm field names are rendered; `inspect -e record` to read current values.\n' +
+    '  - After a dialog or wizard opens: call `inspect -e dialog` immediately to discover its buttons and fields.\n' +
+    '  - Before changing a workflow status: `inspect -e statusbar` → use the returned click_cmd for the target state.\n' +
+    '  - To see visible rows in a list view: `inspect -e list` → use the returned view_cmd to open a specific record.\n' +
+    '  - To navigate by menu: `inspect -e menu` → use the returned click_cmd for the target menu entry.\n' +
+    '  - For current context (model, record id, view type): `inspect` or `inspect -e page`.\n' +
+    '\n' +
+    '# FILLING NON-FORM INPUTS — fill COMMAND\n' +
+    'For inputs that are NOT Odoo form field widgets (search bars, filter boxes, custom HTML inputs):\n' +
+    '  `fill -s <selector> -v <text>` — sets the value and fires input/change events.\n' +
+    '  `fill -s <selector> -v <text> --enter` — also dispatches Enter keydown (required for the Odoo search bar to submit).\n' +
+    'Use `form -o edit` for standard Odoo form fields (char, many2one, selection, etc.).\n' +
+    '\n' +
     buildTraSHPrompt(terminal)
   );
 }

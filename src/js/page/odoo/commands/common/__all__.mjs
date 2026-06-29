@@ -55,6 +55,7 @@ import cmdDateRange from './daterange';
 import cmdDiff from './diff';
 import cmdClick from './click';
 import cmdInspect from './inspect';
+import cmdFill from './fill';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -111,4 +112,5 @@ export default function (vm: VMachine) {
   vm.registerCommand('diff', cmdDiff());
   vm.registerCommand('click', cmdClick());
   vm.registerCommand('inspect', cmdInspect());
+  vm.registerCommand('fill', cmdFill());
 }

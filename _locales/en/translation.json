@@ -516,6 +516,26 @@
     "detail": "Exports the command result to a browser console variable.",
     "resultExported": "Command result exported! now you can use '{{varname}}' variable in the browser console"
   },
+  "cmdFill": {
+    "args": {
+      "enter": "Dispatch Enter keydown after filling (use for search bars)",
+      "index": "Index of the match to use, 0-based (default: 0)",
+      "selector": "CSS selector of the input element",
+      "value": "Text to fill in"
+    },
+    "definition": "Fill a text input, textarea, select, or contenteditable with a value",
+    "detail": "Finds an element by CSS selector and sets its value, then fires input and change events so the framework reacts. Use for inputs that are NOT Odoo form field widgets (search bars, filter boxes, custom HTML inputs). For standard Odoo form fields use \"form -o edit\" instead. -n picks the nth match (0-based). --enter also dispatches an Enter keydown after filling (required for the Odoo search bar to submit the query).",
+    "error": {
+      "indexOutOfRange": "Index {{index}} out of range ({{count}} match(es) found)",
+      "noRoot": "Cannot find Odoo content area",
+      "noSelector": "A CSS selector is required (-s)",
+      "notFillable": "Element matched by \"{{selector}}\" is not a fillable input (input, textarea, select, or contenteditable)",
+      "notFound": "No element found for selector \"{{selector}}\""
+    },
+    "result": {
+      "filled": "Filled \"{{selector}}\"{{enter}} with: {{value}}"
+    }
+  },
   "cmdForm": {
     "args": {
       "field": "The field technical name(s)",
@@ -641,10 +661,14 @@
     "field": {
       "none": "No form fields found in the current view"
     },
+    "list": {
+      "none": "No list rows found in the current view"
+    },
     "menu": {
       "none": "No menu items found"
     },
     "page": {
+      "actionId": "Action ID: {{id}}",
       "breadcrumb": "Breadcrumb: {{path}}",
       "counts": "Elements — buttons: {{b}}, fields: {{f}}, tabs: {{t}}, statusbar states: {{s}}",
       "model": "Model: <strong>{{model}}</strong>",
@@ -669,13 +693,16 @@
       "current": "Current",
       "disabled": "Dis.",
       "formCmd": "form command",
+      "id": "ID",
       "index": "#",
       "label": "Label",
       "name": "Field",
+      "preview": "Cell values (field: value)",
       "required": "Req",
       "text": "Text",
       "type": "Type",
-      "value": "Value"
+      "value": "Value",
+      "viewCmd": "view command"
     },
     "view": {
       "none": "No view switcher found (may be single-view action)"

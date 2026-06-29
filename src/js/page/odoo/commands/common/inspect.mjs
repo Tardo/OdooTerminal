@@ -23,27 +23,60 @@ function getContentRoot(): Element | null {
   return document.body;
 }
 
+// Drops any element that is an ancestor of another collected element, keeping the innermost nodes.
+// Prevents container+child duplication when multi-selector queries collect both a wrapper and its
+// interactive child (e.g. .o_nav_entry div that contains an <a>).
+function dedupeInnermost(els: Array<Element>): Array<Element> {
+  return els.filter(a => !els.some(b => b !== a && a.contains(b)));
+}
+
 // Produces a guaranteed-unique click recipe for a button element.
 // Mirrors the exact enumeration logic of the `click` command (same root,
 // same exclusion, same text filter) so the -n index never drifts.
 function buttonClickRecipe(el: Element, allButtons: $ReadOnlyArray<Element>): string {
   const nameAttr = el.getAttribute('name') ?? '';
   if (nameAttr.length > 0) {
-    return `click -s "button[name=\\"${nameAttr}\\"]"`;
+    const sameName = allButtons.filter(b => b.getAttribute('name') === nameAttr);
+    const nameIdx = sameName.indexOf(el);
+    const sel = `button[name=\\"${nameAttr}\\"]`;
+    return nameIdx <= 0 ? `click -s "${sel}"` : `click -s "${sel}" -n ${nameIdx}`;
   }
 
   const text = (el.textContent ?? '').trim();
-  if (text.length === 0) {
-    const cls = el.getAttribute('class') ?? '';
-    const firstCls = cls.split(' ').find(c => c.length > 0) ?? '';
-    return firstCls.length > 0 ? `click -s ".${firstCls}"` : 'click -s "button"';
+  if (text.length > 0) {
+    // Count index among all buttons that contain this same text (same logic as `click -t`)
+    const lowerText = text.toLowerCase();
+    const sameText = allButtons.filter(b => (b.textContent ?? '').trim().toLowerCase().includes(lowerText));
+    const idx = sameText.indexOf(el);
+    return idx <= 0 ? `click -t "${text}"` : `click -t "${text}" -n ${idx}`;
   }
 
-  // Count index among all buttons that contain this same text (same logic as `click -t`)
-  const lowerText = text.toLowerCase();
-  const sameText = allButtons.filter(b => (b.textContent ?? '').trim().toLowerCase().includes(lowerText));
-  const idx = sameText.indexOf(el);
-  return idx <= 0 ? `click -t "${text}"` : `click -t "${text}" -n ${idx}`;
+  // Icon button: prefer aria-label / title — use attribute selector since click -t matches textContent only
+  const ariaLabel = (el.getAttribute('aria-label') ?? '').trim();
+  if (ariaLabel.length > 0) {
+    const sameAttr = allButtons.filter(b => (b.getAttribute('aria-label') ?? '').trim() === ariaLabel);
+    const attrIdx = sameAttr.indexOf(el);
+    const sel = `button[aria-label=\\"${ariaLabel}\\"]`;
+    return attrIdx <= 0 ? `click -s "${sel}"` : `click -s "${sel}" -n ${attrIdx}`;
+  }
+  const titleAttr = (el.getAttribute('title') ?? '').trim();
+  if (titleAttr.length > 0) {
+    const sameTitle = allButtons.filter(b => (b.getAttribute('title') ?? '').trim() === titleAttr);
+    const titleIdx = sameTitle.indexOf(el);
+    const sel = `button[title=\\"${titleAttr}\\"]`;
+    return titleIdx <= 0 ? `click -s "${sel}"` : `click -s "${sel}" -n ${titleIdx}`;
+  }
+
+  // Last resort: class-based selector with index to ensure uniqueness
+  const cls = el.getAttribute('class') ?? '';
+  const firstCls = cls.split(' ').find(c => c.length > 0) ?? '';
+  if (firstCls.length > 0) {
+    const sameCls = allButtons.filter(b => (b.getAttribute('class') ?? '').split(' ').find(c => c.length > 0) === firstCls);
+    const clsIdx = sameCls.indexOf(el);
+    return clsIdx <= 0 ? `click -s ".${firstCls}"` : `click -s ".${firstCls}" -n ${clsIdx}`;
+  }
+  const absIdx = allButtons.indexOf(el);
+  return absIdx <= 0 ? 'click -s "button"' : `click -s "button" -n ${absIdx}`;
 }
 
 type ButtonInfo = {index: number, text: string, name: string, disabled: boolean, click_cmd: string};
@@ -55,6 +88,8 @@ type ViewInfo = {index: number, type: string, label: string, active: boolean, cl
 type DialogInfo = {title: string, buttons: $ReadOnlyArray<ButtonInfo>, fields: $ReadOnlyArray<FieldInfo>} | null;
 type BreadcrumbInfo = {index: number, label: string, click_cmd: string};
 type RecordFieldInfo = {name: string, value: string};
+type CellEntry = {field: string, value: string};
+type ListRowInfo = {index: number, id: number | string, cells: $ReadOnlyArray<CellEntry>, view_cmd: string};
 type PageInfo = {
   title: string,
   url: string,
@@ -62,6 +97,7 @@ type PageInfo = {
   model: string | void,
   record_id: number | string | void,
   view_type: string | void,
+  action_id: number | string | void,
   element_counts: {buttons: number, fields: number, tabs: number, statusbar: number},
 };
 
@@ -79,20 +115,33 @@ function collectButtons(root: Element): Array<Element> {
 
 function inspectButtons(root: Element): $ReadOnlyArray<ButtonInfo> {
   const all = collectButtons(root);
-  return all.map((el, index) => ({
-    index,
-    text: (el.textContent ?? '').trim(),
-    name: el.getAttribute('name') ?? '',
-    disabled: el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true',
-    click_cmd: buttonClickRecipe(el, all),
-  }));
+  return all.map((el, index) => {
+    const rawText = (el.textContent ?? '').trim();
+    const text =
+      rawText.length > 0
+        ? rawText
+        : ((el.getAttribute('aria-label') ?? el.getAttribute('title') ?? '').trim());
+    return {
+      index,
+      text,
+      name: el.getAttribute('name') ?? '',
+      disabled: el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true',
+      click_cmd: buttonClickRecipe(el, all),
+    };
+  });
 }
 
 function inspectFields(root: Element): $ReadOnlyArray<FieldInfo> {
   // $FlowFixMe[prop-missing]
   const els: $ReadOnlyArray<Element> = Array.from(root.querySelectorAll('.o_field_widget[name]'));
-  return els.map(el => {
+  const seenNames: Set<string> = new Set();
+  const result: Array<FieldInfo> = [];
+  for (const el of els) {
     const name = el.getAttribute('name') ?? '';
+    if (name.length === 0 || seenNames.has(name)) {
+      continue;
+    }
+    seenNames.add(name);
     const typeClass = Array.from(el.classList).find(c => c.startsWith('o_field_') && c !== 'o_field_widget') ?? '';
     const ftype = typeClass.length > 0 ? typeClass.slice('o_field_'.length) : 'unknown';
     const required = el.closest('.o_required_modifier') !== null || el.getAttribute('aria-required') === 'true';
@@ -114,8 +163,9 @@ function inspectFields(root: Element): $ReadOnlyArray<FieldInfo> {
       }
     }
 
-    return {name, label, type: ftype, required, form_cmd: `form -o get -f ${name}`};
-  });
+    result.push({name, label, type: ftype, required, form_cmd: `form -o get -f ${name}`});
+  }
+  return result;
 }
 
 function inspectTabs(root: Element): $ReadOnlyArray<TabInfo> {
@@ -149,16 +199,17 @@ function inspectMenus(): $ReadOnlyArray<MenuInfo> {
     '.o_main_navbar .o_menu_sections button',
   ];
   const seen: Set<Element> = new Set();
-  const items: Array<Element> = [];
+  const raw: Array<Element> = [];
   for (const sel of MENU_SELECTORS) {
     // $FlowFixMe[prop-missing]
     for (const el of document.querySelectorAll(sel)) {
       if (!seen.has(el)) {
         seen.add(el);
-        items.push(el);
+        raw.push(el);
       }
     }
   }
+  const items = dedupeInnermost(raw);
   return items.map((el, index) => ({
     index,
     text: (el.textContent ?? '').trim(),
@@ -250,22 +301,24 @@ function inspectBreadcrumb(): $ReadOnlyArray<BreadcrumbInfo> {
     '.o_breadcrumb .breadcrumb-item',
   ];
   const seen: Set<Element> = new Set();
-  const items: Array<Element> = [];
+  const raw: Array<Element> = [];
   for (const sel of BREADCRUMB_SELECTORS) {
     // $FlowFixMe[prop-missing]
     for (const el of document.querySelectorAll(sel)) {
       if (!seen.has(el) && el.closest('.o_terminal') === null) {
         seen.add(el);
-        items.push(el);
+        raw.push(el);
       }
     }
   }
+  // Drop container elements when their interactive child was also collected.
+  const items = dedupeInnermost(raw);
   return items.map((el, index) => {
     const label = (el.textContent ?? '').trim();
     return {
       index,
       label,
-      click_cmd: `click -t "${label}" -s ".o_breadcrumb"`,
+      click_cmd: `click -t "${label}" -s ".o_breadcrumb a, .o_breadcrumb button"`,
     };
   });
 }
@@ -314,6 +367,7 @@ function inspectPage(root: Element): PageInfo {
   let model: string | void;
   let record_id: number | string | void;
   let view_type: string | void;
+  let action_id: number | string | void;
 
   const modal = getActiveModalInfo();
   if (modal !== null) {
@@ -329,6 +383,8 @@ function inspectPage(root: Element): PageInfo {
         record_id = actionService.props?.resId ?? undefined;
         // $FlowFixMe[prop-missing]
         view_type = actionService.view?.type ?? undefined;
+        // $FlowFixMe[prop-missing]
+        action_id = actionService.action?.id ?? undefined;
       }
     } catch (_e) {
       // older Odoo — fall through to URL hash
@@ -356,8 +412,44 @@ function inspectPage(root: Element): PageInfo {
     model,
     record_id,
     view_type,
+    action_id,
     element_counts: {buttons, fields, tabs, statusbar},
   };
+}
+
+// Visible rows in a list view. Reads `.o_data_row[data-id]` elements and the named cells inside them.
+function inspectList(root: Element, model: string | void): $ReadOnlyArray<ListRowInfo> {
+  // $FlowFixMe[prop-missing]
+  const rowEls: $ReadOnlyArray<Element> = Array.from(root.querySelectorAll('.o_data_row'));
+  return rowEls.map((row, index) => {
+    const idRaw = row.getAttribute('data-id') ?? '';
+    const idNum = idRaw.length > 0 ? Number(idRaw) : NaN;
+    let id: number | string;
+    if (!isNaN(idNum)) {
+      id = idNum;
+    } else if (idRaw.length > 0) {
+      id = idRaw;
+    } else {
+      id = index;
+    }
+
+    const cells: Array<CellEntry> = [];
+    // $FlowFixMe[prop-missing]
+    const cellEls: $ReadOnlyArray<Element> = Array.from(row.querySelectorAll('td[name]'));
+    cellEls.forEach(cell => {
+      const fieldName = cell.getAttribute('name') ?? '';
+      if (fieldName.length > 0) {
+        cells.push({field: fieldName, value: (cell.textContent ?? '').trim()});
+      }
+    });
+
+    const view_cmd =
+      typeof model === 'string' && model.length > 0 && idRaw.length > 0
+        ? `view -m ${model} -i ${String(id)}`
+        : '';
+
+    return {index, id, cells, view_cmd};
+  });
 }
 
 async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
@@ -385,6 +477,9 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
     }
     if (typeof info.view_type === 'string') {
       ctx.screen.print(i18n.t('cmdInspect.page.viewType', 'View type: {{type}}', {type: info.view_type}));
+    }
+    if (typeof info.action_id !== 'undefined') {
+      ctx.screen.print(i18n.t('cmdInspect.page.actionId', 'Action ID: {{id}}', {id: String(info.action_id)}));
     }
     ctx.screen.print(
       i18n.t('cmdInspect.page.counts', 'Elements — buttons: {{b}}, fields: {{f}}, tabs: {{t}}, statusbar states: {{s}}', {
@@ -613,6 +708,37 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
     return items;
   }
 
+  if (typeEl === 'list') {
+    const root = getContentRoot();
+    if (root === null) {
+      ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
+      return;
+    }
+    const pageInfo = inspectPage(root);
+    const items = inspectList(root, pageInfo.model);
+    if (items.length === 0) {
+      ctx.screen.print(i18n.t('cmdInspect.list.none', 'No list rows found in the current view'));
+      return items;
+    }
+    ctx.screen.printTable(
+      [
+        i18n.t('cmdInspect.table.index', '#'),
+        i18n.t('cmdInspect.table.id', 'ID'),
+        i18n.t('cmdInspect.table.preview', 'Cell values (field: value)'),
+        i18n.t('cmdInspect.table.viewCmd', 'view command'),
+      ],
+      items.map(row => {
+        const preview = row.cells
+          .slice(0, 3)
+          .map(c => `${c.field}: ${c.value}`)
+          .join(' | ');
+        return [String(row.index), String(row.id), preview, row.view_cmd];
+      }),
+      '',
+    );
+    return items;
+  }
+
   ctx.screen.printError(
     i18n.t('cmdInspect.error.unknownType', 'Unknown element type: {{type}}', {type: typeEl}),
   );
@@ -626,7 +752,7 @@ export default function (): Partial<CMDDef> {
       'cmdInspect.detail',
       'Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\n' +
       'Types:\n' +
-      '  page (default) — context overview: model, record id, view type, element counts\n' +
+      '  page (default) — context overview: model, record id, view type, action id, element counts\n' +
       '  button — all buttons with a ready-to-use "click" command\n' +
       '  field — Odoo form fields with a "form" command\n' +
       '  tab — notebook tabs with a "click" command\n' +
@@ -635,7 +761,8 @@ export default function (): Partial<CMDDef> {
       '  view — view switcher (list/kanban/form/…) with a "click" command\n' +
       '  dialog — buttons and fields of the currently open dialog\n' +
       '  breadcrumb — back-navigation links with a "click" command\n' +
-      '  record — current form record field values (in-memory)',
+      '  record — current form record field values (in-memory)\n' +
+      '  list — visible rows in the current list view with a "view" command per row',
     ),
     args: [
       [
@@ -644,7 +771,7 @@ export default function (): Partial<CMDDef> {
         false,
         i18n.t('cmdInspect.args.typeElement', 'Element type to inspect'),
         'page',
-        ['page', 'button', 'field', 'tab', 'menu', 'statusbar', 'view', 'dialog', 'breadcrumb', 'record'],
+        ['page', 'button', 'field', 'tab', 'menu', 'statusbar', 'view', 'dialog', 'breadcrumb', 'record', 'list'],
       ],
     ],
     example: '-e button',

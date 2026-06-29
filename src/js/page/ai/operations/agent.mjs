@@ -99,7 +99,30 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
   const maxSteps: number =
     kwargs.max_steps !== null && kwargs.max_steps !== undefined ? kwargs.max_steps : DEFAULT_MAX_STEPS;
   // $FlowFixMe[incompatible-type]
-  const initialMessages: Array<AIMessage> = Array.isArray(kwargs.initial_messages) ? kwargs.initial_messages : [];
+  const rawInitialMessages: Array<AIMessage> = Array.isArray(kwargs.initial_messages) ? kwargs.initial_messages : [];
+  // Strip stale cache_control markers left by the rolling-breakpoint mechanism
+  // in previous turns — the API allows at most 4 blocks with cache_control and
+  // the agent places fresh markers each turn, so old ones must not accumulate.
+  const initialMessages: Array<AIMessage> = rawInitialMessages.map(msg => {
+    if (typeof msg.content === 'string') {
+      return msg;
+    }
+    return {
+      role: msg.role,
+      content: msg.content.map(block => {
+        if (block.type === 'text' && block.cache_control !== undefined) {
+          return {type: 'text', text: block.text};
+        } else if (block.type === 'tool_result' && block.cache_control !== undefined) {
+          return {type: 'tool_result', tool_use_id: block.tool_use_id, content: block.content};
+        } else if (block.type === 'image' && block.cache_control !== undefined) {
+          return {type: 'image', source: block.source};
+        } else if (block.type === 'document' && block.cache_control !== undefined) {
+          return {type: 'document', source: block.source};
+        }
+        return block;
+      }),
+    };
+  });
   // $FlowFixMe[incompatible-type]
   const attachments: Array<AIAttachment> = Array.isArray(kwargs.attachments) ? kwargs.attachments : [];
 
