@@ -20,11 +20,17 @@ export default function (): string {
     "</div>" +
     "<div id='terminal_ai_sidebar' class='terminal-ai-sidebar'>" +
     "<div class='terminal-ai-sidebar-header'>" +
+    "<div class='terminal-ai-sidebar-title-group'>" +
     "<span class='terminal-ai-sidebar-title'>AI</span>" +
+    "<div class='btn btn-sm terminal-ai-help-btn p-1' role='button' title='AI tips'>" +
+    "<i class='fa fa-question-circle'></i>" +
+    '</div>' +
+    '</div>' +
     "<div class='btn btn-sm terminal-ai-new-conv p-1' role='button' title='New conversation'>" +
     "<i class='fa fa-plus'></i>" +
     '</div>' +
     '</div>' +
+    "<div id='terminal_ai_help_popup' class='terminal-ai-help-popup'></div>" +
     "<div class='terminal-ai-model-selector'>" +
     "<select id='terminal_ai_model_select' class='terminal-ai-model-select'>" +
     "<option value=''>-- No model --</option>" +

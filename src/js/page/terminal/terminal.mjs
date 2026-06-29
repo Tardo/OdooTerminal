@@ -123,6 +123,7 @@ export default class Terminal {
   #activeConvId: string | null = null;
   #aiConvList_el: HTMLElement | void;
   #aiModelSelect_el: HTMLSelectElement | void;
+  #aiHelpPopup_el: HTMLElement | void;
   #aiInputHistory: Array<string> = [];
   #pendingAttachments: Array<AIAttachment> = [];
 
@@ -211,6 +212,8 @@ export default class Terminal {
     // $FlowFixMe[method-unbinding]
     this.el.querySelector('.terminal-ai-new-conv')?.addEventListener('click', this.#onClickNewAIConv.bind(this));
     // $FlowFixMe[method-unbinding]
+    this.el.querySelector('.terminal-ai-help-btn')?.addEventListener('click', this.#onClickAIHelp.bind(this));
+    // $FlowFixMe[method-unbinding]
     this.el.querySelector('#terminal_ai_conv_list')?.addEventListener('click', this.#onClickAIConvList.bind(this));
     // Custom Events
     // $FlowFixMe[method-unbinding]
@@ -226,6 +229,10 @@ export default class Terminal {
       this.#aiModelSelect_el = aiModelSelectEl;
       // $FlowFixMe[method-unbinding]
       aiModelSelectEl.addEventListener('change', this.#onChangeAIModel.bind(this));
+    }
+    const aiHelpPopupEl = this.el.querySelector('#terminal_ai_help_popup');
+    if (aiHelpPopupEl instanceof HTMLElement) {
+      this.#aiHelpPopup_el = aiHelpPopupEl;
     }
     this.#populateAIModelSelector();
     this.#isAIMode = getStorageSessionItem('terminal_ai_mode', false);
@@ -1252,6 +1259,31 @@ export default class Terminal {
     this.screen.preventLostInputFocus();
   }
 
+  #onClickAIHelp() {
+    const popup = this.#aiHelpPopup_el;
+    if (!popup) {
+      return;
+    }
+    const isActive = popup.classList.contains('terminal-ai-help-popup-active');
+    if (isActive) {
+      popup.classList.remove('terminal-ai-help-popup-active');
+    } else {
+      if (!popup.dataset['initialized']) {
+        popup.innerHTML =
+          `<div class='terminal-ai-help-popup-title'>${i18n.t('terminal.ai.helpTitle', 'Tips to save tokens')}</div>` +
+          "<ul class='terminal-ai-help-popup-list'>" +
+          `<li>${i18n.t('terminal.ai.helpTip1', 'One topic per conversation — start a new one for each task.')}</li>` +
+          `<li>${i18n.t('terminal.ai.helpTip2', 'History is auto-compressed when context fills up, but shorter conversations always cost fewer tokens.')}</li>` +
+          `<li>${i18n.t('terminal.ai.helpTip3', 'Be specific and concise — vague prompts waste tokens and give worse results.')}</li>` +
+          `<li>${i18n.t('terminal.ai.helpTip4', 'Delete old conversations you no longer need.')}</li>` +
+          `<li>${i18n.t('terminal.ai.helpTip5', 'Attach files only when strictly necessary.')}</li>` +
+          '</ul>';
+        popup.dataset['initialized'] = '1';
+      }
+      popup.classList.add('terminal-ai-help-popup-active');
+    }
+  }
+
   #onClickNewAIConv() {
     this.#saveCurrentScreenSnapshot();
     this.screen.clean();
@@ -1423,6 +1455,17 @@ export default class Terminal {
   }
 
   onCoreClick(ev: MouseEvent) {
+    const helpPopup = this.#aiHelpPopup_el;
+    const clickTarget = ev.target;
+    if (
+      helpPopup &&
+      helpPopup.classList.contains('terminal-ai-help-popup-active') &&
+      clickTarget instanceof HTMLElement &&
+      !helpPopup.contains(clickTarget) &&
+      !clickTarget.closest('.terminal-ai-help-btn')
+    ) {
+      helpPopup.classList.remove('terminal-ai-help-popup-active');
+    }
     if (
       this.busyTooltip_el &&
       ev.target instanceof HTMLElement &&

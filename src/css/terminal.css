@@ -897,6 +897,55 @@
   white-space: nowrap;
 }
 
+.o_terminal .terminal-ai-sidebar-title-group {
+  align-items: center;
+  display: flex;
+  gap: 2px;
+  min-width: 0;
+}
+
+.o_terminal .terminal-ai-help-btn {
+  color: var(--terminal-color-info);
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  opacity: 0.6;
+}
+.o_terminal .terminal-ai-help-btn:hover {
+  color: var(--terminal-color-white);
+  opacity: 1;
+}
+
+.o_terminal .terminal-ai-help-popup {
+  background-color: color-mix(in srgb, var(--terminal-color-dark), white 5%);
+  border-bottom: 1px solid var(--terminal-color-secondary);
+  color: var(--terminal-color-light);
+  display: none;
+  flex-shrink: 0;
+  font-size: x-small;
+  padding: 8px;
+}
+.o_terminal .terminal-ai-help-popup.terminal-ai-help-popup-active {
+  display: block;
+}
+.o_terminal .terminal-ai-help-popup-title {
+  color: var(--terminal-color-info);
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.o_terminal .terminal-ai-help-popup-list {
+  list-style: disc;
+  margin: 0;
+  padding-left: 14px;
+}
+.o_terminal .terminal-ai-help-popup-list li {
+  line-height: 1.5;
+  margin-bottom: 3px;
+}
+.o_terminal .terminal-ai-help-popup-list li:last-child {
+  margin-bottom: 0;
+}
+
 .o_terminal .terminal-ai-new-conv {
   color: var(--terminal-color-info);
   cursor: pointer;
