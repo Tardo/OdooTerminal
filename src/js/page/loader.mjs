@@ -20,6 +20,7 @@ import registerMathFuncs from '@trash/core/math/__all__';
 import registerTimeFuncs from '@trash/core/time/__all__';
 import registerNetFuncs from '@trash/core/net/__all__';
 import registerEnDeFuncs from '@trash/core/ende/__all__';
+import registerStrFuncs from '@trash/core/str/__all__';
 import registerCoreCommands from '@terminal/commands/__all__';
 import registerGraphicsFuncs from '@terminal/libs/graphics/__all__';
 import OdooTerminalTests from '@tests/terminal';
@@ -75,6 +76,7 @@ function loadVMFunctions(vm: VMachine) {
   registerTimeFuncs(vm);
   registerGraphicsFuncs(vm);
   registerEnDeFuncs(vm);
+  registerStrFuncs(vm);
   registerCoreCommands(vm);
   registerOdooCommonCommands(vm);
   if (isBackOffice()) {

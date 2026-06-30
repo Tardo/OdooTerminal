@@ -50,4 +50,14 @@ function arr_filter(arr: List | Any, filter) {
   }
   return $res
 }
+
+function arr_join(arr: List | Any, sep: String = "") {
+  $res = ""
+  $len = $arr['length']
+  for ($i = 0; $i < $len; $i += 1) {
+    if ($i > 0) { $res = $res + $sep }
+    $res = $res + $arr[$i]
+  }
+  return $res
+}
 `;

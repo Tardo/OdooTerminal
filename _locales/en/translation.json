@@ -1319,6 +1319,78 @@
     "definition": "Generate random integers",
     "detail": "Return random integers"
   },
+  "funcStrEnds": {
+    "args": {
+      "str": "The string",
+      "suffix": "The suffix to check"
+    },
+    "definition": "Check if a string ends with a suffix",
+    "detail": "Return true if the string ends with the given suffix"
+  },
+  "funcStrIncludes": {
+    "args": {
+      "needle": "The substring to search for",
+      "str": "The string"
+    },
+    "definition": "Check if a string contains a substring",
+    "detail": "Return true if the string contains the given substring"
+  },
+  "funcStrLower": {
+    "args": {
+      "str": "The string"
+    },
+    "definition": "Convert string to lowercase",
+    "detail": "Return the string converted to lowercase"
+  },
+  "funcStrReplace": {
+    "args": {
+      "all": "Replace all occurrences",
+      "replacement": "The replacement string",
+      "search": "The substring to find",
+      "str": "The source string"
+    },
+    "definition": "Replace occurrences in a string",
+    "detail": "Replace the first (or all with -a) occurrences of a substring"
+  },
+  "funcStrSlice": {
+    "args": {
+      "begin": "Start index (inclusive, negative counts from end)",
+      "end": "End index (exclusive, negative counts from end)",
+      "str": "The string"
+    },
+    "definition": "Extract a substring",
+    "detail": "Return the portion of the string from begin to end (exclusive). Negative indices count from the end."
+  },
+  "funcStrSplit": {
+    "args": {
+      "delim": "The delimiter",
+      "str": "The string to split"
+    },
+    "definition": "Split a string into an array",
+    "detail": "Split a string by a delimiter and return an array of substrings"
+  },
+  "funcStrStarts": {
+    "args": {
+      "prefix": "The prefix to check",
+      "str": "The string"
+    },
+    "definition": "Check if a string starts with a prefix",
+    "detail": "Return true if the string starts with the given prefix"
+  },
+  "funcStrTrim": {
+    "args": {
+      "str": "The string"
+    },
+    "definition": "Trim whitespace from both ends of a string",
+    "detail": "Return the string with leading and trailing whitespace removed"
+  },
+  "funcStrUpper": {
+    "args": {
+      "str": "The string"
+    },
+    "definition": "Convert string to uppercase",
+    "detail": "Return the string converted to uppercase"
+  },
   "getOdooEnvService": {
     "error": "Service '{{service_name}}' is not available"
   },

@@ -139,9 +139,24 @@ export function buildScriptingPrompt(): string {
     '    arr_append $arr $item         — append item to end\n' +
     '    arr_prepend $arr $item        — prepend item to start\n' +
     '    $copy = (arr_clone $arr)      — shallow clone\n' +
+    '    $str  = (arr_join $arr)       — join into string with no separator\n' +
+    '    $str  = (arr_join $arr ",")   — join into string with separator\n' +
     '    $res  = (arr_map $arr (function (item) { return $item * 2 }))\n' +
     '    $res  = (arr_filter $arr (function (item) { return $item > 0 }))\n' +
     '    $res  = (arr_reduce $arr 0 (function (a, b) { return $a + $b }))\n' +
+    '\n' +
+    '  String operations:\n' +
+    '    $arr  = (str_split -s $str -d ",")          — split by delimiter → array\n' +
+    '    $up   = (str_upper -s $str)                 — uppercase\n' +
+    '    $lo   = (str_lower -s $str)                 — lowercase\n' +
+    '    $t    = (str_trim -s $str)                  — strip leading/trailing whitespace\n' +
+    '    $r    = (str_replace -s $str -f "a" -r "b") — replace first occurrence\n' +
+    '    $r    = (str_replace -s $str -f "a" -r "b" -a) — replace all occurrences\n' +
+    '    $sub  = (str_slice -s $str -b 0 -e 5)       — substring [0,5)\n' +
+    '    $sub  = (str_slice -s $str -b -3)            — last 3 chars\n' +
+    '    $bool = (str_includes -s $str -n "needle")  — true if contains substring\n' +
+    '    $bool = (str_starts -s $str -p "prefix")    — true if starts with prefix\n' +
+    '    $bool = (str_ends -s $str -u "suffix")      — true if ends with suffix\n' +
     '\n' +
     '  Math:\n' +
     '    floor -n 12.9       → 12\n' +
@@ -269,8 +284,8 @@ export default function(terminal: Terminal): string {
     '  * Declare & assign:    $var = value\n' +
     '  * Capture cmd output:  $var = (command ...)\n' +
     '    → The ENTIRE outer command must be wrapped in () — even when it already has subcommand args inside:\n' +
-    '      WRONG:   $month = arr_clone -arr (split -s $today -d "-")    ← outer not wrapped, nothing captured\n' +
-    '      CORRECT: $month = (arr_clone -arr (split -s $today -d "-"))  ← outer wrapped, result captured\n' +
+    '      WRONG:   $month = arr_clone -arr (str_split -s $today -d "-")    ← outer not wrapped, nothing captured\n' +
+    '      CORRECT: $month = (arr_clone -arr (str_split -s $today -d "-"))  ← outer wrapped, result captured\n' +
     '  * Array element:       $arr[2] = 42\n' +
     '  * Dict key:            $obj["key"] = "new value"\n' +
     '  * Nested:              $arr[1][0] += 5\n' +
