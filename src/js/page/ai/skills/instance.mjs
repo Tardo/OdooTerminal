@@ -83,15 +83,38 @@ const content: string =
   'search -m res.currency -d [["active","=",true]] -f name,symbol,rate\n' +
   '```\n' +
   '\n' +
+  '## Discovering Fields in OCA / Private Models\n' +
+  'For non-standard models (OCA modules, private/custom modules) **never assume field names**.\n' +
+  'Use semantic search on `field_description` to locate the relevant field without loading the full schema:\n' +
+  '```\n' +
+  '// Find fields matching a concept on a given model\n' +
+  'search -m ir.model.fields -d [["model_id.model","=","<model>"],["field_description","ilike","<concept>"]] -f name,ttype,field_description,modules\n' +
+  '```\n' +
+  'Examples:\n' +
+  '```\n' +
+  '// Looking for a credit limit field on res.partner\n' +
+  'search -m ir.model.fields -d [["model_id.model","=","res.partner"],["field_description","ilike","credit limit"]] -f name,ttype,field_description,modules\n' +
+  '// Looking for a delivery date on stock.picking\n' +
+  'search -m ir.model.fields -d [["model_id.model","=","stock.picking"],["field_description","ilike","delivery"]] -f name,ttype,field_description,modules\n' +
+  '// Looking for internal reference on sale.order\n' +
+  'search -m ir.model.fields -d [["model_id.model","=","sale.order"],["field_description","ilike","reference"]] -f name,ttype,field_description,modules\n' +
+  '```\n' +
+  'The `modules` field in the result tells you which OCA/private module defines the field.\n' +
+  'To explore all models registered by a specific module:\n' +
+  '```\n' +
+  'search -m ir.model -d [["modules","like","<module_name>"]] -f model,name\n' +
+  '```\n' +
+  '\n' +
   '## Tips\n' +
   '- Run `whoami` + `version` at the start of any multi-step task that depends on user, company, or version.\n' +
   '- Use `depends -m base` to confirm a module is installed before querying its models.\n' +
   '- `$$UID` is only valid as a standalone argument; use `$id = $$UID` before embedding in domains.\n' +
-  '- `ir.module.module` is the canonical source for module metadata; `depends -m base` is a faster shortcut for the full installed list.\n';
+  '- `ir.module.module` is the canonical source for module metadata; `depends -m base` is a faster shortcut for the full installed list.\n' +
+  '- For OCA/private models: always use semantic field search (`field_description ilike`) instead of assuming field names.\n';
 
 const skill: SkillDef = {
   name: 'instance',
-  description: 'Odoo instance discovery: active user (whoami), Odoo version, installed modules (depends/ir.module.module), company, system parameters, languages, currencies.',
+  description: 'Odoo instance discovery: active user (whoami), Odoo version, installed modules (depends/ir.module.module), company, system parameters, languages, currencies. Also covers semantic field discovery for OCA/private models (ir.model.fields ilike search).',
   content: (): string => content,
 };
 

@@ -19,6 +19,7 @@ IMP: Command 'form': get, edit, save, clear operations
 IMP: Command 'read_group': Print output
 IMP: TraSH: Performance
 IMP: Options page
+IMP: AI Mode: instance skill
 
 FIX: TraSH: Escaped strings
 FIX: AI Mode: Cache
