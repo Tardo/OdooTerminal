@@ -13,9 +13,11 @@ ADD: AI Mode: Files management
 ADD: AI Mode: Take screenshots
 ADD: AI Mode: Re-run scripts/commands
 ADD: AI Mode: Custom prompt
+ADD: AI Mode: Custom skills
 ADD: Command 'click'
 ADD: Command 'inspect'
 ADD: Command 'fill'
+ADDl Command 'options'
 
 IMP: Command 'form': get, edit, save, clear operations
 IMP: Command 'read_group': Print output

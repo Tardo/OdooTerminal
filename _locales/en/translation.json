@@ -872,6 +872,10 @@
       "notViewDialogsService": "Cannot find time service"
     }
   },
+  "cmdOptions": {
+    "definition": "Open extension options",
+    "detail": "Open the OdooTerminal extension options page."
+  },
   "cmdPaste": {
     "args": {
       "merge": "Try to merge data (if the type is 'model')",

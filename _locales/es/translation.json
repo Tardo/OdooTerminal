@@ -872,6 +872,10 @@
       "notViewDialogsService": "No se pudo encontrar el servicio de hora"
     }
   },
+  "cmdOptions": {
+    "definition": "Abrir opciones de la extensión",
+    "detail": "Abre la página de opciones de la extensión OdooTerminal."
+  },
   "cmdPaste": {
     "args": {
       "merge": "Intentar fusionar los datos (si el tipo es 'model')",

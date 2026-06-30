@@ -56,6 +56,7 @@ import cmdDiff from './diff';
 import cmdClick from './click';
 import cmdInspect from './inspect';
 import cmdFill from './fill';
+import cmdOptions from './options';
 import type VMachine from '@trash/vmachine';
 
 export default function (vm: VMachine) {
@@ -113,4 +114,5 @@ export default function (vm: VMachine) {
   vm.registerCommand('click', cmdClick());
   vm.registerCommand('inspect', cmdInspect());
   vm.registerCommand('fill', cmdFill());
+  vm.registerCommand('options', cmdOptions());
 }
