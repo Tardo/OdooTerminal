@@ -268,6 +268,9 @@ export default function(terminal: Terminal): string {
     '=== 3. VARIABLES ===\n' +
     '  * Declare & assign:    $var = value\n' +
     '  * Capture cmd output:  $var = (command ...)\n' +
+    '    → The ENTIRE outer command must be wrapped in () — even when it already has subcommand args inside:\n' +
+    '      WRONG:   $month = arr_clone -arr (split -s $today -d "-")    ← outer not wrapped, nothing captured\n' +
+    '      CORRECT: $month = (arr_clone -arr (split -s $today -d "-"))  ← outer wrapped, result captured\n' +
     '  * Array element:       $arr[2] = 42\n' +
     '  * Dict key:            $obj["key"] = "new value"\n' +
     '  * Nested:              $arr[1][0] += 5\n' +
