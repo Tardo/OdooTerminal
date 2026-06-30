@@ -6,11 +6,28 @@ import i18n from 'i18next';
 import readGroup from '@odoo/orm/read_group';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
-async function cmdReadGroup(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed> {
-  return readGroup(kwargs.model, kwargs.domain, kwargs.field, kwargs.groupby, await this.getContext());
+const READ_EXCLUDED_KEYS = ["__domain", "__count"];
+
+async function cmdReadGroup(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
+  const results = await readGroup(kwargs.model, kwargs.domain, kwargs.field, kwargs.groupby, await this.getContext());
+  if (results) {
+    const heads = Object.keys(results[0]).filter((key) => !READ_EXCLUDED_KEYS.includes(key));
+    heads.unshift("Count");
+    const rows = [];
+    for (const item of results) {
+      delete item.__domain;
+      const count = item.__count;
+      delete item.__count;
+      const row = Object.values(item);
+      row.unshift(count);
+      rows.push(row);
+    }
+    ctx.screen.printTable(heads, rows);
+  }
+  return results;
 }
 
 async function getOptions(this: Terminal, arg_name: string) {
