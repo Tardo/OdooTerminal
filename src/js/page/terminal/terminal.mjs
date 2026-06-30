@@ -400,6 +400,10 @@ export default class Terminal {
     return this.#shell;
   }
 
+  getCustomSkills(): Array<AICustomSkillDef> {
+    return this.#config.ai_custom_skills || [];
+  }
+
   cleanInputHistory() {
     this.#inputHistory = [];
     removeStorageSessionItem('terminal_screen');

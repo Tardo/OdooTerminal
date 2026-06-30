@@ -3,15 +3,15 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import buildTraSHPrompt from '@ai/prompts/trash';
-import SKILLS from '@ai/skills/__all__';
+import type {SkillDef} from '@ai/skills/__all__';
 import type Terminal from '@odoo/terminal';
 
 
-function buildSkillsSection(): string {
-  if (SKILLS.length === 0) {
+function buildSkillsSection(allSkills: $ReadOnlyArray<SkillDef>): string {
+  if (allSkills.length === 0) {
     return '';
   }
-  const catalog = SKILLS.map(s => `  - ${s.name}: ${s.description}`).join('\n');
+  const catalog = allSkills.map(s => `  - ${s.name}: ${s.description}`).join('\n');
   return (
     '# SKILLS — ON-DEMAND DOMAIN KNOWLEDGE\n' +
     'You have access to skill modules that provide detailed domain guidance. Skills are NOT loaded by default.\n' +
@@ -27,7 +27,7 @@ function buildSkillsSection(): string {
   );
 }
 
-export default function (terminal: Terminal, odoo_ver: string, maxSteps: number, customPrompt?: ?string): string {
+export default function (terminal: Terminal, odoo_ver: string, maxSteps: number, customPrompt?: ?string, allSkills?: $ReadOnlyArray<SkillDef>): string {
   const base =
     `[ROLE] Action-first autonomous agent for OdooTerminal (Odoo ${odoo_ver} ERP).\n` +
     `[CONSTRAINT] Max steps available: ${maxSteps}. Use as FEW steps as possible while remaining accurate — efficiency matters. One well-targeted command beats two exploratory ones.\n` +
@@ -49,7 +49,7 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     '- For display tasks ("show me X", "open X", "list X"): a single view/graph/pivot command is sufficient once fields are confirmed. Call `run_command` with the display command and then respond with empty text.\n' +
     '- Prefer one well-targeted command over two exploratory ones. Do not chain a search + view when view alone accepts a domain filter.\n' +
     '\n' +
-    buildSkillsSection() +
+    buildSkillsSection(allSkills ?? []) +
     '\n' +
     '# GROUNDING RULES (STRICT)\n' +
     '- NEVER assert facts about the Odoo instance from prior knowledge or training data.\n' +

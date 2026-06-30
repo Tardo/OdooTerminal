@@ -8,6 +8,7 @@ import {streamRequest} from '@ai/providers';
 import {startRequest, handleAbort} from '@ai/utils/network';
 import buildMainAgentPrompt from '@ai/agents/main';
 import SKILLS from '@ai/skills/__all__';
+import type {SkillDef} from '@ai/skills/__all__';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {DEFAULT_MAX_STEPS} from '@ai/constants';
 import {computeContextSize, shouldCompress, compressHistory} from '@ai/utils/compress_history';
@@ -169,13 +170,23 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     return blocks;
   })();
 
+  const customSkillDefs: Array<SkillDef> = this.getCustomSkills().map(cs => ({
+    name: cs.name,
+    description: cs.description,
+    content: () => cs.content,
+  }));
+  const allSkills: Array<SkillDef> = [
+    ...SKILLS.filter(s => !customSkillDefs.some(cs => cs.name === s.name)),
+    ...customSkillDefs,
+  ];
+
   const messages: Array<AIMessage> = [
     {
       role: 'system',
       content: [
         {
           type: 'text',
-          text: buildMainAgentPrompt(this, String(getOdooVersion() ?? ''), maxSteps, customSystemPrompt),
+          text: buildMainAgentPrompt(this, String(getOdooVersion() ?? ''), maxSteps, customSystemPrompt, allSkills),
           cache_control: {type: 'ephemeral'},
         },
       ],
@@ -446,14 +457,14 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
 
       } else if (tc.name === 'load_skill') {
         const skillName = String(tc.input.name ?? '').trim();
-        const skill = SKILLS.find(s => s.name === skillName);
+        const skill = allSkills.find(s => s.name === skillName);
 
         let skillContent = '';
 
         if (skill === undefined) {
           skillContent = i18n.t('cmdAI.agent.skill.unknown', 'Skill not found: {{name}}. Available: {{list}}', {
             name: skillName,
-            list: SKILLS.map(s => s.name).join(', '),
+            list: allSkills.map(s => s.name).join(', '),
           });
         } else if (loadedSkills.has(skillName)) {
           skillContent = i18n.t('cmdAI.agent.skill.alreadyLoaded', 'Skill already loaded: {{name}}', {name: skillName});

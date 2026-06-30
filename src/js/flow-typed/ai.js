@@ -71,3 +71,9 @@ declare type AIModelConfig = {
   timeout: number,
   max_tokens: number,
 };
+
+declare type AICustomSkillDef = {
+  name: string,
+  description: string,
+  content: string,
+};

@@ -127,6 +127,36 @@ body {
   width: 8em;
 }
 
+.optsection .ai_custom_skills_form {
+  margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+.optsection .ai_custom_skills_fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+}
+.optsection .ai_custom_skills_fields input#ai_custom_skill_name {
+  width: 14%;
+}
+.optsection .ai_custom_skills_fields input#ai_custom_skill_description {
+  flex-grow: 1;
+}
+.optsection #ai_custom_skill_content {
+  height: 120px;
+  white-space: pre;
+  width: 100%;
+  font-family: monospace;
+  font-size: 0.85em;
+}
+.optsection .ai_custom_skills_actions {
+  display: flex;
+  gap: 0.4em;
+}
+
 .warning_text {
   color: #856404;
   background-color: #fff3cd;

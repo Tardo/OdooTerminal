@@ -16,6 +16,7 @@ let unique_counter: number = 1;
 let shortcuts_defs: {[string]: string} = {};
 let color_domain_defs: {[string]: string} = {};
 let ai_models_defs: Array<{name: string, url: string, api_key: string, model: string, provider: string, timeout: number, max_tokens: number}> = [];
+let ai_custom_skills_defs: Array<AICustomSkillDef> = [];
 
 async function loadThemeValues(theme: string): Promise<{[string]: mixed}> {
   return new Promise((resolve, reject) => {
@@ -255,6 +256,51 @@ function renderAIModelsTable() {
   }
 }
 
+function onClickAICustomSkillRemove(e: MouseEvent) {
+  if (e.target instanceof HTMLElement) {
+    const el_target = e.target;
+    const row_target_id = el_target.dataset.target;
+    const row = document.getElementById(row_target_id);
+    row?.parentNode?.removeChild(row);
+    const idx = Number(el_target.dataset.idx);
+    ai_custom_skills_defs.splice(idx, 1);
+    renderAICustomSkillsTable();
+  }
+}
+
+function renderAICustomSkillsTableItem(tbody: HTMLTableSectionElement, idx: number, entry: AICustomSkillDef) {
+  const row_id = `ai-custom-skill-${unique_counter++}`;
+  const new_row = tbody.insertRow();
+  const new_cell_name = new_row.insertCell(0);
+  const new_cell_desc = new_row.insertCell(1);
+  const new_cell_options = new_row.insertCell(2);
+  new_row.setAttribute('id', row_id);
+  new_cell_name.innerText = entry.name;
+  new_cell_desc.innerText = entry.description;
+  const elm_link_remove = document.createElement('a');
+  elm_link_remove.id = `${row_id}-remove`;
+  elm_link_remove.innerText = 'Remove';
+  elm_link_remove.href = '#';
+  elm_link_remove.classList.add('ai_custom_skill_remove');
+  elm_link_remove.dataset.target = row_id;
+  elm_link_remove.dataset.idx = String(idx);
+  new_cell_options.appendChild(elm_link_remove);
+  elm_link_remove.addEventListener('click', onClickAICustomSkillRemove, false);
+}
+
+function renderAICustomSkillsTable() {
+  const elm_table = document.getElementById('ai_custom_skills_table');
+  const tbody = elm_table?.getElementsByTagName('tbody')[0];
+  if (tbody && tbody instanceof HTMLTableSectionElement) {
+    while (tbody.rows.length > 0) {
+      tbody.deleteRow(0);
+    }
+    for (let i = 0; i < ai_custom_skills_defs.length; i++) {
+      renderAICustomSkillsTableItem(tbody, i, ai_custom_skills_defs[i]);
+    }
+  }
+}
+
 function renderColorDomainTable() {
   const elm_color_domain_table = document.getElementById('color_domain_table');
   const tbody = elm_color_domain_table?.getElementsByTagName('tbody')[0];
@@ -315,6 +361,7 @@ function saveOptions() {
   data.shortcuts = shortcuts_defs;
   data.colors_domain = color_domain_defs;
   data.ai_models = ai_models_defs;
+  data.ai_custom_skills = ai_custom_skills_defs;
   setStorageSync(data);
 }
 
@@ -362,9 +409,13 @@ function applyInputValues(values: {[string]: mixed}) {
   // $FlowFixMe[sketchy-null-mixed]
   // $FlowFixMe[incompatible-type]
   ai_models_defs = values.ai_models || [];
+  // $FlowFixMe[sketchy-null-mixed]
+  // $FlowFixMe[incompatible-type]
+  ai_custom_skills_defs = values.ai_custom_skills || [];
   renderShortcutTable();
   renderColorDomainTable();
   renderAIModelsTable();
+  renderAICustomSkillsTable();
 }
 
 function onSubmitForm(e: Event) {
@@ -476,6 +527,91 @@ function onClickAIModelAdd() {
   }
 }
 
+function onClickAICustomSkillAdd() {
+  const elm_name = document.getElementById('ai_custom_skill_name');
+  const elm_desc = document.getElementById('ai_custom_skill_description');
+  const elm_content = document.getElementById('ai_custom_skill_content');
+  if (
+    elm_name instanceof HTMLInputElement &&
+    elm_name.value &&
+    elm_desc instanceof HTMLInputElement &&
+    elm_desc.value &&
+    elm_content instanceof HTMLTextAreaElement &&
+    elm_content.value
+  ) {
+    ai_custom_skills_defs.push({
+      name: elm_name.value,
+      description: elm_desc.value,
+      content: elm_content.value,
+    });
+    renderAICustomSkillsTable();
+    elm_name.value = '';
+    elm_desc.value = '';
+    elm_content.value = '';
+  }
+}
+
+function onClickExportAICustomSkills() {
+  const json = JSON.stringify(ai_custom_skills_defs, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'odooterminal_skills.json';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function onClickImportAICustomSkills() {
+  const elm = document.getElementById('ai_custom_skills_import_file');
+  if (elm instanceof HTMLInputElement) {
+    elm.value = '';
+    elm.click();
+  }
+}
+
+function onChangeImportAICustomSkillsFile(e: Event) {
+  const target = e.target;
+  if (!(target instanceof HTMLInputElement) || !target.files || target.files.length === 0) {
+    return;
+  }
+  const file = target.files[0];
+  const reader = new FileReader();
+  reader.onload = readerEvent => {
+    // $FlowFixMe[prop-missing]
+    const text: string = readerEvent.target.result;
+    let parsed: mixed;
+    try {
+      parsed = JSON.parse(text);
+    } catch (_) {
+      return;
+    }
+    if (!Array.isArray(parsed)) {
+      return;
+    }
+    for (const entry of parsed) {
+      if (
+        typeof entry !== 'object' ||
+        entry === null ||
+        typeof entry.name !== 'string' ||
+        typeof entry.description !== 'string' ||
+        typeof entry.content !== 'string' ||
+        !entry.name
+      ) {
+        continue;
+      }
+      const existing = ai_custom_skills_defs.findIndex(s => s.name === entry.name);
+      if (existing >= 0) {
+        ai_custom_skills_defs[existing] = {name: entry.name, description: entry.description, content: entry.content};
+      } else {
+        ai_custom_skills_defs.push({name: entry.name, description: entry.description, content: entry.content});
+      }
+    }
+    renderAICustomSkillsTable();
+  };
+  reader.readAsText(file);
+}
+
 async function onClickResetSettings() {
   setStorageSync(SETTING_DEFAULTS);
   applyInputValues(await getStorageSync(SETTING_NAMES));
@@ -554,6 +690,17 @@ function i18n() {
   _apply_i18n('#add_ai_model', 'optionsTitleAIModelsAdd');
   _apply_i18n('#load_ai_models', 'optionsTitleAIModelsLoad');
 
+  _apply_i18n('#title_ai_custom_skills', 'optionsTitleAICustomSkills');
+  _apply_i18n('#desc_ai_custom_skills', 'optionsTitleAICustomSkillsDescription');
+  _apply_i18n('#column_ai_custom_skills_name', 'optionsTitleAICustomSkillsName');
+  _apply_i18n('#column_ai_custom_skills_description', 'optionsTitleAICustomSkillsDescription2');
+  _apply_i18n('#add_ai_custom_skill', 'optionsTitleAICustomSkillsAdd');
+  _apply_i18n('#export_ai_custom_skills', 'optionsTitleAICustomSkillsExport');
+  _apply_i18n('#import_ai_custom_skills', 'optionsTitleAICustomSkillsImport');
+  _apply_i18n("label[for='ai_custom_skill_name']", 'optionsTitleAICustomSkillsNameLabel');
+  _apply_i18n("label[for='ai_custom_skill_description']", 'optionsTitleAICustomSkillsDescriptionLabel');
+  _apply_i18n("label[for='ai_custom_skill_content']", 'optionsTitleAICustomSkillsContentLabel');
+
   _apply_i18n('#title_init_commands', 'optionsTitleInitCommands');
   _apply_i18n('#desc_init_commands', 'optionsTitleInitCommandsDescription');
 
@@ -587,6 +734,10 @@ async function onDOMLoaded() {
   _add_event_listener('#add_color_domain', 'click', onClickColorDomainAdd);
   _add_event_listener('#add_ai_model', 'click', onClickAIModelAdd);
   _add_event_listener('#load_ai_models', 'click', onClickLoadAIModels);
+  _add_event_listener('#add_ai_custom_skill', 'click', onClickAICustomSkillAdd);
+  _add_event_listener('#export_ai_custom_skills', 'click', onClickExportAICustomSkills);
+  _add_event_listener('#import_ai_custom_skills', 'click', onClickImportAICustomSkills);
+  _add_event_listener('#ai_custom_skills_import_file', 'change', onChangeImportAICustomSkillsFile);
   _add_event_listener('#ai_model_provider', 'change', onChangeAIModelProvider);
   document.getElementById('ai_model_provider')?.dispatchEvent(new Event('change'));
   _add_event_listener('.reset_settings', 'click', onClickResetSettings);

@@ -194,6 +194,36 @@
       }
     }
   },
+  "optionsTitleAICustomSkills": {
+    "message": "AI Custom Skills"
+  },
+  "optionsTitleAICustomSkillsDescription": {
+    "message": "Define custom skill modules available to the AI agent. Each skill provides domain-specific knowledge the agent can load on demand."
+  },
+  "optionsTitleAICustomSkillsName": {
+    "message": "Name"
+  },
+  "optionsTitleAICustomSkillsDescription2": {
+    "message": "Description"
+  },
+  "optionsTitleAICustomSkillsNameLabel": {
+    "message": "Name:"
+  },
+  "optionsTitleAICustomSkillsDescriptionLabel": {
+    "message": "Description:"
+  },
+  "optionsTitleAICustomSkillsContentLabel": {
+    "message": "Content:"
+  },
+  "optionsTitleAICustomSkillsAdd": {
+    "message": "Add"
+  },
+  "optionsTitleAICustomSkillsExport": {
+    "message": "Export"
+  },
+  "optionsTitleAICustomSkillsImport": {
+    "message": "Import"
+  },
   "optionsReset": {
     "message": "Reset"
   },

@@ -35,6 +35,7 @@ export const SETTING_TYPES: {
   color_white: SettingType,
   colors_domain: SettingType,
   ai_models: SettingType,
+  ai_custom_skills: SettingType,
 } = {
   init_cmds: 'edit',
   term_context: 'json',
@@ -66,6 +67,7 @@ export const SETTING_TYPES: {
   color_white: 'color',
   colors_domain: 'manual',
   ai_models: 'manual',
+  ai_custom_skills: 'manual',
 };
 
 export const SETTING_NAMES: $ReadOnlyArray<string> = Array.from(Object.keys(SETTING_TYPES));
@@ -101,6 +103,7 @@ export type ExtensionSettings = {
   color_white: string,
   colors_domain: {[string]: string},
   ai_models: Array<AIModelConfig>,
+  ai_custom_skills: Array<AICustomSkillDef>,
 };
 
 export const SETTING_DEFAULTS: ExtensionSettings = {
@@ -134,6 +137,7 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   color_white: '#ffffff',
   colors_domain: {},
   ai_models: [],
+  ai_custom_skills: [],
 };
 
 export const IGNORED_KEYS: $ReadOnlyArray<string> = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];

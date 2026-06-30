@@ -198,6 +198,36 @@
       }
     }
   },
+  "optionsTitleAICustomSkills": {
+    "message": "Habilidades de IA personalizadas"
+  },
+  "optionsTitleAICustomSkillsDescription": {
+    "message": "Define módulos de habilidades personalizadas disponibles para el agente de IA. Cada habilidad proporciona conocimiento específico de dominio que el agente puede cargar bajo demanda."
+  },
+  "optionsTitleAICustomSkillsName": {
+    "message": "Nombre"
+  },
+  "optionsTitleAICustomSkillsDescription2": {
+    "message": "Descripción"
+  },
+  "optionsTitleAICustomSkillsNameLabel": {
+    "message": "Nombre:"
+  },
+  "optionsTitleAICustomSkillsDescriptionLabel": {
+    "message": "Descripción:"
+  },
+  "optionsTitleAICustomSkillsContentLabel": {
+    "message": "Contenido:"
+  },
+  "optionsTitleAICustomSkillsAdd": {
+    "message": "Añadir"
+  },
+  "optionsTitleAICustomSkillsExport": {
+    "message": "Exportar"
+  },
+  "optionsTitleAICustomSkillsImport": {
+    "message": "Importar"
+  },
   "optionsReset": {
     "message": "Reestablecer"
   },

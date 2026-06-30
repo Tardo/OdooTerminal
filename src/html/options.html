@@ -254,6 +254,46 @@
       </div>
 
       <div class="optsection">
+        <h4 id="title_ai_custom_skills">AI Custom Skills</h4>
+        <p id="desc_ai_custom_skills">
+          Define custom skill modules available to the AI agent. Each skill provides domain-specific knowledge the
+          agent can load on demand via the <code>load_skill</code> tool. A custom skill with the same name as a
+          built-in skill will override it.
+        </p>
+        <table class="fullwidth" id="ai_custom_skills_table">
+          <thead>
+            <tr>
+              <th style="width: 20%" id="column_ai_custom_skills_name">Name</th>
+              <th style="width: 70%" id="column_ai_custom_skills_description">Description</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="ai_custom_skills_form">
+          <div class="ai_custom_skills_fields">
+            <label for="ai_custom_skill_name">Name:</label>
+            <input type="text" id="ai_custom_skill_name" name="ai_custom_skill_name" placeholder="my-skill" />
+            <label for="ai_custom_skill_description">Description:</label>
+            <input
+              type="text"
+              id="ai_custom_skill_description"
+              name="ai_custom_skill_description"
+              placeholder="One-line description for the AI to decide when to load this skill"
+            />
+          </div>
+          <label for="ai_custom_skill_content">Content:</label>
+          <textarea id="ai_custom_skill_content" name="ai_custom_skill_content" placeholder="Write the skill content in plain text or markdown. The AI receives this verbatim when it loads the skill."></textarea>
+          <div class="ai_custom_skills_actions">
+            <button id="add_ai_custom_skill">Add</button>
+            <button type="button" id="export_ai_custom_skills">Export</button>
+            <button type="button" id="import_ai_custom_skills">Import</button>
+            <input type="file" id="ai_custom_skills_import_file" accept=".json" style="display:none" />
+          </div>
+        </div>
+      </div>
+
+      <div class="optsection">
         <h4 id="title_init_commands">Init Commands</h4>
         <p id="desc_init_commands">
           Run these commands when initialize the terminal (one per line). Be careful! changes here can cause unwanted
