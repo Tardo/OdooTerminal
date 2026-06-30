@@ -13,6 +13,7 @@ import {DEFAULT_MAX_STEPS} from '@ai/constants';
 import {computeContextSize, shouldCompress, compressHistory} from '@ai/utils/compress_history';
 import searchRead from '@odoo/orm/search_read';
 import captureScreenshot from '@ai/utils/capture_screenshot';
+import encodeHTML from '@terminal/utils/encode_html';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -399,8 +400,10 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
           }
         }
 
+        const safeCmd = encodeHTML(cmd);
         ctx.screen.print(
-          i18n.t('cmdAI.agent.result.running', '[Agent] Running: <code>{{cmd}}</code>', {cmd}),
+          i18n.t('cmdAI.agent.result.running', '[Agent] Running: <code>{{cmd}}</code>', {cmd}) +
+            ` <span class='agent-rerun o_terminal_click o_terminal_cmd' data-cmd='${safeCmd}' title='Re-run'><i class='fa fa-repeat'></i></span>`,
           false,
         );
 
