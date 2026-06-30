@@ -1380,7 +1380,11 @@
       "noConversationsHint": "Create a new conversation to start",
       "noModelsHint": "Configure AI models in the extension options",
       "notConnected": "IA no conectada. Usa \"ai connect\" primero.",
-      "privacyWarning": "Aviso de privacidad: las conversaciones se almacenan en el almacenamiento del navegador y pueden ser leídas por cualquier persona con acceso a este ordenador."
+      "privacyWarning": "Aviso de privacidad: las conversaciones se almacenan en el almacenamiento del navegador y pueden ser leídas por cualquier persona con acceso a este ordenador.",
+      "sysprompt": {
+        "label": "Custom instructions",
+        "placeholder": "Extra instructions for the AI in this conversation..."
+      }
     },
     "close": {
       "prevented": "El terminal ha impedido que la pestaña actual se cierre debido a tareas inacabadas:"

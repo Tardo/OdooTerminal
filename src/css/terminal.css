@@ -1016,6 +1016,56 @@
   min-width: 0;
 }
 
+.o_terminal .terminal-ai-sysprompt-btn {
+  color: var(--terminal-color-info);
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  opacity: 0.6;
+}
+.o_terminal .terminal-ai-sysprompt-btn:hover,
+.o_terminal .terminal-ai-sysprompt-btn.terminal-ai-sysprompt-btn-active {
+  color: var(--terminal-color-white);
+  opacity: 1;
+}
+
+.o_terminal .terminal-ai-sysprompt-panel {
+  background-color: color-mix(in srgb, var(--terminal-color-dark), white 3%);
+  border-bottom: 1px solid var(--terminal-color-secondary);
+  display: none;
+  flex-shrink: 0;
+  padding: 6px;
+}
+.o_terminal .terminal-ai-sysprompt-panel.terminal-ai-sysprompt-panel-active {
+  display: block;
+}
+.o_terminal .terminal-ai-sysprompt-label {
+  color: var(--terminal-color-muted);
+  font-size: x-small;
+  font-weight: bold;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.o_terminal .terminal-ai-sysprompt-textarea {
+  background-color: var(--terminal-color-dark);
+  border: 1px solid var(--terminal-color-secondary);
+  border-radius: 3px;
+  color: var(--terminal-color-light);
+  font-family: monospace;
+  font-size: x-small;
+  min-height: 80px;
+  padding: 4px;
+  resize: vertical;
+  width: 100%;
+}
+.o_terminal .terminal-ai-sysprompt-textarea:focus {
+  border-color: var(--terminal-color-info);
+  outline: none;
+}
+.o_terminal .terminal-ai-sysprompt-textarea:disabled {
+  opacity: 0.4;
+}
+
 .o_terminal .terminal-ai-help-btn {
   color: var(--terminal-color-info);
   cursor: pointer;

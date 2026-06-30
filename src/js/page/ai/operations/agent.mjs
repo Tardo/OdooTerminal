@@ -99,6 +99,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     kwargs.timeout !== null && kwargs.timeout !== undefined ? kwargs.timeout : aiState.timeout;
   const maxSteps: number =
     kwargs.max_steps !== null && kwargs.max_steps !== undefined ? kwargs.max_steps : DEFAULT_MAX_STEPS;
+  const customSystemPrompt: ?string = typeof kwargs.custom_system_prompt === 'string' && kwargs.custom_system_prompt.trim() ? kwargs.custom_system_prompt : null;
   // $FlowFixMe[incompatible-type]
   const rawInitialMessages: Array<AIMessage> = Array.isArray(kwargs.initial_messages) ? kwargs.initial_messages : [];
   // Strip stale cache_control markers left by the rolling-breakpoint mechanism
@@ -174,7 +175,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       content: [
         {
           type: 'text',
-          text: buildMainAgentPrompt(this, String(getOdooVersion() ?? ''), maxSteps),
+          text: buildMainAgentPrompt(this, String(getOdooVersion() ?? ''), maxSteps, customSystemPrompt),
           cache_control: {type: 'ephemeral'},
         },
       ],

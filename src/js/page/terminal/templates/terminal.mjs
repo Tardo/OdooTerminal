@@ -22,6 +22,9 @@ export default function (): string {
     "<div class='terminal-ai-sidebar-header'>" +
     "<div class='terminal-ai-sidebar-title-group'>" +
     "<span class='terminal-ai-sidebar-title'>AI</span>" +
+    "<div class='btn btn-sm terminal-ai-sysprompt-btn p-1' role='button' title='Custom system prompt'>" +
+    "<i class='fa fa-sliders'></i>" +
+    '</div>' +
     "<div class='btn btn-sm terminal-ai-help-btn p-1' role='button' title='AI tips'>" +
     "<i class='fa fa-question-circle'></i>" +
     '</div>' +
@@ -29,6 +32,10 @@ export default function (): string {
     "<div class='btn btn-sm terminal-ai-new-conv p-1' role='button' title='New conversation'>" +
     "<i class='fa fa-plus'></i>" +
     '</div>' +
+    '</div>' +
+    "<div id='terminal_ai_sysprompt_panel' class='terminal-ai-sysprompt-panel'>" +
+    "<div class='terminal-ai-sysprompt-label'></div>" +
+    "<textarea id='terminal_ai_sysprompt' class='terminal-ai-sysprompt-textarea' rows='6'></textarea>" +
     '</div>' +
     "<div id='terminal_ai_help_popup' class='terminal-ai-help-popup'></div>" +
     "<div class='terminal-ai-model-selector'>" +

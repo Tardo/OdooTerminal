@@ -127,6 +127,8 @@ export default class Terminal {
   #aiConvList_el: HTMLElement | void;
   #aiModelSelect_el: HTMLSelectElement | void;
   #aiHelpPopup_el: HTMLElement | void;
+  #aiSyspromptPanel_el: HTMLElement | void;
+  #aiSyspromptTextarea_el: HTMLTextAreaElement | void;
   #aiInputHistory: Array<string> = [];
   #pendingAttachments: Array<AIAttachment> = [];
 
@@ -215,6 +217,8 @@ export default class Terminal {
     // $FlowFixMe[method-unbinding]
     this.el.querySelector('.terminal-ai-new-conv')?.addEventListener('click', this.#onClickNewAIConv.bind(this));
     // $FlowFixMe[method-unbinding]
+    this.el.querySelector('.terminal-ai-sysprompt-btn')?.addEventListener('click', this.#onClickToggleSyspromptPanel.bind(this));
+    // $FlowFixMe[method-unbinding]
     this.el.querySelector('.terminal-ai-help-btn')?.addEventListener('click', this.#onClickAIHelp.bind(this));
     // $FlowFixMe[method-unbinding]
     this.el.querySelector('#terminal_ai_conv_list')?.addEventListener('click', this.#onClickAIConvList.bind(this));
@@ -237,6 +241,21 @@ export default class Terminal {
     if (aiHelpPopupEl instanceof HTMLElement) {
       this.#aiHelpPopup_el = aiHelpPopupEl;
     }
+    const aiSyspromptPanelEl = this.el.querySelector('#terminal_ai_sysprompt_panel');
+    if (aiSyspromptPanelEl instanceof HTMLElement) {
+      this.#aiSyspromptPanel_el = aiSyspromptPanelEl;
+      const label = aiSyspromptPanelEl.querySelector('.terminal-ai-sysprompt-label');
+      if (label) {
+        label.textContent = i18n.t('terminal.ai.sysprompt.label', 'Custom instructions');
+      }
+    }
+    const aiSyspromptTextareaEl = this.el.querySelector('#terminal_ai_sysprompt');
+    if (aiSyspromptTextareaEl instanceof HTMLTextAreaElement) {
+      this.#aiSyspromptTextarea_el = aiSyspromptTextareaEl;
+      aiSyspromptTextareaEl.placeholder = i18n.t('terminal.ai.sysprompt.placeholder', 'Extra instructions for the AI in this conversation...');
+      // $FlowFixMe[method-unbinding]
+      aiSyspromptTextareaEl.addEventListener('input', this.#onInputSysprompt.bind(this));
+    }
     this.#populateAIModelSelector();
     this.#isAIMode = getStorageSessionItem('terminal_ai_mode', false);
     this.#activeConvId = getStorageSessionItem('terminal_ai_active_conv', null);
@@ -251,6 +270,7 @@ export default class Terminal {
         this.#loadAIHistory(this.#activeConvId);
       }
       this.#renderAIConvList();
+      this.#syncSyspromptPanel();
     }
     this.#updateAIIdleEffect();
 
@@ -1255,6 +1275,7 @@ export default class Terminal {
           this.#searchHistoryQuery = '';
         }
         this.screen.setInputDisabled(activeId === null);
+        this.#syncSyspromptPanel();
       } else {
         this.el.classList.remove('terminal-ai-mode');
         target.classList.remove('btn-light');
@@ -1302,6 +1323,47 @@ export default class Terminal {
     }
   }
 
+  #onClickToggleSyspromptPanel() {
+    const panel = this.#aiSyspromptPanel_el;
+    const btn = this.el.querySelector('.terminal-ai-sysprompt-btn');
+    if (!panel) {
+      return;
+    }
+    const isActive = panel.classList.contains('terminal-ai-sysprompt-panel-active');
+    if (isActive) {
+      panel.classList.remove('terminal-ai-sysprompt-panel-active');
+      btn?.classList.remove('terminal-ai-sysprompt-btn-active');
+    } else {
+      panel.classList.add('terminal-ai-sysprompt-panel-active');
+      btn?.classList.add('terminal-ai-sysprompt-btn-active');
+      this.#aiSyspromptTextarea_el?.focus();
+    }
+  }
+
+  #onInputSysprompt() {
+    const convId = this.#activeConvId;
+    if (convId === null) {
+      return;
+    }
+    const text = this.#aiSyspromptTextarea_el?.value ?? '';
+    this.saveConvSystemPrompt(convId, text);
+  }
+
+  #syncSyspromptPanel() {
+    const textarea = this.#aiSyspromptTextarea_el;
+    if (!textarea) {
+      return;
+    }
+    const convId = this.#activeConvId;
+    if (convId === null) {
+      textarea.value = '';
+      textarea.disabled = true;
+    } else {
+      textarea.value = this.getConvSystemPrompt(convId);
+      textarea.disabled = false;
+    }
+  }
+
   #onClickNewAIConv() {
     this.#saveCurrentScreenSnapshot();
     this.screen.clean();
@@ -1309,6 +1371,7 @@ export default class Terminal {
     this.#searchHistoryIter = 0;
     this.#searchHistoryQuery = '';
     this.createAIConversation(i18n.t('terminal.ai.newConversation', 'New conversation'));
+    this.#syncSyspromptPanel();
     this.screen.print(
       i18n.t('terminal.ai.experimentalWarning', 'This mode is experimental; use it with extreme caution.'),
       false,
@@ -1355,6 +1418,7 @@ export default class Terminal {
       this.#saveConversations(convs);
       removeStorageLocalItem(`terminal_ai_conv_${convId}`);
       removeStorageLocalItem(`terminal_ai_history_${convId}`);
+      removeStorageLocalItem(`terminal_ai_sysprompt_${convId}`);
       removeStorageSessionItem(`terminal_ai_screen_${convId}`);
       if (this.#activeConvId === convId) {
         const nextId = convs.length > 0 ? convs[0].id : null;
@@ -1374,6 +1438,7 @@ export default class Terminal {
         }
         this.screen.setInputDisabled(nextId === null);
         this.#updateAIIdleEffect();
+        this.#syncSyspromptPanel();
       }
       this.#renderAIConvList();
     } else if (convId !== this.#activeConvId) {
@@ -1388,6 +1453,7 @@ export default class Terminal {
       }
       this.#renderAIConvList();
       this.#updateAIIdleEffect();
+      this.#syncSyspromptPanel();
       this.screen.preventLostInputFocus();
     }
   }
@@ -1402,6 +1468,18 @@ export default class Terminal {
 
   saveConvMessages(id: string, messages: Array<AIMessage>) {
     setStorageLocalItem(`terminal_ai_conv_${id}`, messages, err => this.screen.printError(err));
+  }
+
+  getConvSystemPrompt(id: string): string {
+    return getStorageLocalItem(`terminal_ai_sysprompt_${id}`, '');
+  }
+
+  saveConvSystemPrompt(id: string, text: string) {
+    if (text) {
+      setStorageLocalItem(`terminal_ai_sysprompt_${id}`, text, err => this.screen.printError(err));
+    } else {
+      removeStorageLocalItem(`terminal_ai_sysprompt_${id}`);
+    }
   }
 
   updateConvName(id: string, name: string) {

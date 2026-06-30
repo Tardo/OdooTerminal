@@ -138,6 +138,7 @@ export default class OdooTerminal extends Terminal {
 
     const history: Array<AIMessage> = this.getConvMessages(convId);
     const isFirstMessage = history.length === 0;
+    const customSystemPrompt = this.getConvSystemPrompt(convId);
 
     let updatedHistory: Array<AIMessage>;
     this._setAIWorking(true);
@@ -145,7 +146,7 @@ export default class OdooTerminal extends Terminal {
       // $FlowFixMe[class-object-subtyping]
       updatedHistory = await cmdAIAgent.call(
         this,
-        {prompt: input, model: null, timeout: null, max_steps: null, max_verifications: null, initial_messages: history, attachments},
+        {prompt: input, model: null, timeout: null, max_steps: null, max_verifications: null, initial_messages: history, attachments, custom_system_prompt: customSystemPrompt},
         {screen: this.screen},
       );
     } catch (err) {

@@ -11,6 +11,8 @@ ADD: AI Mode: Help button
 ADD: AI Mode: Auto-compress history
 ADD: AI Mode: Files management
 ADD: AI Mode: Take screenshots
+ADD: AI Mode: Re-run scripts/commands
+ADD: AI Mode: Custom prompt
 ADD: Command 'click'
 ADD: Command 'inspect'
 ADD: Command 'fill'

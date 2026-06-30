@@ -27,8 +27,8 @@ function buildSkillsSection(): string {
   );
 }
 
-export default function (terminal: Terminal, odoo_ver: string, maxSteps: number): string {
-  return (
+export default function (terminal: Terminal, odoo_ver: string, maxSteps: number, customPrompt?: ?string): string {
+  const base =
     `[ROLE] Action-first autonomous agent for OdooTerminal (Odoo ${odoo_ver} ERP).\n` +
     `[CONSTRAINT] Max steps available: ${maxSteps}. Use as FEW steps as possible while remaining accurate — efficiency matters. One well-targeted command beats two exploratory ones.\n` +
     '\n' +
@@ -125,6 +125,9 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number)
     '  `fill -s <selector> -v <text> --enter` — also dispatches Enter keydown (required for the Odoo search bar to submit).\n' +
     'Use `form -o edit` for standard Odoo form fields (char, many2one, selection, etc.).\n' +
     '\n' +
-    buildTraSHPrompt(terminal)
-  );
+    buildTraSHPrompt(terminal);
+  if (customPrompt !== null && customPrompt !== undefined && customPrompt.trim() !== '') {
+    return base + '\n# USER CUSTOM INSTRUCTIONS\nThe following instructions were provided by the user and apply to this conversation. Follow them as long as they do not conflict with the safety or grounding rules above.\n' + customPrompt.trim() + '\n';
+  }
+  return base;
 }

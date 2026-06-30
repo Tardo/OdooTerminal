@@ -1380,7 +1380,11 @@
       "noConversationsHint": "Create a new conversation to start",
       "noModelsHint": "Configure AI models in the extension options",
       "notConnected": "AI not connected. Use \"ai connect\" first.",
-      "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer."
+      "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.",
+      "sysprompt": {
+        "label": "Custom instructions",
+        "placeholder": "Extra instructions for the AI in this conversation..."
+      }
     },
     "close": {
       "prevented": "The terminal has prevented the current tab from closing due to unfinished tasks:"
