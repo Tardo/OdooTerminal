@@ -67,7 +67,7 @@ function sanitizeArgumentValue(val: mixed, arg_type: number): mixed {
     return [val];
   }
 
-  return (typeof val === 'string') ? ARG.cast(val.trim(), arg_type) : val;
+  return (typeof val === 'string') ? ARG.cast(val, arg_type) : val;
 }
 
 function checkArgumentValueType(val: mixed, arg_type: number) {

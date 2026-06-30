@@ -2,11 +2,10 @@
 
 export default `
 function arr_clone(arr: List | Any) {
-  # Clone an array
   $res = []
   $len = $arr['length']
   for ($i = 0; $i < $len; $i += 1) {
-    $res[$i] = $arr[$i]
+    arr_append $res $arr[$i]
   }
   return $res
 }
@@ -16,7 +15,7 @@ function arr_append(arr: List | Any, item) {
 }
 
 function arr_prepend(arr: List | Any, item) {
-  for ($i = $arr['length']; $i >= 1; $i += 1) {
+  for ($i = $arr['length']; $i >= 1; $i -= 1) {
     $arr[$i] = $arr[$i - 1]
   }
   $arr[0] = $item

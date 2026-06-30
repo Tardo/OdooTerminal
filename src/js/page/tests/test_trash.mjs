@@ -413,4 +413,153 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.getShell().eval(code);
     this.assertEqual(results, 12);
   }
+
+  async test_trash_str_funcs() {
+    // str_split
+    let results = await this.terminal.getShell().eval("str_split -s 'hello,world' -d ','");
+    this.assertEqual(results[0], 'hello');
+    this.assertEqual(results[1], 'world');
+    results = await this.terminal.getShell().eval("str_split -s 'a,b,c' -d ','");
+    this.assertEqual(results.length, 3);
+    this.assertEqual(results[1], 'b');
+
+    // str_upper
+    results = await this.terminal.getShell().eval("str_upper -s 'hello'");
+    this.assertEqual(results, 'HELLO');
+    results = await this.terminal.getShell().eval("str_upper -s 'Hello World'");
+    this.assertEqual(results, 'HELLO WORLD');
+
+    // str_lower
+    results = await this.terminal.getShell().eval("str_lower -s 'HELLO WORLD'");
+    this.assertEqual(results, 'hello world');
+    results = await this.terminal.getShell().eval("str_lower -s 'Hello'");
+    this.assertEqual(results, 'hello');
+
+    // str_trim
+    results = await this.terminal.getShell().eval("str_trim -s '  hello  '");
+    this.assertEqual(results, 'hello');
+    results = await this.terminal.getShell().eval("str_trim -s 'no spaces'");
+    this.assertEqual(results, 'no spaces');
+
+    // str_replace — first occurrence only
+    results = await this.terminal.getShell().eval("str_replace -s 'hello world' -f 'o' -r '0'");
+    this.assertEqual(results, 'hell0 world');
+    // str_replace — all occurrences
+    results = await this.terminal.getShell().eval("str_replace -s 'hello world' -f 'o' -r '0' -a");
+    this.assertEqual(results, 'hell0 w0rld');
+
+    // str_slice — from index
+    results = await this.terminal.getShell().eval("str_slice -s 'hello world' -b 6");
+    this.assertEqual(results, 'world');
+    // str_slice — with end index
+    results = await this.terminal.getShell().eval("str_slice -s 'hello world' -b 0 -e 5");
+    this.assertEqual(results, 'hello');
+    // str_slice — middle slice
+    results = await this.terminal.getShell().eval("str_slice -s 'hello world' -b 3 -e 8");
+    this.assertEqual(results, 'lo wo');
+
+    // str_includes
+    results = await this.terminal.getShell().eval("str_includes -s 'hello world' -n 'world'");
+    this.assertTrue(results);
+    results = await this.terminal.getShell().eval("str_includes -s 'hello world' -n 'xyz'");
+    this.assertFalse(results);
+
+    // str_starts
+    results = await this.terminal.getShell().eval("str_starts -s 'hello world' -p 'hello'");
+    this.assertTrue(results);
+    results = await this.terminal.getShell().eval("str_starts -s 'hello world' -p 'world'");
+    this.assertFalse(results);
+
+    // str_ends
+    results = await this.terminal.getShell().eval("str_ends -s 'hello world' -u 'world'");
+    this.assertTrue(results);
+    results = await this.terminal.getShell().eval("str_ends -s 'hello world' -u 'hello'");
+    this.assertFalse(results);
+  }
+
+  async test_trash_math_funcs() {
+    // floor
+    let results = await this.terminal.getShell().eval("floor -n 3.7");
+    this.assertEqual(results, 3);
+    results = await this.terminal.getShell().eval("floor -n 3.0");
+    this.assertEqual(results, 3);
+
+    // fixed — toFixed(d) then parseInt
+    results = await this.terminal.getShell().eval("fixed -n 3.7 -d 0");
+    this.assertEqual(results, 4);
+    results = await this.terminal.getShell().eval("fixed -n 3.2 -d 0");
+    this.assertEqual(results, 3);
+
+    // rand
+    results = await this.terminal.getShell().eval("rand -mi 5 -ma 10");
+    this.assertTrue(results >= 5 && results <= 10);
+    results = await this.terminal.getShell().eval("rand -mi 42 -ma 42");
+    this.assertEqual(results, 42);
+
+    // abs
+    results = await this.terminal.getShell().eval("abs -n 5");
+    this.assertEqual(results, 5);
+    results = await this.terminal.getShell().eval("abs -n 0");
+    this.assertEqual(results, 0);
+
+    // pow
+    results = await this.terminal.getShell().eval("pow -b 2 -e 5");
+    this.assertEqual(results, 32);
+    results = await this.terminal.getShell().eval("pow -b 3 -e 3");
+    this.assertEqual(results, 27);
+    results = await this.terminal.getShell().eval("pow -b 5 -e 0");
+    this.assertEqual(results, 1);
+  }
+
+  async test_trash_ende_funcs() {
+    // encode b64
+    let results = await this.terminal.getShell().eval("encode -v 'hello' -m b64");
+    this.assertEqual(results, 'aGVsbG8=');
+    // decode b64
+    results = await this.terminal.getShell().eval("decode -v 'aGVsbG8=' -m b64");
+    this.assertEqual(results, 'hello');
+    // round-trip
+    results = await this.terminal.getShell().eval("decode -v (encode -v 'test string' -m b64) -m b64");
+    this.assertEqual(results, 'test string');
+  }
+
+  async test_trash_time_funcs() {
+    // pnow returns a positive number
+    const ts = await this.terminal.getShell().eval("pnow");
+    this.assertTrue(typeof ts === 'number' && ts > 0);
+    // sleep resolves without error
+    await this.terminal.getShell().eval("sleep -t 50");
+  }
+
+  async test_trash_array_stdlib() {
+    // arr_clone — verify the clone contains the same elements
+    let results = await this.terminal.getShell().eval("$ac = [1, 2, 3]; $bc = (arr_clone $ac); $bc");
+    this.assertEqual(results[0], 1);
+    this.assertEqual(results[1], 2);
+    this.assertEqual(results[2], 3);
+    // modifying the clone must not affect the original (use arr_append to avoid indexed-assign on clone)
+    results = await this.terminal.getShell().eval("arr_append $bc 99; $ac");
+    this.assertEqual(results.length, 3);
+
+    // arr_prepend
+    results = await this.terminal.getShell().eval("$ap = [2, 3]; arr_prepend $ap 1; $ap");
+    this.assertEqual(results[0], 1);
+    this.assertEqual(results[1], 2);
+    this.assertEqual(results[2], 3);
+    this.assertEqual(results.length, 3);
+    // prepend to empty array
+    results = await this.terminal.getShell().eval("$ape = []; arr_prepend $ape 42; $ape");
+    this.assertEqual(results[0], 42);
+    this.assertEqual(results.length, 1);
+
+    // arr_join with separator
+    results = await this.terminal.getShell().eval("arr_join [1, 2, 3] ','");
+    this.assertEqual(results, '1,2,3');
+    // arr_join with multi-char separator
+    results = await this.terminal.getShell().eval("arr_join ['a', 'b', 'c'] '|'");
+    this.assertEqual(results, 'a|b|c');
+    // arr_join with default empty separator
+    results = await this.terminal.getShell().eval("arr_join ['x', 'y', 'z']");
+    this.assertEqual(results, 'xyz');
+  }
 }
