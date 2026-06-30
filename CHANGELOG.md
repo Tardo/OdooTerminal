@@ -26,6 +26,7 @@ IMP: Options page
 IMP: AI Mode: instance skill
 
 FIX: TraSH: Escaped strings
+FIX: TraSH: Trim strings
 FIX: AI Mode: Cache
 
 UPD: Documentation
