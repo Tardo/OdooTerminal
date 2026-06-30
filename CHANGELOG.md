@@ -4,6 +4,29 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ---
 
+**13.1.0**
+
+```
+ADD: AI Mode: Help button
+ADD: AI Mode: Auto-compress history
+ADD: AI Mode: Files management
+ADD: AI Mode: Take screenshots
+ADD: Command 'click'
+ADD: Command 'inspect'
+ADD: Command 'fill'
+
+IMP: Command 'form': get, edit, save, clear operations
+IMP: Command 'read_group': Print output
+IMP: TraSH: Performance
+IMP: Options page
+
+FIX: TraSH: Escaped strings
+FIX: AI Mode: Cache
+
+UPD: Documentation
+
+```
+
 **13.0.0**
 
 ```
