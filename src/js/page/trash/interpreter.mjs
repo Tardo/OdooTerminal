@@ -7,13 +7,14 @@ import {
   INSTRUCTION_TYPE,
   KEYWORDS,
   LEXER,
-  LEXERDATA,
-  LEXERDATA_EXTENDED,
-  LEXER_MATH_OPER,
+  LEXERDATA_SET,
+  LEXERDATA_EXTENDED_SET,
+  LEXER_MATH_OPER_SET,
   MATH_OPER_PRIORITIES,
   SYMBOLS,
-  SYMBOLS_MATH_OPER_COMPLEX,
-  SYMBOLS_MATH_OPER,
+  SYMBOLS_MATH_OPER_SET,
+  SYMBOLS_MATH_OPER_FIRST_CHARS,
+  SYMBOLS_MATH_OPER_COMPLEX_FIRST_CHARS,
   ARG,
 } from './constants';
 import Instruction from './instruction';
@@ -209,14 +210,14 @@ export default class Interpreter {
               char === SYMBOLS.EOC ||
               char === SYMBOLS.EOL ||
               (char === SYMBOLS.VARIABLE && prev_char !== SYMBOLS.VARIABLE) ||
-              (char === SYMBOLS.ASSIGNMENT && prev_char !== SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.filter(item => item.startsWith(prev_char)).length) ||
+              (char === SYMBOLS.ASSIGNMENT && prev_char !== SYMBOLS.ASSIGNMENT && (prev_char === '' || !SYMBOLS_MATH_OPER_FIRST_CHARS.has(prev_char))) ||
               (char === SYMBOLS.NOT && prev_char !== SYMBOLS.NOT) ||
-              (SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && !SYMBOLS_MATH_OPER_COMPLEX.filter(item => item.startsWith(prev_char)).length && !value.startsWith(SYMBOLS.ARGUMENT)) ||
+              (SYMBOLS_MATH_OPER_FIRST_CHARS.has(char) && (prev_char === '' || !SYMBOLS_MATH_OPER_COMPLEX_FIRST_CHARS.has(prev_char)) && !value.startsWith(SYMBOLS.ARGUMENT)) ||
               prev_char === SYMBOLS.EOC ||
               prev_char === SYMBOLS.EOL ||
-              (char !== SYMBOLS.ASSIGNMENT && prev_char === SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER.includes(value)) ||
+              (char !== SYMBOLS.ASSIGNMENT && prev_char === SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER_SET.has(value)) ||
               (char !== SYMBOLS.NOT && prev_char === SYMBOLS.NOT && char !== SYMBOLS.NOT_EQUAL[1]) ||
-              (!SYMBOLS_MATH_OPER.filter(item => item.startsWith(char)).length && SYMBOLS_MATH_OPER.includes(value) && (isNumber(char) || char === SYMBOLS.VARIABLE))
+              (!SYMBOLS_MATH_OPER_FIRST_CHARS.has(char) && SYMBOLS_MATH_OPER_SET.has(value) && (isNumber(char) || char === SYMBOLS.VARIABLE))
             ) {
               do_cut = true;
             } else if (
@@ -271,43 +272,44 @@ export default class Interpreter {
     return tokens_info;
   }
 
+  #isDict(stoken: string): boolean {
+    let depth = 0;
+    let inStr = '';
+    let escapeNext = false;
+    const slen = stoken.length;
+    if (slen === 0) {
+      return true;
+    }
+    for (let i = 0; i < slen; ++i) {
+      const ch = stoken[i];
+      const isEscaped = escapeNext;
+      escapeNext = ch === SYMBOLS.ESCAPE && !isEscaped && Boolean(inStr);
+      if (!isEscaped) {
+        if (ch === SYMBOLS.STRING || ch === SYMBOLS.STRING_SIMPLE) {
+          if (inStr === ch) {
+            inStr = '';
+          } else if (!inStr) {
+            inStr = ch;
+          }
+        } else if (!inStr) {
+          if (ch === SYMBOLS.BLOCK_START || ch === SYMBOLS.ARRAY_START || ch === SYMBOLS.LOGIC_BLOCK_START) {
+            ++depth;
+          } else if (ch === SYMBOLS.BLOCK_END || ch === SYMBOLS.ARRAY_END || ch === SYMBOLS.LOGIC_BLOCK_END) {
+            --depth;
+          } else if (ch === SYMBOLS.DICTIONARY_SEPARATOR && depth === 0) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   /**
    * Classify tokens
    * @param {Array} tokens
    */
   #lexer(token: string, next_char: string | void, prev_token_info: LexerInfo | void, prev_token_info_no_space: LexerInfo | void, options: ParserOptions): LexerInfo {
-    const isDict = (stoken: string) => {
-      let depth = 0;
-      let inStr = '';
-      let escapeNext = false;
-      const slen = stoken.length;
-      if (slen === 0) {
-        return true;
-      }
-      for (let i = 0; i < slen; ++i) {
-        const ch = stoken[i];
-        const isEscaped = escapeNext;
-        escapeNext = ch === SYMBOLS.ESCAPE && !isEscaped && Boolean(inStr);
-        if (!isEscaped) {
-          if (ch === SYMBOLS.STRING || ch === SYMBOLS.STRING_SIMPLE) {
-            if (inStr === ch) {
-              inStr = '';
-            } else if (!inStr) {
-              inStr = ch;
-            }
-          } else if (!inStr) {
-            if (ch === SYMBOLS.BLOCK_START || ch === SYMBOLS.ARRAY_START || ch === SYMBOLS.LOGIC_BLOCK_START) {
-              ++depth;
-            } else if (ch === SYMBOLS.BLOCK_END || ch === SYMBOLS.ARRAY_END || ch === SYMBOLS.LOGIC_BLOCK_END) {
-              --depth;
-            } else if (ch === SYMBOLS.DICTIONARY_SEPARATOR && depth === 0) {
-              return true;
-            }
-          }
-        }
-      }
-      return false;
-    };
     const delimiter = options.delimiter ?? SYMBOLS.ITEM_DELIMITER;
     let token_san = token.trim();
     let ttype = LEXER.String;
@@ -375,7 +377,7 @@ export default class Interpreter {
     } else if (token_san[0] === SYMBOLS.BLOCK_START && token_san.at(-1) === SYMBOLS.BLOCK_END) {
       token_san = token_san.substr(1, token_san.length - 2);
       token_san = token_san.trim();
-      if (isDict(token_san)) {
+      if (this.#isDict(token_san)) {
         ttype = LEXER.Dictionary;
       } else {
         ttype = LEXER.Block;
@@ -425,7 +427,7 @@ export default class Interpreter {
       ttype = LEXER.Add;
     } else if (token_san === SYMBOLS.SUBSTRACT) {
       // FIXME: This is a bit crazy :)
-      if ((!prev_token_info || (prev_token_info && (prev_token_info[0] === LEXER.Space || (!isNumber(prev_token_info[1]) && prev_token_info[0] !== LEXER.Variable && prev_token_info[0] !== LEXER.LogicBlock)))) && next_char !== SYMBOLS.SPACE && (next_char === SYMBOLS.VARIABLE || next_char === SYMBOLS.LOGIC_BLOCK_START || isNumber(next_char) || (prev_token_info_no_space && LEXER_MATH_OPER.includes(prev_token_info_no_space[0])))) {
+      if ((!prev_token_info || (prev_token_info && (prev_token_info[0] === LEXER.Space || (!isNumber(prev_token_info[1]) && prev_token_info[0] !== LEXER.Variable && prev_token_info[0] !== LEXER.LogicBlock)))) && next_char !== SYMBOLS.SPACE && (next_char === SYMBOLS.VARIABLE || next_char === SYMBOLS.LOGIC_BLOCK_START || isNumber(next_char) || (prev_token_info_no_space && LEXER_MATH_OPER_SET.has(prev_token_info_no_space[0])))) {
         ttype = LEXER.Negative;
       } else {
         ttype = LEXER.Substract;
@@ -441,7 +443,7 @@ export default class Interpreter {
     }
 
     if (ttype === LEXER.String || ttype === LEXER.StringSimple) {
-      if (typeof prev_token_info !== 'undefined' && LEXERDATA_EXTENDED.includes(prev_token_info[0])) {
+      if (typeof prev_token_info !== 'undefined' && LEXERDATA_EXTENDED_SET.has(prev_token_info[0])) {
         ttype = LEXER.Unknown;
       }
       token_san = this.#unescapeString(this.#trimQuotes(token_san));
@@ -452,7 +454,7 @@ export default class Interpreter {
   #getDataInstructions(tokens: Array<LexerInfo>, from: number, inverse_search: boolean): Array<LexerInfo> {
     const data_tokens = [];
     const push_token = function (token: LexerInfo) {
-      if (token[0] === LEXER.String || token[0] === LEXER.StringSimple || !LEXERDATA_EXTENDED.includes(token[0])) {
+      if (token[0] === LEXER.String || token[0] === LEXER.StringSimple || !LEXERDATA_EXTENDED_SET.has(token[0])) {
         return false;
       }
       data_tokens.push(token);
@@ -488,8 +490,14 @@ export default class Interpreter {
    * Maybe one day 'Shunting Yard Algorithm' will be used here... :/
    */
   #prioritizer(tokens: Array<LexerInfo>): Array<LexerInfo> {
-    const tokens_math_oper = tokens.filter(item => LEXER_MATH_OPER.includes(item[0]));
-    if (tokens_math_oper.length <= 1) {
+    let math_oper_count = 0;
+    for (let i = 0; i < tokens.length; ++i) {
+      if (LEXER_MATH_OPER_SET.has(tokens[i][0])) {
+        ++math_oper_count;
+        if (math_oper_count > 1) break;
+      }
+    }
+    if (math_oper_count <= 1) {
       return tokens;
     }
     let tokens_no_spaces = tokens.filter(item => item[0] !== LEXER.Space);
@@ -1222,8 +1230,11 @@ export default class Interpreter {
               res,
               to_append,
             );
-            const dindex =
-              parsed_array.inputTokens[0].filter(item => LEXERDATA.includes(item.type)).length - parsed_array.inputTokens[0].filter(item => LEXER_MATH_OPER.includes(item.type)).length;
+            let dindex = 0;
+            for (const item of parsed_array.inputTokens[0]) {
+              if (LEXERDATA_SET.has(item.type)) ++dindex;
+              if (LEXER_MATH_OPER_SET.has(item.type)) --dindex;
+            }
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.BUILD_LIST, index, level, dindex));
           }
           break;
@@ -1241,8 +1252,11 @@ export default class Interpreter {
               res,
               to_append,
             );
-            let dindex =
-              parsed_dict.inputTokens[0].filter(item => LEXERDATA.includes(item.type)).length - parsed_dict.inputTokens[0].filter(item => LEXER_MATH_OPER.includes(item.type)).length;
+            let dindex = 0;
+            for (const item of parsed_dict.inputTokens[0]) {
+              if (LEXERDATA_SET.has(item.type)) ++dindex;
+              if (LEXER_MATH_OPER_SET.has(item.type)) --dindex;
+            }
             dindex = parseInt(dindex / 2, 10);
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.BUILD_MAP, index, level, dindex));
           }

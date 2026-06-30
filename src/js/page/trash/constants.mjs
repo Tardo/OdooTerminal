@@ -78,6 +78,8 @@ export const LEXER_MATH_OPER = [
   LEXER.LessThanClosed,
 ];
 
+export const LEXER_MATH_OPER_SET: $ReadOnlySet<number> = new Set(LEXER_MATH_OPER);
+
 export const LEXERDATA = [
   LEXER.Variable,
   LEXER.VariableCall,
@@ -96,6 +98,9 @@ export const LEXERDATA_EXTENDED: Array<number> = LEXERDATA.concat([
   LEXER.Positive,
   LEXER.Not,
 ]);
+
+export const LEXERDATA_SET: $ReadOnlySet<number> = new Set(LEXERDATA);
+export const LEXERDATA_EXTENDED_SET: $ReadOnlySet<number> = new Set(LEXERDATA_EXTENDED);
 
 export const INSTRUCTION_TYPE = {
   LOAD_NAME: 1,
@@ -290,6 +295,10 @@ export const SYMBOLS_MATH_OPER: $ReadOnlyArray<string> = [
   SYMBOLS.MODULO,
   ...SYMBOLS_MATH_OPER_COMPLEX,
 ];
+
+export const SYMBOLS_MATH_OPER_SET: $ReadOnlySet<string> = new Set(SYMBOLS_MATH_OPER);
+export const SYMBOLS_MATH_OPER_FIRST_CHARS: $ReadOnlySet<string> = new Set(SYMBOLS_MATH_OPER.map(s => s[0]));
+export const SYMBOLS_MATH_OPER_COMPLEX_FIRST_CHARS: $ReadOnlySet<string> = new Set(SYMBOLS_MATH_OPER_COMPLEX.map(s => s[0]));
 
 export const SYMBOLS_MATH_SIGN = [SYMBOLS.ADD, SYMBOLS.SUBSTRACT];
 
