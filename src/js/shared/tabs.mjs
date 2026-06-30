@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ubrowser} from './constants.mjs';
+import {ubrowser} from './constants';
 
 export function sendInternalMessage(tab_id: number, message: mixed) {
   ubrowser.tabs.sendMessage(tab_id, {message: message});

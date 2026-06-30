@@ -5,8 +5,7 @@
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import postMessage from '@common/utils/post_message';
-// $FlowFixMe[untyped-import]
-import Recordset from '@terminal/core/recordset.mjs';
+import Recordset from '@terminal/core/recordset';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 

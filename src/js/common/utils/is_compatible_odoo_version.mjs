@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {COMPATIBLE_VERSIONS} from '@common/constants.mjs';
+import {COMPATIBLE_VERSIONS} from '@common/constants';
 
 export default function (version: string): boolean {
   if (!version) {

@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ubrowser} from './constants.mjs';
+import {ubrowser} from './constants';
 
 // $FlowFixMe[unclear-type]
 export function getStorageSync(keys: $ReadOnlyArray<string>): Promise<Object> {

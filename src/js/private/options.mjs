@@ -7,7 +7,7 @@ import '@css/options.css';
 import processKeybind from '@common/utils/process_keybind';
 import {ubrowser} from '@shared/constants';
 import {getStorageSync, setStorageSync} from '@shared/storage';
-import {IGNORED_KEYS, SETTING_DEFAULTS, SETTING_NAMES, SETTING_TYPES, THEMES} from '../common/constants.mjs';
+import {IGNORED_KEYS, SETTING_DEFAULTS, SETTING_NAMES, SETTING_TYPES, THEMES} from '../common/constants';
 
 // $FlowFixMe[unclear-type]
 export type EventCallback = (ev: any) => Promise<void> | void;

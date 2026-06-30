@@ -8,11 +8,10 @@ import postMessage from '@common/utils/post_message';
 import searchCount from '@odoo/orm/search_count';
 import createRecord from '@odoo/orm/create_record';
 import writeRecord from '@odoo/orm/write_record';
-// $FlowFixMe[untyped-import]
-import Recordset from '@terminal/core/recordset.mjs';
+import Recordset from '@terminal/core/recordset';
 import isEmpty from '@trash/utils/is_empty';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
-import type {RecordDef} from '@terminal/core/recordset.mjs';
+import type {RecordDef} from '@terminal/core/recordset';
 import type Terminal from '@terminal/terminal';
 import type {MessageListenerData} from '@terminal/terminal';
 

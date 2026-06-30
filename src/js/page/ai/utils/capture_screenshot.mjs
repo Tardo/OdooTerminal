@@ -3,8 +3,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import postMessage from '@common/utils/post_message';
-import type Terminal from '@terminal/terminal.mjs';
-import type {MessageListenerData} from '@terminal/terminal.mjs';
+import type Terminal from '@terminal/terminal';
+import type {MessageListenerData} from '@terminal/terminal';
 
 
 export default function captureScreenshot(terminal: Terminal, crop: ?(string | HTMLElement)): Promise<string> {

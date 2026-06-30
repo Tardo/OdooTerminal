@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {IGNORED_KEYS} from '@common/constants.mjs';
+import {IGNORED_KEYS} from '@common/constants';
 
 export default function (e: KeyboardEvent): Array<string> {
   const keybind = [];

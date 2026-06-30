@@ -10,7 +10,7 @@ import isFalsy from './utils/is_falsy';
 import type {ArgDef, ArgInfo, CMDDef, ParseInfo} from './interpreter';
 import type {default as VMachine, EvalOptions} from './vmachine';
 import type Frame from './frame';
-import { FUNCTION_TYPE } from './function.mjs';
+import { FUNCTION_TYPE } from './function';
 
 /**
  * Resolve argument information
