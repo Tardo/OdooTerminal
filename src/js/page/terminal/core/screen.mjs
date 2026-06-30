@@ -689,7 +689,7 @@ export default class Screen {
     const uploadBtn = document.createElement('button');
     uploadBtn.className = 'terminal-ai-attach-submenu-item';
     uploadBtn.type = 'button';
-    uploadBtn.innerHTML = "<i class='fa fa-upload'></i> " + i18n.t('terminal.ai.attachUpload', 'Upload file');
+    uploadBtn.append(...Array.from(parseHTML(`<span><i class='fa fa-upload'></i> ${i18n.t('terminal.ai.attachUpload', 'Upload file')}</span>`).childNodes));
     uploadBtn.addEventListener('click', () => {
       this.#closeAttachMenu();
       if (Object.hasOwn(this.#options, 'onAttachFile') && typeof this.#options.onAttachFile === 'function') {
@@ -704,7 +704,7 @@ export default class Screen {
 
     const groupHeader = document.createElement('div');
     groupHeader.className = 'terminal-ai-attach-submenu-group-header';
-    groupHeader.innerHTML = "<i class='fa fa-camera'></i> " + i18n.t('terminal.ai.attachScreenshot', 'Screenshot') + " <i class='fa fa-caret-left'></i>";
+    groupHeader.append(...Array.from(parseHTML(`<span><i class='fa fa-camera'></i> ${i18n.t('terminal.ai.attachScreenshot', 'Screenshot')} <i class='fa fa-caret-right'></i></span>`).childNodes));
     screenshotGroup.append(groupHeader);
 
     const subMenu = document.createElement('div');
@@ -713,7 +713,7 @@ export default class Screen {
     const viewportBtn = document.createElement('button');
     viewportBtn.className = 'terminal-ai-attach-submenu-item';
     viewportBtn.type = 'button';
-    viewportBtn.innerHTML = "<i class='fa fa-desktop'></i> " + i18n.t('terminal.ai.attachScreenshotViewport', 'Full viewport');
+    viewportBtn.append(...Array.from(parseHTML(`<span><i class='fa fa-desktop'></i> ${i18n.t('terminal.ai.attachScreenshotViewport', 'Full viewport')}</span>`).childNodes));
     viewportBtn.addEventListener('click', () => {
       this.#closeAttachMenu();
       if (Object.hasOwn(this.#options, 'onScreenshotViewport') && typeof this.#options.onScreenshotViewport === 'function') {
@@ -725,7 +725,7 @@ export default class Screen {
     const pickBtn = document.createElement('button');
     pickBtn.className = 'terminal-ai-attach-submenu-item';
     pickBtn.type = 'button';
-    pickBtn.innerHTML = "<i class='fa fa-crosshairs'></i> " + i18n.t('terminal.ai.attachScreenshotPick', 'Select element');
+    pickBtn.append(...Array.from(parseHTML(`<span><i class='fa fa-crosshairs'></i> ${i18n.t('terminal.ai.attachScreenshotPick', 'Select element')}</span>`).childNodes));
     pickBtn.addEventListener('click', () => {
       this.#closeAttachMenu();
       if (Object.hasOwn(this.#options, 'onScreenshotPick') && typeof this.#options.onScreenshotPick === 'function') {

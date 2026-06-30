@@ -24,7 +24,6 @@ FIX: TraSH: Escaped strings
 FIX: AI Mode: Cache
 
 UPD: Documentation
-
 ```
 
 **13.0.0**

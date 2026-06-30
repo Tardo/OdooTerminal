@@ -1284,15 +1284,18 @@ export default class Terminal {
       popup.classList.remove('terminal-ai-help-popup-active');
     } else {
       if (!popup.dataset['initialized']) {
-        popup.innerHTML =
-          `<div class='terminal-ai-help-popup-title'>${i18n.t('terminal.ai.helpTitle', 'Tips to save tokens')}</div>` +
-          "<ul class='terminal-ai-help-popup-list'>" +
-          `<li>${i18n.t('terminal.ai.helpTip1', 'One topic per conversation — start a new one for each task.')}</li>` +
-          `<li>${i18n.t('terminal.ai.helpTip2', 'History is auto-compressed when context fills up, but shorter conversations always cost fewer tokens.')}</li>` +
-          `<li>${i18n.t('terminal.ai.helpTip3', 'Be specific and concise — vague prompts waste tokens and give worse results.')}</li>` +
-          `<li>${i18n.t('terminal.ai.helpTip4', 'Delete old conversations you no longer need.')}</li>` +
-          `<li>${i18n.t('terminal.ai.helpTip5', 'Attach files only when strictly necessary.')}</li>` +
-          '</ul>';
+        popup.append(
+          parseHTML(`<div class='terminal-ai-help-popup-title'>${i18n.t('terminal.ai.helpTitle', 'Tips to save tokens')}</div>`),
+          parseHTML(
+            "<ul class='terminal-ai-help-popup-list'>" +
+              `<li>${i18n.t('terminal.ai.helpTip1', 'One topic per conversation — start a new one for each task.')}</li>` +
+              `<li>${i18n.t('terminal.ai.helpTip2', 'History is auto-compressed when context fills up, but shorter conversations always cost fewer tokens.')}</li>` +
+              `<li>${i18n.t('terminal.ai.helpTip3', 'Be specific and concise — vague prompts waste tokens and give worse results.')}</li>` +
+              `<li>${i18n.t('terminal.ai.helpTip4', 'Delete old conversations you no longer need.')}</li>` +
+              `<li>${i18n.t('terminal.ai.helpTip5', 'Attach files only when strictly necessary.')}</li>` +
+              '</ul>',
+          ),
+        );
         popup.dataset['initialized'] = '1';
       }
       popup.classList.add('terminal-ai-help-popup-active');
