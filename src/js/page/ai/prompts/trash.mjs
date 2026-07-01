@@ -5,6 +5,7 @@
 import {getArgumentInfo} from '@trash/argument';
 import {ARG} from '@trash/constants';
 import type {ArgInfo, CMDDef} from '@trash/interpreter';
+import {FUNCTION_TYPE} from '@trash/function';
 import type Terminal from '@odoo/terminal';
 
 
@@ -221,7 +222,7 @@ export function buildScriptingPrompt(): string {
 
 export default function(terminal: Terminal): string {
   const cmds = terminal.getShell().getVM().getRegisteredCmds();
-  const lines = Object.entries(cmds).map(([name, def]) => {
+  const lines = Object.entries(cmds).filter(([_name, def]) => def.type === FUNCTION_TYPE.Command).map(([name, def]) => {
     return buildCommandPrompt(name, def);
   });
 
