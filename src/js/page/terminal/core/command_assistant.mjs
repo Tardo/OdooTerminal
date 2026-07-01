@@ -48,9 +48,31 @@ export default class CommandAssistant {
     this.#shell = parent.getShell();
   }
 
-  #getAvailableCommandNames(name: string): Array<string> {
+  #getAvailableCommandNames(name: string, filter_mode: string): Array<string> {
     const cmd_names = Object.keys(this.#shell.getVM().getRegisteredCmds());
-    return cmd_names.filter(cmd_name => cmd_name.startsWith(name));
+    if (!name) {
+      return cmd_names.sort();
+    }
+    const matches =
+      filter_mode === 'includes'
+        ? cmd_names.filter(cmd_name => cmd_name.includes(name))
+        : cmd_names.filter(cmd_name => cmd_name.startsWith(name));
+    // Rank prefix matches above mid-word matches, then by match position and length,
+    // so the most relevant commands surface first instead of registration order.
+    return matches.sort((a, b) => {
+      const a_starts = a.startsWith(name);
+      const b_starts = b.startsWith(name);
+      if (a_starts !== b_starts) {
+        return a_starts ? -1 : 1;
+      }
+      if (!a_starts) {
+        const pos_diff = a.indexOf(name) - b.indexOf(name);
+        if (pos_diff !== 0) {
+          return pos_diff;
+        }
+      }
+      return a.length - b.length || a.localeCompare(b);
+    });
   }
 
   #getAvailableArguments(command_info: CMDDef, arg_name: string): Array<ArgInfo> {
@@ -270,7 +292,7 @@ export default class CommandAssistant {
     }
     if (input_info.index.cmd === input_info.index.current) {
       // Command name
-      const cmd_names = this.#getAvailableCommandNames(input_info.token.cmd || data);
+      const cmd_names = this.#getAvailableCommandNames(input_info.token.cmd || data, filter_mode);
       for (const cmd_name of cmd_names) {
         ret.push({
           name: cmd_name,

@@ -45,6 +45,9 @@ export type MessageListenerCallback = (data: MessageListenerData) => Promise<mix
 
 const ALLOWED_FUNCS = ['eprint', 'print', 'printError', 'printTable', 'updateInputInfo', 'showQuestion', 'clean', 'printLive'];
 const ALLOWED_SILENT_FUNCS = ['updateInputInfo', 'showQuestion', 'clean'];
+// Delay before recomputing assistant options while typing, so holding a key
+// (e.g. backspace) doesn't reparse/rerender on every repeated keystroke.
+const ASSISTANT_OPTIONS_DEBOUNCE_MS = 80;
 
 const dummyCall = () => {
   // Do nothing
@@ -121,6 +124,8 @@ export default class Terminal {
   #boundDisableModalFocusTrap: () => void;
 
   #mutexAvailableOptions: AMutex = new Mutex();
+  #assistantOptionsDebounceTimer: TimeoutID | null = null;
+  #assistantOptionsTrailingPending: boolean = false;
 
   #isAIMode: boolean = false;
   #activeConvId: string | null = null;
@@ -798,16 +803,16 @@ export default class Terminal {
     this.userContext = {...this.#config.term_context, ...this.userContext};
   }
 
-  updateAssistantoptions() {
+  updateAssistantoptions(): Promise<mixed> {
     if (this.#isAIMode) {
       this.#assistantOptions = [];
       this.#assistantOptionsTotalCount = 0;
       this.screen.updateAssistantPanelOptions([], -1, 0);
-      return;
+      return Promise.resolve();
     }
     this.#mutexAvailableOptions.cancel();
     this.#mutexAvailableOptions.release();
-    this.#mutexAvailableOptions
+    return this.#mutexAvailableOptions
       .runExclusive(async () => {
         const user_input = this.screen.getUserInput();
         if (typeof user_input === 'undefined' || user_input.length === 0) {
@@ -831,6 +836,42 @@ export default class Terminal {
           this.#assistantOptionsTotalCount,
         );
       });
+  }
+
+  // Leading+trailing debounce: the first input event of a burst updates right away
+  // (typing feels instant), further events within the window are collapsed into a
+  // single trailing recompute once the burst settles (so holding e.g. backspace
+  // doesn't reparse/rerender the assistant panel on every repeated keystroke).
+  #scheduleAssistantOptionsUpdate() {
+    if (this.#assistantOptionsDebounceTimer !== null) {
+      this.#assistantOptionsTrailingPending = true;
+      clearTimeout(this.#assistantOptionsDebounceTimer);
+    } else {
+      this.updateAssistantoptions();
+    }
+    this.#assistantOptionsDebounceTimer = setTimeout(() => {
+      this.#assistantOptionsDebounceTimer = null;
+      if (this.#assistantOptionsTrailingPending) {
+        this.#assistantOptionsTrailingPending = false;
+        this.updateAssistantoptions();
+      }
+    }, ASSISTANT_OPTIONS_DEBOUNCE_MS);
+  }
+
+  // Ensures assistant options reflect the latest input before something
+  // (e.g. Tab completion) consumes them, in case a trailing recompute is still pending.
+  #flushAssistantOptionsUpdate(): Promise<mixed> {
+    if (this.#assistantOptionsDebounceTimer !== null) {
+      clearTimeout(this.#assistantOptionsDebounceTimer);
+      this.#assistantOptionsDebounceTimer = null;
+    }
+    if (!this.#assistantOptionsTrailingPending) {
+      return Promise.resolve();
+    }
+    this.#assistantOptionsTrailingPending = false;
+    return this.updateAssistantoptions().catch(() => {
+      // Do nothing
+    });
   }
 
   /* HANDLE EVENTS */
@@ -1079,11 +1120,12 @@ export default class Terminal {
   #onKeyArrowLeft() {
     this.updateAssistantoptions();
   }
-  #onKeyTab(ev: KeyboardEvent) {
+  async #onKeyTab(ev: KeyboardEvent) {
     const user_input = this.screen.getUserInput();
     if (isEmpty(user_input)) {
       return;
     }
+    await this.#flushAssistantOptionsUpdate();
     const parse_info = this.#shell.parse(user_input);
     const [sel_cmd_index, sel_token_index, _unused, sel_level] = this.#commandAssistant.getSelectedParameterIndex(
       parse_info,
@@ -1121,7 +1163,7 @@ export default class Terminal {
     const question_active = this.screen.getQuestionActive();
     if (typeof question_active === 'undefined') {
       // Fish-like feature
-      this.updateAssistantoptions();
+      this.#scheduleAssistantOptionsUpdate();
       const user_input = this.screen.getUserInput();
       this.#searchHistoryQuery = user_input;
       this.#searchHistoryIter = this.#inputHistory.length;
