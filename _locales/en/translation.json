@@ -12,6 +12,12 @@
           "httpError": "HTTP error {{status}}",
           "noStream": "Server did not return a streaming response"
         }
+      },
+      "relayFetch": {
+        "error": {
+          "missingPermission": "Missing browser permission to contact {{url}}. Open the extension's Options page (AI Models section) and use \"Grant access\" for this URL, then try again.",
+          "unknown": "AI request failed"
+        }
       }
     }
   },
@@ -144,6 +150,9 @@
       },
       "result": {
         "connected": "AI Server connected"
+      },
+      "warning": {
+        "missingPermission": "Warning: missing browser permission to contact {{url}}. Open the extension's Options page (AI Models section) and use \"Grant access\" for this URL before sending requests."
       }
     },
     "definition": "AI assistant (connect, chat & exec)",

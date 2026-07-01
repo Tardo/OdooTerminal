@@ -4,6 +4,7 @@
 
 import i18n from 'i18next';
 import {DEFAULT_MAX_TOKENS} from '@ai/constants';
+import {backgroundFetch} from '@ai/utils/relay_fetch';
 
 
 function toOpenAIMessages(messages: Array<AIMessage>): Array<{[string]: mixed}> {
@@ -117,12 +118,11 @@ export default async function streamRequestOpenAI(
     body.parallel_tool_calls = false;
   }
 
-  const response = await fetch(`${url}/chat/completions`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(body),
+  const response = await backgroundFetch(
+    `${url}/chat/completions`,
+    {method: 'POST', headers, body: JSON.stringify(body)},
     signal,
-  });
+  );
 
   if (!response.ok) {
     const errorText = await response.text();

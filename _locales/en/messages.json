@@ -173,6 +173,21 @@
   "optionsTitleAIModelsLoad": {
     "message": "Load models"
   },
+  "optionsTitleAIModelsGrant": {
+    "message": "Grant access"
+  },
+  "optionsAIModelsGrantedLabel": {
+    "message": "Access granted"
+  },
+  "optionsAIModelsGrantSuccess": {
+    "message": "Access granted"
+  },
+  "optionsAIModelsGrantDenied": {
+    "message": "Access denied"
+  },
+  "optionsAIModelsGrantError": {
+    "message": "Error granting access"
+  },
   "optionsAIModelsLoadLoading": {
     "message": "Loading..."
   },

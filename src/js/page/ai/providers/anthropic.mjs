@@ -4,6 +4,7 @@
 
 import i18n from 'i18next';
 import {DEFAULT_MAX_TOKENS} from '@ai/constants';
+import {backgroundFetch} from '@ai/utils/relay_fetch';
 
 
 export default async function streamRequestAnthropic(
@@ -55,12 +56,11 @@ export default async function streamRequestAnthropic(
     body.tool_choice = {type: 'auto', disable_parallel_tool_use: true};
   }
 
-  const response = await fetch(`${url}/v1/messages`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(body),
+  const response = await backgroundFetch(
+    `${url}/v1/messages`,
+    {method: 'POST', headers, body: JSON.stringify(body)},
     signal,
-  });
+  );
 
   if (!response.ok) {
     const errorText = await response.text();

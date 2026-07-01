@@ -70,6 +70,19 @@ function onWindowMessage(event: MessageEvent) {
     ubrowser.runtime.sendMessage({message: 'capture_screenshot'});
   } else if (ev_data.type === 'ODOO_TERM_OPEN_OPTIONS') {
     ubrowser.runtime.sendMessage({message: 'open_options_page'});
+  } else if (ev_data.type === 'ODOO_TERM_AI_CHECK_PERMISSION') {
+    ubrowser.runtime.sendMessage({message: 'ai_check_permission', requestId: ev_data.requestId, url: ev_data.url});
+  } else if (ev_data.type === 'ODOO_TERM_AI_FETCH_START') {
+    ubrowser.runtime.sendMessage({
+      message: 'ai_fetch_start',
+      requestId: ev_data.requestId,
+      url: ev_data.url,
+      method: ev_data.method,
+      headers: ev_data.headers,
+      body: ev_data.body,
+    });
+  } else if (ev_data.type === 'ODOO_TERM_AI_FETCH_ABORT') {
+    ubrowser.runtime.sendMessage({message: 'ai_fetch_abort', requestId: ev_data.requestId});
   }
 }
 
@@ -77,7 +90,8 @@ function onWindowMessage(event: MessageEvent) {
  * Listen message from extension context
  * @param {Object} request
  */
-function onInternalMessage(request: {message: string, dataUrl?: string, error?: string}) {
+// $FlowFixMe[unclear-type]
+function onInternalMessage(request: Object) {
   if (request.message === 'update_odoo_terminal_info') {
     if (InstanceContext.isLoaded) {
       updateInstanceContext();
@@ -97,6 +111,30 @@ function onInternalMessage(request: {message: string, dataUrl?: string, error?: 
       dataUrl: request.dataUrl !== undefined ? request.dataUrl : null,
       error: request.error !== undefined ? request.error : null,
     });
+  } else if (request.message === 'ai_permission_result') {
+    postMessage('ODOO_TERM_AI_PERMISSION_RESULT', {requestId: request.requestId, granted: request.granted});
+  } else if (request.message === 'ai_fetch_headers') {
+    postMessage('ODOO_TERM_AI_FETCH_HEADERS', {
+      requestId: request.requestId,
+      ok: request.ok,
+      status: request.status,
+      statusText: request.statusText,
+    });
+  } else if (request.message === 'ai_fetch_chunk') {
+    postMessage('ODOO_TERM_AI_FETCH_CHUNK', {requestId: request.requestId, chunk: request.chunk});
+  } else if (request.message === 'ai_fetch_error_body') {
+    postMessage('ODOO_TERM_AI_FETCH_ERROR_BODY', {requestId: request.requestId, text: request.text});
+  } else if (request.message === 'ai_fetch_done') {
+    postMessage('ODOO_TERM_AI_FETCH_DONE', {requestId: request.requestId});
+  } else if (request.message === 'ai_fetch_error') {
+    postMessage('ODOO_TERM_AI_FETCH_ERROR', {
+      requestId: request.requestId,
+      code: request.code,
+      url: request.url,
+      error: request.error,
+    });
+  } else if (request.message === 'ai_fetch_aborted') {
+    postMessage('ODOO_TERM_AI_FETCH_ABORTED', {requestId: request.requestId});
   }
 }
 

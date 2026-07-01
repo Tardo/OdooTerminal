@@ -14,8 +14,80 @@
 import {SETTING_DEFAULTS, SETTING_NAMES, VERSION_COLOR} from '@common/constants';
 import sanitizeOdooVersion from '@common/utils/sanitize_odoo_version';
 import {ubrowser} from '@shared/constants';
+import {hasHostPermission} from '@shared/host_permissions';
 import {getStorageSync, setStorageSync} from '@shared/storage';
 import {sendInternalMessage} from '@shared/tabs';
+
+// Requests in flight for the AI fetch relay, keyed by requestId, so 'ai_fetch_abort'
+// can cancel the matching real network request.
+const aiFetchControllers: Map<string, AbortController> = new Map();
+
+function sendAIMessage(tabId: number, type: string, requestId: string, extra?: {[string]: mixed}) {
+  ubrowser.tabs.sendMessage(tabId, {...(extra ?? {}), message: type, requestId});
+}
+
+/**
+ * Performs the real network request to the AI provider from the privileged background
+ * context, bypassing the page's CORS restrictions (the AI code runs injected into the
+ * Odoo tab, so a direct fetch() there is subject to the target API's CORS policy).
+ * Streams the decoded response back to the calling tab as a sequence of messages.
+ */
+// $FlowFixMe[unclear-type]
+async function handleAIFetchStart(request: Object, tabId: number) {
+  const {requestId, url, method, headers, body} = request;
+
+  const allowed = await hasHostPermission(url);
+  if (!allowed) {
+    sendAIMessage(tabId, 'ai_fetch_error', requestId, {code: 'permission', url});
+    return;
+  }
+
+  const controller = new AbortController();
+  aiFetchControllers.set(requestId, controller);
+
+  try {
+    const response = await fetch(url, {method, headers, body, signal: controller.signal});
+
+    sendAIMessage(tabId, 'ai_fetch_headers', requestId, {
+      ok: response.ok,
+      status: response.status,
+      statusText: response.statusText,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      sendAIMessage(tabId, 'ai_fetch_error_body', requestId, {text});
+      return;
+    }
+
+    if (!response.body) {
+      sendAIMessage(tabId, 'ai_fetch_done', requestId);
+      return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) {
+        break;
+      }
+      const chunk = decoder.decode(value !== null && value !== undefined ? value : new Uint8Array(0), {stream: true});
+      if (chunk) {
+        sendAIMessage(tabId, 'ai_fetch_chunk', requestId, {chunk});
+      }
+    }
+    sendAIMessage(tabId, 'ai_fetch_done', requestId);
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      sendAIMessage(tabId, 'ai_fetch_aborted', requestId);
+    } else {
+      sendAIMessage(tabId, 'ai_fetch_error', requestId, {code: 'network', error: String(err.message || err)});
+    }
+  } finally {
+    aiFetchControllers.delete(requestId);
+  }
+}
 
 /**
  * @param {String} icon - url to the icon
@@ -67,6 +139,15 @@ function onInternalMessage(request: Object, sender: Object) {
       .catch((err: Error) => {
         ubrowser.tabs.sendMessage(tabId, {message: 'screenshot_result', error: String(err.message || err)});
       });
+  } else if (request.message === 'ai_check_permission') {
+    const tabId: number = sender.tab.id;
+    hasHostPermission(request.url).then((granted: boolean) => {
+      sendAIMessage(tabId, 'ai_permission_result', request.requestId, {granted});
+    });
+  } else if (request.message === 'ai_fetch_start') {
+    handleAIFetchStart(request, sender.tab.id);
+  } else if (request.message === 'ai_fetch_abort') {
+    aiFetchControllers.get(request.requestId)?.abort();
   }
 }
 

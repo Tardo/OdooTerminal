@@ -9,6 +9,8 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 ```
 IMP: Command 'caf': Show selection options
 IMP: Commans assistant: Refresh handling
+
+FIX: AI Mode: Fetch from the extension context
 ```
 
 **13.1.0**

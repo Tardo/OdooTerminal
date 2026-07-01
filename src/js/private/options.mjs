@@ -6,6 +6,7 @@
 import '@css/options.css';
 import processKeybind from '@common/utils/process_keybind';
 import {ubrowser} from '@shared/constants';
+import {hasHostPermission, requestHostPermission} from '@shared/host_permissions';
 import {getStorageSync, setStorageSync} from '@shared/storage';
 import {IGNORED_KEYS, SETTING_DEFAULTS, SETTING_NAMES, SETTING_TYPES, THEMES} from '../common/constants';
 
@@ -154,6 +155,75 @@ async function onClickLoadAIModels() {
   }
 }
 
+async function onClickGrantAIModelAccess() {
+  const elm_url = document.getElementById('ai_model_url');
+  const elm_status = document.getElementById('ai_model_load_status');
+  if (!(elm_url instanceof HTMLInputElement) || !elm_status) {
+    return;
+  }
+  await grantAccessForURL(elm_url.value, elm_status);
+}
+
+async function grantAccessForURL(url: string, elm_status: HTMLElement): Promise<?boolean> {
+  if (!url) {
+    elm_status.textContent = ubrowser.i18n.getMessage('optionsAIModelsLoadMissingURL');
+    elm_status.setAttribute('class', 'ai_model_load_status ai_model_load_error');
+    return null;
+  }
+  try {
+    const granted = await requestHostPermission(url);
+    if (granted) {
+      elm_status.textContent = ubrowser.i18n.getMessage('optionsAIModelsGrantSuccess');
+      elm_status.setAttribute('class', 'ai_model_load_status ai_model_load_ok');
+    } else {
+      elm_status.textContent = ubrowser.i18n.getMessage('optionsAIModelsGrantDenied');
+      elm_status.setAttribute('class', 'ai_model_load_status ai_model_load_warning');
+    }
+    refreshGrantLinksForURL(url, granted);
+    return granted;
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    elm_status.textContent = `${ubrowser.i18n.getMessage('optionsAIModelsGrantError')}: ${errMsg}`;
+    elm_status.setAttribute('class', 'ai_model_load_status ai_model_load_error');
+    return null;
+  }
+}
+
+function applyGrantLinkState(link: HTMLElement, granted: boolean) {
+  if (granted) {
+    link.innerText = `✓ ${ubrowser.i18n.getMessage('optionsAIModelsGrantedLabel')}`;
+    link.classList.add('ai_model_granted');
+    link.classList.remove('ai_model_grant');
+  } else {
+    link.innerText = ubrowser.i18n.getMessage('optionsTitleAIModelsGrant');
+    link.classList.add('ai_model_grant');
+    link.classList.remove('ai_model_granted');
+  }
+}
+
+function refreshGrantLinksForURL(url: string, granted: boolean) {
+  const links = document.querySelectorAll('.ai_model_grant, .ai_model_granted');
+  for (const link of links) {
+    if (link instanceof HTMLElement) {
+      const link_url: string = link.dataset.url ?? '';
+      if (link_url === url) {
+        applyGrantLinkState(link, granted);
+      }
+    }
+  }
+}
+
+function onClickAIModelGrant(e: MouseEvent) {
+  if (e.target instanceof HTMLElement) {
+    const el_target = e.target;
+    e.preventDefault();
+    const elm_status = document.getElementById('ai_model_load_status');
+    if (elm_status) {
+      grantAccessForURL(el_target.dataset.url ?? '', elm_status);
+    }
+  }
+}
+
 function onClickAIModelRemove(e: MouseEvent) {
   if (e.target instanceof HTMLElement) {
     const el_target = e.target;
@@ -232,6 +302,16 @@ function renderAIModelsTableItem(tbody: HTMLTableSectionElement, idx: number, en
   new_cell_provider.innerText = entry.provider;
   new_cell_model.innerText = entry.model;
   new_cell_max_tokens.innerText = entry.max_tokens > 0 ? String(entry.max_tokens) : '-';
+  const elm_link_grant = document.createElement('a');
+  elm_link_grant.id = `${row_id}-grant`;
+  elm_link_grant.innerText = ubrowser.i18n.getMessage('optionsTitleAIModelsGrant');
+  elm_link_grant.href = '#';
+  elm_link_grant.classList.add('ai_model_grant');
+  elm_link_grant.dataset.url = entry.url;
+  new_cell_options.appendChild(elm_link_grant);
+  elm_link_grant.addEventListener('click', onClickAIModelGrant, false);
+  hasHostPermission(entry.url).then(granted => applyGrantLinkState(elm_link_grant, granted));
+  new_cell_options.appendChild(document.createTextNode(' '));
   const elm_link_remove = document.createElement('a');
   elm_link_remove.id = `${row_id}-remove`;
   elm_link_remove.innerText = 'Remove';
@@ -488,7 +568,7 @@ function onClickColorDomainAdd() {
   }
 }
 
-function onClickAIModelAdd() {
+async function onClickAIModelAdd() {
   const elm_name = document.getElementById('ai_model_name');
   const elm_provider = document.getElementById('ai_model_provider');
   const elm_url = document.getElementById('ai_model_url');
@@ -496,6 +576,7 @@ function onClickAIModelAdd() {
   const elm_model = document.getElementById('ai_model_model');
   const elm_timeout = document.getElementById('ai_model_timeout');
   const elm_max_tokens = document.getElementById('ai_model_max_tokens');
+  const elm_status = document.getElementById('ai_model_load_status');
   if (
     elm_name instanceof HTMLInputElement &&
     elm_name.value &&
@@ -508,9 +589,10 @@ function onClickAIModelAdd() {
     elm_timeout instanceof HTMLInputElement &&
     elm_max_tokens instanceof HTMLInputElement
   ) {
+    const url = elm_url.value;
     ai_models_defs.push({
       name: elm_name.value,
-      url: elm_url.value,
+      url,
       api_key: elm_api_key.value,
       model: elm_model.value,
       provider: elm_provider.value,
@@ -524,6 +606,9 @@ function onClickAIModelAdd() {
     elm_model.value = '';
     elm_timeout.value = '900';
     elm_max_tokens.value = '0';
+    if (elm_status) {
+      await grantAccessForURL(url, elm_status);
+    }
   }
 }
 
@@ -689,6 +774,7 @@ function i18n() {
   _apply_i18n('#label_ai_model_max_tokens', 'optionsTitleAIModelsMaxTokensLabel');
   _apply_i18n('#add_ai_model', 'optionsTitleAIModelsAdd');
   _apply_i18n('#load_ai_models', 'optionsTitleAIModelsLoad');
+  _apply_i18n('#grant_ai_model_access', 'optionsTitleAIModelsGrant');
 
   _apply_i18n('#title_ai_custom_skills', 'optionsTitleAICustomSkills');
   _apply_i18n('#desc_ai_custom_skills', 'optionsTitleAICustomSkillsDescription');
@@ -734,6 +820,7 @@ async function onDOMLoaded() {
   _add_event_listener('#add_color_domain', 'click', onClickColorDomainAdd);
   _add_event_listener('#add_ai_model', 'click', onClickAIModelAdd);
   _add_event_listener('#load_ai_models', 'click', onClickLoadAIModels);
+  _add_event_listener('#grant_ai_model_access', 'click', onClickGrantAIModelAccess);
   _add_event_listener('#add_ai_custom_skill', 'click', onClickAICustomSkillAdd);
   _add_event_listener('#export_ai_custom_skills', 'click', onClickExportAICustomSkills);
   _add_event_listener('#import_ai_custom_skills', 'click', onClickImportAICustomSkills);

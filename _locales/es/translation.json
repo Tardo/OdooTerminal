@@ -12,6 +12,12 @@
           "httpError": "Error HTTP {{status}}",
           "noStream": "El servidor no devolvió una respuesta en streaming"
         }
+      },
+      "relayFetch": {
+        "error": {
+          "missingPermission": "Falta permiso del navegador para contactar con {{url}}. Abre la página de Opciones de la extensión (sección AI Models) y usa \"Grant access\" para esta URL, luego vuelve a intentarlo.",
+          "unknown": "La solicitud a la IA falló"
+        }
       }
     }
   },
@@ -144,6 +150,9 @@
       },
       "result": {
         "connected": "Servidor de IA conectado"
+      },
+      "warning": {
+        "missingPermission": "Aviso: falta permiso del navegador para contactar con {{url}}. Abre la página de Opciones de la extensión (sección AI Models) y usa \"Grant access\" para esta URL antes de enviar solicitudes."
       }
     },
     "definition": "Asistente de IA (connect, chat & exec)",

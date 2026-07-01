@@ -177,6 +177,21 @@
   "optionsTitleAIModelsLoad": {
     "message": "Cargar modelos"
   },
+  "optionsTitleAIModelsGrant": {
+    "message": "Conceder acceso"
+  },
+  "optionsAIModelsGrantedLabel": {
+    "message": "Acceso concedido"
+  },
+  "optionsAIModelsGrantSuccess": {
+    "message": "Acceso concedido"
+  },
+  "optionsAIModelsGrantDenied": {
+    "message": "Acceso denegado"
+  },
+  "optionsAIModelsGrantError": {
+    "message": "Error al conceder acceso"
+  },
   "optionsAIModelsLoadLoading": {
     "message": "Cargando..."
   },
