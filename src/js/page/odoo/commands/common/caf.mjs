@@ -11,7 +11,7 @@ import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpret
 import type Terminal from '@odoo/terminal';
 
 
-const AVAILABLE_PROPERTIES = ['type', 'string', 'relation', 'required', 'readonly', 'searchable', 'store', 'exportable', 'groupable', 'sortable', 'translate', 'company_dependent', 'currency_field', 'depends', 'groups', 'help'];
+const AVAILABLE_PROPERTIES = ['type', 'string', 'relation', 'required', 'readonly', 'searchable', 'store', 'exportable', 'groupable', 'sortable', 'translate', 'company_dependent', 'currency_field', 'depends', 'groups', 'selection', 'help'];
 
 async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const fields = kwargs.field[0] === '*' ? false : kwargs.field;
