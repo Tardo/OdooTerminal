@@ -4,21 +4,13 @@
 
 // $FlowFixMe[untyped-import]
 import {Record} from '@terminal/core/recordset';
-import encodeHTML from '@terminal/utils/encode_html';
-import prettyObjectString from '@terminal/utils/pretty_object_string';
+import formatCellValue from '@terminal/utils/format_cell_value';
 
 export default function (model: string, field: string, item: {[string]: string | number}): string {
   const item_val = item[field];
   // $FlowFixMe[invalid-compare]
   if (item instanceof Record && item.__info[field]?.type === 'binary') {
     return `<span class='btn btn-secondary o_terminal_click o_terminal_read_bin_field' data-model='${model}' data-id='${item.id}' data-field='${field}'>Try Read Field</span>`;
-  } else if (
-    // $FlowFixMe[invalid-compare]
-    item_val !== null &&
-    typeof item_val === 'object' &&
-    !(item_val instanceof Array)
-  ) {
-    return prettyObjectString(item_val);
   }
-  return encodeHTML(String(item_val));
+  return formatCellValue(item_val);
 }

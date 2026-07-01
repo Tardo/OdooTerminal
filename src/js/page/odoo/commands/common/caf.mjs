@@ -6,6 +6,7 @@ import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import {getModelOptions} from './__utils__';
 import isEmpty from '@trash/utils/is_empty';
+import formatCellValue from '@terminal/utils/format_cell_value';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -52,11 +53,10 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
     const l2 = kwargs.property.length;
     for (let x2 = 0; x2 < l2; ++x2) {
       const value = fieldDef[kwargs.property[x2]] ?? '';
-      rows[row_index].push(new String(value).toString());
+      rows[row_index].push(formatCellValue(value));
     }
   }
-  kwargs.property.unshift('field');
-  ctx.screen.printTable(kwargs.property, rows);
+  ctx.screen.printTable(['field', ...kwargs.property], rows);
   return s_result;
 }
 

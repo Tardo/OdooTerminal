@@ -26,8 +26,8 @@ export function renderLineArray(msg: Array<mixed>, cls?: string): Array<string> 
   return res;
 }
 
-export function renderLineObject(msg: {[string]: mixed}, cls?: string): string {
-  return `<span class='line-object ${cls || ''}'>${prettyObjectString(msg)}</span>`;
+export function renderLineObject(msg: mixed, cls?: string, indent: number = 4): string {
+  return `<span class='line-object ${cls || ''}'>${prettyObjectString(msg, indent)}</span>`;
 }
 
 // $FlowFixMe[value-as-type]
@@ -68,12 +68,16 @@ export default function renderLine(msg: mixed, cls?: string): Array<string> {
     } else if (msg instanceof Recordset) {
       res.push(renderLineRecordsetTable(msg.model, msg, cls));
     } else if (msg instanceof Array) {
-      res.push(...renderLineArray(msg, cls));
+      if (msg.some((item: mixed) => item !== null && typeof item === 'object')) {
+        // Nested arrays/objects: show the real literal representation (e.g. [["aa","BB"],["dd","DD"]])
+        // instead of losing data or flattening it into a comma-joined string.
+        res.push(renderLineObject(msg, cls, 0));
+      } else {
+        res.push(...renderLineArray(msg, cls));
+      }
     } else if (msg instanceof FunctionTrash) {
       res.push(renderLineText(msg, cls));
     } else {
-      // $FlowFixMe[incompatible-type]
-      // $FlowFixMe[incompatible-variance]
       res.push(renderLineObject(msg, cls));
     }
   } else {

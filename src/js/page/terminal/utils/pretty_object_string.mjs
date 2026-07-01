@@ -5,6 +5,6 @@
 import encodeHTML from './encode_html';
 import replacer from './stringify_replacer';
 
-export default function (obj: {...}): string {
-  return encodeHTML(JSON.stringify(obj, replacer, 4));
+export default function (obj: mixed, indent: number = 4): string {
+  return encodeHTML(JSON.stringify(obj, replacer, indent) ?? '');
 }

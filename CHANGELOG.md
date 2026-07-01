@@ -12,6 +12,7 @@ IMP: Commans assistant: Refresh handling
 IMP: AI Mode: Don't send internal and native functions
 
 FIX: AI Mode: Fetch from the extension context
+FIX: Command 'caf': Format cell value
 ```
 
 **13.1.0**
