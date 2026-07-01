@@ -4,6 +4,13 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ---
 
+**13.2.0**
+
+```
+IMP: Command 'caf': Show selection options
+IMP: Commans assistant: Refresh handling
+```
+
 **13.1.0**
 
 ```
