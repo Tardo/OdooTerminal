@@ -22,6 +22,32 @@ import {sendInternalMessage} from '@shared/tabs';
 // can cancel the matching real network request.
 const aiFetchControllers: Map<string, AbortController> = new Map();
 
+// A MV3 service worker is torn down after a short idle window (no extension API
+// activity). Slow/local AI backends (e.g. llama.cpp) can go 30+ seconds between
+// stream chunks — especially with tool-calling, which some servers buffer instead
+// of streaming token-by-token — so without this the worker dies mid-request, silently
+// dropping the connection to the AI provider (the page is left waiting forever, since
+// the worker never gets to send back an error). This timer pings a trivial extension
+// API on an interval shorter than the idle window for as long as any AI fetch is
+// in flight, to keep the worker alive until the request settles.
+let aiKeepAliveTimer: IntervalID | null = null;
+
+function startAIKeepAlive() {
+  if (aiKeepAliveTimer !== null) {
+    return;
+  }
+  aiKeepAliveTimer = setInterval(() => {
+    ubrowser.runtime.getPlatformInfo(() => undefined);
+  }, 20000);
+}
+
+function stopAIKeepAliveIfIdle() {
+  if (aiKeepAliveTimer !== null && aiFetchControllers.size === 0) {
+    clearInterval(aiKeepAliveTimer);
+    aiKeepAliveTimer = null;
+  }
+}
+
 function sendAIMessage(tabId: number, type: string, requestId: string, extra?: {[string]: mixed}) {
   ubrowser.tabs.sendMessage(tabId, {...(extra ?? {}), message: type, requestId});
 }
@@ -44,6 +70,7 @@ async function handleAIFetchStart(request: Object, tabId: number) {
 
   const controller = new AbortController();
   aiFetchControllers.set(requestId, controller);
+  startAIKeepAlive();
 
   try {
     const response = await fetch(url, {method, headers, body, signal: controller.signal});
@@ -86,6 +113,7 @@ async function handleAIFetchStart(request: Object, tabId: number) {
     }
   } finally {
     aiFetchControllers.delete(requestId);
+    stopAIKeepAliveIfIdle();
   }
 }
 

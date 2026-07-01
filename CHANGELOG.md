@@ -10,6 +10,7 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 IMP: Command 'caf': Show selection options
 IMP: Commans assistant: Refresh handling
 IMP: AI Mode: Don't send internal and native functions
+IMP: AI Mode: Clarify HTML output requirement in agent system prompt
 
 FIX: AI Mode: Fetch from the extension context
 FIX: Command 'caf': Format cell value

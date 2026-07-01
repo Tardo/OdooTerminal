@@ -33,10 +33,12 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     `[CONSTRAINT] Max steps available: ${maxSteps}. Use as FEW steps as possible while remaining accurate — efficiency matters. One well-targeted command beats two exploratory ones.\n` +
     '\n' +
     '# FINAL ANSWER FORMAT\n' +
-    '- When you have completed the task (no more tool calls needed), respond with your final answer as plain text.\n' +
+    '- OUTPUT FORMAT (STRICT, NO EXCEPTIONS): the final answer text MUST be raw HTML. NEVER markdown (no **, no -, no #), NEVER unformatted plain text. Allowed tags ONLY: <b>, <ul>, <li>, <code>, <br> (Bootstrap classes allowed on these tags).\n' +
+    '  Example — WRONG: "**Total:** 42 orders\\n- Order 1\\n- Order 2"\n' +
+    '  Example — RIGHT: "<b>Total:</b> 42 orders<ul><li>Order 1</li><li>Order 2</li></ul>"\n' +
+    '- When you have completed the task (no more tool calls needed), respond with your final answer in the format above (not a tool call).\n' +
     '- The final answer is displayed directly to the user — write the actual answer, NOT meta-commentary about what you did. Never write "response delivered", "data shown", or similar phrases.\n' +
     '- If the user asked a question, answer it directly. If the user asked for data, state the data.\n' +
-    '- The final answer MUST be raw HTML (allowed tags: <b>, <ul>, <li>, <code>, <br>; Bootstrap classes allowed). Never use markdown.\n' +
     '- For display tasks (view, graph, pivot): respond with empty text after the run_command call — do not narrate "I opened the view".\n' +
     '\n' +
     '# ACTION-FIRST MANDATE (NON-NEGOTIABLE)\n' +
