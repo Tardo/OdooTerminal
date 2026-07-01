@@ -6,7 +6,7 @@ import i18n from 'i18next';
 import searchCount from '@odoo/orm/search_count';
 import searchRead from '@odoo/orm/search_read';
 import getFieldsInfo from '@odoo/orm/get_fields_info';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -127,27 +127,11 @@ async function cmdDescribe(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
   return {count, date_range, key_fields, selections};
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDescribe.definition', 'Model profile: count, date range, key fields and selection values'),
     callback: cmdDescribe,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t(
       'cmdDescribe.detail',
       'Returns a combined profile of the model in one shot: total record count, create_date range (oldest→newest), and a table of key fields (required fields, stored relational fields, selection fields with their possible values). Replaces 3–4 separate commands (caf + count + read_group).',

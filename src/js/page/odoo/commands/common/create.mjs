@@ -5,7 +5,7 @@
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import createRecord from '@odoo/orm/create_record';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 // $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
 import renderRecordCreated from '@odoo/templates/record_created';
@@ -38,27 +38,11 @@ async function cmdCreateModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   return Recordset.make(kwargs.model, records);
 }
 
-async function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdCreate.definition', 'Create new record'),
     callback: cmdCreateModelRecord,
-    options: getOptions,
+    options: getModelOptions,
     unsafe: true,
     detail: i18n.t('cmdCreate.detail', 'Without -v: opens an empty form view for the model. With -v: creates records directly in the database and returns a Recordset with the new IDs. -v accepts a list of value dicts.'),
     args: [

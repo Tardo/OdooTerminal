@@ -3,7 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from '../common/__utils__';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
@@ -29,27 +29,11 @@ async function cmdDoc(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
   window.location = `${window.location.origin}${pathname}`;
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDoc.definition', 'Open technical documentation page'),
     callback: cmdDoc,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t('cmdDoc.detail', 'Open the built-in technical documentation page (Odoo 19.0+ only). Without -m opens the index. With -m, opens docs for that model. With -me, anchors to that method.'),
     args: [
       [

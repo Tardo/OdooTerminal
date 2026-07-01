@@ -23,6 +23,14 @@ function getContentRoot(): Element | null {
   return document.body;
 }
 
+function requireContentRoot(ctx: CMDCallbackContext): Element | null {
+  const root = getContentRoot();
+  if (root === null) {
+    ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
+  }
+  return root;
+}
+
 // Drops any element that is an ancestor of another collected element, keeping the innermost nodes.
 // Prevents container+child duplication when multi-selector queries collect both a wrapper and its
 // interactive child (e.g. .o_nav_entry div that contains an <a>).
@@ -457,9 +465,8 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
   const typeEl: string = typeof kwargs.type_element === 'string' ? kwargs.type_element : 'page';
 
   if (typeEl === 'page') {
-    const root = getContentRoot();
+    const root = requireContentRoot(ctx);
     if (root === null) {
-      ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
       return;
     }
     const info = inspectPage(root);
@@ -493,9 +500,8 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
   }
 
   if (typeEl === 'button') {
-    const root = getContentRoot();
+    const root = requireContentRoot(ctx);
     if (root === null) {
-      ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
       return;
     }
     const items = inspectButtons(root);
@@ -518,9 +524,8 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
   }
 
   if (typeEl === 'field') {
-    const root = getContentRoot();
+    const root = requireContentRoot(ctx);
     if (root === null) {
-      ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
       return;
     }
     const items = inspectFields(root);
@@ -543,9 +548,8 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
   }
 
   if (typeEl === 'tab') {
-    const root = getContentRoot();
+    const root = requireContentRoot(ctx);
     if (root === null) {
-      ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
       return;
     }
     const items = inspectTabs(root);
@@ -585,9 +589,8 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
   }
 
   if (typeEl === 'statusbar') {
-    const root = getContentRoot();
+    const root = requireContentRoot(ctx);
     if (root === null) {
-      ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
       return;
     }
     const items = inspectStatusbar(root);
@@ -687,9 +690,8 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
   }
 
   if (typeEl === 'record') {
-    const root = getContentRoot();
+    const root = requireContentRoot(ctx);
     if (root === null) {
-      ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
       return;
     }
     const items = await inspectRecord(root);
@@ -709,9 +711,8 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
   }
 
   if (typeEl === 'list') {
-    const root = getContentRoot();
+    const root = requireContentRoot(ctx);
     if (root === null) {
-      ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
       return;
     }
     const pageInfo = inspectPage(root);

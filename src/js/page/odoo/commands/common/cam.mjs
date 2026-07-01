@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -36,27 +36,11 @@ async function cmdCheckModelAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
   });
 }
 
-async function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdCam.definition', 'Check model access'),
     callback: cmdCheckModelAccess,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t('cmdCam.detail', 'Show access rights for the selected operation on the selected model'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdCam.args.model', 'The model technical name')],

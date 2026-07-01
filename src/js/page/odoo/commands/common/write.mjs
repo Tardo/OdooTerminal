@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import writeRecord from '@odoo/orm/write_record';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -20,27 +20,11 @@ async function cmdWriteModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx:
   });
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdWrite.definition', 'Update record values'),
     callback: cmdWriteModelRecord,
-    options: getOptions,
+    options: getModelOptions,
     unsafe: true,
     detail: i18n.t('cmdWrite.detail', 'Update record values.'),
     args: [

@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import rpcQuery from '@odoo/rpc';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -24,27 +24,11 @@ async function cmdCallModelMethod(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
   });
 }
 
-async function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdCall.definition', 'Call model method'),
     callback: cmdCallModelMethod,
-    options: getOptions,
+    options: getModelOptions,
     unsafe: true,
     detail: i18n.t(
       'cmdCall.detail',

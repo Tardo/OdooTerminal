@@ -5,7 +5,7 @@
 import i18n from 'i18next';
 import searchRead from '@odoo/orm/search_read';
 import getFieldsInfo from '@odoo/orm/get_fields_info';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -80,27 +80,11 @@ async function cmdDateRange(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
   return {model: kwargs.model, field: kwargs.field, min, max};
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDateRange.definition', 'Show min/max values for a date or datetime field'),
     callback: cmdDateRange,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t(
       'cmdDateRange.detail',
       'Returns the minimum and maximum values of a date or datetime field on a model, optionally filtered by a domain. Validates that the field actually exists and is a date/datetime type before querying. Useful to avoid building graphs or reports over an empty or unexpected date range.',

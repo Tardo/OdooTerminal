@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from '../common/__utils__';
 import getFieldsInfo from '@odoo/orm/get_fields_info';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
@@ -72,27 +72,11 @@ async function cmdGraph(this: Terminal, kwargs: CMDCallbackArgs): Promise<mixed>
   }).then(() => this.doHide());
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdGraph.definition', 'Open graph view'),
     callback: cmdGraph,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t('cmdGraph.detail', 'Open a customized graph view for a model. To retrieve grouped data without opening a view, use the read_group command instead.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdGraph.args.model', 'The model technical name')],

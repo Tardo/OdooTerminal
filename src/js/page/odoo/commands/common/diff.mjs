@@ -5,7 +5,7 @@
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import searchRead from '@odoo/orm/search_read';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -176,27 +176,11 @@ async function cmdDiff(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
   return {model: kwargs.model, id_a, id_b, diff, same};
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDiff.definition', 'Compare two records field by field'),
     callback: cmdDiff,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t(
       'cmdDiff.detail',
       'Fetches two records of the same model and compares every field value. By default shows only fields that differ. Use --all to include matching fields too. Many2one fields are compared by stored ID (not display name) to avoid false positives from renamed related records. Binary fields are excluded.',

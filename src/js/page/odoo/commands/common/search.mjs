@@ -5,7 +5,7 @@
 import i18n from 'i18next';
 import searchRead from '@odoo/orm/search_read';
 import getFieldsInfo from '@odoo/orm/get_fields_info';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 // $FlowFixMe[untyped-import]
 import {default as Recordset} from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
@@ -132,27 +132,11 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
   return recordset;
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdSearch.definition', 'Search model record/s'),
     callback: cmdSearchModelRecord,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t('cmdSearch.detail', 'Launch orm search query'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdSearch.args.model', 'The model technical name')],

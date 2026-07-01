@@ -5,7 +5,7 @@
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import searchRead from '@odoo/orm/search_read';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 // $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
 import {ARG} from '@trash/constants';
@@ -62,27 +62,11 @@ async function cmdSearchModelRecordId(this: Terminal, kwargs: CMDCallbackArgs, c
   return recordset;
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdRead.definition', 'Fetch records by ID'),
     callback: cmdSearchModelRecordId,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t('cmdRead.detail', 'Fetch one or more records by known ID(s) and return a Recordset. Use when you already have the record ID(s). Use search to find records by domain filter instead.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdRead.args.model', 'The model technical name')],

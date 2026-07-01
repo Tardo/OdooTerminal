@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 import isEmpty from '@trash/utils/is_empty';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
@@ -60,27 +60,11 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
   return s_result;
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdCaf.definition', 'Show field definitions for a model'),
     callback: cmdCheckFieldAccess,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t('cmdCaf.detail', 'Return field metadata for the model: type, required, readonly, label, selection values, relation target, etc. To check create/read/write/unlink access rights instead, use cam.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdCaf.args.model', 'The model technical name')],

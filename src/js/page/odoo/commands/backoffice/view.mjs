@@ -7,7 +7,7 @@ import doAction from '@odoo/base/do_action';
 import getParentAdapter from '@odoo/utils/get_parent_adapter';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from '../common/__utils__';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
@@ -82,27 +82,11 @@ async function cmdViewModelRecord(this: Terminal, kwargs: CMDCallbackArgs): Prom
   });
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdView.definition', 'View model record/s'),
     callback: cmdViewModelRecord,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t('cmdView.detail', 'With -i: opens that record in its form view. Without -i: shows a record picker dialog filtered by -d domain. Does not return data.'),
     args: [
       [ARG.String, ['m', 'model'], true, i18n.t('cmdView.args.model', 'The model technical name')],

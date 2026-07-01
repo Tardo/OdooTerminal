@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import readGroup from '@odoo/orm/read_group';
-import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import {getModelOptions} from './__utils__';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -30,27 +30,11 @@ async function cmdReadGroup(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
   return results;
 }
 
-async function getOptions(this: Terminal, arg_name: string) {
-  if (arg_name === 'model') {
-    return cachedSearchRead(
-      'options_ir.model_active',
-      'ir.model',
-      [],
-      ['model'],
-      await this.getContext({active_test: true}),
-      undefined,
-      {orderBy: 'model ASC'},
-      item => item.model,
-    );
-  }
-  return [];
-}
-
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdReadGroup.definition', 'Fetch grouped and aggregated data from a model'),
     callback: cmdReadGroup,
-    options: getOptions,
+    options: getModelOptions,
     detail: i18n.t(
       'cmdReadGroup.detail',
       'Run an ORM read_group on a model and return the aggregated results. Each result row contains the groupby field values, the aggregated measure values, and __count. Use this instead of search when you need sums, counts, or averages per group.',
