@@ -4,6 +4,15 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ---
 
+**13.3.0**
+
+```
+IMP: TraSH: Concat
+IMP: TraSH: Refactor
+
+FIX: Command 'search': Short name for 'options'
+```
+
 **13.2.0**
 
 ```
