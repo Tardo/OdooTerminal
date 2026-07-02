@@ -187,6 +187,24 @@ export default class ASTParser {
         const sub = this.#subUnit(token.value, token.start + 1, {isData: false, silent: false});
         return {node: NODE.BlockStatement, token: token, tokenIndex: this.#ti(unit, token), unit: sub};
       }
+      case LEXER.Increment:
+      case LEXER.Decrement:
+        if (uopts.exprContext !== true) {
+          // Prefix update as a statement: same as $var++ / $var--
+          ++cursor.pos;
+          const target = this.#parsePostfix(unit, cursor, this.#parsePrimary(unit, cursor));
+          if (target.node !== NODE.Variable && target.node !== NODE.Subscript) {
+            this.#throwToken(token);
+          }
+          return {
+            node: NODE.Assignment,
+            token: token,
+            tokenIndex: this.#ti(unit, token),
+            target: target,
+            value: null,
+          };
+        }
+        break;
       case LEXER.VariableCall: {
         ++cursor.pos;
         const args = this.#parseCommandArgs(unit, cursor);
@@ -324,6 +342,17 @@ export default class ASTParser {
         ++cursor.pos;
         const operand = this.#parsePostfix(unit, cursor, this.#parsePrimary(unit, cursor));
         return {node: NODE.Unary, token, tokenIndex: ti, op: LEXER.Negative, expr: operand};
+      }
+      case LEXER.Increment:
+      case LEXER.Decrement: {
+        // Prefix update as expression: updates first, yields the NEW value.
+        // Restricted to plain variables, like the postfix expression form.
+        ++cursor.pos;
+        const operand = this.#parsePostfix(unit, cursor, this.#parsePrimary(unit, cursor));
+        if (operand.node !== NODE.Variable) {
+          this.#throwToken(token);
+        }
+        return {node: NODE.PrefixUpdate, token, tokenIndex: ti, target: operand};
       }
       case LEXER.Not: {
         ++cursor.pos;

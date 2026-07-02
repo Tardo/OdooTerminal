@@ -301,9 +301,11 @@ export default function(terminal: Terminal): string {
     '  * Nested:              $arr[1][0] += 5\n' +
     '  * Compound operators:  += -= *= /=\n' +
     '    Example: $n = 2; $n += 5; $n -= 1; $n *= 2; $n /= 2   → $n == 6\n' +
-    '  * Increment/decrement:  $i++ ←→ $i += 1   $i-- ←→ $i -= 1   (write attached: $i++, NOT $i ++)\n' +
-    '    As a statement it also works on elements: $arr[0]++\n' +
-    '    Inside expressions it is POSTFIX (yields the OLD value, then updates): $i = 5; $a = $i++  → $a == 5, $i == 6\n' +
+    '  * Increment/decrement:  $i++ / ++$i ←→ $i += 1   $i-- / --$i ←→ $i -= 1   (write attached: $i++, NOT $i ++)\n' +
+    '    As a statement both forms work, also on elements: $arr[0]++   ++$arr[0]\n' +
+    '    Inside expressions, POSTFIX yields the OLD value; PREFIX yields the NEW value:\n' +
+    '      $i = 5; $a = $i++   → $a == 5, $i == 6\n' +
+    '      $i = 5; $a = ++$i   → $a == 6, $i == 6\n' +
     '    The expression form only works on plain variables: $a = $arr[0]++ is an ERROR.\n' +
     '\n' +
     '=== 4. OPERATORS ===\n' +

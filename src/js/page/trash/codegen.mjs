@@ -435,6 +435,21 @@ export default class CodeGen {
         this.#push(INSTRUCTION_TYPE.STORE_NAME, this.#ti(expr), unit.id, name_index);
         break;
       }
+      case NODE.PrefixUpdate: {
+        // Prefix ++/--: update the variable first (STORE_NAME with the ++/--
+        // token applies compound semantics, consuming the injected constant
+        // 1), then load the NEW value as the expression result.
+        const upd_target = expr.target;
+        if (!upd_target || upd_target.node !== NODE.Variable) {
+          break;
+        }
+        const name_index = this.#pushName(unit, upd_target.name ?? null);
+        const dindex = this.#pushValue(unit, 1);
+        this.#push(INSTRUCTION_TYPE.LOAD_CONST, this.#ti(expr), unit.id, dindex);
+        this.#push(INSTRUCTION_TYPE.STORE_NAME, this.#ti(expr), unit.id, name_index);
+        this.#push(INSTRUCTION_TYPE.LOAD_NAME, this.#ti(upd_target), unit.id, name_index);
+        break;
+      }
     }
   }
 

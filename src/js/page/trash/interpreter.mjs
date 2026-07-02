@@ -212,7 +212,9 @@ export default class Interpreter {
               prev_char === SYMBOLS.EOL ||
               (char !== SYMBOLS.ASSIGNMENT && prev_char === SYMBOLS.ASSIGNMENT && !SYMBOLS_MATH_OPER_SET.has(value)) ||
               (char !== SYMBOLS.NOT && prev_char === SYMBOLS.NOT && char !== SYMBOLS.NOT_EQUAL[1]) ||
-              (!SYMBOLS_MATH_OPER_FIRST_CHARS.has(char) && SYMBOLS_MATH_OPER_SET.has(value) && (isNumber(char) || char === SYMBOLS.VARIABLE))
+              (!SYMBOLS_MATH_OPER_FIRST_CHARS.has(char) && SYMBOLS_MATH_OPER_SET.has(value) && (isNumber(char) || char === SYMBOLS.VARIABLE)) ||
+              // Detach prefix ++/-- from a following number so the parser can reject it properly
+              ((value === SYMBOLS.INCREMENT || value === SYMBOLS.DECREMENT) && isNumber(char))
             ) {
               do_cut = true;
             } else if (
@@ -311,7 +313,7 @@ export default class Interpreter {
       } else {
         ttype = LEXER.Space;
       }
-    } else if (isFalsy(options?.isData) && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && ((token_san.length === 1 && typeof next_char === 'undefined') || (token_san.length > 1 && token_san[1] !== SYMBOLS.LOGIC_BLOCK_START && token_san[1] !== SYMBOLS.ASSIGNMENT && !isNumber(token_san[1])))) {
+    } else if (isFalsy(options?.isData) && prev_token_info && prev_token_info[0] === LEXER.Space && token_san[0] === SYMBOLS.ARGUMENT && token_san !== SYMBOLS.DECREMENT && ((token_san.length === 1 && typeof next_char === 'undefined') || (token_san.length > 1 && token_san[1] !== SYMBOLS.LOGIC_BLOCK_START && token_san[1] !== SYMBOLS.ASSIGNMENT && !isNumber(token_san[1])))) {
       if (token_san[1] === SYMBOLS.ARGUMENT) {
         ttype = LEXER.ArgumentLong;
         token_san = token_san.substr(2);
@@ -327,7 +329,11 @@ export default class Interpreter {
       ttype = LEXER.Delimiter;
     } else if (
       typeof oper_ttype !== 'undefined' &&
-      (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)
+      (!prev_token_info_no_space ||
+        prev_token_info_no_space[0] !== LEXER.Delimiter ||
+        // ++/-- can legitimately start a statement (prefix form)
+        token_san === SYMBOLS.INCREMENT ||
+        token_san === SYMBOLS.DECREMENT)
     ) {
       ttype = oper_ttype;
     } else if (token_san[0] === SYMBOLS.ARRAY_START && token_san.at(-1) === SYMBOLS.ARRAY_END) {

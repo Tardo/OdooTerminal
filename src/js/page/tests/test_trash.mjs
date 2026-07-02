@@ -133,6 +133,29 @@ export default class TestTrash extends TerminalTestSuite {
     // statement position must NOT leak the old value as a script result
     results = await this.terminal.getShell().eval('$n = 5; $n++; $n');
     this.assertEqual(results, 6);
+    // prefix statements (equivalent to postfix in statement position)
+    results = await this.terminal.getShell().eval('$n = 5; ++$n; $n');
+    this.assertEqual(results, 6);
+    results = await this.terminal.getShell().eval('$n = 5; --$n; $n');
+    this.assertEqual(results, 4);
+    results = await this.terminal.getShell().eval('$arr = [1, 2]; ++$arr[0]; --$arr[1]; $arr');
+    this.assertEqual(results[0], 2);
+    this.assertEqual(results[1], 1);
+    // prefix in expressions (PREFIX: updates first, yields the NEW value)
+    results = await this.terminal.getShell().eval('$i = 5; $a = ++$i; [$a, $i]');
+    this.assertEqual(results[0], 6);
+    this.assertEqual(results[1], 6);
+    results = await this.terminal.getShell().eval('$i = 5; $a = --$i; [$a, $i]');
+    this.assertEqual(results[0], 4);
+    this.assertEqual(results[1], 4);
+    results = await this.terminal.getShell().eval('$i = 5; $a = 1 + ++$i; [$a, $i]');
+    this.assertEqual(results[0], 7);
+    this.assertEqual(results[1], 6);
+    // prefix in for headers and indented inside blocks
+    results = await this.terminal.getShell().eval("$buff = ''; for ($i = 0; $i < 10; ++$i) { $buff = $buff + 'A' }; $buff['length']");
+    this.assertEqual(results, 10);
+    results = await this.terminal.getShell().eval('$n = 10\nfor ($i = 0; $i < 3; $i++) {\n  --$n\n}\n$n');
+    this.assertEqual(results, 7);
   }
 
   async test_trash_forin() {

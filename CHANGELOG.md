@@ -7,7 +7,7 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 **13.3.0**
 
 ```
-ADD: TraSH: Increment/decrement operators ($i++ / $i--), usable in expressions with postfix semantics
+ADD: TraSH: Increment/decrement operators, prefix and postfix ($i++ / ++$i), usable in expressions with C-like semantics
 ADD: TraSH: for-in loops over arrays and strings (for ($item in $items) { ... })
 
 IMP: TraSH: AST-based parser/codegen (same bytecode/VM); replaces the token prioritizer and the linear parse walk

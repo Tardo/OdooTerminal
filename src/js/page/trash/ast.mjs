@@ -31,6 +31,7 @@ export const NODE = {
   AnonFunction: 29,
   Missing: 30,
   PostfixUpdate: 31,
+  PrefixUpdate: 32,
 };
 
 // A unit is one tokenized chunk of input: the root program or the inner
