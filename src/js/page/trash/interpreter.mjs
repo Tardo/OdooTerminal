@@ -107,30 +107,37 @@ export type FunctionParseInfo = [fun_name: string | void, fun_args: $ReadOnlyArr
 export type LoopForParseInfo = [for_init: string, for_check: string, for_iter: string, for_code: string, index: number];
 export type IfParseInfo = [if_check: string, if_code: string, elif_codes: Array<[string, string]>, else_code: string | void, index: number];
 
+// Operator tokens that map 1:1 to a lexer type (only valid when not preceded by a delimiter)
+const OPERATOR_LEXER_TYPES: Map<string, number> = new Map([
+  [SYMBOLS.AND, LEXER.And],
+  [SYMBOLS.OR, LEXER.Or],
+  [SYMBOLS.NOT, LEXER.Not],
+  [SYMBOLS.EQUAL, LEXER.Equal],
+  [SYMBOLS.NOT_EQUAL, LEXER.NotEqual],
+  [SYMBOLS.GREATER_THAN_OPEN, LEXER.GreaterThanOpen],
+  [SYMBOLS.LESS_THAN_OPEN, LEXER.LessThanOpen],
+  [SYMBOLS.GREATER_THAN_CLOSED, LEXER.GreaterThanClosed],
+  [SYMBOLS.LESS_THAN_CLOSED, LEXER.LessThanClosed],
+  [SYMBOLS.ASSIGNMENT, LEXER.Assignment],
+  [SYMBOLS.ASSIGNMENT_ADD, LEXER.AssignmentAdd],
+  [SYMBOLS.ASSIGNMENT_SUBSTRACT, LEXER.AssignmentSubstract],
+  [SYMBOLS.ASSIGNMENT_MULTIPLY, LEXER.AssignmentMultiply],
+  [SYMBOLS.ASSIGNMENT_DIVIDE, LEXER.AssignmentDivide],
+]);
+
 /**
  * This is TraSH
  */
 export default class Interpreter {
   #regexComments: RegExp = new RegExp(/^(\s*)?\/\/.*|^(\s*)?\/\*.+\*\//gm);
 
-  /**
-   * Split and trim values
-   * @param {String} text
-   * @param {String} separator
-   * @returns {Array}
-   */
-  splitAndTrim(text: string, separator: string = ','): Array<string> {
-    return text.split(separator).map(item => item.trim());
-  }
-
   getCanonicalCommandName(cmd_name: string, registered_cmds: RegisteredCMD): string | void {
     if (Object.hasOwn(registered_cmds, cmd_name)) {
       return cmd_name;
     }
 
-    const entries = Object.entries(registered_cmds);
-    for (const [cname, cmd_def] of entries) {
-      if (cmd_def.aliases.indexOf(cmd_name) !== -1) {
+    for (const cname of Object.keys(registered_cmds)) {
+      if (registered_cmds[cname].aliases.includes(cmd_name)) {
         return cname;
       }
     }
@@ -156,7 +163,6 @@ export default class Interpreter {
     let in_lblock = 0;
     let in_block = 0;
     let do_cut = false;
-    let do_skip = false;
     let prev_char = '';
     let escape_next = false;
     let prev_token: LexerInfo | void;
@@ -240,11 +246,8 @@ export default class Interpreter {
         }
         do_cut = false;
       }
-      if (!do_skip) {
-        value += char;
-      }
+      value += char;
       prev_char = char;
-      do_skip = false;
     }
     if (value) {
       tokens.push(this.#lexer(value, undefined, prev_token, prev_token_no_space, options));
@@ -313,6 +316,7 @@ export default class Interpreter {
     const delimiter = options.delimiter ?? SYMBOLS.ITEM_DELIMITER;
     let token_san = token.trim();
     let ttype = LEXER.String;
+    const oper_ttype = OPERATOR_LEXER_TYPES.get(token_san);
     if (!token_san) {
       if (token === SYMBOLS.EOL) {
         ttype = LEXER.Delimiter;
@@ -333,34 +337,11 @@ export default class Interpreter {
       token_san === delimiter
     ) {
       ttype = LEXER.Delimiter;
-    } else if (token_san === SYMBOLS.AND && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.And;
-    } else if (token_san === SYMBOLS.OR && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.Or;
-    } else if (token_san === SYMBOLS.NOT && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.Not;
-    } else if (token_san === SYMBOLS.EQUAL && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.Equal;
-    } else if (token_san === SYMBOLS.NOT_EQUAL && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.NotEqual;
-    } else if (token_san === SYMBOLS.GREATER_THAN_OPEN && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.GreaterThanOpen;
-    } else if (token_san === SYMBOLS.LESS_THAN_OPEN && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.LessThanOpen;
-    } else if (token_san === SYMBOLS.GREATER_THAN_CLOSED && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.GreaterThanClosed;
-    } else if (token_san === SYMBOLS.LESS_THAN_CLOSED && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.LessThanClosed;
-    } else if (token_san === SYMBOLS.ASSIGNMENT && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.Assignment;
-    } else if (token_san === SYMBOLS.ASSIGNMENT_ADD && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.AssignmentAdd;
-    } else if (token_san === SYMBOLS.ASSIGNMENT_SUBSTRACT && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.AssignmentSubstract;
-    } else if (token_san === SYMBOLS.ASSIGNMENT_MULTIPLY && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.AssignmentMultiply;
-    } else if (token_san === SYMBOLS.ASSIGNMENT_DIVIDE && (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)) {
-      ttype = LEXER.AssignmentDivide;
+    } else if (
+      typeof oper_ttype !== 'undefined' &&
+      (!prev_token_info_no_space || prev_token_info_no_space[0] !== LEXER.Delimiter)
+    ) {
+      ttype = oper_ttype;
     } else if (token_san[0] === SYMBOLS.ARRAY_START && token_san.at(-1) === SYMBOLS.ARRAY_END) {
       token_san = token_san.substr(1, token_san.length - 2);
       token_san = token_san.trim();
@@ -519,12 +500,8 @@ export default class Interpreter {
           const next_ntokens = this.#getDataInstructions(tokens_no_spaces, token_index + 1, false);
           const prev_ntokens_str = this.#tokenList2str(prev_ntokens);
           const next_ntokens_str = this.#tokenList2str(next_ntokens);
-          for (let i = 0; i < prev_ntokens.length; ++i) {
-            ntokens.pop();
-          }
-          for (let i = 0; i < next_ntokens.length; ++i) {
-            ++token_index;
-          }
+          ntokens.length -= prev_ntokens.length;
+          token_index += next_ntokens.length;
           const fstr = `${prev_ntokens_str}${token_val}${next_ntokens_str}`;
           ntokens.push([LEXER.LogicBlock, fstr, `(${fstr})`]);
         } else {
@@ -713,24 +690,6 @@ export default class Interpreter {
     to_append.instructions.push(...parse_res.program.instructions);
     res.nestingDepth = parse_res.nestingDepth;
     return parse_res;
-  }
-
-  #parse(data: ParseInfo, buf: ParseBuffer, token: TokenInfo, registeredCmds: RegisteredCMD | void): ParseInfo {
-    const parse_info = this.parse(
-      token.value,
-      {
-        registeredCmds: registeredCmds,
-        silent: true,
-        offset: token.start + 1,
-      },
-      data.nestingDepth + 1,
-    );
-    data.program.values.push(...parse_info.program.values);
-    data.program.names.push(...parse_info.program.names);
-    buf.inputTokens.push(...parse_info.inputTokens);
-    buf.instructions.push(...parse_info.program.instructions);
-    data.nestingDepth = parse_info.nestingDepth;
-    return data;
   }
 
   /**
@@ -1257,7 +1216,7 @@ export default class Interpreter {
               if (LEXERDATA_SET.has(item.type)) ++dindex;
               if (LEXER_MATH_OPER_SET.has(item.type)) --dindex;
             }
-            dindex = parseInt(dindex / 2, 10);
+            dindex = Math.trunc(dindex / 2);
             to_append.instructions.push(new Instruction(INSTRUCTION_TYPE.BUILD_MAP, index, level, dindex));
           }
           break;
@@ -1385,6 +1344,9 @@ export default class Interpreter {
   }
 
   #unescapeString(str: string): string {
+    if (!str.includes(SYMBOLS.ESCAPE)) {
+      return str;
+    }
     let result = '';
     let i = 0;
     const len = str.length;

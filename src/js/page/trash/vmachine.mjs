@@ -20,7 +20,8 @@ import UnknownNameError from './exceptions/unknown_name_error';
 import InvalidCommandDefintionError from './exceptions/invalid_command_definition_error';
 import pluck from './utils/pluck';
 import isNumber from './utils/is_number';
-import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs} from './interpreter';
+import type {RegisteredCMD, CMDDef, ParseInfo, CMDCallbackArgs, TokenInfo, ArgDef} from './interpreter';
+import type Instruction from './instruction';
 
 export type ProcessCommandJobOptions = {
   cmdRaw: string,
@@ -39,6 +40,16 @@ export type EvalOptions = {
   isData?: boolean,
   silent?: boolean,
   aliases: {[string]: string},
+};
+
+// Placeholder used when an instruction has no source token attached
+const DEFAULT_TOKEN: TokenInfo = {
+  value: '',
+  raw: '',
+  type: LEXER.Unknown,
+  start: -1,
+  end: -1,
+  index: -1,
 };
 
 export default class VMachine {
@@ -93,7 +104,15 @@ export default class VMachine {
 
   async #genKwargs(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef): Promise<{[string]: mixed}> {
     let kwargs: {[string]: mixed} = {};
-    const arg_defs = cmd_def.args.filter(arg => frame.args.filter(farg => farg in arg[1]).length)
+    // Resolve each named argument to its first matching definition (same
+    // resolution as getArgumentInfoByName, which tolerates duplicated names)
+    const arg_defs: Array<ArgDef> = [];
+    for (const farg of frame.args) {
+      const matched_def = cmd_def.args.find(arg => arg[1].includes(farg));
+      if (typeof matched_def !== 'undefined' && !arg_defs.includes(matched_def)) {
+        arg_defs.push(matched_def);
+      }
+    }
     if (getArgumentInputCount(arg_defs) > frame.args.length) {
       throw new InvalidCommandArgumentsError(name, frame.args);
     }
@@ -158,7 +177,7 @@ export default class VMachine {
         cmdName: name,
         cmdDef: cmd_def,
         kwargs: kwargs,
-        args: frame.stack.map(item => new String(item).toString()),
+        args: frame.stack.map(item => String(item)),
       },
       silent,
     );
@@ -175,16 +194,12 @@ export default class VMachine {
     const callStack = [];
     let eoe = false;
     let activeFrame = rootFrame;
+    // Tokens are only needed by a few instructions (mostly on error paths),
+    // so they are resolved on demand instead of once per instruction
+    const getToken = (instr: Instruction): TokenInfo =>
+      instr.inputTokenIndex >= 0 ? parse_info.inputTokens[instr.level][instr.inputTokenIndex] : DEFAULT_TOKEN;
     for (let index = 0; !eoe && index < instrLen; ++index) {
       const instr = program.instructions[index];
-      const token =
-        instr.inputTokenIndex >= 0
-          ? parse_info.inputTokens[instr.level][instr.inputTokenIndex]
-          : {
-              value: '',
-              start: -1,
-              end: -1,
-            };
       switch (instr.type) {
         case INSTRUCTION_TYPE.LOAD_NAME_CALLEABLE:
         case INSTRUCTION_TYPE.LOAD_NAME:
@@ -195,23 +210,25 @@ export default class VMachine {
               callStack.push(activeFrame);
             }
             // Check locals
-            try {
-              const local_val = activeFrame.getLocal(var_name);
-              activeFrame.stack.push(local_val);
-            } catch (_err) {
+            const owner_frame = activeFrame.resolveLocal(var_name);
+            if (typeof owner_frame === 'undefined') {
+              const token = getToken(instr);
               throw new UnknownNameError(var_name, token.start, token.end);
             }
+            activeFrame.stack.push(owner_frame.locals[var_name]);
           }
           break;
         case INSTRUCTION_TYPE.LOAD_GLOBAL:
           {
             const cmd_name = program.names[instr.level][instr.operand];
             if (cmd_name === null || typeof cmd_name === 'undefined') {
+              const token = getToken(instr);
               throw new UnknownNameError(i18n.t('UnknownNameError.invalidName', '<InvalidName>'), token.start, token.end)
             } else if (Object.hasOwn(this.#registeredCmds, cmd_name) || cmd_name in opts.aliases) {
               activeFrame = new Frame(cmd_name, activeFrame);
               callStack.push(activeFrame);
             } else {
+              const token = getToken(instr);
               throw new UnknownCommandError(cmd_name, token.start, token.end);
             }
           }
@@ -224,6 +241,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.LOAD_ARG:
           {
+            const token = getToken(instr);
             const arg_name = token.value;
             if (!activeFrame) {
               throw new NotExpectedCommandArgumentError(arg_name, token.start, token.end);
@@ -390,6 +408,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.STORE_NAME:
           {
+            const token = getToken(instr);
             const vname = program.names[instr.level][instr.operand];
             const vvalue = activeFrame.stack.pop();
             if (vname === null || typeof vname === 'undefined') {
@@ -430,7 +449,7 @@ export default class VMachine {
           break;
         case INSTRUCTION_TYPE.STORE_SUBSCR:
           {
-            // const vname = program.names[instr.level][instr.operand];
+            const token = getToken(instr);
             const attr_value = activeFrame.stack.pop();
             const attr_name = activeFrame.stack.pop();
             const data = activeFrame.stack.pop();

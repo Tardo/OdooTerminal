@@ -21,30 +21,27 @@ export default class Frame {
     this.lastFlowCheck = undefined;
   }
 
-  getLocal(var_name: string): mixed {
+  resolveLocal(var_name: string): Frame | void {
     let cur_frame: Frame | void = this;
     while (typeof cur_frame !== 'undefined') {
       if (Object.hasOwn(cur_frame.locals, var_name)) {
-        return cur_frame.locals[var_name];
+        return cur_frame;
       }
       cur_frame = cur_frame.prevFrame;
     }
-    throw new UnknownStoreValue(var_name);
+    return undefined;
+  }
+
+  getLocal(var_name: string): mixed {
+    const owner_frame = this.resolveLocal(var_name);
+    if (typeof owner_frame === 'undefined') {
+      throw new UnknownStoreValue(var_name);
+    }
+    return owner_frame.locals[var_name];
   }
 
   setLocal(var_name: string, value: mixed) {
-    let cur_frame: Frame | void = this;
-    let val_found = false;
-    while (typeof cur_frame !== 'undefined') {
-      if (Object.hasOwn(cur_frame.locals, var_name)) {
-        cur_frame.locals[var_name] = value;
-        val_found = true;
-        break;
-      }
-      cur_frame = cur_frame.prevFrame;
-    }
-    if (!val_found) {
-      this.locals[var_name] = value;
-    }
+    const owner_frame = this.resolveLocal(var_name) || this;
+    owner_frame.locals[var_name] = value;
   }
 }
