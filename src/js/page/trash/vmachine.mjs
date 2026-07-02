@@ -249,13 +249,16 @@ export default class VMachine {
           {
             const valB = activeFrame.stack.pop();
             const valA = activeFrame.stack.pop();
-            if (typeof valB !== 'number' && typeof valB !== 'string') {
+            if (typeof valA === 'string' || typeof valB === 'string') {
+              // String concatenation: coerce the other operand (i.e. booleans, null...) to a string
+              activeFrame.stack.push(`${String(valA)}${String(valB)}`);
+            } else if (typeof valA === 'number' && typeof valB === 'number') {
+              activeFrame.stack.push(valA + valB);
+            } else if (typeof valA !== 'number') {
+              throw new InvalidValueError(valA);
+            } else {
               throw new InvalidValueError(valB);
             }
-            if (typeof valA !== 'number' && typeof valA !== 'string') {
-              throw new InvalidValueError(valA);
-            }
-            activeFrame.stack.push(valA + valB);
           }
           break;
         case INSTRUCTION_TYPE.SUBSTRACT:

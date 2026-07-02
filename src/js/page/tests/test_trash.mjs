@@ -149,6 +149,8 @@ export default class TestTrash extends TerminalTestSuite {
       "$a = [{test: 124, this: 'lelele lololo'}]; $b = [54,42]; $a[0]['this'] + '---' + $b[1];",
     );
     this.assertEqual(results, 'lelele lololo---42');
+    results = await this.terminal.getShell().eval("'VAT: ' + false");
+    this.assertEqual(results, 'VAT: false');
   }
 
   async test_trash_arithmetic() {
