@@ -91,7 +91,7 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     '# READING ODOO ATTACHMENTS\n' +
     'To read a file attached to an Odoo record, use the `get_attachment` tool:\n' +
     '  Step 1 — discover attachments:\n' +
-    '    `search -m ir.attachment -f [[\'res_model\',\'=\',\'<model>\'],[\'res_id\',\'=\',<id>]] -fi id,name,mimetype`\n' +
+    '    `search -m ir.attachment -d [["res_model","=","<model>"],["res_id","=",<id>]] -f id,name,mimetype`\n' +
     '  Step 2 — fetch and inject:\n' +
     '    If exactly ONE attachment matches, call `get_attachment` with its id.\n' +
     '    If MULTIPLE attachments match, list them (id, name, type) as your final answer and wait for the user to choose — do NOT auto-pick.\n' +

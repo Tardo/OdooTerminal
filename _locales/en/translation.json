@@ -1297,10 +1297,11 @@
   },
   "funcFixed": {
     "args": {
-      "num": "The number of decimals"
+      "decimals": "The number of decimals",
+      "num": "The number"
     },
-    "definition": "Rounds a number UP to the nearest integer",
-    "detail": "Rounds a number UP to the nearest integer"
+    "definition": "Round a number to the given decimals, then truncate to integer",
+    "detail": "Round the number using toFixed(decimals) and return the result truncated to an integer"
   },
   "funcFloor": {
     "args": {

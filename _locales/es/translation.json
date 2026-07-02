@@ -1297,10 +1297,11 @@
   },
   "funcFixed": {
     "args": {
-      "num": "El número de decimales"
+      "decimals": "El número de decimales",
+      "num": "El número"
     },
-    "definition": "Redondea un número HACIA ARRIBA al entero más cercano",
-    "detail": "Redondea un número HACIA ARRIBA al entero más cercano"
+    "definition": "Redondea un número a los decimales indicados y lo trunca a entero",
+    "detail": "Redondea el número usando toFixed(decimales) y devuelve el resultado truncado a entero"
   },
   "funcFloor": {
     "args": {

@@ -4,6 +4,7 @@
 
 import i18n from 'i18next';
 import {aiState, aiRuntime} from '@ai/state';
+import buildHTMLFormatPrompt from '@ai/prompts/html_format';
 import {streamRequest} from '@ai/providers';
 import {startRequest, handleAbort} from '@ai/utils/network';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
@@ -31,7 +32,7 @@ export default async function cmdAIChat(kwargs: CMDCallbackArgs, ctx: CMDCallbac
   ctx.screen.print('--- AI Response (' + model + ') ---', false);
 
   try {
-    const {usage} = await streamRequest(url, aiState.apiKey, model, [{role: 'user', content: prompt}], chatController.signal, delta => {
+    const {usage} = await streamRequest(url, aiState.apiKey, model, [{role: 'system', content: buildHTMLFormatPrompt()}, {role: 'user', content: prompt}], chatController.signal, delta => {
       ctx.screen.print(delta, true);
     }, null, aiState.maxTokens);
     ctx.screen.print('');

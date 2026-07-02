@@ -14,13 +14,13 @@ async function funcFixed(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<n
 
 export default function (): Partial<CMDDef> {
   return {
-    definition: i18n.t('funcFixed.definition', 'Rounds a number UP to the nearest integer'),
+    definition: i18n.t('funcFixed.definition', 'Round a number to the given decimals, then truncate to integer'),
     callback: funcFixed,
     type: FUNCTION_TYPE.Internal,
-    detail: i18n.t('funcFixed.detail', 'Rounds a number UP to the nearest integer'),
+    detail: i18n.t('funcFixed.detail', 'Round the number using toFixed(decimals) and return the result truncated to an integer'),
     args: [
       [ARG.Number, ['n', 'num'], true, i18n.t('funcFixed.args.num', 'The number')],
-      [ARG.Number, ['d', 'decimals'], false, i18n.t('funcFixed.args.num', 'The number of decimals')],
+      [ARG.Number, ['d', 'decimals'], false, i18n.t('funcFixed.args.decimals', 'The number of decimals')],
     ],
     example: "-n 12.3",
   };

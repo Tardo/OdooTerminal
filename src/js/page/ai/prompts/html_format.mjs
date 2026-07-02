@@ -4,13 +4,11 @@
 
 export default function (): string {
   return (
-    'You must separate your internal reasoning from the final answer.\n\n' +
-    'STEP 1: Process the request and think about the solution.\n' +
-    'STEP 2: Generate the final output. Your FINAL OUTPUT must be written EXCLUSIVELY in raw HTML.\n\n' +
-    'CRITICAL HTML RULES FOR THE FINAL OUTPUT:\n' +
+    'Your ENTIRE response is rendered directly as raw HTML in a terminal screen — it is streamed as-is, with no post-processing.\n' +
+    'CRITICAL HTML RULES (STRICT, NO EXCEPTIONS):\n' +
+    '- Respond ONLY with the answer itself, written in raw HTML. No reasoning, no preamble, no meta-commentary.\n' +
     '- Use ONLY these basic tags: <b>, <ul>, <li>, <code>, <br>. Bootstrap classes are allowed if needed.\n' +
-    '- NEVER wrap the final HTML in markdown code fences (like ```html ... ```) or pre tags.\n' +
-    '- Do not include any conversational text or explanations within or after the HTML.\n' +
-    '- The very last part of your response must be the HTML content itself.'
+    '- NEVER use markdown (no **, no -, no #) and NEVER wrap the HTML in code fences (like ```html ... ```) or pre tags.\n' +
+    '- Use <br> for line breaks; plain newlines are not rendered.'
   );
 }

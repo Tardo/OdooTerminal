@@ -161,7 +161,7 @@ export function buildScriptingPrompt(): string {
     '\n' +
     '  Math:\n' +
     '    floor -n 12.9       → 12\n' +
-    '    fixed -n 12.567 -d 2 → 12  (applies .toFixed(d) rounding then truncates to integer)\n' +
+    '    fixed -n 3.7 -d 0   → 4   (rounds via .toFixed(d), then truncates to INTEGER — never returns decimals)\n' +
     '    abs -n -5           → 5\n' +
     '    pow -b 2 -e 5       → 32\n' +
     '    rand -mi 1 -ma 10   → random integer in [1, 10]\n' +
@@ -201,12 +201,12 @@ export function buildScriptingPrompt(): string {
     '  }\n' +
     '  $arr\n' +
     '\n' +
-    '  // Create & link: capture ID from create, then open the record\n' +
+    '  // Create & read back: capture ID from create, then read the record\n' +
     '  $r = (create res.partner -v {name:"Test"})\n' +
-    '  view res.partner -i $r["id"]\n' +
+    '  read res.partner -i $r["id"]\n' +
     '\n' +
     '  // Update a field and commit\n' +
-    '  $p = (search -m res.product.product -l 1)\n' +
+    '  $p = (search -m product.product -l 1)\n' +
     '  $p["lst_price"] = $p["lst_price"] * 1.1\n' +
     '  commit $p\n' +
     '\n' +
@@ -274,6 +274,7 @@ export default function(terminal: Terminal): string {
     '=== 2. LITERALS ===\n' +
     '  * Numbers:     42   -7   3.14   -2.5\n' +
     '  * Strings:     "hello world"  or  \'hello world\'  (both quote styles work)\n' +
+    '  * Escapes:     \\" \\\' \\\\ \\n inside strings → "say \\"hi\\""   \'it\\\'s ok\'   "line1\\nline2"  (unknown escapes are kept as-is)\n' +
     '  * Booleans:    true   false\n' +
     '  * Null:        null\n' +
     '  * Arrays:      [1, 2, 3]   ["a", "b"]   [1, [2, 3], "x"]   (nesting allowed)\n' +
@@ -285,8 +286,8 @@ export default function(terminal: Terminal): string {
     '  * Declare & assign:    $var = value\n' +
     '  * Capture cmd output:  $var = (command ...)\n' +
     '    → The ENTIRE outer command must be wrapped in () — even when it already has subcommand args inside:\n' +
-    '      WRONG:   $month = arr_clone -arr (str_split -s $today -d "-")    ← outer not wrapped, nothing captured\n' +
-    '      CORRECT: $month = (arr_clone -arr (str_split -s $today -d "-"))  ← outer wrapped, result captured\n' +
+    '      WRONG:   $rec = read res.users -i (search -m res.users -f id)[0]["id"]    ← outer not wrapped, nothing captured\n' +
+    '      CORRECT: $rec = (read res.users -i (search -m res.users -f id)[0]["id"])  ← outer wrapped, result captured\n' +
     '  * Array element:       $arr[2] = 42\n' +
     '  * Dict key:            $obj["key"] = "new value"\n' +
     '  * Nested:              $arr[1][0] += 5\n' +
@@ -345,8 +346,7 @@ export default function(terminal: Terminal): string {
     '\n' +
     '=== 9. RECORDSETS (SINGLETON VS MULTI-RECORD) ===\n' +
     '  * SINGLETON (create, read <single-id>, search -l 1):\n' +
-    '    - Access field: $res["field_name"]\n' +
-    '    - NEVER index: $res[0]["field"]  ← WRONG on a singleton\n' +
+    '    - Access field directly: $res["field_name"]   ($res[0]["field"] also works, but the [0] is unnecessary)\n' +
     '  * MULTI-RECORD (search -m without -l 1):\n' +
     '    - Count: $res["length"]   (never $res["ids"]["length"])\n' +
     '    - Access item: $res[0]["field"], $res[1]["field"]\n' +
