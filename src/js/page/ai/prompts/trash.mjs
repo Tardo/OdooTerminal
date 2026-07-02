@@ -224,7 +224,7 @@ export function buildScriptingPrompt(): string {
 
 export default function(terminal: Terminal): string {
   const cmds = terminal.getShell().getVM().getRegisteredCmds();
-  const lines = Object.entries(cmds).filter(([_name, def]) => def.type === FUNCTION_TYPE.Command).map(([name, def]) => {
+  const lines = Object.entries(cmds).filter(([_name, def]) => def.type === FUNCTION_TYPE.Command || def.type === FUNCTION_TYPE.Internal).map(([name, def]) => {
     return buildCommandPrompt(name, def);
   });
 
