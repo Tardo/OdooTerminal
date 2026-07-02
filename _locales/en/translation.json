@@ -122,7 +122,7 @@
       "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
       "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
       "model": "Model name to use",
-      "operation": "operation: connect, chat or exec",
+      "operation": "operation: connect, chat, agent, attach or stop",
       "prompt": "The prompt or natural language request to send",
       "provider": "AI provider: openai (default) or anthropic",
       "timeout": "Max seconds to wait for a response (0 = no limit)",
@@ -156,12 +156,12 @@
         "missingPermission": "Warning: missing browser permission to contact {{url}}. Open the extension's Options page (AI Models section) and use \"Grant access\" for this URL before sending requests."
       }
     },
-    "definition": "AI assistant (connect, chat & exec)",
-    "detail": "Connect to an AI server (OpenAI-compatible API) and chat with it or translate natural language into terminal commands.",
+    "definition": "AI assistant (connect, chat & agent)",
+    "detail": "Connect to an AI server (OpenAI-compatible or Anthropic API) and chat with it, translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively.",
     "error": {
-      "noSubcommand": "Usage: ai connect|chat|exec|stop ...",
+      "noSubcommand": "Usage: ai connect|chat|agent|stop ...",
       "unknownOperation": "Unknown operation: {{sub}}",
-      "usage": "Usage: ai connect|chat|exec|stop ..."
+      "usage": "Usage: ai connect|chat|agent|attach|stop ..."
     },
     "stop": {
       "noRequest": "No active AI request to stop."
@@ -218,7 +218,7 @@
   "cmdCaf": {
     "args": {
       "field": "The field names to request",
-      "filter": "The filter to apply",
+      "filter": "The filter to apply. Example: -fi {required: true}",
       "model": "The model technical name",
       "property": "The field properties to display"
     },
@@ -463,7 +463,7 @@
     "args": {
       "code": "TraSH Code"
     },
-    "definition": "Disassembler bytecode",
+    "definition": "Dissasembler bytecode",
     "detail": "Shows the bytecode generated for the input",
     "table": {
       "instrCode": "Instr. Code",
@@ -594,7 +594,7 @@
     "args": {
       "domain": "The domain filter",
       "groupby": "Fields to group by",
-      "measure": "The measure field",
+      "measure": "The measure field (plain field name, e.g. amount_total — NOT sum:amount_total)",
       "model": "The model technical name",
       "name": "The view title",
       "type": "The chart type"
@@ -657,7 +657,7 @@
       "none": "No buttons found in the current view"
     },
     "definition": "Inspect interactive elements on the current page",
-    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nTypes:\n  page (default) — context overview: model, record id, view type, element counts\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)",
+    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nTypes:\n  page (default) — context overview: model, record id, view type, action id, element counts\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)\n  list — visible rows in the current list view with a \"view\" command per row",
     "dialog": {
       "buttons": "<em>Buttons:</em>",
       "fields": "<em>Fields:</em>",
@@ -905,7 +905,7 @@
     "args": {
       "col": "Fields to group by in columns",
       "domain": "The domain filter",
-      "measure": "Fields to use as measures",
+      "measure": "Fields to use as measures (plain field names, e.g. amount_total — NOT sum:amount_total)",
       "model": "The model technical name",
       "name": "The view title",
       "row": "Fields to group by in rows"
@@ -1184,7 +1184,7 @@
       "ref": "The view reference name"
     },
     "definition": "View model record/s",
-    "detail": "With -i: opens that record in its form view. Without -i: shows a record picker dialog. Does not return data.",
+    "detail": "With -i: opens that record in its form view. Without -i: shows a record picker dialog filtered by -d domain. Does not return data.",
     "error": {
       "notViewDialogsService": "Cannot find view dialog service"
     },
@@ -1237,10 +1237,10 @@
   },
   "cmdZip": {
     "args": {
-      "values": "Data to write (must be an array of tuples [filename, filedata, ?fileoptions])"
+      "values": "Data to write (must be an array of tuples [filename, filedata, fileoptions])"
     },
     "definition": "Create zip file",
-    "detail": "To learn about the available options, check out the JSZip help: https://stuk.github.io/jszip"
+    "detail": "To learn about the available options, check out the zip.js help"
   },
   "file2attachment": {
     "aborted": "Aborted by user. No file given...",
@@ -1406,7 +1406,7 @@
     "error": "Service '{{service_name}}' is not available"
   },
   "loader": {
-    "cantInitTerm": "Can't initialize terminal",
+    "cantInitTerm": "Can't initilize terminal",
     "testsEnabled": "Tests Enabled"
   },
   "longpolling": {
@@ -1421,7 +1421,7 @@
     },
     "longpolling": {
       "error": {
-        "init": "Can't initialize longpolling: ",
+        "init": "Can't initilize longpolling: ",
         "read": "** Reading Error! **"
       },
       "new": "New Longpolling Notification:"
@@ -1582,7 +1582,7 @@
       "attachScreenshotPick": "Select element",
       "attachScreenshotViewport": "Full viewport",
       "attachUpload": "Upload file",
-      "experimentalWarning": "This mode is experimental, use it with extreme caution",
+      "experimentalWarning": "This mode is experimental; use it with extreme caution.",
       "helpTip1": "One topic per conversation — start a new one for each task.",
       "helpTip2": "History is auto-compressed when context fills up, but shorter conversations always cost fewer tokens.",
       "helpTip3": "Be specific and concise — vague prompts waste tokens and give worse results.",

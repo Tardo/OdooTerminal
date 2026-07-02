@@ -80,8 +80,10 @@ export function buildScriptingPrompt(): string {
     '    if ($x == 2) { return "A" } elif ($x == 3) { return "B" } else { return "C" }\n' +
     '    → if none match and no else, execution continues after the block.\n' +
     '\n' +
-    '  for loop (C-style):\n' +
-    '    for ($i = 0; $i < 10; $i += 1) { ... }\n' +
+    '  for loop (two forms):\n' +
+    '    for ($i = 0; $i < 10; $i++) { ... }      C-style ($i++ ←→ $i += 1, $i-- ←→ $i -= 1)\n' +
+    '    for ($item in $items) { ... }            for-in: $items must be an ARRAY (or string), NOT a dict\n' +
+    '    → "for ($x of ...)" does NOT exist; use "in".\n' +
     '    → break: exits the innermost loop only.\n' +
     '    → continue: skips to the next iteration.\n' +
     '    → silent before commands inside loops suppresses output clutter.\n' +
@@ -265,6 +267,12 @@ export default function(terminal: Terminal): string {
     'FORBIDDEN: $val = ($x > 5) ? "big" : "small"\n' +
     'REQUIRED:  if ($x > 5) { $val = "big" } else { $val = "small" }\n' +
     '\n' +
+    '[RULE 3 — LOOP FORMS]\n' +
+    'Two loop forms exist — C-style and for-in:\n' +
+    '  for ($i = 0; $i < 10; $i++) { ... }\n' +
+    '  for ($item in $items) { ... }        ← $items MUST be an array (e.g. search results) or a string\n' +
+    'for-in does NOT work on dicts. "for ($x of ...)" does NOT exist — use "in".\n' +
+    '\n' +
     '=== 1. SYNTAX BASICS ===\n' +
     '  * Statement separators: ";" and newline (\\n) are equivalent — both end a statement.\n' +
     '    $a = 1; $b = 2   ←→   $a = 1\\n$b = 2   (identical)\n' +
@@ -293,6 +301,10 @@ export default function(terminal: Terminal): string {
     '  * Nested:              $arr[1][0] += 5\n' +
     '  * Compound operators:  += -= *= /=\n' +
     '    Example: $n = 2; $n += 5; $n -= 1; $n *= 2; $n /= 2   → $n == 6\n' +
+    '  * Increment/decrement:  $i++ ←→ $i += 1   $i-- ←→ $i -= 1   (write attached: $i++, NOT $i ++)\n' +
+    '    As a statement it also works on elements: $arr[0]++\n' +
+    '    Inside expressions it is POSTFIX (yields the OLD value, then updates): $i = 5; $a = $i++  → $a == 5, $i == 6\n' +
+    '    The expression form only works on plain variables: $a = $arr[0]++ is an ERROR.\n' +
     '\n' +
     '=== 4. OPERATORS ===\n' +
     '  * Arithmetic:  +  -  *  /  %  (standard math precedence: * / % before + -)\n' +

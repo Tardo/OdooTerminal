@@ -52,6 +52,8 @@ export const LEXER = {
   Break: 45,
   Continue: 46,
   Null: 47,
+  Increment: 48,
+  Decrement: 49,
 };
 
 export const LEXER_MATH_C = [
@@ -248,6 +250,8 @@ export const SYMBOLS = {
   ASSIGNMENT_SUBSTRACT: '-=',
   ASSIGNMENT_MULTIPLY: '*=',
   ASSIGNMENT_DIVIDE: '/=',
+  INCREMENT: '++',
+  DECREMENT: '--',
   ARGUMENT: '-',
   ARRAY_START: '[',
   ARRAY_END: ']',

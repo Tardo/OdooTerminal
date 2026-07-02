@@ -98,6 +98,66 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results, 12);
   }
 
+  async test_trash_increment_decrement() {
+    // postfix ++/-- on variables (statement-level sugar for += 1 / -= 1)
+    let results = await this.terminal.getShell().eval('$n = 5; $n++; $n');
+    this.assertEqual(results, 6);
+    results = await this.terminal.getShell().eval('$n = 5; $n--; $n');
+    this.assertEqual(results, 4);
+    results = await this.terminal.getShell().eval('$n = 0; $n++; $n++; $n++; $n');
+    this.assertEqual(results, 3);
+    // in for-loop headers
+    results = await this.terminal.getShell().eval("$buff = ''; for ($i = 0; $i < 10; $i++) { $buff = $buff + 'A' }; $buff");
+    this.assertEqual(results.length, 10);
+    results = await this.terminal.getShell().eval('$c = 0; for ($i = 5; $i > 0; $i--) { $c += 1 }; $c');
+    this.assertEqual(results, 5);
+    // on array/dict elements
+    results = await this.terminal.getShell().eval('$arr = [1, 2]; $arr[0]++; $arr[1]--; $arr');
+    this.assertEqual(results[0], 2);
+    this.assertEqual(results[1], 1);
+    results = await this.terminal.getShell().eval('$obj = {a: 10}; $obj["a"]++; $obj["a"]');
+    this.assertEqual(results, 11);
+    // long argument names (--flag) must keep working
+    results = await this.terminal.getShell().eval("str_replace -s 'hello world' -f 'o' -r '0' --all");
+    this.assertEqual(results, 'hell0 w0rld');
+    // expression position (POSTFIX: yields the old value, then updates)
+    results = await this.terminal.getShell().eval('$i = 5; $a = $i++; [$a, $i]');
+    this.assertEqual(results[0], 5);
+    this.assertEqual(results[1], 6);
+    results = await this.terminal.getShell().eval('$i = 5; $a = ($i--); [$a, $i]');
+    this.assertEqual(results[0], 5);
+    this.assertEqual(results[1], 4);
+    results = await this.terminal.getShell().eval('$i = 5; $a = 1 + $i++; [$a, $i]');
+    this.assertEqual(results[0], 6);
+    this.assertEqual(results[1], 6);
+    // statement position must NOT leak the old value as a script result
+    results = await this.terminal.getShell().eval('$n = 5; $n++; $n');
+    this.assertEqual(results, 6);
+  }
+
+  async test_trash_forin() {
+    let results = await this.terminal.getShell().eval('$sum = 0; for ($x in [1, 2, 3, 4]) { $sum += $x }; $sum');
+    this.assertEqual(results, 10);
+    results = await this.terminal.getShell().eval(
+      "$names = ''; $items = [{n: 'a'}, {n: 'b'}]; for ($it in $items) { $names = $names + $it['n'] }; $names",
+    );
+    this.assertEqual(results, 'ab');
+    // nested for-in (hidden loop vars must not collide)
+    results = await this.terminal.getShell().eval('$t = 0; for ($a in [1, 2]) { for ($b in [10, 20]) { $t += $a * $b } }; $t');
+    this.assertEqual(results, 90);
+    // break / continue
+    results = await this.terminal.getShell().eval('$c = 0; for ($x in [1, 2, 3, 4, 5]) { if ($x == 4) { break }; $c += 1 }; $c');
+    this.assertEqual(results, 3);
+    results = await this.terminal.getShell().eval('$c = 0; for ($x in [1, 2, 3, 4, 5]) { if ($x % 2 == 0) { continue }; $c += $x }; $c');
+    this.assertEqual(results, 9);
+    // iterate a subcommand result (recordset)
+    results = await this.terminal.getShell().eval('$c = 0; for ($p in (search res.partner -f id -l 3)) { $c += 1 }; $c');
+    this.assertEqual(results, 3);
+    // iterate a string
+    results = await this.terminal.getShell().eval("$r = ''; for ($ch in 'abc') { $r = $ch + $r }; $r");
+    this.assertEqual(results, 'cba');
+  }
+
   async test_trash_variables() {
     await this.terminal.getShell().eval("$test = 'this is a test'");
     let results = await this.terminal.getShell().eval('$test');

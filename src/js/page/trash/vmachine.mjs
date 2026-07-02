@@ -421,16 +421,16 @@ export default class VMachine {
               const value_token = parse_info.inputTokens[value_instr.level][value_instr.inputTokenIndex] || {};
               throw new InvalidTokenError(value_token.value, value_token.start, value_token.end);
             } else {
-              if (token.type === LEXER.AssignmentAdd || token.type === LEXER.AssignmentSubstract || token.type === LEXER.AssignmentMultiply || token.type === LEXER.AssignmentDivide) {
+              if (token.type === LEXER.AssignmentAdd || token.type === LEXER.AssignmentSubstract || token.type === LEXER.AssignmentMultiply || token.type === LEXER.AssignmentDivide || token.type === LEXER.Increment || token.type === LEXER.Decrement) {
                 let stored_value = activeFrame.getLocal(vname);
                 if (typeof stored_value === 'undefined') {
                   throw new InvalidNameError(vname, token.start, token.end);
                 }
 
-                if (token.type === LEXER.AssignmentAdd) {
+                if (token.type === LEXER.AssignmentAdd || token.type === LEXER.Increment) {
                   // $FlowFixMe[unsafe-addition]
                   stored_value = stored_value + vvalue;
-                } else if (token.type === LEXER.AssignmentSubstract) {
+                } else if (token.type === LEXER.AssignmentSubstract || token.type === LEXER.Decrement) {
                   // $FlowFixMe[unsafe-arithmetic]
                   stored_value = stored_value - vvalue;
                 } else if (token.type === LEXER.AssignmentMultiply) {
@@ -456,10 +456,10 @@ export default class VMachine {
             try {
               // $FlowFixMe[incompatible-type]
               const data_obj: {[mixed]: mixed} = data;
-              if (token.type === LEXER.AssignmentAdd) {
+              if (token.type === LEXER.AssignmentAdd || token.type === LEXER.Increment) {
                 // $FlowFixMe[unsafe-addition]
                 data_obj[attr_name] = data_obj[attr_name] + attr_value;
-              } else if (token.type === LEXER.AssignmentSubstract) {
+              } else if (token.type === LEXER.AssignmentSubstract || token.type === LEXER.Decrement) {
                 // $FlowFixMe[unsafe-arithmetic]
                 data_obj[attr_name] = data_obj[attr_name] - attr_value;
               } else if (token.type === LEXER.AssignmentMultiply) {

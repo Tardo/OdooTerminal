@@ -7,10 +7,19 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 **13.3.0**
 
 ```
+ADD: TraSH: Increment/decrement operators ($i++ / $i--), usable in expressions with postfix semantics
+ADD: TraSH: for-in loops over arrays and strings (for ($item in $items) { ... })
+
+IMP: TraSH: AST-based parser/codegen (same bytecode/VM); replaces the token prioritizer and the linear parse walk
+IMP: TraSH: Correct short-circuit for chained && expressions
+IMP: TraSH: Standard operator precedence in expressions mixing strings and math
 IMP: TraSH: Concat
 IMP: TraSH: Refactor
+IMP: AI Mode: Prompt fixes (attachment discovery flags, model names, escapes, for-in rule)
+IMP: AI Mode: Send HTML format system prompt in chat mode
 
 FIX: Command 'search': Short name for 'options'
+FIX: TraSH: 'fixed' function description
 ```
 
 **13.2.0**
