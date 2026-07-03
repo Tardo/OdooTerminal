@@ -647,4 +647,64 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.getShell().eval("arr_join ['x', 'y', 'z']");
     this.assertEqual(results, 'xyz');
   }
+
+  async test_trash_dict_funcs() {
+    // dict_keys / dict_values / dict_entries
+    let results = await this.terminal.getShell().eval("dict_keys {a: 1, b: 2}");
+    this.assertEqual(results.length, 2);
+    this.assertTrue(results.includes('a'));
+    this.assertTrue(results.includes('b'));
+    results = await this.terminal.getShell().eval("dict_values {a: 1, b: 2}");
+    this.assertEqual(results.length, 2);
+    this.assertTrue(results.includes(1));
+    this.assertTrue(results.includes(2));
+    results = await this.terminal.getShell().eval("dict_entries {a: 1, b: 2}");
+    this.assertEqual(results.length, 2);
+    const entries = Object.fromEntries(results);
+    this.assertEqual(entries.a, 1);
+    this.assertEqual(entries.b, 2);
+
+    // dict_has
+    results = await this.terminal.getShell().eval("dict_has {a: 1} 'a'");
+    this.assertTrue(results);
+    results = await this.terminal.getShell().eval("dict_has {a: 1} 'b'");
+    this.assertFalse(results);
+
+    // dict_get with and without default
+    results = await this.terminal.getShell().eval("dict_get {a: 1} 'a'");
+    this.assertEqual(results, 1);
+    results = await this.terminal.getShell().eval("dict_get {a: 1} 'b' 99");
+    this.assertEqual(results, 99);
+
+    // dict_set mutates in place and returns the dictionary
+    results = await this.terminal.getShell().eval("$d = {a: 1}; dict_set $d 'b' 2; $d");
+    this.assertEqual(results.a, 1);
+    this.assertEqual(results.b, 2);
+
+    // dict_remove mutates in place
+    results = await this.terminal.getShell().eval("$d = {a: 1, b: 2}; dict_remove $d 'a'; $d");
+    this.assertNotIn(results, 'a');
+    this.assertEqual(results.b, 2);
+
+    // dict_merge does not mutate its inputs
+    results = await this.terminal.getShell().eval(
+      "$d1 = {a: 1}; $d2 = {b: 2}; $merged = (dict_merge $d1 $d2); [$merged, $d1, $d2]",
+    );
+    this.assertEqual(results[0].a, 1);
+    this.assertEqual(results[0].b, 2);
+    this.assertNotIn(results[1], 'b');
+    this.assertNotIn(results[2], 'a');
+
+    // dict_clone independence
+    results = await this.terminal.getShell().eval("$d = {a: 1}; $c = (dict_clone $d); dict_set $c 'b' 2; [$d, $c]");
+    this.assertNotIn(results[0], 'b');
+    this.assertEqual(results[1].a, 1);
+    this.assertEqual(results[1].b, 2);
+
+    // dict_size
+    results = await this.terminal.getShell().eval("dict_size {a: 1, b: 2, c: 3}");
+    this.assertEqual(results, 3);
+    results = await this.terminal.getShell().eval("dict_size {}");
+    this.assertEqual(results, 0);
+  }
 }

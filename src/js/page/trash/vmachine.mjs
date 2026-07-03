@@ -94,6 +94,30 @@ export default class VMachine {
     return this.#registeredCmds[cmd];
   }
 
+  // Invoke a function value (e.g. a `$$var` reference or an inline anonymous
+  // function) with positional arguments. Used by Internal functions that
+  // accept callbacks (arr_map, arr_filter, arr_reduce...). A fresh Frame is
+  // used so the caller's own frame (still needed by the outer execute loop)
+  // is never mutated.
+  async callFunctionValue(fn: mixed, values: $ReadOnlyArray<mixed>, frame: Frame, opts: EvalOptions): Promise<mixed> {
+    // $FlowFixMe[incompatible-use]
+    if (fn === null || typeof fn !== 'object' || typeof fn.callback !== 'function') {
+      throw new InvalidValueError(fn);
+    }
+    const kwargs: {[string]: mixed} = {};
+    // $FlowFixMe[incompatible-use]
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[sketchy-null-mixed]
+    const fn_args: $ReadOnlyArray<ArgDef> = fn.args || [];
+    for (let index = 0; index < values.length && index < fn_args.length; ++index) {
+      kwargs[fn_args[index][1][1]] = values[index];
+    }
+    const call_frame = new Frame(undefined, frame);
+    // $FlowFixMe[incompatible-use]
+    // $FlowFixMe[not-a-function]
+    return await fn.callback(this, kwargs, call_frame, opts);
+  }
+
   static async #fallbackExecuteCommand(): Promise<> {
     throw new InvalidCommandDefintionError;
   }

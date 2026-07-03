@@ -156,19 +156,29 @@ Operators are listed from highest to lowest precedence:
 |---|---|
 | `fetch(url, options, timeout)` | Performs an HTTP request; returns a `Response` object or `null` on timeout |
 
----
-
-## Standard Library
-
-The standard library provides helper functions implemented in TraSH itself. They are loaded automatically.
-
-### Array Helpers
+### Array
 
 | Function | Description |
 |---|---|
 | `arr_clone(arr)` | Returns a shallow copy of an array |
-| `arr_append(arr, item)` | Appends `item` to the end of `arr` |
-| `arr_prepend(arr, item)` | Inserts `item` at the beginning of `arr` |
+| `arr_append(arr, item)` | Appends `item` to the end of `arr` (mutates it in place); returns `arr` |
+| `arr_prepend(arr, item)` | Inserts `item` at the beginning of `arr` (mutates it in place); returns `arr` |
+| `arr_join(arr, sep = '')` | Joins all items of `arr` into a string, separated by `sep` |
 | `arr_reduce(arr, initial, reducer)` | Reduces `arr` to a single value using the `reducer` function |
 | `arr_map(arr, mapper)` | Returns a new array with `mapper` applied to each element |
 | `arr_filter(arr, filter)` | Returns a new array containing only elements for which `filter` returns true |
+
+### Dictionary
+
+| Function | Description |
+|---|---|
+| `dict_keys(dict)` | Returns an array with the keys of `dict` |
+| `dict_values(dict)` | Returns an array with the values of `dict` |
+| `dict_entries(dict)` | Returns an array of `[key, value]` pairs of `dict` |
+| `dict_has(dict, key)` | Returns true if `dict` has `key` |
+| `dict_get(dict, key, default)` | Returns the value for `key`, or `default` if it does not exist |
+| `dict_set(dict, key, value)` | Sets `key` to `value` in `dict` (mutates it in place); returns `dict` |
+| `dict_remove(dict, key)` | Removes `key` from `dict` (mutates it in place); returns `dict` |
+| `dict_merge(dict, other)` | Returns a new dictionary combining `dict` and `other` (`other` takes precedence) |
+| `dict_clone(dict)` | Returns a shallow copy of a dictionary |
+| `dict_size(dict)` | Returns the number of keys in `dict` |

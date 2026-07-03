@@ -108,6 +108,10 @@ export function buildScriptingPrompt(): string {
     '    $res = (arr_map $arr (function (item) { return $item * 2 }))\n' +
     '    $res = (arr_filter $arr (function (item) { return $item > 0 }))\n' +
     '    $res = (arr_reduce $arr 0 (function (a, b) { return $a + $b }))\n' +
+    '  Dictionaries (dict_set/dict_remove mutate in-place, others do not):\n' +
+    '    $keys = (dict_keys $dict) · $values = (dict_values $dict) · $pairs = (dict_entries $dict)  → array of [key, value]\n' +
+    '    (dict_has $dict "k") → boolean · (dict_get $dict "k" $default) · (dict_size $dict) → number of keys\n' +
+    '    dict_set $dict "k" $v · dict_remove $dict "k" · $copy = (dict_clone $dict) · $merged = (dict_merge $dict1 $dict2)  (dict2 wins on key conflicts)\n' +
     '  Strings:\n' +
     '    (str_split -s $str -d ",") → array · (str_upper -s $str) · (str_lower -s $str) · (str_trim -s $str)\n' +
     '    (str_replace -s $str -f "a" -r "b")  first occurrence; add -a for all\n' +

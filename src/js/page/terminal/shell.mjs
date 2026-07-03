@@ -7,7 +7,6 @@ import VMachine from '@trash/vmachine';
 import Frame from '@trash/frame';
 import ProcessJobError from './exceptions/process_job_error';
 import Interpreter from '@trash/interpreter';
-import codeArray from '@trash/std/array';
 import type {ParserOptions, ParseInfo} from '@trash/interpreter';
 import type {EvalOptions, ProcessCommandJobOptions} from '@trash/vmachine';
 
@@ -53,9 +52,6 @@ export default class Shell {
       processCommandJob: (cmdInfo, silent) => this.#processCommandJob(cmdInfo, silent),
       silent: false,
     });
-
-    // Load TL
-    this.eval(codeArray);
   }
 
   getCommandJobMeta(command_info: ProcessCommandJobOptions, job_index: number, silent: boolean = false): JobMetaInfo {

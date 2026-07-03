@@ -1271,6 +1271,62 @@
     "definition": "Valor absoluto de un número",
     "detail": "Devuelve el valor absoluto de un número."
   },
+  "funcArrAppend": {
+    "args": {
+      "arr": "The array",
+      "item": "The item to append"
+    },
+    "definition": "Append an item to an array",
+    "detail": "Append an item to the end of an array (mutates it in place)"
+  },
+  "funcArrClone": {
+    "args": {
+      "arr": "The array"
+    },
+    "definition": "Clone an array",
+    "detail": "Return a shallow copy of an array"
+  },
+  "funcArrFilter": {
+    "args": {
+      "arr": "The array",
+      "filter": "The filter function"
+    },
+    "definition": "Filter an array",
+    "detail": "Return a new array containing only the elements for which the filter function returns true"
+  },
+  "funcArrJoin": {
+    "args": {
+      "arr": "The array",
+      "sep": "The separator"
+    },
+    "definition": "Join an array into a string",
+    "detail": "Join all items of an array into a string, separated by the given separator"
+  },
+  "funcArrMap": {
+    "args": {
+      "arr": "The array",
+      "mapper": "The mapper function"
+    },
+    "definition": "Map an array",
+    "detail": "Return a new array with the mapper function applied to each element"
+  },
+  "funcArrPrepend": {
+    "args": {
+      "arr": "The array",
+      "item": "The item to prepend"
+    },
+    "definition": "Prepend an item to an array",
+    "detail": "Insert an item at the beginning of an array (mutates it in place)"
+  },
+  "funcArrReduce": {
+    "args": {
+      "arr": "The array",
+      "initial": "The initial accumulator value",
+      "reducer": "The reducer function"
+    },
+    "definition": "Reduce an array",
+    "detail": "Reduce an array to a single value using the reducer function"
+  },
   "funcDecode": {
     "args": {
       "method": "El método de decodificación",
@@ -1278,6 +1334,83 @@
     },
     "definition": "Decodificar",
     "detail": "Decodificar datos"
+  },
+  "funcDictClone": {
+    "args": {
+      "dict": "The dictionary"
+    },
+    "definition": "Clone a dictionary",
+    "detail": "Return a shallow copy of a dictionary"
+  },
+  "funcDictEntries": {
+    "args": {
+      "dict": "The dictionary"
+    },
+    "definition": "Get the entries of a dictionary",
+    "detail": "Return an array of [key, value] pairs of a dictionary"
+  },
+  "funcDictGet": {
+    "args": {
+      "default": "The default value",
+      "dict": "The dictionary",
+      "key": "The key"
+    },
+    "definition": "Get a value from a dictionary",
+    "detail": "Return the value for the given key, or the default value if the key does not exist"
+  },
+  "funcDictHas": {
+    "args": {
+      "dict": "The dictionary",
+      "key": "The key"
+    },
+    "definition": "Check if a dictionary has a key",
+    "detail": "Return true if the dictionary has the given key"
+  },
+  "funcDictKeys": {
+    "args": {
+      "dict": "The dictionary"
+    },
+    "definition": "Get the keys of a dictionary",
+    "detail": "Return an array with all the keys of a dictionary"
+  },
+  "funcDictMerge": {
+    "args": {
+      "dict": "The dictionary",
+      "other": "The dictionary to merge in"
+    },
+    "definition": "Merge two dictionaries",
+    "detail": "Return a new dictionary with the entries of both dictionaries (the second one takes precedence)"
+  },
+  "funcDictRemove": {
+    "args": {
+      "dict": "The dictionary",
+      "key": "The key"
+    },
+    "definition": "Remove a key from a dictionary",
+    "detail": "Remove the given key from a dictionary (mutates the dictionary in place)"
+  },
+  "funcDictSet": {
+    "args": {
+      "dict": "The dictionary",
+      "key": "The key",
+      "value": "The value"
+    },
+    "definition": "Set a value in a dictionary",
+    "detail": "Set the value for the given key (mutates the dictionary in place)"
+  },
+  "funcDictSize": {
+    "args": {
+      "dict": "The dictionary"
+    },
+    "definition": "Get the number of keys in a dictionary",
+    "detail": "Return the number of keys of a dictionary"
+  },
+  "funcDictValues": {
+    "args": {
+      "dict": "The dictionary"
+    },
+    "definition": "Get the values of a dictionary",
+    "detail": "Return an array with all the values of a dictionary"
   },
   "funcEncode": {
     "args": {

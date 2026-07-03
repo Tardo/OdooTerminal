@@ -15,7 +15,7 @@ function buildSkillsSection(allSkills: $ReadOnlyArray<SkillDef>): string {
   return (
     '# SKILLS — ON-DEMAND KNOWLEDGE\n' +
     'Skills are NOT loaded by default. Call `load_skill` with the skill name; the content arrives as the tool result — then continue your work.\n' +
-    '- Load `trash-syntax` BEFORE writing any script that uses control flow (if/for/break/continue), functions, or stdlib (arr_*, floor, encode, sleep, etc.). Skip for a single plain command.\n' +
+    '- Load `trash-syntax` BEFORE writing any script that uses control flow (if/for/break/continue), functions, or stdlib (arr_*, dict_*, floor, encode, sleep, etc.). Skip for a single plain command.\n' +
     '- Load domain skills (instance, accounting, …) only when unsure about field names or query patterns. Never load a skill you already have; at most one skill per step.\n' +
     'Available skills:\n' +
     catalog + '\n'
