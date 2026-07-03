@@ -46,11 +46,12 @@ const AGENT_TOOLS: Array<AIToolDef> = [
   {
     name: 'take_screenshot',
     description:
-      'Capture a screenshot of the current browser page (visible viewport only — off-screen content is not included). ' +
+      'LAST RESORT: capture a screenshot of the current browser page (visible viewport only — off-screen content is not included). ' +
+      'A screenshot consumes far more tokens than command output — before using this tool, try run_command alternatives: ' +
+      '`inspect` to read the rendered DOM (buttons, fields, dialogs, list rows), `read`/`search` for record data, `form -o get` for form values. ' +
+      'Use ONLY for strictly visual information no command can provide (layout/styling, chart rendering, images) or when the user explicitly asks for a screenshot. ' +
       'The user must confirm before the screenshot is taken. ' +
       'Optionally crop to a specific DOM element by providing a CSS selector. ' +
-      'The screenshot is injected as an image so you can visually inspect the page. ' +
-      'Use this tool when you need to see what is currently displayed in the browser, verify UI elements, or analyse the page state visually. ' +
       'Requires a vision-capable model.',
     parameters: {
       type: 'object',
@@ -323,20 +324,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
 
     // No tool calls → final answer
     if (toolCalls.length === 0) {
-      if (cmdExecutedCount === 0) {
-        messages.push({
-          role: 'user',
-          content:
-            'You must call run_command at least once before providing a final answer for tasks involving Odoo data. ' +
-            'Execute a command now.',
-        });
-        await new Promise(resolve => requestAnimationFrame(resolve));
-        if (step + 1 < maxSteps) {
-          startThinking(step + 2);
-        }
-        continue;
-      }
-      if (cmdSuccessCount === 0) {
+      if (cmdExecutedCount > 0 && cmdSuccessCount === 0) {
         messages.push({
           role: 'user',
           content:
