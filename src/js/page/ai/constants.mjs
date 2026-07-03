@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-export const DEFAULT_MAX_STEPS: number = 25;
+export const DEFAULT_MAX_STEPS: number = 99;
 export const DEFAULT_MAX_TOKENS: number = 4000;
 
 // Token threshold that triggers history compression during an agent run.

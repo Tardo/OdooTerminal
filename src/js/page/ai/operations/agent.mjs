@@ -47,12 +47,8 @@ const AGENT_TOOLS: Array<AIToolDef> = [
     name: 'take_screenshot',
     description:
       'LAST RESORT: capture a screenshot of the current browser page (visible viewport only — off-screen content is not included). ' +
-      'A screenshot consumes far more tokens than command output — before using this tool, try run_command alternatives: ' +
-      '`inspect` to read the rendered DOM (buttons, fields, dialogs, list rows), `read`/`search` for record data, `form -o get` for form values. ' +
-      'Use ONLY for strictly visual information no command can provide (layout/styling, chart rendering, images) or when the user explicitly asks for a screenshot. ' +
-      'The user must confirm before the screenshot is taken. ' +
-      'Optionally crop to a specific DOM element by providing a CSS selector. ' +
-      'Requires a vision-capable model.',
+      'Follow the SCREENSHOTS system-prompt rules: try run_command alternatives (inspect, read/search, form -o get) first. ' +
+      'The user must confirm each capture. Requires a vision-capable model.',
     parameters: {
       type: 'object',
       properties: {
@@ -69,10 +65,8 @@ const AGENT_TOOLS: Array<AIToolDef> = [
     name: 'get_attachment',
     description:
       'Fetch a binary attachment from Odoo (ir.attachment) by id and inject its content into the conversation for reading. ' +
-      'For PDFs and images, the full file content is injected directly (Anthropic provider only). ' +
-      'For text files, the decoded text is returned. Other formats return a description. ' +
-      'IMPORTANT: Use run_command to search ir.attachment first (e.g. search -m ir.attachment -f [[\'res_model\',\'=\',\'sale.order\'],[\'res_id\',\'=\',<id>]] -fi id,name,mimetype) to discover available attachments and their IDs. ' +
-      'If multiple attachments match, present the list as your final answer and wait for the user to select one — do NOT auto-pick.',
+      'PDFs/images are injected directly (Anthropic provider only); text files are decoded inline; other formats return a description. ' +
+      'Follow the ODOO ATTACHMENTS system-prompt workflow: discover ids with run_command first; if multiple match, list them and wait for the user — do NOT auto-pick.',
     parameters: {
       type: 'object',
       properties: {
