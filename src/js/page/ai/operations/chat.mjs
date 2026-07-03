@@ -49,7 +49,7 @@ export default async function cmdAIChat(kwargs: CMDCallbackArgs, ctx: CMDCallbac
     }
   } catch (err) {
     if (!handleAbort(err, ctx)) {
-      ctx.screen.eprint(i18n.t('cmdAI.chat.error.requestFailed', 'Request failed: ') + err.message);
+      ctx.screen.eprint(i18n.t('cmdAI.chat.error.requestFailed', 'Request failed: ') + err.message, false, 'error_message');
       throw err;
     }
   } finally {

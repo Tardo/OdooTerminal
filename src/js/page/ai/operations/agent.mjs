@@ -297,7 +297,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       }
     } catch (err) {
       if (!handleAbort(err, ctx)) {
-        ctx.screen.eprint(i18n.t('cmdAI.agent.error.requestFailed', 'Request failed: ') + err.message);
+        ctx.screen.eprint(i18n.t('cmdAI.agent.error.requestFailed', 'Request failed: ') + err.message, false, 'error_message');
         throw err;
       }
       return messages.slice(1);

@@ -5,6 +5,7 @@
 import i18n from 'i18next';
 import {DEFAULT_MAX_TOKENS} from '@ai/constants';
 import {backgroundFetch} from '@ai/utils/relay_fetch';
+import {formatHTTPError} from '@ai/utils/network';
 
 
 function toOpenAIMessages(messages: Array<AIMessage>): Array<{[string]: mixed}> {
@@ -126,11 +127,7 @@ export default async function streamRequestOpenAI(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(
-      i18n.t('ai.utils.network.error.httpError', 'HTTP error {{status}}', {status: response.status}) +
-      '\n' +
-      errorText,
-    );
+    throw new Error(formatHTTPError(response.status, errorText));
   }
 
   if (!response.body) {
