@@ -4,7 +4,7 @@
 
 import buildTraSHPrompt from '@ai/prompts/trash';
 import type {SkillDef} from '@ai/skills/__all__';
-import type Terminal from '@odoo/terminal';
+import Terminal from '@odoo/terminal';
 
 
 function buildSkillsSection(allSkills: $ReadOnlyArray<SkillDef>): string {
