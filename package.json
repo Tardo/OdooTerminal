@@ -29,8 +29,10 @@
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-eslint": "^9.2.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-replace": "^6",
     "@rollup/plugin-terser": "^1.0.0",
     "adm-zip": "^0.5.18",
+    "ant-design-vue": "^4.2.6",
     "autoprefixer": "^10.5.2",
     "babel-jest": "^30.4.1",
     "babel-plugin-i18next-extract": "^1.1.0",
@@ -43,7 +45,7 @@
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-json": "^4.0.1",
     "eslint-plugin-prettier": "^5.5.6",
-    "flow-bin": "^0.316.0",
+    "flow-bin": "^0.294.0",
     "flow-typed": "^4.1.1",
     "hermes-eslint": "^0.36.1",
     "husky": "^9.1.7",
@@ -60,7 +62,9 @@
     "rollup": "^4.62.2",
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-vue": "^6",
     "simple-git": "^3.36.0",
+    "vue": "^3.5",
     "web-ext": "^10.4.0"
   },
   "overrides": {
@@ -95,7 +99,8 @@
         {
           "locales": [
             "en",
-            "es"
+            "es",
+            "zh"
           ],
           "discardOldKeys": true,
           "outputPath": "_locales/{{locale}}/{{ns}}.json",

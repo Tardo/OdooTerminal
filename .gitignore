@@ -23,3 +23,5 @@ __pycache__/
 claude.json
 CLAUDE.md
 AGENTS.md
+/.idea/
+/OdooTerminal.pem

@@ -2,6 +2,7 @@ allowBuilds:
   puppeteer: true
   spawn-sync: true
   unrs-resolver: true
+  core-js: true
 
 overrides:
   jest-environment-puppeteer>jest-environment-node: "^30"
