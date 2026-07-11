@@ -18,6 +18,7 @@ import parseHTML from '@terminal/utils/parse_html';
 import debounce from '@terminal/utils/debounce';
 import defer from '@terminal/utils/defer';
 import encodeHTML from '@terminal/utils/encode_html';
+import highlightTextNodes from '@terminal/utils/highlight_text';
 import genColorFromString from '@terminal/utils/gen_color_from_string';
 import getColorGrayValue from '@terminal/utils/get_color_gray_value';
 import hsl2rgb from '@terminal/utils/hsl2rgb';
@@ -33,6 +34,7 @@ export type InputInfo = {
   username: string,
   version: string,
   host: string,
+  db: string,
 };
 
 export type InputMode = 'single' | 'multi';
@@ -64,6 +66,8 @@ export type ScreenOptions = {
   onRemoveAttachment?: onRemoveAttachmentCallback,
   onScreenshotViewport?: onScreenshotViewportCallback,
   onScreenshotPick?: onScreenshotPickCallback,
+  highlightWords?: Array<string>,
+  maxLines?: number,
 };
 
 export const PROMPT = '>';
@@ -73,10 +77,12 @@ export const LINE_SELECTOR = ':scope > span .print-table tr, :scope > span';
 export default class Screen {
   #max_lines = 750;
   #max_buff_lines = 100;
+  #highlightWords: Array<string> = [];
   #input_info: InputInfo = {
     username: 'Unknown',
     version: 'Unknown',
     host: 'Unknown',
+    db: '',
   };
 
   #questions: Array<Question> = [];
@@ -124,6 +130,10 @@ export default class Screen {
 
   start(container: HTMLElement, options: ScreenOptions) {
     this.#options = options;
+    if (typeof options.maxLines === 'number' && options.maxLines > 0) {
+      this.#max_lines = options.maxLines;
+    }
+    this.#highlightWords = Array.isArray(options.highlightWords) ? options.highlightWords : [];
     this.#container_el = container;
     this.#createScreen();
     this.#createAttachPreview();
@@ -362,7 +372,11 @@ export default class Screen {
   }
 
   #printHTML(html: string) {
-    this.#buff.push(parseHTML(html));
+    const node = parseHTML(html);
+    if (this.#highlightWords.length) {
+      highlightTextNodes(node, this.#highlightWords);
+    }
+    this.#buff.push(node);
     this.flush();
   }
 
@@ -495,6 +509,20 @@ export default class Screen {
         info_ver_info.setAttribute('title', this.#input_info.version);
       }
     }
+    if (Object.hasOwn(this.#input_info, 'db')) {
+      const info_db_el = this.#userInput_el.querySelector('#terminal-prompt-info-db');
+      if (info_db_el) {
+        const db = this.#input_info.db;
+        const db_container = this.#userInput_el.querySelector('.terminal-prompt-db-container');
+        if (db) {
+          info_db_el.textContent = `db: ${db}`;
+          info_db_el.setAttribute('title', db);
+          db_container?.classList.remove('d-none', 'hidden');
+        } else {
+          db_container?.classList.add('d-none', 'hidden');
+        }
+      }
+    }
     if (
       Object.hasOwn(this.#input_info, 'host') &&
       typeof this.#input_info.host !== 'undefined'
@@ -581,7 +609,7 @@ export default class Screen {
         if (values.length === 0) {
           this.#interactiveContainer_el.textContent = this.#question_active?.question || '';
         } else {
-          this.#interactiveContainer_el.textContent = `${this.#question_active?.question || ''} [${values.join('/')}]`;
+          this.#renderQuestionChoices(this.#interactiveContainer_el, this.#question_active?.question || '', values, active_q);
         }
       }
       this.#interactiveContainer_el.classList.remove('d-none', 'hidden');
@@ -596,6 +624,30 @@ export default class Screen {
         this.#updateInputMode(this.#options.inputMode);
       }
     }
+  }
+
+  #renderQuestionChoices(container: HTMLElement, questionText: string, values: Array<string>, active_q: Question): void {
+    container.textContent = '';
+    container.append(document.createTextNode(`${questionText} [`));
+    values.forEach((val, idx) => {
+      if (idx > 0) {
+        container.append(document.createTextNode('/'));
+      }
+      const link = document.createElement('a');
+      link.href = '#';
+      link.textContent = val;
+      link.className = 'ot-question-choice';
+      if (val.toLowerCase() === String(active_q.def_value ?? '').toLowerCase()) {
+        link.classList.add('ot-question-default');
+      }
+      const answer = val.toLowerCase();
+      link.addEventListener('click', (ev: MouseEvent) => {
+        ev.preventDefault();
+        this.responseQuestion(active_q, answer);
+      });
+      container.append(link);
+    });
+    container.append(document.createTextNode(']'));
   }
 
   responseQuestion(question: Question, response: string) {
