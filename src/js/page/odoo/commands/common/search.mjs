@@ -71,7 +71,7 @@ async function cmdSearchModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx
 
   const result = await searchRead(kwargs.model, kwargs.domain, fields, await this.getContext(), {
     ...kwargs.options,
-    limit: kwargs.limit,
+    limit: kwargs.limit ?? (this.getConfig().rlimit_value > 0 ? this.getConfig().rlimit_value : undefined),
     offset: kwargs.offset,
     orderBy: kwargs.order,
   });

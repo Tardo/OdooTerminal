@@ -110,6 +110,7 @@ export default async function(items: Recordset, context: ?{[string]: mixed}): Pr
   const field_infos_entries = Object.entries(field_infos);
   const field_xmlids = field_infos_entries.filter(([_field_name, field_info]) => field_info.relation).map(([field_name, field_info]) => {
     const field_ids: Array<number> = [];
+    // $FlowFixMe[incompatible-type]
     for (const item of items) {
       // $FlowFixMe[prop-missing]
       const field_data = item[field_name];
@@ -128,6 +129,7 @@ export default async function(items: Recordset, context: ?{[string]: mixed}): Pr
   const xmlids_result_obj = Object.fromEntries(xmlids_result);
 
   let res = '<?xml version="1.0" encoding="utf-8" ?>\n<odoo>\n';
+  // $FlowFixMe[incompatible-type]
   for (const item of items) {
     // $FlowFixMe[prop-missing]
     res += `\t<record id="${main_xml_ids[item.id]}" model="${model}">\n`;
