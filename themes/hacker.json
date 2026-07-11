@@ -1,0 +1,16 @@
+{
+  "opacity": 95,
+  "fontsize": "medium",
+  "fontsize_ca": "small",
+  "fontfamily": "'Courier New', monospace",
+  "color_primary": "#ffb000",
+  "color_secondary": "#2a1d08",
+  "color_success": "#a8ff60",
+  "color_danger": "#ff4040",
+  "color_warning": "#ffd866",
+  "color_info": "#ffce5c",
+  "color_light": "#ffce5c",
+  "color_dark": "#0a0805",
+  "color_muted": "#4a3520",
+  "color_white": "#fff2cc"
+}

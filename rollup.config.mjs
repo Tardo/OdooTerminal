@@ -4,6 +4,7 @@ import terser from '@rollup/plugin-terser';
 import {babel} from '@rollup/plugin-babel';
 import eslint from '@rollup/plugin-eslint';
 import commonjs from '@rollup/plugin-commonjs';
+import replace from '@rollup/plugin-replace';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 import path from 'path';
@@ -130,7 +131,7 @@ export default [
     },
   },
   {
-    input: ['src/js/private/options.mjs', 'src/js/private/background.mjs'],
+    input: ['src/js/private/options/app.mjs', 'src/js/private/background.mjs'],
     output: {
       sourcemap: (!is_production && 'inline') || false,
       format: 'esm',
@@ -153,12 +154,26 @@ export default [
             find: '@css',
             replacement: path.resolve('src/css'),
           },
+          {
+            find: 'vue',
+            replacement: path.resolve('node_modules/vue/dist/vue.esm-bundler.js'),
+          },
         ],
       }),
       nodeResolve({
         browser: true,
       }),
       commonjs(),
+
+      replace({
+        preventAssignment: true,
+        values: {
+          'process.env.NODE_ENV': JSON.stringify(is_production ? 'production' : 'development'),
+          __VUE_OPTIONS_API__: 'true',
+          __VUE_PROD_DEVTOOLS__: 'false',
+          __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
+        },
+      }),
 
       babel({
         babelHelpers: 'bundled',
@@ -176,7 +191,7 @@ export default [
     ],
     watch: {
       clearScreen: false,
-      include: ['src/css/options.css', 'src/js/private/**'],
+      include: ['src/js/private/**'],
     },
   },
 ];
