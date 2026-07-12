@@ -4,16 +4,16 @@
 
 import i18next from 'i18next';
 import HttpApi from 'i18next-http-backend';
-import {reactive} from 'vue';
+import {signal} from '@preact/signals';
 
 const SUPPORTED = ['en', 'es', 'zh'];
 
-// Components call t() during render and read `tick`, so bumping it after a
-// language change forces every dependent component to re-render with the new
-// translations — without this, i18next is not reactive on its own.
-const i18nState = reactive({tick: 0});
+// Components call t() during render; reading tick.value subscribes the
+// component to language changes, so bumping it after a switch forces every
+// dependent component to re-render — i18next is not reactive on its own.
+const tick = signal(0);
 
-function resolveLng(lang) {
+function resolveLng(lang: ?string): string {
   if (!lang || lang === 'auto') {
     const nav = (typeof navigator !== 'undefined' && navigator.language) || 'en';
     const base = nav.split('-')[0];
@@ -24,7 +24,7 @@ function resolveLng(lang) {
 
 // options page lives at src/html/options.html, so a relative loadPath would be
 // wrong — resolve via the runtime URL of the extension root instead.
-function backendRequest(_options, url, _payload, callback) {
+function backendRequest(_options: any, url: string, _payload: any, callback: (any, any) => void) {
   const fileUrl = chrome.runtime.getURL(`_locales/${url}/translation.json`);
   fetch(fileUrl)
     .then((r) => r.json())
@@ -32,9 +32,9 @@ function backendRequest(_options, url, _payload, callback) {
     .catch((err) => callback(err));
 }
 
-let initPromise = null;
+let initPromise: Promise<any> | null = null;
 
-export async function initI18n(lang) {
+export async function initI18n(lang: ?string) {
   if (initPromise) return initPromise;
   const lng = resolveLng(lang);
   initPromise = i18next.use(HttpApi).init({
@@ -49,23 +49,22 @@ export async function initI18n(lang) {
     },
   });
   await initPromise;
-  i18nState.tick++;
-  return initPromise;
+  tick.value++;
   return initPromise;
 }
 
-export async function changeLanguage(lang) {
+export async function changeLanguage(lang: ?string) {
   await initI18n(lang);
   const lng = resolveLng(lang);
   if (i18next.language !== lng) {
     await i18next.changeLanguage(lng);
   }
-  i18nState.tick++;
+  tick.value++;
 }
 
-export function t(key, fallback, options) {
+export function t(key: string, fallback?: string, options?: any): string {
   // eslint-disable-next-line no-unused-expressions
-  i18nState.tick; // track reactive dependency so language changes re-render
+  tick.value; // track reactive dependency so language changes re-render
   if (i18next.isInitialized) {
     // i18next-extract-disable-next-line
     const val = i18next.t(key, options);

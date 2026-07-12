@@ -1242,7 +1242,6 @@
     "definition": "创建 ZIP 文件",
     "detail": "有关可用选项，请参阅 JSZip 帮助：https://stuk.github.io/jszip"
   },
-  "confirm": "确认",
   "file2attachment": {
     "aborted": "用户已中止。未提供文件...",
     "noFile": "未选择文件"
@@ -1466,10 +1465,12 @@
   "optionsReset": "恢复默认设置",
   "optionsResetConfirm": "这将把所有设置恢复为默认值。确定吗？",
   "optionsResetDone": "设置已恢复为默认值",
+  "optionsResetFailed": "重置设置失败",
   "optionsSave": "保存设置",
   "optionsSaveFailed": "保存设置失败",
   "optionsSaved": "设置已成功保存",
   "optionsSubtitle": "设置与配置",
+  "optionsTableEmpty": "暂无数据",
   "optionsTermContextInvalidJson": "无效的 JSON 格式",
   "optionsThemePresetDark": "深色",
   "optionsThemePresetHacker": "黑客",

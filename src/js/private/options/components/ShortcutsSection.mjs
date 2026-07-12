@@ -1,126 +1,94 @@
 // @flow strict
 // Copyright  Taois <taoist.han@vertechs.com>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-// $FlowFixMe[object-this-reference]
-import {defineComponent, h} from 'vue';
-import {Card, Table, Button, Row, Col, Input} from 'ant-design-vue';
+
+import {h} from 'preact';
+import {useState} from 'preact/hooks';
+import {Card, Table, Button, Row, Col, Input} from '../ui.mjs';
 import processKeybind from '@common/utils/process_keybind';
 import {IGNORED_KEYS} from '@common/constants';
 import {t} from '../i18n.mjs';
 
-export default defineComponent({
-  name: 'ShortcutsSection',
-  props: {
-    settings: {type: Object, required: true},
-  },
-  data() {
-    return {
-      newKeybind: '',
-      newKeybindValue: '',
-      newCommand: '',
-    };
-  },
-  computed: {
-    // Columns live in computed (not data) so their titles re-resolve t() on
-    // every render — data() runs once before i18n is ready and would pin the
-    // English fallback forever.
-    columns() {
-      return [
-        {title: t('optionsTitleShortcutsKeybind', 'Keybind'), dataIndex: 'display'},
-        {title: t('optionsTitleShortcutsCommand', 'Command'), dataIndex: 'command'},
-        {title: '', dataIndex: 'actions', width: 120},
-      ];
-    },
-    shortcuts() {
-      const defs = this.settings.shortcuts || {};
-      return Object.entries(defs).map(([keybind, command]) => ({
-        keybind,
-        display: JSON.parse(keybind || '[]').join(' + '),
-        command,
-      }));
-    },
-  },
-  methods: {
-    onKeyDownShortcut(e) {
-      const keybind = processKeybind(e);
-      if (IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
-        this.newKeybindValue = JSON.stringify(keybind);
-        this.newKeybind = keybind.join(' + ');
-      } else {
-        this.newKeybindValue = '';
-        this.newKeybind = keybind.length ? `${keybind.join(' + ')} + ` : '';
-      }
-      e.preventDefault();
-    },
-    onKeyUpShortcut() {
-      if (!this.newKeybindValue) this.newKeybind = '';
-    },
-    addShortcut() {
-      if (!this.newKeybindValue || !this.newCommand) return;
-      this.settings.shortcuts = {...(this.settings.shortcuts || {}), [this.newKeybindValue]: this.newCommand};
-      this.newKeybind = '';
-      this.newKeybindValue = '';
-      this.newCommand = '';
-    },
-    removeShortcut(keybind) {
-      const shortcuts = {...(this.settings.shortcuts || {})};
-      delete shortcuts[keybind];
-      this.settings.shortcuts = shortcuts;
-    },
-  },
-  render() {
-    return h(Card, {title: t('optionsTitleShortcuts', 'Shortcuts'), class: 'ot-card'}, {
-      default: () => [
-        h(
-          Table,
-          {
-            dataSource: this.shortcuts,
-            columns: this.columns,
-            pagination: false,
-            size: 'small',
-            rowKey: 'keybind',
-            style: {marginBottom: '16px'},
-          },
-          {
-            bodyCell: ({column, record}) => {
-              if (column.dataIndex === 'actions') {
-                return h(
-                  Button,
-                  {danger: true, size: 'small', onClick: () => this.removeShortcut(record.keybind)},
-                  () => t('optionsTitleShortcutsRemove', 'Remove'),
-                );
-              }
-              return record[column.dataIndex];
-            },
-          },
-        ),
-        h(Row, {gutter: [10, 10]}, () => [
-          h(
-            Col,
-            {xs: 24, sm: 8},
-            () =>
-              h(Input, {
-                value: this.newKeybind,
-                'onUpdate:value': (v) => { this.newKeybind = v; },
-                placeholder: t('optionsTitleShortcutsPressKeys', 'Press keys...'),
-                readonly: true,
-                onKeydown: this.onKeyDownShortcut,
-                onKeyup: this.onKeyUpShortcut,
-              }),
-          ),
-          h(
-            Col,
-            {xs: 24, sm: 8},
-            () =>
-              h(Input, {
-                value: this.newCommand,
-                'onUpdate:value': (v) => { this.newCommand = v; },
-                placeholder: t('optionsTitleShortcutsCommand', 'Command'),
-              }),
-          ),
-          h(Col, {xs: 24, sm: 8}, () => h(Button, {type: 'primary', onClick: this.addShortcut}, () => t('optionsTitleShortcutsAdd', 'Add'))),
-        ]),
-      ],
+export default function ShortcutsSection({settings, mutate}: any) {
+  const [newKeybind, setNewKeybind] = useState<string>('');
+  const [newKeybindValue, setNewKeybindValue] = useState<string>('');
+  const [newCommand, setNewCommand] = useState<string>('');
+
+  const columns = [
+    {title: t('optionsTitleShortcutsKeybind', 'Keybind'), dataIndex: 'display'},
+    {title: t('optionsTitleShortcutsCommand', 'Command'), dataIndex: 'command'},
+    {title: '', dataIndex: 'actions', width: 120},
+  ];
+  const defs = settings.shortcuts || {};
+  const shortcuts = Object.entries(defs).map(([keybind, command]) => ({
+    keybind,
+    display: JSON.parse(keybind || '[]').join(' + '),
+    command,
+  }));
+
+  const onKeyDownShortcut = (e: KeyboardEvent) => {
+    const keybind = processKeybind(e);
+    if (IGNORED_KEYS.indexOf(e.key) === -1 && e.key) {
+      setNewKeybindValue(JSON.stringify(keybind));
+      setNewKeybind(keybind.join(' + '));
+    } else {
+      setNewKeybindValue('');
+      setNewKeybind(keybind.length ? `${keybind.join(' + ')} + ` : '');
+    }
+    e.preventDefault();
+  };
+  const onKeyUpShortcut = () => {
+    if (!newKeybindValue) setNewKeybind('');
+  };
+  const addShortcut = () => {
+    if (!newKeybindValue || !newCommand) return;
+    const kb = newKeybindValue;
+    const cmd = newCommand;
+    mutate((s: any) => {
+      s.shortcuts = {...(s.shortcuts || {}), [kb]: cmd};
     });
-  },
-});
+    setNewKeybind('');
+    setNewKeybindValue('');
+    setNewCommand('');
+  };
+  const removeShortcut = (keybind: string) => {
+    mutate((s: any) => {
+      const sc = {...(s.shortcuts || {})};
+      delete sc[keybind];
+      s.shortcuts = sc;
+    });
+  };
+
+  return h(Card, {title: t('optionsTitleShortcuts', 'Shortcuts'), class: 'ot-card'},
+    h(Table, {
+      dataSource: shortcuts,
+      columns,
+      size: 'small',
+      rowKey: 'keybind',
+      style: {marginBottom: '16px'},
+      bodyCell: ({column, record}: any) => {
+        if (column.dataIndex === 'actions') {
+          return h(Button, {danger: true, size: 'small', onClick: () => removeShortcut(record.keybind)}, t('optionsTitleShortcutsRemove', 'Remove'));
+        }
+        return record[column.dataIndex];
+      },
+    }),
+    h(Row, {gutter: [10, 10]},
+      h(Col, {flex: '1 1 200px'},
+        h(Input, {
+          value: newKeybind,
+          'onUpdate:value': (v: string) => setNewKeybind(v),
+          placeholder: t('optionsTitleShortcutsPressKeys', 'Press keys...'),
+          readonly: true,
+          onKeydown: onKeyDownShortcut,
+          onKeyup: onKeyUpShortcut,
+        })),
+      h(Col, {flex: '1 1 200px'},
+        h(Input, {
+          value: newCommand,
+          'onUpdate:value': (v: string) => setNewCommand(v),
+          placeholder: t('optionsTitleShortcutsCommand', 'Command'),
+        })),
+      h(Col, {flex: '0 0 auto'},
+        h(Button, {type: 'primary', onClick: addShortcut}, t('optionsTitleShortcutsAdd', 'Add')))));
+}

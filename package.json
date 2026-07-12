@@ -32,7 +32,6 @@
     "@rollup/plugin-replace": "^6",
     "@rollup/plugin-terser": "^1.0.0",
     "adm-zip": "^0.5.18",
-    "ant-design-vue": "^4.2.6",
     "autoprefixer": "^10.5.2",
     "babel-jest": "^30.4.1",
     "babel-plugin-i18next-extract": "^1.1.0",
@@ -62,9 +61,7 @@
     "rollup": "^4.62.2",
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-vue": "^6",
     "simple-git": "^3.36.0",
-    "vue": "^3.5",
     "web-ext": "^10.4.0"
   },
   "overrides": {
@@ -138,9 +135,11 @@
     "singleAttributePerLine": false
   },
   "dependencies": {
+    "@preact/signals": "^2.9.3",
     "@zip.js/zip.js": "^2.8.26",
     "async-mutex": "^0.5.0",
     "i18next": "^26.3.3",
-    "i18next-http-backend": "^4.0.0"
+    "i18next-http-backend": "^4.0.0",
+    "preact": "^10.29.7"
   }
 }

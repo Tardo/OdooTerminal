@@ -1242,7 +1242,6 @@
     "definition": "Crear archivo zip",
     "detail": "Para conocer las opciones disponibles, consulta la ayuda de JSZip: https://stuk.github.io/jszip"
   },
-  "confirm": "Confirmar",
   "file2attachment": {
     "aborted": "Aborted by user. No file given...",
     "noFile": "No file selected"
@@ -1466,10 +1465,12 @@
   "optionsReset": "Restablecer a valores por defecto",
   "optionsResetConfirm": "Esto restablecerá todas las configuraciones a sus valores predeterminados. ¿Estás seguro?",
   "optionsResetDone": "Las configuraciones se han restablecido a los valores predeterminados",
+  "optionsResetFailed": "Error al restablecer la configuración",
   "optionsSave": "Guardar configuración",
   "optionsSaveFailed": "Error al guardar la configuración",
   "optionsSaved": "Configuración guardada correctamente",
   "optionsSubtitle": "Configuración y ajustes",
+  "optionsTableEmpty": "Sin datos",
   "optionsTermContextInvalidJson": "Formato JSON no válido",
   "optionsThemePresetDark": "Oscuro",
   "optionsThemePresetHacker": "Hacker",

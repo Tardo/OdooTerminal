@@ -154,10 +154,6 @@ export default [
             find: '@css',
             replacement: path.resolve('src/css'),
           },
-          {
-            find: 'vue',
-            replacement: path.resolve('node_modules/vue/dist/vue.esm-bundler.js'),
-          },
         ],
       }),
       nodeResolve({
@@ -169,9 +165,6 @@ export default [
         preventAssignment: true,
         values: {
           'process.env.NODE_ENV': JSON.stringify(is_production ? 'production' : 'development'),
-          __VUE_OPTIONS_API__: 'true',
-          __VUE_PROD_DEVTOOLS__: 'false',
-          __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
         },
       }),
 
