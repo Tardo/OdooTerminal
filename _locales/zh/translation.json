@@ -1569,7 +1569,7 @@
   "optionsTitleThemeFontSizeXSmall": "特小",
   "optionsTitleThemeOpacity": "不透明度",
   "optionsTitleThemePreset": "主题预设",
-  "optionsTitleThemePresetNone": "无",
+  "optionsTitleThemePresetCustom": "自定义",
   "optionsTitleThemeRemove": "删除",
   "optionsUnsavedChanges": "有未保存的更改",
   "optionsWarningAIModelsKeys": "警告：API 密钥存储在浏览器存储中。",

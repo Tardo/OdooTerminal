@@ -509,28 +509,19 @@ export default class Screen {
         info_ver_info.setAttribute('title', this.#input_info.version);
       }
     }
-    if (Object.hasOwn(this.#input_info, 'db')) {
-      const info_db_el = this.#userInput_el.querySelector('#terminal-prompt-info-db');
-      if (info_db_el) {
-        const db = this.#input_info.db;
-        const db_container = this.#userInput_el.querySelector('.terminal-prompt-db-container');
-        if (db) {
-          info_db_el.textContent = `db: ${db}`;
-          info_db_el.setAttribute('title', db);
-          db_container?.classList.remove('d-none', 'hidden');
-        } else {
-          db_container?.classList.add('d-none', 'hidden');
-        }
-      }
-    }
     if (
       Object.hasOwn(this.#input_info, 'host') &&
       typeof this.#input_info.host !== 'undefined'
     ) {
       const info_host_el = this.#userInput_el.querySelector('#terminal-prompt-info-host');
       if (info_host_el) {
-        info_host_el.textContent = this.#input_info.host;
-        info_host_el.setAttribute('title', this.#input_info.host);
+        // Show the active database in the right slot when available, falling
+        // back to host. Coloring below still keys off host so per-site colors
+        // persist.
+        const db = this.#input_info.db;
+        const display = db ? `db: ${db}` : this.#input_info.host;
+        info_host_el.textContent = display;
+        info_host_el.setAttribute('title', display);
       }
       // Custom color indicator per host
       if (this.#input_info.host.startsWith('localhost') || this.#input_info.host.startsWith('127.0.0.1')) {

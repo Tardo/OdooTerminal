@@ -75,7 +75,7 @@ async function postInitTerminal(term_obj: OdooTerminal, config: TerminalOptions)
   if (sess && typeof sess.db === 'string' && sess.db) {
     db = sess.db;
   }
-  if (!db) {
+  if (!db && config.elephant) {
     const session_info = await getSessionInfo();
     if (session_info && typeof session_info.db === 'string' && session_info.db) {
       db = session_info.db;

@@ -1569,7 +1569,7 @@
   "optionsTitleThemeFontSizeXSmall": "Muy pequeño",
   "optionsTitleThemeOpacity": "Opacidad",
   "optionsTitleThemePreset": "Tema predefinido",
-  "optionsTitleThemePresetNone": "Ninguno",
+  "optionsTitleThemePresetCustom": "Personalizado",
   "optionsTitleThemeRemove": "Eliminar",
   "optionsUnsavedChanges": "Cambios sin guardar",
   "optionsWarningAIModelsKeys": "Advertencia: Las claves de API se almacenan en el almacenamiento del navegador.",

@@ -1569,7 +1569,7 @@
   "optionsTitleThemeFontSizeXSmall": "X-Small",
   "optionsTitleThemeOpacity": "Opacity",
   "optionsTitleThemePreset": "Theme Preset",
-  "optionsTitleThemePresetNone": "None",
+  "optionsTitleThemePresetCustom": "Custom",
   "optionsTitleThemeRemove": "Remove",
   "optionsUnsavedChanges": "Unsaved changes",
   "optionsWarningAIModelsKeys": "Warning: API keys are stored in browser storage.",

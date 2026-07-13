@@ -7,9 +7,6 @@ import i18n from 'i18next';
 
 export default function (PROMPT: string): string {
   return `<div class='terminal-user-input'>
-    <div class='terminal-prompt-container terminal-prompt-db-container d-none hidden'>
-      <span id="terminal-prompt-info-db" class='terminal-prompt-info'></span>
-    </div>
     <div class='terminal-prompt-container'>
       <span id="terminal-prompt-main" class='terminal-prompt'></span>
       <span>${encodeHTML(PROMPT)}</span>
