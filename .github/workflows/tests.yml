@@ -24,10 +24,10 @@ jobs:
           node-version: '*'
           check-latest: true
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
         name: Install pnpm
         with:
-          version: latest
+          version: 11
           cache: true
 
       - name: Install dependencies
@@ -69,10 +69,10 @@ jobs:
           node-version: '*'
           check-latest: true
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
         name: Install pnpm
         with:
-          version: latest
+          version: 11
           cache: true
 
       - name: Install dependencies
