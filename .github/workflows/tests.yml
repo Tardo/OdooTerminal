@@ -27,7 +27,7 @@ jobs:
       - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
         name: Install pnpm
         with:
-          version: 11
+          version: 11.11.0
           cache: true
 
       - name: Install dependencies
@@ -72,7 +72,7 @@ jobs:
       - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
         name: Install pnpm
         with:
-          version: 11
+          version: 11.11.0
           cache: true
 
       - name: Install dependencies
