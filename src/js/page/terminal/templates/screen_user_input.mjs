@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import encodeHTML from '@terminal/utils/encode_html';
+import i18n from 'i18next';
 
 export default function (PROMPT: string): string {
   return `<div class='terminal-user-input'>
@@ -17,7 +18,7 @@ export default function (PROMPT: string): string {
       <textarea id='terminal_input_multi' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" rows="8"></textarea>
     </div>
     <div class='terminal-ai-attach-zone'>
-      <button id='terminal_ai_attach_btn' class='terminal-ai-attach-btn' type='button' title='Attach file'>
+      <button id='terminal_ai_attach_btn' class='terminal-ai-attach-btn' type='button' title='${i18n.t('terminal.tooltip.attachFile', 'Attach file')}'>
         <i class='fa fa-paperclip'></i>
       </button>
     </div>

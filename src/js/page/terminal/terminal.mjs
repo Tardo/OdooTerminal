@@ -217,6 +217,18 @@ export default class Terminal {
     this.el.querySelector('.terminal-multiline')?.addEventListener('click', this.#onClickToggleMultiline.bind(this));
     // $FlowFixMe[method-unbinding]
     this.el.querySelector('.terminal-screen-icon-reload-shell')?.addEventListener('click', this.#onClickReloadShell.bind(this));
+    const debugBtn = this.el.querySelector('.terminal-screen-icon-debug');
+    // $FlowFixMe[method-unbinding]
+    debugBtn?.addEventListener('click', this.#onClickToggleDebug.bind(this));
+    if (debugBtn instanceof HTMLElement) {
+      const curDebug = new URLSearchParams(window.location.search).get('debug');
+      if (curDebug === '1' || curDebug === 'assets') {
+        debugBtn.classList.add('active');
+      }
+      if (curDebug === 'assets') {
+        debugBtn.classList.add('active-assets');
+      }
+    }
     // $FlowFixMe[method-unbinding]
     this.el.querySelector('.terminal-screen-icon-ai-mode')?.addEventListener('click', this.#onClickToggleAIMode.bind(this));
     // $FlowFixMe[method-unbinding]
@@ -352,6 +364,8 @@ export default class Terminal {
     this.screen.start(this.el, {
       inputColors: this.#config.colors_domain,
       inputMode: this.#config.multiline ? 'multi' : 'single',
+      highlightWords: this.#config.hightlight_words ? this.#config.hightlight_words_list : [],
+      maxLines: this.#config.screen_buffer_size,
       onSaveScreen: function (this: Terminal, content: string) {
         debounce(() => {
           setStorageSessionItem('terminal_screen', content, err => this.screen.print(err));
@@ -405,8 +419,12 @@ export default class Terminal {
     return this.#shell;
   }
 
+  getConfig(): TerminalOptions {
+    return this.#config;
+  }
+
   getCustomSkills(): Array<AICustomSkillDef> {
-    return this.#config.ai_custom_skills || [];
+    return Array.isArray(this.#config.ai_custom_skills) ? this.#config.ai_custom_skills : [];
   }
 
   cleanInputHistory() {
@@ -485,6 +503,8 @@ export default class Terminal {
 
   // $FlowFixMe[unclear-type]
   async execute(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false, update_input: boolean = true): Promise<any> {
+    const track_time = this.#config.show_execution_time;
+    const t0 = track_time ? performance.now() : 0;
     if (!silent) {
       this.screen.printCommand(code);
     }
@@ -502,6 +522,10 @@ export default class Terminal {
         silent: silent,
         aliases: getStorageLocalItem('terminal_aliases', {}),
       }, isolated_frame);
+      if (track_time) {
+        const ms = Math.round(performance.now() - t0);
+        this.screen.print(`<small class='o_terminal-exec-time'>⏱ ${ms} ms</small>`);
+      }
     } catch (err) {
       this.screen.printError(`${err.name}: ${err.message}`);
       let err_msg = err.data;
@@ -1046,6 +1070,20 @@ export default class Terminal {
     }
   }
 
+  #onClickToggleDebug() {
+    const params = new URLSearchParams(window.location.search);
+    const cur = params.get('debug');
+    let curMode = 0;
+    if (cur === '1') {
+      curMode = 1;
+    } else if (cur === 'assets') {
+      curMode = 2;
+    }
+    const nextMode = (curMode + 1) % 3;
+    params.set('debug', nextMode === 1 ? '1' : nextMode === 2 ? 'assets' : '');
+    window.location.search = params.toString();
+  }
+
   #onKeyEnter() {
     if (this.#isAIMode) {
       const input = this.screen.getUserInput();
@@ -1218,7 +1256,7 @@ export default class Terminal {
     if (!selectEl) {
       return;
     }
-    const models = this.#config.ai_models || [];
+    const models = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
     while (selectEl.options.length > 1) {
       selectEl.remove(1);
     }
@@ -1236,7 +1274,7 @@ export default class Terminal {
   }
 
   #applyAIModel(name: string) {
-    const models = this.#config.ai_models || [];
+    const models = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
     const found = models.find(m => m.name === name);
     if (found) {
       aiState.url = found.url;

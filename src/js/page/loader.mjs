@@ -15,6 +15,9 @@ import getOdooVersion from '@odoo/utils/get_odoo_version';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getUID from '@odoo/net_utils/get_uid';
 import getUsername from '@odoo/net_utils/get_username';
+import getSessionInfo from '@odoo/net_utils/get_session_info';
+import getOdooSession from '@odoo/utils/get_odoo_session';
+import {startTechnicalModelObserver} from '@odoo/page_features/technical_model_name';
 import isBackOffice from '@odoo/utils/is_backoffice';
 import registerMathFuncs from '@trash/core/math/__all__';
 import registerTimeFuncs from '@trash/core/time/__all__';
@@ -67,6 +70,24 @@ async function postInitTerminal(term_obj: OdooTerminal, config: TerminalOptions)
   if (uid && uid !== -1) {
     vals.username = username ? username : `uid: ${uid}`;
   }
+  let db = '';
+  const sess = getOdooSession();
+  if (sess && typeof sess.db === 'string' && sess.db) {
+    db = sess.db;
+  }
+  if (!db && config.elephant) {
+    const session_info = await getSessionInfo();
+    if (session_info && typeof session_info.db === 'string' && session_info.db) {
+      db = session_info.db;
+    }
+  }
+  if (!db) {
+    const m = window.location.search.match(/[?&]db=([^&]+)/);
+    if (m) db = decodeURIComponent(m[1]);
+  }
+  if (db) {
+    vals.db = db;
+  }
   term_obj.screen.updateInputInfo(vals);
 }
 
@@ -89,6 +110,9 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
     raw_server_info: info,
     load_tests: config.devmode_tests,
   };
+  if (config.show_technical_model) {
+    startTechnicalModelObserver(Number(config.show_technical_model_min_version) || 18);
+  }
   const term_obj = getTerminalObj();
   if (term_obj) {
     loadVMFunctions(term_obj.getShell().getVM());
@@ -109,7 +133,7 @@ function initTranslations(langpath: string, lang: string) {
   return i18n.use(HttpApi).init({
     lng: lang_s,
     fallbackLng: 'en',
-    supportedLngs: ['en', 'es'],
+    supportedLngs: ['en', 'es', 'zh'],
     load: ['languageOnly'],
     debug: false,
     backend: {

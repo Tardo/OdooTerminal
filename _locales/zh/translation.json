@@ -1,0 +1,1682 @@
+{
+  "No": "否",
+  "UnknownNameError": {
+    "invalidName": "<InvalidName>"
+  },
+  "Yes": "是",
+  "ai": {
+    "utils": {
+      "network": {
+        "error": {
+          "aborted": "请求已取消。",
+          "httpError": "HTTP 错误 {{status}}",
+          "noStream": "服务器未返回流式响应"
+        }
+      },
+      "relayFetch": {
+        "error": {
+          "missingPermission": "缺少联系 {{url}} 的浏览器权限。请打开扩展的选项页面（AI 模型部分）并为此 URL 使用\"授权访问\"，然后重试。",
+          "unknown": "AI 请求失败"
+        }
+      }
+    }
+  },
+  "cancel": "取消",
+  "checkStorageError": {
+    "message": "请<strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>清屏</strong>或/和<strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>清除历史</strong>以释放存储空间。浏览器 <u>存储配额已超出</u> 😭",
+    "warning": "警告："
+  },
+  "cmd2DClear": {
+    "args": {
+      "canvas": "画布",
+      "from-x": "矩形 X 起点",
+      "from-y": "矩形 Y 起点",
+      "height": "矩形高度",
+      "width": "矩形宽度"
+    },
+    "definition": "清除画布",
+    "detail": "清除画布"
+  },
+  "cmd2DCreateWindow": {
+    "args": {
+      "height": "画布高度",
+      "posx": "画布位置 X",
+      "posy": "画布位置 Y",
+      "width": "画布宽度"
+    },
+    "definition": "创建 2D 窗口",
+    "detail": "创建 2D 窗口"
+  },
+  "cmd2DDestroyWindow": {
+    "args": {
+      "canvas": "画布"
+    },
+    "definition": "销毁 2D 窗口",
+    "detail": "销毁 2D 窗口"
+  },
+  "cmd2DLine": {
+    "args": {
+      "canvas": "画布",
+      "color": "线条颜色",
+      "from-x": "线条起点 X",
+      "from-y": "线条起点 Y",
+      "to-x": "线条终点 X",
+      "to-y": "线条终点 Y",
+      "width": "线条宽度"
+    },
+    "definition": "绘制线条",
+    "detail": "绘制线条"
+  },
+  "cmd2DRect": {
+    "args": {
+      "canvas": "画布",
+      "color": "矩形颜色",
+      "height": "矩形高度",
+      "width": "矩形宽度",
+      "x": "矩形 X 起点",
+      "y": "矩形 Y 起点"
+    },
+    "definition": "绘制矩形",
+    "detail": "绘制矩形"
+  },
+  "cmdAI": {
+    "agent": {
+      "attachment": {
+        "question": "[Agent] 读取附件 {{id}} 并将其内容发送给 AI — 允许？",
+        "rejected": "附件访问被用户拒绝。"
+      },
+      "error": {
+        "noPrompt": "未提供提示词。使用方法：ai agent -p \"your request\"",
+        "notConfigured": "未连接。请先使用 \"ai connect\"",
+        "requestFailed": "请求失败："
+      },
+      "result": {
+        "cmdReason": "[Agent] {{reason}}",
+        "fetchingAttachment": "[Agent] 正在获取附件 {{id}}",
+        "header": "--- Agent ---",
+        "maxSteps": "Agent 已达到最大步数但未给出最终答案。",
+        "noReturnValue": "(命令已执行，无返回值)",
+        "running": "[Agent] 运行中：<code>{{cmd}}</code>",
+        "thinking": "[Agent] 思考中... (步骤 {{step}}/{{max}})"
+      },
+      "screenshot": {
+        "capturing": "[Agent] 正在截取屏幕截图...",
+        "question": "[Agent] 截取屏幕截图{{sel}} — 允许？",
+        "questionWithReason": "[Agent] {{reason}} — 截取屏幕截图{{sel}} — 允许？",
+        "rejected": "屏幕截图被用户拒绝。"
+      },
+      "skill": {
+        "alreadyLoaded": "技能已加载：{{name}}",
+        "loading": "[Agent] 正在加载技能：{{name}}",
+        "unknown": "技能未找到：{{name}}。可用技能：{{list}}"
+      },
+      "unsafe": {
+        "question": "[Agent] 不安全命令：{{cmd}} — 执行？",
+        "questionWithReason": "[Agent] {{reason}} — 不安全命令：{{cmd}} — 执行？",
+        "rejected": "命令被用户拒绝：{{cmd}}"
+      }
+    },
+    "args": {
+      "apiKey": "用于认证的 API 密钥",
+      "attachId": "ir.attachment ID，用作 AI 输入附件（attach 操作）",
+      "maxSteps": "Agent 最大迭代次数（仅 agent，默认 {{DEFAULT_MAX_STEPS}}）",
+      "maxTokens": "每次请求的最大输出 token 数（成本安全限制，默认 {{DEFAULT_MAX_TOKENS}}）",
+      "model": "使用的模型名称",
+      "operation": "操作：connect、chat 或 exec",
+      "prompt": "要发送的提示词或自然语言请求",
+      "provider": "AI 提供商：openai（默认）或 anthropic",
+      "timeout": "等待响应的最大秒数（0 = 无限制）",
+      "url": "AI 服务器 URL（例如 http://localhost:8080/v1）"
+    },
+    "attach": {
+      "error": {
+        "noData": "附件 {{id}} 没有二进制数据",
+        "noId": "未提供附件 ID。使用方法：ai attach -i <id>",
+        "notFound": "附件 {{id}} 未找到"
+      }
+    },
+    "chat": {
+      "error": {
+        "noPrompt": "未提供提示词。使用方法：ai chat -p \"your prompt\"",
+        "notConfigured": "未连接。请先使用 \"ai connect\"",
+        "requestFailed": "请求失败："
+      },
+      "result": {
+        "sending": "正在发送请求..."
+      }
+    },
+    "connect": {
+      "error": {
+        "noUrl": "未提供 URL。使用方法：ai connect -u <url>"
+      },
+      "result": {
+        "connected": "AI 服务器已连接"
+      },
+      "warning": {
+        "missingPermission": "警告：缺少联系 {{url}} 的浏览器权限。请在发送请求前打开扩展的选项页面（AI 模型部分）并为此 URL 使用\"授权访问\"。"
+      }
+    },
+    "definition": "AI 助手（connect、chat 和 exec）",
+    "detail": "连接到 AI 服务器（兼容 OpenAI 的 API）进行对话或将自然语言转换为终端命令。",
+    "error": {
+      "noSubcommand": "用法：ai connect|chat|exec|stop ...",
+      "unknownOperation": "未知操作：{{sub}}",
+      "usage": "用法：ai connect|chat|exec|stop ..."
+    },
+    "stop": {
+      "noRequest": "没有活跃的 AI 请求可停止。"
+    },
+    "tokens": {
+      "cache": " · 缓存：{{read}} 已读 / {{created}} 已创建",
+      "cacheReadOnly": " · 缓存：{{read}} 已节省",
+      "usage": "Token：{{prompt}} 输入 / {{completion}} 输出（共 {{total}}）"
+    }
+  },
+  "cmdAction": {
+    "args": {
+      "action": "要启动的动作<br/>可以是字符串、数字或对象",
+      "options": "使用的额外选项"
+    },
+    "definition": "调用动作",
+    "detail": "通过数字 ID、XML-ID 字符串或动作字典启动任意 Odoo 动作。不返回数据。"
+  },
+  "cmdAlias": {
+    "args": {
+      "cmd": "要运行的命令",
+      "name": "别名名称"
+    },
+    "created": "别名创建成功",
+    "definition": "创建别名",
+    "detail": "定义别名以便快速执行命令。<br><b>警告：</b>此命令使用\"本地存储\"持久化数据，即使关闭浏览器数据仍在。其他计算机用户可以轻松访问此数据。如果使用共享计算机，请勿使用敏感数据。<br><br>可使用位置参数（$1,$2,$3,$N...）",
+    "example": "-n myalias -c \"print 'Hello, $1!'\"",
+    "invalidAliasName": "无效的别名名称",
+    "notDefined": "未定义任何别名。",
+    "notExists": "所选别名不存在",
+    "removed": "别名删除成功"
+  },
+  "cmdBarcode": {
+    "args": {
+      "barcodeDelay": "条码读取间隔（毫秒）",
+      "data": "要发送的数据",
+      "operation": "操作",
+      "pressDelay": "按键事件间隔（毫秒）"
+    },
+    "definition": "条码操作",
+    "detail": "查看信息和发送条码字符串",
+    "error": {
+      "invalidOperation": "无效操作！",
+      "moudeNotAvailable": "'barcode' 模块未安装/不可用",
+      "noData": "未提供数据！"
+    },
+    "result": {
+      "acceptScan": "当前是否接受条码扫描？{{isAcceptingScan}}",
+      "availableCommands": "可用命令：{{availableCommands}}",
+      "maxTimeBetweenKeysInMs": "按键间最大时间（毫秒）：{{maxTimeBetweenKeysInMs}}",
+      "reservedPrefixes": "保留的条码前缀：{{prefixes}}"
+    }
+  },
+  "cmdCaf": {
+    "args": {
+      "field": "要请求的字段名称",
+      "filter": "要应用的过滤器",
+      "model": "模型技术名称",
+      "property": "要显示的字段属性"
+    },
+    "definition": "显示模型的字段定义",
+    "detail": "返回模型的字段元数据：类型、必填、只读、标签、选择值、关联目标等。要检查创建/读取/写入/删除访问权限，请使用 cam。"
+  },
+  "cmdCall": {
+    "args": {
+      "argument": "参数列表",
+      "call": "要调用的方法名称",
+      "kwarg": "参数字典",
+      "model": "模型技术名称"
+    },
+    "definition": "调用模型方法",
+    "detail": "调用模型方法。注意：带有 @api.model 装饰器的方法不需要 id。"
+  },
+  "cmdCam": {
+    "args": {
+      "model": "模型技术名称",
+      "operation": "要执行的操作"
+    },
+    "definition": "检查模型访问权限",
+    "detail": "显示所选模型上所选操作的访问权限",
+    "result": {
+      "haveAccessRights": "您在 {{model}} 上有 '{{operation}}' 的访问权限",
+      "notAccessRights": "您无法在 {{model}} 上执行 '{{operation}}'"
+    }
+  },
+  "cmdChrono": {
+    "args": {
+      "cmd": "要运行的命令"
+    },
+    "definition": "打印命令执行所用时间",
+    "detail": "打印执行命令所用的秒数。<br/>注意：此时间包括格式化结果的时间！",
+    "result": {
+      "timeElapsed": "已用时间：'{{time_elapsed_secs}}' 秒"
+    }
+  },
+  "cmdClear": {
+    "args": {
+      "section": "要清除的部分<br/>- screen：清除屏幕<br/>- history：清除命令历史"
+    },
+    "definition": "清除终端部分",
+    "detail": "清除所选部分"
+  },
+  "cmdClick": {
+    "args": {
+      "index": "要点击的匹配项索引，从 0 开始（默认：0）",
+      "list": "列出所有匹配项但不点击",
+      "selector": "CSS 选择器（默认：button）",
+      "text": "要匹配的按钮文本（不区分大小写，部分匹配）"
+    },
+    "definition": "点击当前视图中的按钮或元素",
+    "detail": "通过可见文本或 CSS 选择器查找并点击按钮或元素。-t 匹配文本包含给定字符串的任意按钮（不区分大小写）。-s 覆盖元素选择器（默认：button）。-n 选择第 n 个匹配项（从 0 开始）。--list 显示所有匹配项但不点击。",
+    "error": {
+      "indexOutOfRange": "索引 {{index}} 超出范围（找到 {{count}} 个匹配项）",
+      "noRoot": "无法找到 Odoo 内容区域",
+      "notFound": "未找到选择器 \"{{selector}}\" 对应的元素",
+      "notFoundText": "未找到匹配 \"{{text}}\" 的按钮",
+      "notHtmlElement": "匹配的元素不可点击"
+    },
+    "result": {
+      "clicked": "已点击：{{label}}"
+    }
+  },
+  "cmdCommit": {
+    "args": {
+      "recordset": "记录集"
+    },
+    "definition": "提交记录集更改",
+    "detail": "写入记录集更改",
+    "error": {
+      "invalidRecordset": "无效的记录集",
+      "noCommit": "没有需要提交的内容！",
+      "success": "{{model}} 的记录 '{{pids}}' 更新成功"
+    }
+  },
+  "cmdContext": {
+    "args": {
+      "operation": "要执行的操作",
+      "value": "值"
+    },
+    "definition": "会话上下文字典操作",
+    "detail": "会话上下文字典操作。",
+    "error": {
+      "keyNotPresent": "所选键不在终端上下文中",
+      "notSession": "无法找到会话信息",
+      "operationNotSupported": "此操作在 v15.0+ 中暂不支持"
+    }
+  },
+  "cmdContextTerm": {
+    "args": {
+      "operation": "要执行的操作",
+      "value": "值"
+    },
+    "definition": "终端上下文字典操作",
+    "detail": "终端上下文字典操作。此上下文仅影响终端操作。",
+    "error": {
+      "notPresent": "所选键不在终端上下文中"
+    }
+  },
+  "cmdCopy": {
+    "args": {
+      "data": "数据",
+      "type": "数据类型"
+    },
+    "definition": "复制数据以粘贴到其他实例",
+    "detail": "复制模型记录或变量",
+    "result": {
+      "dateCopied": "数据已复制！"
+    }
+  },
+  "cmdCount": {
+    "args": {
+      "domain": "域",
+      "model": "模型技术名称",
+      "options": "选项"
+    },
+    "definition": "获取指定模型在选定域中的记录数",
+    "detail": "获取指定模型在选定域中的记录数",
+    "result": "结果：{{result}}"
+  },
+  "cmdCreate": {
+    "args": {
+      "model": "模型技术名称",
+      "options": "选项",
+      "value": "要写入的值"
+    },
+    "definition": "创建新记录",
+    "detail": "不带 -v：打开模型的空白表单视图。带 -v：直接在数据库中创建记录并返回包含新 ID 的 Recordset。-v 接受值字典列表。"
+  },
+  "cmdDBList": {
+    "args": {
+      "onlyActive": "仅打印活动数据库名称"
+    },
+    "definition": "显示数据库名称",
+    "detail": "显示数据库名称",
+    "error": {
+      "noDBNames": "无法获取数据库名称",
+      "notSession": "无法找到会话信息"
+    },
+    "result": {
+      "activeDatabase": "<strong>{{database}}</strong>（活动数据库）"
+    }
+  },
+  "cmdDateRange": {
+    "args": {
+      "domain": "可选的域过滤器",
+      "field": "日期或日期时间字段名称",
+      "model": "模型技术名称"
+    },
+    "definition": "显示日期或日期时间字段的最小/最大值",
+    "detail": "返回模型中日期或日期时间字段的最小值和最大值，可选地通过域过滤。在查询前验证字段是否存在且为日期/日期时间类型。用于避免在空或意外的日期范围上构建图表或报告。",
+    "error": {
+      "notDateField": "字段 '{{field}}' 的类型为 '{{type}}'，期望为 date 或 datetime",
+      "unknownField": "在模型 '{{model}}' 中未找到字段 '{{field}}'"
+    },
+    "result": {
+      "header": "<strong>{{model}}.{{field}}</strong>（{{label}}）",
+      "max": "最大值：<strong>{{max}}</strong>",
+      "min": "最小值：<strong>{{min}}</strong>",
+      "noData": "未找到 <strong>{{model}}.{{field}}</strong> 的数据"
+    }
+  },
+  "cmdDebug": {
+    "args": {
+      "mode": "模式<br>- 0：禁用<br>- 1：启用<br>- 2：启用并加载资源"
+    },
+    "definition": "设置调试模式",
+    "detail": "设置 Odoo 调试模式并重新加载页面。值：0 = 禁用，1 = 启用，2 = 启用并加载资源。",
+    "error": {
+      "invalidDebugMode": "无效的调试模式"
+    },
+    "result": {
+      "disabled": "调试模式<strong>已禁用</strong>",
+      "enabled": "调试模式<strong>已启用</strong>",
+      "enabledAssets": "调试模式（含资源）<strong>已启用</strong>",
+      "reload": "正在重新加载页面..."
+    }
+  },
+  "cmdDepends": {
+    "args": {
+      "key": "键",
+      "module": "模块技术名称",
+      "section": "URL 部分"
+    },
+    "definition": "查看依赖于给定模块的模块",
+    "detail": "显示依赖于给定模块的模块列表",
+    "error": {
+      "noModulesFound": "未找到模块！",
+      "noWizard": "无法创建向导记录！",
+      "notInstalled": "模块 '{{module}}' 未安装"
+    }
+  },
+  "cmdDescribe": {
+    "args": {
+      "model": "模型技术名称"
+    },
+    "definition": "模型概况：记录数、日期范围、关键字段和选择值",
+    "detail": "一次性返回模型的综合概况：总记录数、create_date 范围（最早→最新），以及关键字段表（必填字段、存储的关系字段、带可能值的选择字段）。替代 3-4 个单独命令（caf + count + read_group）。",
+    "result": {
+      "count": "总记录数：<strong>{{count}}</strong>",
+      "dateRange": "日期范围：{{min}} → {{max}}",
+      "header": "<strong>模型概况：{{model}}</strong>"
+    },
+    "table": {
+      "extra": "关联 / 值",
+      "field": "字段",
+      "label": "标签",
+      "required": "必填",
+      "type": "类型"
+    }
+  },
+  "cmdDiff": {
+    "args": {
+      "all": "显示所有字段，包括相同的字段",
+      "field": "要比较的字段（默认：所有非二进制字段）。使用 '*' 表示全部。",
+      "id": "要比较的两个记录 ID（例如 [10, 20]）",
+      "model": "模型技术名称",
+      "options": "额外选项"
+    },
+    "definition": "逐字段比较两条记录",
+    "detail": "获取同一模型的两条记录并比较每个字段值。默认仅显示不同的字段。使用 --all 包括相同的字段。Many2one 字段按存储的 ID（而非显示名称）比较，以避免因重命名关联记录而产生误报。二进制字段被排除。",
+    "error": {
+      "exactlyTwo": "需要恰好两个记录 ID",
+      "notFound": "记录 {{id}} 在 '{{model}}' 中未找到"
+    },
+    "result": {
+      "header": "<strong>比较 {{model}}：#{{id_a}} vs #{{id_b}}</strong>",
+      "identical": "记录在请求的字段上<strong>完全相同</strong>",
+      "summary": "不同字段：<strong>{{diff}}</strong> / 总计：<strong>{{total}}</strong>"
+    },
+    "table": {
+      "field": "字段",
+      "label": "标签",
+      "type": "类型",
+      "valA": "#{{id}}",
+      "valB": "#{{id}}"
+    }
+  },
+  "cmdDis": {
+    "args": {
+      "code": "TraSH 代码"
+    },
+    "definition": "反编译字节码",
+    "detail": "显示输入生成的字节码",
+    "table": {
+      "instrCode": "指令代码",
+      "instrName": "指令名称",
+      "level": "级别",
+      "meta": "元数据",
+      "token": "Token",
+      "value": "名称/值/参数"
+    }
+  },
+  "cmdDoc": {
+    "args": {
+      "method": "方法名称",
+      "model": "模型技术名称"
+    },
+    "definition": "打开技术文档页面",
+    "detail": "打开内置技术文档页面（仅 Odoo 19.0+）。不带 -m 打开索引。带 -m 打开该模型的文档。带 -me 锚定到该方法。",
+    "error": {
+      "incompatibleOdooVersion": "此命令仅在 Odoo 19.0+ 中可用"
+    }
+  },
+  "cmdEffect": {
+    "args": {
+      "options": "使用的额外选项",
+      "type": "效果类型"
+    },
+    "definition": "显示效果",
+    "detail": "播放视觉 UI 效果。不带 -t 列出所有已注册的效果名称。带 -t 播放该效果。Odoo 15.0+ 可用。",
+    "error": {
+      "incompatibleOdooVersion": "此命令仅在 Odoo 15.0+ 中可用",
+      "notRegistryService": "无法找到注册表服务"
+    },
+    "result": {
+      "availableEffects": "可用效果："
+    }
+  },
+  "cmdExportFile": {
+    "args": {
+      "delimiter": "分隔符",
+      "fieldData": "表示文件数据的字段",
+      "fieldName": "表示文件名的字段",
+      "filename": "文件名",
+      "format": "导出使用的格式",
+      "mimetype": "文件的 MIME 类型",
+      "noHeader": "不使用表头",
+      "value": "要导出的值"
+    },
+    "definition": "将值导出到本地文件",
+    "detail": "将值保存到磁盘。格式：json（任意值）、csv/xml/zip（仅 Recordset）、raw（带自定义 MIME 类型的二进制）。zip 使用 --field-name 和 --field-data 将每条记录导出为单独的文件。",
+    "invalidFieldData": "未找到名为 '{{fieldData}}' 的字段来表示数据",
+    "invalidFieldName": "未找到名为 '{{fieldName}}' 的字段来表示名称",
+    "invalidValue": "无效的值：csv 和 xml 必须是记录集",
+    "resultExported": "命令结果已导出到 '{{filename}}' 文件"
+  },
+  "cmdExportVar": {
+    "args": {
+      "value": "要导出的值"
+    },
+    "definition": "将命令结果导出到浏览器控制台变量",
+    "detail": "将命令结果导出到浏览器控制台变量。",
+    "resultExported": "命令结果已导出！现在可以在浏览器控制台中使用 '{{varname}}' 变量"
+  },
+  "cmdFill": {
+    "args": {
+      "enter": "填充后触发 Enter 键事件（用于搜索栏）",
+      "index": "要使用的匹配项索引，从 0 开始（默认：0）",
+      "selector": "输入元素的 CSS 选择器",
+      "value": "要填入的文本"
+    },
+    "definition": "在文本输入框、文本区域、选择器或可编辑区域中填充值",
+    "detail": "通过 CSS 选择器查找元素并设置其值，然后触发 input 和 change 事件以便框架响应。用于非 Odoo 表单字段控件的输入（搜索栏、过滤框、自定义 HTML 输入）。对于标准 Odoo 表单字段，请使用 \"form -o edit\"。-n 选择第 n 个匹配项（从 0 开始）。--enter 还会在填充后触发 Enter 键事件（Odoo 搜索栏提交查询所需）。",
+    "error": {
+      "indexOutOfRange": "索引 {{index}} 超出范围（找到 {{count}} 个匹配项）",
+      "noRoot": "无法找到 Odoo 内容区域",
+      "noSelector": "需要 CSS 选择器（-s）",
+      "notFillable": "\"{{selector}}\" 匹配的元素不是可填充的输入（input、textarea、select 或 contenteditable）",
+      "notFound": "未找到选择器 \"{{selector}}\" 对应的元素"
+    },
+    "result": {
+      "filled": "已填充 \"{{selector}}\"{{enter}}，内容：{{value}}"
+    }
+  },
+  "cmdForm": {
+    "args": {
+      "field": "字段技术名称",
+      "operation": "要执行的操作",
+      "value": "要设置的字段值（用于 edit 操作）"
+    },
+    "definition": "与当前表单视图交互（get、edit、save、highlight、clear）",
+    "detail": "get：返回内存中的字段值。edit：在打开的表单内存记录中设置字段值（触发 onchange，不保存）。save：将当前表单记录持久化到数据库。highlight：视觉标记字段，必要时激活其笔记本标签页。clear：移除高亮（所有字段，或仅 -f 指定的字段）。",
+    "error": {
+      "fieldNotFound": "在当前视图中未找到表单字段 '{{field}}'",
+      "fieldRequired": "highlight 操作需要字段名称",
+      "fieldsRequired": "get 操作需要至少一个字段名称（使用 -f [field1, field2]）",
+      "noFormView": "在当前页面中未找到可编辑的表单视图",
+      "valuesRequired": "edit 操作需要值字典（使用 -v {field: value, ...}）"
+    },
+    "result": {
+      "cleared": "字段高亮已清除",
+      "edited": "已更新当前表单中的 {{count}} 个字段",
+      "highlighted": "已高亮 {{count}} 个字段 '{{field}}'",
+      "saved": "表单记录已保存"
+    }
+  },
+  "cmdFuncTrash": {
+    "args": {
+      "name": "函数参数"
+    }
+  },
+  "cmdGen": {
+    "args": {
+      "max": "最大值",
+      "min": "最小值",
+      "type": "生成器类型"
+    },
+    "definition": "生成随机值",
+    "detail": "生成数字、字符串、URL、日期等..."
+  },
+  "cmdGenFile": {
+    "args": {
+      "name": "File 对象文件名",
+      "options": "File 对象选项"
+    },
+    "definition": "生成 File 对象",
+    "detail": "打开浏览器文件对话框，并用所选文件的内容实例化一个 File 对象"
+  },
+  "cmdGraph": {
+    "args": {
+      "domain": "域过滤器",
+      "groupby": "分组字段",
+      "measure": "度量字段",
+      "model": "模型技术名称",
+      "name": "视图标题",
+      "type": "图表类型"
+    },
+    "definition": "打开图形视图",
+    "detail": "打开模型的自定义图形视图。要获取分组数据而不打开视图，请使用 read_group 命令。",
+    "error": {
+      "measurePrefix": "度量字段必须是纯字段名称（例如 'amount_total'），不能带聚合前缀（例如 'sum:amount_total'）",
+      "unknownFields": "{{arg}}：在 '{{model}}' 中未找到字段：{{fields}}。使用 'caf -m {{model}}' 列出可用字段。"
+    },
+    "result": {
+      "name": "图形视图"
+    }
+  },
+  "cmdHelp": {
+    "args": {
+      "all": "显示所有命令",
+      "cmd": "要查询的命令",
+      "onlyInternal": "仅显示内部命令"
+    },
+    "definition": "打印此帮助或命令详细信息",
+    "detail": "显示命令及快速定义。<br/>- <> ~> 必需参数<br/>- [] ~> 可选参数",
+    "error": {
+      "commandNotExist": "'{{cmd}}' 命令不存在"
+    },
+    "result": {
+      "arguments": "参数",
+      "description": "描述",
+      "example": "示例",
+      "name": "名称"
+    }
+  },
+  "cmdInfo": {
+    "args": {
+      "activeId": "活动记录 ID",
+      "activeModel": "活动记录模型",
+      "userId": "用户 ID",
+      "userLogin": "用户登录名"
+    },
+    "definition": "获取会话信息",
+    "detail": "返回当前会话/页面的某项数据。请使用恰好一个标志：--user-id（数字用户 ID）、--user-login（登录名）、--active-id（当前视图的记录 ID）、--active-model（当前视图的模型）。"
+  },
+  "cmdInput": {
+    "args": {
+      "choices": "选项",
+      "default": "默认选项",
+      "question": "问题"
+    },
+    "definition": "请求用户输入",
+    "detail": "返回用户输入的数据。"
+  },
+  "cmdInspect": {
+    "args": {
+      "typeElement": "要检查的元素类型"
+    },
+    "breadcrumb": {
+      "none": "未找到面包屑导航"
+    },
+    "button": {
+      "none": "当前视图中未找到按钮"
+    },
+    "definition": "检查当前页面上的交互元素",
+    "detail": "列出给定类型的元素，并提供与每个元素交互的终端命令。供 LLM 使用：先调用 inspect，然后使用生成的命令。\n类型：\n  page（默认）— 上下文概览：模型、记录 ID、视图类型、元素计数\n  button — 所有按钮及可直接使用的 \"click\" 命令\n  field — Odoo 表单字段及 \"form\" 命令\n  tab — 笔记本标签页及 \"click\" 命令\n  menu — 顶部导航栏菜单项及 \"click\" 命令\n  statusbar — 工作流状态按钮及 \"click\" 命令\n  view — 视图切换器（list/kanban/form/…）及 \"click\" 命令\n  dialog — 当前打开对话框的按钮和字段\n  breadcrumb — 返回导航链接及 \"click\" 命令\n  record — 当前表单记录字段值（内存中）",
+    "dialog": {
+      "buttons": "<em>按钮：</em>",
+      "fields": "<em>字段：</em>",
+      "none": "当前没有打开的对话框",
+      "title": "对话框：<strong>{{title}}</strong>"
+    },
+    "error": {
+      "noRoot": "无法找到 Odoo 内容区域",
+      "unknownType": "未知元素类型：{{type}}"
+    },
+    "field": {
+      "none": "当前视图中未找到表单字段"
+    },
+    "list": {
+      "none": "当前视图中未找到列表行"
+    },
+    "menu": {
+      "none": "未找到菜单项"
+    },
+    "page": {
+      "actionId": "动作 ID：{{id}}",
+      "breadcrumb": "面包屑：{{path}}",
+      "counts": "元素 — 按钮：{{b}}，字段：{{f}}，标签页：{{t}}，状态栏状态：{{s}}",
+      "model": "模型：<strong>{{model}}</strong>",
+      "pageTitle": "标题：<em>{{title}}</em>",
+      "recordId": "记录 ID：<strong>{{id}}</strong>",
+      "title": "页面概览",
+      "url": "URL：{{url}}",
+      "viewType": "视图类型：{{type}}"
+    },
+    "record": {
+      "none": "当前视图中未找到表单记录"
+    },
+    "statusbar": {
+      "none": "当前视图中未找到状态栏"
+    },
+    "tab": {
+      "none": "当前视图中未找到笔记本标签页"
+    },
+    "table": {
+      "active": "活动",
+      "clickCmd": "click 命令",
+      "current": "当前",
+      "disabled": "禁用",
+      "formCmd": "form 命令",
+      "id": "ID",
+      "index": "#",
+      "label": "标签",
+      "name": "字段",
+      "preview": "单元格值（字段: 值）",
+      "required": "必填",
+      "text": "文本",
+      "type": "类型",
+      "value": "值",
+      "viewCmd": "view 命令"
+    },
+    "view": {
+      "none": "未找到视图切换器（可能是单视图动作）"
+    }
+  },
+  "cmdInstall": {
+    "args": {
+      "module": "模块技术名称"
+    },
+    "definition": "安装模块",
+    "detail": "启动模块安装过程。",
+    "error": {
+      "moduleNotExist": "'{{module}}' 模块不存在",
+      "moduleNotInstalled": "意外错误。模块未安装"
+    },
+    "result": {
+      "success": "{{modules}} 模块安装成功"
+    }
+  },
+  "cmdJSTest": {
+    "args": {
+      "device": "测试设备",
+      "module": "模块技术名称"
+    },
+    "definition": "启动 JS 测试",
+    "detail": "以桌面或移动模式运行所选模块的 js 测试。"
+  },
+  "cmdJobs": {
+    "definition": "显示正在运行的任务",
+    "detail": "显示正在运行的任务",
+    "result": {
+      "timeout": "此任务运行时间过长"
+    }
+  },
+  "cmdJson": {
+    "args": {
+      "data": "要发送的数据",
+      "endpoint": "端点"
+    },
+    "definition": "发送 POST JSON",
+    "detail": "发送 HTTP POST 'application/json' 请求"
+  },
+  "cmdLang": {
+    "args": {
+      "format": "使用的格式",
+      "lang": "语言<br/>可使用 '__new__' 创建新语言（空翻译模板）",
+      "module": "模块技术名称",
+      "name": "语言名称",
+      "noOverwrite": "不覆盖当前翻译的标志",
+      "operation": "操作"
+    },
+    "definition": "翻译操作",
+    "detail": "export：下载模块的 .po/.csv 翻译文件。import：从磁盘上传翻译文件。list：打印已安装的语言代码和名称。不带额外参数时，export/import 打开 Odoo 向导。",
+    "error": {
+      "exportInvalidArguments": "'export' 操作需要以下参数：--lang、--format、--module",
+      "importInvalidArguments": "'import' 操作需要以下参数：--name、--lang、--format、--module",
+      "invalidOperation": "无效操作！",
+      "noModulesFound": "未找到模块！",
+      "noWizard": "无法创建向导记录！"
+    },
+    "result": {
+      "success": "语言文件导入成功"
+    }
+  },
+  "cmdLastSeen": {
+    "definition": "查看用户在线状态",
+    "detail": "显示用户最后在线时间",
+    "error": {
+      "notAvailable": "无法使用 lastseen，'bus' 模块未安装"
+    },
+    "table": {
+      "lastSeen": "最后在线",
+      "userID": "用户 ID",
+      "userName": "用户名"
+    }
+  },
+  "cmdLoad": {
+    "args": {
+      "type": "资源类型",
+      "url": "资源 URL"
+    },
+    "definition": "加载外部资源",
+    "detail": "加载外部资源（javascript 和 css）"
+  },
+  "cmdLogin": {
+    "args": {
+      "database": "数据库<br/>可使用 '*' 表示当前数据库",
+      "noReload": "不重新加载",
+      "password": "密码",
+      "user": "登录名<br/>可选择以 '#' 字符开头，此时也将用作密码"
+    },
+    "definition": "以...身份登录",
+    "detail": "以所选用户身份登录。",
+    "error": {
+      "notSession": "无法找到会话信息",
+      "unknownDB": "未知的活动数据库。尝试使用 '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>' 命令。"
+    },
+    "result": {
+      "success": "已成功登录为 '{{login}}'"
+    }
+  },
+  "cmdLogout": {
+    "definition": "登出",
+    "detail": "退出会话",
+    "error": {
+      "notSession": "无法找到会话信息"
+    },
+    "result": {
+      "success": "已登出"
+    }
+  },
+  "cmdLongpolling": {
+    "args": {
+      "operation": "要执行的操作<br>- verbose > 打印传入通知<br>- off > 关闭详细模式<br>- add_channel > 添加监听频道<br>- del_channel > 删除监听频道<br>- start > 启动客户端长轮询服务<br> - stop > 停止客户端长轮询服务",
+      "param": "参数"
+    },
+    "definition": "长轮询操作",
+    "detail": "长轮询操作。",
+    "error": {
+      "invalidChannel": "无效的频道名称",
+      "invalidSubscription": "无效的订阅名称",
+      "notAvailable": "无法使用长轮询，'bus' 模块未安装"
+    },
+    "result": {
+      "join": "已加入 '{{channel_name}}' 频道",
+      "leave": "已离开 '{{channel_name}}' 频道",
+      "start": "长轮询已启动",
+      "stop": "长轮询已停止",
+      "subscribe": "已订阅 '{{subscription}}'",
+      "unsubscribe": "已取消订阅 '{{subscription}}'",
+      "verboseDisabled": "长轮询详细模式已关闭",
+      "verboseEnabled": "长轮询已进入详细模式"
+    }
+  },
+  "cmdMetadata": {
+    "args": {
+      "id": "记录 ID",
+      "model": "记录模型"
+    },
+    "definition": "查看记录元数据",
+    "detail": "显示记录的 ORM 元数据：create_uid、create_date、write_uid、write_date、noupdate 标志和 XML ID。",
+    "error": {
+      "notFound": "无法找到给定 ID 的任何元数据"
+    }
+  },
+  "cmdNotify": {
+    "args": {
+      "buttons": "按钮",
+      "className": "CSS 类名",
+      "message": "消息",
+      "sticky": "是否固定",
+      "subtitle": "副标题",
+      "title": "标题",
+      "type": "类型"
+    },
+    "definition": "显示通知",
+    "detail": "显示带有自定义消息的通知"
+  },
+  "cmdNow": {
+    "args": {
+      "type": "日期类型",
+      "tz": "使用时区"
+    },
+    "definition": "当前时间",
+    "detail": "打印当前时间",
+    "error": {
+      "notViewDialogsService": "无法找到时间服务"
+    }
+  },
+  "cmdOptions": {
+    "definition": "打开扩展选项",
+    "detail": "打开 OdooTerminal 扩展选项页面。"
+  },
+  "cmdPaste": {
+    "args": {
+      "merge": "尝试合并数据（如果类型为 'model'）",
+      "yes": "不显示确认提示"
+    },
+    "definition": "粘贴已复制的数据",
+    "detail": "粘贴模型记录或变量",
+    "error": {
+      "invalidData": "粘贴的数据无效！未定义模型",
+      "noData": "没有可复制的数据！"
+    },
+    "question": {
+      "continue": "这将修改 '{{model}}' 模型。是否继续？"
+    }
+  },
+  "cmdPivot": {
+    "args": {
+      "col": "按列分组的字段",
+      "domain": "域过滤器",
+      "measure": "用作度量的字段",
+      "model": "模型技术名称",
+      "name": "视图标题",
+      "row": "按行分组的字段"
+    },
+    "definition": "打开数据透视视图",
+    "detail": "打开模型的自定义数据透视视图。要获取聚合数据而不打开视图，请使用 read_group 命令。",
+    "error": {
+      "measurePrefix": "度量字段必须是纯字段名称（例如 'amount_total'），不能带聚合前缀（例如 'sum:amount_total'）",
+      "unknownFields": "{{arg}}：在 '{{model}}' 中未找到字段：{{fields}}。使用 'caf -m {{model}}' 列出可用字段。"
+    },
+    "result": {
+      "name": "数据透视视图"
+    }
+  },
+  "cmdPost": {
+    "args": {
+      "data": "数据",
+      "endpoit": "端点",
+      "mode": "模式"
+    },
+    "definition": "发送 POST 请求",
+    "detail": "向所选端点发送 POST 请求"
+  },
+  "cmdPrint": {
+    "args": {
+      "msg": "要打印的消息"
+    },
+    "definition": "打印消息",
+    "detail": "计算参数并打印结果。"
+  },
+  "cmdRead": {
+    "args": {
+      "field": "要请求的字段<br/>可使用 '*' 显示所有字段",
+      "id": "记录 ID",
+      "model": "模型技术名称",
+      "options": "选项",
+      "readBinary": "不过滤二进制字段"
+    },
+    "definition": "按 ID 获取记录",
+    "detail": "通过已知 ID 获取一条或多条记录并返回 Recordset。当您已有记录 ID 时使用。要通过域过滤器查找记录，请使用 search。"
+  },
+  "cmdReadGroup": {
+    "args": {
+      "domain": "域过滤器",
+      "field": "要聚合的字段（度量）。省略则仅获取计数。",
+      "groupby": "分组字段",
+      "model": "模型技术名称"
+    },
+    "definition": "从模型获取分组和聚合数据",
+    "detail": "在模型上运行 ORM read_group 并返回聚合结果。每行结果包含分组字段值、聚合度量值和 __count。当需要每个组的总和、计数或平均值时，使用此命令替代 search。"
+  },
+  "cmdRef": {
+    "args": {
+      "xmlid": "XML-ID"
+    },
+    "definition": "显示给定 XML-ID 引用的模型和 ID",
+    "detail": "显示给定 XML-ID 引用的模型和 ID",
+    "table": {
+      "resID": "资源 ID",
+      "resModel": "资源模型",
+      "xmlID": "XML ID"
+    }
+  },
+  "cmdReload": {
+    "definition": "重新加载当前页面",
+    "detail": "重新加载当前页面。"
+  },
+  "cmdRenewDatabase": {
+    "args": {
+      "dbuuid": "更新数据库的 UUID",
+      "expires_in": "设置数据库过期前的延迟天数。"
+    },
+    "definition": "续期数据库",
+    "detail": "为您的开发数据库重新生成新的 UUID 和过期日期。",
+    "result": {
+      "success": "数据库续期成功",
+      "success_date": "新过期日期 {{formattedExpirationDate}}。",
+      "success_with_uuid": "新 UUID {{uuid}}。"
+    }
+  },
+  "cmdRollback": {
+    "args": {
+      "recordset": "记录集"
+    },
+    "definition": "回滚记录集更改",
+    "detail": "撤销记录集更改",
+    "error": {
+      "invalidRecordset": "无效的记录集"
+    },
+    "result": {
+      "success": "记录集更改已回滚"
+    }
+  },
+  "cmdRpc": {
+    "args": {
+      "options": "RPC 查询选项"
+    },
+    "definition": "执行原始 RPC",
+    "detail": "执行原始 RPC"
+  },
+  "cmdRun": {
+    "definition": "运行 TraSH 脚本",
+    "detail": "运行 TraSH 脚本"
+  },
+  "cmdSearch": {
+    "args": {
+      "all": "显示所有记录（不截断）",
+      "domain": "域",
+      "field": "要请求的字段名称<br/>可使用 '*' 显示模型的所有字段",
+      "limit": "要请求的记录数限制",
+      "model": "模型技术名称",
+      "more": "显示更多结果的标志",
+      "offset": "偏移量（起始位置）<br/>可以是零（无限制）",
+      "options": "选项",
+      "order": "排序方式。必须加引号因为包含空格：-o \"name ASC\" 或 -o \"id DESC, name\"",
+      "readBinary": "不过滤二进制字段"
+    },
+    "definition": "搜索模型记录",
+    "detail": "启动 ORM 搜索查询",
+    "error": {
+      "noMoreResults": "没有更多结果可打印",
+      "resultTruncated": "<strong class='text-warning'>结果已截断为 {{len}} 条记录！</strong>查询结果过大无法完整显示。"
+    },
+    "question": {
+      "showMore": "还有 {{len}} 条结果可打印。是否显示更多？"
+    },
+    "result": {
+      "count": "记录数：{{count}}"
+    }
+  },
+  "cmdSettings": {
+    "args": {
+      "module": "模块技术名称"
+    },
+    "definition": "打开设置页面",
+    "detail": "打开指定模块的 Odoo 设置表单视图。不返回数据。"
+  },
+  "cmdSleep": {
+    "args": {
+      "time": "休眠时间（毫秒）"
+    },
+    "definition": "休眠",
+    "detail": "休眠（时间单位：毫秒）"
+  },
+  "cmdSysParam": {
+    "args": {
+      "key": "参数键（get/set 操作必需）",
+      "operation": "要执行的操作。",
+      "value": "参数值（set 操作必需）"
+    },
+    "definition": "管理系统参数",
+    "detail": "在 ir.config_parameter 模型中获取、设置或列出参数。",
+    "error": {
+      "invalidOperation": "无效操作。使用 'get'、'set' 或 'list'",
+      "listEmpty": "未找到系统参数",
+      "missingKey": "set 操作需要键参数",
+      "missingValue": "set 操作需要值参数",
+      "noUpdate": "更新参数失败",
+      "notFound": "参数未找到"
+    },
+    "result": {
+      "success": "参数设置成功"
+    },
+    "table": {
+      "param": "参数",
+      "value": "值"
+    }
+  },
+  "cmdToggleTerm": {
+    "args": {
+      "force": "强制显示/隐藏"
+    },
+    "definition": "切换终端可见性",
+    "detail": "切换终端可见性"
+  },
+  "cmdTour": {
+    "args": {
+      "clear": "清除巡检状态",
+      "name": "巡检技术名称",
+      "onlyActive": "仅过滤活动的"
+    },
+    "definition": "启动巡检",
+    "detail": "运行所选巡检。如果未指定巡检，则打印所有可用巡检。",
+    "error": {
+      "notAccesible": "巡检不可访问！当前无法使用。",
+      "notAvailable": "此功能在 Odoo <17.0 中不可用",
+      "notExist": "给定的巡检不存在！"
+    },
+    "result": {
+      "clean": "巡检 '{{name}}' 已清除",
+      "empty": "巡检列表为空",
+      "running": "正在运行巡检..."
+    }
+  },
+  "cmdURL": {
+    "definition": "获取 URL 参数",
+    "detail": "从当前页面 URL 中提取组件。使用 -s href 获取完整 URL，-s hash -k model 读取 hash 中的模型，-s search -k <param> 获取查询字符串值。",
+    "error": {
+      "notKey": "未提供键"
+    }
+  },
+  "cmdUal": {
+    "definition": "更新应用列表",
+    "detail": "通过扫描插件路径扫描新模块或更新模块来刷新模块注册表。在安装刚添加到文件系统的模块之前需要执行此操作。",
+    "error": {
+      "noUpdate": "无法更新应用列表！"
+    },
+    "result": {
+      "success": "应用列表已成功更新"
+    }
+  },
+  "cmdUhg": {
+    "args": {
+      "group": "组的技术名称<br/>组名可选择以 '!' 开头表示\"不在该组中\""
+    },
+    "definition": "检查用户是否在所选组中",
+    "detail": "检查用户是否在所选组中。"
+  },
+  "cmdUninstall": {
+    "args": {
+      "force": "强制模式",
+      "module": "模块技术名称"
+    },
+    "definition": "卸载模块",
+    "detail": "启动模块删除过程。",
+    "error": {
+      "canceled": "操作已取消",
+      "notExist": "'{{module}}' 模块不存在"
+    },
+    "question": {
+      "continue": "是否继续？"
+    },
+    "result": {
+      "success": "'{{module}}'（{{name}}）模块卸载成功",
+      "willRemoved": "此操作还将移除以下模块："
+    }
+  },
+  "cmdUnlink": {
+    "args": {
+      "id": "记录 ID",
+      "model": "模型技术名称",
+      "options": "选项"
+    },
+    "definition": "删除记录",
+    "detail": "删除记录。",
+    "result": {
+      "success": "{{model}} 记录删除成功"
+    }
+  },
+  "cmdUpgrade": {
+    "args": {
+      "module": "模块技术名称"
+    },
+    "definition": "升级模块",
+    "detail": "启动模块升级过程。",
+    "error": {
+      "notExist": "'{{module}}' 模块不存在",
+      "notUpgraded": "意外错误。模块未升级"
+    },
+    "result": {
+      "sucess": "'{{modules}}' 模块升级成功"
+    }
+  },
+  "cmdVersion": {
+    "definition": "查看 Odoo 版本",
+    "detail": "显示 Odoo 版本",
+    "error": {
+      "notVersionInfo": "无法找到版本信息"
+    }
+  },
+  "cmdView": {
+    "args": {
+      "domain": "记录选择器的域过滤器",
+      "id": "记录 ID",
+      "model": "模型技术名称",
+      "ref": "视图引用名称"
+    },
+    "definition": "查看模型记录",
+    "detail": "带 -i：在表单视图中打开该记录。不带 -i：显示记录选择器对话框。不返回数据。",
+    "error": {
+      "notViewDialogsService": "无法找到视图对话框服务"
+    },
+    "result": {
+      "selectRecord": "选择记录",
+      "viewRecord": "查看记录"
+    }
+  },
+  "cmdWhoami": {
+    "definition": "查看当前用户登录名",
+    "detail": "显示当前用户登录名",
+    "error": {
+      "noLogin": "哎呀！无法获取登录名 :/"
+    }
+  },
+  "cmdWrite": {
+    "args": {
+      "id": "记录 ID",
+      "model": "模型技术名称",
+      "options": "选项",
+      "value": "要写入的值"
+    },
+    "definition": "更新记录值",
+    "detail": "更新记录值。",
+    "result": {
+      "success": "{{model}} 记录更新成功"
+    }
+  },
+  "cmdWs": {
+    "args": {
+      "data": "数据",
+      "endpoint": "端点",
+      "noTls": "不使用 TLS",
+      "operation": "操作",
+      "websocket": "WebSocket 对象"
+    },
+    "definition": "打开 WebSocket",
+    "detail": "打开 WebSocket",
+    "error": {
+      "invalidOperation": "无效操作",
+      "noEndpoint": "需要端点才能连接",
+      "noWebsocket": "需要 WebSocket 才能操作"
+    },
+    "result": {
+      "connectionClosed": "[{{url}}] 连接已正常关闭，代码={{code}} 原因={{reason}}",
+      "connectionDied": "[{{url}}] 连接已断开",
+      "connectionError": "需要 WebSocket 才能操作",
+      "connectionEstablished": "[{{url}}] 连接已建立"
+    }
+  },
+  "cmdZip": {
+    "args": {
+      "values": "要写入的数据（必须是元组数组 [filename, filedata, ?fileoptions]）"
+    },
+    "definition": "创建 ZIP 文件",
+    "detail": "有关可用选项，请参阅 JSZip 帮助：https://stuk.github.io/jszip"
+  },
+  "file2attachment": {
+    "aborted": "用户已中止。未提供文件...",
+    "noFile": "未选择文件"
+  },
+  "file2base64": {
+    "aborted": "用户已中止。未提供文件..."
+  },
+  "file2file": {
+    "aborted": "用户已中止。未提供文件..."
+  },
+  "func2DText": {
+    "args": {
+      "canvas": "画布",
+      "color": "文本颜色",
+      "font": "文本字体",
+      "text": "文本",
+      "x": "文本 X 坐标",
+      "y": "文本 Y 坐标"
+    },
+    "definition": "绘制文本",
+    "detail": "绘制文本"
+  },
+  "funcAbs": {
+    "args": {
+      "num": "数字"
+    },
+    "definition": "计算数字的绝对值",
+    "detail": "返回数字的绝对值。"
+  },
+  "funcDecode": {
+    "args": {
+      "method": "解码方法",
+      "value": "要解码的值"
+    },
+    "definition": "解码",
+    "detail": "解码数据"
+  },
+  "funcEncode": {
+    "args": {
+      "method": "编码方法",
+      "value": "要编码的值"
+    },
+    "definition": "编码",
+    "detail": "编码数据"
+  },
+  "funcFetch": {
+    "args": {
+      "timeout": "超时时间",
+      "url": "fetch 选项"
+    },
+    "definition": "HTTP 请求",
+    "detail": "用于发出 HTTP 请求和处理响应的接口。"
+  },
+  "funcFixed": {
+    "args": {
+      "num": "小数位数"
+    },
+    "definition": "将数字向上舍入到最接近的整数",
+    "detail": "将数字向上舍入到最接近的整数"
+  },
+  "funcFloor": {
+    "args": {
+      "num": "数字"
+    },
+    "definition": "将数字向下舍入到最接近的整数",
+    "detail": "将数字向下舍入到最接近的整数"
+  },
+  "funcPNow": {
+    "definition": "毫秒级高精度时间戳",
+    "detail": "毫秒级高精度时间戳。"
+  },
+  "funcPow": {
+    "args": {
+      "base": "底数",
+      "exponent": "指数"
+    },
+    "definition": "计算 x 的 y 次幂的值",
+    "detail": "计算 x 的 y 次幂的值"
+  },
+  "funcRand": {
+    "args": {
+      "max": "最大值",
+      "min": "最小值"
+    },
+    "definition": "生成随机整数",
+    "detail": "返回随机整数"
+  },
+  "funcStrEnds": {
+    "args": {
+      "str": "字符串",
+      "suffix": "要检查的后缀"
+    },
+    "definition": "检查字符串是否以指定后缀结尾",
+    "detail": "如果字符串以给定后缀结尾则返回 true"
+  },
+  "funcStrIncludes": {
+    "args": {
+      "needle": "要搜索的子字符串",
+      "str": "字符串"
+    },
+    "definition": "检查字符串是否包含子字符串",
+    "detail": "如果字符串包含给定子字符串则返回 true"
+  },
+  "funcStrLower": {
+    "args": {
+      "str": "字符串"
+    },
+    "definition": "将字符串转换为小写",
+    "detail": "返回转换为小写的字符串"
+  },
+  "funcStrReplace": {
+    "args": {
+      "all": "替换所有出现",
+      "replacement": "替换字符串",
+      "search": "要查找的子字符串",
+      "str": "源字符串"
+    },
+    "definition": "替换字符串中的内容",
+    "detail": "替换子字符串的第一次（或使用 -a 替换所有）出现"
+  },
+  "funcStrSlice": {
+    "args": {
+      "begin": "起始索引（包含，负数从末尾计数）",
+      "end": "结束索引（不包含，负数从末尾计数）",
+      "str": "字符串"
+    },
+    "definition": "提取子字符串",
+    "detail": "返回字符串从 begin 到 end（不包含）的部分。负索引从末尾计数。"
+  },
+  "funcStrSplit": {
+    "args": {
+      "delim": "分隔符",
+      "str": "要分割的字符串"
+    },
+    "definition": "将字符串分割为数组",
+    "detail": "按分隔符分割字符串并返回子字符串数组"
+  },
+  "funcStrStarts": {
+    "args": {
+      "prefix": "要检查的前缀",
+      "str": "字符串"
+    },
+    "definition": "检查字符串是否以指定前缀开头",
+    "detail": "如果字符串以给定前缀开头则返回 true"
+  },
+  "funcStrTrim": {
+    "args": {
+      "str": "字符串"
+    },
+    "definition": "去除字符串两端的空白字符",
+    "detail": "返回去除首尾空白字符的字符串"
+  },
+  "funcStrUpper": {
+    "args": {
+      "str": "字符串"
+    },
+    "definition": "将字符串转换为大写",
+    "detail": "返回转换为大写的字符串"
+  },
+  "getOdooEnvService": {
+    "error": "服务 '{{service_name}}' 不可用"
+  },
+  "loader": {
+    "cantInitTerm": "无法初始化终端",
+    "testsEnabled": "测试已启用"
+  },
+  "longpolling": {
+    "error": {
+      "invalidVersion": "此操作在当前 Odoo 版本中无效",
+      "notAvailable": "bus 服务不可用"
+    }
+  },
+  "odoo": {
+    "error": {
+      "notRoot": "无法找到根对象"
+    },
+    "longpolling": {
+      "error": {
+        "init": "无法初始化长轮询：",
+        "read": "** 读取错误！**"
+      },
+      "new": "新的长轮询通知："
+    },
+    "templates": {
+      "metadata": {
+        "createDate": "创建日期",
+        "createUID": "创建者 UID",
+        "noUpdate": "不更新",
+        "writeDate": "修改日期",
+        "writeUID": "修改者 UID",
+        "xmlID": "XML-ID"
+      },
+      "recordCreated": {
+        "sucess": "{{model}} 记录创建成功：{{- links}}"
+      },
+      "whoami": {
+        "activeCompany": "活动公司",
+        "inCompanies": "所属公司",
+        "inGroups": "所属组",
+        "login": "登录名",
+        "partner": "合作伙伴",
+        "user": "用户"
+      }
+    }
+  },
+  "ok": "确定",
+  "optionsAIModelsAddRequired": "名称、URL 和模型为必填项",
+  "optionsAIModelsGrantDenied": "授权被拒绝",
+  "optionsAIModelsGrantError": "授权出错",
+  "optionsAIModelsGrantSuccess": "授权成功",
+  "optionsAIModelsGrantedLabel": "已授权",
+  "optionsAIModelsLoadEmpty": "未找到模型",
+  "optionsAIModelsLoadError": "加载模型失败",
+  "optionsAIModelsLoadLoading": "加载中...",
+  "optionsAIModelsLoadMissingURL": "请先输入 URL",
+  "optionsAIModelsLoadSuccess": "已加载 {{count}} 个模型",
+  "optionsAISkillsAddRequired": "名称、描述和内容为必填项",
+  "optionsLanguage": "语言",
+  "optionsLanguageAuto": "自动",
+  "optionsNoChanges": "所有更改已保存",
+  "optionsReset": "恢复默认设置",
+  "optionsResetConfirm": "这将把所有设置恢复为默认值。确定吗？",
+  "optionsResetDone": "设置已恢复为默认值",
+  "optionsResetFailed": "重置设置失败",
+  "optionsSave": "保存设置",
+  "optionsSaveFailed": "保存设置失败",
+  "optionsSaved": "设置已成功保存",
+  "optionsSubtitle": "设置与配置",
+  "optionsTableEmpty": "暂无数据",
+  "optionsTermContextInvalidJson": "无效的 JSON 格式",
+  "optionsThemePresetDark": "深色",
+  "optionsThemePresetHacker": "黑客",
+  "optionsThemePresetLight": "浅色",
+  "optionsThemePresetMatrix": "Matrix",
+  "optionsThemePresetOdoo": "Odoo",
+  "optionsThemePresetTech": "科技",
+  "optionsTipAIModelsCapabilities": "提示：使用支持工具调用、视觉和扩展思考的模型。",
+  "optionsTitleAICustomSkills": "AI 技能",
+  "optionsTitleAICustomSkillsAdd": "添加",
+  "optionsTitleAICustomSkillsContentLabel": "内容",
+  "optionsTitleAICustomSkillsContentPlaceholder": "用纯文本或 Markdown 编写技能内容。",
+  "optionsTitleAICustomSkillsDescription": "定义可供 AI 代理使用的自定义技能模块。",
+  "optionsTitleAICustomSkillsDescription2": "描述",
+  "optionsTitleAICustomSkillsDescriptionLabel": "描述",
+  "optionsTitleAICustomSkillsDescriptionPlaceholder": "给 AI 的一行描述",
+  "optionsTitleAICustomSkillsExport": "导出",
+  "optionsTitleAICustomSkillsImport": "导入",
+  "optionsTitleAICustomSkillsName": "名称",
+  "optionsTitleAICustomSkillsNameLabel": "名称",
+  "optionsTitleAICustomSkillsNamePlaceholder": "my-skill",
+  "optionsTitleAICustomSkillsRemoveConfirm": "删除此技能？",
+  "optionsTitleAIModels": "AI 模型",
+  "optionsTitleAIModelsAPIKey": "API 密钥",
+  "optionsTitleAIModelsAdd": "添加",
+  "optionsTitleAIModelsAdvanced": "高级选项",
+  "optionsTitleAIModelsAvailable": "可用模型：",
+  "optionsTitleAIModelsDescription": "定义在 AI 模式下使用的 AI 模型配置。",
+  "optionsTitleAIModelsGrant": "授权访问",
+  "optionsTitleAIModelsLoad": "加载模型",
+  "optionsTitleAIModelsMaxTokens": "最大 Token 数",
+  "optionsTitleAIModelsMaxTokensLabel": "最大 Token 数（0 = 默认）",
+  "optionsTitleAIModelsModel": "模型",
+  "optionsTitleAIModelsName": "名称",
+  "optionsTitleAIModelsNamePlaceholder": "我的模型",
+  "optionsTitleAIModelsProvider": "提供商",
+  "optionsTitleAIModelsRemove": "删除模型？",
+  "optionsTitleAIModelsRemoveConfirm": "删除此 AI 模型配置？",
+  "optionsTitleAIModelsTimeout": "超时（秒）",
+  "optionsTitleBehaviour": "行为",
+  "optionsTitleBehaviourElephant": "解析未知值",
+  "optionsTitleBehaviourMaximized": "最大化",
+  "optionsTitleBehaviourMultiline": "多行",
+  "optionsTitleBehaviourPinned": "固定",
+  "optionsTitleCommandAssistant": "命令助手",
+  "optionsTitleCommandAssistantDynOptionsDisabled": "禁用动态选项",
+  "optionsTitleCommandAssistantMatchMode": "匹配模式",
+  "optionsTitleCommandAssistantMatchModeIncludes": "包含",
+  "optionsTitleCommandAssistantMatchModeStartsWith": "前缀匹配",
+  "optionsTitleCommandAssistantMaxResults": "最大结果数",
+  "optionsTitleDeveloperZone": "扩展开发者区域",
+  "optionsTitleDeveloperZoneModeConsoleErrors": "在浏览器控制台显示错误",
+  "optionsTitleDeveloperZoneModeIgnoreCompChecks": "禁用 Odoo 版本检查",
+  "optionsTitleDeveloperZoneModeTests": "使用 OdooTerminalTests",
+  "optionsTitleInitCommands": "初始化命令",
+  "optionsTitleInitCommandsDescription": "初始化终端时执行这些命令（每行一条）。",
+  "optionsTitleMisc": "其他设置",
+  "optionsTitleMiscHighlightWords": "高亮单词",
+  "optionsTitleMiscHighlightWordsList": "高亮单词列表",
+  "optionsTitleMiscRlimitValue": "限制记录数",
+  "optionsTitleMiscScreenBufferSize": "屏幕缓冲区大小",
+  "optionsTitleMiscShowExecutionTime": "显示执行时间",
+  "optionsTitleMiscShowTechnicalModel": "显示模型技术名称",
+  "optionsTitleMiscShowTechnicalModelHint": "仅适用于 Odoo 17+",
+  "optionsTitleMiscShowTechnicalModelMinVersion": "最低 Odoo 版本",
+  "optionsTitleShortcuts": "快捷键",
+  "optionsTitleShortcutsAdd": "添加",
+  "optionsTitleShortcutsCommand": "命令",
+  "optionsTitleShortcutsKeybind": "组合键",
+  "optionsTitleShortcutsPressKeys": "按下按键...",
+  "optionsTitleShortcutsRemove": "移除",
+  "optionsTitleTerminalContext": "终端上下文",
+  "optionsTitleTerminalContextDescription": "此上下文将与终端操作中的“常规”上下文合并。JSON 格式。",
+  "optionsTitleTheme": "主题",
+  "optionsTitleThemeAdd": "添加",
+  "optionsTitleThemeColor": "颜色",
+  "optionsTitleThemeColorDanger": "危险",
+  "optionsTitleThemeColorDark": "深色",
+  "optionsTitleThemeColorDomainTable": "域名颜色",
+  "optionsTitleThemeColorInfo": "信息",
+  "optionsTitleThemeColorLight": "浅色",
+  "optionsTitleThemeColorMuted": "柔和",
+  "optionsTitleThemeColorPrimary": "主要",
+  "optionsTitleThemeColorSecondary": "次要",
+  "optionsTitleThemeColorSuccess": "成功",
+  "optionsTitleThemeColorWarning": "警告",
+  "optionsTitleThemeColorWhite": "白色",
+  "optionsTitleThemeColors": "颜色",
+  "optionsTitleThemeDomain": "域名",
+  "optionsTitleThemeFontFamily": "字体",
+  "optionsTitleThemeFontSize": "字号",
+  "optionsTitleThemeFontSizeCA": "命令助手字号",
+  "optionsTitleThemeFontSizeLarge": "大",
+  "optionsTitleThemeFontSizeMedium": "中",
+  "optionsTitleThemeFontSizeSmall": "小",
+  "optionsTitleThemeFontSizeXSmall": "特小",
+  "optionsTitleThemeOpacity": "不透明度",
+  "optionsTitleThemePreset": "主题预设",
+  "optionsTitleThemePresetCustom": "自定义",
+  "optionsTitleThemeRemove": "删除",
+  "optionsUnsavedChanges": "有未保存的更改",
+  "optionsWarningAIModelsKeys": "警告：API 密钥存储在浏览器存储中。",
+  "terminal": {
+    "ai": {
+      "attachExpand": "点击放大",
+      "attachRemove": "移除附件",
+      "attachScreenshot": "屏幕截图",
+      "attachScreenshotPick": "选择元素",
+      "attachScreenshotViewport": "整个视口",
+      "attachUpload": "上传文件",
+      "experimentalWarning": "此模式为实验性功能，请谨慎使用",
+      "helpTip1": "每次对话一个主题 — 为每个任务新建对话。",
+      "helpTip2": "上下文满时会自动压缩历史记录，但较短的对话始终消耗更少的 token。",
+      "helpTip3": "具体且简洁 — 模糊的提示会浪费 token 且效果更差。",
+      "helpTip4": "删除不再需要的旧对话。",
+      "helpTip5": "仅在严格必要时附加文件。",
+      "helpTitle": "节省 token 的技巧",
+      "newConversation": "新建对话",
+      "noConversationsHint": "新建一个对话开始",
+      "noModelsHint": "请在扩展选项中配置 AI 模型",
+      "notConnected": "AI 未连接。请先使用 \"ai connect\"。",
+      "privacyWarning": "隐私提示：对话存储在浏览器存储中，任何有权访问此计算机的人都可以读取。",
+      "sysprompt": {
+        "label": "自定义指令",
+        "placeholder": "此对话中给 AI 的额外指令..."
+      }
+    },
+    "close": {
+      "prevented": "由于未完成的任务，终端已阻止当前标签页关闭："
+    },
+    "cmd": {
+      "default": {
+        "definition": "未定义命令",
+        "detail": "此命令没有详细的说明信息"
+      }
+    },
+    "error": {
+      "invalidHTTPRequest": "无效的 HTTP 请求",
+      "notInitJob": "意外错误：无法初始化任务！",
+      "notLoaded": "终端未加载",
+      "unknown": "[!] 哎呀！未知错误！（没有详细的错误信息 :/）"
+    },
+    "exception": {
+      "ElementNotFoundError": "元素未找到错误（{{selector}}）！",
+      "ElementNotFoundTemplateError": "未找到元素！",
+      "InvalidElementTemplateError": "模板中的元素无效！",
+      "ProcessJobError": "执行 '{{cmd_name}}' 时出错",
+      "TooManyElementsTemplateError": "模板中的元素过多，无法分配给一个元素！"
+    },
+    "info": {
+      "ai": {
+        "waiting": "AI 思考中..."
+      },
+      "job": {
+        "running": "正在运行 {{count}} 个命令",
+        "unhealthy": "（{{count_unhealthy}} 个异常）"
+      }
+    },
+    "notLoaded": "终端未加载",
+    "question": {
+      "aborted": "操作已中止"
+    },
+    "tooltip": {
+      "aiMode": "AI 模式",
+      "aiTips": "AI 提示",
+      "attachFile": "附加文件",
+      "customSystemPrompt": "自定义系统提示词",
+      "debug": "切换调试模式",
+      "maximize": "最大化",
+      "multiLine": "多行",
+      "newConversation": "新建对话",
+      "pin": "固定",
+      "reloadShell": "重载 Shell"
+    },
+    "unknownCommand": "未知命令 '{{org_cmd}}'，位于 {{start}}:{{end}}。您是否想输入 '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'？",
+    "unregisteredUser": "未注册用户"
+  },
+  "trash": {
+    "argument": {
+      "invalid": "无效的参数 '{{arg_long_name}}' 值类型：{{value_type}} 不是 {{arg_type}}",
+      "noExist": "参数 '{{arg_name}}' 不存在",
+      "requiredNotSet": "必需参数未设置！（{{required_not_set}}）"
+    },
+    "exception": {
+      "invalidCommandArgumentsError": "无效的命令参数",
+      "invalidCommandArugmentValueError": "意外的 '{{arg_value}}' 值！",
+      "invalidCommandDefinition": "无效的命令定义！",
+      "invalidInstructionError": "无效的指令",
+      "invalidNameError": "无效的名称 '{{vname}}'，位于 {{start}}:{{end}}",
+      "invalidTokenError": "无效的 token '{{vname}}'，位于 {{start}}:{{end}}",
+      "invalidValueError": "无效的值 '{{value}}'",
+      "notExpectedCommandArgumentError": "参数 '{{arg_name}}' 在 {{start}}:{{end}} 处不被期望",
+      "unknownCommandError": "未知命令 '{{cmd_name}}'，位于 {{start}}:{{end}}",
+      "unknownNameError": "未知名称 '{{vname}}'，位于 {{start}}:{{end}}",
+      "unknownStoreValue": "未知的存储值 '{{vname}}'"
+    },
+    "vmachine": {
+      "func": {
+        "definition": "内部函数",
+        "detail": "内部函数"
+      }
+    }
+  },
+  "utilInjectResource": {
+    "error": {
+      "invalidType": "无效的资源类型"
+    }
+  }
+}

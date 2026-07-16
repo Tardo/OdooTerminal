@@ -36,6 +36,14 @@ export const SETTING_TYPES: {
   colors_domain: SettingType,
   ai_models: SettingType,
   ai_custom_skills: SettingType,
+  hightlight_words: SettingType,
+  hightlight_words_list: SettingType,
+  rlimit_value: SettingType,
+  show_execution_time: SettingType,
+  show_technical_model: SettingType,
+  show_technical_model_min_version: SettingType,
+  screen_buffer_size: SettingType,
+  theme_preset: SettingType,
 } = {
   init_cmds: 'edit',
   term_context: 'json',
@@ -68,6 +76,14 @@ export const SETTING_TYPES: {
   colors_domain: 'manual',
   ai_models: 'manual',
   ai_custom_skills: 'manual',
+  hightlight_words: 'check',
+  hightlight_words_list: 'manual',
+  rlimit_value: 'int',
+  show_execution_time: 'check',
+  show_technical_model: 'check',
+  show_technical_model_min_version: 'option',
+  screen_buffer_size: 'int',
+  theme_preset: 'option',
 };
 
 export const SETTING_NAMES: $ReadOnlyArray<string> = Array.from(Object.keys(SETTING_TYPES));
@@ -104,6 +120,14 @@ export type ExtensionSettings = {
   colors_domain: {[string]: string},
   ai_models: Array<AIModelConfig>,
   ai_custom_skills: Array<AICustomSkillDef>,
+  hightlight_words: boolean,
+  hightlight_words_list: Array<string>,
+  rlimit_value: number,
+  show_execution_time: boolean,
+  show_technical_model: boolean,
+  show_technical_model_min_version: '17' | '18' | '19',
+  screen_buffer_size: number,
+  theme_preset: string,
 };
 
 export const SETTING_DEFAULTS: ExtensionSettings = {
@@ -138,6 +162,14 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   colors_domain: {},
   ai_models: [],
   ai_custom_skills: [],
+  hightlight_words: false,
+  hightlight_words_list: [],
+  rlimit_value: 0,
+  show_execution_time: false,
+  show_technical_model: false,
+  show_technical_model_min_version: '18',
+  screen_buffer_size: 0,
+  theme_preset: '',
 };
 
 export const IGNORED_KEYS: $ReadOnlyArray<string> = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];
@@ -175,4 +207,6 @@ export const THEMES: $ReadOnlyArray<[string, string]> = [
   ['light', 'Light'],
   ['odoo', 'Odoo'],
   ['matrix', 'Matrix'],
+  ['hacker', 'Hacker'],
+  ['tech', 'Tech'],
 ]

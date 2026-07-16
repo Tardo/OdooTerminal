@@ -29,6 +29,7 @@
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-eslint": "^9.2.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-replace": "^6",
     "@rollup/plugin-terser": "^1.0.0",
     "adm-zip": "^0.5.18",
     "autoprefixer": "^10.5.2",
@@ -43,7 +44,7 @@
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-json": "^4.0.1",
     "eslint-plugin-prettier": "^5.5.6",
-    "flow-bin": "^0.316.0",
+    "flow-bin": "^0.294.0",
     "flow-typed": "^4.1.1",
     "hermes-eslint": "^0.36.1",
     "husky": "^9.1.7",
@@ -95,7 +96,8 @@
         {
           "locales": [
             "en",
-            "es"
+            "es",
+            "zh"
           ],
           "discardOldKeys": true,
           "outputPath": "_locales/{{locale}}/{{ns}}.json",
@@ -133,9 +135,11 @@
     "singleAttributePerLine": false
   },
   "dependencies": {
+    "@preact/signals": "^2.9.3",
     "@zip.js/zip.js": "^2.8.26",
     "async-mutex": "^0.5.0",
     "i18next": "^26.3.3",
-    "i18next-http-backend": "^4.0.0"
+    "i18next-http-backend": "^4.0.0",
+    "preact": "^10.29.7"
   }
 }

@@ -1,5 +1,6 @@
 [ignore]
 <PROJECT_ROOT>/node_modules/.*
+<PROJECT_ROOT>/src/js/private/options/.*
 
 [include]
 

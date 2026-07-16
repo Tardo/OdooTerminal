@@ -1,184 +1,175 @@
 {
   "extensionDescription": {
-    "message": "Terminal-like to send json-rpc requests and use tools for Odoo developers"
+    "message": "类终端界面，用于发送 json-rpc 请求并为 Odoo 开发者提供工具"
   },
 
   "optionsTitle": {
-    "message": "OdooTerminal Options"
+    "message": "OdooTerminal 选项"
   },
   "optionsTitleBehaviour": {
-    "message": "Behaviour"
+    "message": "行为"
   },
   "optionsTitleBehaviourPinned": {
-    "message": "Pinned"
+    "message": "固定"
   },
   "optionsTitleBehaviourMaximized": {
-    "message": "Maximized"
+    "message": "最大化"
   },
   "optionsTitleBehaviourMultiline": {
-    "message": "Multi-line"
+    "message": "多行"
   },
   "optionsTitleBehaviourElephant": {
-    "message": "Attempt to resolve unknown values (mainly the login name)"
+    "message": "尝试解析未知值（主要是登录名）"
   },
   "optionsTitleTheme": {
-    "message": "Theme"
+    "message": "主题"
   },
   "optionsTitleThemeOpacity": {
-    "message": "Opacity"
+    "message": "不透明度"
   },
   "optionsTitleThemeColorDomainTable": {
-    "message": "Color per domain"
+    "message": "按域名设置颜色"
   },
   "optionsTitleThemeDomain": {
-    "message": "Domain"
+    "message": "域名"
   },
   "optionsTitleThemeColor": {
-    "message": "Color"
+    "message": "颜色"
   },
   "optionsTitleThemeAdd": {
-    "message": "Add"
+    "message": "添加"
   },
   "optionsTitleThemeFontSize": {
-    "message": "Font Size"
+    "message": "字体大小"
   },
   "optionsTitleThemeFontSizeCA": {
-    "message": "Font Size (CA)"
+    "message": "字体大小（命令助手）"
   },
   "optionsTitleThemeFontFamily": {
-    "message": "Font Family"
+    "message": "字体族"
   },
   "optionsTitleThemeColorPrimary": {
-    "message": "Primary"
+    "message": "主色"
   },
   "optionsTitleThemeColorSecondary": {
-    "message": "Secondary"
+    "message": "次要色"
   },
   "optionsTitleThemeColorSuccess": {
-    "message": "Success"
+    "message": "成功色"
   },
   "optionsTitleThemeColorDanger": {
-    "message": "Danger"
+    "message": "危险色"
   },
   "optionsTitleThemeColorWarning": {
-    "message": "Warning"
+    "message": "警告色"
   },
   "optionsTitleThemeColorInfo": {
-    "message": "Info"
+    "message": "信息色"
   },
   "optionsTitleThemeColorLight": {
-    "message": "Light"
+    "message": "亮色"
   },
   "optionsTitleThemeColorDark": {
-    "message": "Dark"
+    "message": "暗色"
   },
   "optionsTitleThemeColorMuted": {
-    "message": "Muted"
+    "message": "柔和色"
   },
   "optionsTitleThemeColorWhite": {
-    "message": "White"
+    "message": "白色"
   },
   "optionsLanguage": {
-    "message": "Language"
+    "message": "语言"
   },
   "optionsLanguageAuto": {
-    "message": "Auto"
+    "message": "自动"
   },
   "optionsTitleThemePreset": {
-    "message": "Theme Preset"
+    "message": "主题预设"
   },
   "optionsTitleThemePresetNone": {
-    "message": "None"
+    "message": "无"
   },
   "optionsTitleThemeFontSizeSmall": {
-    "message": "Small"
+    "message": "小"
   },
   "optionsTitleThemeFontSizeMedium": {
-    "message": "Medium"
+    "message": "中"
   },
   "optionsTitleThemeFontSizeLarge": {
-    "message": "Large"
+    "message": "大"
   },
   "optionsTitleThemeColors": {
-    "message": "Colors"
+    "message": "颜色"
   },
   "optionsTitleThemeRemove": {
-    "message": "Remove"
+    "message": "移除"
   },
   "optionsTitleShortcuts": {
-    "message": "Shortcuts"
+    "message": "快捷键"
   },
   "optionsTitleShortcutsKeybind": {
-    "message": "Keybind"
+    "message": "键绑定"
   },
   "optionsTitleShortcutsCommand": {
-    "message": "Command"
+    "message": "命令"
   },
   "optionsTitleShortcutsAdd": {
-    "message": "Add"
+    "message": "添加"
   },
   "optionsTitleShortcutsRemove": {
-    "message": "Remove"
+    "message": "移除"
   },
   "optionsTitleShortcutsPressKeys": {
-    "message": "Press keys..."
+    "message": "按下按键..."
   },
   "optionsTitleCommandAssistant": {
-    "message": "Command Assistant"
+    "message": "命令助手"
   },
   "optionsTitleCommandAssistantMaxTokens": {
-    "message": "Max Tokens"
+    "message": "最大 token 数"
   },
   "optionsTitleCommandAssistantTemperature": {
-    "message": "Temperature"
+    "message": "温度"
   },
   "optionsTitleCommandAssistantContextLines": {
-    "message": "Context Lines"
+    "message": "上下文行数"
   },
   "optionsTitleCommandAssistantContextFileSize": {
-    "message": "Context File Max Size (bytes)"
+    "message": "上下文文件最大大小（字节）"
   },
   "optionsTitleCommandAssistantContextFileLines": {
-    "message": "Context File Max Lines"
+    "message": "上下文文件最大行数"
   },
   "optionsTitleCommandAssistantExcludePatterns": {
-    "message": "Exclude Patterns"
+    "message": "排除模式"
   },
   "optionsTitleCommandAssistantCustomInstructions": {
-    "message": "Custom Instructions"
+    "message": "自定义指令"
   },
   "optionsTitleCommandAssistantCustomInstructionsPlaceholder": {
-    "message": "Additional instructions for the AI..."
+    "message": "AI 的附加指令..."
   },
   "optionsTitleCommandAssistantDebugMode": {
-    "message": "Debug Mode"
-  },
-  "optionsTitleCommandAssistantDynOptionsDisabled": {
-    "message": "Disable dynamic options"
-  },
-  "optionsTitleCommandAssistantMatchMode": {
-    "message": "Match mode:"
-  },
-  "optionsTitleCommandAssistantMaxResults": {
-    "message": "Max. results:"
+    "message": "调试模式"
   },
   "optionsTitleInitCommands": {
-    "message": "Init Commands"
+    "message": "初始化命令"
   },
   "optionsTitleInitCommandsDescription": {
-    "message": "Run these commands when initialize the terminal (one per line). Be careful! changes here can cause unwanted exceptions. Note that the commands will be executed on all 'odoo' pages."
+    "message": "初始化终端时运行这些命令（每行一条）。请谨慎操作！此处的更改可能导致意外异常。请注意，这些命令将在所有 'odoo' 页面上执行。"
   },
   "optionsTitleTerminalContext": {
-    "message": "Terminal Context"
+    "message": "终端上下文"
   },
   "optionsTitleTerminalContextDescription": {
-    "message": "This context will be merged with the 'normal' context on terminal operations. In json format."
+    "message": "此上下文将与终端操作中的 'normal' 上下文合并。使用 JSON 格式。"
   },
   "optionsTitleDeveloperZone": {
-    "message": "Extension Developer Zone"
+    "message": "扩展开发者区域"
   },
   "optionsTitleDeveloperZoneModeTests": {
-    "message": "Use $terminaltests$",
+    "message": "使用 $terminaltests$",
     "placeholders": {
       "terminaltests": {
         "content": "OdooTerminalTests"
@@ -186,91 +177,91 @@
     }
   },
   "optionsTitleDeveloperZoneModeIgnoreCompChecks": {
-    "message": "Disable Odoo version checking (this can cause unwanted exceptions!)"
+    "message": "禁用 Odoo 版本检查（这可能导致意外异常！）"
   },
   "optionsTitleDeveloperZoneModeConsoleErrors": {
-    "message": "Show errors in the browser console"
+    "message": "在浏览器控制台中显示错误"
   },
   "optionsTitleAIModels": {
-    "message": "AI Models"
+    "message": "AI 模型"
   },
   "optionsTitleAIModelsDescription": {
-    "message": "Define AI model profiles to use in AI mode. Select the active model from the dropdown in the AI sidebar."
+    "message": "定义在 AI 模式下使用的 AI 模型配置文件。从 AI 侧边栏的下拉菜单中选择活动模型。"
   },
   "optionsWarningAIModelsKeys": {
-    "message": "Warning: API keys are stored in browser storage and can be read by anyone with access to this computer."
+    "message": "警告：API 密钥存储在浏览器存储中，任何有权访问此计算机的人都可以读取。"
   },
   "optionsTipAIModelsCapabilities": {
-    "message": "Tip: For best results, use a model that supports tool use (required for agent mode), vision (to analyze screenshots), file processing (PDFs and images from Odoo attachments), and extended thinking (for complex multi-step tasks)."
+    "message": "提示：为获得最佳效果，请使用支持工具使用（代理模式必需）、视觉（分析截图）、文件处理（来自 Odoo 附件的 PDF 和图片）和扩展思考（复杂多步骤任务）的模型。"
   },
   "optionsTitleAIModelsName": {
-    "message": "Name"
+    "message": "名称"
   },
   "optionsTitleAIModelsProvider": {
-    "message": "Provider"
+    "message": "提供商"
   },
   "optionsTitleAIModelsModel": {
-    "message": "Model"
+    "message": "模型"
   },
   "optionsTitleAIModelsMaxTokens": {
-    "message": "Max tokens"
+    "message": "最大 token 数"
   },
   "optionsTitleAIModelsAdvanced": {
-    "message": "Advanced options"
+    "message": "高级选项"
   },
   "optionsTitleAIModelsTimeout": {
-    "message": "Timeout (s):"
+    "message": "超时时间（秒）"
   },
   "optionsTitleAIModelsMaxTokensLabel": {
-    "message": "Max tokens (0 = default):"
+    "message": "最大 token 数（0 = 默认）"
   },
   "optionsTitleAIModelsAPIKey": {
-    "message": "API Key"
+    "message": "API 密钥"
   },
   "optionsTitleAIModelsBaseURL": {
-    "message": "Base URL"
+    "message": "基础 URL"
   },
   "optionsTitleAIModelsTemperature": {
-    "message": "Temperature"
+    "message": "温度"
   },
   "optionsTitleAIModelsStreaming": {
-    "message": "Enable Streaming"
+    "message": "启用流式传输"
   },
   "optionsTitleAIModelsAdd": {
-    "message": "Add"
+    "message": "添加"
   },
   "optionsTitleAIModelsLoad": {
-    "message": "Load models"
+    "message": "加载模型"
   },
   "optionsTitleAIModelsGrant": {
-    "message": "Grant access"
+    "message": "授予权限"
   },
   "optionsAIModelsGrantedLabel": {
-    "message": "Access granted"
+    "message": "已授予权限"
   },
   "optionsAIModelsGrantSuccess": {
-    "message": "Access granted"
+    "message": "权限已授予"
   },
   "optionsAIModelsGrantDenied": {
-    "message": "Access denied"
+    "message": "权限被拒绝"
   },
   "optionsAIModelsGrantError": {
-    "message": "Error granting access"
+    "message": "授予权限时出错"
   },
   "optionsAIModelsLoadLoading": {
-    "message": "Loading..."
+    "message": "加载中..."
   },
   "optionsAIModelsLoadError": {
-    "message": "Error loading models"
+    "message": "加载模型时出错"
   },
   "optionsAIModelsLoadMissingURL": {
-    "message": "Enter URL first"
+    "message": "请先输入 URL"
   },
   "optionsAIModelsLoadEmpty": {
-    "message": "No models found"
+    "message": "未找到模型"
   },
   "optionsAIModelsLoadSuccess": {
-    "message": "$COUNT$ models loaded",
+    "message": "已加载 $COUNT$ 个模型",
     "placeholders": {
       "count": {
         "content": "$1",
@@ -279,90 +270,90 @@
     }
   },
   "optionsTitleAICustomSkills": {
-    "message": "AI Custom Skills"
+    "message": "AI 自定义技能"
   },
   "optionsTitleAICustomSkillsDescription": {
-    "message": "Define custom skill modules available to the AI agent. Each skill provides domain-specific knowledge the agent can load on demand."
+    "message": "定义 AI 代理可用的自定义技能模块。每个技能提供特定领域的知识，代理可按需加载。"
   },
   "optionsTitleAICustomSkillsName": {
-    "message": "Name"
+    "message": "名称"
   },
   "optionsTitleAICustomSkillsDescription2": {
-    "message": "Description"
+    "message": "描述"
   },
   "optionsTitleAICustomSkillsNameLabel": {
-    "message": "Name"
+    "message": "名称"
   },
   "optionsTitleAICustomSkillsDescriptionLabel": {
-    "message": "Description"
+    "message": "描述"
   },
   "optionsTitleAICustomSkillsContentLabel": {
-    "message": "Content"
+    "message": "内容"
   },
   "optionsTitleAICustomSkillsAdd": {
-    "message": "Add"
+    "message": "添加"
   },
   "optionsTitleAICustomSkillsRemove": {
-    "message": "Remove"
+    "message": "移除"
   },
   "optionsTitleAICustomSkillsRemoveConfirm": {
-    "message": "Remove this skill?"
+    "message": "确认移除此技能？"
   },
   "optionsTitleAICustomSkillsExists": {
-    "message": "Skill already exists"
+    "message": "技能已存在"
   },
   "optionsTitleAICustomSkillsExport": {
-    "message": "Export"
+    "message": "导出"
   },
   "optionsTitleAICustomSkillsImport": {
-    "message": "Import"
+    "message": "导入"
   },
   "optionsTitleMisc": {
-    "message": "Misc"
+    "message": "杂项"
   },
   "optionsTitleMiscAutocopy": {
-    "message": "Auto Copy"
+    "message": "自动复制"
   },
   "optionsTitleMiscAutoopen": {
-    "message": "Auto Open"
+    "message": "自动打开"
   },
   "optionsTitleMiscRlimitEnabled": {
-    "message": "Record Limit"
+    "message": "记录限制"
   },
   "optionsTitleMiscRlimitValue": {
-    "message": "Limit Records"
+    "message": "限制记录数"
   },
   "optionsTitleMiscHighlightWords": {
-    "message": "Highlight Words"
+    "message": "高亮词汇"
   },
   "optionsTitleMiscHighlightWordsList": {
-    "message": "Highlight Words List"
+    "message": "高亮词汇列表"
   },
   "optionsTitleMiscTermHeight": {
-    "message": "Terminal Height"
+    "message": "终端高度"
   },
   "optionsTitleMiscTermWidth": {
-    "message": "Terminal Width"
+    "message": "终端宽度"
   },
   "optionsTitleMiscScreenBufferSize": {
-    "message": "Screen Buffer Size"
+    "message": "屏幕缓冲区大小"
   },
   "optionsTitleMiscShowExecutionTime": {
-    "message": "Show Execution Time"
+    "message": "显示执行时间"
   },
   "optionsTitleMiscShowEnvMessage": {
-    "message": "Show Env Message"
+    "message": "显示环境消息"
   },
   "optionsUnsavedChanges": {
-    "message": "Unsaved changes"
+    "message": "未保存的更改"
   },
   "optionsNoChanges": {
-    "message": "No changes"
+    "message": "无更改"
   },
   "optionsReset": {
-    "message": "Reset to Defaults"
+    "message": "重置为默认值"
   },
   "optionsSave": {
-    "message": "Save Settings"
+    "message": "保存设置"
   }
 }

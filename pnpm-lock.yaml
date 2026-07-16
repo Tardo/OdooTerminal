@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@preact/signals':
+        specifier: ^2.9.3
+        version: 2.9.3(preact@10.29.7)
       '@zip.js/zip.js':
         specifier: ^2.8.26
         version: 2.8.26
@@ -23,6 +26,9 @@ importers:
       i18next-http-backend:
         specifier: ^4.0.0
         version: 4.0.0
+      preact:
+        specifier: ^10.29.7
+        version: 10.29.7
     devDependencies:
       '@babel/cli':
         specifier: ^7.29.7
@@ -60,6 +66,9 @@ importers:
       '@rollup/plugin-node-resolve':
         specifier: ^16.0.3
         version: 16.0.3(rollup@4.62.2)
+      '@rollup/plugin-replace':
+        specifier: ^6
+        version: 6.0.3(rollup@4.62.2)
       '@rollup/plugin-terser':
         specifier: ^1.0.0
         version: 1.0.0(rollup@4.62.2)
@@ -103,8 +112,8 @@ importers:
         specifier: ^5.5.6
         version: 5.5.6(eslint-config-prettier@10.1.8(eslint@9.39.4))(eslint@9.39.4)(prettier@3.9.3)
       flow-bin:
-        specifier: ^0.316.0
-        version: 0.316.0
+        specifier: ^0.294.0
+        version: 0.294.0
       flow-typed:
         specifier: ^4.1.1
         version: 4.1.1
@@ -1144,6 +1153,14 @@ packages:
     resolution: {integrity: sha512-//0sR/cow/s4ICQaYoAobOl4aU8cjU6x/V24V7XkKotb9+O+3zySIYp146vpaobYHnxa4pZX8NkV54Z5AwbDKA==}
     engines: {node: '>=12'}
 
+  '@preact/signals-core@1.14.4':
+    resolution: {integrity: sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA==}
+
+  '@preact/signals@2.9.3':
+    resolution: {integrity: sha512-4g3L/dYgUt0PPE6mnYsgCP/3DEhmAYTQxjzwfSPnXQ7Lj1WPBBEY83F48X0RcNEP3ycr57T8Hcpg4PVU5VM7pg==}
+    peerDependencies:
+      preact: '>= 10.25.0 || >=11.0.0-0'
+
   '@puppeteer/browsers@3.0.3':
     resolution: {integrity: sha512-v3YaiGpzUTgOZkHBFR0iZg58Vto25SqBQxfLUXDiofJccwVl6Mlr7BdLCS1NZgxikdeIHf936cxYWL9IZp3tow==}
     engines: {node: '>=22.12.0'}
@@ -1210,6 +1227,15 @@ packages:
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.78.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
+  '@rollup/plugin-replace@6.0.3':
+    resolution: {integrity: sha512-J4RZarRvQAm5IF0/LwUUg+obsm+xZhYnbMXmXROyoSE1ATJe3oXSb9L5MMppdxP2ylNSjv6zFBwKYjcKMucVfA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
     peerDependenciesMeta:
       rollup:
         optional: true
@@ -2633,8 +2659,8 @@ packages:
   flatted@3.4.2:
     resolution: {integrity: sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==}
 
-  flow-bin@0.316.0:
-    resolution: {integrity: sha512-AzmAMRTcTGtEa86c6z6eFKF4E5j1z8+S7uBMl0fe24rEvb+FROmaSHPXmg8Dsjnn7yaoaERKMl2pgBrOP49uIw==}
+  flow-bin@0.294.0:
+    resolution: {integrity: sha512-ICR6mSDil2Y4B5YtCKlA+WvDn5TgvBwDOheMrdU61Gwx6ZtWFnHP1SOgll7Fw9JqpHrbet6dww2RA734lum45g==}
     engines: {node: '>=0.10.0'}
     hasBin: true
 
@@ -2754,7 +2780,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+    deprecated: Glob versions prior to v9 are no longer supported
 
   global-directory@4.0.1:
     resolution: {integrity: sha512-wHTUcDUoZ1H5/0iVqEudYW4/kAlN5cZ3j/bXn0Dpbizl9iaUVeWSHqiOjsgk6OW2bkLclbBjzewBz6weQ1zA2Q==}
@@ -4164,6 +4190,14 @@ packages:
   powershell-utils@0.1.0:
     resolution: {integrity: sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A==}
     engines: {node: '>=20'}
+
+  preact@10.29.7:
+    resolution: {integrity: sha512-DCHYrK/B10yUD3ZjLfhZ3WIE/9Vf9VFUODcRE2dRomTYDpJk6z6L9wecSfhfE6M9ZTHUdyQkoC46arIDhEV84Q==}
+    peerDependencies:
+      preact-render-to-string: '>=5'
+    peerDependenciesMeta:
+      preact-render-to-string:
+        optional: true
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -6349,6 +6383,13 @@ snapshots:
       '@pnpm/network.ca-file': 1.0.2
       config-chain: 1.1.13
 
+  '@preact/signals-core@1.14.4': {}
+
+  '@preact/signals@2.9.3(preact@10.29.7)':
+    dependencies:
+      '@preact/signals-core': 1.14.4
+      preact: 10.29.7
+
   '@puppeteer/browsers@3.0.3':
     dependencies:
       debug: 4.4.3
@@ -6409,6 +6450,13 @@ snapshots:
       deepmerge: 4.3.1
       is-module: 1.0.0
       resolve: 1.22.12
+    optionalDependencies:
+      rollup: 4.62.2
+
+  '@rollup/plugin-replace@6.0.3(rollup@4.62.2)':
+    dependencies:
+      '@rollup/pluginutils': 5.4.0(rollup@4.62.2)
+      magic-string: 0.30.21
     optionalDependencies:
       rollup: 4.62.2
 
@@ -7833,7 +7881,7 @@ snapshots:
 
   flatted@3.4.2: {}
 
-  flow-bin@0.316.0: {}
+  flow-bin@0.294.0: {}
 
   flow-typed@4.1.1:
     dependencies:
@@ -9515,6 +9563,8 @@ snapshots:
       source-map-js: 1.2.1
 
   powershell-utils@0.1.0: {}
+
+  preact@10.29.7: {}
 
   prelude-ls@1.2.1: {}
 
