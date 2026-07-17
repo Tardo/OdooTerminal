@@ -526,7 +526,7 @@ export default class Screen {
         // back to host. Coloring below still keys off host so per-site colors
         // persist.
         const db = this.#input_info.db;
-        const display = db ? `db: ${db}` : this.#input_info.host;
+        const display = db || this.#input_info.host;
         info_host_el.textContent = display;
         info_host_el.setAttribute('title', display);
       }
