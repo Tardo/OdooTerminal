@@ -121,7 +121,7 @@ function App() {
   return h('div', {class: 'options-app'},
     h('header', {class: 'options-header'},
       h('div', {class: 'header-brand'},
-        h('div', {class: 'brand-icon'}, h('span', {class: 'brand-icon-text'}, '>_')),
+        h('div', {class: 'brand-icon'}, h('img', {src: '../img/terminal-48.png', alt: '', width: 40, height: 40})),
         h('div', {class: 'brand-text'},
           h('h1', {class: 'brand-title'}, 'OdooTerminal'),
           h('p', {class: 'brand-subtitle'}, t('optionsSubtitle', 'Settings & Configuration')))),
