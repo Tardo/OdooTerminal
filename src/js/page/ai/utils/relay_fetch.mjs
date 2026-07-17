@@ -15,7 +15,7 @@ import postMessage from '@common/utils/post_message';
 type RelayFetchInit = {
   method: string,
   headers: {[string]: string},
-  body: string,
+  body?: string,
 };
 
 type RelayReadResult = {done: boolean, value?: ?Uint8Array};
@@ -99,7 +99,7 @@ function buildFetchError(code: mixed, url: mixed, error: mixed): Error {
     return new Error(
       i18n.t(
         'ai.utils.relayFetch.error.missingPermission',
-        'Missing browser permission to contact {{url}}. Open the extension\'s Options page (AI Models section) and use "Grant access" for this URL, then try again.',
+        'Missing browser permission to contact {{url}}. Open the extension\'s Options page (AI Providers section) and use "Grant access" for this URL, then try again.',
         {url: String(url ?? '')},
       ),
     );

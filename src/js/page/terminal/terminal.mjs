@@ -30,6 +30,7 @@ import postMessage from '@common/utils/post_message';
 import file2attachment from './utils/file2attachment';
 import elementPicker from './utils/element_picker';
 import captureScreenshot from '@ai/utils/capture_screenshot';
+import listModels from '@ai/utils/list_models';
 import {Mutex} from 'async-mutex';
 import {aiState} from '@ai/state';
 import type {JobMetaInfo} from './shell';
@@ -130,7 +131,10 @@ export default class Terminal {
   #isAIMode: boolean = false;
   #activeConvId: string | null = null;
   #aiConvList_el: HTMLElement | void;
+  #aiProviderSelect_el: HTMLSelectElement | void;
   #aiModelSelect_el: HTMLSelectElement | void;
+  #aiModelsLoadedProvider: string | null = null;
+  #aiModelFetchController: AbortController | void;
   #aiHelpPopup_el: HTMLElement | void;
   #aiSyspromptPanel_el: HTMLElement | void;
   #aiSyspromptTextarea_el: HTMLTextAreaElement | void;
@@ -248,6 +252,12 @@ export default class Terminal {
     if (aiConvListEl instanceof HTMLElement) {
       this.#aiConvList_el = aiConvListEl;
     }
+    const aiProviderSelectEl = this.el.querySelector('#terminal_ai_provider_select');
+    if (aiProviderSelectEl instanceof HTMLSelectElement) {
+      this.#aiProviderSelect_el = aiProviderSelectEl;
+      // $FlowFixMe[method-unbinding]
+      aiProviderSelectEl.addEventListener('change', this.#onChangeAIProvider.bind(this));
+    }
     const aiModelSelectEl = this.el.querySelector('#terminal_ai_model_select');
     if (aiModelSelectEl instanceof HTMLSelectElement) {
       this.#aiModelSelect_el = aiModelSelectEl;
@@ -273,7 +283,7 @@ export default class Terminal {
       // $FlowFixMe[method-unbinding]
       aiSyspromptTextareaEl.addEventListener('input', this.#onInputSysprompt.bind(this));
     }
-    this.#populateAIModelSelector();
+    this.#populateAIProviderSelector();
     this.#isAIMode = getStorageSessionItem('terminal_ai_mode', false);
     this.#activeConvId = getStorageSessionItem('terminal_ai_active_conv', null);
     if (this.#isAIMode) {
@@ -288,6 +298,7 @@ export default class Terminal {
       }
       this.#renderAIConvList();
       this.#syncSyspromptPanel();
+      this.#ensureAIModelsLoaded();
     }
     this.#updateAIIdleEffect();
 
@@ -1250,47 +1261,165 @@ export default class Terminal {
     }
   }
 
-  /* AI MODEL SELECTOR */
-  #populateAIModelSelector() {
-    const selectEl = this.#aiModelSelect_el;
+  /* AI PROVIDER + MODEL SELECTORS */
+  #populateAIProviderSelector() {
+    const selectEl = this.#aiProviderSelect_el;
     if (!selectEl) {
       return;
     }
-    const models = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
+    const providers = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
     while (selectEl.options.length > 1) {
       selectEl.remove(1);
     }
-    for (const m of models) {
+    for (const p of providers) {
       const opt = document.createElement('option');
-      opt.value = m.name;
-      opt.textContent = m.name;
+      opt.value = p.name;
+      opt.textContent = p.name;
       selectEl.appendChild(opt);
     }
-    const activeModelName: string | null = getStorageLocalItem('terminal_ai_active_model', null);
-    if (activeModelName !== null) {
-      selectEl.value = activeModelName;
-      this.#applyAIModel(activeModelName);
+    const activeProviderName: string | null = getStorageLocalItem('terminal_ai_active_provider', null);
+    if (activeProviderName !== null) {
+      selectEl.value = activeProviderName;
     }
+    // No network here: this runs on every page load, and most loads never open AI mode.
+    this.#applyAIProvider(selectEl.value, false);
   }
 
-  #applyAIModel(name: string) {
-    const models = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
-    const found = models.find(m => m.name === name);
+  #applyAIProvider(name: string, fetchModels: boolean = true) {
+    const providers = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
+    const found = providers.find(p => p.name === name);
     if (found) {
       aiState.url = found.url;
       aiState.apiKey = found.api_key || null;
-      aiState.model = found.model || null;
       aiState.provider = found.provider || null;
       aiState.timeout = found.timeout > 0 ? found.timeout : null;
       aiState.maxTokens = found.max_tokens > 0 ? found.max_tokens : null;
     } else {
       aiState.url = null;
       aiState.apiKey = null;
-      aiState.model = null;
       aiState.provider = null;
       aiState.timeout = null;
       aiState.maxTokens = null;
     }
+    this.#resetAIModelSelector(found);
+    if (fetchModels && found) {
+      this.#loadAIModels(found);
+    }
+  }
+
+  #onChangeAIProvider(ev: Event) {
+    if (!(ev.target instanceof HTMLSelectElement)) {
+      return;
+    }
+    const name = ev.target.value;
+    setStorageLocalItem('terminal_ai_active_provider', name || null, err => this.screen.printError(err));
+    this.#applyAIProvider(name);
+  }
+
+  // Clears the model select and preselects the remembered model (if any) for the
+  // given provider without hitting the network — the live list is only fetched
+  // lazily, see #ensureAIModelsLoaded / #loadAIModels.
+  #resetAIModelSelector(provider: AIModelConfig | void) {
+    const selectEl = this.#aiModelSelect_el;
+    if (!selectEl) {
+      return;
+    }
+    while (selectEl.options.length > 1) {
+      selectEl.remove(1);
+    }
+    this.#aiModelsLoadedProvider = null;
+    if (!provider) {
+      selectEl.disabled = true;
+      this.#applyAIModel('');
+      return;
+    }
+    selectEl.disabled = false;
+    const remembered = getStorageLocalItem<{[string]: string}>('terminal_ai_active_models', {});
+    const rememberedModel = remembered[provider.name];
+    if (rememberedModel) {
+      const opt = document.createElement('option');
+      opt.value = rememberedModel;
+      opt.textContent = rememberedModel;
+      selectEl.appendChild(opt);
+      selectEl.value = rememberedModel;
+    }
+    this.#applyAIModel(selectEl.value);
+  }
+
+  // Fetches the live model list for the given provider the first time it's needed
+  // (provider switch, or entering AI mode) instead of on every page load.
+  #ensureAIModelsLoaded() {
+    const providerName = this.#aiProviderSelect_el?.value;
+    if (providerName === undefined || providerName === '' || this.#aiModelsLoadedProvider === providerName) {
+      return;
+    }
+    const providers = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
+    const found = providers.find(p => p.name === providerName);
+    if (found) {
+      this.#loadAIModels(found);
+    }
+  }
+
+  async #loadAIModels(provider: AIModelConfig) {
+    const selectEl = this.#aiModelSelect_el;
+    if (!selectEl) {
+      return;
+    }
+    // Session-cached per provider (name+url) so a persisted AI mode doesn't refetch
+    // on every page navigation — a fresh Terminal instance is created on each one.
+    const cache = getStorageSessionItem<{[string]: {url: string, models: Array<string>}}>(
+      'terminal_ai_models_cache',
+      {},
+    );
+    const cached = cache[provider.name];
+    let models: Array<string>;
+    if (cached && cached.url === provider.url) {
+      models = cached.models;
+    } else {
+      this.#aiModelFetchController?.abort();
+      const controller = new AbortController();
+      this.#aiModelFetchController = controller;
+      try {
+        models = await listModels(provider.url, provider.api_key || null, provider.provider, controller.signal);
+      } catch (err) {
+        if (controller.signal.aborted) {
+          return;
+        }
+        this.screen.printError(
+          i18n.t(
+            'terminal.ai.modelsLoadError',
+            'Could not load the models list ({{error}}). Grant access to this URL in the extension options (AI Providers section) and try again.',
+            {error: err instanceof Error ? err.message : String(err)},
+          ),
+        );
+        return;
+      }
+      if (controller.signal.aborted || this.#aiProviderSelect_el?.value !== provider.name) {
+        return;
+      }
+      cache[provider.name] = {url: provider.url, models};
+      setStorageSessionItem('terminal_ai_models_cache', cache, err => this.screen.printError(err));
+    }
+    const remembered = getStorageLocalItem<{[string]: string}>('terminal_ai_active_models', {});
+    const toSelect = remembered[provider.name] || selectEl.value;
+    while (selectEl.options.length > 1) {
+      selectEl.remove(1);
+    }
+    for (const m of models) {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      selectEl.appendChild(opt);
+    }
+    if (toSelect && models.indexOf(toSelect) !== -1) {
+      selectEl.value = toSelect;
+    }
+    this.#aiModelsLoadedProvider = provider.name;
+    this.#applyAIModel(selectEl.value);
+  }
+
+  #applyAIModel(name: string) {
+    aiState.model = name || null;
   }
 
   #onChangeAIModel(ev: Event) {
@@ -1298,7 +1427,12 @@ export default class Terminal {
       return;
     }
     const name = ev.target.value;
-    setStorageLocalItem('terminal_ai_active_model', name || null, err => this.screen.printError(err));
+    const providerName = this.#aiProviderSelect_el?.value;
+    if (providerName !== undefined && providerName !== '') {
+      const remembered = getStorageLocalItem<{[string]: string}>('terminal_ai_active_models', {});
+      remembered[providerName] = name;
+      setStorageLocalItem('terminal_ai_active_models', remembered, err => this.screen.printError(err));
+    }
     this.#applyAIModel(name);
   }
 
@@ -1322,7 +1456,7 @@ export default class Terminal {
         "<div class='terminal-ai-conv-empty-hint'>" +
           "<span class='terminal-ai-conv-empty-arrow'>&#8593;</span>" +
           `<span>${i18n.t('terminal.ai.noConversationsHint', 'Create a new conversation to start')}</span>` +
-          `<button class='terminal-ai-conv-empty-options'>${i18n.t('terminal.ai.noModelsHint', 'Configure AI models in the extension options')}</button>` +
+          `<button class='terminal-ai-conv-empty-options'>${i18n.t('terminal.ai.noModelsHint', 'Configure AI providers in the extension options')}</button>` +
           '</div>',
       );
       hint.querySelector('.terminal-ai-conv-empty-options')?.addEventListener('click', () => {
@@ -1360,6 +1494,7 @@ export default class Terminal {
         }
         this.screen.setInputDisabled(activeId === null);
         this.#syncSyspromptPanel();
+        this.#ensureAIModelsLoaded();
       } else {
         this.el.classList.remove('terminal-ai-mode');
         target.classList.remove('btn-light');

@@ -1166,7 +1166,10 @@
 
 .o_terminal .terminal-ai-model-selector {
   border-bottom: 1px solid var(--terminal-color-secondary);
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
+  gap: 4px;
   padding: 4px 6px;
 }
 
@@ -1178,6 +1181,11 @@
   font-size: x-small;
   padding: 2px 4px;
   width: 100%;
+}
+
+.o_terminal .terminal-ai-model-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .o_terminal .terminal-ai-conv-list {

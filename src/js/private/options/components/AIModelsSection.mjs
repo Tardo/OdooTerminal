@@ -18,20 +18,14 @@ export default function AIModelsSection({settings, mutate}: any) {
   const [newProvider, setNewProvider] = useState<string>('openai');
   const [newUrl, setNewUrl] = useState<string>(PROVIDER_DEFAULT_URLS.openai);
   const [newApiKey, setNewApiKey] = useState<string>('');
-  const [newModel, setNewModel] = useState<string>('');
   const [newTimeout, setNewTimeout] = useState<number>(900);
   const [newMaxTokens, setNewMaxTokens] = useState<number>(0);
-  const [loadStatus, setLoadStatus] = useState<string>('');
-  const [loadStatusType, setLoadStatusType] = useState<string>('');
-  const [modelSuggestions, setModelSuggestions] = useState<Array<string>>([]);
   const [grantedUrls, setGrantedUrls] = useState<Array<string>>([]);
 
   const models = Array.isArray(settings.ai_models) ? settings.ai_models : [];
-  const statusColor = loadStatusType === 'error' ? 'red' : loadStatusType === 'warning' ? 'orange' : 'green';
   const columns = [
     {title: t('optionsTitleAIModelsName', 'Name'), dataIndex: 'name'},
     {title: t('optionsTitleAIModelsProvider', 'Provider'), dataIndex: 'provider', width: 110},
-    {title: t('optionsTitleAIModelsModel', 'Model'), dataIndex: 'model'},
     {title: t('optionsTitleAIModelsMaxTokens', 'Max tokens'), dataIndex: 'max_tokens', width: 110},
     {title: '', dataIndex: 'actions', width: 200},
   ];
@@ -87,55 +81,15 @@ export default function AIModelsSection({settings, mutate}: any) {
     }
   };
 
-  const loadModels = async () => {
-    if (!newUrl) {
-      setLoadStatus(t('optionsAIModelsLoadMissingURL', 'Enter URL first'));
-      setLoadStatusType('error');
-      return;
-    }
-    setLoadStatus(t('optionsAIModelsLoadLoading', 'Loading...'));
-    setLoadStatusType('');
-    try {
-      const isAnthropic = newProvider === 'anthropic';
-      const headers: {[string]: string} = {'Content-Type': 'application/json'};
-      if (isAnthropic) {
-        headers['anthropic-version'] = '2023-06-01';
-        headers['anthropic-dangerous-direct-browser-access'] = 'true';
-        if (newApiKey) headers['x-api-key'] = newApiKey;
-      } else if (newApiKey) {
-        headers['Authorization'] = `Bearer ${newApiKey}`;
-      }
-      const endpoint = isAnthropic ? `${newUrl}/v1/models` : `${newUrl}/models`;
-      const response = await fetch(endpoint, {headers});
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const json: any = await response.json();
-      const items = json.data || [];
-      const suggestions = items.map((m: any) => m.id).filter(Boolean).sort();
-      setModelSuggestions(suggestions);
-      if (suggestions.length === 0) {
-        setLoadStatus(t('optionsAIModelsLoadEmpty', 'No models found'));
-        setLoadStatusType('warning');
-      } else {
-        setLoadStatus(t('optionsAIModelsLoadSuccess', `${suggestions.length} models loaded`, {count: suggestions.length}));
-        setLoadStatusType('success');
-      }
-    } catch (err) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      setLoadStatus(`${t('optionsAIModelsLoadError', 'Error loading models')}: ${errMsg}`);
-      setLoadStatusType('error');
-    }
-  };
-
   const addModel = () => {
-    if (!newName || !newUrl || !newModel) {
-      message.warning(t('optionsAIModelsAddRequired', 'Name, URL and Model are required'));
+    if (!newName || !newUrl) {
+      message.warning(t('optionsAIModelsAddRequired', 'Name and URL are required'));
       return;
     }
     const entry = {
       name: newName,
       url: newUrl,
       api_key: newApiKey,
-      model: newModel,
       provider: newProvider,
       timeout: newTimeout || 900,
       max_tokens: newMaxTokens || 0,
@@ -147,15 +101,14 @@ export default function AIModelsSection({settings, mutate}: any) {
     });
     setNewName('');
     setNewApiKey('');
-    setNewModel('');
     setNewTimeout(900);
     setNewMaxTokens(0);
   };
 
   const confirmRemoveModel = async (idx: number) => {
     const ok = await confirmDialog({
-      title: t('optionsTitleAIModelsRemove', 'Remove model?'),
-      content: t('optionsTitleAIModelsRemoveConfirm', 'Remove this AI model profile?'),
+      title: t('optionsTitleAIModelsRemove', 'Remove provider?'),
+      content: t('optionsTitleAIModelsRemoveConfirm', 'Remove this AI provider connection?'),
       okText: t('optionsTitleThemeRemove', 'Remove'),
       cancelText: t('cancel', 'Cancel'),
     });
@@ -169,17 +122,17 @@ export default function AIModelsSection({settings, mutate}: any) {
 
   useEffect(() => {
     refreshAllGrantStates();
-  }, []);
+  }, [settings.ai_models]);
   useEffect(() => {
     checkNewUrlGrant();
   }, [newUrl]);
 
   const newUrlGranted = grantedUrls.indexOf(newUrl) !== -1;
 
-  return h(Card, {title: t('optionsTitleAIModels', 'AI Models'), class: 'ot-card'},
-    h('p', {class: 'ot-hint'}, t('optionsTitleAIModelsDescription', 'Define AI model profiles to use in AI mode.')),
+  return h(Card, {title: t('optionsTitleAIModels', 'AI Providers'), class: 'ot-card'},
+    h('p', {class: 'ot-hint'}, t('optionsTitleAIModelsDescription', 'Define AI provider connections to use in AI mode. The model is picked from AI mode itself, below the provider selector.')),
     h('p', {class: 'ot-warn'}, t('optionsWarningAIModelsKeys', 'Warning: API keys are stored in browser storage.')),
-    h('p', {class: 'ot-tip'}, t('optionsTipAIModelsCapabilities', 'Tip: Use a model that supports tool use, vision, and extended thinking.')),
+    h('p', {class: 'ot-tip'}, t('optionsTipAIModelsCapabilities', 'Tip: Pick a model that supports tool use, vision, and extended thinking when selecting it in AI mode.')),
     h(Table, {
       dataSource: models,
       columns,
@@ -203,33 +156,25 @@ export default function AIModelsSection({settings, mutate}: any) {
     }),
     h('div', {class: 'ot-form'},
       h(Row, {gutter: [10, 0]},
-        h(Col, {flex: '1 1 200px'},
-          h(Field, {label: t('optionsTitleAIModelsName', 'Name')},
-            h(Input, {value: newName, 'onUpdate:value': (v: string) => setNewName(v), placeholder: t('optionsTitleAIModelsNamePlaceholder', 'My Model')}))),
         h(Col, {flex: '1 1 160px'},
+          h(Field, {label: t('optionsTitleAIModelsName', 'Name')},
+            h(Input, {value: newName, 'onUpdate:value': (v: string) => setNewName(v), placeholder: t('optionsTitleAIModelsNamePlaceholder', 'My Provider')}))),
+        h(Col, {flex: '1 1 140px'},
           h(Field, {label: t('optionsTitleAIModelsProvider', 'Provider')},
             h(Select, {value: newProvider, 'onUpdate:value': onProviderChange, style: {width: '100%'}},
               h(SelectOption, {value: 'openai'}, 'OpenAI'),
               h(SelectOption, {value: 'anthropic'}, 'Anthropic')))),
-        h(Col, {flex: '1 1 260px'},
-          h(Field, {label: 'URL'},
-            h(Input, {value: newUrl, 'onUpdate:value': (v: string) => setNewUrl(v), placeholder: 'https://api.openai.com/v1'})))),
-      h(Row, {gutter: [10, 0]},
         h(Col, {flex: '1 1 200px'},
+          h(Field, {label: 'URL'},
+            h(Input, {value: newUrl, 'onUpdate:value': (v: string) => setNewUrl(v), placeholder: 'https://api.openai.com/v1'}))),
+        h(Col, {flex: '1 1 160px'},
           h(Field, {label: t('optionsTitleAIModelsAPIKey', 'API Key')},
             h(Input, {type: 'password', value: newApiKey, 'onUpdate:value': (v: string) => setNewApiKey(v), placeholder: 'sk-...'}))),
-        h(Col, {flex: '1 1 200px'},
-          h(Field, {label: t('optionsTitleAIModelsModel', 'Model')},
-            h(Input, {value: newModel, 'onUpdate:value': (v: string) => setNewModel(v), placeholder: 'gpt-4'}))),
-        h(Col, {flex: '1 1 260px'},
+        h(Col, {flex: '0 0 auto'},
           h(Field, {label: t('optionsTitleAIModelsAdd', 'Actions')},
             h('div', {class: 'ot-btn-row'},
               h(Button, {type: 'primary', onClick: addModel}, t('optionsTitleAIModelsAdd', 'Add')),
-              h(Button, {onClick: loadModels}, t('optionsTitleAIModelsLoad', 'Load models')),
-              newUrlGranted
-                ? h(Tag, {color: 'green'}, `✓ ${t('optionsAIModelsGrantedLabel', 'Access granted')}`)
-                : h(Button, {onClick: () => grantAccess(newUrl)}, t('optionsTitleAIModelsGrant', 'Grant access')))))),
-      loadStatus ? h('p', {class: `ot-status ot-status-${statusColor}`}, loadStatus) : null),
+              !newUrlGranted && h(Button, {onClick: () => grantAccess(newUrl)}, t('optionsTitleAIModelsGrant', 'Grant access'))))))),
     h('details', {class: 'ot-collapse', style: {marginBottom: '16px'}},
       h('summary', {class: 'ot-collapse-header'}, t('optionsTitleAIModelsAdvanced', 'Advanced options')),
       h('div', {class: 'ot-form ot-collapse-body'},
@@ -239,11 +184,5 @@ export default function AIModelsSection({settings, mutate}: any) {
               h(InputNumber, {value: newTimeout, 'onUpdate:value': (v: number) => setNewTimeout(v), min: 0, style: {width: '100%'}}))),
           h(Col, {flex: '1'},
             h(Field, {label: t('optionsTitleAIModelsMaxTokensLabel', 'Max tokens (0 = default)')},
-              h(InputNumber, {value: newMaxTokens, 'onUpdate:value': (v: number) => setNewMaxTokens(v), min: 0, style: {width: '100%'}})))))),
-    modelSuggestions.length > 0
-      ? h('div', {class: 'ot-tag-list'},
-          h('p', {class: 'ot-tip'}, t('optionsTitleAIModelsAvailable', 'Available models:')),
-          h('div', {class: 'ot-tags'},
-            modelSuggestions.map((m) => h(Tag, {key: m, style: {cursor: 'pointer'}, onClick: () => setNewModel(m)}, m))))
-      : null);
+              h(InputNumber, {value: newMaxTokens, 'onUpdate:value': (v: number) => setNewMaxTokens(v), min: 0, style: {width: '100%'}})))))));
 }

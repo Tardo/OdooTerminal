@@ -47,7 +47,10 @@ export default function (): string {
     '</div>' +
     "<div id='terminal_ai_help_popup' class='terminal-ai-help-popup'></div>" +
     "<div class='terminal-ai-model-selector'>" +
-    "<select id='terminal_ai_model_select' class='terminal-ai-model-select'>" +
+    "<select id='terminal_ai_provider_select' class='terminal-ai-model-select'>" +
+    "<option value=''>-- No provider --</option>" +
+    '</select>' +
+    "<select id='terminal_ai_model_select' class='terminal-ai-model-select' disabled>" +
     "<option value=''>-- No model --</option>" +
     '</select>' +
     '</div>' +

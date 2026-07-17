@@ -40,7 +40,7 @@ export default async function cmdAIConnect(kwargs: CMDCallbackArgs, ctx: CMDCall
     ctx.screen.print(
       i18n.t(
         'cmdAI.connect.warning.missingPermission',
-        'Warning: missing browser permission to contact {{url}}. Open the extension\'s Options page (AI Models section) and use "Grant access" for this URL before sending requests.',
+        'Warning: missing browser permission to contact {{url}}. Open the extension\'s Options page (AI Providers section) and use "Grant access" for this URL before sending requests.',
         {url},
       ),
       false,

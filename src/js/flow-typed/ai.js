@@ -66,7 +66,6 @@ declare type AIModelConfig = {
   name: string,
   url: string,
   api_key: string,
-  model: string,
   provider: string,
   timeout: number,
   max_tokens: number,

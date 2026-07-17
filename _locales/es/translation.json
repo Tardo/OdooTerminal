@@ -15,7 +15,7 @@
       },
       "relayFetch": {
         "error": {
-          "missingPermission": "Missing browser permission to contact {{url}}. Open the extension's Options page (AI Models section) and use \"Grant access\" for this URL, then try again.",
+          "missingPermission": "Missing browser permission to contact {{url}}. Open the extension's Options page (AI Providers section) and use \"Grant access\" for this URL, then try again.",
           "unknown": "AI request failed"
         }
       }
@@ -153,7 +153,7 @@
         "connected": "AI Server connected"
       },
       "warning": {
-        "missingPermission": "Warning: missing browser permission to contact {{url}}. Open the extension's Options page (AI Models section) and use \"Grant access\" for this URL before sending requests."
+        "missingPermission": "Warning: missing browser permission to contact {{url}}. Open the extension's Options page (AI Providers section) and use \"Grant access\" for this URL before sending requests."
       }
     },
     "definition": "AI assistant (connect, chat & agent)",
@@ -1582,16 +1582,12 @@
     }
   },
   "ok": "Aceptar",
-  "optionsAIModelsAddRequired": "Nombre, URL y Modelo son obligatorios",
+  "optionsAIModelsAddRequired": "Nombre y URL son obligatorios",
   "optionsAIModelsGrantDenied": "Acceso denegado",
   "optionsAIModelsGrantError": "Error al conceder acceso",
   "optionsAIModelsGrantSuccess": "Acceso concedido",
   "optionsAIModelsGrantedLabel": "Acceso concedido",
-  "optionsAIModelsLoadEmpty": "No se encontraron modelos",
-  "optionsAIModelsLoadError": "Error al cargar modelos",
-  "optionsAIModelsLoadLoading": "Cargando...",
   "optionsAIModelsLoadMissingURL": "Introduce la URL primero",
-  "optionsAIModelsLoadSuccess": "{{count}} modelos cargados",
   "optionsAISkillsAddRequired": "Nombre, Descripción y Contenido son obligatorios",
   "optionsLanguage": "Idioma",
   "optionsLanguageAuto": "Automático",
@@ -1612,7 +1608,7 @@
   "optionsThemePresetMatrix": "Matrix",
   "optionsThemePresetOdoo": "Odoo",
   "optionsThemePresetTech": "Tecnológico",
-  "optionsTipAIModelsCapabilities": "Consejo: Usa un modelo que admita uso de herramientas, visión y pensamiento extendido.",
+  "optionsTipAIModelsCapabilities": "Consejo: Elige un modelo que admita uso de herramientas, visión y pensamiento extendido al seleccionarlo en modo IA.",
   "optionsTitleAICustomSkills": "Habilidades de IA",
   "optionsTitleAICustomSkillsAdd": "Añadir",
   "optionsTitleAICustomSkillsContentLabel": "Contenido",
@@ -1627,22 +1623,19 @@
   "optionsTitleAICustomSkillsNameLabel": "Nombre",
   "optionsTitleAICustomSkillsNamePlaceholder": "my-skill",
   "optionsTitleAICustomSkillsRemoveConfirm": "¿Eliminar esta habilidad?",
-  "optionsTitleAIModels": "Modelos de IA",
+  "optionsTitleAIModels": "Proveedores de IA",
   "optionsTitleAIModelsAPIKey": "Clave de API",
   "optionsTitleAIModelsAdd": "Añadir",
   "optionsTitleAIModelsAdvanced": "Opciones avanzadas",
-  "optionsTitleAIModelsAvailable": "Modelos disponibles:",
-  "optionsTitleAIModelsDescription": "Define perfiles de modelos de IA para usar en modo IA.",
+  "optionsTitleAIModelsDescription": "Define conexiones a proveedores de IA para usarlas en modo IA. El modelo se selecciona desde el propio modo IA, debajo del selector de proveedor.",
   "optionsTitleAIModelsGrant": "Conceder acceso",
-  "optionsTitleAIModelsLoad": "Cargar modelos",
   "optionsTitleAIModelsMaxTokens": "Tokens máx.",
   "optionsTitleAIModelsMaxTokensLabel": "Tokens máx. (0 = predeterminado)",
-  "optionsTitleAIModelsModel": "Modelo",
   "optionsTitleAIModelsName": "Nombre",
-  "optionsTitleAIModelsNamePlaceholder": "Mi modelo",
+  "optionsTitleAIModelsNamePlaceholder": "Mi proveedor",
   "optionsTitleAIModelsProvider": "Proveedor",
-  "optionsTitleAIModelsRemove": "¿Eliminar modelo?",
-  "optionsTitleAIModelsRemoveConfirm": "¿Eliminar este perfil de modelo de IA?",
+  "optionsTitleAIModelsRemove": "¿Eliminar proveedor?",
+  "optionsTitleAIModelsRemoveConfirm": "¿Eliminar esta conexión de proveedor de IA?",
   "optionsTitleAIModelsTimeout": "Tiempo de espera (s)",
   "optionsTitleBehaviour": "Comportamiento",
   "optionsTitleBehaviourElephant": "Resolver valores desconocidos",
@@ -1722,9 +1715,10 @@
       "helpTip4": "Delete old conversations you no longer need.",
       "helpTip5": "Attach files only when strictly necessary.",
       "helpTitle": "Tips to save tokens",
+      "modelsLoadError": "Could not load the models list ({{error}}). Grant access to this URL in the extension options (AI Providers section) and try again.",
       "newConversation": "New conversation",
       "noConversationsHint": "Create a new conversation to start",
-      "noModelsHint": "Configure AI models in the extension options",
+      "noModelsHint": "Configure AI providers in the extension options",
       "notConnected": "AI not connected. Use \"ai connect\" first.",
       "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.",
       "sysprompt": {
