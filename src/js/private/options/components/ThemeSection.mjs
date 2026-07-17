@@ -38,7 +38,7 @@ export default function ThemeSection({settings, mutate, loadThemeValues}: any) {
 
   const colorDomain = Object.entries(settings.colors_domain || {}).map(([domain, color]) => ({domain, color}));
   const domainColumns = [
-    {title: t('optionsTitleThemeDomain', 'Domain'), dataIndex: 'domain'},
+    {title: t('optionsTitleThemeDomain', 'Website'), dataIndex: 'domain'},
     {title: t('optionsTitleThemeColor', 'Color'), dataIndex: 'color'},
     {title: '', dataIndex: 'actions', width: 120},
   ];
@@ -76,6 +76,7 @@ export default function ThemeSection({settings, mutate, loadThemeValues}: any) {
   ];
 
   return h(Card, {title: t('optionsTitleTheme', 'Theme'), class: 'ot-card'},
+    h('p', {class: 'ot-hint'}, t('optionsTitleThemeDescription', 'Customize how the terminal looks: pick a ready-made preset or fine-tune individual colors, fonts and opacity below.')),
     h('div', {class: 'ot-form'},
       h(Row, {gutter: 16},
         h(Col, null,
@@ -109,7 +110,8 @@ export default function ThemeSection({settings, mutate, loadThemeValues}: any) {
       h(Divider, {orientation: 'left'}, t('optionsTitleThemeColors', 'Colors')),
       h(Row, {gutter: [16, 8]},
         colorFields.map(([key, label]) => h(Col, {key, flex: '1 1 120px'}, h(Field, {label}, colorField(key))))),
-      h(Divider, {orientation: 'left'}, t('optionsTitleThemeColorDomainTable', 'Color Domain')),
+      h(Divider, {orientation: 'left'}, t('optionsTitleThemeColorDomainTable', 'Per-site Colors')),
+      h('p', {class: 'ot-tip'}, t('optionsTitleThemeColorDomainHint', 'Give a specific website its own accent color, e.g. to tell a production site apart from a staging one at a glance.')),
       h(Table, {
         dataSource: colorDomain,
         columns: domainColumns,

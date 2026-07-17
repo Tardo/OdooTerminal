@@ -8,6 +8,7 @@ import {t} from '../i18n.mjs';
 
 export default function DeveloperZoneSection({settings, mutate}: any) {
   return h(Card, {title: t('optionsTitleDeveloperZone', 'Extension Developer Zone'), class: 'ot-card'},
+    h('p', {class: 'ot-hint'}, t('optionsTitleDeveloperZoneDescription', 'Options for developers of OdooTerminal itself. Most users can leave these off.')),
     h('div', {class: 'ot-check-stack'},
       h(Checkbox, {checked: settings.devmode_tests, 'onUpdate:checked': (v: boolean) => mutate((s: any) => { s.devmode_tests = v; })},
         t('optionsTitleDeveloperZoneModeTests', 'Use OdooTerminalTests')),

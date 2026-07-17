@@ -60,6 +60,7 @@ export default function ShortcutsSection({settings, mutate}: any) {
   };
 
   return h(Card, {title: t('optionsTitleShortcuts', 'Shortcuts'), class: 'ot-card'},
+    h('p', {class: 'ot-hint'}, t('optionsTitleShortcutsDescription', 'Run a terminal command by pressing a key combination, from anywhere on the page. To add one: click the "Press keys..." box, press the combination, type the command to run, then Add.')),
     h(Table, {
       dataSource: shortcuts,
       columns,

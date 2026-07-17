@@ -172,6 +172,9 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   theme_preset: '',
 };
 
+// Effective screen line buffer used when 'screen_buffer_size' is unset/0 (see core/screen.mjs)
+export const DEFAULT_SCREEN_BUFFER_SIZE = 750;
+
 export const IGNORED_KEYS: $ReadOnlyArray<string> = ['Control', 'Meta', 'Shift', 'Alt', 'Escape'];
 
 export const VERSION_COLOR = {

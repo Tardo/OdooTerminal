@@ -8,6 +8,7 @@ import {t, changeLanguage} from '../i18n.mjs';
 
 export default function BehaviourSection({settings, mutate}: any) {
   return h(Card, {title: t('optionsTitleBehaviour', 'Behaviour'), class: 'ot-card'},
+    h('p', {class: 'ot-hint'}, t('optionsTitleBehaviourDescription', "General settings: interface language and how the terminal window opens (pinned open, maximized, multi-line input).")),
     h('div', {class: 'ot-form'},
       h(Field, {label: t('optionsLanguage', 'Language')},
         h(Select, {
@@ -36,5 +37,6 @@ export default function BehaviourSection({settings, mutate}: any) {
             t('optionsTitleBehaviourMultiline', 'Multi-line'))),
         h(Col, null,
           h(Checkbox, {checked: settings.elephant, 'onUpdate:checked': (v: boolean) => mutate((s: any) => { s.elephant = v; })},
-            t('optionsTitleBehaviourElephant', 'Resolve unknown values'))))));
+            t('optionsTitleBehaviourElephant', 'Resolve unknown values')),
+          h('p', {class: 'ot-tip'}, t('optionsTitleBehaviourElephantHint', "If the current user or database name can't be read from the page, send an extra request to fetch them. A bit slower, but avoids showing them as unknown."))))));
 }

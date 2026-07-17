@@ -157,6 +157,7 @@ export function InputNumber(props: any): VNode {
     type: 'number',
     class: `ot-input-number${props.class ? ` ${props.class}` : ''}`,
     value: props.value,
+    placeholder: props.placeholder,
     min: props.min,
     max: props.max,
     step: props.step,

@@ -47,7 +47,7 @@ export default function TerminalContextSection({settings, mutate}: any) {
   };
 
   return h(Card, {title: t('optionsTitleTerminalContext', 'Terminal Context'), class: 'ot-card'},
-    h('p', {class: 'ot-hint'}, t('optionsTitleTerminalContextDescription', 'This context will be merged with the "normal" context on terminal operations. In json format.')),
+    h('p', {class: 'ot-hint'}, t('optionsTitleTerminalContextDescription', "Extra key-value data (Odoo's \"context\", e.g. language or active_test) automatically added to every command the terminal sends to Odoo. Write it as JSON. Most users can leave it with its default values.")),
     h(Textarea, {
       value: rawJson,
       'onUpdate:value': onInput,

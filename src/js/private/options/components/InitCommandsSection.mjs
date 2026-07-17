@@ -8,7 +8,7 @@ import {t} from '../i18n.mjs';
 
 export default function InitCommandsSection({settings, mutate}: any) {
   return h(Card, {title: t('optionsTitleInitCommands', 'Init Commands'), class: 'ot-card'},
-    h('p', {class: 'ot-hint'}, t('optionsTitleInitCommandsDescription', 'Run these commands when initialize the terminal (one per line).')),
+    h('p', {class: 'ot-hint'}, t('optionsTitleInitCommandsDescription', 'These commands run automatically every time the terminal starts, in order, one per line. Useful for things like clearing the screen or opening a specific view.')),
     h(Textarea, {
       value: settings.init_cmds,
       'onUpdate:value': (v: string) => mutate((s: any) => {

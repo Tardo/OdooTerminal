@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
+import {DEFAULT_SCREEN_BUFFER_SIZE} from '@common/constants';
 import renderPromptCmd from '@terminal/templates/prompt_command';
 import renderPromptCmdHiddenArgs from '@terminal/templates/prompt_command_hidden_args';
 import renderErrorMessage from '@terminal/templates/error_message';
@@ -75,7 +76,7 @@ export const LINE_SELECTOR = ':scope > span .print-table tr, :scope > span';
 
 
 export default class Screen {
-  #max_lines = 750;
+  #max_lines: number = DEFAULT_SCREEN_BUFFER_SIZE;
   #max_buff_lines = 100;
   #highlightWords: Array<string> = [];
   #input_info: InputInfo = {
