@@ -135,16 +135,17 @@ export default class Shell {
       throw new Error(i18n.t('terminal.error.notInitJob', "Unexpected error: can't initialize the job!"));
     }
     let result: mixed = null;
-    let error = '';
+    let error: mixed = null;
     let is_failed = false;
     const meta = this.getCommandJobMeta(command_info, job_index, silent);
     try {
       result = await this.#options.invokeExternalCommand(meta);
     } catch (err) {
       is_failed = true;
-      error =
-        err?.message ||
-        i18n.t('terminal.error.unknown', '[!] Oops! Unknown error! (no detailed error message given :/)');
+      // Keep the original error (e.g. an Odoo RPCError with '.data.name/.message/.debug')
+      // instead of flattening it to '.message' — that discards the real server-side
+      // reason and leaves only a generic label for both the screen and the AI agent.
+      error = err ?? i18n.t('terminal.error.unknown', '[!] Oops! Unknown error! (no detailed error message given :/)');
     } finally {
       this.onFinishCommand(job_index);
     }

@@ -458,6 +458,12 @@ export default class Screen {
         debug_error.data.arguments && JSON.stringify(debug_error.data.arguments),
         encodeHTML(debug_error.data.debug || ''),
       );
+    } else if (typeof error === 'object') {
+      // Not a recognized Odoo/HTTP error shape (e.g. a plain Error thrown by a command) —
+      // fall back to its message instead of letting it fall through to JSON.stringify,
+      // which renders '{}' for a bare Error (message/stack aren't enumerable).
+      // $FlowFixMe[incompatible-use]
+      error_msg = encodeHTML(String(error.message || error));
     }
 
     this.#print(error_msg, 'error_message');

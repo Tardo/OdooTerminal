@@ -14,6 +14,7 @@ import {DEFAULT_MAX_STEPS} from '@ai/constants';
 import {computeContextSize, shouldCompress, compressHistory} from '@ai/utils/compress_history';
 import searchRead from '@odoo/orm/search_read';
 import captureScreenshot from '@ai/utils/capture_screenshot';
+import describeCommandError from '@ai/utils/describe_command_error';
 import encodeHTML from '@terminal/utils/encode_html';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -441,7 +442,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
           }
         } catch (err) {
           cmdFailed = true;
-          outputStr = err.message;
+          outputStr = describeCommandError(err);
         }
 
         cmdExecutedCount++;

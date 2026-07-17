@@ -5,6 +5,7 @@
 import TerminalTestSuite from './tests';
 import asyncSleep from '@terminal/utils/async_sleep';
 import keyCode from '@terminal/utils/keycode';
+import describeCommandError from '@ai/utils/describe_command_error';
 
 export default class TestCore extends TerminalTestSuite {
   _orig_context: {[string]: mixed} = {};
@@ -193,5 +194,23 @@ export default class TestCore extends TerminalTestSuite {
     }));
     const res = await red_prom;
     this.assertEqual(res, "testing!");
+  }
+
+  async test_describe_command_error() {
+    // Odoo RPCError: ProcessJobError.data = original error, whose own '.data' is Odoo's
+    // exception dict — the real business error the AI agent needs to see and self-correct on.
+    this.assertEqual(
+      describeCommandError({
+        data: {
+          message: 'Odoo Server Error',
+          data: {name: 'UserError', message: 'You cannot do X', debug: 'Traceback...'},
+        },
+      }),
+      'UserError: You cannot do X: Traceback...',
+    );
+    // Plain JS Error thrown by a command (no Odoo '.data' shape) — falls back to its message.
+    this.assertEqual(describeCommandError({data: new Error('boom')}), 'Error: boom');
+    // No '.data' at all (e.g. UnknownCommandError, InvalidCommandArgumentFormatError).
+    this.assertEqual(describeCommandError({message: 'Unknown Command x'}), 'Unknown Command x');
   }
 }
