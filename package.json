@@ -10,7 +10,7 @@
     "dev:flowcheck": "cross-env ODOO_TERMINAL_ENV=development flow check",
     "dev:rollup": "cross-env ODOO_TERMINAL_ENV=development rollup -c",
     "dev:rollup:watch": "cross-env ODOO_TERMINAL_ENV=development rollup -c -w",
-    "dev:flow-typed": "flow-typed install -o --ignoreDeps dev peer bundled --libdefDir src/js/flow-typed/",
+    "dev:flow-typed": "flow-typed install -o -s --ignoreDeps dev peer bundled --libdefDir src/js/flow-typed/",
     "prod:build": "cross-env ODOO_TERMINAL_ENV=production node scripts/build.mjs",
     "start:firefox": "cross-env ODOO_TERMINAL_ENV=development node scripts/build.mjs && web-ext run --verbose -t firefox-desktop",
     "start:chromium": "cross-env ODOO_TERMINAL_ENV=development node scripts/build.mjs && web-ext run --verbose -t chromium",
