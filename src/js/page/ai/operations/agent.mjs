@@ -19,6 +19,29 @@ import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 
+// Weak models sometimes ignore the "raw HTML only" instruction and answer in
+// markdown/plain text despite the prompt reminders. Deterministic fallback:
+// only touches text that has no allowed HTML tags in it already.
+function coerceToAllowedHtml(text: string): string {
+  if (/<\/?(b|ul|li|code|br)\b/i.test(text)) {
+    return text;
+  }
+  let html = text
+    .replace(/```([\s\S]*?)```/g, (_m, code) => `<code>${code.trim()}</code>`)
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')
+    .replace(/^\s*#{1,6}\s+(.+)$/gm, '<b>$1</b>');
+  html = html.replace(/(^|\n)((?:[ \t]*[-*][ \t]+.+(?:\n|$))+)/g, (_m, pre, block) => {
+    const items = block
+      .trim()
+      .split('\n')
+      .map(line => `<li>${line.replace(/^[ \t]*[-*][ \t]+/, '')}</li>`)
+      .join('');
+    return `${pre}<ul>${items}</ul>`;
+  });
+  return html.replace(/\n+/g, '<br>');
+}
+
 const AGENT_TOOLS: Array<AIToolDef> = [
   {
     name: 'run_command',
@@ -352,7 +375,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
 
       if (finalText) {
         ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
-        ctx.screen.print(finalText, false);
+        ctx.screen.print(coerceToAllowedHtml(finalText), false);
       }
       printTokenUsage();
       return messages.slice(1);

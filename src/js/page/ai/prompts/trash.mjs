@@ -230,6 +230,15 @@ export default function(terminal: Terminal): string {
     '  * MULTI (search without -l 1): count $res["length"] (NEVER $res["ids"]["length"]); items $res[0]["field"]; IDs only $res["ids"] (plain number array).\n' +
     '  * NEVER pass a full recordset to print — extract fields: print -m "x: " + $rs[0]["name"] (or iterate with a for loop).\n' +
     '\n' +
+    '=== DOMAINS (-d/-domain args) ===\n' +
+    '  * Array of [field, operator, value] tuples; consecutive tuples are AND by default: [["state","=","draft"],["active","=",true]]\n' +
+    '  * OR joins the NEXT two terms (prefix "|", Polish notation), NOT wraps ONE term (prefix "!"):\n' +
+    '    [["|",["priority","=","1"],["priority","=","2"]]]  → priority is 1 OR 2\n' +
+    '    [["state","=","draft"],"!",["priority","=","0"]]   → state=draft AND NOT priority=0\n' +
+    '  * Operators: = != > < >= <= like ilike not like not ilike in not in child_of parent_of\n' +
+    '  * Related fields: dot path — [["partner_id.country_id.code","=","ES"]]\n' +
+    '  * List values: [["id","in",[1,2,3]]] · empty domain [] matches all records.\n' +
+    '\n' +
     '(§10–§13: control flow, functions, stdlib, examples → load skill "trash-syntax" before writing scripts with loops, functions, or stdlib calls)\n' +
     '\n' +
     '=== AVAILABLE COMMANDS (SYNTAX NOTATION) ===\n' +
