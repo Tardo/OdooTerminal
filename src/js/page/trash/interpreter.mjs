@@ -380,6 +380,8 @@ export default class Interpreter {
       ttype = LEXER.Boolean;
     } else if (token_san === KEYWORDS.NULL) {
       ttype = LEXER.Null;
+    } else if (token_san === KEYWORDS.UNDEFINED) {
+      ttype = LEXER.Undefined;
     } else if (token_san === KEYWORDS.FUNCTION) {
       ttype = LEXER.Function;
     } else if (token_san === KEYWORDS.RETURN) {

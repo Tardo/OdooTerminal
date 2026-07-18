@@ -305,6 +305,9 @@ export default class ASTParser {
       case LEXER.Null:
         ++cursor.pos;
         return {node: NODE.Literal, token, tokenIndex: ti, literal: null};
+      case LEXER.Undefined:
+        ++cursor.pos;
+        return {node: NODE.Literal, token, tokenIndex: ti, literal: undefined};
       case LEXER.String:
       case LEXER.StringSimple:
         ++cursor.pos;

@@ -19,6 +19,14 @@ $var = 'value'   # declare and assign
 $var             # retrieve the value
 ```
 
+Accessing a dictionary key or array index that does not exist yields `undefined` (a distinct value from `null`):
+
+```
+$d = {a: 1}
+$d['nope'] == undefined   # true
+$d['nope'] == null        # false
+```
+
 If a variable holds a function, use `$$` to invoke it:
 
 ```

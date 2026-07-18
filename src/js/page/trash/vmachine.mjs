@@ -451,13 +451,16 @@ export default class VMachine {
           {
             const token = getToken(instr);
             const vname = program.names[instr.level][instr.operand];
+            // An empty stack means a malformed assignment (e.g. '$x ='); a popped
+            // 'undefined' is now a legit value (missing dict/array member access)
+            const has_value = activeFrame.stack.length > 0;
             const vvalue = activeFrame.stack.pop();
             if (vname === null || typeof vname === 'undefined') {
               if (!token) {
                 throw new InvalidInstructionError();
               }
               throw new InvalidNameError(token.value, token.start, token.end);
-            } else if (typeof vvalue === 'undefined') {
+            } else if (!has_value) {
               const value_instr = program.instructions[index - 1];
               const value_token = parse_info.inputTokens[value_instr.level][value_instr.inputTokenIndex] || {};
               throw new InvalidTokenError(value_token.value, value_token.start, value_token.end);
@@ -529,11 +532,12 @@ export default class VMachine {
               throw new InvalidValueError(typeof attr_name === 'string' ? attr_name : 'Unknown');
             }
 
-            let res_value = null;
+            // Missing properties/indexes resolve to 'undefined' (JS-like), not null
+            let res_value: mixed;
             try {
               // $FlowFixMe[incompatible-use]
               // $FlowFixMe[prop-missing]
-              res_value = value[attr_name];
+              res_value = (value[attr_name]: mixed);
             } catch (_err) {
               // Do nothing
             }

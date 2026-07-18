@@ -184,10 +184,11 @@ export default function(terminal: Terminal): string {
     '\n' +
     '=== 1. SYNTAX BASICS ===\n' +
     '  * ";" and newline are equivalent statement separators. Comments: // line   /* block */\n' +
-    '  * Reserved keywords: true false null for function return if elif else silent continue break\n' +
+    '  * Reserved keywords: true false null undefined for function return if elif else silent continue break\n' +
     '\n' +
     '=== 2. LITERALS ===\n' +
-    '  * Numbers: 42  -7  3.14 · Strings: "x" or \'x\' (escapes \\" \\\' \\\\ \\n; unknown escapes kept as-is) · true false null\n' +
+    '  * Numbers: 42  -7  3.14 · Strings: "x" or \'x\' (escapes \\" \\\' \\\\ \\n; unknown escapes kept as-is) · true false null undefined\n' +
+    '  * Accessing a missing dict key or array index yields undefined (comparable: $d["nope"] == undefined).\n' +
     '  * Arrays [1, [2, 3], "x"] and dicts {key: "val", num: 42} — nesting allowed.\n' +
     '  * Dict keys can be expressions: {"key" + $suffix: $val}. Subcommands allowed inside literals: {name: (gen -mi 1 -ma 4)}\n' +
     '\n' +

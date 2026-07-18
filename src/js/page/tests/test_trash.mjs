@@ -87,6 +87,29 @@ export default class TestTrash extends TerminalTestSuite {
     this.assertEqual(results.key, 'value');
   }
 
+  async test_trash_undefined() {
+    // missing dict key / array index resolves to undefined (not null)
+    let results = await this.terminal.getShell().eval("$d = {a: 1}; $d['nope']");
+    this.assertEqual(results, undefined);
+    results = await this.terminal.getShell().eval('$arr = [1, 2]; $arr[10]');
+    this.assertEqual(results, undefined);
+    // undefined literal and comparisons
+    results = await this.terminal.getShell().eval('undefined');
+    this.assertEqual(results, undefined);
+    results = await this.terminal.getShell().eval("$d = {a: 1}; $d['nope'] == undefined");
+    this.assertTrue(results);
+    results = await this.terminal.getShell().eval("$d = {a: 1}; $d['nope'] == null");
+    this.assertFalse(results);
+    results = await this.terminal.getShell().eval("$d = {a: null}; $d['a'] == null");
+    this.assertTrue(results);
+    // undefined can be stored in variables and re-compared
+    results = await this.terminal.getShell().eval("$d = {}; $x = $d['nope']; $x == undefined");
+    this.assertTrue(results);
+    // undefined is falsy in conditions
+    results = await this.terminal.getShell().eval("$d = {}; if ($d['flag']) { return 'a' }; return 'b'");
+    this.assertEqual(results, 'b');
+  }
+
   async test_trash_assigments() {
     let results = await this.terminal.getShell().eval("$var_at = 2; $var_at += 5; $var_at -= 1; $var_at *= 2; $var_at /= 2; $var_at");
     this.assertEqual(results, 6);

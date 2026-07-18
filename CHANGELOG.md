@@ -7,6 +7,7 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 **14.0.0**
 
 ```
+ADD: TraSH: 'undefined' literal; accessing a missing dictionary key or array index now yields undefined instead of null
 ADD: TraSH: Increment/decrement operators, prefix and postfix ($i++ / ++$i), usable in expressions with C-like semantics
 ADD: TraSH: for-in loops over arrays and strings (for ($item in $items) { ... })
 ADD: IA: MCP over HTTP

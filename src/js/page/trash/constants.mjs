@@ -54,6 +54,7 @@ export const LEXER = {
   Null: 47,
   Increment: 48,
   Decrement: 49,
+  Undefined: 50,
 };
 
 export const LEXER_MATH_C = [
@@ -310,6 +311,7 @@ export const KEYWORDS = {
   TRUE: 'true',
   FALSE: 'false',
   NULL: 'null',
+  UNDEFINED: 'undefined',
   FOR: 'for',
   FUNCTION: 'function',
   RETURN: 'return',
