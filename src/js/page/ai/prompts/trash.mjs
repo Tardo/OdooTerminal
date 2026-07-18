@@ -224,6 +224,9 @@ export default function(terminal: Terminal): string {
     '=== 8. SUBCOMMAND CALLS & NESTING ===\n' +
     '  * Wrap in (): $val = (search -m res.partner -l 1) · chain access: (search -m res.partner -f name)[0]["name"]\n' +
     '  * Inline in args: read res.users -i (search -m res.users -f id)[0]["id"] · inside literals: {total: (count -m res.partner)}\n' +
+    '  * A command used as an ARGUMENT VALUE must ALWAYS be wrapped in () — without them the inner command name becomes a literal string and its flags leak into the OUTER command:\n' +
+    '    WRONG:   print -m now -t date      ← prints the string "now"; -t is not a print arg → error\n' +
+    '    CORRECT: print -m (now -t date)\n' +
     '\n' +
     '=== 9. RECORDSETS (SINGLETON VS MULTI-RECORD) ===\n' +
     '  * SINGLETON (create, read <single-id>, search -l 1): access fields directly — $res["field_name"].\n' +
