@@ -79,6 +79,7 @@ async function handleAIFetchStart(request: Object, tabId: number) {
       ok: response.ok,
       status: response.status,
       statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
     });
 
     if (!response.ok) {

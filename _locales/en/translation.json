@@ -5,6 +5,12 @@
   },
   "Yes": "Yes",
   "ai": {
+    "mcp": {
+      "error": {
+        "badResponse": "MCP server returned an unparsable response",
+        "toolFailedNoMessage": "Tool returned an error with no message"
+      }
+    },
     "utils": {
       "network": {
         "error": {
@@ -89,6 +95,12 @@
         "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
         "notConfigured": "Not connected. Use \"ai connect\" first",
         "requestFailed": "Request failed: "
+      },
+      "mcp": {
+        "calling": "[Agent] Calling MCP tool: <code>{{tool}}</code> ({{server}})",
+        "discoveryFailed": "[Agent] MCP server \"{{name}}\" unavailable, skipping: {{error}}",
+        "question": "[Agent] Wants to use tools from MCP server \"{{name}}\" ({{url}}) — Allow for this conversation?",
+        "rejected": "MCP server \"{{name}}\" rejected by user."
       },
       "result": {
         "cmdReason": "[Agent] {{reason}}",
@@ -1591,6 +1603,7 @@
   "optionsAISkillsAddRequired": "Name, Description and Content are required",
   "optionsLanguage": "Language",
   "optionsLanguageAuto": "Auto",
+  "optionsMCPServersAddRequired": "Name and URL are required",
   "optionsNoChanges": "No changes",
   "optionsReset": "Reset to Defaults",
   "optionsResetConfirm": "This will reset all settings to their default values. Are you sure?",
@@ -1609,6 +1622,7 @@
   "optionsThemePresetOdoo": "Odoo",
   "optionsThemePresetTech": "Tech",
   "optionsTipAIModelsCapabilities": "Tip: Pick a model that supports tool use, vision, and extended thinking when selecting it in AI mode.",
+  "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\", not \"ai chat\". The agent asks for permission once per server per conversation.",
   "optionsTitleAICustomSkills": "AI Skills",
   "optionsTitleAICustomSkillsAdd": "Add",
   "optionsTitleAICustomSkillsContentLabel": "Content",
@@ -1661,6 +1675,15 @@
   "optionsTitleDeveloperZoneModeTests": "Use OdooTerminalTests",
   "optionsTitleInitCommands": "Init Commands",
   "optionsTitleInitCommandsDescription": "These commands run automatically every time the terminal starts, in order, one per line. Useful for things like clearing the screen or opening a specific view.",
+  "optionsTitleMCPServers": "MCP Servers",
+  "optionsTitleMCPServersAdd": "Add",
+  "optionsTitleMCPServersDescription": "Connect the AI agent to remote MCP (Model Context Protocol) servers. Tools exposed by enabled servers are offered to the agent alongside its built-in tools.",
+  "optionsTitleMCPServersEnabled": "Enabled",
+  "optionsTitleMCPServersName": "Name",
+  "optionsTitleMCPServersNamePlaceholder": "My MCP Server",
+  "optionsTitleMCPServersRemove": "Remove server?",
+  "optionsTitleMCPServersRemoveConfirm": "Remove this MCP server connection?",
+  "optionsTitleMCPServersUrl": "URL",
   "optionsTitleMisc": "Misc",
   "optionsTitleMiscDescription": "Other display and command settings that don't fit elsewhere.",
   "optionsTitleMiscHighlightWords": "Highlight Words",

@@ -130,6 +130,11 @@ export default class Terminal {
 
   #isAIMode: boolean = false;
   #activeConvId: string | null = null;
+  // MCP server usage is confirmed once per conversation, not once per agent step/invocation
+  // (a conversation spans several 'ai agent' calls via initial_messages) — keyed by conversation
+  // id so switching conversations re-prompts, but continuing one does not. In-memory only: it
+  // does not survive a page reload, which is an acceptable, safer default (no silent cross-session trust).
+  #mcpConfirmedServers: Map<string, Set<string>> = new Map();
   #aiConvList_el: HTMLElement | void;
   #aiProviderSelect_el: HTMLSelectElement | void;
   #aiModelSelect_el: HTMLSelectElement | void;
@@ -436,6 +441,20 @@ export default class Terminal {
 
   getCustomSkills(): Array<AICustomSkillDef> {
     return Array.isArray(this.#config.ai_custom_skills) ? this.#config.ai_custom_skills : [];
+  }
+
+  getMCPServers(): Array<MCPServerConfig> {
+    return Array.isArray(this.#config.mcp_servers) ? this.#config.mcp_servers : [];
+  }
+
+  getMCPConfirmedServers(): Set<string> {
+    const key = this.#activeConvId ?? '__no_conversation__';
+    let confirmed = this.#mcpConfirmedServers.get(key);
+    if (confirmed === undefined) {
+      confirmed = new Set();
+      this.#mcpConfirmedServers.set(key, confirmed);
+    }
+    return confirmed;
   }
 
   cleanInputHistory() {

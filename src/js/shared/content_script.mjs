@@ -119,6 +119,7 @@ function onInternalMessage(request: Object) {
       ok: request.ok,
       status: request.status,
       statusText: request.statusText,
+      headers: request.headers,
     });
   } else if (request.message === 'ai_fetch_chunk') {
     postMessage('ODOO_TERM_AI_FETCH_CHUNK', {requestId: request.requestId, chunk: request.chunk});

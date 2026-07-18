@@ -76,3 +76,17 @@ declare type AICustomSkillDef = {
   description: string,
   content: string,
 };
+
+declare type MCPServerConfig = {
+  name: string,
+  url: string,
+  api_key: string,
+  timeout: number,
+  enabled: boolean,
+};
+
+declare type MCPToolInfo = {
+  name: string,
+  description: string,
+  inputSchema: {[string]: mixed},
+};

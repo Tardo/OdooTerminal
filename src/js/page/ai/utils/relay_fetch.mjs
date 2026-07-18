@@ -28,6 +28,7 @@ export type RelayFetchResponse = {
   ok: boolean,
   status: number,
   statusText: string,
+  headers: {[string]: string},
   text: () => Promise<string>,
   body: ?RelayReader,
 };
@@ -158,6 +159,8 @@ export function backgroundFetch(url: string, init: RelayFetchInit, signal: Abort
           ok: Boolean(data.ok),
           status: Number(data.status),
           statusText: String(data.statusText ?? ''),
+          // $FlowFixMe[incompatible-type]
+          headers: data.headers !== null && data.headers !== undefined && typeof data.headers === 'object' ? data.headers : {},
           text: () => errorTextPromise,
           body: data.ok ? reader : null,
         });

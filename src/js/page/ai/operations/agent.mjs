@@ -9,6 +9,7 @@ import {startRequest, handleAbort} from '@ai/utils/network';
 import buildMainAgentPrompt from '@ai/agents/main';
 import SKILLS from '@ai/skills/__all__';
 import type {SkillDef} from '@ai/skills/__all__';
+import {listMCPTools, callMCPTool, slugifyServerName, buildMCPToolName} from '@ai/mcp/client';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {DEFAULT_MAX_STEPS} from '@ai/constants';
 import {computeContextSize, shouldCompress, compressHistory} from '@ai/utils/compress_history';
@@ -199,6 +200,40 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     ...customSkillDefs,
   ];
 
+  // Discover tools from enabled MCP servers up front so they can be offered to the model
+  // alongside the native tools. A short per-server timeout keeps one unreachable server
+  // from stalling the whole agent run — it is simply skipped with a warning.
+  const mcpToolDefs: Array<AIToolDef> = [];
+  const mcpToolMap: Map<string, {server: MCPServerConfig, toolName: string}> = new Map();
+  for (const server of this.getMCPServers().filter(s => s.enabled)) {
+    const discovery = startRequest(8);
+    try {
+      const tools = await listMCPTools(server, discovery.signal);
+      const slug = slugifyServerName(server.name);
+      for (const tool of tools) {
+        const fullName = buildMCPToolName(slug, tool.name);
+        mcpToolMap.set(fullName, {server, toolName: tool.name});
+        mcpToolDefs.push({
+          name: fullName,
+          description: `[MCP:${server.name}] ${tool.description || tool.name}`,
+          parameters: tool.inputSchema,
+        });
+      }
+    } catch (err) {
+      ctx.screen.print(
+        i18n.t('cmdAI.agent.mcp.discoveryFailed', '[Agent] MCP server "{{name}}" unavailable, skipping: {{error}}', {
+          name: server.name,
+          error: err.message,
+        }),
+        false,
+      );
+    }
+  }
+  const agentTools: Array<AIToolDef> = [...AGENT_TOOLS, ...mcpToolDefs];
+  // Servers are confirmed once per conversation (persists across agent steps/invocations within
+  // the same conversation via Terminal — see getMCPConfirmedServers), not on every tool call.
+  const confirmedMCPServers: Set<string> = this.getMCPConfirmedServers();
+
   const messages: Array<AIMessage> = [
     {
       role: 'system',
@@ -302,7 +337,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         () => undefined,
         null,
         aiState.maxTokens,
-        AGENT_TOOLS,
+        agentTools,
       );
       text = result.text;
       toolCalls = result.toolCalls;
@@ -601,6 +636,61 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
             type: 'tool_result',
             tool_use_id: tc.id,
             content: `Screenshot failed: ${err.message}`,
+          });
+        }
+
+      } else if (mcpToolMap.has(tc.name)) {
+        const mcpEntry = mcpToolMap.get(tc.name);
+        if (mcpEntry === undefined) {
+          toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Unknown tool: ${tc.name}`});
+          continue;
+        }
+        const {server, toolName} = mcpEntry;
+
+        if (!confirmedMCPServers.has(server.name)) {
+          const question = i18n.t(
+            'cmdAI.agent.mcp.question',
+            '[Agent] Wants to use tools from MCP server "{{name}}" ({{url}}) — Allow for this conversation?',
+            {name: server.name, url: server.url},
+          );
+          const answer = await ctx.screen.showQuestion(question, ['y', 'n'], 'n');
+          if (answer?.toLowerCase() !== 'y') {
+            toolResults.push({
+              type: 'tool_result',
+              tool_use_id: tc.id,
+              content: i18n.t('cmdAI.agent.mcp.rejected', 'MCP server "{{name}}" rejected by user.', {name: server.name}),
+            });
+            continue;
+          }
+          confirmedMCPServers.add(server.name);
+        }
+
+        ctx.screen.print(
+          i18n.t('cmdAI.agent.mcp.calling', '[Agent] Calling MCP tool: <code>{{tool}}</code> ({{server}})', {
+            tool: toolName,
+            server: server.name,
+          }),
+          false,
+        );
+
+        const callController = startRequest(server.timeout || 30);
+        try {
+          const {text: mcpText, isError} = await callMCPTool(server, toolName, tc.input, callController.signal);
+          let outputStr = mcpText || (isError ? 'MCP tool failed with no message' : '(no output)');
+          const MAX_MCP_OUTPUT_CHARS = 6000;
+          if (outputStr.length > MAX_MCP_OUTPUT_CHARS) {
+            outputStr = outputStr.slice(0, MAX_MCP_OUTPUT_CHARS) + `\n[output truncated — ${outputStr.length} chars total, showing first ${MAX_MCP_OUTPUT_CHARS}]`;
+          }
+          toolResults.push({
+            type: 'tool_result',
+            tool_use_id: tc.id,
+            content: isError ? `MCP tool failed:\n${outputStr}` : `MCP tool output:\n${outputStr}`,
+          });
+        } catch (err) {
+          toolResults.push({
+            type: 'tool_result',
+            tool_use_id: tc.id,
+            content: `MCP tool call failed: ${err.message}`,
           });
         }
 

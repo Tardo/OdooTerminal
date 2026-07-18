@@ -12,6 +12,7 @@ import ShortcutsSection from './components/ShortcutsSection.mjs';
 import CommandAssistantSection from './components/CommandAssistantSection.mjs';
 import AIModelsSection from './components/AIModelsSection.mjs';
 import AISkillsSection from './components/AISkillsSection.mjs';
+import MCPServersSection from './components/MCPServersSection.mjs';
 import InitCommandsSection from './components/InitCommandsSection.mjs';
 import TerminalContextSection from './components/TerminalContextSection.mjs';
 import DeveloperZoneSection from './components/DeveloperZoneSection.mjs';
@@ -29,6 +30,7 @@ const SECTIONS: Array<SectionDef> = [
   {id: 'command-assistant', title: () => t('optionsTitleCommandAssistant', 'Command Assistant'), comp: CommandAssistantSection},
   {id: 'ai-models', title: () => t('optionsTitleAIModels', 'AI Providers'), comp: AIModelsSection},
   {id: 'ai-skills', title: () => t('optionsTitleAICustomSkills', 'AI Skills'), comp: AISkillsSection},
+  {id: 'mcp-servers', title: () => t('optionsTitleMCPServers', 'MCP Servers'), comp: MCPServersSection},
   {id: 'init-commands', title: () => t('optionsTitleInitCommands', 'Init Commands'), comp: InitCommandsSection},
   {id: 'terminal-context', title: () => t('optionsTitleTerminalContext', 'Terminal Context'), comp: TerminalContextSection},
   {id: 'developer-zone', title: () => t('optionsTitleDeveloperZone', 'Developer Zone'), comp: DeveloperZoneSection},

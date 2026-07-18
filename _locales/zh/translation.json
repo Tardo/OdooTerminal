@@ -5,6 +5,12 @@
   },
   "Yes": "是",
   "ai": {
+    "mcp": {
+      "error": {
+        "badResponse": "MCP server returned an unparsable response",
+        "toolFailedNoMessage": "Tool returned an error with no message"
+      }
+    },
     "utils": {
       "network": {
         "error": {
@@ -89,6 +95,12 @@
         "noPrompt": "未提供提示词。使用方法：ai agent -p \"your request\"",
         "notConfigured": "未连接。请先使用 \"ai connect\"",
         "requestFailed": "请求失败："
+      },
+      "mcp": {
+        "calling": "[Agent] Calling MCP tool: <code>{{tool}}</code> ({{server}})",
+        "discoveryFailed": "[Agent] MCP server \"{{name}}\" unavailable, skipping: {{error}}",
+        "question": "[Agent] Wants to use tools from MCP server \"{{name}}\" ({{url}}) — Allow for this conversation?",
+        "rejected": "MCP server \"{{name}}\" rejected by user."
       },
       "result": {
         "cmdReason": "[Agent] {{reason}}",
@@ -1591,6 +1603,7 @@
   "optionsAISkillsAddRequired": "名称、描述和内容为必填项",
   "optionsLanguage": "语言",
   "optionsLanguageAuto": "自动",
+  "optionsMCPServersAddRequired": "Name and URL are required",
   "optionsNoChanges": "所有更改已保存",
   "optionsReset": "恢复默认设置",
   "optionsResetConfirm": "这将把所有设置恢复为默认值。确定吗？",
@@ -1609,6 +1622,7 @@
   "optionsThemePresetOdoo": "Odoo",
   "optionsThemePresetTech": "科技",
   "optionsTipAIModelsCapabilities": "提示：使用支持工具调用、视觉和扩展思考的模型。",
+  "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\", not \"ai chat\". The agent asks for permission once per server per conversation.",
   "optionsTitleAICustomSkills": "AI 技能",
   "optionsTitleAICustomSkillsAdd": "添加",
   "optionsTitleAICustomSkillsContentLabel": "内容",
@@ -1661,6 +1675,15 @@
   "optionsTitleDeveloperZoneModeTests": "使用 OdooTerminalTests",
   "optionsTitleInitCommands": "初始化命令",
   "optionsTitleInitCommandsDescription": "这些命令会在终端每次启动时自动按顺序执行，每行一条。适合用来清屏或打开某个特定视图等操作。",
+  "optionsTitleMCPServers": "MCP Servers",
+  "optionsTitleMCPServersAdd": "Add",
+  "optionsTitleMCPServersDescription": "Connect the AI agent to remote MCP (Model Context Protocol) servers. Tools exposed by enabled servers are offered to the agent alongside its built-in tools.",
+  "optionsTitleMCPServersEnabled": "Enabled",
+  "optionsTitleMCPServersName": "Name",
+  "optionsTitleMCPServersNamePlaceholder": "My MCP Server",
+  "optionsTitleMCPServersRemove": "Remove server?",
+  "optionsTitleMCPServersRemoveConfirm": "Remove this MCP server connection?",
+  "optionsTitleMCPServersUrl": "URL",
   "optionsTitleMisc": "其他设置",
   "optionsTitleMiscDescription": "其他未归入别处的显示与命令相关设置。",
   "optionsTitleMiscHighlightWords": "高亮单词",
