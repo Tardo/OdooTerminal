@@ -166,9 +166,10 @@ export default function(terminal: Terminal): string {
     'A CMD script returns the result of EACH top-level statement (one not nested inside an assignment, a subcommand () or a block {}):\n' +
     '  • ONE top-level statement → you receive its value directly.\n' +
     '  • TWO OR MORE → you receive a JSON array, one entry per statement, in order.\n' +
-    'Assignments ($var = ...) execute but return NOTHING.\n' +
-    '  WRONG:   CMD: $products = (search -m product.product -f name -l 10)             → "(command executed, no return value)"\n' +
-    '  CORRECT: CMD: $products = (search -m product.product -f name -l 10); $products  → the products array\n' +
+    'Assignments ($var = ...) execute but return NOTHING — only assign when $var is reused LATER; a one-off value needs no variable:\n' +
+    '  WRONG:    CMD: $products = (search -m product.product -f name -l 10)             → "(command executed, no return value)"\n' +
+    '  NEEDLESS: CMD: $products = (search -m product.product -f name -l 10); $products  → works, but pointless — nothing reuses $products\n' +
+    '  CORRECT:  CMD: search -m product.product -f name -l 10                           → same result, no $var needed\n' +
     'ONE CMD per turn — never send multiple CMD lines; combine statements with ";":\n' +
     '  CMD: search -m res.partner -f name -l 5; count -m res.partner   → [<partners array>, <count>]\n' +
     '\n' +
