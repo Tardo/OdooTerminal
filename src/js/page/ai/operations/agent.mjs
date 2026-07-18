@@ -456,7 +456,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         const safeCmd = encodeHTML(cmd);
         ctx.screen.print(
           i18n.t('cmdAI.agent.result.running', '[Agent] Running: <code>{{cmd}}</code>', {cmd}) +
-            ` <span class='agent-rerun o_terminal_click o_terminal_cmd' data-cmd='${safeCmd}' title='Re-run'><i class='fa fa-repeat'></i></span>`,
+            ` <span class='agent-copy o_terminal_click' data-cmd='${safeCmd}' title='Copy'><i class='fa fa-copy'></i></span>`,
           false,
         );
 

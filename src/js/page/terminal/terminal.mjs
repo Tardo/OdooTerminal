@@ -1076,6 +1076,14 @@ export default class Terminal {
     }
   }
 
+  #onClickAgentCopy(target: HTMLElement) {
+    if (Object.hasOwn(target.dataset, 'cmd')) {
+      navigator.clipboard?.writeText(target.dataset.cmd)?.catch(() => {
+        // Do nothing
+      });
+    }
+  }
+
   #onClickToggleMaximize(ev: MouseEvent) {
     this.#config.maximized = !this.#config.maximized;
     if (ev.currentTarget instanceof HTMLElement) {
@@ -1896,9 +1904,13 @@ export default class Terminal {
       !this.#config.pinned
     ) {
       this.doHide();
-    } else if (ev.target instanceof HTMLElement && ev.target.classList.contains('o_terminal_cmd')) {
-      // $FlowFixMe[incompatible-type]
-      this.#onClickTerminalCommand(ev.target);
+    } else if (clickTarget instanceof HTMLElement) {
+      const copyTarget = clickTarget.closest('.agent-copy');
+      if (copyTarget instanceof HTMLElement) {
+        this.#onClickAgentCopy(copyTarget);
+      } else if (clickTarget.classList.contains('o_terminal_cmd')) {
+        this.#onClickTerminalCommand(clickTarget);
+      }
     }
   }
   #onCoreKeyDown(this: Terminal, ev: KeyboardEvent) {

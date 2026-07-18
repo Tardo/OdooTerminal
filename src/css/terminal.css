@@ -232,13 +232,13 @@
 .o_terminal div#terminal_screen span:hover > .agent-stop {
   opacity: 1;
 }
-.o_terminal div#terminal_screen .agent-rerun {
+.o_terminal div#terminal_screen .agent-copy {
   opacity: 0;
   transition: opacity 0.15s;
   margin-left: 0.3em;
   cursor: pointer;
 }
-.o_terminal div#terminal_screen span:hover > .agent-rerun {
+.o_terminal div#terminal_screen span:hover > .agent-copy {
   opacity: 1;
 }
 
