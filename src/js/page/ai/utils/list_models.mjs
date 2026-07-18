@@ -16,6 +16,8 @@ export default async function listModels(
   signal: AbortSignal,
 ): Promise<Array<string>> {
   const isAnthropic = provider === 'anthropic';
+  const isGemini = provider === 'gemini';
+  const isCohere = provider === 'cohere';
   const headers: {[string]: string} = {'Content-Type': 'application/json'};
   if (isAnthropic) {
     headers['anthropic-version'] = '2023-06-01';
@@ -23,10 +25,16 @@ export default async function listModels(
     if (apiKey !== null && apiKey !== undefined) {
       headers['x-api-key'] = apiKey;
     }
+  } else if (isGemini) {
+    if (apiKey !== null && apiKey !== undefined) {
+      headers['x-goog-api-key'] = apiKey;
+    }
   } else if (apiKey !== null && apiKey !== undefined) {
     headers['Authorization'] = `Bearer ${apiKey}`;
   }
-  const endpoint = isAnthropic ? `${url}/v1/models` : `${url}/models`;
+  // Cohere's chat endpoint is v2 but its model listing is still served under v1, same as
+  // Anthropic's split versioning below.
+  const endpoint = isAnthropic || isCohere ? `${url}/v1/models` : `${url}/models`;
   const response = await backgroundFetch(endpoint, {method: 'GET', headers}, signal);
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
@@ -45,6 +53,22 @@ export default async function listModels(
     full += decoder.decode(value !== null && value !== undefined ? value : new Uint8Array(0), {stream: true});
   }
   const json = JSON.parse(full);
+  if (isGemini) {
+    const models = json.models || [];
+    return models
+      .filter((m) => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+      .map((m) => String(m.name || '').replace(/^models\//, ''))
+      .filter(Boolean)
+      .sort();
+  }
+  if (isCohere) {
+    const models = json.models || [];
+    return models
+      .filter((m) => Array.isArray(m.endpoints) && m.endpoints.includes('chat'))
+      .map((m) => String(m.name || ''))
+      .filter(Boolean)
+      .sort();
+  }
   const items = json.data || [];
   return items.map((m) => m.id).filter(Boolean).sort();
 }

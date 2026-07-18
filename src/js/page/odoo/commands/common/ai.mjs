@@ -109,7 +109,7 @@ export default function (): Partial<CMDDef> {
     callback: cmdAI,
     detail: i18n.t(
       'cmdAI.detail',
-      'Connect to an AI server (OpenAI-compatible or Anthropic API) and chat with it, translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively.',
+      'Connect to an AI server (OpenAI-compatible, Anthropic, Gemini or Cohere API) and chat with it, translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively. The openai provider is OpenAI-compatible, so it also covers Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI and similar servers via a custom URL.',
     ),
     args: [
       [
@@ -141,9 +141,9 @@ export default function (): Partial<CMDDef> {
         ARG.String,
         ['pr', 'provider'],
         false,
-        i18n.t('cmdAI.args.provider', 'AI provider: openai (default) or anthropic'),
+        i18n.t('cmdAI.args.provider', 'AI provider: openai (OpenAI-compatible, default), anthropic, gemini or cohere'),
         null,
-        ['openai', 'anthropic'],
+        ['openai', 'anthropic', 'gemini', 'cohere'],
       ],
       // chat / agent options
       [

@@ -11,6 +11,13 @@
         "toolFailedNoMessage": "Tool returned an error with no message"
       }
     },
+    "providers": {
+      "gemini": {
+        "error": {
+          "blocked": "Gemini blocked the response ({{reason}})"
+        }
+      }
+    },
     "utils": {
       "network": {
         "error": {
@@ -134,7 +141,7 @@
       "model": "Model name to use",
       "operation": "operation: connect, chat, agent, attach or stop",
       "prompt": "The prompt or natural language request to send",
-      "provider": "AI provider: openai (default) or anthropic",
+      "provider": "Proveedor de IA: openai (compatible con OpenAI, por defecto), anthropic, gemini o cohere",
       "timeout": "Max seconds to wait for a response (0 = no limit)",
       "url": "AI server URL (e.g. http://localhost:8080/v1)"
     },
@@ -167,7 +174,7 @@
       }
     },
     "definition": "AI assistant (connect, chat & agent)",
-    "detail": "Connect to an AI server (OpenAI-compatible or Anthropic API) and chat with it, translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively.",
+    "detail": "Conéctate a un servidor de IA (API compatible con OpenAI, Anthropic, Gemini o Cohere) para chatear con él, traducir lenguaje natural a comandos de terminal, o ejecutar un agente autónomo que ejecuta comandos de forma iterativa. El proveedor openai es compatible con OpenAI, por lo que también cubre Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI y servidores similares mediante una URL personalizada.",
     "error": {
       "noSubcommand": "Usage: ai connect|chat|agent|stop ...",
       "unknownOperation": "Unknown operation: {{sub}}",

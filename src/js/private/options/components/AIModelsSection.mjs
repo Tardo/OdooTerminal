@@ -11,6 +11,8 @@ import {hasHostPermission, requestHostPermission} from '@shared/host_permissions
 const PROVIDER_DEFAULT_URLS: {[string]: string} = {
   openai: 'https://api.openai.com/v1',
   anthropic: 'https://api.anthropic.com',
+  gemini: 'https://generativelanguage.googleapis.com/v1beta',
+  cohere: 'https://api.cohere.com',
 };
 
 export default function AIModelsSection({settings, mutate}: any) {
@@ -162,8 +164,10 @@ export default function AIModelsSection({settings, mutate}: any) {
         h(Col, {flex: '1 1 140px'},
           h(Field, {label: t('optionsTitleAIModelsProvider', 'Provider')},
             h(Select, {value: newProvider, 'onUpdate:value': onProviderChange, style: {width: '100%'}},
-              h(SelectOption, {value: 'openai'}, 'OpenAI'),
-              h(SelectOption, {value: 'anthropic'}, 'Anthropic')))),
+              h(SelectOption, {value: 'openai'}, 'OpenAI-compatible'),
+              h(SelectOption, {value: 'anthropic'}, 'Anthropic'),
+              h(SelectOption, {value: 'gemini'}, 'Gemini'),
+              h(SelectOption, {value: 'cohere'}, 'Cohere')))),
         h(Col, {flex: '1 1 200px'},
           h(Field, {label: 'URL'},
             h(Input, {value: newUrl, 'onUpdate:value': (v: string) => setNewUrl(v), placeholder: 'https://api.openai.com/v1'}))),

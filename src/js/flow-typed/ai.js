@@ -20,6 +20,8 @@ declare type AIToolCall = {
   id: string,
   name: string,
   input: {[string]: mixed},
+  // Gemini-only: echoed back verbatim on the next turn's functionCall part. See gemini.mjs.
+  thoughtSignature?: ?string,
 };
 
 declare type AIToolDef = {
@@ -36,7 +38,7 @@ declare type AIAttachment = {
 
 declare type AIContentBlock =
   | {type: 'text', text: string, cache_control?: {type: 'ephemeral'}}
-  | {type: 'tool_use', id: string, name: string, input: {[string]: mixed}}
+  | {type: 'tool_use', id: string, name: string, input: {[string]: mixed}, thoughtSignature?: ?string}
   | {type: 'tool_result', tool_use_id: string, content: string, cache_control?: {type: 'ephemeral'}}
   | {type: 'image', source: {type: 'base64', media_type: string, data: string}, cache_control?: {type: 'ephemeral'}}
   | {type: 'document', source: {type: 'base64', media_type: string, data: string}, cache_control?: {type: 'ephemeral'}};

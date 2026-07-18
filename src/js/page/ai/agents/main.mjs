@@ -64,7 +64,7 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     '# ODOO ATTACHMENTS — get_attachment\n' +
     '1. Discover: `search -m ir.attachment -d [["res_model","=","<model>"],["res_id","=",<id>]] -f id,name,mimetype`\n' +
     '2. Exactly ONE match → call `get_attachment` with its id. MULTIPLE → list them (id, name, type) as your final answer and wait for the user to choose (never auto-pick). NONE → tell the user and stop.\n' +
-    'PDFs/images are injected as readable content (Anthropic only); text files decode inline; other formats unsupported.\n' +
+    'PDFs/images are injected as readable content (Anthropic and Gemini only); text files decode inline; other formats unsupported.\n' +
     '\n' +
     '# form -o highlight — HARD PREREQUISITE (NON-NEGOTIABLE)\n' +
     'It reads the form view currently rendered in the browser: without an OPEN FORM it ALWAYS fails (a list view is NOT enough). Mandatory sequence — always two separate run_command calls, never combined:\n' +

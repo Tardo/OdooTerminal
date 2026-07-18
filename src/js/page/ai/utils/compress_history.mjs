@@ -2,7 +2,13 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {ANTHROPIC_CONTEXT_LIMIT_TOKENS, OPENAI_CONTEXT_LIMIT_TOKENS, COMPRESS_KEEP_ROUNDS} from '@ai/constants';
+import {
+  ANTHROPIC_CONTEXT_LIMIT_TOKENS,
+  OPENAI_CONTEXT_LIMIT_TOKENS,
+  GEMINI_CONTEXT_LIMIT_TOKENS,
+  COHERE_CONTEXT_LIMIT_TOKENS,
+  COMPRESS_KEEP_ROUNDS,
+} from '@ai/constants';
 
 
 // Returns the true context size in tokens for the last request, accounting for
@@ -20,9 +26,17 @@ export function computeContextSize(usage: TokenUsage, provider: ?string): number
   return usage.prompt_tokens;
 }
 
+const CONTEXT_LIMIT_TOKENS_BY_PROVIDER: {[string]: number} = {
+  anthropic: ANTHROPIC_CONTEXT_LIMIT_TOKENS,
+  gemini: GEMINI_CONTEXT_LIMIT_TOKENS,
+  cohere: COHERE_CONTEXT_LIMIT_TOKENS,
+};
+
 export function shouldCompress(contextSize: number, provider: ?string): boolean {
   const limit =
-    provider === 'anthropic' ? ANTHROPIC_CONTEXT_LIMIT_TOKENS : OPENAI_CONTEXT_LIMIT_TOKENS;
+    provider !== null && provider !== undefined && CONTEXT_LIMIT_TOKENS_BY_PROVIDER[provider] !== undefined
+      ? CONTEXT_LIMIT_TOKENS_BY_PROVIDER[provider]
+      : OPENAI_CONTEXT_LIMIT_TOKENS;
   return contextSize >= limit;
 }
 

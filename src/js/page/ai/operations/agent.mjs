@@ -90,7 +90,7 @@ const AGENT_TOOLS: Array<AIToolDef> = [
     name: 'get_attachment',
     description:
       'Fetch a binary attachment from Odoo (ir.attachment) by id and inject its content into the conversation for reading. ' +
-      'PDFs/images are injected directly (Anthropic provider only); text files are decoded inline; other formats return a description. ' +
+      'PDFs/images are injected directly (Anthropic and Gemini providers only); text files are decoded inline; other formats return a description. ' +
       'Follow the ODOO ATTACHMENTS system-prompt workflow: discover ids with run_command first; if multiple match, list them and wait for the user — do NOT auto-pick.',
     parameters: {
       type: 'object',
@@ -390,7 +390,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       assistantContent.push({type: 'text', text});
     }
     for (const tc of toolCalls) {
-      assistantContent.push({type: 'tool_use', id: tc.id, name: tc.name, input: tc.input});
+      assistantContent.push({type: 'tool_use', id: tc.id, name: tc.name, input: tc.input, thoughtSignature: tc.thoughtSignature});
     }
     messages.push({role: 'assistant', content: assistantContent});
 
@@ -572,10 +572,10 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
               const data = String(rec.datas || '');
               if (!data) {
                 toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Attachment "${attName}" has no binary data.`});
-              } else if (aiState.provider === 'anthropic' && mimetype === 'application/pdf') {
+              } else if ((aiState.provider === 'anthropic' || aiState.provider === 'gemini') && mimetype === 'application/pdf') {
                 toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Fetched PDF "${attName}" (id=${attachId}). The document follows — read it to complete the task.`});
                 siblingDocBlocks.push({type: 'document', source: {type: 'base64', media_type: mimetype, data}});
-              } else if (aiState.provider === 'anthropic' && mimetype.startsWith('image/')) {
+              } else if ((aiState.provider === 'anthropic' || aiState.provider === 'gemini') && mimetype.startsWith('image/')) {
                 toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: `Fetched image "${attName}" (id=${attachId}). The image follows.`});
                 siblingDocBlocks.push({type: 'image', source: {type: 'base64', media_type: mimetype, data}});
               } else if (mimetype.startsWith('text/')) {
@@ -591,7 +591,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
                 toolResults.push({
                   type: 'tool_result',
                   tool_use_id: tc.id,
-                  content: `Attachment "${attName}" (${mimetype}) — binary content cannot be read inline. For PDFs and images, use the Anthropic provider.`,
+                  content: `Attachment "${attName}" (${mimetype}) — binary content cannot be read inline. For PDFs and images, use the Anthropic or Gemini provider.`,
                 });
               }
             }

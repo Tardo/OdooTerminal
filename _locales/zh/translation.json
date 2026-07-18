@@ -11,6 +11,13 @@
         "toolFailedNoMessage": "Tool returned an error with no message"
       }
     },
+    "providers": {
+      "gemini": {
+        "error": {
+          "blocked": "Gemini blocked the response ({{reason}})"
+        }
+      }
+    },
     "utils": {
       "network": {
         "error": {
@@ -134,7 +141,7 @@
       "model": "使用的模型名称",
       "operation": "操作：connect、chat 或 exec",
       "prompt": "要发送的提示词或自然语言请求",
-      "provider": "AI 提供商：openai（默认）或 anthropic",
+      "provider": "AI 提供商：openai（兼容 OpenAI，默认）、anthropic、gemini 或 cohere",
       "timeout": "等待响应的最大秒数（0 = 无限制）",
       "url": "AI 服务器 URL（例如 http://localhost:8080/v1）"
     },
@@ -167,7 +174,7 @@
       }
     },
     "definition": "AI 助手（connect、chat 和 exec）",
-    "detail": "连接到 AI 服务器（兼容 OpenAI 的 API）进行对话或将自然语言转换为终端命令。",
+    "detail": "连接到 AI 服务器（兼容 OpenAI、Anthropic、Gemini 或 Cohere 的 API）进行对话、将自然语言转换为终端命令，或运行能够迭代执行命令的自主 Agent。openai 提供商兼容 OpenAI，因此通过自定义 URL 也可用于 Groq、Mistral、DeepSeek、Ollama、OpenRouter、xAI 等类似服务器。",
     "error": {
       "noSubcommand": "用法：ai connect|chat|exec|stop ...",
       "unknownOperation": "未知操作：{{sub}}",
