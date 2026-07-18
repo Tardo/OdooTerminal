@@ -123,9 +123,7 @@
         "unknown": "技能未找到：{{name}}。可用技能：{{list}}"
       },
       "unsafe": {
-        "question": "[Agent] 不安全命令：{{cmd}} — 执行？",
-        "questionWithReason": "[Agent] {{reason}} — 不安全命令：{{cmd}} — 执行？",
-        "rejected": "命令被用户拒绝：{{cmd}}"
+        "question": "[Agent] 不安全命令：{{cmd}} — 执行？"
       }
     },
     "args": {
@@ -1840,7 +1838,8 @@
       "func": {
         "definition": "内部函数",
         "detail": "内部函数"
-      }
+      },
+      "unsafeRejected": "Command '{{cmd}}' rejected by user"
     }
   },
   "utilInjectResource": {

@@ -234,6 +234,25 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
   // the same conversation via Terminal — see getMCPConfirmedServers), not on every tool call.
   const confirmedMCPServers: Set<string> = this.getMCPConfirmedServers();
 
+  // Unsafe-command confirmation for agent-driven execution. The guard runs at the
+  // real invocation point (VMachine.#invokeFunction), so it can't be bypassed by
+  // hiding an unsafe command in a loop body, nested call, or assignment — unlike
+  // static parsing of the command string. Confirmed once per command name per
+  // task, so a loop over one unsafe command prompts a single time.
+  const confirmedUnsafe: Set<string> = new Set();
+  const unsafeCmdGuard = async (cmdName: string): Promise<boolean> => {
+    if (confirmedUnsafe.has(cmdName)) {
+      return true;
+    }
+    const question = i18n.t('cmdAI.agent.unsafe.question', '[Agent] Unsafe command: {{cmd}} — Execute?', {cmd: cmdName});
+    const answer = await ctx.screen.showQuestion(question, ['y', 'n'], 'n');
+    if (answer?.toLowerCase() === 'y') {
+      confirmedUnsafe.add(cmdName);
+      return true;
+    }
+    return false;
+  };
+
   const messages: Array<AIMessage> = [
     {
       role: 'system',
@@ -434,25 +453,6 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
           );
         }
 
-        const registeredCmds = this.getShell().getVM().getRegisteredCmds();
-        const isUnsafe = cmd.split(';').map(part => part.trim().split(/\s+/)[0]).filter(Boolean)
-          .some(name => registeredCmds[name]?.unsafe);
-
-        if (isUnsafe) {
-          const question = reason
-            ? i18n.t('cmdAI.agent.unsafe.questionWithReason', '[Agent] {{reason}} — Unsafe command: {{cmd}} — Execute?', {reason, cmd})
-            : i18n.t('cmdAI.agent.unsafe.question', '[Agent] Unsafe command: {{cmd}} — Execute?', {cmd});
-          const answer = await ctx.screen.showQuestion(question, ['y', 'n'], 'n');
-          if (answer?.toLowerCase() !== 'y') {
-            toolResults.push({
-              type: 'tool_result',
-              tool_use_id: tc.id,
-              content: i18n.t('cmdAI.agent.unsafe.rejected', 'Command rejected by user: {{cmd}}', {cmd}),
-            });
-            continue;
-          }
-        }
-
         const safeCmd = encodeHTML(cmd);
         ctx.screen.print(
           i18n.t('cmdAI.agent.result.running', '[Agent] Running: <code>{{cmd}}</code>', {cmd}) +
@@ -462,6 +462,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
 
         let outputStr = '';
         let cmdFailed = false;
+        this.setUnsafeCmdGuard(unsafeCmdGuard);
         try {
           // $FlowFixMe[incompatible-type]
           const result: mixed = await this.executeAll(cmd, false, true, false, false);
@@ -478,6 +479,8 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         } catch (err) {
           cmdFailed = true;
           outputStr = describeCommandError(err);
+        } finally {
+          this.clearUnsafeCmdGuard();
         }
 
         cmdExecutedCount++;

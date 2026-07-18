@@ -41,6 +41,9 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('funcFetch.definition', 'HTTP requests'),
     callback: funcFetch,
+    // Arbitrary outbound HTTP from the page context (data exfiltration / SSRF).
+    // Gate it behind confirmation when driven by the AI agent.
+    unsafe: true,
     type: FUNCTION_TYPE.Internal,
     detail: i18n.t('funcFetch.detail', 'Interface for making HTTP requests and processing the responses.'),
     args: [

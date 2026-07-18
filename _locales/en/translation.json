@@ -123,9 +123,7 @@
         "unknown": "Skill not found: {{name}}. Available: {{list}}"
       },
       "unsafe": {
-        "question": "[Agent] Unsafe command: {{cmd}} — Execute?",
-        "questionWithReason": "[Agent] {{reason}} — Unsafe command: {{cmd}} — Execute?",
-        "rejected": "Command rejected by user: {{cmd}}"
+        "question": "[Agent] Unsafe command: {{cmd}} — Execute?"
       }
     },
     "args": {
@@ -1840,7 +1838,8 @@
       "func": {
         "definition": "Internal function",
         "detail": "Internal function"
-      }
+      },
+      "unsafeRejected": "Command '{{cmd}}' rejected by user"
     }
   },
   "utilInjectResource": {

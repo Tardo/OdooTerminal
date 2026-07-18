@@ -33,6 +33,11 @@ export type ProcessCommandJobOptions = {
 export type ProcessCommandJobCallback = (options: ProcessCommandJobOptions, silect: boolean) => Promise<mixed>;
 export type VMachineOptions = {
   processCommandJob: ProcessCommandJobCallback,
+  // Asked to confirm before an `unsafe` command/function actually runs. Returns
+  // false to reject (execution aborts). Wired from the Terminal via the Shell;
+  // only the AI agent installs a real guard — manual/init execution passes
+  // through unconditionally.
+  confirmUnsafe?: (cmdName: string, cmdRaw: string) => Promise<boolean>,
   silent: boolean,
 };
 
@@ -172,6 +177,18 @@ export default class VMachine {
   }
 
   async #invokeFunction(opts: EvalOptions, frame: Frame, name: string, cmd_def: CMDDef, parse_info: ParseInfo, silent: boolean): Promise<mixed> {
+    // Execution-time safety gate. This is the single chokepoint every command
+    // AND Internal function (e.g. `fetch`) passes through, so gating an `unsafe`
+    // command here is robust by construction — it can't be smuggled past by
+    // hiding it in a loop body, a nested call, or an assignment. The guard (set
+    // only by the AI agent) confirms once per command per run, so a loop over an
+    // unsafe command prompts a single time.
+    if (cmd_def?.unsafe === true && this.options.confirmUnsafe) {
+      const approved = await this.options.confirmUnsafe(name, parse_info.inputRawString);
+      if (!approved) {
+        throw new Error(i18n.t('trash.vmachine.unsafeRejected', "Command '{{cmd}}' rejected by user", {cmd: name}));
+      }
+    }
     let kwargs: {[string]: mixed} = {};
     if (typeof cmd_def !== 'undefined') {
       kwargs = await this.#genKwargs(opts, frame, name, cmd_def);

@@ -129,6 +129,11 @@ export default class Terminal {
   #assistantOptionsTrailingPending: boolean = false;
 
   #isAIMode: boolean = false;
+  // Installed by the AI agent for the duration of a run so unsafe commands are
+  // confirmed at their real invocation point (see Shell/VMachine wiring). Null
+  // for manual/init execution, which runs unsafe commands without prompting
+  // (the user typing them is the confirmation).
+  #unsafeCmdGuard: ?(cmdName: string, cmdRaw: string) => Promise<boolean> = null;
   #activeConvId: string | null = null;
   // MCP server usage is confirmed once per conversation, not once per agent step/invocation
   // (a conversation spans several 'ai agent' calls via initial_messages) — keyed by conversation
@@ -151,6 +156,7 @@ export default class Terminal {
     this.#boundDisableModalFocusTrap = this.#disableModalFocusTrap.bind(this);
     this.#shell = new Shell({
       invokeExternalCommand: meta => this.#invokeExternalCommand(meta),
+      confirmUnsafe: (name, raw) => (this.#unsafeCmdGuard ? this.#unsafeCmdGuard(name, raw) : Promise.resolve(true)),
       onStartCommand: () => this.#updateJobsInfo(),
       onTimeoutCommand: () => this.#updateJobsInfo(),
       onFinishCommand: () => this.#updateJobsInfo(),
@@ -433,6 +439,16 @@ export default class Terminal {
   /* BASIC FUNCTIONS */
   getShell(): Shell {
     return this.#shell;
+  }
+
+  // Install/remove the confirmation gate used for `unsafe` commands while the AI
+  // agent drives execution. See #unsafeCmdGuard and the Shell/VMachine wiring.
+  setUnsafeCmdGuard(fn: (cmdName: string, cmdRaw: string) => Promise<boolean>) {
+    this.#unsafeCmdGuard = fn;
+  }
+
+  clearUnsafeCmdGuard() {
+    this.#unsafeCmdGuard = null;
   }
 
   getConfig(): TerminalOptions {

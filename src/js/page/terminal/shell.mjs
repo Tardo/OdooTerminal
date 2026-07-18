@@ -15,6 +15,7 @@ export type ShellCMDCallback = (job_info: JobInfo) => void;
 
 export type ShellOptions = {
   invokeExternalCommand: ShellInvokeExternalCallback,
+  confirmUnsafe?: (cmdName: string, cmdRaw: string) => Promise<boolean>,
   commandTimeout?: number,
   onStartCommand?: ShellCMDCallback,
   onTimeoutCommand?: ShellCMDCallback,
@@ -50,6 +51,8 @@ export default class Shell {
     this.#interpreter = new Interpreter();
     this.#virtMachine = new VMachine({
       processCommandJob: (cmdInfo, silent) => this.#processCommandJob(cmdInfo, silent),
+      confirmUnsafe: (name, raw) =>
+        this.#options.confirmUnsafe ? this.#options.confirmUnsafe(name, raw) : Promise.resolve(true),
       silent: false,
     });
   }

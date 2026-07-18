@@ -16,6 +16,9 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdLoad.definition', 'Load external resource'),
     callback: cmdLoadResource,
+    // Injects arbitrary remote JS/CSS into the authenticated Odoo page (RCE).
+    // Must require confirmation before the AI agent can run it autonomously.
+    unsafe: true,
     detail: i18n.t('cmdLoad.detail', 'Load external source (javascript & css)'),
     args: [
       [ARG.String, ['u', 'url'], true, i18n.t('cmdLoad.args.url', 'The URL of the asset')],
