@@ -4,11 +4,37 @@
 
 import isEmpty from '@trash/utils/is_empty';
 import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
-import {INSTRUCTION_TYPE, KEYMAP, LEXER} from '@trash/constants';
-import difference from '@trash/utils/difference';
+import {INSTRUCTION_TYPE, LEXER} from '@trash/constants';
 import type {CMDDef, ArgInfo, ParseInfo} from '@trash/interpreter';
 import type Shell from '@terminal/shell';
 import type Terminal from '@terminal/terminal';
+
+// Optimal String Alignment distance (Damerau-Levenshtein restricted to one adjacent
+// transposition, still O(n*m)): catches common single-swap typos ("serach" -> "search",
+// distance 1) that plain Levenshtein scores as 2 substitutions instead, without the extra
+// alphabet-indexed pass full unrestricted Damerau-Levenshtein needs for this small catalog.
+function osaDistance(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  const d: Array<Array<number>> = [];
+  for (let i = 0; i <= m; ++i) {
+    d.push(new Array<number>(n + 1).fill(0));
+    d[i][0] = i;
+  }
+  for (let j = 0; j <= n; ++j) {
+    d[0][j] = j;
+  }
+  for (let i = 1; i <= m; ++i) {
+    for (let j = 1; j <= n; ++j) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+  }
+  return d[m][n];
+}
 
 export type CMDAssistantOption = {
   name?: string,
@@ -376,91 +402,36 @@ export default class CommandAssistant {
     return ret;
   }
 
-   // Key Distance Comparison (Simple mode)
-  // Comparison by distance between keys.
-  //
-  // This mode of analysis limit it to qwerty layouts
-  // but can predict words with a better accuracy.
-  // Example Case:
-  //   - Two commands: horse, house
-  //   - User input: hoese
-  //
-  //   - Output using simple comparison: horse and house (both have the
-  //     same weight)
-  //   - Output using KDC: horse
+  // Suggests the closest registered command for a typo or an invented/hallucinated name.
+  // Length-normalized OSA distance (ratio = edits / longer-word-length), threshold empirically
+  // tuned against this catalog: <= 0.3 catches real typos (substitution/insertion/deletion/
+  // adjacent-swap) while rejecting names that merely share a few letters with something
+  // registered (e.g. "delete" is NOT close to "unlink" or "clear" under this metric) — replaced
+  // the previous keyboard-distance heuristic, whose SCORE_LIMIT was lenient enough to match
+  // any short input to *something*, which is unsafe to hand an LLM as a confident suggestion.
   searchSimiliarCommand(in_cmd: string): string | void {
     if (in_cmd.length < 3) {
       return undefined;
     }
-
-    // Only consider words with score lower than this limit
-    const SCORE_LIMIT = 50;
-    // Columns per Key and Rows per Key
-    const cpk = 10,
-      rpk = 3;
-    const max_dist = Math.sqrt(cpk + rpk);
-    const _get_key_dist = function (from: string, to: string) {
-      const _get_key_pos2d = function (key: string) {
-        const i = KEYMAP.indexOf(key);
-        if (i === -1) {
-          return [cpk, rpk];
-        }
-        return [i / cpk, i % rpk];
-      };
-
-      const from_pos = _get_key_pos2d(from);
-      const to_pos = _get_key_pos2d(to);
-      const x = (to_pos[0] - from_pos[0]) * (to_pos[0] - from_pos[0]);
-      const y = (to_pos[1] - from_pos[1]) * (to_pos[1] - from_pos[1]);
-      return Math.sqrt(x + y);
-    };
-
+    const MAX_RATIO = 0.3;
     const sanitized_in_cmd = in_cmd.toLowerCase();
     const sorted_cmd_keys = Object.keys(this.#shell.getVM().getRegisteredCmds()).sort();
-    const min_score = [0, ''];
-    const sorted_keys_len = sorted_cmd_keys.length;
-    for (let x = 0; x < sorted_keys_len; ++x) {
-      const cmd = sorted_cmd_keys[x];
-      // Analize typo's
-      const search_index = sanitized_in_cmd.search(cmd);
-      let cmd_score = 0;
-      if (search_index === -1) {
-        // Penalize word length diff
-        cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length) / 2 + max_dist;
-        // Analize letter key distances
-        for (let i = 0; i < sanitized_in_cmd.length; ++i) {
-          if (i < cmd.length) {
-            const score = _get_key_dist(sanitized_in_cmd.charAt(i), cmd.charAt(i));
-            if (score === 0) {
-              --cmd_score;
-            } else {
-              cmd_score += score;
-            }
-          } else {
-            break;
-          }
-        }
-        // Using all letters?
-        const cmd_vec = cmd.split('').map(k => k.charCodeAt(0));
-        const in_cmd_vec = sanitized_in_cmd.split('').map(k => k.charCodeAt(0));
-        if (difference(in_cmd_vec, cmd_vec).length === 0) {
-          cmd_score -= max_dist;
-        }
-      } else {
-        cmd_score = Math.abs(sanitized_in_cmd.length - cmd.length) / 2;
-      }
-
-      // Search lower score
-      // if zero = perfect match (this never should happens)
-      if (min_score[1] === '' || cmd_score < min_score[0]) {
-        min_score[0] = cmd_score;
-        min_score[1] = cmd;
-        if (min_score[0] === 0.0) {
+    let best_cmd: string | void;
+    let best_dist = Infinity;
+    for (const cmd of sorted_cmd_keys) {
+      const dist = osaDistance(sanitized_in_cmd, cmd);
+      if (dist < best_dist) {
+        best_dist = dist;
+        best_cmd = cmd;
+        if (best_dist === 0) {
           break;
         }
       }
     }
-
-    return min_score[0] < SCORE_LIMIT ? min_score[1] : undefined;
+    if (typeof best_cmd === 'undefined') {
+      return undefined;
+    }
+    const ratio = best_dist / Math.max(sanitized_in_cmd.length, best_cmd.length);
+    return ratio <= MAX_RATIO ? best_cmd : undefined;
   }
 }

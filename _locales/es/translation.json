@@ -1813,6 +1813,8 @@
       "reloadShell": "Recargar Shell"
     },
     "unknownCommand": "Comando desconocido '{{org_cmd}}' en {{start}}:{{end}}. ¿Quiso decir '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
+    "unknownCommandAgentHint": "Comando desconocido '{{org_cmd}}'. No es un comando registrado — consulte la lista de AVAILABLE COMMANDS ya proporcionada, o ejecute 'help --all' para listar todos los comandos.",
+    "unknownCommandSuggestion": "Comando desconocido '{{org_cmd}}'. ¿Quiso decir '{{cmd}}'? Si no, ejecute 'help --all' para listar todos los comandos.",
     "unregisteredUser": "Usuario sin registrar"
   },
   "trash": {

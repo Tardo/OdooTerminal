@@ -1813,6 +1813,8 @@
       "reloadShell": "重载 Shell"
     },
     "unknownCommand": "未知命令 '{{org_cmd}}'，位于 {{start}}:{{end}}。您是否想输入 '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'？",
+    "unknownCommandAgentHint": "未知命令 '{{org_cmd}}'。它不是已注册的命令 — 请查阅已提供的 AVAILABLE COMMANDS 列表，或运行 'help --all' 列出所有命令。",
+    "unknownCommandSuggestion": "未知命令 '{{org_cmd}}'。您是否想输入 '{{cmd}}'？如果不是，请运行 'help --all' 列出所有命令。",
     "unregisteredUser": "未注册用户"
   },
   "trash": {

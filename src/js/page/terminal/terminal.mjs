@@ -625,26 +625,44 @@ export default class Terminal {
         aliases: getStorageLocalItem('terminal_aliases', {}),
       }, isolated_frame);
     } catch (err) {
+      // Computed unconditionally (not just !silent) so silent runs (the AI agent) can also
+      // self-correct: err.data becomes a plain-text hint that describeCommandError() surfaces
+      // to the LLM — a specific "did you mean X" when searchSimiliarCommand is confident
+      // (length-normalized edit distance, see command_assistant.mjs), else a pointer back at
+      // the real catalog rather than a guess.
+      let similar_cmd;
+      if (err.constructor === UnknownCommandError) {
+        similar_cmd = this.#commandAssistant.searchSimiliarCommand(err.cmd_name);
+        err.data =
+          typeof similar_cmd !== 'undefined'
+            ? i18n.t(
+                'terminal.unknownCommandSuggestion',
+                "Unknown command '{{org_cmd}}'. Did you mean '{{cmd}}'? If not, run 'help --all' to list every command.",
+                {org_cmd: err.cmd_name, cmd: similar_cmd},
+              )
+            : i18n.t(
+                'terminal.unknownCommandAgentHint',
+                "Unknown command '{{org_cmd}}'. It is not a registered command — check the AVAILABLE COMMANDS list already provided, or run 'help --all' to list every command.",
+                {org_cmd: err.cmd_name},
+              );
+      }
       // Silent runs (the AI agent) already surface failures to the LLM via the thrown
       // error below — printing here would show it on screen as if a real user triggered
       // it, when it's an internal/background operation.
       if (!silent) {
         this.screen.printError(`${err.name}: ${err.message}`);
         let err_msg = err.data;
-        if (err.constructor === UnknownCommandError) {
-          const similar_cmd = this.#commandAssistant.searchSimiliarCommand(err.cmd_name);
-          if (typeof similar_cmd !== 'undefined') {
-            err_msg = i18n.t(
-              'terminal.unknownCommand',
-              "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
-              {
-                org_cmd: err.cmd_name,
-                start: err.start,
-                end: err.end,
-                cmd: similar_cmd,
-              },
-            );
-          }
+        if (err.constructor === UnknownCommandError && typeof similar_cmd !== 'undefined') {
+          err_msg = i18n.t(
+            'terminal.unknownCommand',
+            "Unknown command '{{org_cmd}}' at {{start}}:{{end}}. Did you mean '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
+            {
+              org_cmd: err.cmd_name,
+              start: err.start,
+              end: err.end,
+              cmd: similar_cmd,
+            },
+          );
         }
         this.screen.printError(err_msg, true);
       }
