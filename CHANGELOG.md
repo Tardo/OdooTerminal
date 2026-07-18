@@ -4,11 +4,15 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ---
 
-**13.3.0**
+**14.0.0**
 
 ```
 ADD: TraSH: Increment/decrement operators, prefix and postfix ($i++ / ++$i), usable in expressions with C-like semantics
 ADD: TraSH: for-in loops over arrays and strings (for ($item in $items) { ... })
+ADD: IA: MCP over HTTP
+ADD: Terminal toolbar button to change debug mode (thanks to @hjdhnx) (pr #152)
+ADD: Miscelanea options (show model, highlight words, limits, ...) (thanks to @hjdhnx) (pr #152)
+ADD: Chinese translations (thanks to @hjdhnx) (pr #152)
 
 IMP: TraSH: AST-based parser/codegen; replaces the token prioritizer and the linear parse walk
 IMP: TraSH: Correct short-circuit for chained && expressions
@@ -16,9 +20,11 @@ IMP: TraSH: Standard operator precedence in expressions mixing strings and math
 IMP: TraSH: Concat
 IMP: AI Mode: Prompt fixes (attachment discovery flags, model names, escapes, for-in rule)
 IMP: AI Mode: Send HTML format system prompt in chat mode
+IMP: Options Page (thanks to @hjdhnx) (pr #152)
 
 FIX: Command 'search': Short name for 'options'
 FIX: TraSH: 'fixed' function description
+FIX: Multi-line input (thanks to @hjdhnx) (pr #152)
 ```
 
 **13.2.0**
