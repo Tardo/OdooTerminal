@@ -1623,6 +1623,7 @@
   "optionsThemePresetTech": "Tech",
   "optionsTipAIModelsCapabilities": "Tip: Pick a model that supports tool use, vision, and extended thinking when selecting it in AI mode.",
   "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\", not \"ai chat\". The agent asks for permission once per server per conversation.",
+  "optionsTitleAI": "AI",
   "optionsTitleAICustomSkills": "AI Skills",
   "optionsTitleAICustomSkillsAdd": "Add",
   "optionsTitleAICustomSkillsContentLabel": "Content",

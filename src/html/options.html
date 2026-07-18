@@ -271,6 +271,7 @@
         resize: vertical;
         width: 100%;
       }
+      .ot-input,
       .ot-input-number {
         width: 100%;
       }
@@ -586,6 +587,44 @@
         color: #1677ff;
         border-left-color: #1677ff;
         font-weight: 500;
+      }
+
+      /* Tabs (category switcher inside a merged section) */
+      .ot-tabs-nav {
+        display: flex;
+        gap: 4px;
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 16px;
+      }
+      .ot-tabs-tab {
+        padding: 10px 16px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.65);
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        transition: all 0.2s;
+      }
+      .ot-tabs-tab:hover {
+        color: #1677ff;
+      }
+      .ot-tabs-tab.active {
+        color: #1677ff;
+        border-bottom-color: #1677ff;
+        font-weight: 500;
+      }
+      .ot-tabs-content .ot-card {
+        border: none;
+        box-shadow: none;
+        margin-bottom: 0;
+      }
+      .ot-tabs-content .ot-card-body {
+        padding: 0;
+      }
+      .ot-tabs-content .ot-card-head {
+        display: none;
       }
 
       /* Hints */

@@ -174,7 +174,11 @@ export default function AIModelsSection({settings, mutate}: any) {
           h(Field, {label: t('optionsTitleAIModelsAdd', 'Actions')},
             h('div', {class: 'ot-btn-row'},
               h(Button, {type: 'primary', onClick: addModel}, t('optionsTitleAIModelsAdd', 'Add')),
-              !newUrlGranted && h(Button, {onClick: () => grantAccess(newUrl)}, t('optionsTitleAIModelsGrant', 'Grant access'))))))),
+              h(Button, {
+                onClick: () => grantAccess(newUrl),
+                disabled: newUrlGranted,
+                style: newUrlGranted ? {visibility: 'hidden'} : undefined,
+              }, t('optionsTitleAIModelsGrant', 'Grant access'))))))),
     h('details', {class: 'ot-collapse', style: {marginBottom: '16px'}},
       h('summary', {class: 'ot-collapse-header'}, t('optionsTitleAIModelsAdvanced', 'Advanced options')),
       h('div', {class: 'ot-form ot-collapse-body'},

@@ -1623,6 +1623,7 @@
   "optionsThemePresetTech": "科技",
   "optionsTipAIModelsCapabilities": "提示：使用支持工具调用、视觉和扩展思考的模型。",
   "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\", not \"ai chat\". The agent asks for permission once per server per conversation.",
+  "optionsTitleAI": "AI",
   "optionsTitleAICustomSkills": "AI 技能",
   "optionsTitleAICustomSkillsAdd": "添加",
   "optionsTitleAICustomSkillsContentLabel": "内容",
