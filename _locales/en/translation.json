@@ -698,6 +698,7 @@
       "actionId": "Action ID: {{id}}",
       "breadcrumb": "Breadcrumb: {{path}}",
       "counts": "Elements — buttons: {{b}}, fields: {{f}}, tabs: {{t}}, statusbar states: {{s}}",
+      "modalOpen": "Modal open: <strong>{{title}}</strong> — other types now inspect the modal, not the background page",
       "model": "Model: <strong>{{model}}</strong>",
       "pageTitle": "Title: <em>{{title}}</em>",
       "recordId": "Record ID: <strong>{{id}}</strong>",

@@ -698,6 +698,7 @@
       "actionId": "动作 ID：{{id}}",
       "breadcrumb": "面包屑：{{path}}",
       "counts": "元素 — 按钮：{{b}}，字段：{{f}}，标签页：{{t}}，状态栏状态：{{s}}",
+      "modalOpen": "Modal open: <strong>{{title}}</strong> — other types now inspect the modal, not the background page",
       "model": "模型：<strong>{{model}}</strong>",
       "pageTitle": "标题：<em>{{title}}</em>",
       "recordId": "记录 ID：<strong>{{id}}</strong>",

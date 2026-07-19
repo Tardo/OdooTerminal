@@ -23,8 +23,16 @@ function getContentRoot(): Element | null {
   return document.body;
 }
 
+// Top-most active modal dialog, if one is open. Modals (Odoo 16+) render outside
+// .o_action_manager, so background-scoped queries never see their content.
+function getActiveDialogRoot(): Element | null {
+  // $FlowFixMe[prop-missing]
+  return document.querySelector('.o_dialog:not(.o_inactive_modal) .modal-dialog, .modal.show .modal-dialog');
+}
+
+// A modal captures all interaction, so every inspect type scopes to it when one is open.
 function requireContentRoot(ctx: CMDCallbackContext): Element | null {
-  const root = getContentRoot();
+  const root = getActiveDialogRoot() ?? getContentRoot();
   if (root === null) {
     ctx.screen.printError(i18n.t('cmdInspect.error.noRoot', 'Cannot find Odoo content area'));
   }
@@ -107,6 +115,8 @@ type PageInfo = {
   view_type: string | void,
   action_id: number | string | void,
   element_counts: {buttons: number, fields: number, tabs: number, statusbar: number},
+  modal_open: boolean,
+  modal_title: string,
 };
 
 function collectButtons(root: Element): Array<Element> {
@@ -284,9 +294,7 @@ function inspectViews(): $ReadOnlyArray<ViewInfo> {
 // Active dialog: title + its own buttons and Odoo field widgets.
 // When no dialog is open, returns null.
 function inspectDialog(): DialogInfo {
-  // Prefer the top-most non-inactive dialog
-  // $FlowFixMe[prop-missing]
-  const dialogEl = document.querySelector('.o_dialog:not(.o_inactive_modal) .modal-dialog, .modal.show .modal-dialog');
+  const dialogEl = getActiveDialogRoot();
   if (dialogEl === null || typeof dialogEl === 'undefined') {
     return null;
   }
@@ -377,6 +385,15 @@ function inspectPage(root: Element): PageInfo {
   let view_type: string | void;
   let action_id: number | string | void;
 
+  const dialogRoot = getActiveDialogRoot();
+  const modal_open = dialogRoot !== null;
+  let modal_title = '';
+  if (dialogRoot !== null) {
+    // $FlowFixMe[prop-missing]
+    const titleEl = dialogRoot.querySelector('.modal-title, .o_dialog_title');
+    modal_title = titleEl !== null && typeof titleEl !== 'undefined' ? (titleEl.textContent ?? '').trim() : '';
+  }
+
   const modal = getActiveModalInfo();
   if (modal !== null) {
     model = modal.model;
@@ -422,6 +439,8 @@ function inspectPage(root: Element): PageInfo {
     view_type,
     action_id,
     element_counts: {buttons, fields, tabs, statusbar},
+    modal_open,
+    modal_title,
   };
 }
 
@@ -475,6 +494,13 @@ async function cmdInspect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pro
     ctx.screen.print(i18n.t('cmdInspect.page.url', 'URL: {{url}}', {url: info.url}));
     if (info.breadcrumb.length > 0) {
       ctx.screen.print(i18n.t('cmdInspect.page.breadcrumb', 'Breadcrumb: {{path}}', {path: info.breadcrumb.join(' › ')}));
+    }
+    if (info.modal_open) {
+      ctx.screen.print(
+        i18n.t('cmdInspect.page.modalOpen', 'Modal open: <strong>{{title}}</strong> — other types now inspect the modal, not the background page', {
+          title: info.modal_title || '(no title)',
+        }),
+      );
     }
     if (typeof info.model === 'string') {
       ctx.screen.print(i18n.t('cmdInspect.page.model', 'Model: <strong>{{model}}</strong>', {model: info.model}));
@@ -752,8 +778,9 @@ export default function (): Partial<CMDDef> {
     detail: i18n.t(
       'cmdInspect.detail',
       'Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\n' +
+      'When a modal dialog is open, every type below scopes to it instead of the background page.\n' +
       'Types:\n' +
-      '  page (default) — context overview: model, record id, view type, action id, element counts\n' +
+      '  page (default) — context overview: model, record id, view type, action id, element counts, modal state\n' +
       '  button — all buttons with a ready-to-use "click" command\n' +
       '  field — Odoo form fields with a "form" command\n' +
       '  tab — notebook tabs with a "click" command\n' +
