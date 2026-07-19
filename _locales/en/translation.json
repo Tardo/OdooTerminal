@@ -139,9 +139,10 @@
       "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
       "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
       "model": "Model name to use",
-      "operation": "operation: connect, chat, agent, attach or stop",
+      "operation": "operation: connect, chat, agent, pet, attach or stop",
       "prompt": "The prompt or natural language request to send",
       "provider": "AI provider: openai (OpenAI-compatible, default), anthropic, gemini or cohere",
+      "reasoning": "Reasoning effort for \"thinking\" models (agent and pet): off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
       "timeout": "Max seconds to wait for a response (0 = no limit)",
       "url": "AI server URL (e.g. http://localhost:8080/v1)"
     },
@@ -174,11 +175,26 @@
       }
     },
     "definition": "AI assistant (connect, chat & agent)",
-    "detail": "Connect to an AI server (OpenAI-compatible, Anthropic, Gemini or Cohere API) and chat with it, translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively. The openai provider is OpenAI-compatible, so it also covers Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI and similar servers via a custom URL.",
+    "detail": "Connect to an AI server (OpenAI-compatible, Anthropic, Gemini or Cohere API) and chat with it, translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively. The openai provider is OpenAI-compatible, so it also covers Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI and similar servers via a custom URL.\n\"pet\" is an opt-in floating guardian that reacts on its own: every time it detects a save or an opened record, it automatically sends a one-shot, read-only consult (no run_command, cannot change anything) to the AI and peeks from the right edge with a short verdict. Since this fires constantly and can burn tokens fast, use a local model for it: \"ai pet -p on -m <local-model>\". \"-m\" alone (without -p) just changes the model without touching on/off. Clicking the pet never calls the AI — it opens the terminal, shows the last note, and lets you continue manually. If a \"thinking\" model shows nothing, set \"-r off\" (agent or pet) so it skips chain-of-thought instead of spending its reply budget on it.",
     "error": {
-      "noSubcommand": "Usage: ai connect|chat|agent|stop ...",
+      "noSubcommand": "Usage: ai connect|chat|agent|pet|attach|stop ...",
       "unknownOperation": "Unknown operation: {{sub}}",
-      "usage": "Usage: ai connect|chat|agent|attach|stop ..."
+      "usage": "Usage: ai connect|chat|agent|pet|attach|stop ..."
+    },
+    "pet": {
+      "model": {
+        "notSet": "(not set)"
+      },
+      "noProvider": "No dedicated provider is configured for the pet yet, so it has nothing to call. The pet never borrows the AI sidebar's active connection — open the extension's Options page → Guardian Pet and pick a provider + model there (add one under \"AI Providers\" first if you haven't). That choice is remembered per instance too, so this is a one-time step.",
+      "reasoning": {
+        "default": "default",
+        "hint": "Tip: if the pet sometimes shows nothing, your model may be spending its whole reply on internal reasoning before answering. Try \"ai pet -r off\" (or a non-thinking model for this slot)."
+      },
+      "status": {
+        "off": "Pet mode: off (model for when enabled: {{model}})",
+        "on": "Pet mode: on for this instance (saved locally — survives closing the browser, no need to redo this or reconnect next time). Model: {{model}}. Reasoning: {{reasoning}}."
+      },
+      "tokenWarning": "⚠ High token usage: the pet calls the AI automatically on EVERY save and every record you open, with no manual step in between. Only use this with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended."
     },
     "stop": {
       "noRequest": "No active AI request to stop."
@@ -1606,6 +1622,23 @@
   "optionsAIModelsGrantSuccess": "Access granted",
   "optionsAIModelsGrantedLabel": "Access granted",
   "optionsAIModelsLoadMissingURL": "Enter URL first",
+  "optionsAIPetDescription": "A floating guardian that reacts on its own to page activity (save/open) with a short, read-only AI verdict — it never runs commands or changes anything. This sets the default for every Odoo instance the extension runs on; each instance can still override the model locally with the \"ai pet\" terminal command.",
+  "optionsAIPetEnabled": "Enabled by default",
+  "optionsAIPetHint": "No local server configured yet? Add one under the \"AI Providers\" tab, then pick it here.",
+  "optionsAIPetManualHint": "Leave this off to keep it opt-in per instance: run \"ai pet -p on\" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with \"-m <model>\"). Turn it off again with \"ai pet -p off\".",
+  "optionsAIPetModel": "Default model",
+  "optionsAIPetModelsLoadError": "Could not load models",
+  "optionsAIPetNoModel": "-- Default model --",
+  "optionsAIPetNoProvider": "-- No provider --",
+  "optionsAIPetProvider": "Provider",
+  "optionsAIPetReasoning": "Reasoning",
+  "optionsAIPetReasoningDefault": "-- Default (no override) --",
+  "optionsAIPetReasoningHigh": "High",
+  "optionsAIPetReasoningHint": "If the pet sometimes shows nothing, your model may be a \"thinking\" model spending its whole reply on internal reasoning — try \"Off\". Only applies to OpenAI-compatible servers (local llama.cpp/vLLM/Ollama, etc.); can also be overridden per instance with \"ai pet -r <level>\".",
+  "optionsAIPetReasoningLow": "Low",
+  "optionsAIPetReasoningMedium": "Medium",
+  "optionsAIPetReasoningOff": "Off (skip chain-of-thought)",
+  "optionsAIPetTokenWarning": "⚠ High token usage: it calls the AI automatically on EVERY save and every record you open, with no manual step in between. Only use it with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended.",
   "optionsAISkillsAddRequired": "Name, Description and Content are required",
   "optionsLanguage": "Language",
   "optionsLanguageAuto": "Auto",
@@ -1658,6 +1691,7 @@
   "optionsTitleAIModelsRemove": "Remove provider?",
   "optionsTitleAIModelsRemoveConfirm": "Remove this AI provider connection?",
   "optionsTitleAIModelsTimeout": "Timeout (s)",
+  "optionsTitleAIPet": "Guardian Pet",
   "optionsTitleBehaviour": "Behaviour",
   "optionsTitleBehaviourDescription": "General settings: interface language and how the terminal window opens (pinned open, maximized, multi-line input).",
   "optionsTitleBehaviourElephant": "Resolve unknown values",
@@ -1768,6 +1802,13 @@
       "noModelsHint": "Configure AI providers in the extension options",
       "notConnected": "AI not connected. Use \"ai connect\" first.",
       "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.",
+      "reasoning": {
+        "default": "-- Reasoning --",
+        "high": "Reasoning: High",
+        "low": "Reasoning: Low",
+        "medium": "Reasoning: Medium",
+        "off": "Reasoning: Off"
+      },
       "sysprompt": {
         "label": "Custom instructions",
         "placeholder": "Extra instructions for the AI in this conversation..."
@@ -1805,11 +1846,16 @@
       }
     },
     "notLoaded": "Terminal not loaded",
+    "pet": {
+      "note": "🛡 <strong>{{label}}</strong> — {{text}}",
+      "tooltip": "OdooTerminal guardian — click to open and see the last note"
+    },
     "question": {
       "aborted": "Operation aborted"
     },
     "tooltip": {
       "aiMode": "AI Mode",
+      "aiReasoning": "Reasoning effort for \"thinking\" models (openai provider only). \"Off\" asks local OpenAI-compatible servers to skip chain-of-thought.",
       "aiTips": "AI tips",
       "attachFile": "Attach file",
       "customSystemPrompt": "Custom system prompt",

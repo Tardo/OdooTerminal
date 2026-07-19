@@ -142,6 +142,7 @@
       "operation": "操作：connect、chat 或 exec",
       "prompt": "要发送的提示词或自然语言请求",
       "provider": "AI 提供商：openai（兼容 OpenAI，默认）、anthropic、gemini 或 cohere",
+      "reasoning": "Reasoning effort for \"thinking\" models (agent and pet): off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
       "timeout": "等待响应的最大秒数（0 = 无限制）",
       "url": "AI 服务器 URL（例如 http://localhost:8080/v1）"
     },
@@ -179,6 +180,21 @@
       "noSubcommand": "用法：ai connect|chat|exec|stop ...",
       "unknownOperation": "未知操作：{{sub}}",
       "usage": "用法：ai connect|chat|exec|stop ..."
+    },
+    "pet": {
+      "model": {
+        "notSet": "(not set)"
+      },
+      "noProvider": "No AI provider is active right now, so the pet has nothing to call yet. Pick one from the provider dropdown in the AI sidebar (or add one in the extension's Options page → AI Providers) — that choice is remembered per instance too, so this is a one-time step.",
+      "reasoning": {
+        "default": "default",
+        "hint": "Tip: if the pet sometimes shows nothing, your model may be spending its whole reply on internal reasoning before answering. Try \"ai pet -r off\" (or a non-thinking model for this slot)."
+      },
+      "status": {
+        "off": "Pet mode: off (model for when enabled: {{model}})",
+        "on": "Pet mode: on. It reacts on every save/open with an automatic AI consult (model: {{model}}) — a local model is strongly recommended, since this can burn tokens fast on a cloud provider."
+      },
+      "tokenWarning": "⚠ High token usage: the pet calls the AI automatically on EVERY save and every record you open, with no manual step in between. Only use this with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended."
     },
     "stop": {
       "noRequest": "没有活跃的 AI 请求可停止。"
@@ -1606,6 +1622,23 @@
   "optionsAIModelsGrantSuccess": "授权成功",
   "optionsAIModelsGrantedLabel": "已授权",
   "optionsAIModelsLoadMissingURL": "请先输入 URL",
+  "optionsAIPetDescription": "A floating guardian that reacts on its own to page activity (save/open) with a short, read-only AI verdict — it never runs commands or changes anything. This sets the default for every Odoo instance the extension runs on; each instance can still override it locally with the \"ai pet\" terminal command.",
+  "optionsAIPetEnabled": "Enabled by default",
+  "optionsAIPetHint": "It fires on every save/open, so a cloud model can burn through tokens fast — a local server (Ollama, llama.cpp, etc.) set up as an AI provider is strongly recommended here.",
+  "optionsAIPetManualHint": "Leave this off to keep it opt-in per instance: run \"ai pet -p on\" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with \"-m <model>\"). Turn it off again with \"ai pet -p off\".",
+  "optionsAIPetModel": "Default model",
+  "optionsAIPetModelsLoadError": "Could not load models",
+  "optionsAIPetNoModel": "-- Default model --",
+  "optionsAIPetNoProvider": "-- No provider --",
+  "optionsAIPetProvider": "Provider",
+  "optionsAIPetReasoning": "Reasoning",
+  "optionsAIPetReasoningDefault": "-- Default (no override) --",
+  "optionsAIPetReasoningHigh": "High",
+  "optionsAIPetReasoningHint": "If the pet sometimes shows nothing, your model may be a \"thinking\" model spending its whole reply on internal reasoning — try \"Off\". Only applies to OpenAI-compatible servers (local llama.cpp/vLLM/Ollama, etc.); can also be overridden per instance with \"ai pet -r <level>\".",
+  "optionsAIPetReasoningLow": "Low",
+  "optionsAIPetReasoningMedium": "Medium",
+  "optionsAIPetReasoningOff": "Off (skip chain-of-thought)",
+  "optionsAIPetTokenWarning": "⚠ High token usage: it calls the AI automatically on EVERY save and every record you open, with no manual step in between. Only use it with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended.",
   "optionsAISkillsAddRequired": "名称、描述和内容为必填项",
   "optionsLanguage": "语言",
   "optionsLanguageAuto": "自动",
@@ -1658,6 +1691,7 @@
   "optionsTitleAIModelsRemove": "删除模型？",
   "optionsTitleAIModelsRemoveConfirm": "删除此 AI 模型配置？",
   "optionsTitleAIModelsTimeout": "超时（秒）",
+  "optionsTitleAIPet": "Guardian Pet",
   "optionsTitleBehaviour": "行为",
   "optionsTitleBehaviourDescription": "常规设置：界面语言，以及终端窗口的打开方式（固定显示、最大化、多行输入）。",
   "optionsTitleBehaviourElephant": "解析未知值",
@@ -1768,6 +1802,13 @@
       "noModelsHint": "请在扩展选项中配置 AI 模型",
       "notConnected": "AI 未连接。请先使用 \"ai connect\"。",
       "privacyWarning": "隐私提示：对话存储在浏览器存储中，任何有权访问此计算机的人都可以读取。",
+      "reasoning": {
+        "default": "-- Reasoning --",
+        "high": "Reasoning: High",
+        "low": "Reasoning: Low",
+        "medium": "Reasoning: Medium",
+        "off": "Reasoning: Off"
+      },
       "sysprompt": {
         "label": "自定义指令",
         "placeholder": "此对话中给 AI 的额外指令..."
@@ -1805,11 +1846,16 @@
       }
     },
     "notLoaded": "终端未加载",
+    "pet": {
+      "note": "🛡 <strong>{{label}}</strong> — {{text}}",
+      "tooltip": "OdooTerminal — click for a hint about what just happened"
+    },
     "question": {
       "aborted": "操作已中止"
     },
     "tooltip": {
       "aiMode": "AI 模式",
+      "aiReasoning": "Reasoning effort for \"thinking\" models (openai provider only). \"Off\" asks local OpenAI-compatible servers to skip chain-of-thought.",
       "aiTips": "AI 提示",
       "attachFile": "附加文件",
       "customSystemPrompt": "自定义系统提示词",

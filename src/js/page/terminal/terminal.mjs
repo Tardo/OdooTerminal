@@ -23,6 +23,10 @@ import renderTerminal from './templates/terminal';
 import renderAIConvItem from './templates/ai_conv_item';
 import renderBusyTooltip from './templates/busy_tooltip';
 import renderWelcome from './templates/welcome';
+import renderPet from './templates/pet';
+import {setPetStimulusHandler, setPetStimulusEnabled} from '@ai/pet/stimuli';
+import type {PetStimulus} from '@ai/pet/stimuli';
+import {runGuardianConsult} from '@ai/pet/consult';
 import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 import parseHTML from './utils/parse_html';
@@ -143,6 +147,7 @@ export default class Terminal {
   #aiConvList_el: HTMLElement | void;
   #aiProviderSelect_el: HTMLSelectElement | void;
   #aiModelSelect_el: HTMLSelectElement | void;
+  #aiReasoningSelect_el: HTMLSelectElement | void;
   #aiModelsLoadedProvider: string | null = null;
   #aiModelFetchController: AbortController | void;
   #aiHelpPopup_el: HTMLElement | void;
@@ -150,6 +155,17 @@ export default class Terminal {
   #aiSyspromptTextarea_el: HTMLTextAreaElement | void;
   #aiInputHistory: Array<string> = [];
   #pendingAttachments: Array<AIAttachment> = [];
+
+  // "Pet" mode: opt-in, off by default. Local heuristics (see @ai/pet/stimuli) decide when
+  // something happened; every stimulus fires a one-shot, tool-less guardian consult
+  // (see @ai/pet/consult) automatically — clicking the pet never calls the AI itself,
+  // it only opens the terminal to show the last note and hands off to the user.
+  #isPetMode: boolean = false;
+  #pet_el: HTMLElement | void;
+  #petDismissTimer: TimeoutID | null = null;
+  #lastPetStimulus: PetStimulus | null = null;
+  #lastPetText: string | null = null;
+  #petBusy: boolean = false;
 
   constructor() {
     // $FlowFixMe[method-unbinding]
@@ -216,6 +232,19 @@ export default class Terminal {
 
     this.#applyTheme();
 
+    // Local storage (not session): an "activate for this instance" preference should survive
+    // closing the browser, not just the tab — local storage is already origin-scoped, i.e.
+    // naturally per Odoo instance, same as terminal_ai_active_provider/terminal_pet_model below.
+    // Falls back to the extension-wide Options page default (#config.pet_enabled) the first
+    // time this instance is seen; once the user runs "ai pet" here, that explicit local choice
+    // wins from then on, same precedence as ai_models vs terminal_ai_active_provider.
+    const storedPetMode: mixed = getStorageLocalItem('terminal_pet_mode', null);
+    this.#isPetMode = storedPetMode === null ? Boolean(this.#config.pet_enabled) : Boolean(storedPetMode);
+    this.#pet_el?.classList.toggle('terminal-pet-active', this.#isPetMode);
+    // $FlowFixMe[method-unbinding]
+    setPetStimulusHandler(this.#onPetStimulus.bind(this));
+    setPetStimulusEnabled(this.#isPetMode);
+
     // $FlowFixMe[method-unbinding]
     window.addEventListener('message', this.#onWindowMessage.bind(this), false);
     // $FlowFixMe[method-unbinding]
@@ -274,6 +303,17 @@ export default class Terminal {
       this.#aiModelSelect_el = aiModelSelectEl;
       // $FlowFixMe[method-unbinding]
       aiModelSelectEl.addEventListener('change', this.#onChangeAIModel.bind(this));
+    }
+    const aiReasoningSelectEl = this.el.querySelector('#terminal_ai_reasoning_select');
+    if (aiReasoningSelectEl instanceof HTMLSelectElement) {
+      this.#aiReasoningSelect_el = aiReasoningSelectEl;
+      const storedReasoning: mixed = getStorageLocalItem('terminal_ai_reasoning', null);
+      if (typeof storedReasoning === 'string' && storedReasoning.length > 0) {
+        aiReasoningSelectEl.value = storedReasoning;
+      }
+      this.#applyAIReasoning(aiReasoningSelectEl.value);
+      // $FlowFixMe[method-unbinding]
+      aiReasoningSelectEl.addEventListener('change', this.#onChangeAIReasoning.bind(this));
     }
     const aiHelpPopupEl = this.el.querySelector('#terminal_ai_help_popup');
     if (aiHelpPopupEl instanceof HTMLElement) {
@@ -350,6 +390,19 @@ export default class Terminal {
       }
     } else if (existing_tooltip instanceof HTMLElement) {
       this.busyTooltip_el = existing_tooltip;
+    }
+    const existing_pet = document.getElementById('terminal_pet');
+    if (!existing_pet) {
+      const body = document.body;
+      if (body) {
+        const pet_el = parseHTML(renderPet());
+        body.append(pet_el);
+        this.#pet_el = pet_el;
+        // $FlowFixMe[method-unbinding]
+        pet_el.addEventListener('click', this.#onClickPet.bind(this));
+      }
+    } else if (existing_pet instanceof HTMLElement) {
+      this.#pet_el = existing_pet;
     }
   }
 
@@ -754,6 +807,95 @@ export default class Terminal {
 
   async getContext(extra_context: ?{[string]: mixed}): Promise<{[string]: mixed}> {
     return {...this.userContext, ...extra_context};
+  }
+
+  // Opt-in "pet" mode: force true/false to set explicitly, omit to toggle. Returns the new state.
+  togglePetMode(force?: boolean): boolean {
+    const next = typeof force === 'boolean' ? force : !this.#isPetMode;
+    this.#isPetMode = next;
+    setStorageLocalItem('terminal_pet_mode', next, err => this.screen.printError(err));
+    setPetStimulusEnabled(next);
+    this.#pet_el?.classList.toggle('terminal-pet-active', next);
+    if (!next) {
+      this.#hidePet();
+    }
+    return next;
+  }
+
+  isPetModeEnabled(): boolean {
+    return this.#isPetMode;
+  }
+
+  // Precedence: this instance's explicit choice (ai pet -m) > the Options page default
+  // (#config.pet_model). Deliberately does NOT fall back to aiState.model (the AI sidebar's
+  // active model) — the pet must stay fully independent of whatever's active for manual
+  // chat/agent use, see #resolvePetConnection.
+  getPetModel(): string {
+    const stored: mixed = getStorageLocalItem('terminal_pet_model', null);
+    if (typeof stored === 'string' && stored.length > 0) {
+      return stored;
+    }
+    if (typeof this.#config.pet_model === 'string' && this.#config.pet_model.length > 0) {
+      return this.#config.pet_model;
+    }
+    return '';
+  }
+
+  // Options → Guardian Pet lets the pet run its own dedicated provider (e.g. a local server),
+  // independent of whatever's active for manual chat — same reference-by-name convention as
+  // ai_models/terminal_ai_active_provider. Deliberately does NOT fall back to the currently
+  // active aiState connection when no dedicated provider is configured (or its saved name no
+  // longer matches an entry): the pet's messages must stay independent of the AI sidebar/agent
+  // mode, so "nothing dedicated configured" means "nothing to call" (null), not "borrow the
+  // agent connection". See hasPetConnection()/cmdAI.pet.noProvider for the user-facing warning.
+  #resolvePetConnection(): {url: string, apiKey: ?string, provider: ?string, maxTokens: ?number} | null {
+    const providerName = this.#config.pet_provider;
+    if (typeof providerName === 'string' && providerName.length > 0) {
+      const providers: Array<AIModelConfig> = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
+      const found = providers.find(p => p.name === providerName);
+      if (found) {
+        return {
+          url: found.url,
+          apiKey: found.api_key || null,
+          // 'openai' (streamRequest's own default), NOT null — a null provider here would fall
+          // through to aiState.provider in streamRequest(), silently re-coupling the pet to
+          // whatever's active in the AI sidebar. Only reachable for a hand-edited/imported entry
+          // with an empty provider field; the Options form always writes a non-empty one.
+          provider: found.provider || 'openai',
+          maxTokens: found.max_tokens > 0 ? found.max_tokens : null,
+        };
+      }
+    }
+    return null;
+  }
+
+  setPetModel(model: string) {
+    setStorageLocalItem('terminal_pet_model', model, err => this.screen.printError(err));
+  }
+
+  // Same precedence as getPetModel(): instance override (ai pet -r) > Options default
+  // (#config.pet_reasoning) > '' (no override sent — current/legacy behaviour, see consult.mjs).
+  getPetReasoning(): string {
+    const stored: mixed = getStorageLocalItem('terminal_pet_reasoning', null);
+    if (typeof stored === 'string' && stored.length > 0) {
+      return stored;
+    }
+    if (typeof this.#config.pet_reasoning === 'string' && this.#config.pet_reasoning.length > 0) {
+      return this.#config.pet_reasoning;
+    }
+    return '';
+  }
+
+  setPetReasoning(reasoning: string) {
+    setStorageLocalItem('terminal_pet_reasoning', reasoning, err => this.screen.printError(err));
+  }
+
+  // Whether the pet has anything to call right now — requires its OWN dedicated Options-page
+  // provider (Options → Guardian Pet); it never borrows the AI sidebar's active connection, see
+  // #resolvePetConnection. Used by `ai pet` to warn the user instead of silently enabling a
+  // guardian that will never actually fire.
+  hasPetConnection(): boolean {
+    return this.#resolvePetConnection() !== null;
   }
 
   /* PRIVATE METHODS*/
@@ -1507,6 +1649,21 @@ export default class Terminal {
     this.#applyAIModel(name);
   }
 
+  // openai-provider only (see providers/openai.mjs reasoningEffort) — harmless to leave set while
+  // on another provider, since streamRequest() only forwards it to the openai branch.
+  #applyAIReasoning(value: string) {
+    aiState.reasoning = value || null;
+  }
+
+  #onChangeAIReasoning(ev: Event) {
+    if (!(ev.target instanceof HTMLSelectElement)) {
+      return;
+    }
+    const value = ev.target.value;
+    setStorageLocalItem('terminal_ai_reasoning', value || null, err => this.screen.printError(err));
+    this.#applyAIReasoning(value);
+  }
+
   /* AI CONVERSATIONS */
   #getConversations(): Array<AIConversation> {
     return getStorageLocalItem('terminal_ai_conversations', []);
@@ -1583,6 +1740,80 @@ export default class Terminal {
     setStorageSessionItem('terminal_ai_mode', this.#isAIMode, err => this.screen.printError(err));
     this.#updateAIIdleEffect();
     this.screen.preventLostInputFocus();
+  }
+
+  // Reactive: every stimulus fires an automatic one-shot guardian consult (see @ai/pet/consult
+  // — plain chat, no tools, no run_command, so it can never touch the page while the user is
+  // working). The consult itself decides whether there's anything concrete/useful to say (it
+  // returns '' otherwise, see NOTHING_TOKEN) — so the pet stays fully invisible for the common
+  // case where nothing is wrong, instead of peeking out on every save/open just to say so.
+  // #petBusy is a correctness guard against overlapping requests racing each other, not a cost
+  // throttle — token cost is the user's call.
+  async #onPetStimulus(stim: PetStimulus) {
+    if (this.#petBusy) {
+      return;
+    }
+    const connection = this.#resolvePetConnection();
+    if (connection === null) {
+      return;
+    }
+    this.#petBusy = true;
+    try {
+      const reasoning = this.getPetReasoning();
+      const text = await runGuardianConsult(stim, connection, this.getPetModel(), 60, reasoning.length > 0 ? reasoning : null);
+      if (text.length === 0) {
+        return;
+      }
+      this.#lastPetStimulus = stim;
+      this.#lastPetText = text;
+      const bubble = this.#pet_el?.querySelector('.terminal-pet-bubble');
+      if (bubble) {
+        bubble.textContent = text;
+      }
+      this.#pet_el?.classList.add('terminal-pet-peek');
+      if (this.#petDismissTimer !== null) {
+        clearTimeout(this.#petDismissTimer);
+      }
+      this.#petDismissTimer = setTimeout(() => this.#hidePet(), 9000);
+    } catch (err) {
+      logger.error('pet', err);
+    } finally {
+      this.#petBusy = false;
+    }
+  }
+
+  #hidePet() {
+    this.#pet_el?.classList.remove('terminal-pet-peek');
+    if (this.#petDismissTimer !== null) {
+      clearTimeout(this.#petDismissTimer);
+      this.#petDismissTimer = null;
+    }
+  }
+
+  // Never calls the AI itself — it opens the terminal, surfaces the last guardian note as
+  // context, and hands off to the user for any follow-up (full agent capability, same as
+  // typing directly).
+  async #onClickPet() {
+    this.#hidePet();
+    await this.doShow();
+    if (!this.#isAIMode) {
+      const btn = this.el.querySelector('.terminal-screen-icon-ai-mode');
+      if (btn instanceof HTMLElement) {
+        btn.click();
+      }
+    }
+    if (this.#activeConvId === null) {
+      this.createAIConversation(i18n.t('terminal.ai.newConversation', 'New conversation'));
+    }
+    if (this.#lastPetText !== null && this.#lastPetStimulus !== null) {
+      this.screen.print(
+        i18n.t('terminal.pet.note', '🛡 <strong>{{label}}</strong> — {{text}}', {
+          label: this.#lastPetStimulus.label,
+          text: this.#lastPetText,
+        }),
+      );
+    }
+    this.screen.focus();
   }
 
   #onClickAIHelp() {

@@ -7,6 +7,8 @@ import getOdooRoot from '@odoo/utils/get_odoo_root';
 import getActiveModalInfo from '@odoo/utils/get_active_modal_info';
 import getUrlInfo from '@odoo/utils/get_url_info';
 import getFormRecord from '@odoo/utils/get_form_record';
+import getFieldWidgetsInfo from '@odoo/utils/get_field_widgets_info';
+import formatFieldValue from '@odoo/utils/format_field_value';
 import {ARG} from '@trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 
@@ -150,40 +152,7 @@ function inspectButtons(root: Element): $ReadOnlyArray<ButtonInfo> {
 }
 
 function inspectFields(root: Element): $ReadOnlyArray<FieldInfo> {
-  // $FlowFixMe[prop-missing]
-  const els: $ReadOnlyArray<Element> = Array.from(root.querySelectorAll('.o_field_widget[name]'));
-  const seenNames: Set<string> = new Set();
-  const result: Array<FieldInfo> = [];
-  for (const el of els) {
-    const name = el.getAttribute('name') ?? '';
-    if (name.length === 0 || seenNames.has(name)) {
-      continue;
-    }
-    seenNames.add(name);
-    const typeClass = Array.from(el.classList).find(c => c.startsWith('o_field_') && c !== 'o_field_widget') ?? '';
-    const ftype = typeClass.length > 0 ? typeClass.slice('o_field_'.length) : 'unknown';
-    const required = el.closest('.o_required_modifier') !== null || el.getAttribute('aria-required') === 'true';
-
-    let label = '';
-    // $FlowFixMe[prop-missing]
-    const labelEl = document.querySelector(`.o_form_label[for="${name}"], label[for="${name}"]`);
-    if (labelEl !== null && typeof labelEl !== 'undefined') {
-      label = (labelEl.textContent ?? '').trim();
-    }
-    if (label.length === 0) {
-      const row = el.closest('.o_wrap_field, tr');
-      if (row !== null && typeof row !== 'undefined') {
-        // $FlowFixMe[prop-missing]
-        const labelCell = row.querySelector('.o_form_label, .o_td_label label');
-        if (labelCell !== null && typeof labelCell !== 'undefined') {
-          label = (labelCell.textContent ?? '').trim();
-        }
-      }
-    }
-
-    result.push({name, label, type: ftype, required, form_cmd: `form -o get -f ${name}`});
-  }
-  return result;
+  return getFieldWidgetsInfo(root).map(f => ({...f, form_cmd: `form -o get -f ${f.name}`}));
 }
 
 function inspectTabs(root: Element): $ReadOnlyArray<TabInfo> {
@@ -345,32 +314,9 @@ async function inspectRecord(root: Element): Promise<$ReadOnlyArray<RecordFieldI
   if (adapter === null) {
     return [];
   }
-  const fieldNames: Array<string> = [];
-  const seen: Set<string> = new Set();
-  // $FlowFixMe[prop-missing]
-  root.querySelectorAll('.o_field_widget[name]').forEach(el => {
-    const name = el.getAttribute('name') ?? '';
-    if (name.length > 0 && !seen.has(name)) {
-      seen.add(name);
-      fieldNames.push(name);
-    }
-  });
+  const fieldNames = getFieldWidgetsInfo(root).map(f => f.name);
   const values = adapter.read(fieldNames);
-  return fieldNames.map(name => {
-    const raw = values[name];
-    let display: string;
-    if (raw === null || raw === undefined) {
-      display = '';
-    } else if (Array.isArray(raw) && raw.length === 2) {
-      // many2one: [id, display_name]
-      display = String(raw[1] ?? raw[0]);
-    } else if (typeof raw === 'object') {
-      display = JSON.stringify(raw);
-    } else {
-      display = String(raw);
-    }
-    return {name, value: display};
-  });
+  return fieldNames.map(name => ({name, value: formatFieldValue(values[name])}));
 }
 
 function inspectPage(root: Element): PageInfo {

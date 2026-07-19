@@ -45,6 +45,10 @@ export const SETTING_TYPES: {
   show_technical_model_min_version: SettingType,
   screen_buffer_size: SettingType,
   theme_preset: SettingType,
+  pet_enabled: SettingType,
+  pet_provider: SettingType,
+  pet_model: SettingType,
+  pet_reasoning: SettingType,
 } = {
   init_cmds: 'edit',
   term_context: 'json',
@@ -86,6 +90,10 @@ export const SETTING_TYPES: {
   show_technical_model_min_version: 'option',
   screen_buffer_size: 'int',
   theme_preset: 'option',
+  pet_enabled: 'check',
+  pet_provider: 'edit',
+  pet_model: 'edit',
+  pet_reasoning: 'edit',
 };
 
 export const SETTING_NAMES: $ReadOnlyArray<string> = Array.from(Object.keys(SETTING_TYPES));
@@ -131,6 +139,17 @@ export type ExtensionSettings = {
   show_technical_model_min_version: '17' | '18' | '19',
   screen_buffer_size: number,
   theme_preset: string,
+  // Extension-wide default for the "ai pet" guardian; each Odoo instance can still override
+  // it locally with `ai pet -p on|off -m <model>` (see terminal.mjs #isPetMode / getPetModel).
+  // pet_provider is the .name of an entry in ai_models — same reference-by-name convention as
+  // terminal_ai_active_provider — so the pet can run its own dedicated connection (e.g. a local
+  // server) independent of whichever provider is active for manual chat/agent use.
+  pet_enabled: boolean,
+  pet_provider: string,
+  pet_model: string,
+  // '' (no override), 'off', 'low', 'medium' or 'high' — see providers/openai.mjs
+  // reasoningEffort. Openai-provider only for now.
+  pet_reasoning: string,
 };
 
 export const SETTING_DEFAULTS: ExtensionSettings = {
@@ -174,6 +193,10 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   show_technical_model_min_version: '18',
   screen_buffer_size: 0,
   theme_preset: '',
+  pet_enabled: false,
+  pet_provider: '',
+  pet_model: '',
+  pet_reasoning: '',
 };
 
 // Effective screen line buffer used when 'screen_buffer_size' is unset/0 (see core/screen.mjs)

@@ -139,9 +139,10 @@
       "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
       "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
       "model": "Model name to use",
-      "operation": "operation: connect, chat, agent, attach or stop",
+      "operation": "operation: connect, chat, agent, pet, attach or stop",
       "prompt": "The prompt or natural language request to send",
       "provider": "Proveedor de IA: openai (compatible con OpenAI, por defecto), anthropic, gemini o cohere",
+      "reasoning": "Nivel de razonamiento para modelos \"pensantes\" (agent y pet): off, low, medium o high. 'off' pide a servidores locales compatibles con OpenAI (llama.cpp, vLLM, ...) que se salten el razonamiento interno — úsalo si un modelo no muestra salida porque gasta toda su respuesta pensando. Por ahora solo con el proveedor openai.",
       "timeout": "Max seconds to wait for a response (0 = no limit)",
       "url": "AI server URL (e.g. http://localhost:8080/v1)"
     },
@@ -174,11 +175,26 @@
       }
     },
     "definition": "AI assistant (connect, chat & agent)",
-    "detail": "Conéctate a un servidor de IA (API compatible con OpenAI, Anthropic, Gemini o Cohere) para chatear con él, traducir lenguaje natural a comandos de terminal, o ejecutar un agente autónomo que ejecuta comandos de forma iterativa. El proveedor openai es compatible con OpenAI, por lo que también cubre Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI y servidores similares mediante una URL personalizada.",
+    "detail": "Conéctate a un servidor de IA (API compatible con OpenAI, Anthropic, Gemini o Cohere) para chatear con él, traducir lenguaje natural a comandos de terminal, o ejecutar un agente autónomo que ejecuta comandos de forma iterativa. El proveedor openai es compatible con OpenAI, por lo que también cubre Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI y servidores similares mediante una URL personalizada.\n\"pet\" es un guardián flotente opcional que reacciona por su cuenta: cada vez que detecta un guardado o un registro abierto, envía automáticamente una consulta de un solo turno, solo lectura (sin run_command, no puede cambiar nada) a la IA y asoma por el borde derecho con un veredicto breve. Como esto se dispara constantemente y puede consumir tokens muy rápido, usa un modelo local para ello: \"ai pet -p on -m <modelo-local>\". \"-m\" solo (sin -p) cambia el modelo sin tocar el on/off. Hacer clic en la mascota nunca llama a la IA — abre el terminal, muestra la última nota, y te deja continuar manualmente. Si un modelo \"pensante\" no muestra nada, pon \"-r off\" (en agent o pet) para que se salte el razonamiento interno en vez de gastar en él toda su respuesta.",
     "error": {
-      "noSubcommand": "Usage: ai connect|chat|agent|stop ...",
+      "noSubcommand": "Usage: ai connect|chat|agent|pet|attach|stop ...",
       "unknownOperation": "Unknown operation: {{sub}}",
-      "usage": "Usage: ai connect|chat|agent|attach|stop ..."
+      "usage": "Usage: ai connect|chat|agent|pet|attach|stop ..."
+    },
+    "pet": {
+      "model": {
+        "notSet": "(sin configurar)"
+      },
+      "noProvider": "Todavía no hay un proveedor dedicado configurado para la mascota, así que no tiene a quién consultar. La mascota nunca toma prestada la conexión activa de la barra lateral de IA — abre la página de Opciones de la extensión → Guardian Pet y elige ahí un proveedor y un modelo (añade uno en \"Proveedores de IA\" primero si aún no lo has hecho). Esa elección también se recuerda por instancia, así que es un paso único.",
+      "reasoning": {
+        "default": "por defecto",
+        "hint": "Consejo: si la mascota a veces no muestra nada, puede que tu modelo esté gastando toda su respuesta en razonamiento interno antes de contestar. Prueba \"ai pet -r off\" (o un modelo no pensante para este puesto)."
+      },
+      "status": {
+        "off": "Modo mascota: desactivado (modelo cuando se active: {{model}})",
+        "on": "Modo mascota: activado para esta instancia (guardado localmente — sobrevive a cerrar el navegador, no hace falta repetir esto ni reconectar la próxima vez). Modelo: {{model}}. Razonamiento: {{reasoning}}."
+      },
+      "tokenWarning": "⚠ Alto consumo de tokens: la mascota llama a la IA automáticamente en CADA guardado y en cada registro que abras, sin ningún paso manual de por medio. Úsala solo con un modelo local (Ollama, llama.cpp, etc.) — NO se recomienda con un proveedor de pago en la nube, donde puede generar una factura considerable sin que te des cuenta."
     },
     "stop": {
       "noRequest": "No active AI request to stop."
@@ -1606,6 +1622,23 @@
   "optionsAIModelsGrantSuccess": "Acceso concedido",
   "optionsAIModelsGrantedLabel": "Acceso concedido",
   "optionsAIModelsLoadMissingURL": "Introduce la URL primero",
+  "optionsAIPetDescription": "Una mascota flotante que reacciona por su cuenta a la actividad de la página (guardar/abrir) con un veredicto breve de solo lectura de la IA — nunca ejecuta comandos ni cambia nada. Esto fija el valor por defecto para todas las instancias de Odoo en las que corra la extensión; cada instancia puede seguir anulando el modelo localmente con el comando de terminal \"ai pet\".",
+  "optionsAIPetEnabled": "Activada por defecto",
+  "optionsAIPetHint": "¿Aún no tienes un servidor local configurado? Añade uno en la pestaña \"Proveedores de IA\" y luego elígelo aquí.",
+  "optionsAIPetManualHint": "Déjalo desactivado para que sea opcional por instancia: ejecuta \"ai pet -p on\" en el terminal de cualquier instancia de Odoo para activarla solo ahí (usará el proveedor/modelo elegidos abajo, salvo que los sobrescribas con \"-m <modelo>\"). Desactívala de nuevo con \"ai pet -p off\".",
+  "optionsAIPetModel": "Modelo por defecto",
+  "optionsAIPetModelsLoadError": "No se pudieron cargar los modelos",
+  "optionsAIPetNoModel": "-- Modelo por defecto --",
+  "optionsAIPetNoProvider": "-- Sin proveedor --",
+  "optionsAIPetProvider": "Proveedor",
+  "optionsAIPetReasoning": "Razonamiento",
+  "optionsAIPetReasoningDefault": "-- Por defecto (sin forzar) --",
+  "optionsAIPetReasoningHigh": "Alto",
+  "optionsAIPetReasoningHint": "Si la mascota a veces no muestra nada, puede que tu modelo sea \"pensante\" y gaste toda su respuesta en razonamiento interno — prueba \"Off\". Solo aplica a servidores compatibles con OpenAI (llama.cpp/vLLM/Ollama locales, etc.); también se puede forzar por instancia con \"ai pet -r <nivel>\".",
+  "optionsAIPetReasoningLow": "Bajo",
+  "optionsAIPetReasoningMedium": "Medio",
+  "optionsAIPetReasoningOff": "Off (sin razonamiento)",
+  "optionsAIPetTokenWarning": "⚠ Alto consumo de tokens: llama a la IA automáticamente en CADA guardado y en cada registro que abras, sin ningún paso manual de por medio. Úsala solo con un modelo local (Ollama, llama.cpp, etc.) — NO se recomienda con un proveedor de pago en la nube, donde puede generar una factura considerable sin que te des cuenta.",
   "optionsAISkillsAddRequired": "Nombre, Descripción y Contenido son obligatorios",
   "optionsLanguage": "Idioma",
   "optionsLanguageAuto": "Automático",
@@ -1658,6 +1691,7 @@
   "optionsTitleAIModelsRemove": "¿Eliminar proveedor?",
   "optionsTitleAIModelsRemoveConfirm": "¿Eliminar esta conexión de proveedor de IA?",
   "optionsTitleAIModelsTimeout": "Tiempo de espera (s)",
+  "optionsTitleAIPet": "Mascota guardiana",
   "optionsTitleBehaviour": "Comportamiento",
   "optionsTitleBehaviourDescription": "Ajustes generales: idioma de la interfaz y cómo se abre la ventana del terminal (fijado, maximizado, entrada multilínea).",
   "optionsTitleBehaviourElephant": "Resolver valores desconocidos",
@@ -1768,6 +1802,13 @@
       "noModelsHint": "Configure AI providers in the extension options",
       "notConnected": "AI not connected. Use \"ai connect\" first.",
       "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.",
+      "reasoning": {
+        "default": "-- Razonamiento --",
+        "high": "Razonamiento: Alto",
+        "low": "Razonamiento: Bajo",
+        "medium": "Razonamiento: Medio",
+        "off": "Razonamiento: Off"
+      },
       "sysprompt": {
         "label": "Custom instructions",
         "placeholder": "Extra instructions for the AI in this conversation..."
@@ -1805,11 +1846,16 @@
       }
     },
     "notLoaded": "Terminal not loaded",
+    "pet": {
+      "note": "🛡 <strong>{{label}}</strong> — {{text}}",
+      "tooltip": "OdooTerminal — haz clic para ver la última nota del guardián"
+    },
     "question": {
       "aborted": "Operation aborted"
     },
     "tooltip": {
       "aiMode": "Modo IA",
+      "aiReasoning": "Nivel de razonamiento para modelos \"pensantes\" (solo proveedor openai). \"Off\" pide a servidores locales compatibles con OpenAI que se salten el razonamiento interno.",
       "aiTips": "Consejos de IA",
       "attachFile": "Adjuntar archivo",
       "customSystemPrompt": "Prompt del sistema personalizado",

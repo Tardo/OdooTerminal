@@ -120,6 +120,10 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     kwargs.timeout !== null && kwargs.timeout !== undefined ? kwargs.timeout : aiState.timeout;
   const maxSteps: number =
     kwargs.max_steps !== null && kwargs.max_steps !== undefined ? kwargs.max_steps : DEFAULT_MAX_STEPS;
+  // Explicit "ai agent -r ..." wins; otherwise fall back to the AI sidebar's reasoning selector
+  // (aiState.reasoning) — this is what makes typed conversation turns (onAIModeInput) pick it up
+  // too, since those call cmdAIAgent directly without going through the "ai agent" command args.
+  const reasoning: ?string = typeof kwargs.reasoning === 'string' && kwargs.reasoning.length > 0 ? kwargs.reasoning : aiState.reasoning;
   const customSystemPrompt: ?string = typeof kwargs.custom_system_prompt === 'string' && kwargs.custom_system_prompt.trim() ? kwargs.custom_system_prompt : null;
   // $FlowFixMe[incompatible-type]
   const rawInitialMessages: Array<AIMessage> = Array.isArray(kwargs.initial_messages) ? kwargs.initial_messages : [];
@@ -357,6 +361,8 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         null,
         aiState.maxTokens,
         agentTools,
+        undefined,
+        reasoning,
       );
       text = result.text;
       toolCalls = result.toolCalls;

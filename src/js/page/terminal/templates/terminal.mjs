@@ -53,6 +53,18 @@ export default function (): string {
     "<select id='terminal_ai_model_select' class='terminal-ai-model-select' disabled>" +
     "<option value=''>-- No model --</option>" +
     '</select>' +
+    "<select id='terminal_ai_reasoning_select' class='terminal-ai-model-select' title='" +
+    i18n.t(
+      'terminal.tooltip.aiReasoning',
+      'Reasoning effort for "thinking" models (openai provider only). "Off" asks local OpenAI-compatible servers to skip chain-of-thought.',
+    ) +
+    "'>" +
+    `<option value=''>${i18n.t('terminal.ai.reasoning.default', '-- Reasoning --')}</option>` +
+    `<option value='off'>${i18n.t('terminal.ai.reasoning.off', 'Reasoning: Off')}</option>` +
+    `<option value='low'>${i18n.t('terminal.ai.reasoning.low', 'Reasoning: Low')}</option>` +
+    `<option value='medium'>${i18n.t('terminal.ai.reasoning.medium', 'Reasoning: Medium')}</option>` +
+    `<option value='high'>${i18n.t('terminal.ai.reasoning.high', 'Reasoning: High')}</option>` +
+    '</select>' +
     '</div>' +
     "<div id='terminal_ai_conv_list' class='terminal-ai-conv-list'></div>" +
     '</div>' +

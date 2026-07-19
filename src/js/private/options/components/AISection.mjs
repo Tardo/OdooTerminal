@@ -9,11 +9,13 @@ import {t} from '../i18n.mjs';
 import AIModelsSection from './AIModelsSection.mjs';
 import AISkillsSection from './AISkillsSection.mjs';
 import MCPServersSection from './MCPServersSection.mjs';
+import AIPetSection from './AIPetSection.mjs';
 
 const TABS = [
   {key: 'models', label: () => t('optionsTitleAIModels', 'AI Providers'), comp: AIModelsSection},
   {key: 'skills', label: () => t('optionsTitleAICustomSkills', 'AI Skills'), comp: AISkillsSection},
   {key: 'mcp', label: () => t('optionsTitleMCPServers', 'MCP Servers'), comp: MCPServersSection},
+  {key: 'pet', label: () => t('optionsTitleAIPet', 'Guardian Pet'), comp: AIPetSection},
 ];
 
 export default function AISection(props: any) {

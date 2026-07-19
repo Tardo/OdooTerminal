@@ -5,6 +5,9 @@ declare type AIState = {
   timeout: ?number,
   provider: ?string,
   maxTokens: ?number,
+  // 'off' | 'low' | 'medium' | 'high', from the AI sidebar's reasoning selector. openai provider
+  // only for now — see providers/openai.mjs reasoningEffort.
+  reasoning: ?string,
 };
 
 declare type TokenUsage = {
@@ -52,6 +55,9 @@ declare type AIStreamResult = {
   text: string,
   toolCalls: Array<AIToolCall>,
   usage: ?TokenUsage,
+  // openai provider only: chain-of-thought captured from a separate `reasoning_content` delta
+  // field (llama.cpp/DeepSeek-style backends). Diagnostic only, never shown as the answer.
+  reasoning?: string,
 };
 
 declare type AIRuntime = {

@@ -19,13 +19,22 @@ export function streamRequest(
   stop?: ?Array<string>,
   maxTokens?: ?number,
   tools?: ?Array<AIToolDef>,
+  // Defaults to the globally active connection's provider (aiState.provider) — pass this
+  // explicitly for a one-off call against a DIFFERENT connection (e.g. the pet guardian using
+  // its own dedicated provider) so it doesn't depend on / interfere with the global aiState.
+  providerOverride?: ?string,
+  // openai provider only for now — see reasoningEffort in providers/openai.mjs. Anthropic/Gemini
+  // use structurally different "extended thinking" APIs (separate content-block types in the
+  // stream); wiring those up needs its own pass, not a same-shaped param here.
+  reasoning?: ?string,
 ): Promise<AIStreamResult> {
-  if (aiState.provider === 'anthropic') {
+  const provider = providerOverride !== null && providerOverride !== undefined ? providerOverride : aiState.provider;
+  if (provider === 'anthropic') {
     return streamRequestAnthropic(url, apiKey, model, messages, signal, onDelta, stop, maxTokens, tools);
-  } else if (aiState.provider === 'gemini') {
+  } else if (provider === 'gemini') {
     return streamRequestGemini(url, apiKey, model, messages, signal, onDelta, stop, maxTokens, tools);
-  } else if (aiState.provider === 'cohere') {
+  } else if (provider === 'cohere') {
     return streamRequestCohere(url, apiKey, model, messages, signal, onDelta, stop, maxTokens, tools);
   }
-  return streamRequestOpenAI(url, apiKey, model, messages, signal, onDelta, stop, maxTokens, tools);
+  return streamRequestOpenAI(url, apiKey, model, messages, signal, onDelta, stop, maxTokens, tools, reasoning);
 }

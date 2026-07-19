@@ -1569,3 +1569,67 @@
   font-style: italic;
   margin-left: 3px;
 }
+
+/* AI pet: lives outside #terminal so it stays visible while the terminal is closed.
+   Anchored to the right edge, mostly off-screen ("peeking") until a stimulus arrives. */
+.terminal-pet {
+  align-items: center;
+  cursor: pointer;
+  display: none;
+  position: fixed;
+  right: 0;
+  top: 45%;
+  transform: translateX(calc(100% - 12px));
+  transition: transform 320ms ease-out;
+  z-index: 1099;
+}
+.terminal-pet.terminal-pet-active {
+  display: flex;
+}
+.terminal-pet.terminal-pet-peek {
+  transform: translateX(0);
+}
+.terminal-pet-orb {
+  align-items: center;
+  animation: terminal-pet-pulse 2.5s ease-in-out infinite;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  border-radius: 50% 0 0 50%;
+  box-shadow: -1px 1px 8px rgba(0, 0, 0, 0.35);
+  display: flex;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+.terminal-pet-icon {
+  color: #fff;
+  font-size: 1.2rem;
+}
+@keyframes terminal-pet-pulse {
+  0%,
+  100% {
+    box-shadow: -1px 1px 8px rgba(0, 0, 0, 0.35);
+  }
+  50% {
+    box-shadow: -1px 1px 16px rgba(124, 58, 237, 0.75);
+  }
+}
+.terminal-pet-bubble {
+  background: var(--terminal-color-dark, #343a40);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-right: 6px;
+  max-width: 0;
+  overflow: hidden;
+  padding: 0;
+  transition:
+    max-width 320ms ease-out,
+    padding 320ms ease-out;
+  white-space: nowrap;
+}
+.terminal-pet.terminal-pet-peek .terminal-pet-bubble {
+  max-width: 240px;
+  padding: 6px 10px;
+  white-space: normal;
+}

@@ -91,6 +91,14 @@ export default async function streamRequestOpenAI(
   stop?: ?Array<string>,
   maxTokens?: ?number,
   tools?: ?Array<AIToolDef>,
+  // Best-effort thinking control for OpenAI-compatible backends — there's no single param that
+  // works everywhere, so this sends whichever convention matches the level:
+  // - 'low'/'medium'/'high': the real OpenAI `reasoning_effort` field (also honoured by
+  //   llama.cpp's gpt-oss/harmony support). Reasoning-only models require this to be set;
+  //   non-reasoning models are likely to reject it — that's why it's only sent when requested.
+  // - 'off': `chat_template_kwargs.enable_thinking = false`, the llama.cpp/vLLM convention for
+  //   Qwen3-style hybrid models. Harmless no-op for templates that don't read that kwarg.
+  reasoningEffort?: ?string,
 ): Promise<AIStreamResult> {
   const headers: {[string]: string} = {
     'Content-Type': 'application/json',
@@ -119,6 +127,12 @@ export default async function streamRequestOpenAI(
     body.parallel_tool_calls = false;
   }
 
+  if (reasoningEffort === 'off') {
+    body.chat_template_kwargs = {enable_thinking: false};
+  } else if (reasoningEffort === 'low' || reasoningEffort === 'medium' || reasoningEffort === 'high') {
+    body.reasoning_effort = reasoningEffort;
+  }
+
   const response = await backgroundFetch(
     `${url}/chat/completions`,
     {method: 'POST', headers, body: JSON.stringify(body)},
@@ -137,6 +151,12 @@ export default async function streamRequestOpenAI(
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let fullResponse = '';
+  // Reasoning models on llama.cpp/DeepSeek-style backends stream their chain-of-thought as this
+  // SEPARATE delta field, not inline in `content` — previously dropped entirely, which made a
+  // response that was 100% reasoning look identical to a genuinely empty one. Captured (not fed
+  // to onDelta — it's not the answer) so callers can tell the difference. See reasoningEffort
+  // above to suppress it instead.
+  let reasoningResponse = '';
   let buffer = '';
   let usage: ?TokenUsage = null;
 
@@ -176,6 +196,9 @@ export default async function streamRequestOpenAI(
           fullResponse += delta.content;
           onDelta(delta.content);
         }
+        if (delta.reasoning_content) {
+          reasoningResponse += delta.reasoning_content;
+        }
         const tcs = delta.tool_calls;
         if (Array.isArray(tcs)) {
           for (const tc of tcs) {
@@ -209,5 +232,5 @@ export default async function streamRequestOpenAI(
     }
   }
 
-  return {text: fullResponse, toolCalls, usage};
+  return {text: fullResponse, toolCalls, usage, reasoning: reasoningResponse.length > 0 ? reasoningResponse : undefined};
 }

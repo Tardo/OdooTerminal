@@ -9,6 +9,7 @@ export const aiState: AIState = {
   timeout: null,
   provider: null,
   maxTokens: null,
+  reasoning: null,
 };
 
 export const aiRuntime: AIRuntime = {
