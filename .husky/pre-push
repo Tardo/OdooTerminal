@@ -1,1 +1,2 @@
+pnpm run prod:build
 pnpm run dev:web-ext
