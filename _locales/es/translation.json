@@ -139,11 +139,10 @@
       "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
       "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
       "model": "Model name to use",
-      "operation": "operation: connect, chat, agent, watchdog, attach or stop",
-      "profile": "Personalidad del vigilante: técnico (por defecto), contable o comercial — cambia el vocabulario/enfoque de sus veredictos. Solo el perfil técnico explica las excepciones (errores de RPC/JS); los demás perfiles no reaccionan a ellas (el mensaje de error que muestra el propio Odoo en pantalla no se ve afectado).",
+      "operation": "operation: connect, agent, attach or stop",
       "prompt": "The prompt or natural language request to send",
       "provider": "Proveedor de IA: openai (compatible con OpenAI, por defecto), anthropic, gemini o cohere",
-      "reasoning": "Nivel de razonamiento para modelos \"pensantes\" (agent y watchdog): off, low, medium o high. 'off' pide a servidores locales compatibles con OpenAI (llama.cpp, vLLM, ...) que se salten el razonamiento interno — úsalo si un modelo no muestra salida porque gasta toda su respuesta pensando. Por ahora solo con el proveedor openai.",
+      "reasoning": "Nivel de razonamiento para modelos \"pensantes\" (solo agent): off, low, medium o high. 'off' pide a servidores locales compatibles con OpenAI (llama.cpp, vLLM, ...) que se salten el razonamiento interno — úsalo si un modelo no muestra salida porque gasta toda su respuesta pensando. Por ahora solo con el proveedor openai.",
       "timeout": "Max seconds to wait for a response (0 = no limit)",
       "url": "AI server URL (e.g. http://localhost:8080/v1)"
     },
@@ -152,16 +151,6 @@
         "noData": "Attachment {{id}} has no binary data",
         "noId": "No attachment id provided. Use: ai attach -i <id>",
         "notFound": "Attachment {{id}} not found"
-      }
-    },
-    "chat": {
-      "error": {
-        "noPrompt": "No prompt provided. Use: ai chat -p \"your prompt\"",
-        "notConfigured": "Not connected. Use \"ai connect\" first",
-        "requestFailed": "Request failed: "
-      },
-      "result": {
-        "sending": "Sending request..."
       }
     },
     "connect": {
@@ -175,12 +164,12 @@
         "missingPermission": "Warning: missing browser permission to contact {{url}}. Open the extension's Options page (AI Providers section) and use \"Grant access\" for this URL before sending requests."
       }
     },
-    "definition": "AI assistant (connect, chat & agent)",
-    "detail": "Conéctate a un servidor de IA (API compatible con OpenAI, Anthropic, Gemini o Cohere) para chatear con él, traducir lenguaje natural a comandos de terminal, o ejecutar un agente autónomo que ejecuta comandos de forma iterativa. El proveedor openai es compatible con OpenAI, por lo que también cubre Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI y servidores similares mediante una URL personalizada.\n\"watchdog\" es un vigilante flotante opcional que reacciona por su cuenta: cada vez que detecta un guardado, una eliminación, un registro abierto, la edición de un campo (de formulario o de una línea de lista), que el cursor se demore sobre un botón o un campo, un mensaje de aviso/error de Odoo, o una excepción (un error de RPC de un guardado/eliminación, o un error de JS no capturado en la página — explicada con un análisis de causa raíz, solo en el perfil técnico, ver \"-pf\" más abajo), envía automáticamente una consulta de un solo turno, solo lectura (sin run_command, no puede cambiar nada) a la IA y asoma por el borde derecho con un veredicto breve. Como esto se dispara constantemente y puede consumir tokens muy rápido, usa un modelo local para ello: \"ai watchdog -p on -m <modelo-local>\". \"-m\" solo (sin -p) cambia el modelo sin tocar el on/off. \"-pf <perfil>\" elige para quién escribe: técnico (por defecto, además el único perfil que explica excepciones), contable o comercial. Hacer clic en el vigilante nunca llama a la IA ni registra sus notas en la conversación del terminal/agente — solo despliega la burbuja en el sitio para mostrar el historial de mensajes del vigilante; vuelve a hacer clic para contraerla. Si un modelo \"pensante\" no muestra nada, pon \"-r off\" (en agent o watchdog) para que se salte el razonamiento interno en vez de gastar en él toda su respuesta.",
+    "definition": "AI assistant (connect & agent)",
+    "detail": "Conéctate a un servidor de IA (API compatible con OpenAI, Anthropic, Gemini o Cohere), traduce lenguaje natural a comandos de terminal, o ejecuta un agente autónomo que ejecuta comandos de forma iterativa. El proveedor openai es compatible con OpenAI, por lo que también cubre Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI y servidores similares mediante una URL personalizada. Consulta el comando \"watchdog\" para el vigilante de IA flotante y opcional que reacciona por su cuenta a la actividad de la página.",
     "error": {
-      "noSubcommand": "Usage: ai connect|chat|agent|watchdog|attach|stop ...",
+      "noSubcommand": "Usage: ai connect|agent|attach|stop ...",
       "unknownOperation": "Unknown operation: {{sub}}",
-      "usage": "Usage: ai connect|chat|agent|watchdog|attach|stop ..."
+      "usage": "Usage: ai connect|agent|attach|stop ..."
     },
     "stop": {
       "noRequest": "No active AI request to stop."
@@ -189,21 +178,6 @@
       "cache": " · Cache: {{read}} read / {{created}} created",
       "cacheReadOnly": " · Cache: {{read}} saved",
       "usage": "Tokens: {{prompt}} in / {{completion}} out ({{total}} total)"
-    },
-    "watchdog": {
-      "model": {
-        "notSet": "(sin configurar)"
-      },
-      "noProvider": "Todavía no hay un proveedor dedicado configurado para el vigilante, así que no tiene a quién consultar. El vigilante nunca toma prestada la conexión activa de la barra lateral de IA — abre la página de Opciones de la extensión → AI Watchdog y elige ahí un proveedor y un modelo (añade uno en \"Proveedores de IA\" primero si aún no lo has hecho). Esa elección también se recuerda por instancia, así que es un paso único.",
-      "reasoning": {
-        "default": "por defecto",
-        "hint": "Consejo: si el vigilante a veces no muestra nada, puede que tu modelo esté gastando toda su respuesta en razonamiento interno antes de contestar. Prueba \"ai watchdog -r off\" (o un modelo no pensante para este puesto)."
-      },
-      "status": {
-        "off": "Modo vigilante: desactivado (modelo cuando se active: {{model}})",
-        "on": "Modo vigilante: activado para esta instancia (guardado localmente — sobrevive a cerrar el navegador, no hace falta repetir esto ni reconectar la próxima vez). Modelo: {{model}}. Perfil: {{profile}}. Razonamiento: {{reasoning}}."
-      },
-      "tokenWarning": "⚠ Alto consumo de tokens: el vigilante llama a la IA automáticamente en CADA guardado, edición de campo, registro que abras, demora del cursor sobre un botón y mensaje de aviso/error de Odoo — sin ningún paso manual de por medio. Úsalo solo con un modelo local (Ollama, llama.cpp, etc.) — NO se recomienda con un proveedor de pago en la nube, donde puede generar una factura considerable sin que te des cuenta."
     }
   },
   "cmdAction": {
@@ -1228,6 +1202,29 @@
       "viewRecord": "View Record"
     }
   },
+  "cmdWatchdog": {
+    "args": {
+      "model": "Nombre del modelo a usar para el vigilante",
+      "profile": "Personalidad del vigilante: técnico (por defecto), contable o comercial — cambia el vocabulario/enfoque de sus veredictos. Solo el perfil técnico explica las excepciones (errores de RPC/JS); los demás perfiles no reaccionan a ellas (el mensaje de error que muestra el propio Odoo en pantalla no se ve afectado).",
+      "reasoning": "Nivel de razonamiento para modelos \"pensantes\": off, low, medium o high. 'off' pide a servidores locales compatibles con OpenAI (llama.cpp, vLLM, ...) que se salten el razonamiento interno — úsalo si un modelo no muestra salida porque gasta toda su respuesta pensando. Por ahora solo con el proveedor openai.",
+      "state": "Activa o desactiva el vigilante para esta instancia"
+    },
+    "definition": "Vigilante de IA flotante y opcional que reacciona por su cuenta a la actividad de la página",
+    "detail": "Un vigilante de IA flotante y opcional que reacciona por su cuenta: cada vez que detecta un guardado, una eliminación, un registro abierto, la edición de un campo (de formulario o de una línea de lista), que el cursor se demore sobre un botón o un campo, un mensaje de aviso/error de Odoo, o una excepción (un error de RPC de un guardado/eliminación, o un error de JS no capturado en la página — explicada con un análisis de causa raíz, solo en el perfil técnico, ver \"-pf\" más abajo), envía automáticamente una consulta de un solo turno, solo lectura (sin run_command, no puede cambiar nada) a la IA y asoma por el borde derecho con un veredicto breve. Como esto se dispara constantemente y puede consumir tokens muy rápido, usa un modelo local para ello: \"watchdog -p on -m <modelo-local>\". \"-m\" solo (sin \"-p\") cambia el modelo sin tocar el on/off. \"-pf <perfil>\" elige para quién escribe: técnico (por defecto, además el único perfil que explica excepciones), contable o comercial. Hacer clic en el vigilante nunca llama a la IA ni registra sus notas en la conversación del terminal/agente — solo despliega la burbuja en el sitio para mostrar el historial de mensajes del vigilante; vuelve a hacer clic para contraerla. Si un modelo \"pensante\" no muestra nada, pon \"-r off\" para que se salte el razonamiento interno en vez de gastar en él toda su respuesta. Necesita su propia conexión: configura un proveedor y modelo en la página de Opciones de la extensión → AI Watchdog (independiente de la conexión del comando \"ai\").",
+    "model": {
+      "notSet": "(sin configurar)"
+    },
+    "noProvider": "Todavía no hay un proveedor dedicado configurado para el vigilante, así que no tiene a quién consultar. El vigilante nunca toma prestada la conexión activa de la barra lateral de IA — abre la página de Opciones de la extensión → AI Watchdog y elige ahí un proveedor y un modelo (añade uno en \"Proveedores de IA\" primero si aún no lo has hecho). Esa elección también se recuerda por instancia, así que es un paso único.",
+    "reasoning": {
+      "default": "por defecto",
+      "hint": "Consejo: si el vigilante a veces no muestra nada, puede que tu modelo esté gastando toda su respuesta en razonamiento interno antes de contestar. Prueba \"watchdog -r off\" (o un modelo no pensante para este puesto)."
+    },
+    "status": {
+      "off": "Modo vigilante: desactivado (modelo cuando se active: {{model}})",
+      "on": "Modo vigilante: activado para esta instancia (guardado localmente — sobrevive a cerrar el navegador, no hace falta repetir esto ni reconectar la próxima vez). Modelo: {{model}}. Perfil: {{profile}}. Razonamiento: {{reasoning}}."
+    },
+    "tokenWarning": "⚠ Alto consumo de tokens: el vigilante llama a la IA automáticamente en CADA guardado, edición de campo, registro que abras, demora del cursor sobre un botón y mensaje de aviso/error de Odoo — sin ningún paso manual de por medio. Úsalo solo con un modelo local (Ollama, llama.cpp, etc.) — NO se recomienda con un proveedor de pago en la nube, donde puede generar una factura considerable sin que te des cuenta."
+  },
   "cmdWhoami": {
     "definition": "Know current user login",
     "detail": "Shows current user login",
@@ -1624,24 +1621,24 @@
   "optionsAIModelsGrantedLabel": "Acceso concedido",
   "optionsAIModelsLoadMissingURL": "Introduce la URL primero",
   "optionsAISkillsAddRequired": "Nombre, Descripción y Contenido son obligatorios",
-  "optionsAIWatchdogDescription": "Un vigilante flotante que reacciona por su cuenta a la actividad de la página (guardar/abrir/editar/cursor sobre un botón/mensajes de Odoo) con un veredicto breve de solo lectura de la IA — nunca ejecuta comandos ni cambia nada. Esto fija el valor por defecto para todas las instancias de Odoo en las que corra la extensión; cada instancia puede seguir anulando el modelo localmente con el comando de terminal \"ai watchdog\".",
+  "optionsAIWatchdogDescription": "Un vigilante flotante que reacciona por su cuenta a la actividad de la página (guardar/abrir/editar/cursor sobre un botón/mensajes de Odoo) con un veredicto breve de solo lectura de la IA — nunca ejecuta comandos ni cambia nada. Esto fija el valor por defecto para todas las instancias de Odoo en las que corra la extensión; cada instancia puede seguir anulando el modelo localmente con el comando de terminal \"watchdog\".",
   "optionsAIWatchdogEnabled": "Activado por defecto",
   "optionsAIWatchdogHint": "¿Aún no tienes un servidor local configurado? Añade uno en la pestaña \"Proveedores de IA\" y luego elígelo aquí.",
-  "optionsAIWatchdogManualHint": "Déjalo desactivado para que sea opcional por instancia: ejecuta \"ai watchdog -p on\" en el terminal de cualquier instancia de Odoo para activarlo solo ahí (usará el proveedor/modelo elegidos abajo, salvo que los sobrescribas con \"-m <modelo>\"). Desactívalo de nuevo con \"ai watchdog -p off\".",
+  "optionsAIWatchdogManualHint": "Déjalo desactivado para que sea opcional por instancia: ejecuta \"watchdog -p on\" en el terminal de cualquier instancia de Odoo para activarlo solo ahí (usará el proveedor/modelo elegidos abajo, salvo que los sobrescribas con \"-m <modelo>\"). Desactívalo de nuevo con \"watchdog -p off\".",
   "optionsAIWatchdogModel": "Modelo por defecto",
   "optionsAIWatchdogModelsLoadError": "No se pudieron cargar los modelos",
   "optionsAIWatchdogNoModel": "-- Modelo por defecto --",
   "optionsAIWatchdogNoProvider": "-- Sin proveedor --",
   "optionsAIWatchdogProfile": "Perfil",
   "optionsAIWatchdogProfileAccounting": "Contable",
-  "optionsAIWatchdogProfileHint": "Cambia el enfoque y el vocabulario de los veredictos (p. ej. totales/impuestos contables frente a datos de cliente/venta). Las comprobaciones de campos obligatorios siempre se aplican, sea cual sea el perfil. Solo el perfil Técnico explica las excepciones (errores de RPC de un guardado/eliminación fallidos, o errores de JS no capturados) — los demás perfiles no reaccionan a ellas (el mensaje de error que muestra el propio Odoo en pantalla no se ve afectado). También se puede forzar por instancia con \"ai watchdog -pf <perfil>\".",
+  "optionsAIWatchdogProfileHint": "Cambia el enfoque y el vocabulario de los veredictos (p. ej. totales/impuestos contables frente a datos de cliente/venta). Las comprobaciones de campos obligatorios siempre se aplican, sea cual sea el perfil. Solo el perfil Técnico explica las excepciones (errores de RPC de un guardado/eliminación fallidos, o errores de JS no capturados) — los demás perfiles no reaccionan a ellas (el mensaje de error que muestra el propio Odoo en pantalla no se ve afectado). También se puede forzar por instancia con \"watchdog -pf <perfil>\".",
   "optionsAIWatchdogProfileSales": "Comercial",
   "optionsAIWatchdogProfileTechnical": "Técnico (por defecto)",
   "optionsAIWatchdogProvider": "Proveedor",
   "optionsAIWatchdogReasoning": "Razonamiento",
   "optionsAIWatchdogReasoningDefault": "-- Por defecto (sin forzar) --",
   "optionsAIWatchdogReasoningHigh": "Alto",
-  "optionsAIWatchdogReasoningHint": "Si el vigilante a veces no muestra nada, puede que tu modelo sea \"pensante\" y gaste toda su respuesta en razonamiento interno — prueba \"Off\". Solo aplica a servidores compatibles con OpenAI (llama.cpp/vLLM/Ollama locales, etc.); también se puede forzar por instancia con \"ai watchdog -r <nivel>\".",
+  "optionsAIWatchdogReasoningHint": "Si el vigilante a veces no muestra nada, puede que tu modelo sea \"pensante\" y gaste toda su respuesta en razonamiento interno — prueba \"Off\". Solo aplica a servidores compatibles con OpenAI (llama.cpp/vLLM/Ollama locales, etc.); también se puede forzar por instancia con \"watchdog -r <nivel>\".",
   "optionsAIWatchdogReasoningLow": "Bajo",
   "optionsAIWatchdogReasoningMedium": "Medio",
   "optionsAIWatchdogReasoningOff": "Off (sin razonamiento)",
@@ -1667,7 +1664,7 @@
   "optionsThemePresetOdoo": "Odoo",
   "optionsThemePresetTech": "Tecnológico",
   "optionsTipAIModelsCapabilities": "Consejo: Elige un modelo que admita uso de herramientas, visión y pensamiento extendido al seleccionarlo en modo IA.",
-  "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\", not \"ai chat\". The agent asks for permission once per server per conversation.",
+  "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\". The agent asks for permission once per server per conversation.",
   "optionsTitleAI": "IA",
   "optionsTitleAICustomSkills": "Habilidades de IA",
   "optionsTitleAICustomSkillsAdd": "Añadir",

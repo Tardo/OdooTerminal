@@ -18,7 +18,7 @@
 //   only as a ceiling against pathological cases, not as a speed lever — see the comment above
 //   MAX_ROWS for why (prefill is cheap; the caps were tightened once for latency and that
 //   degraded verdict quality by hiding data, so they're deliberately generous now).
-// - `reasoning` (from Options → AI Watchdog, or "ai watchdog -r <level>") lets a "thinking" local
+// - `reasoning` (from Options → AI Watchdog, or "watchdog -r <level>") lets a "thinking" local
 //   model be told to skip/limit its chain-of-thought instead of spending WATCHDOG_MAX_TOKENS on
 //   it before ever emitting a verdict — see providers/openai.mjs reasoningEffort.
 

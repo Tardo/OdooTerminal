@@ -243,7 +243,7 @@ export default class Terminal {
     // closing the browser, not just the tab — local storage is already origin-scoped, i.e.
     // naturally per Odoo instance, same as terminal_ai_active_provider/terminal_watchdog_model
     // below. Falls back to the extension-wide Options page default (#config.watchdog_enabled)
-    // the first time this instance is seen; once the user runs "ai watchdog" here, that explicit
+    // the first time this instance is seen; once the user runs "watchdog" here, that explicit
     // local choice wins from then on, same precedence as ai_models vs terminal_ai_active_provider.
     const storedWatchdogMode: mixed = getStorageLocalItem('terminal_watchdog_mode', null);
     this.#isWatchdogMode = storedWatchdogMode === null ? Boolean(this.#config.watchdog_enabled) : Boolean(storedWatchdogMode);
@@ -834,7 +834,7 @@ export default class Terminal {
     return this.#isWatchdogMode;
   }
 
-  // Precedence: this instance's explicit choice (ai watchdog -m) > the Options page default
+  // Precedence: this instance's explicit choice (watchdog -m) > the Options page default
   // (#config.watchdog_model). Deliberately does NOT fall back to aiState.model (the AI sidebar's
   // active model) — the watchdog must stay fully independent of whatever's active for manual
   // chat/agent use, see #resolveWatchdogConnection.
@@ -855,7 +855,7 @@ export default class Terminal {
   // currently active aiState connection when no dedicated provider is configured (or its saved
   // name no longer matches an entry): the watchdog's messages must stay independent of the AI
   // sidebar/agent mode, so "nothing dedicated configured" means "nothing to call" (null), not
-  // "borrow the agent connection". See hasWatchdogConnection()/cmdAI.watchdog.noProvider for the
+  // "borrow the agent connection". See hasWatchdogConnection()/cmdWatchdog.noProvider for the
   // user-facing warning.
   #resolveWatchdogConnection(): {url: string, apiKey: ?string, provider: ?string, maxTokens: ?number} | null {
     const providerName = this.#config.watchdog_provider;
@@ -882,7 +882,7 @@ export default class Terminal {
     setStorageLocalItem('terminal_watchdog_model', model, err => this.screen.printError(err));
   }
 
-  // Same precedence as getWatchdogModel(): instance override (ai watchdog -r) > Options default
+  // Same precedence as getWatchdogModel(): instance override (watchdog -r) > Options default
   // (#config.watchdog_reasoning) > '' (no override sent — current/legacy behaviour, see consult.mjs).
   getWatchdogReasoning(): string {
     const stored: mixed = getStorageLocalItem('terminal_watchdog_reasoning', null);
@@ -899,7 +899,7 @@ export default class Terminal {
     setStorageLocalItem('terminal_watchdog_reasoning', reasoning, err => this.screen.printError(err));
   }
 
-  // Same precedence chain as getWatchdogReasoning(): instance override (ai watchdog -pf) > Options
+  // Same precedence chain as getWatchdogReasoning(): instance override (watchdog -pf) > Options
   // default (#config.watchdog_profile) > 'technical'. Unlike reasoning, there is no "no override"
   // state — every consult needs a persona, so this never returns ''.
   getWatchdogProfile(): string {
@@ -919,7 +919,7 @@ export default class Terminal {
 
   // Whether the watchdog has anything to call right now — requires its OWN dedicated
   // Options-page provider (Options → AI Watchdog); it never borrows the AI sidebar's active
-  // connection, see #resolveWatchdogConnection. Used by `ai watchdog` to warn the user instead
+  // connection, see #resolveWatchdogConnection. Used by `watchdog` to warn the user instead
   // of silently enabling a watchdog that will never actually fire.
   hasWatchdogConnection(): boolean {
     return this.#resolveWatchdogConnection() !== null;

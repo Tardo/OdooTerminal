@@ -49,7 +49,7 @@ export default function AIWatchdogSection({settings, mutate}: any) {
     h('p', {class: 'ot-hint'},
       t(
         'optionsAIWatchdogDescription',
-        'A floating watchdog that reacts on its own to page activity (save/open/edit/hover/Odoo messages) with a short, read-only AI verdict — it never runs commands or changes anything. This sets the default for every Odoo instance the extension runs on; each instance can still override the model locally with the "ai watchdog" terminal command.',
+        'A floating watchdog that reacts on its own to page activity (save/open/edit/hover/Odoo messages) with a short, read-only AI verdict — it never runs commands or changes anything. This sets the default for every Odoo instance the extension runs on; each instance can still override the model locally with the "watchdog" terminal command.',
       )),
     h('p', {class: 'ot-warn'},
       t(
@@ -64,7 +64,7 @@ export default function AIWatchdogSection({settings, mutate}: any) {
       h('p', {class: 'ot-tip'},
         t(
           'optionsAIWatchdogManualHint',
-          'Leave this off to keep it opt-in per instance: run "ai watchdog -p on" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with "-m <model>"). Turn it off again with "ai watchdog -p off".',
+          'Leave this off to keep it opt-in per instance: run "watchdog -p on" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with "-m <model>"). Turn it off again with "watchdog -p off".',
         )),
       h(Field, {label: t('optionsAIWatchdogProvider', 'Provider')},
         h(Select, {
@@ -100,7 +100,7 @@ export default function AIWatchdogSection({settings, mutate}: any) {
       h('p', {class: 'ot-tip'},
         t(
           'optionsAIWatchdogProfileHint',
-          'Changes the verdicts\' focus and vocabulary (e.g. accounting totals/taxes vs. sales/customer data). Required-field checks always apply regardless of profile. Only the Technical profile explains exceptions (RPC errors from a failed save/delete, or uncaught JS errors) — the other profiles don\'t react to them (Odoo\'s own on-screen error message is unaffected either way). Can also be overridden per instance with "ai watchdog -pf <profile>".',
+          'Changes the verdicts\' focus and vocabulary (e.g. accounting totals/taxes vs. sales/customer data). Required-field checks always apply regardless of profile. Only the Technical profile explains exceptions (RPC errors from a failed save/delete, or uncaught JS errors) — the other profiles don\'t react to them (Odoo\'s own on-screen error message is unaffected either way). Can also be overridden per instance with "watchdog -pf <profile>".',
         )),
       h(Field, {label: t('optionsAIWatchdogReasoning', 'Reasoning')},
         h(Select, {
@@ -116,7 +116,7 @@ export default function AIWatchdogSection({settings, mutate}: any) {
       h('p', {class: 'ot-tip'},
         t(
           'optionsAIWatchdogReasoningHint',
-          'If the watchdog sometimes shows nothing, your model may be a "thinking" model spending its whole reply on internal reasoning — try "Off". Only applies to OpenAI-compatible servers (local llama.cpp/vLLM/Ollama, etc.); can also be overridden per instance with "ai watchdog -r <level>".',
+          'If the watchdog sometimes shows nothing, your model may be a "thinking" model spending its whole reply on internal reasoning — try "Off". Only applies to OpenAI-compatible servers (local llama.cpp/vLLM/Ollama, etc.); can also be overridden per instance with "watchdog -r <level>".',
         )),
       h('p', {class: 'ot-tip'},
         t(

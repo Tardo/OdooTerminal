@@ -141,8 +141,8 @@ export type ExtensionSettings = {
   show_technical_model_min_version: '17' | '18' | '19',
   screen_buffer_size: number,
   theme_preset: string,
-  // Extension-wide default for the "ai watchdog"; each Odoo instance can still override it
-  // locally with `ai watchdog -p on|off -m <model>` (see terminal.mjs #isWatchdogMode /
+  // Extension-wide default for the "watchdog" command; each Odoo instance can still override it
+  // locally with `watchdog -p on|off -m <model>` (see terminal.mjs #isWatchdogMode /
   // getWatchdogModel). watchdog_provider is the .name of an entry in ai_models — same
   // reference-by-name convention as terminal_ai_active_provider — so the watchdog can run its
   // own dedicated connection (e.g. a local server) independent of whichever provider is active

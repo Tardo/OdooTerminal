@@ -126,7 +126,7 @@ export default function MCPServersSection({settings, mutate}: any) {
   return h(Card, {title: t('optionsTitleMCPServers', 'MCP Servers'), class: 'ot-card'},
     h('p', {class: 'ot-hint'}, t('optionsTitleMCPServersDescription', 'Connect the AI agent to remote MCP (Model Context Protocol) servers. Tools exposed by enabled servers are offered to the agent alongside its built-in tools.')),
     h('p', {class: 'ot-warn'}, t('optionsWarningAIModelsKeys', 'Warning: API keys are stored in browser storage.')),
-    h('p', {class: 'ot-tip'}, t('optionsTipMCPServersScope', 'Tip: MCP tools are only available in "ai agent", not "ai chat". The agent asks for permission once per server per conversation.')),
+    h('p', {class: 'ot-tip'}, t('optionsTipMCPServersScope', 'Tip: MCP tools are only available in "ai agent". The agent asks for permission once per server per conversation.')),
     h(Table, {
       dataSource: servers,
       columns,
