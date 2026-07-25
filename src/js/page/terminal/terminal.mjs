@@ -210,56 +210,14 @@ export default class Terminal {
     this.createTerminal();
   }
 
-  init(settings: TerminalOptions) {
-    this.#applySettings(settings);
-    this.#wasLoaded = true;
-    if (this.#config.pinned) {
-      this.doShow();
-      const elm = this.el.querySelector('.terminal-screen-icon-pin');
-      if (elm) {
-        elm.classList.remove('btn-dark');
-        elm.classList.add('btn-light');
-      }
-    }
-    if (this.#config.maximized) {
-      this.el.classList.add('term-maximized');
-      const elm = this.el.querySelector('.terminal-screen-icon-maximize');
-      if (elm) {
-        elm.classList.remove('btn-dark');
-        elm.classList.add('btn-light');
-      }
-    }
-    if (this.#config.multiline) {
-      const elm = this.el.querySelector('.terminal-multiline');
-      if (elm) {
-        elm.classList.remove('btn-dark');
-        elm.classList.add('btn-light');
-      }
-    }
-
-    this.#applyTheme();
-
-    // Local storage (not session): an "activate for this instance" preference should survive
-    // closing the browser, not just the tab — local storage is already origin-scoped, i.e.
-    // naturally per Odoo instance, same as terminal_ai_active_provider/terminal_watchdog_model
-    // below. Falls back to the extension-wide Options page default (#config.watchdog_enabled)
-    // the first time this instance is seen; once the user runs "watchdog" here, that explicit
-    // local choice wins from then on, same precedence as ai_models vs terminal_ai_active_provider.
-    const storedWatchdogMode: mixed = getStorageLocalItem('terminal_watchdog_mode', null);
-    this.#isWatchdogMode = storedWatchdogMode === null ? Boolean(this.#config.watchdog_enabled) : Boolean(storedWatchdogMode);
-    this.#watchdog_el?.classList.toggle('terminal-watchdog-active', this.#isWatchdogMode);
-    // $FlowFixMe[method-unbinding]
-    setWatchdogStimulusHandler(this.#onWatchdogStimulus.bind(this));
-    setWatchdogStimulusEnabled(this.#isWatchdogMode);
-
-    // $FlowFixMe[method-unbinding]
-    window.addEventListener('message', this.#onWindowMessage.bind(this), false);
-    // $FlowFixMe[method-unbinding]
-    window.addEventListener('keydown', this.#onCoreKeyDown.bind(this));
-    // $FlowFixMe[method-unbinding]
-    window.addEventListener('click', this.onCoreClick.bind(this));
-    // $FlowFixMe[method-unbinding]
-    window.addEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
+  /**
+   * Wires every listener that lives on `this.el`'s subtree. Called from init() on first load,
+   * and again from #injectTerminal() whenever `this.el` is no longer connected to the document
+   * and gets replaced — otherwise the old listeners stay attached to the discarded node and
+   * every toolbar button (debug included) silently stops responding. See #bindScreen() for the
+   * matching re-bind of the screen widget itself.
+   */
+  #bindElListeners() {
     // $FlowFixMe[method-unbinding]
     this.el.querySelector('.terminal-screen-icon-maximize')?.addEventListener('click', this.#onClickToggleMaximize.bind(this));
     // $FlowFixMe[method-unbinding]
@@ -343,6 +301,59 @@ export default class Terminal {
       aiSyspromptTextareaEl.addEventListener('input', this.#onInputSysprompt.bind(this));
     }
     this.#populateAIProviderSelector();
+  }
+
+  init(settings: TerminalOptions) {
+    this.#applySettings(settings);
+    this.#wasLoaded = true;
+    if (this.#config.pinned) {
+      this.doShow();
+      const elm = this.el.querySelector('.terminal-screen-icon-pin');
+      if (elm) {
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
+      }
+    }
+    if (this.#config.maximized) {
+      this.el.classList.add('term-maximized');
+      const elm = this.el.querySelector('.terminal-screen-icon-maximize');
+      if (elm) {
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
+      }
+    }
+    if (this.#config.multiline) {
+      const elm = this.el.querySelector('.terminal-multiline');
+      if (elm) {
+        elm.classList.remove('btn-dark');
+        elm.classList.add('btn-light');
+      }
+    }
+
+    this.#applyTheme();
+
+    // Local storage (not session): an "activate for this instance" preference should survive
+    // closing the browser, not just the tab — local storage is already origin-scoped, i.e.
+    // naturally per Odoo instance, same as terminal_ai_active_provider/terminal_watchdog_model
+    // below. Falls back to the extension-wide Options page default (#config.watchdog_enabled)
+    // the first time this instance is seen; once the user runs "watchdog" here, that explicit
+    // local choice wins from then on, same precedence as ai_models vs terminal_ai_active_provider.
+    const storedWatchdogMode: mixed = getStorageLocalItem('terminal_watchdog_mode', null);
+    this.#isWatchdogMode = storedWatchdogMode === null ? Boolean(this.#config.watchdog_enabled) : Boolean(storedWatchdogMode);
+    this.#watchdog_el?.classList.toggle('terminal-watchdog-active', this.#isWatchdogMode);
+    // $FlowFixMe[method-unbinding]
+    setWatchdogStimulusHandler(this.#onWatchdogStimulus.bind(this));
+    setWatchdogStimulusEnabled(this.#isWatchdogMode);
+
+    // $FlowFixMe[method-unbinding]
+    window.addEventListener('message', this.#onWindowMessage.bind(this), false);
+    // $FlowFixMe[method-unbinding]
+    window.addEventListener('keydown', this.#onCoreKeyDown.bind(this));
+    // $FlowFixMe[method-unbinding]
+    window.addEventListener('click', this.onCoreClick.bind(this));
+    // $FlowFixMe[method-unbinding]
+    window.addEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
+    this.#bindElListeners();
     this.#isAIMode = getStorageSessionItem('terminal_ai_mode', false);
     this.#activeConvId = getStorageSessionItem('terminal_ai_active_conv', null);
     if (this.#isAIMode) {
@@ -384,9 +395,18 @@ export default class Terminal {
     if (terms_elms.length > 1) {
       // Remove extra terminals
       terms_elms.forEach(elm => elm.remove());
-    } else if (terms_elms.length === 0) {
+    } else if (terms_elms.length === 0 && !this.el?.isConnected) {
+      // The `:not(:first-child)` selector above misses the live terminal when it happens to sit
+      // first among body's children — guarding on isConnected keeps that case from being treated
+      // as "terminal gone" and spawning a second, unbound one alongside the still-working original.
       this.el = parseHTML(this.#rawTerminalTemplate);
       document.body?.append(this.el);
+      if (this.#wasLoaded) {
+        this.#bindElListeners();
+        if (this.#wasStart) {
+          this.#bindScreen();
+        }
+      }
     }
     const existing_tooltip = document.getElementById('terminal_busy_tooltip');
     if (!existing_tooltip) {
@@ -432,18 +452,22 @@ export default class Terminal {
     document.documentElement?.style.setProperty('--terminal-color-white', this.#config.color_white);
   }
 
-  async start(): Promise<> {
-    if (!this.#wasLoaded) {
-      throw new Error(i18n.t('terminal.error.notLoaded', 'Terminal not loaded'));
-    }
-
+  /**
+   * (Re)builds the screen widget inside the current `this.el` and points runningCmdCount_el
+   * at it. Called from start() on first load, and again after #injectTerminal() replaces
+   * `this.el` (because the old node was no longer connected to the document) so buttons that
+   * read/write screen state (multiline, reload-shell, ai-mode, ...) keep working instead of
+   * touching a detached node. Previously printed output is captured and restored so a
+   * re-injection doesn't blank the terminal.
+   */
+  #bindScreen(): void {
     const elm = this.el.querySelector('#terminal_running_cmd_count');
     if (!elm) {
       throw new ElementNotFoundError('#terminal_running_cmd_count');
     }
     // $FlowFixMe[incompatible-type]
     this.runningCmdCount_el = elm;
-    this.#commandAssistant = new CommandAssistant(this);
+    const savedContent = this.screen.getContent();
     this.screen.start(this.el, {
       inputColors: this.#config.colors_domain,
       inputMode: this.#config.multiline ? 'multi' : 'single',
@@ -476,9 +500,20 @@ export default class Terminal {
         this.#onScreenshotPick();
       },
     });
+    if (savedContent) {
+      this.screen.setContent(savedContent);
+    }
     if (this.#isAIMode && this.#activeConvId === null) {
       this.screen.setInputDisabled(true);
     }
+  }
+
+  async start(): Promise<> {
+    if (!this.#wasLoaded) {
+      throw new Error(i18n.t('terminal.error.notLoaded', 'Terminal not loaded'));
+    }
+    this.#commandAssistant = new CommandAssistant(this);
+    this.#bindScreen();
     this.onStart();
   }
 
