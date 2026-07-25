@@ -34,7 +34,19 @@ function getTourNames(only_active: boolean = false): $ReadOnlyArray<string> {
       const {tourState} = tour_state_obj;
       return tourState.getActiveTourNames();
     }
-    return tour_obj.getSortedTours().map(item => item.name);
+    if (typeof tour_obj.getSortedTours === 'function') {
+      return tour_obj.getSortedTours().map(item => item.name);
+    }
+    // Odoo >= 18: tour_service no longer exposes getSortedTours, read tours straight from the registry.
+    const registry_obj = getOdooService('@web/core/registry');
+    if (!registry_obj) {
+      throw new Error(i18n.t('cmdTour.error.notAccesible', "tour not accesible! Can't use it in this moment."));
+    }
+    const {registry} = registry_obj;
+    return registry
+      .category('web_tour.tours')
+      .getEntries()
+      .map(([name]) => name);
   } else {
     if (only_active) {
       throw new Error(i18n.t('cmdTour.error.notAvailable', 'This is not available on Odoo <17.0'));
