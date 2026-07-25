@@ -20,7 +20,7 @@ export function streamRequest(
   maxTokens?: ?number,
   tools?: ?Array<AIToolDef>,
   // Defaults to the globally active connection's provider (aiState.provider) — pass this
-  // explicitly for a one-off call against a DIFFERENT connection (e.g. the pet guardian using
+  // explicitly for a one-off call against a DIFFERENT connection (e.g. the AI watchdog using
   // its own dedicated provider) so it doesn't depend on / interfere with the global aiState.
   providerOverride?: ?string,
   // openai provider only for now — see reasoningEffort in providers/openai.mjs. Anthropic/Gemini

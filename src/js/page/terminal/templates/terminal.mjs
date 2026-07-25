@@ -50,21 +50,29 @@ export default function (): string {
     "<select id='terminal_ai_provider_select' class='terminal-ai-model-select'>" +
     "<option value=''>-- No provider --</option>" +
     '</select>' +
+    "<div class='terminal-ai-model-row'>" +
     "<select id='terminal_ai_model_select' class='terminal-ai-model-select' disabled>" +
     "<option value=''>-- No model --</option>" +
     '</select>' +
-    "<select id='terminal_ai_reasoning_select' class='terminal-ai-model-select' title='" +
+    "<div class='terminal-ai-reasoning'>" +
+    "<div id='terminal_ai_reasoning_btn' class='btn btn-sm terminal-ai-reasoning-btn p-1' role='button' title='" +
     i18n.t(
       'terminal.tooltip.aiReasoning',
       'Reasoning effort for "thinking" models (openai provider only). "Off" asks local OpenAI-compatible servers to skip chain-of-thought.',
     ) +
     "'>" +
-    `<option value=''>${i18n.t('terminal.ai.reasoning.default', '-- Reasoning --')}</option>` +
-    `<option value='off'>${i18n.t('terminal.ai.reasoning.off', 'Reasoning: Off')}</option>` +
-    `<option value='low'>${i18n.t('terminal.ai.reasoning.low', 'Reasoning: Low')}</option>` +
-    `<option value='medium'>${i18n.t('terminal.ai.reasoning.medium', 'Reasoning: Medium')}</option>` +
-    `<option value='high'>${i18n.t('terminal.ai.reasoning.high', 'Reasoning: High')}</option>` +
-    '</select>' +
+    "<i class='fa fa-tachometer'></i>" +
+    "<span class='terminal-ai-reasoning-btn-label'></span>" +
+    '</div>' +
+    "<div id='terminal_ai_reasoning_menu' class='terminal-ai-reasoning-menu'>" +
+    `<div class='terminal-ai-reasoning-menu-item' data-value=''>${i18n.t('terminal.ai.reasoning.default', '-- Reasoning --')}</div>` +
+    `<div class='terminal-ai-reasoning-menu-item' data-value='off'>${i18n.t('terminal.ai.reasoning.off', 'Reasoning: Off')}</div>` +
+    `<div class='terminal-ai-reasoning-menu-item' data-value='low'>${i18n.t('terminal.ai.reasoning.low', 'Reasoning: Low')}</div>` +
+    `<div class='terminal-ai-reasoning-menu-item' data-value='medium'>${i18n.t('terminal.ai.reasoning.medium', 'Reasoning: Medium')}</div>` +
+    `<div class='terminal-ai-reasoning-menu-item' data-value='high'>${i18n.t('terminal.ai.reasoning.high', 'Reasoning: High')}</div>` +
+    '</div>' +
+    '</div>' +
+    '</div>' +
     '</div>' +
     "<div id='terminal_ai_conv_list' class='terminal-ai-conv-list'></div>" +
     '</div>' +

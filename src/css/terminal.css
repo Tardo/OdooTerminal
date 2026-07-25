@@ -1188,6 +1188,68 @@
   opacity: 0.5;
 }
 
+.o_terminal .terminal-ai-model-row {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+.o_terminal .terminal-ai-model-row .terminal-ai-model-select {
+  flex: 1;
+  width: auto;
+}
+
+.o_terminal .terminal-ai-reasoning {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.o_terminal .terminal-ai-reasoning-btn {
+  align-items: center;
+  color: var(--terminal-color-info);
+  cursor: pointer;
+  display: flex;
+  font-size: x-small;
+  gap: 3px;
+  line-height: 1;
+  opacity: 0.6;
+}
+.o_terminal .terminal-ai-reasoning-btn:hover,
+.o_terminal .terminal-ai-reasoning-btn.terminal-ai-reasoning-btn-active {
+  color: var(--terminal-color-white);
+  opacity: 1;
+}
+.o_terminal .terminal-ai-reasoning-btn-label {
+  text-transform: capitalize;
+}
+
+.o_terminal .terminal-ai-reasoning-menu {
+  background-color: color-mix(in srgb, var(--terminal-color-dark), white 5%);
+  border: 1px solid var(--terminal-color-secondary);
+  border-radius: 3px;
+  display: none;
+  min-width: 140px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 2px);
+  z-index: 10;
+}
+.o_terminal .terminal-ai-reasoning-menu.terminal-ai-reasoning-menu-active {
+  display: block;
+}
+.o_terminal .terminal-ai-reasoning-menu-item {
+  color: var(--terminal-color-light);
+  cursor: pointer;
+  font-size: x-small;
+  padding: 4px 8px;
+}
+.o_terminal .terminal-ai-reasoning-menu-item:hover {
+  background-color: var(--terminal-color-secondary);
+}
+.o_terminal .terminal-ai-reasoning-menu-item.terminal-ai-reasoning-menu-item-active {
+  color: var(--terminal-color-white);
+  font-weight: bold;
+}
+
 .o_terminal .terminal-ai-conv-list {
   flex: 1;
   overflow-y: auto;
@@ -1570,9 +1632,9 @@
   margin-left: 3px;
 }
 
-/* AI pet: lives outside #terminal so it stays visible while the terminal is closed.
+/* AI Watchdog: lives outside #terminal so it stays visible while the terminal is closed.
    Anchored to the right edge, mostly off-screen ("peeking") until a stimulus arrives. */
-.terminal-pet {
+.terminal-watchdog {
   align-items: center;
   cursor: pointer;
   display: none;
@@ -1583,15 +1645,15 @@
   transition: transform 320ms ease-out;
   z-index: 1099;
 }
-.terminal-pet.terminal-pet-active {
+.terminal-watchdog.terminal-watchdog-active {
   display: flex;
 }
-.terminal-pet.terminal-pet-peek {
+.terminal-watchdog.terminal-watchdog-peek {
   transform: translateX(0);
 }
-.terminal-pet-orb {
+.terminal-watchdog-orb {
   align-items: center;
-  animation: terminal-pet-pulse 2.5s ease-in-out infinite;
+  animation: terminal-watchdog-pulse 2.5s ease-in-out infinite;
   background: linear-gradient(135deg, #7c3aed, #3b82f6);
   border-radius: 50% 0 0 50%;
   box-shadow: -1px 1px 8px rgba(0, 0, 0, 0.35);
@@ -1600,11 +1662,11 @@
   justify-content: center;
   width: 44px;
 }
-.terminal-pet-icon {
+.terminal-watchdog-icon {
   color: #fff;
   font-size: 1.2rem;
 }
-@keyframes terminal-pet-pulse {
+@keyframes terminal-watchdog-pulse {
   0%,
   100% {
     box-shadow: -1px 1px 8px rgba(0, 0, 0, 0.35);
@@ -1613,7 +1675,7 @@
     box-shadow: -1px 1px 16px rgba(124, 58, 237, 0.75);
   }
 }
-.terminal-pet-bubble {
+.terminal-watchdog-bubble {
   background: var(--terminal-color-dark, #343a40);
   border-radius: 6px;
   color: #fff;
@@ -1628,8 +1690,28 @@
     padding 320ms ease-out;
   white-space: nowrap;
 }
-.terminal-pet.terminal-pet-peek .terminal-pet-bubble {
+.terminal-watchdog.terminal-watchdog-peek .terminal-watchdog-bubble {
   max-width: 240px;
   padding: 6px 10px;
   white-space: normal;
+}
+.terminal-watchdog.terminal-watchdog-expanded .terminal-watchdog-bubble {
+  max-height: 320px;
+  max-width: 320px;
+  overflow-y: auto;
+}
+.terminal-watchdog-history-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+}
+.terminal-watchdog-history-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.terminal-watchdog-history-item strong {
+  display: block;
+  font-size: 10px;
+  opacity: 0.7;
 }

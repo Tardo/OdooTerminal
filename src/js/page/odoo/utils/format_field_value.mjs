@@ -3,7 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 // Renders a raw in-memory field value (as returned by FormRecordAdapter#read) into a short
-// human-readable string — shared by `inspect -e record` and the AI pet's guardian consult.
+// human-readable string — shared by `inspect -e record` and the AI watchdog's consult.
 export default function formatFieldValue(raw: mixed): string {
   if (raw === null || raw === undefined) {
     return '';

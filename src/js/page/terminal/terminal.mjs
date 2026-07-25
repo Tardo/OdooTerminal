@@ -23,10 +23,11 @@ import renderTerminal from './templates/terminal';
 import renderAIConvItem from './templates/ai_conv_item';
 import renderBusyTooltip from './templates/busy_tooltip';
 import renderWelcome from './templates/welcome';
-import renderPet from './templates/pet';
-import {setPetStimulusHandler, setPetStimulusEnabled} from '@ai/pet/stimuli';
-import type {PetStimulus} from '@ai/pet/stimuli';
-import {runGuardianConsult} from '@ai/pet/consult';
+import renderWatchdog from './templates/watchdog';
+import renderWatchdogHistoryItem from './templates/watchdog_history_item';
+import {setWatchdogStimulusHandler, setWatchdogStimulusEnabled} from '@ai/watchdog/stimuli';
+import type {WatchdogStimulus} from '@ai/watchdog/stimuli';
+import {runWatchdogConsult} from '@ai/watchdog/consult';
 import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 import parseHTML from './utils/parse_html';
@@ -53,6 +54,9 @@ const ALLOWED_SILENT_FUNCS = ['updateInputInfo', 'showQuestion', 'clean'];
 // Delay before recomputing assistant options while typing, so holding a key
 // (e.g. backspace) doesn't reparse/rerender on every repeated keystroke.
 const ASSISTANT_OPTIONS_DEBOUNCE_MS = 80;
+// Bubble history is in-memory only (cleared on reload) — a hard cap just guards against an
+// unbounded array on a long session, not a UX limit anyone is expected to hit by scrolling.
+const WATCHDOG_HISTORY_MAX = 20;
 
 const dummyCall = () => {
   // Do nothing
@@ -147,7 +151,8 @@ export default class Terminal {
   #aiConvList_el: HTMLElement | void;
   #aiProviderSelect_el: HTMLSelectElement | void;
   #aiModelSelect_el: HTMLSelectElement | void;
-  #aiReasoningSelect_el: HTMLSelectElement | void;
+  #aiReasoningBtn_el: HTMLElement | void;
+  #aiReasoningMenu_el: HTMLElement | void;
   #aiModelsLoadedProvider: string | null = null;
   #aiModelFetchController: AbortController | void;
   #aiHelpPopup_el: HTMLElement | void;
@@ -156,16 +161,18 @@ export default class Terminal {
   #aiInputHistory: Array<string> = [];
   #pendingAttachments: Array<AIAttachment> = [];
 
-  // "Pet" mode: opt-in, off by default. Local heuristics (see @ai/pet/stimuli) decide when
-  // something happened; every stimulus fires a one-shot, tool-less guardian consult
-  // (see @ai/pet/consult) automatically — clicking the pet never calls the AI itself,
-  // it only opens the terminal to show the last note and hands off to the user.
-  #isPetMode: boolean = false;
-  #pet_el: HTMLElement | void;
-  #petDismissTimer: TimeoutID | null = null;
-  #lastPetStimulus: PetStimulus | null = null;
-  #lastPetText: string | null = null;
-  #petBusy: boolean = false;
+  // AI Watchdog mode: opt-in, off by default. Local heuristics (see @ai/watchdog/stimuli) decide
+  // when something happened; every stimulus fires a one-shot, tool-less consult
+  // (see @ai/watchdog/consult) automatically — clicking the watchdog never calls the AI itself,
+  // and its notes are never registered into the terminal/agent conversation: clicking just
+  // expands the bubble in place to show the watchdog's own message history (#watchdogHistory),
+  // fully independent of any AI-mode conversation/history.
+  #isWatchdogMode: boolean = false;
+  #watchdog_el: HTMLElement | void;
+  #watchdogDismissTimer: TimeoutID | null = null;
+  #watchdogHistory: Array<{stim: WatchdogStimulus, text: string}> = [];
+  #watchdogExpanded: boolean = false;
+  #watchdogBusy: boolean = false;
 
   constructor() {
     // $FlowFixMe[method-unbinding]
@@ -234,16 +241,16 @@ export default class Terminal {
 
     // Local storage (not session): an "activate for this instance" preference should survive
     // closing the browser, not just the tab — local storage is already origin-scoped, i.e.
-    // naturally per Odoo instance, same as terminal_ai_active_provider/terminal_pet_model below.
-    // Falls back to the extension-wide Options page default (#config.pet_enabled) the first
-    // time this instance is seen; once the user runs "ai pet" here, that explicit local choice
-    // wins from then on, same precedence as ai_models vs terminal_ai_active_provider.
-    const storedPetMode: mixed = getStorageLocalItem('terminal_pet_mode', null);
-    this.#isPetMode = storedPetMode === null ? Boolean(this.#config.pet_enabled) : Boolean(storedPetMode);
-    this.#pet_el?.classList.toggle('terminal-pet-active', this.#isPetMode);
+    // naturally per Odoo instance, same as terminal_ai_active_provider/terminal_watchdog_model
+    // below. Falls back to the extension-wide Options page default (#config.watchdog_enabled)
+    // the first time this instance is seen; once the user runs "ai watchdog" here, that explicit
+    // local choice wins from then on, same precedence as ai_models vs terminal_ai_active_provider.
+    const storedWatchdogMode: mixed = getStorageLocalItem('terminal_watchdog_mode', null);
+    this.#isWatchdogMode = storedWatchdogMode === null ? Boolean(this.#config.watchdog_enabled) : Boolean(storedWatchdogMode);
+    this.#watchdog_el?.classList.toggle('terminal-watchdog-active', this.#isWatchdogMode);
     // $FlowFixMe[method-unbinding]
-    setPetStimulusHandler(this.#onPetStimulus.bind(this));
-    setPetStimulusEnabled(this.#isPetMode);
+    setWatchdogStimulusHandler(this.#onWatchdogStimulus.bind(this));
+    setWatchdogStimulusEnabled(this.#isWatchdogMode);
 
     // $FlowFixMe[method-unbinding]
     window.addEventListener('message', this.#onWindowMessage.bind(this), false);
@@ -304,16 +311,17 @@ export default class Terminal {
       // $FlowFixMe[method-unbinding]
       aiModelSelectEl.addEventListener('change', this.#onChangeAIModel.bind(this));
     }
-    const aiReasoningSelectEl = this.el.querySelector('#terminal_ai_reasoning_select');
-    if (aiReasoningSelectEl instanceof HTMLSelectElement) {
-      this.#aiReasoningSelect_el = aiReasoningSelectEl;
-      const storedReasoning: mixed = getStorageLocalItem('terminal_ai_reasoning', null);
-      if (typeof storedReasoning === 'string' && storedReasoning.length > 0) {
-        aiReasoningSelectEl.value = storedReasoning;
-      }
-      this.#applyAIReasoning(aiReasoningSelectEl.value);
+    const aiReasoningBtnEl = this.el.querySelector('#terminal_ai_reasoning_btn');
+    const aiReasoningMenuEl = this.el.querySelector('#terminal_ai_reasoning_menu');
+    if (aiReasoningBtnEl instanceof HTMLElement && aiReasoningMenuEl instanceof HTMLElement) {
+      this.#aiReasoningBtn_el = aiReasoningBtnEl;
+      this.#aiReasoningMenu_el = aiReasoningMenuEl;
       // $FlowFixMe[method-unbinding]
-      aiReasoningSelectEl.addEventListener('change', this.#onChangeAIReasoning.bind(this));
+      aiReasoningBtnEl.addEventListener('click', this.#onClickToggleReasoningMenu.bind(this));
+      // $FlowFixMe[method-unbinding]
+      aiReasoningMenuEl.addEventListener('click', this.#onClickReasoningMenuItem.bind(this));
+      const storedReasoning: mixed = getStorageLocalItem('terminal_ai_reasoning', null);
+      this.#setAIReasoning(typeof storedReasoning === 'string' ? storedReasoning : '');
     }
     const aiHelpPopupEl = this.el.querySelector('#terminal_ai_help_popup');
     if (aiHelpPopupEl instanceof HTMLElement) {
@@ -391,18 +399,18 @@ export default class Terminal {
     } else if (existing_tooltip instanceof HTMLElement) {
       this.busyTooltip_el = existing_tooltip;
     }
-    const existing_pet = document.getElementById('terminal_pet');
-    if (!existing_pet) {
+    const existing_watchdog = document.getElementById('terminal_watchdog');
+    if (!existing_watchdog) {
       const body = document.body;
       if (body) {
-        const pet_el = parseHTML(renderPet());
-        body.append(pet_el);
-        this.#pet_el = pet_el;
+        const watchdog_el = parseHTML(renderWatchdog());
+        body.append(watchdog_el);
+        this.#watchdog_el = watchdog_el;
         // $FlowFixMe[method-unbinding]
-        pet_el.addEventListener('click', this.#onClickPet.bind(this));
+        watchdog_el.addEventListener('click', this.#onClickWatchdog.bind(this));
       }
-    } else if (existing_pet instanceof HTMLElement) {
-      this.#pet_el = existing_pet;
+    } else if (existing_watchdog instanceof HTMLElement) {
+      this.#watchdog_el = existing_watchdog;
     }
   }
 
@@ -809,47 +817,48 @@ export default class Terminal {
     return {...this.userContext, ...extra_context};
   }
 
-  // Opt-in "pet" mode: force true/false to set explicitly, omit to toggle. Returns the new state.
-  togglePetMode(force?: boolean): boolean {
-    const next = typeof force === 'boolean' ? force : !this.#isPetMode;
-    this.#isPetMode = next;
-    setStorageLocalItem('terminal_pet_mode', next, err => this.screen.printError(err));
-    setPetStimulusEnabled(next);
-    this.#pet_el?.classList.toggle('terminal-pet-active', next);
+  // Opt-in AI Watchdog mode: force true/false to set explicitly, omit to toggle. Returns the new state.
+  toggleWatchdogMode(force?: boolean): boolean {
+    const next = typeof force === 'boolean' ? force : !this.#isWatchdogMode;
+    this.#isWatchdogMode = next;
+    setStorageLocalItem('terminal_watchdog_mode', next, err => this.screen.printError(err));
+    setWatchdogStimulusEnabled(next);
+    this.#watchdog_el?.classList.toggle('terminal-watchdog-active', next);
     if (!next) {
-      this.#hidePet();
+      this.#hideWatchdog();
     }
     return next;
   }
 
-  isPetModeEnabled(): boolean {
-    return this.#isPetMode;
+  isWatchdogModeEnabled(): boolean {
+    return this.#isWatchdogMode;
   }
 
-  // Precedence: this instance's explicit choice (ai pet -m) > the Options page default
-  // (#config.pet_model). Deliberately does NOT fall back to aiState.model (the AI sidebar's
-  // active model) — the pet must stay fully independent of whatever's active for manual
-  // chat/agent use, see #resolvePetConnection.
-  getPetModel(): string {
-    const stored: mixed = getStorageLocalItem('terminal_pet_model', null);
+  // Precedence: this instance's explicit choice (ai watchdog -m) > the Options page default
+  // (#config.watchdog_model). Deliberately does NOT fall back to aiState.model (the AI sidebar's
+  // active model) — the watchdog must stay fully independent of whatever's active for manual
+  // chat/agent use, see #resolveWatchdogConnection.
+  getWatchdogModel(): string {
+    const stored: mixed = getStorageLocalItem('terminal_watchdog_model', null);
     if (typeof stored === 'string' && stored.length > 0) {
       return stored;
     }
-    if (typeof this.#config.pet_model === 'string' && this.#config.pet_model.length > 0) {
-      return this.#config.pet_model;
+    if (typeof this.#config.watchdog_model === 'string' && this.#config.watchdog_model.length > 0) {
+      return this.#config.watchdog_model;
     }
     return '';
   }
 
-  // Options → Guardian Pet lets the pet run its own dedicated provider (e.g. a local server),
-  // independent of whatever's active for manual chat — same reference-by-name convention as
-  // ai_models/terminal_ai_active_provider. Deliberately does NOT fall back to the currently
-  // active aiState connection when no dedicated provider is configured (or its saved name no
-  // longer matches an entry): the pet's messages must stay independent of the AI sidebar/agent
-  // mode, so "nothing dedicated configured" means "nothing to call" (null), not "borrow the
-  // agent connection". See hasPetConnection()/cmdAI.pet.noProvider for the user-facing warning.
-  #resolvePetConnection(): {url: string, apiKey: ?string, provider: ?string, maxTokens: ?number} | null {
-    const providerName = this.#config.pet_provider;
+  // Options → AI Watchdog lets the watchdog run its own dedicated provider (e.g. a local
+  // server), independent of whatever's active for manual chat — same reference-by-name
+  // convention as ai_models/terminal_ai_active_provider. Deliberately does NOT fall back to the
+  // currently active aiState connection when no dedicated provider is configured (or its saved
+  // name no longer matches an entry): the watchdog's messages must stay independent of the AI
+  // sidebar/agent mode, so "nothing dedicated configured" means "nothing to call" (null), not
+  // "borrow the agent connection". See hasWatchdogConnection()/cmdAI.watchdog.noProvider for the
+  // user-facing warning.
+  #resolveWatchdogConnection(): {url: string, apiKey: ?string, provider: ?string, maxTokens: ?number} | null {
+    const providerName = this.#config.watchdog_provider;
     if (typeof providerName === 'string' && providerName.length > 0) {
       const providers: Array<AIModelConfig> = Array.isArray(this.#config.ai_models) ? this.#config.ai_models : [];
       const found = providers.find(p => p.name === providerName);
@@ -858,7 +867,7 @@ export default class Terminal {
           url: found.url,
           apiKey: found.api_key || null,
           // 'openai' (streamRequest's own default), NOT null — a null provider here would fall
-          // through to aiState.provider in streamRequest(), silently re-coupling the pet to
+          // through to aiState.provider in streamRequest(), silently re-coupling the watchdog to
           // whatever's active in the AI sidebar. Only reachable for a hand-edited/imported entry
           // with an empty provider field; the Options form always writes a non-empty one.
           provider: found.provider || 'openai',
@@ -869,33 +878,51 @@ export default class Terminal {
     return null;
   }
 
-  setPetModel(model: string) {
-    setStorageLocalItem('terminal_pet_model', model, err => this.screen.printError(err));
+  setWatchdogModel(model: string) {
+    setStorageLocalItem('terminal_watchdog_model', model, err => this.screen.printError(err));
   }
 
-  // Same precedence as getPetModel(): instance override (ai pet -r) > Options default
-  // (#config.pet_reasoning) > '' (no override sent — current/legacy behaviour, see consult.mjs).
-  getPetReasoning(): string {
-    const stored: mixed = getStorageLocalItem('terminal_pet_reasoning', null);
+  // Same precedence as getWatchdogModel(): instance override (ai watchdog -r) > Options default
+  // (#config.watchdog_reasoning) > '' (no override sent — current/legacy behaviour, see consult.mjs).
+  getWatchdogReasoning(): string {
+    const stored: mixed = getStorageLocalItem('terminal_watchdog_reasoning', null);
     if (typeof stored === 'string' && stored.length > 0) {
       return stored;
     }
-    if (typeof this.#config.pet_reasoning === 'string' && this.#config.pet_reasoning.length > 0) {
-      return this.#config.pet_reasoning;
+    if (typeof this.#config.watchdog_reasoning === 'string' && this.#config.watchdog_reasoning.length > 0) {
+      return this.#config.watchdog_reasoning;
     }
     return '';
   }
 
-  setPetReasoning(reasoning: string) {
-    setStorageLocalItem('terminal_pet_reasoning', reasoning, err => this.screen.printError(err));
+  setWatchdogReasoning(reasoning: string) {
+    setStorageLocalItem('terminal_watchdog_reasoning', reasoning, err => this.screen.printError(err));
   }
 
-  // Whether the pet has anything to call right now — requires its OWN dedicated Options-page
-  // provider (Options → Guardian Pet); it never borrows the AI sidebar's active connection, see
-  // #resolvePetConnection. Used by `ai pet` to warn the user instead of silently enabling a
-  // guardian that will never actually fire.
-  hasPetConnection(): boolean {
-    return this.#resolvePetConnection() !== null;
+  // Same precedence chain as getWatchdogReasoning(): instance override (ai watchdog -pf) > Options
+  // default (#config.watchdog_profile) > 'technical'. Unlike reasoning, there is no "no override"
+  // state — every consult needs a persona, so this never returns ''.
+  getWatchdogProfile(): string {
+    const stored: mixed = getStorageLocalItem('terminal_watchdog_profile', null);
+    if (typeof stored === 'string' && stored.length > 0) {
+      return stored;
+    }
+    if (typeof this.#config.watchdog_profile === 'string' && this.#config.watchdog_profile.length > 0) {
+      return this.#config.watchdog_profile;
+    }
+    return 'technical';
+  }
+
+  setWatchdogProfile(profile: string) {
+    setStorageLocalItem('terminal_watchdog_profile', profile, err => this.screen.printError(err));
+  }
+
+  // Whether the watchdog has anything to call right now — requires its OWN dedicated
+  // Options-page provider (Options → AI Watchdog); it never borrows the AI sidebar's active
+  // connection, see #resolveWatchdogConnection. Used by `ai watchdog` to warn the user instead
+  // of silently enabling a watchdog that will never actually fire.
+  hasWatchdogConnection(): boolean {
+    return this.#resolveWatchdogConnection() !== null;
   }
 
   /* PRIVATE METHODS*/
@@ -1651,17 +1678,35 @@ export default class Terminal {
 
   // openai-provider only (see providers/openai.mjs reasoningEffort) — harmless to leave set while
   // on another provider, since streamRequest() only forwards it to the openai branch.
-  #applyAIReasoning(value: string) {
+  #setAIReasoning(value: string) {
     aiState.reasoning = value || null;
+    const label = this.#aiReasoningBtn_el?.querySelector('.terminal-ai-reasoning-btn-label');
+    if (label) {
+      label.textContent = value;
+    }
+    this.#aiReasoningBtn_el?.classList.toggle('terminal-ai-reasoning-btn-active', value.length > 0);
+    for (const item of this.#aiReasoningMenu_el?.querySelectorAll('.terminal-ai-reasoning-menu-item') ?? []) {
+      if (item instanceof HTMLElement) {
+        const itemValue = String(item.dataset['value'] ?? '');
+        item.classList.toggle('terminal-ai-reasoning-menu-item-active', itemValue === value);
+      }
+    }
   }
 
-  #onChangeAIReasoning(ev: Event) {
-    if (!(ev.target instanceof HTMLSelectElement)) {
+  #onClickToggleReasoningMenu(ev: MouseEvent) {
+    ev.stopPropagation();
+    this.#aiReasoningMenu_el?.classList.toggle('terminal-ai-reasoning-menu-active');
+  }
+
+  #onClickReasoningMenuItem(ev: MouseEvent) {
+    const item = ev.target instanceof HTMLElement ? ev.target.closest('.terminal-ai-reasoning-menu-item') : null;
+    if (!(item instanceof HTMLElement)) {
       return;
     }
-    const value = ev.target.value;
+    const value = item.dataset['value'] ?? '';
     setStorageLocalItem('terminal_ai_reasoning', value || null, err => this.screen.printError(err));
-    this.#applyAIReasoning(value);
+    this.#setAIReasoning(value);
+    this.#aiReasoningMenu_el?.classList.remove('terminal-ai-reasoning-menu-active');
   }
 
   /* AI CONVERSATIONS */
@@ -1742,78 +1787,112 @@ export default class Terminal {
     this.screen.preventLostInputFocus();
   }
 
-  // Reactive: every stimulus fires an automatic one-shot guardian consult (see @ai/pet/consult
-  // — plain chat, no tools, no run_command, so it can never touch the page while the user is
+  // Reactive: every stimulus fires an automatic one-shot consult (see @ai/watchdog/consult —
+  // plain chat, no tools, no run_command, so it can never touch the page while the user is
   // working). The consult itself decides whether there's anything concrete/useful to say (it
-  // returns '' otherwise, see NOTHING_TOKEN) — so the pet stays fully invisible for the common
-  // case where nothing is wrong, instead of peeking out on every save/open just to say so.
-  // #petBusy is a correctness guard against overlapping requests racing each other, not a cost
-  // throttle — token cost is the user's call.
-  async #onPetStimulus(stim: PetStimulus) {
-    if (this.#petBusy) {
+  // returns '' otherwise, see NOTHING_TOKEN) — so the watchdog stays fully invisible for the
+  // common case where nothing is wrong, instead of peeking out on every save/open just to say so.
+  // #watchdogBusy is a correctness guard against overlapping requests racing each other, not a
+  // cost throttle — token cost is the user's call.
+  async #onWatchdogStimulus(stim: WatchdogStimulus) {
+    if (stim.type === 'error') {
+      // Logged unconditionally, before #watchdogBusy/profile can drop it — same "classify every
+      // outcome instead of guessing" pattern @ai/watchdog/consult already uses for truncation/
+      // reasoning. This is what tells the NEXT "the exception explanation is generic" report
+      // apart: label still reading OWL's own wrapper text ("...see this Error's cause property")
+      // means the cause-chain walk (stimuli.mjs causeChain()) didn't reach the real error — a
+      // stimuli.mjs bug; label reading the actual exception but the bubble still being vague
+      // means the input was fine and the system prompt is the problem instead. Don't guess which
+      // one it is from the bubble text alone, check this line first.
+      logger.info(
+        'watchdog',
+        `error stimulus: "${stim.label}"${typeof stim.detail === 'string' && stim.detail.length > 0 ? ` (detail: ${stim.detail.length} chars)` : ' (no detail/stack)'}`,
+      );
+    }
+    if (this.#watchdogBusy) {
       return;
     }
-    const connection = this.#resolvePetConnection();
+    // Exceptions (RPC errors + uncaught JS errors, see @ai/watchdog/stimuli) are deliberately a
+    // technical-profile-only concern — explaining a stack trace/traceback is exactly the kind of
+    // thing an accounting/sales persona has no use for. Gated here (not in stimuli.mjs, which
+    // stays profile-agnostic by design) so switching profile takes effect immediately without
+    // reinstalling any listener, and so non-technical profiles skip the AI call entirely instead
+    // of just staying silent about it.
+    if (stim.type === 'error' && this.getWatchdogProfile() !== 'technical') {
+      return;
+    }
+    const connection = this.#resolveWatchdogConnection();
     if (connection === null) {
       return;
     }
-    this.#petBusy = true;
+    this.#watchdogBusy = true;
     try {
-      const reasoning = this.getPetReasoning();
-      const text = await runGuardianConsult(stim, connection, this.getPetModel(), 60, reasoning.length > 0 ? reasoning : null);
+      const reasoning = this.getWatchdogReasoning();
+      const text = await runWatchdogConsult(
+        stim,
+        connection,
+        this.getWatchdogModel(),
+        60,
+        reasoning.length > 0 ? reasoning : null,
+        this.getWatchdogProfile(),
+      );
       if (text.length === 0) {
         return;
       }
-      this.#lastPetStimulus = stim;
-      this.#lastPetText = text;
-      const bubble = this.#pet_el?.querySelector('.terminal-pet-bubble');
+      this.#watchdogHistory.unshift({stim, text});
+      if (this.#watchdogHistory.length > WATCHDOG_HISTORY_MAX) {
+        this.#watchdogHistory.length = WATCHDOG_HISTORY_MAX;
+      }
+      this.#watchdogExpanded = false;
+      this.#watchdog_el?.classList.remove('terminal-watchdog-expanded');
+      const bubble = this.#watchdog_el?.querySelector('.terminal-watchdog-bubble');
       if (bubble) {
         bubble.textContent = text;
       }
-      this.#pet_el?.classList.add('terminal-pet-peek');
-      if (this.#petDismissTimer !== null) {
-        clearTimeout(this.#petDismissTimer);
+      this.#watchdog_el?.classList.add('terminal-watchdog-peek');
+      if (this.#watchdogDismissTimer !== null) {
+        clearTimeout(this.#watchdogDismissTimer);
       }
-      this.#petDismissTimer = setTimeout(() => this.#hidePet(), 9000);
+      this.#watchdogDismissTimer = setTimeout(() => this.#hideWatchdog(), 9000);
     } catch (err) {
-      logger.error('pet', err);
+      logger.error('watchdog', err);
     } finally {
-      this.#petBusy = false;
+      this.#watchdogBusy = false;
     }
   }
 
-  #hidePet() {
-    this.#pet_el?.classList.remove('terminal-pet-peek');
-    if (this.#petDismissTimer !== null) {
-      clearTimeout(this.#petDismissTimer);
-      this.#petDismissTimer = null;
+  #hideWatchdog() {
+    this.#watchdogExpanded = false;
+    this.#watchdog_el?.classList.remove('terminal-watchdog-peek', 'terminal-watchdog-expanded');
+    if (this.#watchdogDismissTimer !== null) {
+      clearTimeout(this.#watchdogDismissTimer);
+      this.#watchdogDismissTimer = null;
     }
   }
 
-  // Never calls the AI itself — it opens the terminal, surfaces the last guardian note as
-  // context, and hands off to the user for any follow-up (full agent capability, same as
-  // typing directly).
-  async #onClickPet() {
-    this.#hidePet();
-    await this.doShow();
-    if (!this.#isAIMode) {
-      const btn = this.el.querySelector('.terminal-screen-icon-ai-mode');
-      if (btn instanceof HTMLElement) {
-        btn.click();
-      }
+  // Never calls the AI, and never touches the terminal/agent conversation — toggles the bubble
+  // in place to show the watchdog's own message history (#watchdogHistory). Click again (or a
+  // new stimulus) to collapse.
+  #onClickWatchdog() {
+    if (this.#watchdogExpanded) {
+      this.#hideWatchdog();
+      return;
     }
-    if (this.#activeConvId === null) {
-      this.createAIConversation(i18n.t('terminal.ai.newConversation', 'New conversation'));
+    if (this.#watchdogDismissTimer !== null) {
+      clearTimeout(this.#watchdogDismissTimer);
+      this.#watchdogDismissTimer = null;
     }
-    if (this.#lastPetText !== null && this.#lastPetStimulus !== null) {
-      this.screen.print(
-        i18n.t('terminal.pet.note', '🛡 <strong>{{label}}</strong> — {{text}}', {
-          label: this.#lastPetStimulus.label,
-          text: this.#lastPetText,
-        }),
-      );
+    this.#watchdogExpanded = true;
+    this.#watchdog_el?.classList.add('terminal-watchdog-peek', 'terminal-watchdog-expanded');
+    const bubble = this.#watchdog_el?.querySelector('.terminal-watchdog-bubble');
+    if (!bubble) {
+      return;
     }
-    this.screen.focus();
+    if (this.#watchdogHistory.length === 0) {
+      bubble.textContent = i18n.t('terminal.watchdog.historyEmpty', 'No messages yet.');
+      return;
+    }
+    bubble.replaceChildren(...this.#watchdogHistory.map(entry => parseHTML(renderWatchdogHistoryItem(entry.stim.label, entry.text))));
   }
 
   #onClickAIHelp() {
@@ -2116,6 +2195,16 @@ export default class Terminal {
       !clickTarget.closest('.terminal-ai-help-btn')
     ) {
       helpPopup.classList.remove('terminal-ai-help-popup-active');
+    }
+    const reasoningMenu = this.#aiReasoningMenu_el;
+    if (
+      reasoningMenu &&
+      reasoningMenu.classList.contains('terminal-ai-reasoning-menu-active') &&
+      clickTarget instanceof HTMLElement &&
+      !reasoningMenu.contains(clickTarget) &&
+      !clickTarget.closest('.terminal-ai-reasoning-btn')
+    ) {
+      reasoningMenu.classList.remove('terminal-ai-reasoning-menu-active');
     }
     if (
       this.busyTooltip_el &&

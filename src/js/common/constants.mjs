@@ -45,10 +45,11 @@ export const SETTING_TYPES: {
   show_technical_model_min_version: SettingType,
   screen_buffer_size: SettingType,
   theme_preset: SettingType,
-  pet_enabled: SettingType,
-  pet_provider: SettingType,
-  pet_model: SettingType,
-  pet_reasoning: SettingType,
+  watchdog_enabled: SettingType,
+  watchdog_provider: SettingType,
+  watchdog_model: SettingType,
+  watchdog_reasoning: SettingType,
+  watchdog_profile: SettingType,
 } = {
   init_cmds: 'edit',
   term_context: 'json',
@@ -90,10 +91,11 @@ export const SETTING_TYPES: {
   show_technical_model_min_version: 'option',
   screen_buffer_size: 'int',
   theme_preset: 'option',
-  pet_enabled: 'check',
-  pet_provider: 'edit',
-  pet_model: 'edit',
-  pet_reasoning: 'edit',
+  watchdog_enabled: 'check',
+  watchdog_provider: 'edit',
+  watchdog_model: 'edit',
+  watchdog_reasoning: 'edit',
+  watchdog_profile: 'edit',
 };
 
 export const SETTING_NAMES: $ReadOnlyArray<string> = Array.from(Object.keys(SETTING_TYPES));
@@ -139,17 +141,23 @@ export type ExtensionSettings = {
   show_technical_model_min_version: '17' | '18' | '19',
   screen_buffer_size: number,
   theme_preset: string,
-  // Extension-wide default for the "ai pet" guardian; each Odoo instance can still override
-  // it locally with `ai pet -p on|off -m <model>` (see terminal.mjs #isPetMode / getPetModel).
-  // pet_provider is the .name of an entry in ai_models — same reference-by-name convention as
-  // terminal_ai_active_provider — so the pet can run its own dedicated connection (e.g. a local
-  // server) independent of whichever provider is active for manual chat/agent use.
-  pet_enabled: boolean,
-  pet_provider: string,
-  pet_model: string,
+  // Extension-wide default for the "ai watchdog"; each Odoo instance can still override it
+  // locally with `ai watchdog -p on|off -m <model>` (see terminal.mjs #isWatchdogMode /
+  // getWatchdogModel). watchdog_provider is the .name of an entry in ai_models — same
+  // reference-by-name convention as terminal_ai_active_provider — so the watchdog can run its
+  // own dedicated connection (e.g. a local server) independent of whichever provider is active
+  // for manual chat/agent use.
+  watchdog_enabled: boolean,
+  watchdog_provider: string,
+  watchdog_model: string,
   // '' (no override), 'off', 'low', 'medium' or 'high' — see providers/openai.mjs
   // reasoningEffort. Openai-provider only for now.
-  pet_reasoning: string,
+  watchdog_reasoning: string,
+  // '' (unset, Terminal#getWatchdogProfile falls back to 'technical'), 'technical', 'accounting'
+  // or 'sales' — which lens the watchdog's verdicts are written through, see
+  // @ai/watchdog/consult's PROFILE_ROLE/PROFILE_LENS. The shared contract (sentinel, terseness,
+  // required-field priority) never changes across profiles, only vocabulary/emphasis does.
+  watchdog_profile: string,
 };
 
 export const SETTING_DEFAULTS: ExtensionSettings = {
@@ -193,10 +201,11 @@ export const SETTING_DEFAULTS: ExtensionSettings = {
   show_technical_model_min_version: '18',
   screen_buffer_size: 0,
   theme_preset: '',
-  pet_enabled: false,
-  pet_provider: '',
-  pet_model: '',
-  pet_reasoning: '',
+  watchdog_enabled: false,
+  watchdog_provider: '',
+  watchdog_model: '',
+  watchdog_reasoning: '',
+  watchdog_profile: '',
 };
 
 // Effective screen line buffer used when 'screen_buffer_size' is unset/0 (see core/screen.mjs)
