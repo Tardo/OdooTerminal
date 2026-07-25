@@ -22,6 +22,7 @@ import cmdLastSeen from './lastseen';
 import cmdLogin from './login';
 import cmdLogout from './logout';
 import cmdLongpolling from './longpolling';
+import cmdMarkdown from './markdown';
 import cmdMetadata from './metadata';
 import cmdPaste from './paste';
 import cmdNow from './now';
@@ -95,6 +96,7 @@ export default function (vm: VMachine) {
   vm.registerCommand('count', cmdCount());
   vm.registerCommand('ref', cmdRef());
   vm.registerCommand('rpc', cmdRpc());
+  vm.registerCommand('markdown', cmdMarkdown());
   vm.registerCommand('metadata', cmdMetadata());
   vm.registerCommand('paste', cmdPaste());
   vm.registerCommand('barcode', cmdBarcode());

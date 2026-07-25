@@ -856,6 +856,13 @@
       "verboseEnabled": "Now long-polling is in verbose mode"
     }
   },
+  "cmdMarkdown": {
+    "args": {
+      "text": "The markdown text to convert"
+    },
+    "definition": "Renders markdown as HTML",
+    "detail": "Converts the given markdown text to HTML using markdown-it and prints the result"
+  },
   "cmdMetadata": {
     "args": {
       "id": "The record id",
