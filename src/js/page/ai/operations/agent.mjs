@@ -521,13 +521,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         } else {
           loadedSkills.add(skillName);
           const skillLabel = i18n.t('cmdAI.agent.skill.loading', '[Agent] Loading skill: {{name}}', {name: skillName});
-          const skillHtml = Array.from(skillLabel)
-            .map((ch, i) => {
-              const safe = ch === '&' ? '&amp;' : ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === ' ' ? '&nbsp;' : ch;
-              return `<span class="agent-skill-char" style="animation-delay:${i * 38}ms">${safe}</span>`;
-            })
-            .join('');
-          ctx.screen.print(skillHtml, false, 'agent-skill-loading');
+          ctx.screen.print(skillLabel, false, 'agent-action');
           const major = Number(getOdooVersion('major') ?? -1);
           skillContent = `Skill loaded: ${skillName}\n${skill.content(major)}`;
         }
@@ -680,6 +674,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
             server: server.name,
           }),
           false,
+          'agent-action',
         );
 
         const callController = startRequest(server.timeout || 30);
