@@ -130,6 +130,82 @@
   white-space: nowrap;
 }
 
+.o_terminal div#terminal_screen .line-text p {
+  margin: 0.3em 0;
+}
+.o_terminal div#terminal_screen .line-text p:first-child {
+  margin-top: 0;
+}
+.o_terminal div#terminal_screen .line-text p:last-child {
+  margin-bottom: 0;
+}
+
+.o_terminal div#terminal_screen .line-text h1,
+.o_terminal div#terminal_screen .line-text h2,
+.o_terminal div#terminal_screen .line-text h3,
+.o_terminal div#terminal_screen .line-text h4,
+.o_terminal div#terminal_screen .line-text h5,
+.o_terminal div#terminal_screen .line-text h6 {
+  color: var(--terminal-color-primary);
+  font-size: 1em;
+  font-weight: bold;
+  margin: 0.3em 0;
+}
+.o_terminal div#terminal_screen .line-text h1:first-child,
+.o_terminal div#terminal_screen .line-text h2:first-child,
+.o_terminal div#terminal_screen .line-text h3:first-child,
+.o_terminal div#terminal_screen .line-text h4:first-child,
+.o_terminal div#terminal_screen .line-text h5:first-child,
+.o_terminal div#terminal_screen .line-text h6:first-child {
+  margin-top: 0;
+}
+.o_terminal div#terminal_screen .line-text h1:last-child,
+.o_terminal div#terminal_screen .line-text h2:last-child,
+.o_terminal div#terminal_screen .line-text h3:last-child,
+.o_terminal div#terminal_screen .line-text h4:last-child,
+.o_terminal div#terminal_screen .line-text h5:last-child,
+.o_terminal div#terminal_screen .line-text h6:last-child {
+  margin-bottom: 0;
+}
+
+.o_terminal div#terminal_screen .line-text ol,
+.o_terminal div#terminal_screen .line-text ul {
+  margin: 0.3em 0;
+  padding-left: 1.8em;
+}
+.o_terminal div#terminal_screen .line-text ol:first-child,
+.o_terminal div#terminal_screen .line-text ul:first-child {
+  margin-top: 0;
+}
+.o_terminal div#terminal_screen .line-text ol:last-child,
+.o_terminal div#terminal_screen .line-text ul:last-child {
+  margin-bottom: 0;
+}
+
+.o_terminal div#terminal_screen .line-text table {
+  border-collapse: collapse;
+  display: block;
+  margin: 0.3em 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.o_terminal div#terminal_screen .line-text table:first-child {
+  margin-top: 0;
+}
+.o_terminal div#terminal_screen .line-text table:last-child {
+  margin-bottom: 0;
+}
+.o_terminal div#terminal_screen .line-text th,
+.o_terminal div#terminal_screen .line-text td {
+  border: 1px solid var(--terminal-color-muted);
+  padding: 0.3em 0.6em;
+  text-align: left;
+}
+.o_terminal div#terminal_screen .line-text th {
+  background-color: var(--terminal-color-secondary);
+  color: var(--terminal-color-white);
+}
+
 .o_terminal div#terminal_screen .line-pre {
   white-space: pre;
 }

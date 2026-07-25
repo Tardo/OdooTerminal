@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import buildTraSHPrompt from '@ai/prompts/trash';
+import buildMarkdownFormatPrompt from '@ai/prompts/markdown_format';
 import type {SkillDef} from '@ai/skills/__all__';
 import type Terminal from '@odoo/terminal';
 
@@ -28,9 +29,7 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     `[CONSTRAINT] Max steps: ${maxSteps}. Use as FEW as possible — one well-targeted command beats two exploratory ones.\n` +
     '\n' +
     '# FINAL ANSWER FORMAT (STRICT, NO EXCEPTIONS)\n' +
-    '- The final answer MUST be raw HTML. NEVER markdown (no **, no -, no #), never unformatted plain text. Allowed tags ONLY: <b>, <ul>, <li>, <code>, <br> (Bootstrap classes allowed).\n' +
-    '  Example — WRONG: "**Total:** 42 orders\\n- Order 1\\n- Order 2"\n' +
-    '  Example — RIGHT: "<b>Total:</b> 42 orders<ul><li>Order 1</li><li>Order 2</li></ul>"\n' +
+    buildMarkdownFormatPrompt() + '\n' +
     '- When the task is complete (no more tool calls), respond with the final answer. It is shown directly to the user: write the actual answer/data, never meta-commentary ("response delivered", "data shown", "I opened the view").\n' +
     '- Display tasks (view, graph, pivot): respond with EMPTY text after the run_command call — unless the ONE VIEW SLOT rule (see DISPLAY below) forced you to leave something out, in which case add ONLY that leftover part as plain text.\n' +
     '\n' +
@@ -81,10 +80,10 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     buildTraSHPrompt(terminal);
   // Recency anchor: the format rule sits ~15K tokens above (before the TraSH
   // prompt and command catalog); repeating it at the very end keeps weak models
-  // from drifting back to markdown in the final answer.
+  // from drifting into raw HTML tags (their old habit) in the final answer.
   const reminder =
     '\n!!! FINAL ANSWER FORMAT REMINDER !!!\n' +
-    'The final answer MUST be raw HTML using ONLY <b>, <ul>, <li>, <code>, <br> — NEVER markdown (no **, no -, no #), NEVER code fences.\n';
+    'The final answer MUST be plain Markdown (bold/code/lists only) — it is converted to HTML automatically. NEVER raw HTML tags, NEVER headings/tables, NEVER wrap the answer in a code fence.\n';
   if (customPrompt !== null && customPrompt !== undefined && customPrompt.trim() !== '') {
     return base + '\n# USER CUSTOM INSTRUCTIONS\nProvided by the user for this conversation; follow them unless they conflict with the safety or grounding rules above.\n' + customPrompt.trim() + '\n' + reminder;
   }
