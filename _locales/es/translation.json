@@ -39,6 +39,21 @@
     "message": "Clear the <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>screen</strong> or/and <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>history</strong> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
     "warning": "WARNING: "
   },
+  "cmd2DCircle": {
+    "args": {
+      "canvas": "The canvas",
+      "color": "The color",
+      "end-angle": "End angle in degrees",
+      "radius": "The radius",
+      "start-angle": "Start angle in degrees",
+      "stroke": "Draw the outline instead of filling",
+      "width": "The outline width",
+      "x": "The center X point",
+      "y": "The center Y point"
+    },
+    "definition": "Draw a circle or arc",
+    "detail": "Draw a circle, arc or pie slice"
+  },
   "cmd2DClear": {
     "args": {
       "canvas": "The canvas",
@@ -52,6 +67,7 @@
   },
   "cmd2DCreateWindow": {
     "args": {
+      "centered": "Center the canvas on screen",
       "height": "The canvas height",
       "posx": "The canvas position X",
       "posy": "The canvas position Y",
@@ -67,6 +83,15 @@
     "definition": "Destroy 2D Window",
     "detail": "Destroy 2D Window"
   },
+  "cmd2DHandleLoop": {
+    "args": {
+      "canvas": "The canvas",
+      "fun": "The draw function",
+      "max-frames": "Stop after this many frames (-1 = unlimited)"
+    },
+    "definition": "Run a graphics loop",
+    "detail": "Call the given function once per browser frame with (time, delta, count). Stops when the window is destroyed, after --max-frames, or when the function returns false. Returns the number of frames run"
+  },
   "cmd2DLine": {
     "args": {
       "canvas": "The canvas",
@@ -79,6 +104,17 @@
     },
     "definition": "Draw a line",
     "detail": "Draw a line"
+  },
+  "cmd2DPoly": {
+    "args": {
+      "canvas": "The canvas",
+      "color": "The color",
+      "fill": "Close the shape and fill it",
+      "points": "The list of [x, y] points",
+      "width": "The line width"
+    },
+    "definition": "Draw a polyline or polygon",
+    "detail": "Draw a polyline from a list of [x, y] points. With --fill the shape is closed and filled"
   },
   "cmd2DRect": {
     "args": {
@@ -1290,6 +1326,10 @@
   },
   "file2file": {
     "aborted": "Aborted by user. No file given..."
+  },
+  "func2DNextFrame": {
+    "definition": "Wait for the next animation frame",
+    "detail": "Waits until the browser is ready to paint the next frame and returns its timestamp. Use it to pace animation loops instead of sleep."
   },
   "func2DText": {
     "args": {

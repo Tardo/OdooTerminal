@@ -3,6 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import accountingSkill from './accounting';
+import graphicsSkill from './graphics';
 import instanceSkill from './instance';
 import trashSyntaxSkill from './trash_syntax';
 
@@ -17,6 +18,7 @@ const SKILLS: $ReadOnlyArray<SkillDef> = [
   trashSyntaxSkill,
   instanceSkill,
   accountingSkill,
+  graphicsSkill,
 ];
 
 export default SKILLS;

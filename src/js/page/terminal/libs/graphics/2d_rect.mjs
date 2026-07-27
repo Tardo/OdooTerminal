@@ -5,13 +5,15 @@
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
+import scheduleDraw from './render_queue';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function func2DRect(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  const ctx = kwargs.canvas.getContext("2d");
-  ctx.fillStyle = kwargs.color;
-  ctx.fillRect(kwargs.x, kwargs.y, kwargs.width, kwargs.height);
+  scheduleDraw(kwargs.canvas, ctx => {
+    ctx.fillStyle = kwargs.color;
+    ctx.fillRect(kwargs.x, kwargs.y, kwargs.width, kwargs.height);
+  });
 }
 
 export default function (): Partial<CMDDef> {

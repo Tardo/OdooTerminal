@@ -730,4 +730,40 @@ export default class TestTrash extends TerminalTestSuite {
     results = await this.terminal.getShell().eval("dict_size {}");
     this.assertEqual(results, 0);
   }
+
+  async test_trash_graphics_funcs() {
+    const canvas = await this.terminal.getShell().eval("$gw = (2d_create_window -w 50 -h 50); $gw");
+    this.assertTrue(canvas instanceof HTMLCanvasElement);
+    // Queued draws are flushed once 2d_next_frame resolves
+    await this.terminal.getShell().eval("2d_rect -c $gw -x 0 -y 0 -w 50 -h 50 -rc '#ff0000'");
+    await this.terminal.getShell().eval("2d_circle -c $gw -x 12 -y 12 -r 8 -cc '#00ff00'");
+    await this.terminal.getShell().eval("2d_poly -c $gw -p [[30, 30], [49, 30], [40, 49]] -pc '#0000ff' --fill");
+    const ts = await this.terminal.getShell().eval("2d_next_frame");
+    this.assertTrue(typeof ts === 'number' && ts > 0);
+    const ctx = canvas.getContext('2d');
+    // rect
+    let pixel = ctx.getImageData(1, 1, 1, 1).data;
+    this.assertEqual(pixel[0], 255);
+    this.assertEqual(pixel[3], 255);
+    // circle center
+    pixel = ctx.getImageData(12, 12, 1, 1).data;
+    this.assertEqual(pixel[1], 255);
+    // poly interior
+    pixel = ctx.getImageData(38, 34, 1, 1).data;
+    this.assertEqual(pixel[2], 255);
+    await this.terminal.getShell().eval("2d_destroy_window -c $gw");
+    this.assertFalse(canvas.isConnected);
+
+    // 2d_handle_loop: runs the callback once per frame, stops at --max-frames,
+    // closures over outer vars persist between frames
+    const loop_res = await this.terminal.getShell().eval(
+      "$gw2 = (2d_create_window -w 30 -h 30)\n" +
+        "$cnt = 0\n" +
+        "$frames = (2d_handle_loop -c $gw2 -f (function () { $cnt += 1 }) -mf 3)\n" +
+        '2d_destroy_window -c $gw2\n' +
+        '[$frames, $cnt]',
+    );
+    this.assertEqual(loop_res[0], 3);
+    this.assertEqual(loop_res[1], 3);
+  }
 }

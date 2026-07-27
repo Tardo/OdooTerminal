@@ -15,7 +15,11 @@ async function func2DCreateWindow(vmachine: VMachine, kwargs: CMDCallbackArgs): 
   canvas.width = kwargs.width;
   canvas.height = kwargs.height;
   canvas.classList.add('terminal-graphics-window');
-  if (typeof kwargs.x === 'undefined' && typeof kwargs.y === 'undefined') {
+  if (kwargs.centered) {
+    canvas.style.left = '50%';
+    canvas.style.top = '50%';
+    canvas.style.transform = 'translate(-50%, -50%)';
+  } else if (typeof kwargs.x === 'undefined' && typeof kwargs.y === 'undefined') {
     canvas.style.marginLeft = 'auto';
     canvas.style.marginRight = 'auto';
     canvas.style.left = '0';
@@ -39,7 +43,8 @@ export default function (): Partial<CMDDef> {
       [ARG.Number, ['h', 'height'], true, i18n.t('cmd2DCreateWindow.args.height', 'The canvas height')],
       [ARG.Number, ['x', 'x'], false, i18n.t('cmd2DCreateWindow.args.posx', 'The canvas position X')],
       [ARG.Number, ['y', 'y'], false, i18n.t('cmd2DCreateWindow.args.posy', 'The canvas position Y')],
+      [ARG.Flag, ['ct', 'centered'], false, i18n.t('cmd2DCreateWindow.args.centered', 'Center the canvas on screen')],
     ],
-    example: "-w 800 -h 600",
+    example: "-w 800 -h 600 --centered",
   };
 }

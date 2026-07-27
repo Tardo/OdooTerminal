@@ -5,14 +5,16 @@
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
+import scheduleDraw from './render_queue';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function func2DClear(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  const ctx = kwargs.canvas.getContext("2d");
-  const w = (kwargs.width === -1) ? kwargs.canvas.width : kwargs.width;
-  const h = (kwargs.width === -1) ? kwargs.canvas.height : kwargs.height;
-  ctx.clearRect(kwargs.x, kwargs.y, w, h);
+  scheduleDraw(kwargs.canvas, ctx => {
+    const w = (kwargs.width === -1) ? kwargs.canvas.width : kwargs.width;
+    const h = (kwargs.height === -1) ? kwargs.canvas.height : kwargs.height;
+    ctx.clearRect(kwargs.x, kwargs.y, w, h);
+  });
 }
 
 export default function (): Partial<CMDDef> {

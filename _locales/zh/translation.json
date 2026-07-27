@@ -39,6 +39,21 @@
     "message": "请<strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>清屏</strong>或/和<strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>清除历史</strong>以释放存储空间。浏览器 <u>存储配额已超出</u> 😭",
     "warning": "警告："
   },
+  "cmd2DCircle": {
+    "args": {
+      "canvas": "The canvas",
+      "color": "The color",
+      "end-angle": "End angle in degrees",
+      "radius": "The radius",
+      "start-angle": "Start angle in degrees",
+      "stroke": "Draw the outline instead of filling",
+      "width": "The outline width",
+      "x": "The center X point",
+      "y": "The center Y point"
+    },
+    "definition": "Draw a circle or arc",
+    "detail": "Draw a circle, arc or pie slice"
+  },
   "cmd2DClear": {
     "args": {
       "canvas": "画布",
@@ -52,6 +67,7 @@
   },
   "cmd2DCreateWindow": {
     "args": {
+      "centered": "Center the canvas on screen",
       "height": "画布高度",
       "posx": "画布位置 X",
       "posy": "画布位置 Y",
@@ -67,6 +83,15 @@
     "definition": "销毁 2D 窗口",
     "detail": "销毁 2D 窗口"
   },
+  "cmd2DHandleLoop": {
+    "args": {
+      "canvas": "The canvas",
+      "fun": "The draw function",
+      "max-frames": "Stop after this many frames (-1 = unlimited)"
+    },
+    "definition": "Run a graphics loop",
+    "detail": "Call the given function once per browser frame with (time, delta, count). Stops when the window is destroyed, after --max-frames, or when the function returns false. Returns the number of frames run"
+  },
   "cmd2DLine": {
     "args": {
       "canvas": "画布",
@@ -79,6 +104,17 @@
     },
     "definition": "绘制线条",
     "detail": "绘制线条"
+  },
+  "cmd2DPoly": {
+    "args": {
+      "canvas": "The canvas",
+      "color": "The color",
+      "fill": "Close the shape and fill it",
+      "points": "The list of [x, y] points",
+      "width": "The line width"
+    },
+    "definition": "Draw a polyline or polygon",
+    "detail": "Draw a polyline from a list of [x, y] points. With --fill the shape is closed and filled"
   },
   "cmd2DRect": {
     "args": {
@@ -1290,6 +1326,10 @@
   },
   "file2file": {
     "aborted": "用户已中止。未提供文件..."
+  },
+  "func2DNextFrame": {
+    "definition": "Wait for the next animation frame",
+    "detail": "Waits until the browser is ready to paint the next frame and returns its timestamp. Use it to pace animation loops instead of sleep."
   },
   "func2DText": {
     "args": {

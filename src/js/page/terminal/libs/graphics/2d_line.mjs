@@ -5,17 +5,19 @@
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
+import scheduleDraw from './render_queue';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function func2DLine(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  const ctx = kwargs.canvas.getContext("2d");
-  ctx.beginPath();
-  ctx.moveTo(kwargs.from_x, kwargs.from_y);
-  ctx.lineTo(kwargs.to_x, kwargs.to_y);
-  ctx.lineWidth = kwargs.width;
-  ctx.strokeStyle = kwargs.color;
-  ctx.stroke();
+  scheduleDraw(kwargs.canvas, ctx => {
+    ctx.beginPath();
+    ctx.moveTo(kwargs.from_x, kwargs.from_y);
+    ctx.lineTo(kwargs.to_x, kwargs.to_y);
+    ctx.lineWidth = kwargs.width;
+    ctx.strokeStyle = kwargs.color;
+    ctx.stroke();
+  });
 }
 
 export default function (): Partial<CMDDef> {
