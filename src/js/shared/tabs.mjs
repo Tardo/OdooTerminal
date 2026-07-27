@@ -5,7 +5,9 @@
 import {ubrowser} from './constants';
 
 export function sendInternalMessage(tab_id: number, message: mixed) {
-  ubrowser.tabs.sendMessage(tab_id, {message: message});
+  // Tabs without the content script (chrome://, extension pages like the options
+  // page, PDF viewer...) reject with 'Receiving end does not exist'.
+  ubrowser.tabs.sendMessage(tab_id, {message: message}).catch(() => undefined);
 }
 
 export function getActiveTab(): Promise<number> {

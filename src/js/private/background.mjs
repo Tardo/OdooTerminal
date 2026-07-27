@@ -49,7 +49,8 @@ function stopAIKeepAliveIfIdle() {
 }
 
 function sendAIMessage(tabId: number, type: string, requestId: string, extra?: {[string]: mixed}) {
-  ubrowser.tabs.sendMessage(tabId, {...(extra ?? {}), message: type, requestId});
+  // The tab can be closed while a fetch is still streaming; nobody left to notify.
+  ubrowser.tabs.sendMessage(tabId, {...(extra ?? {}), message: type, requestId}).catch(() => undefined);
 }
 
 /**
@@ -163,10 +164,12 @@ function onInternalMessage(request: Object, sender: Object) {
     // $FlowFixMe[prop-missing]
     ubrowser.tabs.captureVisibleTab(null, {format: 'png'})
       .then((dataUrl: string) => {
-        ubrowser.tabs.sendMessage(tabId, {message: 'screenshot_result', dataUrl});
+        ubrowser.tabs.sendMessage(tabId, {message: 'screenshot_result', dataUrl}).catch(() => undefined);
       })
       .catch((err: Error) => {
-        ubrowser.tabs.sendMessage(tabId, {message: 'screenshot_result', error: String(err.message || err)});
+        ubrowser.tabs
+          .sendMessage(tabId, {message: 'screenshot_result', error: String(err.message || err)})
+          .catch(() => undefined);
       });
   } else if (request.message === 'ai_check_permission') {
     const tabId: number = sender.tab.id;
