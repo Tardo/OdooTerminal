@@ -141,13 +141,13 @@ export default class OdooTerminal extends Terminal {
     const customSystemPrompt = this.getConvSystemPrompt(convId);
 
     let updatedHistory: Array<AIMessage>;
-    this._setAIWorking(true);
+    this._setAIWorking(true, convId);
     try {
       // $FlowFixMe[class-object-subtyping]
       updatedHistory = await cmdAIAgent.call(
         this,
         {prompt: input, model: null, timeout: null, max_steps: null, max_verifications: null, initial_messages: history, attachments, custom_system_prompt: customSystemPrompt},
-        {screen: this.screen},
+        this.getAIRunCtx(convId),
       );
     } catch (err) {
       if (!(err instanceof Error) || err.name !== 'AbortError') {

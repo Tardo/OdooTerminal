@@ -105,6 +105,10 @@
     "definition": "绘制线条",
     "detail": "绘制线条"
   },
+  "cmd2DListWindows": {
+    "definition": "List 2D windows",
+    "detail": "List the currently open 2D windows with their unique id, width and height"
+  },
   "cmd2DPoly": {
     "args": {
       "canvas": "The canvas",
@@ -1839,6 +1843,8 @@
       "attachScreenshotPick": "选择元素",
       "attachScreenshotViewport": "整个视口",
       "attachUpload": "上传文件",
+      "busyBlocked": "[!] Can't send: an AI request is already running (see the conversation list). Wait for it to finish or switch to it.",
+      "busyDeleteBlocked": "[!] Can't delete: this conversation still has an AI request running.",
       "experimentalWarning": "此模式为实验性功能，请谨慎使用",
       "helpTip1": "每次对话一个主题 — 为每个任务新建对话。",
       "helpTip2": "上下文满时会自动压缩历史记录，但较短的对话始终消耗更少的 token。",
@@ -1852,6 +1858,7 @@
       "noModelsHint": "请在扩展选项中配置 AI 模型",
       "notConnected": "AI 未连接。请先使用 \"ai connect\"。",
       "privacyWarning": "隐私提示：对话存储在浏览器存储中，任何有权访问此计算机的人都可以读取。",
+      "questionAutoDeclined": "[Agent] Question auto-declined (conversation not active): {{question}}",
       "reasoning": {
         "default": "-- Reasoning --",
         "high": "Reasoning: High",

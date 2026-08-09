@@ -371,6 +371,13 @@
 .o_terminal .terminal-user-input.terminal-input-disabled {
   display: none;
 }
+.o_terminal .terminal-user-input.terminal-input-busy {
+  border-top-color: var(--terminal-color-info);
+  opacity: 0.75;
+}
+.o_terminal .terminal-user-input.terminal-input-busy #terminal-prompt-main {
+  animation: o-terminal-thinking 1.8s ease-in-out infinite;
+}
 
 .o_terminal .terminal-ai-attach-zone {
   display: none;
@@ -1344,6 +1351,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.o_terminal .terminal-ai-conv-busy {
+  color: var(--terminal-color-info);
+  flex-shrink: 0;
+  font-size: 0.9em;
 }
 
 .o_terminal .terminal-ai-conv-delete {

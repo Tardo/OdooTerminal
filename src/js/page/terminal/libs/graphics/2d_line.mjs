@@ -6,11 +6,12 @@ import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
 import scheduleDraw from './render_queue';
+import {resolveWindow} from './windows';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function func2DLine(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  scheduleDraw(kwargs.canvas, ctx => {
+  scheduleDraw(resolveWindow(kwargs.canvas), ctx => {
     ctx.beginPath();
     ctx.moveTo(kwargs.from_x, kwargs.from_y);
     ctx.lineTo(kwargs.to_x, kwargs.to_y);
@@ -27,7 +28,7 @@ export default function (): Partial<CMDDef> {
     type: FUNCTION_TYPE.Internal,
     detail: i18n.t('cmd2DLine.detail', 'Draw a line'),
     args: [
-      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DLine.args.canvas', 'The canvas')],
+      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DLine.args.canvas', 'The canvas or its window id')],
       [ARG.Number, ['fx', 'from-x'], true, i18n.t('cmd2DLine.args.from-x', 'The line from X point')],
       [ARG.Number, ['fy', 'from-y'], true, i18n.t('cmd2DLine.args.from-y', 'The line from Y point')],
       [ARG.Number, ['tx', 'to-x'], true, i18n.t('cmd2DLine.args.to-x', 'The line to X point')],

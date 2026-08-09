@@ -751,8 +751,17 @@ export default class TestTrash extends TerminalTestSuite {
     // poly interior
     pixel = ctx.getImageData(38, 34, 1, 1).data;
     this.assertEqual(pixel[2], 255);
-    await this.terminal.getShell().eval("2d_destroy_window -c $gw");
+
+    // Windows are listed with their unique id, and can be operated on by that id alone
+    let win_list = await this.terminal.getShell().eval('2d_list_windows');
+    const win_info = win_list.find(item => item.id === canvas.id);
+    this.assertTrue(typeof win_info !== 'undefined');
+    this.assertEqual(win_info.width, 50);
+    this.assertEqual(win_info.height, 50);
+    await this.terminal.getShell().eval(`2d_destroy_window -c '${canvas.id}'`);
     this.assertFalse(canvas.isConnected);
+    win_list = await this.terminal.getShell().eval('2d_list_windows');
+    this.assertTrue(typeof win_list.find(item => item.id === canvas.id) === 'undefined');
 
     // 2d_handle_loop: runs the callback once per frame, stops at --max-frames,
     // closures over outer vars persist between frames

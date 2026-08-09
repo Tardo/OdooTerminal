@@ -6,11 +6,12 @@ import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
 import scheduleDraw from './render_queue';
+import {resolveWindow} from './windows';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function func2DRect(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  scheduleDraw(kwargs.canvas, ctx => {
+  scheduleDraw(resolveWindow(kwargs.canvas), ctx => {
     ctx.fillStyle = kwargs.color;
     ctx.fillRect(kwargs.x, kwargs.y, kwargs.width, kwargs.height);
   });
@@ -23,7 +24,7 @@ export default function (): Partial<CMDDef> {
     type: FUNCTION_TYPE.Internal,
     detail: i18n.t('cmd2DRect.detail', 'Draw a rect'),
     args: [
-      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DRect.args.canvas', 'The canvas')],
+      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DRect.args.canvas', 'The canvas or its window id')],
       [ARG.Number, ['x', 'x'], true, i18n.t('cmd2DRect.args.x', 'The rect X point')],
       [ARG.Number, ['y', 'y'], true, i18n.t('cmd2DRect.args.y', 'The rect Y point')],
       [ARG.Number, ['w', 'width'], true, i18n.t('cmd2DRect.args.width', 'The rect width'), 1],

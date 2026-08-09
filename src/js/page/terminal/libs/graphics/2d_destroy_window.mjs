@@ -5,11 +5,14 @@
 import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
+import {resolveWindow, unregisterWindow} from './windows';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function func2DDestroyWindow(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  kwargs.canvas.remove();
+  const canvas = resolveWindow(kwargs.canvas);
+  unregisterWindow(canvas);
+  canvas.remove();
 }
 
 export default function (): Partial<CMDDef> {
@@ -19,7 +22,7 @@ export default function (): Partial<CMDDef> {
     type: FUNCTION_TYPE.Internal,
     detail: i18n.t('cmd2DDestroyWindow.detail', 'Destroy 2D Window'),
     args: [
-      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DDestroyWindow.args.canvas', 'The canvas')],
+      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DDestroyWindow.args.canvas', 'The canvas or its window id')],
     ],
     example: "-c $myWindow",
   };

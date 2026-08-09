@@ -143,11 +143,28 @@ export default class Terminal {
   // (the user typing them is the confirmation).
   #unsafeCmdGuard: ?(cmdName: string, cmdRaw: string) => Promise<boolean> = null;
   #activeConvId: string | null = null;
+  // The conversation the in-flight agent run (if any) actually belongs to — fixed for the
+  // run's whole duration, unlike #activeConvId which changes as the user navigates. Only
+  // one run can be in flight at a time (see #onKeyEnter's _isAIWorking guard), so this is
+  // the single source of truth for "which conversation is busy" (#isConvBusy) regardless of
+  // which conversation happens to be on screen.
+  #runningConvId: string | null = null;
   // MCP server usage is confirmed once per conversation, not once per agent step/invocation
   // (a conversation spans several 'ai agent' calls via initial_messages) — keyed by conversation
   // id so switching conversations re-prompts, but continuing one does not. In-memory only: it
   // does not survive a page reload, which is an acceptable, safer default (no silent cross-session trust).
   #mcpConfirmedServers: Map<string, Set<string>> = new Map();
+  // Detached, unmounted Screen instances that keep receiving agent output for a
+  // conversation the user has switched away from mid-run, so a background run's
+  // messages land in its own conversation instead of whichever one is on screen
+  // (see getAIRunCtx). Seeded from terminal_ai_screen_<id> on divergence and
+  // merged back into the live screen when the user switches back to it.
+  #bgAIScreens: Map<string, Screen> = new Map();
+  // Most recent printLive() element per conversation (the agent's "Thinking... (Xs)" ticker),
+  // so #saveCurrentScreenSnapshot can detach it before serializing — see the comment there.
+  // Superseded automatically each time a new one is created; never explicitly pruned (bounded
+  // by conversation count, same trade-off as #mcpConfirmedServers above).
+  #activeLiveEls: Map<string, HTMLElement> = new Map();
   #aiConvList_el: HTMLElement | void;
   #aiProviderSelect_el: HTMLSelectElement | void;
   #aiModelSelect_el: HTMLSelectElement | void;
@@ -368,6 +385,7 @@ export default class Terminal {
       }
       this.#renderAIConvList();
       this.#syncSyspromptPanel();
+      this.#syncAIRunSettingsForConv(this.#activeConvId);
       this.#ensureAIModelsLoaded();
     }
     this.#updateAIIdleEffect();
@@ -503,9 +521,7 @@ export default class Terminal {
     if (savedContent) {
       this.screen.setContent(savedContent);
     }
-    if (this.#isAIMode && this.#activeConvId === null) {
-      this.screen.setInputDisabled(true);
-    }
+    this.#syncInputDisabled();
   }
 
   async start(): Promise<> {
@@ -575,9 +591,15 @@ export default class Terminal {
   }
 
   #saveCurrentScreenSnapshot() {
-    if (this.#isAIMode && this.#activeConvId !== null) {
+    const activeConvId = this.#activeConvId;
+    if (this.#isAIMode && activeConvId !== null) {
+      // Detach this conversation's live printLive element (if any) before serializing —
+      // otherwise the snapshot bakes in a frozen copy of it, and the element itself then
+      // gets re-parented on top of that copy by the next tick (see getAIRunCtx's printLive
+      // wrapper / updateLiveEl), producing two "Thinking..." lines instead of one moving line.
+      this.#activeLiveEls.get(activeConvId)?.remove();
       setStorageSessionItem(
-        `terminal_ai_screen_${this.#activeConvId}`,
+        `terminal_ai_screen_${activeConvId}`,
         this.screen.getContent(),
         err => this.screen.printError(err),
       );
@@ -1034,9 +1056,178 @@ export default class Terminal {
     return hist[this.#searchHistoryIter];
   }
 
-  _setAIWorking(value: boolean) {
+  _setAIWorking(value: boolean, convId: ?string) {
     this._isAIWorking = value;
+    if (value) {
+      this.#runningConvId = convId ?? null;
+    } else {
+      // Retire the finished run's tracked live element. Left tracked, it would be a
+      // permanently-frozen historical "Thinking..." line by now — but #saveCurrentScreenSnapshot
+      // and #activateConvScreen don't know that, and would keep detaching/reattaching it (moving
+      // it to the end of the transcript) on every future, completely unrelated switch away from
+      // and back to this conversation.
+      if (this.#runningConvId !== null) {
+        this.#activeLiveEls.delete(this.#runningConvId);
+      }
+      this.#runningConvId = null;
+    }
     this.#updateJobsInfo();
+    this.screen.setInputBusy(value);
+    this.#renderAIConvList();
+  }
+
+  // Whether `convId` has an agent run in flight right now, live or backgrounded — drives the
+  // spinner in the conversation list (see #renderAIConvList/renderAIConvItem), which stays a
+  // reliable "still working" signal even for a conversation the transcript timer can't reach.
+  // Tied to #runningConvId, not #activeConvId — the run's home conversation doesn't change
+  // just because the user navigates elsewhere to look at something else while it works.
+  #isConvBusy(convId: string): boolean {
+    return convId === this.#runningConvId;
+  }
+
+  // Single source of truth for the AI input's disabled state: disabled only when no
+  // conversation is selected. Deliberately independent of _isAIWorking — disabling the
+  // native input while a run is in flight would also block answering that same run's
+  // pending showQuestion() (routed through #onInputKeyUp's question-active branch, which
+  // never reaches #onKeyEnter), since a disabled <input> receives no keyboard events at
+  // all. New-run submission is instead blocked in #onKeyEnter (see _isAIWorking check
+  // there), which only guards the "start a run" path and leaves question-answering alone.
+  #syncInputDisabled() {
+    this.screen.setInputDisabled(this.#isAIMode && this.#activeConvId === null);
+  }
+
+  // Whether `convId` is the conversation actually on screen right now. Requires AI mode
+  // too, not just a matching id — leaving AI mode via the toolbar toggle doesn't clear
+  // #activeConvId, and the live screen then renders the normal-terminal transcript instead.
+  #isConvLive(convId: string): boolean {
+    return this.#isAIMode && convId === this.#activeConvId;
+  }
+
+  // Returns the Screen that should receive agent output for `convId` right now: the live
+  // screen if that conversation is the one on display, otherwise a detached background
+  // Screen dedicated to it, lazily created/seeded from its last saved snapshot. Reconciles
+  // and drops a stale background entry if `convId` has since become the active conversation
+  // again (e.g. the caller wraps every access in a fresh lookup rather than caching it).
+  #getConvScreen(convId: string): Screen {
+    if (this.#isConvLive(convId)) {
+      return this.screen;
+    }
+    let bg = this.#bgAIScreens.get(convId);
+    if (!bg) {
+      bg = new Screen({username: '', host: ''});
+      bg.start(document.createElement('div'), {
+        inputColors: {},
+        inputMode: 'single',
+        onCleanScreen: dummyCall,
+        onSaveScreen: (content: string) => {
+          setStorageSessionItem(`terminal_ai_screen_${convId}`, content, dummyCall);
+        },
+        onInput: dummyCall,
+        onInputKeyUp: dummyCall,
+      });
+      const snap: string = getStorageSessionItem(`terminal_ai_screen_${convId}`, '');
+      if (snap.length > 0) {
+        bg.setContent(snap);
+      }
+      this.#bgAIScreens.set(convId, bg);
+    }
+    return bg;
+  }
+
+  // Content to show when (re)activating `convId`: prefer an in-flight background screen's
+  // in-memory content over storage (onSaveScreen is debounced, so storage can lag), and
+  // drop the background screen once merged since the live screen now owns the conversation.
+  #takeConvScreenContent(convId: string): string {
+    const bg = this.#bgAIScreens.get(convId);
+    if (bg) {
+      this.#bgAIScreens.delete(convId);
+      // Same reason as #saveCurrentScreenSnapshot: if convId's live printLive element was
+      // re-parented into `bg` by the last tick, serializing it here would bake in a frozen
+      // copy, and the original would then land on top of it in the live screen on the next
+      // tick — detach first so only the (about-to-reattach) original ever renders.
+      this.#activeLiveEls.get(convId)?.remove();
+      return bg.getContent();
+    }
+    return getStorageSessionItem(`terminal_ai_screen_${convId}`, '');
+  }
+
+  // Restores `convId`'s transcript onto the live screen and, if it still has an agent run
+  // ticking, reattaches that live element immediately — call this instead of driving
+  // #takeConvScreenContent + screen.setContent by hand. Skipping the reattach here would leave
+  // a ~100ms gap (until the agent's own next tick) where the ticker is simply absent right
+  // after switching to a conversation that's still working, which reads as a stale/unrefreshed
+  // screen rather than as "still thinking".
+  #activateConvScreen(convId: string) {
+    const snap = this.#takeConvScreenContent(convId);
+    if (snap.length > 0) {
+      this.screen.setContent(snap);
+    }
+    const liveEl = this.#activeLiveEls.get(convId);
+    if (liveEl) {
+      this.screen.reattachLiveEl(liveEl);
+    }
+  }
+
+  // ctx.screen for an agent run tied to `convId`: every property access resolves the target
+  // screen fresh (see #getConvScreen), so output keeps landing in the right conversation even
+  // if the user switches away mid-run, instead of leaking into whatever is on screen. Same
+  // unrestricted surface as passing the real Screen (this call site is Terminal-internal, not
+  // a TraSH command callback, so it isn't routed through ScreenCommandHandler's allowlist).
+  // showQuestion can't be answered on a background screen (nothing renders it), so it
+  // auto-declines instead of hanging forever.
+  getAIRunCtx(convId: string): {screen: mixed} {
+    const terminal = this;
+    const proxy = new Proxy(
+      {},
+      {
+        get(_target: {...}, prop: mixed): mixed {
+          if (typeof prop !== 'string') {
+            return undefined;
+          }
+          if (prop === 'showQuestion') {
+            return async (question: string, values: $ReadOnlyArray<string>, def_value: string): Promise<mixed> => {
+              if (!terminal.#isConvLive(convId)) {
+                terminal.#getConvScreen(convId).print(
+                  i18n.t(
+                    'terminal.ai.questionAutoDeclined',
+                    '[Agent] Question auto-declined (conversation not active): {{question}}',
+                    {question},
+                  ),
+                  false,
+                  'line-warning',
+                );
+                return def_value;
+              }
+              return terminal.#getConvScreen(convId).showQuestion(question, values, def_value);
+            };
+          }
+          if (prop === 'printLive') {
+            // A live indicator (the agent's "Thinking... (Xs)" ticker) is created once and
+            // then updated in place many times, including by a setInterval that mutates a
+            // DOM reference it cached from the initial call — it never asks ctx.screen again.
+            // Keep that same element alive across a conversation switch (re-parenting it
+            // between the live screen and convId's background screen via updateLiveEl)
+            // instead of resolving a fresh target and losing/orphaning it, so the ticker
+            // keeps counting instead of freezing when the user switches away and back.
+            return (cls?: string): {update: (html: string) => void, el: HTMLElement} => {
+              const {el} = terminal.#getConvScreen(convId).printLive(cls);
+              terminal.#activeLiveEls.set(convId, el);
+              return {
+                el,
+                update: (html: string) => {
+                  terminal.#getConvScreen(convId).updateLiveEl(el, html);
+                },
+              };
+            };
+          }
+          const screen = terminal.#getConvScreen(convId);
+          // $FlowFixMe[prop-missing]
+          const ref = screen[prop];
+          return typeof ref === 'function' ? ref.bind(screen) : ref;
+        },
+      },
+    );
+    return {screen: proxy};
   }
 
   #updateJobsInfo() {
@@ -1377,6 +1568,21 @@ export default class Terminal {
       if (!input.trim() && !hasPendingAttachments) {
         return;
       }
+      // Only one #unsafeCmdGuard/aiRuntime.controller slot exists terminal-wide, so a second
+      // run started here (e.g. after switching to another conversation to type while the
+      // first is still working) would silently steal them from the first. Switching
+      // conversations to read them mid-run stays allowed; only starting a new run is blocked.
+      if (this._isAIWorking) {
+        this.screen.print(
+          i18n.t(
+            'terminal.ai.busyBlocked',
+            "[!] Can't send: an AI request is already running (see the conversation list). Wait for it to finish or switch to it.",
+          ),
+          false,
+          'line-warning',
+        );
+        return;
+      }
       if (input.trim()) {
         this.screen.printCommand(input);
       }
@@ -1589,6 +1795,9 @@ export default class Terminal {
     const name = ev.target.value;
     setStorageLocalItem('terminal_ai_active_provider', name || null, err => this.screen.printError(err));
     this.#applyAIProvider(name);
+    if (this.#activeConvId !== null) {
+      this.saveConvAISetting(this.#activeConvId, 'provider', name);
+    }
   }
 
   // Clears the model select and preselects the remembered model (if any) for the
@@ -1609,8 +1818,9 @@ export default class Terminal {
       return;
     }
     selectEl.disabled = false;
+    const convModel = this.#activeConvId !== null ? this.getConvAISettings(this.#activeConvId).model : '';
     const remembered = getStorageLocalItem<{[string]: string}>('terminal_ai_active_models', {});
-    const rememberedModel = remembered[provider.name];
+    const rememberedModel = convModel || remembered[provider.name];
     if (rememberedModel) {
       const opt = document.createElement('option');
       opt.value = rememberedModel;
@@ -1675,8 +1885,9 @@ export default class Terminal {
       cache[provider.name] = {url: provider.url, models};
       setStorageSessionItem('terminal_ai_models_cache', cache, err => this.screen.printError(err));
     }
+    const convModel = this.#activeConvId !== null ? this.getConvAISettings(this.#activeConvId).model : '';
     const remembered = getStorageLocalItem<{[string]: string}>('terminal_ai_active_models', {});
-    const toSelect = remembered[provider.name] || selectEl.value;
+    const toSelect = convModel || remembered[provider.name] || selectEl.value;
     while (selectEl.options.length > 1) {
       selectEl.remove(1);
     }
@@ -1709,6 +1920,9 @@ export default class Terminal {
       setStorageLocalItem('terminal_ai_active_models', remembered, err => this.screen.printError(err));
     }
     this.#applyAIModel(name);
+    if (this.#activeConvId !== null) {
+      this.saveConvAISetting(this.#activeConvId, 'model', name);
+    }
   }
 
   // openai-provider only (see providers/openai.mjs reasoningEffort) — harmless to leave set while
@@ -1741,6 +1955,9 @@ export default class Terminal {
     const value = item.dataset['value'] ?? '';
     setStorageLocalItem('terminal_ai_reasoning', value || null, err => this.screen.printError(err));
     this.#setAIReasoning(value);
+    if (this.#activeConvId !== null) {
+      this.saveConvAISetting(this.#activeConvId, 'reasoning', value);
+    }
     this.#aiReasoningMenu_el?.classList.remove('terminal-ai-reasoning-menu-active');
   }
 
@@ -1772,7 +1989,9 @@ export default class Terminal {
       });
       listEl.replaceChildren(hint);
     } else {
-      listEl.replaceChildren(...convs.map(c => parseHTML(renderAIConvItem(c.id, c.name, c.id === this.#activeConvId))));
+      listEl.replaceChildren(
+        ...convs.map(c => parseHTML(renderAIConvItem(c.id, c.name, c.id === this.#activeConvId, this.#isConvBusy(c.id)))),
+      );
     }
   }
 
@@ -1791,17 +2010,15 @@ export default class Terminal {
         const activeId = this.#activeConvId;
         if (activeId !== null) {
           this.#loadAIHistory(activeId);
-          const snap: string = getStorageSessionItem(`terminal_ai_screen_${activeId}`, '');
-          if (snap.length > 0) {
-            this.screen.setContent(snap);
-          }
+          this.#activateConvScreen(activeId);
         } else {
           this.#aiInputHistory = [];
           this.#searchHistoryIter = 0;
           this.#searchHistoryQuery = '';
         }
-        this.screen.setInputDisabled(activeId === null);
+        this.#syncInputDisabled();
         this.#syncSyspromptPanel();
+        this.#syncAIRunSettingsForConv(activeId);
         this.#ensureAIModelsLoaded();
       } else {
         this.el.classList.remove('terminal-ai-mode');
@@ -1814,7 +2031,7 @@ export default class Terminal {
         if (snap.length > 0) {
           this.screen.setContent(snap);
         }
-        this.screen.setInputDisabled(false);
+        this.#syncInputDisabled();
       }
     }
     setStorageSessionItem('terminal_ai_mode', this.#isAIMode, err => this.screen.printError(err));
@@ -1999,6 +2216,39 @@ export default class Terminal {
     }
   }
 
+  // Restores the provider/model/reasoning this conversation last used, falling back to
+  // whatever's currently selected (the global "last used anywhere" default) for a
+  // conversation that never explicitly changed any of them. Call on every conversation
+  // switch, alongside #syncSyspromptPanel.
+  #syncAIRunSettingsForConv(convId: string | null) {
+    const settings = convId !== null ? this.getConvAISettings(convId) : null;
+    const providerSelectEl = this.#aiProviderSelect_el;
+    if (providerSelectEl && settings?.provider && providerSelectEl.value !== settings.provider) {
+      providerSelectEl.value = settings.provider;
+      // Full reload — provider actually changed, so the model list itself is different
+      // and needs (re)fetching. #resetAIModelSelector/#loadAIModels read #activeConvId
+      // directly and already prefer this conversation's saved model once they run.
+      this.#applyAIProvider(settings.provider);
+    } else {
+      // Provider unchanged (the common case, most conversations share one) — apply just
+      // the remembered model on top of whatever's already loaded, without clearing/refetching
+      // the whole (possibly already-cached) options list the way #resetAIModelSelector would.
+      const modelSelectEl = this.#aiModelSelect_el;
+      const targetModel = settings?.model ?? '';
+      if (modelSelectEl && targetModel && modelSelectEl.value !== targetModel) {
+        if (!Array.from(modelSelectEl.options).some(opt => opt.value === targetModel)) {
+          const opt = document.createElement('option');
+          opt.value = targetModel;
+          opt.textContent = targetModel;
+          modelSelectEl.appendChild(opt);
+        }
+        modelSelectEl.value = targetModel;
+        this.#applyAIModel(targetModel);
+      }
+    }
+    this.#setAIReasoning(settings?.reasoning || getStorageLocalItem('terminal_ai_reasoning', '') || '');
+  }
+
   #onClickNewAIConv() {
     this.#saveCurrentScreenSnapshot();
     this.screen.clean();
@@ -2007,6 +2257,7 @@ export default class Terminal {
     this.#searchHistoryQuery = '';
     this.createAIConversation(i18n.t('terminal.ai.newConversation', 'New conversation'));
     this.#syncSyspromptPanel();
+    this.#syncAIRunSettingsForConv(this.#activeConvId);
     this.screen.print(
       i18n.t('terminal.ai.experimentalWarning', 'This mode is experimental; use it with extreme caution.'),
       false,
@@ -2048,12 +2299,24 @@ export default class Terminal {
     }
     if (isDelete) {
       ev.stopPropagation();
+      // Refuse to delete a conversation with an agent run still in flight (in the
+      // background or, if it's the active one, live) — deleting it out from under
+      // the run would resurrect its storage keys once the run finishes and saves.
+      if (this.#isConvBusy(convId)) {
+        this.screen.print(
+          i18n.t('terminal.ai.busyDeleteBlocked', "[!] Can't delete: this conversation still has an AI request running."),
+          false,
+          'line-warning',
+        );
+        return;
+      }
       let convs = this.#getConversations();
       convs = convs.filter(c => c.id !== convId);
       this.#saveConversations(convs);
       removeStorageLocalItem(`terminal_ai_conv_${convId}`);
       removeStorageLocalItem(`terminal_ai_history_${convId}`);
       removeStorageLocalItem(`terminal_ai_sysprompt_${convId}`);
+      removeStorageLocalItem(`terminal_ai_settings_${convId}`);
       removeStorageSessionItem(`terminal_ai_screen_${convId}`);
       if (this.#activeConvId === convId) {
         const nextId = convs.length > 0 ? convs[0].id : null;
@@ -2062,18 +2325,16 @@ export default class Terminal {
         this.screen.clean();
         if (nextId !== null) {
           this.#loadAIHistory(nextId);
-          const snap: string = getStorageSessionItem(`terminal_ai_screen_${nextId}`, '');
-          if (snap.length > 0) {
-            this.screen.setContent(snap);
-          }
+          this.#activateConvScreen(nextId);
         } else {
           this.#aiInputHistory = [];
           this.#searchHistoryIter = 0;
           this.#searchHistoryQuery = '';
         }
-        this.screen.setInputDisabled(nextId === null);
+        this.#syncInputDisabled();
         this.#updateAIIdleEffect();
         this.#syncSyspromptPanel();
+        this.#syncAIRunSettingsForConv(nextId);
       }
       this.#renderAIConvList();
     } else if (convId !== this.#activeConvId) {
@@ -2082,13 +2343,11 @@ export default class Terminal {
       setStorageSessionItem('terminal_ai_active_conv', convId, err => this.screen.printError(err));
       this.#loadAIHistory(convId);
       this.screen.clean();
-      const snap: string = getStorageSessionItem(`terminal_ai_screen_${convId}`, '');
-      if (snap.length > 0) {
-        this.screen.setContent(snap);
-      }
+      this.#activateConvScreen(convId);
       this.#renderAIConvList();
       this.#updateAIIdleEffect();
       this.#syncSyspromptPanel();
+      this.#syncAIRunSettingsForConv(convId);
       this.screen.preventLostInputFocus();
     }
   }
@@ -2117,6 +2376,17 @@ export default class Terminal {
     }
   }
 
+  getConvAISettings(id: string): AIConvSettings {
+    return getStorageLocalItem(`terminal_ai_settings_${id}`, {provider: '', model: '', reasoning: ''});
+  }
+
+  // Merges a single field so callers don't need to read-modify-write the whole record.
+  saveConvAISetting(id: string, field: 'provider' | 'model' | 'reasoning', value: string) {
+    const settings = this.getConvAISettings(id);
+    settings[field] = value;
+    setStorageLocalItem(`terminal_ai_settings_${id}`, settings, err => this.screen.printError(err));
+  }
+
   updateConvName(id: string, name: string) {
     const convs = this.#getConversations();
     const conv = convs.find(c => c.id === id);
@@ -2143,7 +2413,7 @@ export default class Terminal {
     this.#activeConvId = id;
     setStorageSessionItem('terminal_ai_active_conv', id, err => this.screen.printError(err));
     this.#renderAIConvList();
-    this.screen.setInputDisabled(false);
+    this.#syncInputDisabled();
     this.#updateAIIdleEffect();
     return id;
   }

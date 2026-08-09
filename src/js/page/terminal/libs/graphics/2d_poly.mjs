@@ -6,6 +6,7 @@ import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
 import scheduleDraw from './render_queue';
+import {resolveWindow} from './windows';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
@@ -13,7 +14,7 @@ async function func2DPoly(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<
   if (kwargs.points.length < 2) {
     return;
   }
-  scheduleDraw(kwargs.canvas, ctx => {
+  scheduleDraw(resolveWindow(kwargs.canvas), ctx => {
     ctx.beginPath();
     ctx.moveTo(kwargs.points[0][0], kwargs.points[0][1]);
     for (let index = 1; index < kwargs.points.length; ++index) {
@@ -41,7 +42,7 @@ export default function (): Partial<CMDDef> {
       'Draw a polyline from a list of [x, y] points. With --fill the shape is closed and filled',
     ),
     args: [
-      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DPoly.args.canvas', 'The canvas')],
+      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DPoly.args.canvas', 'The canvas or its window id')],
       [ARG.List | ARG.Any, ['p', 'points'], true, i18n.t('cmd2DPoly.args.points', 'The list of [x, y] points')],
       [ARG.String, ['pc', 'color'], false, i18n.t('cmd2DPoly.args.color', 'The color'), '#000'],
       [ARG.Flag, ['f', 'fill'], false, i18n.t('cmd2DPoly.args.fill', 'Close the shape and fill it')],

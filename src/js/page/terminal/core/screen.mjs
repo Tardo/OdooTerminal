@@ -161,7 +161,19 @@ export default class Screen {
     if (!this.#wasStart) {
       return '';
     }
+    // Lines printed just before this call may still be sitting in #buff waiting for their
+    // rAF flush — drain them synchronously so callers that snapshot content mid-run (e.g.
+    // switching AI conversations) never lose the last few lines to that race.
+    this.#drainBuffer();
     return this.#screen_el.innerHTML;
+  }
+
+  #drainBuffer() {
+    if (this.#buff.length === 0) {
+      return;
+    }
+    this.#screen_el.append(...this.#buff.splice(0, this.#buff.length));
+    this.#lazyVacuum();
   }
 
   setContent(html: string) {
@@ -338,6 +350,16 @@ export default class Screen {
     this.#userInput_el.classList.toggle('terminal-input-disabled', disabled);
   }
 
+  // Visual-only cue that an AI run is in flight elsewhere — unlike setInputDisabled, never
+  // touches the native `disabled` attribute (which would also block the keyboard path for
+  // answering that same run's pending showQuestion()) and never hides the input row.
+  setInputBusy(busy: boolean) {
+    if (!this.#wasStart) {
+      return;
+    }
+    this.#userInput_el.classList.toggle('terminal-input-busy', busy);
+  }
+
   /* PRINT */
   flush() {
     if (!this.#flushing) {
@@ -490,6 +512,36 @@ export default class Screen {
         }
       },
     };
+  }
+
+  // Updates a printLive element that may belong to a *different* Screen instance than the
+  // one it was created on (see Terminal#getAIRunCtx's printLive wrapper, which keeps one
+  // live element alive across a conversation switching between the live screen and a
+  // detached background one). Re-parents it here first if needed — DOM re-parenting moves
+  // the node, it doesn't clone it, so callers keeping a raw reference to it (e.g. the AI
+  // agent's elapsed-time ticker) keep working unmodified after the move.
+  updateLiveEl(el: HTMLElement, html: string) {
+    if (!this.#wasStart) {
+      return;
+    }
+    if (el.parentNode !== this.#screen_el) {
+      this.#screen_el.append(el);
+    }
+    const wrapper = parseHTML(`<span>${html}</span>`);
+    el.replaceChildren(...Array.from(wrapper.childNodes));
+    this.scrollDown();
+  }
+
+  // Re-parents a printLive element here without touching its content, for when a conversation
+  // becomes active again and its ticker should reappear immediately instead of waiting up to
+  // ~100ms for the agent's own interval tick to call updateLiveEl next (a visible gap that reads
+  // as "the screen didn't refresh" or "the indicator vanished"). No-op if already here.
+  reattachLiveEl(el: HTMLElement) {
+    if (!this.#wasStart || el.parentNode === this.#screen_el) {
+      return;
+    }
+    this.#screen_el.append(el);
+    this.scrollDown();
   }
 
   updateInputInfo(info?: Partial<InputInfo>) {

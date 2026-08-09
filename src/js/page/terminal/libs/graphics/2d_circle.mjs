@@ -6,11 +6,12 @@ import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
 import scheduleDraw from './render_queue';
+import {resolveWindow} from './windows';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function func2DCircle(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  scheduleDraw(kwargs.canvas, ctx => {
+  scheduleDraw(resolveWindow(kwargs.canvas), ctx => {
     const start = (kwargs.start_angle * Math.PI) / 180;
     const end = (kwargs.end_angle * Math.PI) / 180;
     const partial = kwargs.end_angle - kwargs.start_angle < 360;
@@ -41,7 +42,7 @@ export default function (): Partial<CMDDef> {
     type: FUNCTION_TYPE.Internal,
     detail: i18n.t('cmd2DCircle.detail', 'Draw a circle, arc or pie slice'),
     args: [
-      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DCircle.args.canvas', 'The canvas')],
+      [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DCircle.args.canvas', 'The canvas or its window id')],
       [ARG.Number, ['x', 'x'], true, i18n.t('cmd2DCircle.args.x', 'The center X point')],
       [ARG.Number, ['y', 'y'], true, i18n.t('cmd2DCircle.args.y', 'The center Y point')],
       [ARG.Number, ['r', 'radius'], true, i18n.t('cmd2DCircle.args.radius', 'The radius')],

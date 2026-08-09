@@ -6,11 +6,12 @@ import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
 import scheduleDraw from './render_queue';
+import {resolveWindow} from './windows';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
 async function func2DText(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
-  scheduleDraw(kwargs.canvas, ctx => {
+  scheduleDraw(resolveWindow(kwargs.canvas), ctx => {
     ctx.fillStyle = kwargs.color;
     ctx.font = kwargs.font;
     ctx.fillText(kwargs.text, kwargs.x, kwargs.y);
@@ -24,7 +25,7 @@ export default function (): Partial<CMDDef> {
     type: FUNCTION_TYPE.Internal,
     detail: i18n.t('func2DText.detail', 'Draw a text'),
     args: [
-      [ARG.Any, ['c', 'canvas'], true, i18n.t('func2DText.args.canvas', 'The canvas')],
+      [ARG.Any, ['c', 'canvas'], true, i18n.t('func2DText.args.canvas', 'The canvas or its window id')],
       [ARG.String, ['t', 'text'], true, i18n.t('func2DText.args.text', 'The text')],
       [ARG.Number, ['x', 'x'], true, i18n.t('func2DText.args.x', 'The text X point')],
       [ARG.Number, ['y', 'y'], true, i18n.t('func2DText.args.y', 'The text Y point')],

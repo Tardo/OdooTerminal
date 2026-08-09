@@ -70,6 +70,12 @@ declare type AIConversation = {
   createdAt: number,
 };
 
+declare type AIConvSettings = {
+  provider: string,
+  model: string,
+  reasoning: string,
+};
+
 declare type AIModelConfig = {
   name: string,
   url: string,

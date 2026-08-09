@@ -105,6 +105,10 @@
     "definition": "Draw a line",
     "detail": "Draw a line"
   },
+  "cmd2DListWindows": {
+    "definition": "List 2D windows",
+    "detail": "List the currently open 2D windows with their unique id, width and height"
+  },
   "cmd2DPoly": {
     "args": {
       "canvas": "The canvas",
@@ -1839,6 +1843,8 @@
       "attachScreenshotPick": "Select element",
       "attachScreenshotViewport": "Full viewport",
       "attachUpload": "Upload file",
+      "busyBlocked": "[!] Can't send: an AI request is already running (see the conversation list). Wait for it to finish or switch to it.",
+      "busyDeleteBlocked": "[!] Can't delete: this conversation still has an AI request running.",
       "experimentalWarning": "This mode is experimental; use it with extreme caution.",
       "helpTip1": "One topic per conversation — start a new one for each task.",
       "helpTip2": "History is auto-compressed when context fills up, but shorter conversations always cost fewer tokens.",
@@ -1852,6 +1858,7 @@
       "noModelsHint": "Configure AI providers in the extension options",
       "notConnected": "AI not connected. Use \"ai connect\" first.",
       "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.",
+      "questionAutoDeclined": "[Agent] Question auto-declined (conversation not active): {{question}}",
       "reasoning": {
         "default": "-- Reasoning --",
         "high": "Reasoning: High",

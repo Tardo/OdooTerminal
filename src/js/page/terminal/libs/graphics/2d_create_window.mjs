@@ -6,6 +6,7 @@ import i18n from 'i18next';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
 import uniqueId from '@trash/utils/unique_id';
+import {registerWindow} from './windows';
 import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
 import type VMachine from '@trash/vmachine';
 
@@ -29,6 +30,7 @@ async function func2DCreateWindow(vmachine: VMachine, kwargs: CMDCallbackArgs): 
     canvas.style.top = `${kwargs.y}px`;
   }
   document.getElementsByTagName("body")[0].appendChild(canvas);
+  registerWindow(canvas);
   return canvas;
 }
 

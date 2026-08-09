@@ -28,6 +28,7 @@ const content: string =
   'One check at the end of the drawing; not after every call.\n' +
   '\n' +
   '## Functions\n' +
+  "- `2d_list_windows` — list open windows as `[{id, width, height}, ...]`. Every function accepting `-c` takes the canvas value OR its `id` string, so a window can be operated on later without keeping its $var.\n" +
   '- `2d_rect -c $win -x N -y N -w N -h N -rc COLOR` — filled rectangle (bars).\n' +
   '- `2d_line -c $win -fx N -fy N -tx N -ty N -lc COLOR -w N` — line segment (axes, grid).\n' +
   '- `2d_poly -c $win -p [[x, y], [x, y], ...] -pc COLOR -w N` — polyline (line charts). Add `--fill` to close and fill the shape.\n' +
