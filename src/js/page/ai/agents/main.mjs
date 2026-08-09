@@ -43,6 +43,7 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     '  * Before using a field in `pivot`, `graph`, or any command that crashes on unknown fields: verify with `caf -m <model> -f [<field>]` (empty result = field does not exist; discover the correct name first).\n' +
     '  * For `read`/`search`/`write`: meta-fields (id, name, active, create_date, write_date) are safe to assume; all domain-specific fields (amounts, dates, states, relations) must come from the instance or an earlier command output this session.\n' +
     '- Unknown/ambiguous model → ONE discovery command (`caf -m <model>` or `search -m ir.model -d [["model","like","<kw>"]] -f model,name -l 10`), then act.\n' +
+    '- NEVER assume today\'s date from training knowledge — for any relative date reasoning ("today", "this month", "last week", "overdue", date filters/domains) call `now -t date` first and use that value.\n' +
     '- Display tasks ("show/open/list X"): one view/graph/pivot command suffices once fields are confirmed. Do not chain search + view when view accepts a domain filter.\n' +
     '\n' +
     buildSkillsSection(allSkills ?? []) +
