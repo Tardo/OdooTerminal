@@ -41,6 +41,7 @@ async function getOptions(this: Terminal, arg_name: string) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdSettings.definition', 'Open settings page'),
+    category: 'system',
     callback: cmdOpenSettings,
     options: getOptions,
     detail: i18n.t('cmdSettings.detail', 'Open the Odoo Settings form view for the specified module. Does not return data.'),

@@ -130,6 +130,7 @@ async function cmdDescribe(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDescribe.definition', 'Model profile: count, date range, key fields and selection values'),
+    category: 'devtools',
     callback: cmdDescribe,
     options: getModelOptions,
     detail: i18n.t(

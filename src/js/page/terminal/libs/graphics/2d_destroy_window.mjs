@@ -20,6 +20,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DDestroyWindow.definition', 'Destroy 2D Window'),
     callback: func2DDestroyWindow,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t('cmd2DDestroyWindow.detail', 'Destroy 2D Window'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DDestroyWindow.args.canvas', 'The canvas or its window id')],

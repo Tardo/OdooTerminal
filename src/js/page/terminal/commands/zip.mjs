@@ -15,6 +15,7 @@ async function cmdZip(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdZip.definition', 'Create zip file'),
+    category: 'terminal',
     callback: cmdZip,
     detail: i18n.t('cmdZip.detail', 'To learn about the available options, check out the zip.js help'),
     args: [

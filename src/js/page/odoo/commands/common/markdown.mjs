@@ -20,6 +20,7 @@ async function cmdMarkdown(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Pr
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdMarkdown.definition', 'Renders markdown as HTML'),
+    category: 'devtools',
     callback: cmdMarkdown,
     detail: i18n.t(
       'cmdMarkdown.detail',

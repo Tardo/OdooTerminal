@@ -18,6 +18,7 @@ async function cmdToggleTerm(this: Terminal, kwargs: CMDCallbackArgs): Promise<>
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdToggleTerm.definition', 'Toggle terminal visibility'),
+    category: 'terminal',
     callback: cmdToggleTerm,
     detail: i18n.t('cmdToggleTerm.detail', 'Toggle terminal visibility'),
     args: [

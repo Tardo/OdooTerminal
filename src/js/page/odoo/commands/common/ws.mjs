@@ -70,6 +70,7 @@ async function cmdWebSocket(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdWs.definition', 'Open a web socket'),
+    category: 'devtools',
     callback: cmdWebSocket,
     detail: i18n.t('cmdWs.detail', 'Open a web socket'),
     args: [

@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcStrEnds.definition', 'Check if a string ends with a suffix'),
     callback: funcStrEnds,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcStrEnds.detail', 'Return true if the string ends with the given suffix'),
     args: [
       [ARG.String, ['s', 'str'], true, i18n.t('funcStrEnds.args.str', 'The string')],

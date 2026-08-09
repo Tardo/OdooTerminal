@@ -84,6 +84,7 @@ async function getOptions(this: Terminal, arg_name: string) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdUninstall.definition', 'Uninstall a module'),
+    category: 'system',
     callback: cmdUninstallModule,
     options: getOptions,
     unsafe: true,

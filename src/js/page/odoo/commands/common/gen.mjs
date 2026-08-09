@@ -42,6 +42,7 @@ async function cmdGen(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdGen.definition', 'Generate random values'),
+    category: 'devtools',
     callback: cmdGen,
     detail: i18n.t('cmdGen.detail', "Generate numbers, strings, url's, dates, etc..."),
     args: [

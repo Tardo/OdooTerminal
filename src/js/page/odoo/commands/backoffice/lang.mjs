@@ -173,6 +173,7 @@ async function getOptions(this: Terminal, arg_name: string): Promise<Array<strin
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdLang.definition', 'Operations over translations'),
+    category: 'system',
     callback: cmdLang,
     options: getOptions,
     detail: i18n.t('cmdLang.detail', 'export: downloads a .po/.csv translation file for a module. import: uploads a translation file from disk. list: prints installed language codes and names. Without extra args, export/import open the Odoo wizard instead.'),

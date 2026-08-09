@@ -21,6 +21,7 @@ async function cmdShowOdooVersion(kwargs: CMDCallbackArgs, ctx: CMDCallbackConte
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdVersion.definition', 'Know Odoo version'),
+    category: 'system',
     callback: cmdShowOdooVersion,
     detail: i18n.t('cmdVersion.detail', 'Shows Odoo version'),
   };

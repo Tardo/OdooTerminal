@@ -16,6 +16,7 @@ async function cmdRun(this: Terminal): Promise<> {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdRun.definition', 'Run a TraSH script'),
+    category: 'terminal',
     callback: cmdRun,
     detail: i18n.t('cmdRun.detail', 'Run a TraSH script'),
   };

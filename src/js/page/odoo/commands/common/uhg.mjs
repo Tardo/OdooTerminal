@@ -50,6 +50,7 @@ async function getOptions(this: Terminal, arg_name: string) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdUhg.definition', 'Check if user is in the selected groups'),
+    category: 'system',
     callback: cmdUserHasGroups,
     options: getOptions,
     detail: i18n.t('cmdUhg.detail', 'Check if user is in the selected groups.'),

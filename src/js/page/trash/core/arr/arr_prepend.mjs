@@ -19,6 +19,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcArrPrepend.definition', 'Prepend an item to an array'),
     callback: funcArrPrepend,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcArrPrepend.detail', 'Insert an item at the beginning of an array (mutates it in place)'),
     args: [
       [ARG.List | ARG.Any, ['a', 'arr'], true, i18n.t('funcArrPrepend.args.arr', 'The array')],

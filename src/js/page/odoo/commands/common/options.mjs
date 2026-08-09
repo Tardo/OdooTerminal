@@ -13,6 +13,7 @@ async function cmdOptions() {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdOptions.definition', 'Open extension options'),
+    category: 'system',
     callback: cmdOptions,
     detail: i18n.t('cmdOptions.detail', 'Open the OdooTerminal extension options page.'),
   };

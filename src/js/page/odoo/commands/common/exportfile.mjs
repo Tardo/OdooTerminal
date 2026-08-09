@@ -79,6 +79,7 @@ async function cmdExportFile(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdExportFile.definition', 'Export a value to a local file'),
+    category: 'devtools',
     callback: cmdExportFile,
     detail: i18n.t('cmdExportFile.detail', 'Save a value to disk. Formats: json (any value), csv/xml/zip (Recordset only), raw (binary with custom MIME type). zip exports each record as a separate file using --field-name and --field-data.'),
     args: [

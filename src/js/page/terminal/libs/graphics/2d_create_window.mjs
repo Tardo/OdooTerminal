@@ -39,6 +39,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DCreateWindow.definition', 'Create 2D Window'),
     callback: func2DCreateWindow,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t('cmd2DCreateWindow.detail', 'Create 2D Window'),
     args: [
       [ARG.Number, ['w', 'width'], true, i18n.t('cmd2DCreateWindow.args.width', 'The canvas width')],

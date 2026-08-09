@@ -179,6 +179,7 @@ async function cmdDiff(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDiff.definition', 'Compare two records field by field'),
+    category: 'devtools',
     callback: cmdDiff,
     options: getModelOptions,
     detail: i18n.t(

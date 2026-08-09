@@ -69,6 +69,7 @@ async function cmdWatchdog(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdWatchdog.definition', 'Opt-in floating AI watchdog that reacts to page activity on its own'),
+    category: 'devtools',
     callback: cmdWatchdog,
     detail: i18n.t(
       'cmdWatchdog.detail',

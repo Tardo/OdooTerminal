@@ -20,6 +20,7 @@ async function cmdPostJSONData(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext)
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdJson.definition', 'Send POST JSON'),
+    category: 'devtools',
     callback: cmdPostJSONData,
     detail: i18n.t('cmdJson.detail', "Sends HTTP POST 'application/json' request"),
     args: [

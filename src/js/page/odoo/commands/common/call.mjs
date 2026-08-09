@@ -27,6 +27,7 @@ async function cmdCallModelMethod(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdCall.definition', 'Call model method'),
+    category: 'system',
     callback: cmdCallModelMethod,
     options: getModelOptions,
     unsafe: true,

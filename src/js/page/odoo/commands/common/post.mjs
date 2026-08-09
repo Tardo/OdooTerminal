@@ -35,6 +35,7 @@ async function cmdPostData(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdPost.definition', 'Send POST request'),
+    category: 'system',
     callback: cmdPostData,
     unsafe: true,
     detail: i18n.t('cmdPost.detail', 'Send POST request to selected endpoint'),

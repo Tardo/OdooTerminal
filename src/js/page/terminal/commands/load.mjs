@@ -15,6 +15,7 @@ async function cmdLoadResource(this: Terminal, kwargs: CMDCallbackArgs): Promise
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdLoad.definition', 'Load external resource'),
+    category: 'terminal',
     callback: cmdLoadResource,
     // Injects arbitrary remote JS/CSS into the authenticated Odoo page (RCE).
     // Must require confirmation before the AI agent can run it autonomously.

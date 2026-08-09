@@ -40,6 +40,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DHandleLoop.definition', 'Run a graphics loop'),
     callback: func2DHandleLoop,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t(
       'cmd2DHandleLoop.detail',
       'Call the given function once per browser frame with (time, delta, count). Stops when the window is destroyed, after --max-frames, or when the function returns false. Returns the number of frames run',

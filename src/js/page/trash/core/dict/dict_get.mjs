@@ -21,6 +21,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcDictGet.definition', 'Get a value from a dictionary'),
     callback: funcDictGet,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcDictGet.detail', 'Return the value for the given key, or the default value if the key does not exist'),
     args: [
       [ARG.Dictionary, ['d', 'dict'], true, i18n.t('funcDictGet.args.dict', 'The dictionary')],

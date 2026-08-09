@@ -21,6 +21,7 @@ async function cmdUpdateAppList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CM
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdUal.definition', 'Update apps list'),
+    category: 'system',
     callback: cmdUpdateAppList,
     unsafe: true,
     detail: i18n.t('cmdUal.detail', 'Refresh the module registry by scanning the addons path for new or updated modules. Required before installing a module that was just added to the filesystem.'),

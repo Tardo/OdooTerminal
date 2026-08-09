@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DListWindows.definition', 'List 2D windows'),
     callback: func2DListWindows,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t(
       'cmd2DListWindows.detail',
       'List the currently open 2D windows with their unique id, width and height',

@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcStrUpper.definition', 'Convert string to uppercase'),
     callback: funcStrUpper,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcStrUpper.detail', 'Return the string converted to uppercase'),
     args: [
       [ARG.String, ['s', 'str'], true, i18n.t('funcStrUpper.args.str', 'The string')],

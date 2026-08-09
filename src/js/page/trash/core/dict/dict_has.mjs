@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcDictHas.definition', 'Check if a dictionary has a key'),
     callback: funcDictHas,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcDictHas.detail', 'Return true if the dictionary has the given key'),
     args: [
       [ARG.Dictionary, ['d', 'dict'], true, i18n.t('funcDictHas.args.dict', 'The dictionary')],

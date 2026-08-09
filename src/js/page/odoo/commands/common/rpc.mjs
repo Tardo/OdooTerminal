@@ -16,6 +16,7 @@ async function cmdRpc(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdRpc.definition', 'Execute raw rpc'),
+    category: 'system',
     callback: cmdRpc,
     unsafe: true,
     detail: i18n.t('cmdRpc.detail', 'Execute raw rpc'),

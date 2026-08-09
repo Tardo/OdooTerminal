@@ -124,6 +124,7 @@ async function getOptions(this: Terminal, arg_name: string) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdSysParam.definition', 'Manage system parameters'),
+    category: 'system',
     callback: cmdSysParam,
     options: getOptions,
     unsafe: true,

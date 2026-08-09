@@ -660,12 +660,14 @@
   "cmdHelp": {
     "args": {
       "all": "显示所有命令",
+      "category": "Filter commands by category",
       "cmd": "要查询的命令",
       "onlyInternal": "仅显示内部命令"
     },
     "definition": "打印此帮助或命令详细信息",
     "detail": "显示命令及快速定义。<br/>- <> ~> 必需参数<br/>- [] ~> 可选参数",
     "error": {
+      "categoryEmpty": "No commands found in category '{{category}}'. Available: {{list}}",
       "commandNotExist": "'{{cmd}}' 命令不存在"
     },
     "result": {

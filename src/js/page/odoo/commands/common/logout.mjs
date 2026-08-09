@@ -25,6 +25,7 @@ async function cmdLogOut(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallba
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdLogout.definition', 'Log out'),
+    category: 'system',
     callback: cmdLogOut,
     detail: i18n.t('cmdLogout.detail', 'Session log out'),
   };

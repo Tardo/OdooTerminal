@@ -64,6 +64,7 @@ async function getOptions(this: Terminal, arg_name: string) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdInstall.definition', 'Install a module'),
+    category: 'system',
     callback: cmdInstallModule,
     options: getOptions,
     unsafe: true,

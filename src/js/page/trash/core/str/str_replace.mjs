@@ -22,6 +22,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcStrReplace.definition', 'Replace occurrences in a string'),
     callback: funcStrReplace,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcStrReplace.detail', 'Replace the first (or all with -a) occurrences of a substring'),
     args: [
       [ARG.String, ['s', 'str'], true, i18n.t('funcStrReplace.args.str', 'The source string')],

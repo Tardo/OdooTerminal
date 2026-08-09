@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcStrStarts.definition', 'Check if a string starts with a prefix'),
     callback: funcStrStarts,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcStrStarts.detail', 'Return true if the string starts with the given prefix'),
     args: [
       [ARG.String, ['s', 'str'], true, i18n.t('funcStrStarts.args.str', 'The string')],

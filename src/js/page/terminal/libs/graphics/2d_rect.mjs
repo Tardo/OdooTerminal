@@ -22,6 +22,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DRect.definition', 'Draw a rect'),
     callback: func2DRect,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t('cmd2DRect.detail', 'Draw a rect'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DRect.args.canvas', 'The canvas or its window id')],

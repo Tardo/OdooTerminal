@@ -26,6 +26,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DLine.definition', 'Draw a line'),
     callback: func2DLine,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t('cmd2DLine.detail', 'Draw a line'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DLine.args.canvas', 'The canvas or its window id')],

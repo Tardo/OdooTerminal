@@ -112,6 +112,7 @@ async function getOptions(this: Terminal, arg_name: string): Promise<Array<strin
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDepends.definition', 'Know modules that depends on the given module'),
+    category: 'system',
     callback: cmdModuleDepends,
     options: getOptions,
     detail: i18n.t('cmdDepends.detail', 'Show a list of the modules that depends on the given module'),

@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdSleep.definition', 'Sleep'),
     callback: funcSleep,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('cmdSleep.detail', 'Sleep (time in ms)'),
     args: [
       [ARG.Number, ['t', 'time'], false, i18n.t('cmdSleep.args.time', 'The time to sleep (in ms)')],

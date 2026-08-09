@@ -99,6 +99,7 @@ async function cmdBarcode(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdBarcode.definition', 'Operations over barcode'),
+    category: 'devtools',
     callback: cmdBarcode,
     detail: i18n.t('cmdBarcode.detail', 'See information and send barcode strings'),
     args: [

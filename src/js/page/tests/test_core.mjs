@@ -47,6 +47,8 @@ export default class TestCore extends TerminalTestSuite {
     await this.terminal.execute('help', false, true);
     await this.terminal.execute('help -c search', false, true);
     await this.terminal.execute('help search', false, true);
+    const res = await this.terminal.execute('help --category stdlib', false, true);
+    this.assertIn(res, 'arr_map');
   }
 
   async test_print() {

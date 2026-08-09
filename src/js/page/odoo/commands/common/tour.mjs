@@ -109,6 +109,7 @@ function getOptions(arg_name: string) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdTour.definition', 'Launch Tour'),
+    category: 'devtools',
     callback: cmdRunTour,
     options: getOptions,
     detail: i18n.t('cmdTour.detail', 'Runs the selected tour. If no tour given, prints all available tours.'),

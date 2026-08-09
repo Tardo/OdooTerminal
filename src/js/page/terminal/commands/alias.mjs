@@ -40,6 +40,7 @@ async function cmdAlias(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbac
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdAlias.definition', 'Create aliases'),
+    category: 'terminal',
     callback: cmdAlias,
     detail: i18n.t(
       'cmdAlias.detail',

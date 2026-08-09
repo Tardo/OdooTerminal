@@ -17,6 +17,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcPow.definition', 'Calculate the exponent value of x raised to the power of y'),
     callback: funcPow,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcPow.detail', 'Calculate the exponent value of x raised to the power of y'),
     args: [
       [ARG.Number, ['b', 'base'], true, i18n.t('funcPow.args.base', 'Base')],

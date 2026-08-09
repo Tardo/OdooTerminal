@@ -55,6 +55,7 @@ async function cmdRenewDatabase(this: Terminal, kwargs: CMDCallbackArgs, ctx: CM
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdRenewDatabase.definition', 'Renew the database'),
+    category: 'system',
     callback: cmdRenewDatabase,
     unsafe: true,
     detail: i18n.t(

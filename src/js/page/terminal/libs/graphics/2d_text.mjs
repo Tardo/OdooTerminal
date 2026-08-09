@@ -23,6 +23,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('func2DText.definition', 'Draw a text'),
     callback: func2DText,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t('func2DText.detail', 'Draw a text'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('func2DText.args.canvas', 'The canvas or its window id')],

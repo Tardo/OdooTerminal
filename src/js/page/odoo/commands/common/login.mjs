@@ -74,6 +74,7 @@ async function getOptions(this: Terminal, arg_name: string) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdLogin.definition', 'Login as...'),
+    category: 'system',
     callback: cmdLoginAs,
     options: getOptions,
     detail: i18n.t('cmdLogin.detail', 'Login as selected user.'),

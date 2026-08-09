@@ -36,6 +36,7 @@ async function cmdLastSeen(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdLastSeen.definition', 'Know user presence'),
+    category: 'system',
     callback: cmdLastSeen,
     detail: i18n.t('cmdLastSeen.detail', 'Show users last seen'),
   };

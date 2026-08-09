@@ -15,6 +15,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('func2DNextFrame.definition', 'Wait for the next animation frame'),
     callback: func2DNextFrame,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t(
       'func2DNextFrame.detail',
       'Waits until the browser is ready to paint the next frame and returns its timestamp. Use it to pace animation loops instead of sleep.',

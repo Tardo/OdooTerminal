@@ -45,6 +45,7 @@ async function cmdSetDebugMode(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext)
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDebug.definition', 'Set debug mode'),
+    category: 'system',
     callback: cmdSetDebugMode,
     detail: i18n.t('cmdDebug.detail', 'Set the Odoo debug mode and reload the page. Values: 0 = disabled, 1 = enabled, 2 = enabled with assets.'),
     args: [

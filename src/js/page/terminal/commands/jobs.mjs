@@ -29,6 +29,7 @@ async function cmdJobs(
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdJobs.definition', 'Display running jobs'),
+    category: 'terminal',
     callback: cmdJobs,
     detail: i18n.t('cmdJobs.detail', 'Display running jobs'),
   };

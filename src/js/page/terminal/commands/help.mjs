@@ -6,6 +6,7 @@ import i18n from 'i18next';
 import {getArgumentInfo} from '@trash/argument';
 import {ARG} from '@trash/constants';
 import {FUNCTION_TYPE} from '@trash/function';
+import {buildCommandPrompt} from '@ai/prompts/trash';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
 import type Terminal from '@terminal/terminal';
 import type Screen from '@terminal/core/screen';
@@ -55,20 +56,51 @@ async function printHelpDetailed(screen: Screen, cmd: string, cmd_def: CMDDef) {
   }
 }
 
-async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<void> {
+async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
   if (typeof kwargs.cmd === 'undefined') {
-    const sorted_cmd_keys = Object.keys(this.getShell().getVM().getRegisteredCmds()).sort();
+    const cmds = this.getShell().getVM().getRegisteredCmds();
+    const sorted_cmd_keys = Object.keys(cmds).sort();
     const sorted_keys_len = sorted_cmd_keys.length;
+    const matched: Array<string> = [];
     for (let x = 0; x < sorted_keys_len; ++x) {
       const _cmd = sorted_cmd_keys[x];
-      const cmd_def = this.getShell().getVM().getRegisteredCmds()[_cmd];
+      const cmd_def = cmds[_cmd];
       const is_command = cmd_def.type === FUNCTION_TYPE.Command;
+      // A category is a self-contained filter: some categories (stdlib, graphics) are
+      // entirely Internal-type, so gating them behind --all/--only-internal too would
+      // make "help --category stdlib" return nothing by default.
+      if (typeof kwargs.category !== 'undefined') {
+        if (cmd_def.category === kwargs.category) {
+          ctx.screen.printHelpSimple(_cmd, cmd_def, !is_command);
+          matched.push(_cmd);
+        }
+        continue;
+      }
       if (kwargs.all || (!kwargs.only_internal && is_command) || (kwargs.only_internal && !is_command)) {
-        ctx.screen.printHelpSimple(_cmd, this.getShell().getVM().getRegisteredCmds()[_cmd], !is_command);
+        ctx.screen.printHelpSimple(_cmd, cmd_def, !is_command);
       }
     }
+    // Category lookups double as an AI discovery path (via run_command): return the
+    // compact syntax notation — the same one used in the agent's system prompt — so
+    // the result is directly usable, not just the pretty screen output.
+    if (typeof kwargs.category !== 'undefined') {
+      if (matched.length === 0) {
+        const known = [...new Set(Object.values(cmds).map(def => def.category))].sort();
+        throw new Error(
+          i18n.t('cmdHelp.error.categoryEmpty', "No commands found in category '{{category}}'. Available: {{list}}", {
+            category: kwargs.category,
+            list: known.join(', '),
+          }),
+        );
+      }
+      return matched.map(_cmd => buildCommandPrompt(_cmd, cmds[_cmd])).join('\n');
+    }
   } else if (Object.hasOwn(this.getShell().getVM().getRegisteredCmds(), kwargs.cmd)) {
-    await printHelpDetailed.call(this, ctx.screen, kwargs.cmd, this.getShell().getVM().getRegisteredCmds()[kwargs.cmd]);
+    const cmd_def = this.getShell().getVM().getRegisteredCmds()[kwargs.cmd];
+    await printHelpDetailed.call(this, ctx.screen, kwargs.cmd, cmd_def);
+    // Same reasoning as the category branch above: give run_command a value to read,
+    // not just the screen-formatted output.
+    return buildCommandPrompt(kwargs.cmd, cmd_def);
   } else {
     throw new Error(i18n.t('cmdHelp.error.commandNotExist', "'{{cmd}}' command doesn't exist", {cmd: kwargs.cmd}));
   }
@@ -77,6 +109,9 @@ async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
 function getOptions(this: Terminal, arg_name: string): Promise<Array<string>> {
   if (arg_name === 'cmd') {
     return Promise.resolve(Object.keys(this.getShell().getVM().getRegisteredCmds()));
+  } else if (arg_name === 'category') {
+    const cmds = this.getShell().getVM().getRegisteredCmds();
+    return Promise.resolve([...new Set(Object.values(cmds).map(def => def.category))].sort());
   }
   return Promise.resolve([]);
 }
@@ -92,9 +127,10 @@ export default function (): Partial<CMDDef> {
     ),
     args: [
       [ARG.String, ['c', 'cmd'], false, i18n.t('cmdHelp.args.cmd', 'The command to consult')],
+      [ARG.String, ['cat', 'category'], false, i18n.t('cmdHelp.args.category', 'Filter commands by category')],
       [ARG.Flag, ['a', 'all'], false, i18n.t('cmdHelp.args.all', 'Show all commands')],
       [ARG.Flag, ['oi', 'only-internal'], false, i18n.t('cmdHelp.args.onlyInternal', 'Show only internal commands')],
     ],
-    example: '-c search',
+    example: '--category system',
   };
 }

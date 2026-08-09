@@ -45,6 +45,7 @@ export default function (): Partial<CMDDef> {
     // Gate it behind confirmation when driven by the AI agent.
     unsafe: true,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcFetch.detail', 'Interface for making HTTP requests and processing the responses.'),
     args: [
       [ARG.String, ['u', 'url'], true, i18n.t('funcFetch.args.url', 'The URL')],

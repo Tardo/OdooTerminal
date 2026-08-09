@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcDictClone.definition', 'Clone a dictionary'),
     callback: funcDictClone,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcDictClone.detail', 'Return a shallow copy of a dictionary'),
     args: [
       [ARG.Dictionary, ['d', 'dict'], true, i18n.t('funcDictClone.args.dict', 'The dictionary')],

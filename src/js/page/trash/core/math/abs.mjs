@@ -17,6 +17,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcAbs.definition', 'Absolute value of a number'),
     callback: funcAbs,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcAbs.detail', 'Returns the absolute value of a number.'),
     args: [
       [ARG.Number, ['n', 'num'], true, i18n.t('funcAbs.args.num', 'The number')],

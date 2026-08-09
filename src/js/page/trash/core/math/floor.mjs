@@ -17,6 +17,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcFloor.definition', 'Rounds a number DOWN to the nearest integer'),
     callback: funcFloor,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcFloor.detail', 'Rounds a number DOWN to the nearest integer'),
     args: [
       [ARG.Number, ['n', 'num'], true, i18n.t('funcFloor.args.num', 'The number')],

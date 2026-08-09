@@ -86,6 +86,7 @@ export default class VMachine {
       aliases: [],
       example: '',
       type: FUNCTION_TYPE.Command,
+      category: 'core',
       ...cmd_def,
     };
   }

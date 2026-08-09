@@ -17,6 +17,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcRand.definition', 'Generate random integers'),
     callback: funcRand,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcRand.detail', 'Return random integers'),
     args: [
       [ARG.Number, ['mi', 'min'], true, i18n.t('funcRand.args.min', 'Min. value')],

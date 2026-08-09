@@ -94,6 +94,7 @@ async function cmdAI(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackCo
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdAI.definition', 'AI assistant (connect & agent)'),
+    category: 'devtools',
     callback: cmdAI,
     detail: i18n.t(
       'cmdAI.detail',

@@ -151,11 +151,33 @@ export function buildScriptingPrompt(): string {
   );
 }
 
+// One-line hint per non-core category, shown so the model knows such commands exist and
+// where to get their syntax before it needs them — without preloading the syntax itself.
+const CATEGORY_HINTS: {[string]: string} = {
+  system: 'session/instance admin — login, modules, DB, system params, upgrades',
+  devtools: 'diagnostics & data tools — introspection, testing, import/export, AI/watchdog config',
+  ui: 'UI actions — menu actions, effects, notifications',
+  terminal: 'terminal/shell features (aliases, jobs, scripting utilities) — not Odoo data',
+  stdlib: 'array/dict/string/math/time/encoding helpers — already covered by skill "trash-syntax" §12, no need for help',
+  graphics: '2D drawing/canvas (charts, shapes, diagrams) — already covered by skill "graphics", no need for help',
+};
+
 export default function(terminal: Terminal): string {
   const cmds = terminal.getShell().getVM().getRegisteredCmds();
-  const lines = Object.entries(cmds).filter(([_name, def]) => def.type === FUNCTION_TYPE.Command || def.type === FUNCTION_TYPE.Internal).map(([name, def]) => {
+  const entries = Object.entries(cmds).filter(([_name, def]) => def.type === FUNCTION_TYPE.Command || def.type === FUNCTION_TYPE.Internal);
+  const lines = entries.filter(([_name, def]) => def.category === 'core').map(([name, def]) => {
     return buildCommandPrompt(name, def);
   });
+
+  const otherCategoryCounts: Map<string, number> = new Map();
+  for (const [, def] of entries) {
+    if (def.category === 'core') continue;
+    otherCategoryCounts.set(def.category, (otherCategoryCounts.get(def.category) ?? 0) + 1);
+  }
+  const otherCategories = [...otherCategoryCounts.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([cat, count]) => `  - ${cat} (${count} commands): ${CATEGORY_HINTS[cat] ?? ''}`)
+    .join('\n');
 
   return (
     'TraSH scripting language — follow strictly:\n' +
@@ -249,7 +271,13 @@ export default function(terminal: Terminal): string {
     '=== AVAILABLE COMMANDS (SYNTAX NOTATION) ===\n' +
     'Notation: <-flag/name type=default> required, [-flag/name type=default] optional\n' +
     'Types: str, num, flag, dict, any, [x]=list of x, str(a|b)=enum\n' +
-    'Only use the following registered commands:\n' +
-    lines.join('\n')
+    'Core commands — always available, no preloading needed:\n' +
+    lines.join('\n') +
+    '\n\n' +
+    '=== OTHER COMMAND CATEGORIES (NOT PRELOADED) ===\n' +
+    'These commands exist and are usable, but their syntax is intentionally not loaded above to save tokens.\n' +
+    'Before using ANY command not in the list above, run `help --category <name>` via run_command to get its exact syntax first — never guess flags.\n' +
+    'A category dump can be long; if you only need ONE command from it, `help -c <cmd>` returns just that one.\n' +
+    otherCategories + '\n'
   );
 }

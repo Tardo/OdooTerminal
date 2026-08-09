@@ -24,6 +24,7 @@ async function cmdExportVar(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdExportVar.definition', 'Exports the command result to a browser console variable'),
+    category: 'terminal',
     callback: cmdExportVar,
     detail: i18n.t('cmdExportVar.detail', 'Exports the command result to a browser console variable.'),
     args: [[ARG.Any, ['v', 'value'], true, i18n.t('cmdExportVar.args.value', 'The value to export')]],

@@ -40,6 +40,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DCircle.definition', 'Draw a circle or arc'),
     callback: func2DCircle,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t('cmd2DCircle.detail', 'Draw a circle, arc or pie slice'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DCircle.args.canvas', 'The canvas or its window id')],

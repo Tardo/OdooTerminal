@@ -18,6 +18,7 @@ async function cmdClear(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbac
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdClear.definition', 'Clean terminal section'),
+    category: 'terminal',
     callback: cmdClear,
     detail: i18n.t('cmdClear.detail', 'Clean the selected section'),
     args: [

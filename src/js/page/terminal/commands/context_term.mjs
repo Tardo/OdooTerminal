@@ -35,6 +35,7 @@ async function cmdTerminalContextOperation(
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdContextTerm.definition', 'Operations over terminal context dictionary'),
+    category: 'terminal',
     callback: cmdTerminalContextOperation,
     detail: i18n.t(
       'cmdContextTerm.detail',

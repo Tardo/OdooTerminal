@@ -32,6 +32,7 @@ async function cmdDoc(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDoc.definition', 'Open technical documentation page'),
+    category: 'devtools',
     callback: cmdDoc,
     options: getModelOptions,
     detail: i18n.t('cmdDoc.detail', 'Open the built-in technical documentation page (Odoo 19.0+ only). Without -m opens the index. With -m, opens docs for that model. With -me, anchors to that method.'),

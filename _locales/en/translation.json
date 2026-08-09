@@ -660,12 +660,14 @@
   "cmdHelp": {
     "args": {
       "all": "Show all commands",
+      "category": "Filter commands by category",
       "cmd": "The command to consult",
       "onlyInternal": "Show only internal commands"
     },
     "definition": "Print this help or command detailed info",
     "detail": "Show commands and a quick definition.<br/>- <> ~> Required Parameter<br/>- [] ~> Optional Parameter",
     "error": {
+      "categoryEmpty": "No commands found in category '{{category}}'. Available: {{list}}",
       "commandNotExist": "'{{cmd}}' command doesn't exist"
     },
     "result": {

@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcStrLower.definition', 'Convert string to lowercase'),
     callback: funcStrLower,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcStrLower.detail', 'Return the string converted to lowercase'),
     args: [
       [ARG.String, ['s', 'str'], true, i18n.t('funcStrLower.args.str', 'The string')],

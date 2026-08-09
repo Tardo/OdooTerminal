@@ -76,6 +76,7 @@ export type CMDDef = {
   aliases: $ReadOnlyArray<string>,
   example: string,
   type: number,
+  category: string,
 };
 
 export type RegisteredCMD = {[string]: CMDDef};

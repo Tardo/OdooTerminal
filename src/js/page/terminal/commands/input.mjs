@@ -19,6 +19,7 @@ async function cmdInput(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbac
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdInput.definition', 'Requests user input'),
+    category: 'terminal',
     callback: cmdInput,
     detail: i18n.t('cmdInput.detail', 'Returns the data entered by the user.'),
     args: [

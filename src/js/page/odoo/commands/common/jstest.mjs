@@ -40,6 +40,7 @@ async function getOptions(this: Terminal, arg_name: string) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdJSTest.definition', 'Launch JS Tests'),
+    category: 'devtools',
     callback: cmdJSTest,
     options: getOptions,
     detail: i18n.t('cmdJSTest.detail', 'Runs js tests in desktop or mobile mode for the selected module.'),

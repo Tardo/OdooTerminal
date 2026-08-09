@@ -52,6 +52,7 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     '- `run_command` returns the results of ALL top-level statements serialized as JSON — raw structured data (see [RULE 1 — SCRIPT RESULTS] below), not a text summary. Every field of every returned record is inspectable; no chaining needed to see multiple records.\n' +
     '- If a command fails: change strategy, reuse literal values from past output, and NEVER repeat the exact same failed command.\n' +
     '- Unsafe/destructive commands (write, unlink, create, call, rpc, post, install, uninstall, upgrade, commit, rollback, renew_database, sysparam, ual) require user confirmation. If rejected: try a read-only alternative, ask for clarification, or report that the operation needs approval.\n' +
+    '  Only write/unlink/create/commit/rollback are preloaded below (category `core`); the rest are in category `system` — run `help --category system` via run_command for their exact syntax before first use.\n' +
     '\n' +
     '# DISPLAY — PREFER ODOO VIEWS OVER print\n' +
     '  Single record → `view -m <model> -i <id>` · multiple → `view -m <model> [-d domain]` · grouped/numeric → `graph -m <model> [-g groupby] [-e measure] [-t bar|line|pie]` · matrix → `pivot -m <model> [-r row_field] [-c col_field] [-e measure]`\n' +

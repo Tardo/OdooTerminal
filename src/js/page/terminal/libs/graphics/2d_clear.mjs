@@ -24,6 +24,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DClear.definition', 'Clear canvas'),
     callback: func2DClear,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t('cmd2DClear.detail', 'Clear canvas'),
     args: [
       [ARG.Any, ['c', 'canvas'], true, i18n.t('cmd2DClear.args.canvas', 'The canvas or its window id')],

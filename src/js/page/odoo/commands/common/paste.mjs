@@ -148,6 +148,7 @@ function cmdPaste(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackConte
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdPaste.definition', 'Pastes copied data'),
+    category: 'devtools',
     callback: cmdPaste,
     detail: i18n.t('cmdPaste.detail', 'Paste model records or variables'),
     args: [

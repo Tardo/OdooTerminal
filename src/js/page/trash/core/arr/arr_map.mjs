@@ -23,6 +23,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcArrMap.definition', 'Map an array'),
     callback: funcArrMap,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcArrMap.detail', 'Return a new array with the mapper function applied to each element'),
     args: [
       [ARG.List | ARG.Any, ['a', 'arr'], true, i18n.t('funcArrMap.args.arr', 'The array')],

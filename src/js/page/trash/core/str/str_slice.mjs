@@ -22,6 +22,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcStrSlice.definition', 'Extract a substring'),
     callback: funcStrSlice,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcStrSlice.detail', 'Return the portion of the string from begin to end (exclusive). Negative indices count from the end.'),
     args: [
       [ARG.String, ['s', 'str'], true, i18n.t('funcStrSlice.args.str', 'The string')],

@@ -83,6 +83,7 @@ async function cmdDateRange(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDateRange.definition', 'Show min/max values for a date or datetime field'),
+    category: 'devtools',
     callback: cmdDateRange,
     options: getModelOptions,
     detail: i18n.t(

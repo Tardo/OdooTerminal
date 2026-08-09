@@ -71,6 +71,7 @@ async function cmdShowDBList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDBList.definition', 'Show database names'),
+    category: 'system',
     callback: cmdShowDBList,
     detail: i18n.t('cmdDBList.detail', 'Show database names'),
     args: [

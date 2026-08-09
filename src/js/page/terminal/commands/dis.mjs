@@ -59,6 +59,7 @@ async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdDis.definition', 'Dissasembler bytecode'),
+    category: 'terminal',
     callback: cmdDis,
     detail: i18n.t('cmdDis.detail', 'Shows the bytecode generated for the input'),
     args: [[ARG.String, ['c', 'code'], true, i18n.t('cmdDis.args.code', 'TraSH Code')]],

@@ -39,6 +39,7 @@ async function cmdShowEffect(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdEffect.definition', 'Show effect'),
+    category: 'ui',
     callback: cmdShowEffect,
     detail: i18n.t('cmdEffect.detail', 'Play a visual UI effect. Without -t, lists all registered effect names. With -t, plays that effect. Available in Odoo 15.0+.'),
     args: [

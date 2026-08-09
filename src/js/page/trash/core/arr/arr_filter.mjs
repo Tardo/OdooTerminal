@@ -25,6 +25,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcArrFilter.definition', 'Filter an array'),
     callback: funcArrFilter,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcArrFilter.detail', 'Return a new array containing only the elements for which the filter function returns true'),
     args: [
       [ARG.List | ARG.Any, ['a', 'arr'], true, i18n.t('funcArrFilter.args.arr', 'The array')],

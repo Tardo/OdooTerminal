@@ -61,6 +61,7 @@ async function cmdLongpolling(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDC
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdLongpolling.definition', 'Long-Polling operations'),
+    category: 'system',
     callback: cmdLongpolling,
     detail: i18n.t('cmdLongpolling.detail', 'Operations over long-polling.'),
     args: [

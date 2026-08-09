@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcDictSize.definition', 'Get the number of keys in a dictionary'),
     callback: funcDictSize,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcDictSize.detail', 'Return the number of keys of a dictionary'),
     args: [
       [ARG.Dictionary, ['d', 'dict'], true, i18n.t('funcDictSize.args.dict', 'The dictionary')],

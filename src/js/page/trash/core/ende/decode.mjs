@@ -21,6 +21,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcDecode.definition', 'Decode data'),
     callback: funcDecode,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcDecode.detail', 'Decode data'),
     args: [
       [ARG.String, ['v', 'value'], true, i18n.t('funcDecode.args.value', 'The value to decode')],

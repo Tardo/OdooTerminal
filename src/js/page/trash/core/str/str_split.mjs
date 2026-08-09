@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcStrSplit.definition', 'Split a string into an array'),
     callback: funcStrSplit,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcStrSplit.detail', 'Split a string by a delimiter and return an array of substrings'),
     args: [
       [ARG.String, ['s', 'str'], true, i18n.t('funcStrSplit.args.str', 'The string to split')],

@@ -15,6 +15,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcPNow.definition', 'High resolution timestamp in milliseconds'),
     callback: funcPNow,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcPNow.detail', 'High resolution timestamp in milliseconds.'),
   };
 }

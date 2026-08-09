@@ -15,6 +15,7 @@ async function cmdGenFile(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdGenFile.definition', 'Generate a File object'),
+    category: 'terminal',
     callback: cmdGenFile,
     detail: i18n.t(
       'cmdGenFile.detail',

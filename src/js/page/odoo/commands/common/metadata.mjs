@@ -43,6 +43,7 @@ async function cmdMetadata(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdMetadata.definition', 'View record metadata'),
+    category: 'devtools',
     callback: cmdMetadata,
     options: getModelOptions,
     detail: i18n.t('cmdMetadata.detail', 'Show ORM metadata for a record: create_uid, create_date, write_uid, write_date, noupdate flag, and XML ID.'),

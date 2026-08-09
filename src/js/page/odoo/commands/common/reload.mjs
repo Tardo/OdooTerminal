@@ -12,6 +12,7 @@ async function cmdReloadPage() {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdReload.definition', 'Reload current page'),
+    category: 'system',
     callback: cmdReloadPage,
     detail: i18n.t('cmdReload.detail', 'Reload current page.'),
   };

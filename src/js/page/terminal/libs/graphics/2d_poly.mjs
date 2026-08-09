@@ -37,6 +37,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmd2DPoly.definition', 'Draw a polyline or polygon'),
     callback: func2DPoly,
     type: FUNCTION_TYPE.Internal,
+    category: 'graphics',
     detail: i18n.t(
       'cmd2DPoly.detail',
       'Draw a polyline from a list of [x, y] points. With --fill the shape is closed and filled',

@@ -40,6 +40,7 @@ async function cmdNotify(this: Terminal, kwargs: CMDCallbackArgs) {
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdNotify.definition', 'Shows a notification'),
+    category: 'ui',
     callback: cmdNotify,
     detail: i18n.t('cmdNotify.detail', 'Displays a notification with a custom message'),
     args: [

@@ -39,6 +39,7 @@ async function cmdInfo(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdInfo.definition', 'Get session information'),
+    category: 'system',
     callback: cmdInfo,
     detail: i18n.t('cmdInfo.detail', 'Return one piece of current session/page data. Use exactly one flag: --user-id (numeric user ID), --user-login (login name), --active-id (record ID from the current view), --active-model (model from the current view).'),
     args: [

@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcDictValues.definition', 'Get the values of a dictionary'),
     callback: funcDictValues,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcDictValues.detail', 'Return an array with all the values of a dictionary'),
     args: [
       [ARG.Dictionary, ['d', 'dict'], true, i18n.t('funcDictValues.args.dict', 'The dictionary')],

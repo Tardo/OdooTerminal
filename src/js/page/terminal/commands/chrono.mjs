@@ -21,6 +21,7 @@ async function cmdChrono(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallba
 export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdChrono.definition', 'Print the time expended executing a command'),
+    category: 'terminal',
     callback: cmdChrono,
     detail: i18n.t(
       'cmdChrono.detail',

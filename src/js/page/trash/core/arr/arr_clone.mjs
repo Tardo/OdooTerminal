@@ -18,6 +18,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcArrClone.definition', 'Clone an array'),
     callback: funcArrClone,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcArrClone.detail', 'Return a shallow copy of an array'),
     args: [
       [ARG.List | ARG.Any, ['a', 'arr'], true, i18n.t('funcArrClone.args.arr', 'The array')],

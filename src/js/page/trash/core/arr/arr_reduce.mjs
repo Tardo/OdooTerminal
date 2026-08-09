@@ -23,6 +23,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcArrReduce.definition', 'Reduce an array'),
     callback: funcArrReduce,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcArrReduce.detail', 'Reduce an array to a single value using the reducer function'),
     args: [
       [ARG.List | ARG.Any, ['a', 'arr'], true, i18n.t('funcArrReduce.args.arr', 'The array')],

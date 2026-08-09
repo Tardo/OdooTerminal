@@ -19,6 +19,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('funcDictSet.definition', 'Set a value in a dictionary'),
     callback: funcDictSet,
     type: FUNCTION_TYPE.Internal,
+    category: 'stdlib',
     detail: i18n.t('funcDictSet.detail', 'Set the value for the given key (mutates the dictionary in place)'),
     args: [
       [ARG.Dictionary, ['d', 'dict'], true, i18n.t('funcDictSet.args.dict', 'The dictionary')],
