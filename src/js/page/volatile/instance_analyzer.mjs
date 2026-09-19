@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 import isCompatibleOdooVersion from '@common/utils/is_compatible_odoo_version';
 import postMessage from '@common/utils/post_message';

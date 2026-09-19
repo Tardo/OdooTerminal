@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 import getOdooService from './get_odoo_service';
 import save2file from '@terminal/utils/save2file';

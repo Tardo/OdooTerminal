@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 import listModels from '@common/utils/ai_models_protocol';
 import {backgroundFetch} from '@ai/utils/relay_fetch';

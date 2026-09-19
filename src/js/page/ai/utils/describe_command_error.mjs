@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 // A failed run_command reaches the agent as a ProcessJobError whose generic ".message"
 // ("Error executing 'search'") hides the real reason. The actual cause lives in '.data' —

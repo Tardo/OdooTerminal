@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 import v11v12 from './accounting/v11_v12';
 import v13 from './accounting/v13';

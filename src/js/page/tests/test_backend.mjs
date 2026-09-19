@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 import asyncSleep from '@terminal/utils/async_sleep';
 import getOdooVersion from '@odoo/utils/get_odoo_version';

@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 import searchRead from '@odoo/orm/search_read';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';

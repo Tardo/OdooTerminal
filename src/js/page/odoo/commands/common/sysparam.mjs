@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright Baptiste <swano@ik.me>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';

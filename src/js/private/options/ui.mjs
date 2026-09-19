@@ -1,6 +1,7 @@
 // @flow strict
 // Copyright  Taois <taoist.han@vertechs.com>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
+// License MIT (https://opensource.org/license/mit).
 
 import {h, type VNode} from 'preact';
 import {signal} from '@preact/signals';

@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 // The watchdog's one-shot Q&A: no tool calls, no run_command — it can only see a data
 // snapshot, never act on it. That's deliberate: a full agent run can fire view/click/form-edit,

@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 // Version-agnostic page "stimuli" for the AI watchdog: local heuristics only, no AI calls here.
 // - save: any successful write/create through the standard /web/dataset/call_kw/<model>/<method>

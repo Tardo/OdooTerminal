@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 // Shared "list available models for a provider" logic — the header/endpoint shaping and
 // per-provider response parsing are identical whether the request leaves from the page

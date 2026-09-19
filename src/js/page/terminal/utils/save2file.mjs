@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 export default function (filename: string, type: string, data: mixed) {
   const blob = data instanceof Blob ? data : new Blob([data], {type: type});

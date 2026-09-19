@@ -8,6 +8,8 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ```
 IMP: Use external @Tardo/trash package
+
+UPD: Change license to MIT
 ```
 
 **14.0.0**

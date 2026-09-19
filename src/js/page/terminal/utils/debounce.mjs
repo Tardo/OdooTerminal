@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 export type DebounceCallback = (ev: {...}) => void;
 export type DebounceInnerCallback = (...args: Array<{...}>) => mixed;
 

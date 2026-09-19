@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 import ElementNotFoundTemplateError from '@terminal/exceptions/element_not_found_template_error';
 import TooManyElementsTemplateError from '@terminal/exceptions/too_many_elements_template_error';

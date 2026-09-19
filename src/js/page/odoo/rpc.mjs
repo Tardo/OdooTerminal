@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 /** This is a clone of Odoo implementation but without data transformations and adapted to new versions */
 import getOdooService from './utils/get_odoo_service';

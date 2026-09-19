@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 export default function (option_html_items: Array<string>): string {
   return `<ul class="nav nav-pills text-white">${option_html_items.join('')}</ul>`;

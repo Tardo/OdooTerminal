@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 
 // Registry of open 2D windows, keyed by their unique canvas.id. Lets commands
 // operate on a window via its id alone, without needing to keep the $var

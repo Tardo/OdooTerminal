@@ -1,6 +1,7 @@
 // @flow strict
 // Copyright  Taois <taoist.han@vertechs.com>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// Copyright  Alexandre Díaz <dev@redneboa.es>
+// License MIT (https://opensource.org/license/mit).
 
 const ESCAPE_RE = /[.*+?^${}()|[\]\\]/g;
 

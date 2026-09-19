@@ -1,6 +1,6 @@
 // @flow strict
 // Copyright  Alexandre Díaz <dev@redneboa.es>
-// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+// License MIT (https://opensource.org/license/mit).
 import func2DCreateWindow from './2d_create_window';
 import funcDDestroyWindow from './2d_destroy_window';
 import func2DListWindows from './2d_list_windows';
