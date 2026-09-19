@@ -19,19 +19,19 @@ import getSessionInfo from '@odoo/net_utils/get_session_info';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import {startTechnicalModelObserver} from '@odoo/page_features/technical_model_name';
 import isBackOffice from '@odoo/utils/is_backoffice';
-import registerMathFuncs from '@trash/core/math/__all__';
-import registerTimeFuncs from '@trash/core/time/__all__';
-import registerNetFuncs from '@trash/core/net/__all__';
-import registerEnDeFuncs from '@trash/core/ende/__all__';
-import registerStrFuncs from '@trash/core/str/__all__';
-import registerArrFuncs from '@trash/core/arr/__all__';
-import registerDictFuncs from '@trash/core/dict/__all__';
+import registerMathFuncs from '@tardo/trash/core/math/__all__';
+import registerTimeFuncs from '@tardo/trash/core/time/__all__';
+import registerNetFuncs from '@tardo/trash/core/net/__all__';
+import registerEnDeFuncs from '@tardo/trash/core/ende/__all__';
+import registerStrFuncs from '@tardo/trash/core/str/__all__';
+import registerArrFuncs from '@tardo/trash/core/arr/__all__';
+import registerDictFuncs from '@tardo/trash/core/dict/__all__';
 import registerCoreCommands from '@terminal/commands/__all__';
 import registerGraphicsFuncs from '@terminal/libs/graphics/__all__';
 import OdooTerminalTests from '@tests/terminal';
 import type {TerminalOptions} from '@terminal/terminal';
 import type {InputInfo} from '@terminal/core/screen';
-import type VMachine from '@trash/vmachine';
+import type VMachine from '@tardo/trash/vmachine';
 
 export type LoaderConfig = {
   config: {[string]: mixed},

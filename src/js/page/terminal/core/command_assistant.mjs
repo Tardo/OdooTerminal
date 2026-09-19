@@ -2,10 +2,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import isEmpty from '@trash/utils/is_empty';
-import {getArgumentInfo, getArgumentInfoByName} from '@trash/argument';
-import {INSTRUCTION_TYPE, LEXER} from '@trash/constants';
-import type {CMDDef, ArgInfo, ParseInfo} from '@trash/interpreter';
+import isEmpty from '@tardo/trash/utils/is_empty';
+import {getArgumentInfo, getArgumentInfoByName} from '@tardo/trash/argument';
+import {INSTRUCTION_TYPE, LEXER} from '@tardo/trash/constants';
+import type {CMDDef, ArgInfo, ParseInfo} from '@tardo/trash/interpreter';
 import type Shell from '@terminal/shell';
 import type Terminal from '@terminal/terminal';
 

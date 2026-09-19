@@ -8,9 +8,9 @@ import processKeybind from '@common/utils/process_keybind';
 import {SETTING_DEFAULTS} from '@common/constants';
 import Shell from './shell';
 import ElementNotFoundError from './exceptions/element_not_found_error';
-import UnknownCommandError from '@trash/exceptions/unknown_command_error';
-import InvalidCommandDefintionError from '@trash/exceptions/invalid_command_definition_error';
-import isEmpty from '@trash/utils/is_empty';
+import UnknownCommandError from '@tardo/trash/exceptions/unknown_command_error';
+import InvalidCommandDefintionError from '@tardo/trash/exceptions/invalid_command_definition_error';
+import isEmpty from '@tardo/trash/utils/is_empty';
 import CommandAssistant from './core/command_assistant';
 import Screen from './core/screen';
 import {getStorageItem as getStorageLocalItem, setStorageItem as setStorageLocalItem, removeStorageItem as removeStorageLocalItem} from './core/storage/local';
@@ -797,6 +797,7 @@ export default class Terminal {
     if (meta.info.cmdName in aliases) {
       const alias_cmd = this.#parseAlias(aliases, meta.info.cmdName, meta.info.args);
       return await this.#shell.eval(alias_cmd || "", {
+        ...meta.info.executionOptions,
         silent: meta.silent,
         aliases: aliases,
       });

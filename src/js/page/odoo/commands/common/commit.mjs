@@ -6,9 +6,9 @@ import i18n from 'i18next';
 import writeRecord from '@odoo/orm/write_record';
 // $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
-import isEmpty from '@trash/utils/is_empty';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import isEmpty from '@tardo/trash/utils/is_empty';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdCommit(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {

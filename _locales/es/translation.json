@@ -1,8 +1,5 @@
 {
   "No": "No",
-  "UnknownNameError": {
-    "invalidName": "<NombreNoVálido>"
-  },
   "Yes": "Yes",
   "ai": {
     "mcp": {
@@ -23,6 +20,7 @@
         "error": {
           "aborted": "Request cancelled.",
           "httpError": "HTTP error {{status}}",
+          "malformedToolCall": "The backend returned an unparsed tool-call attempt (raw chat-template tokens) instead of a valid response. The model likely lacks the capacity for reliable tool calling — try a stronger model or a smaller/simpler prompt.",
           "noStream": "Server did not return a streaming response"
         }
       },
@@ -34,14 +32,14 @@
       }
     }
   },
-  "cancel": "Cancelar",
+  "cancel": "Cancel",
   "checkStorageError": {
     "message": "Clear the <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>screen</strong> or/and <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>history</strong> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
     "warning": "WARNING: "
   },
   "cmd2DCircle": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The color",
       "end-angle": "End angle in degrees",
       "radius": "The radius",
@@ -56,7 +54,7 @@
   },
   "cmd2DClear": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "from-x": "The rect X point",
       "from-y": "The rect Y point",
       "height": "The rect height",
@@ -78,14 +76,14 @@
   },
   "cmd2DDestroyWindow": {
     "args": {
-      "canvas": "The canvas"
+      "canvas": "The canvas or its window id"
     },
     "definition": "Destroy 2D Window",
     "detail": "Destroy 2D Window"
   },
   "cmd2DHandleLoop": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "fun": "The draw function",
       "max-frames": "Stop after this many frames (-1 = unlimited)"
     },
@@ -94,7 +92,7 @@
   },
   "cmd2DLine": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The line color",
       "from-x": "The line from X point",
       "from-y": "The line from Y point",
@@ -111,7 +109,7 @@
   },
   "cmd2DPoly": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The color",
       "fill": "Close the shape and fill it",
       "points": "The list of [x, y] points",
@@ -122,7 +120,7 @@
   },
   "cmd2DRect": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The rect color",
       "height": "The rect height",
       "width": "The rect width",
@@ -139,6 +137,7 @@
         "rejected": "Attachment access rejected by user."
       },
       "error": {
+        "emptyResponse": "[Agent] The model returned an empty response (no text, no tool calls). The backend or model likely failed silently — try a different model or check the server logs.",
         "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
         "notConfigured": "Not connected. Use \"ai connect\" first",
         "requestFailed": "Request failed: "
@@ -181,8 +180,8 @@
       "model": "Model name to use",
       "operation": "operation: connect, agent, attach or stop",
       "prompt": "The prompt or natural language request to send",
-      "provider": "Proveedor de IA: openai (compatible con OpenAI, por defecto), anthropic, gemini o cohere",
-      "reasoning": "Nivel de razonamiento para modelos \"pensantes\" (solo agent): off, low, medium o high. 'off' pide a servidores locales compatibles con OpenAI (llama.cpp, vLLM, ...) que se salten el razonamiento interno — úsalo si un modelo no muestra salida porque gasta toda su respuesta pensando. Por ahora solo con el proveedor openai.",
+      "provider": "AI provider: openai (OpenAI-compatible, default), anthropic, gemini or cohere",
+      "reasoning": "Reasoning effort for \"thinking\" models (agent only): off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
       "timeout": "Max seconds to wait for a response (0 = no limit)",
       "url": "AI server URL (e.g. http://localhost:8080/v1)"
     },
@@ -205,7 +204,7 @@
       }
     },
     "definition": "AI assistant (connect & agent)",
-    "detail": "Conéctate a un servidor de IA (API compatible con OpenAI, Anthropic, Gemini o Cohere), traduce lenguaje natural a comandos de terminal, o ejecuta un agente autónomo que ejecuta comandos de forma iterativa. El proveedor openai es compatible con OpenAI, por lo que también cubre Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI y servidores similares mediante una URL personalizada. Consulta el comando \"watchdog\" para el vigilante de IA flotante y opcional que reacciona por su cuenta a la actividad de la página.",
+    "detail": "Connect to an AI server (OpenAI-compatible, Anthropic, Gemini or Cohere API), translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively. The openai provider is OpenAI-compatible, so it also covers Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI and similar servers via a custom URL. See the \"watchdog\" command for the opt-in floating AI watchdog that reacts to page activity on its own.",
     "error": {
       "noSubcommand": "Usage: ai connect|agent|attach|stop ...",
       "unknownOperation": "Unknown operation: {{sub}}",
@@ -616,11 +615,6 @@
       "saved": "Form record saved"
     }
   },
-  "cmdFuncTrash": {
-    "args": {
-      "name": "El parámetro de la función"
-    }
-  },
   "cmdGen": {
     "args": {
       "max": "Max. value",
@@ -707,7 +701,7 @@
       "none": "No buttons found in the current view"
     },
     "definition": "Inspect interactive elements on the current page",
-    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nTypes:\n  page (default) — context overview: model, record id, view type, action id, element counts\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)\n  list — visible rows in the current list view with a \"view\" command per row",
+    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nWhen a modal dialog is open, every type below scopes to it instead of the background page.\nTypes:\n  page (default) — context overview: model, record id, view type, action id, element counts, modal state\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)\n  list — visible rows in the current list view with a \"view\" command per row",
     "dialog": {
       "buttons": "<em>Buttons:</em>",
       "fields": "<em>Fields:</em>",
@@ -1101,13 +1095,6 @@
     "definition": "Open settings page",
     "detail": "Open the Odoo Settings form view for the specified module. Does not return data."
   },
-  "cmdSleep": {
-    "args": {
-      "time": "El tiempo de espera (en ms)"
-    },
-    "definition": "Esperar",
-    "detail": "Esperar (tiempo en ms)"
-  },
   "cmdSysParam": {
     "args": {
       "key": "Parameter key (required for get/set operations)",
@@ -1253,26 +1240,26 @@
   },
   "cmdWatchdog": {
     "args": {
-      "model": "Nombre del modelo a usar para el vigilante",
-      "profile": "Personalidad del vigilante: técnico (por defecto), contable o comercial — cambia el vocabulario/enfoque de sus veredictos. Solo el perfil técnico explica las excepciones (errores de RPC/JS); los demás perfiles no reaccionan a ellas (el mensaje de error que muestra el propio Odoo en pantalla no se ve afectado).",
-      "reasoning": "Nivel de razonamiento para modelos \"pensantes\": off, low, medium o high. 'off' pide a servidores locales compatibles con OpenAI (llama.cpp, vLLM, ...) que se salten el razonamiento interno — úsalo si un modelo no muestra salida porque gasta toda su respuesta pensando. Por ahora solo con el proveedor openai.",
-      "state": "Activa o desactiva el vigilante para esta instancia"
+      "model": "Model name to use for the watchdog",
+      "profile": "Watchdog persona: technical (default), accounting or sales — changes the vocabulary/focus of its verdicts. Only the technical profile explains exceptions (RPC/JS errors); the other profiles don't react to them (Odoo's own on-screen error message is unaffected either way).",
+      "reasoning": "Reasoning effort for \"thinking\" models: off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
+      "state": "Turn the watchdog on or off for this instance"
     },
-    "definition": "Vigilante de IA flotante y opcional que reacciona por su cuenta a la actividad de la página",
-    "detail": "Un vigilante de IA flotante y opcional que reacciona por su cuenta: cada vez que detecta un guardado, una eliminación, un registro abierto, la edición de un campo (de formulario o de una línea de lista), que el cursor se demore sobre un botón o un campo, un mensaje de aviso/error de Odoo, o una excepción (un error de RPC de un guardado/eliminación, o un error de JS no capturado en la página — explicada con un análisis de causa raíz, solo en el perfil técnico, ver \"-pf\" más abajo), envía automáticamente una consulta de un solo turno, solo lectura (sin run_command, no puede cambiar nada) a la IA y asoma por el borde derecho con un veredicto breve. Como esto se dispara constantemente y puede consumir tokens muy rápido, usa un modelo local para ello: \"watchdog -p on -m <modelo-local>\". \"-m\" solo (sin \"-p\") cambia el modelo sin tocar el on/off. \"-pf <perfil>\" elige para quién escribe: técnico (por defecto, además el único perfil que explica excepciones), contable o comercial. Hacer clic en el vigilante nunca llama a la IA ni registra sus notas en la conversación del terminal/agente — solo despliega la burbuja en el sitio para mostrar el historial de mensajes del vigilante; vuelve a hacer clic para contraerla. Si un modelo \"pensante\" no muestra nada, pon \"-r off\" para que se salte el razonamiento interno en vez de gastar en él toda su respuesta. Necesita su propia conexión: configura un proveedor y modelo en la página de Opciones de la extensión → AI Watchdog (independiente de la conexión del comando \"ai\").",
+    "definition": "Opt-in floating AI watchdog that reacts to page activity on its own",
+    "detail": "An opt-in floating AI watchdog that reacts on its own: every time it detects a save, a deletion, an opened record, a field edit (form or list line), a lingering hover over a button or field, a warning/error message from Odoo, or an exception (an RPC error from a save/delete, or an uncaught JS error on the page — explained with a root-cause read, technical profile only, see \"-pf\" below), it automatically sends a one-shot, read-only consult (no run_command, cannot change anything) to the AI and peeks from the right edge with a short verdict. Since this fires constantly and can burn tokens fast, use a local model for it: \"watchdog -p on -m <local-model>\". \"-m\" alone (without \"-p\") just changes the model without touching on/off. \"-pf <profile>\" picks who it writes for: technical (default, also the only profile that explains exceptions), accounting or sales. Clicking the watchdog never calls the AI and never registers its notes into the terminal/agent conversation — it just expands the bubble in place to show the watchdog's own message history; click again to collapse. If a \"thinking\" model shows nothing, set \"-r off\" so it skips chain-of-thought instead of spending its reply budget on it. Needs its own connection: configure a provider + model under the extension's Options page → AI Watchdog (independent from the \"ai\" command's connection).",
     "model": {
-      "notSet": "(sin configurar)"
+      "notSet": "(not set)"
     },
-    "noProvider": "Todavía no hay un proveedor dedicado configurado para el vigilante, así que no tiene a quién consultar. El vigilante nunca toma prestada la conexión activa de la barra lateral de IA — abre la página de Opciones de la extensión → AI Watchdog y elige ahí un proveedor y un modelo (añade uno en \"Proveedores de IA\" primero si aún no lo has hecho). Esa elección también se recuerda por instancia, así que es un paso único.",
+    "noProvider": "No dedicated provider is configured for the watchdog yet, so it has nothing to call. The watchdog never borrows the AI sidebar's active connection — open the extension's Options page → AI Watchdog and pick a provider + model there (add one under \"AI Providers\" first if you haven't). That choice is remembered per instance too, so this is a one-time step.",
     "reasoning": {
-      "default": "por defecto",
-      "hint": "Consejo: si el vigilante a veces no muestra nada, puede que tu modelo esté gastando toda su respuesta en razonamiento interno antes de contestar. Prueba \"watchdog -r off\" (o un modelo no pensante para este puesto)."
+      "default": "default",
+      "hint": "Tip: if the watchdog sometimes shows nothing, your model may be spending its whole reply on internal reasoning before answering. Try \"watchdog -r off\" (or a non-thinking model for this slot)."
     },
     "status": {
-      "off": "Modo vigilante: desactivado (modelo cuando se active: {{model}})",
-      "on": "Modo vigilante: activado para esta instancia (guardado localmente — sobrevive a cerrar el navegador, no hace falta repetir esto ni reconectar la próxima vez). Modelo: {{model}}. Perfil: {{profile}}. Razonamiento: {{reasoning}}."
+      "off": "Watchdog mode: off (model for when enabled: {{model}})",
+      "on": "Watchdog mode: on for this instance (saved locally — survives closing the browser, no need to redo this or reconnect next time). Model: {{model}}. Profile: {{profile}}. Reasoning: {{reasoning}}."
     },
-    "tokenWarning": "⚠ Alto consumo de tokens: el vigilante llama a la IA automáticamente en CADA guardado, edición de campo, registro que abras, demora del cursor sobre un botón y mensaje de aviso/error de Odoo — sin ningún paso manual de por medio. Úsalo solo con un modelo local (Ollama, llama.cpp, etc.) — NO se recomienda con un proveedor de pago en la nube, donde puede generar una factura considerable sin que te des cuenta."
+    "tokenWarning": "⚠ High token usage: the watchdog calls the AI automatically on EVERY save, field edit, record you open, lingering hover over a button, and Odoo warning/error message — with no manual step in between. Only use this with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended."
   },
   "cmdWhoami": {
     "definition": "Know current user login",
@@ -1339,7 +1326,7 @@
   },
   "func2DText": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The text color",
       "font": "The text font",
       "text": "The text",
@@ -1348,277 +1335,6 @@
     },
     "definition": "Draw a text",
     "detail": "Draw a text"
-  },
-  "funcAbs": {
-    "args": {
-      "num": "El número"
-    },
-    "definition": "Valor absoluto de un número",
-    "detail": "Devuelve el valor absoluto de un número."
-  },
-  "funcArrAppend": {
-    "args": {
-      "arr": "The array",
-      "item": "The item to append"
-    },
-    "definition": "Append an item to an array",
-    "detail": "Append an item to the end of an array (mutates it in place)"
-  },
-  "funcArrClone": {
-    "args": {
-      "arr": "The array"
-    },
-    "definition": "Clone an array",
-    "detail": "Return a shallow copy of an array"
-  },
-  "funcArrFilter": {
-    "args": {
-      "arr": "The array",
-      "filter": "The filter function"
-    },
-    "definition": "Filter an array",
-    "detail": "Return a new array containing only the elements for which the filter function returns true"
-  },
-  "funcArrJoin": {
-    "args": {
-      "arr": "The array",
-      "sep": "The separator"
-    },
-    "definition": "Join an array into a string",
-    "detail": "Join all items of an array into a string, separated by the given separator"
-  },
-  "funcArrMap": {
-    "args": {
-      "arr": "The array",
-      "mapper": "The mapper function"
-    },
-    "definition": "Map an array",
-    "detail": "Return a new array with the mapper function applied to each element"
-  },
-  "funcArrPrepend": {
-    "args": {
-      "arr": "The array",
-      "item": "The item to prepend"
-    },
-    "definition": "Prepend an item to an array",
-    "detail": "Insert an item at the beginning of an array (mutates it in place)"
-  },
-  "funcArrReduce": {
-    "args": {
-      "arr": "The array",
-      "initial": "The initial accumulator value",
-      "reducer": "The reducer function"
-    },
-    "definition": "Reduce an array",
-    "detail": "Reduce an array to a single value using the reducer function"
-  },
-  "funcDecode": {
-    "args": {
-      "method": "El método de decodificación",
-      "value": "El valor a decodificar"
-    },
-    "definition": "Decodificar",
-    "detail": "Decodificar datos"
-  },
-  "funcDictClone": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Clone a dictionary",
-    "detail": "Return a shallow copy of a dictionary"
-  },
-  "funcDictEntries": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Get the entries of a dictionary",
-    "detail": "Return an array of [key, value] pairs of a dictionary"
-  },
-  "funcDictGet": {
-    "args": {
-      "default": "The default value",
-      "dict": "The dictionary",
-      "key": "The key"
-    },
-    "definition": "Get a value from a dictionary",
-    "detail": "Return the value for the given key, or the default value if the key does not exist"
-  },
-  "funcDictHas": {
-    "args": {
-      "dict": "The dictionary",
-      "key": "The key"
-    },
-    "definition": "Check if a dictionary has a key",
-    "detail": "Return true if the dictionary has the given key"
-  },
-  "funcDictKeys": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Get the keys of a dictionary",
-    "detail": "Return an array with all the keys of a dictionary"
-  },
-  "funcDictMerge": {
-    "args": {
-      "dict": "The dictionary",
-      "other": "The dictionary to merge in"
-    },
-    "definition": "Merge two dictionaries",
-    "detail": "Return a new dictionary with the entries of both dictionaries (the second one takes precedence)"
-  },
-  "funcDictRemove": {
-    "args": {
-      "dict": "The dictionary",
-      "key": "The key"
-    },
-    "definition": "Remove a key from a dictionary",
-    "detail": "Remove the given key from a dictionary (mutates the dictionary in place)"
-  },
-  "funcDictSet": {
-    "args": {
-      "dict": "The dictionary",
-      "key": "The key",
-      "value": "The value"
-    },
-    "definition": "Set a value in a dictionary",
-    "detail": "Set the value for the given key (mutates the dictionary in place)"
-  },
-  "funcDictSize": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Get the number of keys in a dictionary",
-    "detail": "Return the number of keys of a dictionary"
-  },
-  "funcDictValues": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Get the values of a dictionary",
-    "detail": "Return an array with all the values of a dictionary"
-  },
-  "funcEncode": {
-    "args": {
-      "method": "El método de codificación",
-      "value": "El valor a codificar"
-    },
-    "definition": "Codificar",
-    "detail": "Codificar datos"
-  },
-  "funcFetch": {
-    "args": {
-      "timeout": "El tiempo de espera",
-      "url": "Las opciones de fetch"
-    },
-    "definition": "Solicitudes HTTP",
-    "detail": "Interfaz para realizar solicitudes HTTP y procesar respuestas."
-  },
-  "funcFixed": {
-    "args": {
-      "decimals": "El número de decimales",
-      "num": "El número"
-    },
-    "definition": "Redondea un número a los decimales indicados y lo trunca a entero",
-    "detail": "Redondea el número usando toFixed(decimales) y devuelve el resultado truncado a entero"
-  },
-  "funcFloor": {
-    "args": {
-      "num": "El número"
-    },
-    "definition": "Redondea un número HACIA ABAJO al entero más cercano",
-    "detail": "Redondea un número HACIA ABAJO al entero más cercano"
-  },
-  "funcPNow": {
-    "definition": "Marca de tiempo de alta resolución en milisegundos",
-    "detail": "Marca de tiempo de alta resolución en milisegundos."
-  },
-  "funcPow": {
-    "args": {
-      "base": "Base",
-      "exponent": "Exponente"
-    },
-    "definition": "Calcula el valor de x elevado a la potencia y",
-    "detail": "Calcula el valor de x elevado a la potencia y"
-  },
-  "funcRand": {
-    "args": {
-      "max": "Valor máx.",
-      "min": "Valor mín."
-    },
-    "definition": "Generar enteros aleatorios",
-    "detail": "Devuelve enteros aleatorios"
-  },
-  "funcStrEnds": {
-    "args": {
-      "str": "The string",
-      "suffix": "The suffix to check"
-    },
-    "definition": "Check if a string ends with a suffix",
-    "detail": "Return true if the string ends with the given suffix"
-  },
-  "funcStrIncludes": {
-    "args": {
-      "needle": "The substring to search for",
-      "str": "The string"
-    },
-    "definition": "Check if a string contains a substring",
-    "detail": "Return true if the string contains the given substring"
-  },
-  "funcStrLower": {
-    "args": {
-      "str": "The string"
-    },
-    "definition": "Convert string to lowercase",
-    "detail": "Return the string converted to lowercase"
-  },
-  "funcStrReplace": {
-    "args": {
-      "all": "Replace all occurrences",
-      "replacement": "The replacement string",
-      "search": "The substring to find",
-      "str": "The source string"
-    },
-    "definition": "Replace occurrences in a string",
-    "detail": "Replace the first (or all with -a) occurrences of a substring"
-  },
-  "funcStrSlice": {
-    "args": {
-      "begin": "Start index (inclusive, negative counts from end)",
-      "end": "End index (exclusive, negative counts from end)",
-      "str": "The string"
-    },
-    "definition": "Extract a substring",
-    "detail": "Return the portion of the string from begin to end (exclusive). Negative indices count from the end."
-  },
-  "funcStrSplit": {
-    "args": {
-      "delim": "The delimiter",
-      "str": "The string to split"
-    },
-    "definition": "Split a string into an array",
-    "detail": "Split a string by a delimiter and return an array of substrings"
-  },
-  "funcStrStarts": {
-    "args": {
-      "prefix": "The prefix to check",
-      "str": "The string"
-    },
-    "definition": "Check if a string starts with a prefix",
-    "detail": "Return true if the string starts with the given prefix"
-  },
-  "funcStrTrim": {
-    "args": {
-      "str": "The string"
-    },
-    "definition": "Trim whitespace from both ends of a string",
-    "detail": "Return the string with leading and trailing whitespace removed"
-  },
-  "funcStrUpper": {
-    "args": {
-      "str": "The string"
-    },
-    "definition": "Convert string to uppercase",
-    "detail": "Return the string converted to uppercase"
   },
   "getOdooEnvService": {
     "error": "Service '{{service_name}}' is not available"
@@ -1666,112 +1382,112 @@
       }
     }
   },
-  "ok": "Aceptar",
-  "optionsAIModelsAddRequired": "Nombre y URL son obligatorios",
-  "optionsAIModelsGrantDenied": "Acceso denegado",
-  "optionsAIModelsGrantError": "Error al conceder acceso",
-  "optionsAIModelsGrantSuccess": "Acceso concedido",
-  "optionsAIModelsGrantedLabel": "Acceso concedido",
-  "optionsAIModelsLoadMissingURL": "Introduce la URL primero",
-  "optionsAISkillsAddRequired": "Nombre, Descripción y Contenido son obligatorios",
-  "optionsAIWatchdogDescription": "Un vigilante flotante que reacciona por su cuenta a la actividad de la página (guardar/abrir/editar/cursor sobre un botón/mensajes de Odoo) con un veredicto breve de solo lectura de la IA — nunca ejecuta comandos ni cambia nada. Esto fija el valor por defecto para todas las instancias de Odoo en las que corra la extensión; cada instancia puede seguir anulando el modelo localmente con el comando de terminal \"watchdog\".",
-  "optionsAIWatchdogEnabled": "Activado por defecto",
-  "optionsAIWatchdogHint": "¿Aún no tienes un servidor local configurado? Añade uno en la pestaña \"Proveedores de IA\" y luego elígelo aquí.",
-  "optionsAIWatchdogManualHint": "Déjalo desactivado para que sea opcional por instancia: ejecuta \"watchdog -p on\" en el terminal de cualquier instancia de Odoo para activarlo solo ahí (usará el proveedor/modelo elegidos abajo, salvo que los sobrescribas con \"-m <modelo>\"). Desactívalo de nuevo con \"watchdog -p off\".",
-  "optionsAIWatchdogModel": "Modelo por defecto",
-  "optionsAIWatchdogModelsLoadError": "No se pudieron cargar los modelos",
-  "optionsAIWatchdogNoModel": "-- Modelo por defecto --",
-  "optionsAIWatchdogNoProvider": "-- Sin proveedor --",
-  "optionsAIWatchdogProfile": "Perfil",
-  "optionsAIWatchdogProfileAccounting": "Contable",
-  "optionsAIWatchdogProfileHint": "Cambia el enfoque y el vocabulario de los veredictos (p. ej. totales/impuestos contables frente a datos de cliente/venta). Las comprobaciones de campos obligatorios siempre se aplican, sea cual sea el perfil. Solo el perfil Técnico explica las excepciones (errores de RPC de un guardado/eliminación fallidos, o errores de JS no capturados) — los demás perfiles no reaccionan a ellas (el mensaje de error que muestra el propio Odoo en pantalla no se ve afectado). También se puede forzar por instancia con \"watchdog -pf <perfil>\".",
-  "optionsAIWatchdogProfileSales": "Comercial",
-  "optionsAIWatchdogProfileTechnical": "Técnico (por defecto)",
-  "optionsAIWatchdogProvider": "Proveedor",
-  "optionsAIWatchdogReasoning": "Razonamiento",
-  "optionsAIWatchdogReasoningDefault": "-- Por defecto (sin forzar) --",
-  "optionsAIWatchdogReasoningHigh": "Alto",
-  "optionsAIWatchdogReasoningHint": "Si el vigilante a veces no muestra nada, puede que tu modelo sea \"pensante\" y gaste toda su respuesta en razonamiento interno — prueba \"Off\". Solo aplica a servidores compatibles con OpenAI (llama.cpp/vLLM/Ollama locales, etc.); también se puede forzar por instancia con \"watchdog -r <nivel>\".",
-  "optionsAIWatchdogReasoningLow": "Bajo",
-  "optionsAIWatchdogReasoningMedium": "Medio",
-  "optionsAIWatchdogReasoningOff": "Off (sin razonamiento)",
-  "optionsAIWatchdogTokenWarning": "⚠ Alto consumo de tokens: llama a la IA automáticamente en CADA guardado, edición de campo, registro que abras, demora del cursor sobre un botón y mensaje de aviso/error de Odoo — sin ningún paso manual de por medio. Úsalo solo con un modelo local (Ollama, llama.cpp, etc.) — NO se recomienda con un proveedor de pago en la nube, donde puede generar una factura considerable sin que te des cuenta.",
-  "optionsLanguage": "Idioma",
-  "optionsLanguageAuto": "Automático",
+  "ok": "OK",
+  "optionsAIModelsAddRequired": "Name and URL are required",
+  "optionsAIModelsGrantDenied": "Access denied",
+  "optionsAIModelsGrantError": "Error granting access",
+  "optionsAIModelsGrantSuccess": "Access granted",
+  "optionsAIModelsGrantedLabel": "Access granted",
+  "optionsAIModelsLoadMissingURL": "Enter URL first",
+  "optionsAISkillsAddRequired": "Name, Description and Content are required",
+  "optionsAIWatchdogDescription": "A floating watchdog that reacts on its own to page activity (save/open/edit/hover/Odoo messages) with a short, read-only AI verdict — it never runs commands or changes anything. This sets the default for every Odoo instance the extension runs on; each instance can still override the model locally with the \"watchdog\" terminal command.",
+  "optionsAIWatchdogEnabled": "Enabled by default",
+  "optionsAIWatchdogHint": "No local server configured yet? Add one under the \"AI Providers\" tab, then pick it here.",
+  "optionsAIWatchdogManualHint": "Leave this off to keep it opt-in per instance: run \"watchdog -p on\" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with \"-m <model>\"). Turn it off again with \"watchdog -p off\".",
+  "optionsAIWatchdogModel": "Model",
+  "optionsAIWatchdogModelsLoadError": "Could not load models",
+  "optionsAIWatchdogNoModel": "-- Default model --",
+  "optionsAIWatchdogNoProvider": "-- No provider --",
+  "optionsAIWatchdogProfile": "Profile",
+  "optionsAIWatchdogProfileAccounting": "Accounting",
+  "optionsAIWatchdogProfileHint": "Changes the verdicts' focus and vocabulary (e.g. accounting totals/taxes vs. sales/customer data). Required-field checks always apply regardless of profile. Only the Technical profile explains exceptions (RPC errors from a failed save/delete, or uncaught JS errors) — the other profiles don't react to them (Odoo's own on-screen error message is unaffected either way). Can also be overridden per instance with \"watchdog -pf <profile>\".",
+  "optionsAIWatchdogProfileSales": "Sales",
+  "optionsAIWatchdogProfileTechnical": "Technical (default)",
+  "optionsAIWatchdogProvider": "Provider",
+  "optionsAIWatchdogReasoning": "Reasoning",
+  "optionsAIWatchdogReasoningDefault": "-- Default (no override) --",
+  "optionsAIWatchdogReasoningHigh": "High",
+  "optionsAIWatchdogReasoningHint": "If the watchdog sometimes shows nothing, your model may be a \"thinking\" model spending its whole reply on internal reasoning — try \"Off\". Only applies to OpenAI-compatible servers (local llama.cpp/vLLM/Ollama, etc.); can also be overridden per instance with \"watchdog -r <level>\".",
+  "optionsAIWatchdogReasoningLow": "Low",
+  "optionsAIWatchdogReasoningMedium": "Medium",
+  "optionsAIWatchdogReasoningOff": "Off (skip chain-of-thought)",
+  "optionsAIWatchdogTokenWarning": "⚠ High token usage: it calls the AI automatically on EVERY save, field edit, record you open, lingering hover over a button, and Odoo warning/error message — with no manual step in between. Only use it with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended.",
+  "optionsLanguage": "Language",
+  "optionsLanguageAuto": "Auto",
   "optionsMCPServersAddRequired": "Name and URL are required",
-  "optionsNoChanges": "Todos los cambios guardados",
-  "optionsReset": "Restablecer a valores por defecto",
-  "optionsResetConfirm": "Esto restablecerá todas las configuraciones a sus valores predeterminados. ¿Estás seguro?",
-  "optionsResetDone": "Las configuraciones se han restablecido a los valores predeterminados",
-  "optionsResetFailed": "Error al restablecer la configuración",
-  "optionsSave": "Guardar configuración",
-  "optionsSaveFailed": "Error al guardar la configuración",
-  "optionsSaved": "Configuración guardada correctamente",
-  "optionsSubtitle": "Configuración y ajustes",
-  "optionsTableEmpty": "Sin datos",
-  "optionsTermContextInvalidJson": "Formato JSON no válido",
-  "optionsThemePresetDark": "Oscuro",
+  "optionsNoChanges": "All changes saved",
+  "optionsReset": "Reset to Defaults",
+  "optionsResetConfirm": "This will reset all settings to their default values. Are you sure?",
+  "optionsResetDone": "Settings have been reset to defaults",
+  "optionsResetFailed": "Failed to reset settings",
+  "optionsSave": "Save Settings",
+  "optionsSaveFailed": "Failed to save settings",
+  "optionsSaved": "Settings saved successfully",
+  "optionsSubtitle": "Settings & Configuration",
+  "optionsTableEmpty": "No data",
+  "optionsTermContextInvalidJson": "Invalid JSON format",
+  "optionsThemePresetDark": "Dark",
   "optionsThemePresetHacker": "Hacker",
-  "optionsThemePresetLight": "Claro",
+  "optionsThemePresetLight": "Light",
   "optionsThemePresetMatrix": "Matrix",
   "optionsThemePresetOdoo": "Odoo",
-  "optionsThemePresetTech": "Tecnológico",
-  "optionsTipAIModelsCapabilities": "Consejo: Elige un modelo que admita uso de herramientas, visión y pensamiento extendido al seleccionarlo en modo IA.",
+  "optionsThemePresetTech": "Tech",
+  "optionsTipAIModelsCapabilities": "Tip: Pick a model that supports tool use, vision, and extended thinking when selecting it in AI mode.",
   "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\". The agent asks for permission once per server per conversation.",
-  "optionsTitleAI": "IA",
-  "optionsTitleAICustomSkills": "Habilidades de IA",
-  "optionsTitleAICustomSkillsAdd": "Añadir",
-  "optionsTitleAICustomSkillsContentLabel": "Contenido",
-  "optionsTitleAICustomSkillsContentPlaceholder": "Escribe el contenido de la habilidad en texto plano o markdown.",
-  "optionsTitleAICustomSkillsDescription": "Define módulos de habilidades personalizadas disponibles para el agente de IA.",
-  "optionsTitleAICustomSkillsDescription2": "Descripción",
-  "optionsTitleAICustomSkillsDescriptionLabel": "Descripción",
-  "optionsTitleAICustomSkillsDescriptionPlaceholder": "Una breve descripción para la IA",
-  "optionsTitleAICustomSkillsExport": "Exportar",
-  "optionsTitleAICustomSkillsImport": "Importar",
-  "optionsTitleAICustomSkillsName": "Nombre",
-  "optionsTitleAICustomSkillsNameLabel": "Nombre",
+  "optionsTitleAI": "AI",
+  "optionsTitleAICustomSkills": "AI Skills",
+  "optionsTitleAICustomSkillsAdd": "Add",
+  "optionsTitleAICustomSkillsContentLabel": "Content",
+  "optionsTitleAICustomSkillsContentPlaceholder": "Write the skill content in plain text or markdown.",
+  "optionsTitleAICustomSkillsDescription": "Define custom skill modules available to the AI agent.",
+  "optionsTitleAICustomSkillsDescription2": "Description",
+  "optionsTitleAICustomSkillsDescriptionLabel": "Description",
+  "optionsTitleAICustomSkillsDescriptionPlaceholder": "One-line description for the AI",
+  "optionsTitleAICustomSkillsExport": "Export",
+  "optionsTitleAICustomSkillsImport": "Import",
+  "optionsTitleAICustomSkillsName": "Name",
+  "optionsTitleAICustomSkillsNameLabel": "Name",
   "optionsTitleAICustomSkillsNamePlaceholder": "my-skill",
-  "optionsTitleAICustomSkillsRemoveConfirm": "¿Eliminar esta habilidad?",
-  "optionsTitleAIModels": "Proveedores de IA",
-  "optionsTitleAIModelsAPIKey": "Clave de API",
-  "optionsTitleAIModelsAdd": "Añadir",
-  "optionsTitleAIModelsAdvanced": "Opciones avanzadas",
-  "optionsTitleAIModelsDescription": "Define conexiones a proveedores de IA para usarlas en modo IA. El modelo se selecciona desde el propio modo IA, debajo del selector de proveedor.",
-  "optionsTitleAIModelsGrant": "Conceder acceso",
-  "optionsTitleAIModelsMaxTokens": "Tokens máx.",
-  "optionsTitleAIModelsMaxTokensLabel": "Tokens máx. (0 = predeterminado)",
-  "optionsTitleAIModelsName": "Nombre",
-  "optionsTitleAIModelsNamePlaceholder": "Mi proveedor",
-  "optionsTitleAIModelsProvider": "Proveedor",
-  "optionsTitleAIModelsRemove": "¿Eliminar proveedor?",
-  "optionsTitleAIModelsRemoveConfirm": "¿Eliminar esta conexión de proveedor de IA?",
-  "optionsTitleAIModelsTimeout": "Tiempo de espera (s)",
+  "optionsTitleAICustomSkillsRemoveConfirm": "Remove this skill?",
+  "optionsTitleAIModels": "AI Providers",
+  "optionsTitleAIModelsAPIKey": "API Key",
+  "optionsTitleAIModelsAdd": "Add",
+  "optionsTitleAIModelsAdvanced": "Advanced options",
+  "optionsTitleAIModelsDescription": "Define AI provider connections to use in AI mode. The model is picked from AI mode itself, below the provider selector.",
+  "optionsTitleAIModelsGrant": "Grant access",
+  "optionsTitleAIModelsMaxTokens": "Max tokens",
+  "optionsTitleAIModelsMaxTokensLabel": "Max tokens (0 = default)",
+  "optionsTitleAIModelsName": "Name",
+  "optionsTitleAIModelsNamePlaceholder": "My Provider",
+  "optionsTitleAIModelsProvider": "Provider",
+  "optionsTitleAIModelsRemove": "Remove provider?",
+  "optionsTitleAIModelsRemoveConfirm": "Remove this AI provider connection?",
+  "optionsTitleAIModelsTimeout": "Timeout (s)",
   "optionsTitleAIWatchdog": "AI Watchdog",
-  "optionsTitleBehaviour": "Comportamiento",
-  "optionsTitleBehaviourDescription": "Ajustes generales: idioma de la interfaz y cómo se abre la ventana del terminal (fijado, maximizado, entrada multilínea).",
-  "optionsTitleBehaviourElephant": "Resolver valores desconocidos",
-  "optionsTitleBehaviourElephantHint": "Si el usuario actual o el nombre de la base de datos no se pueden leer directamente de la página, se envía una petición adicional para obtenerlos. Es un poco más lento, pero evita que aparezcan como desconocidos.",
-  "optionsTitleBehaviourMaximized": "Maximizado",
-  "optionsTitleBehaviourMultiline": "Multilínea",
-  "optionsTitleBehaviourPinned": "Fijado",
-  "optionsTitleCommandAssistant": "Asistente de comandos",
-  "optionsTitleCommandAssistantDescription": "Controla el desplegable de sugerencias que aparece mientras escribes un comando.",
-  "optionsTitleCommandAssistantDynOptionsDisabled": "Desactivar opciones dinámicas",
-  "optionsTitleCommandAssistantDynOptionsDisabledHint": "Las opciones dinámicas son sugerencias obtenidas de la base de datos (por ejemplo, nombres de registros o de modelos). Desactívalas si notas el asistente lento.",
-  "optionsTitleCommandAssistantMatchMode": "Modo de coincidencia",
-  "optionsTitleCommandAssistantMatchModeHint": "Cómo se filtran las sugerencias según lo que has escrito: solo opciones que empiecen por ello, u opciones que lo contengan en cualquier parte.",
-  "optionsTitleCommandAssistantMatchModeIncludes": "Contiene",
-  "optionsTitleCommandAssistantMatchModeStartsWith": "Empieza por",
-  "optionsTitleCommandAssistantMaxResults": "Resultados máx.",
-  "optionsTitleCommandAssistantMaxResultsHint": "Número máximo de sugerencias que se muestran a la vez en el desplegable.",
-  "optionsTitleDeveloperZone": "Zona de desarrollador de la extensión",
-  "optionsTitleDeveloperZoneDescription": "Opciones para desarrolladores de OdooTerminal. La mayoría de usuarios pueden dejarlas desactivadas.",
-  "optionsTitleDeveloperZoneModeConsoleErrors": "Mostrar errores en la consola del navegador",
-  "optionsTitleDeveloperZoneModeIgnoreCompChecks": "Desactivar comprobación de versión de Odoo",
-  "optionsTitleDeveloperZoneModeTests": "Usar OdooTerminalTests",
-  "optionsTitleInitCommands": "Comandos de inicio",
-  "optionsTitleInitCommandsDescription": "Estos comandos se ejecutan automáticamente cada vez que arranca el terminal, en orden, uno por línea. Útil para cosas como limpiar la pantalla o abrir una vista concreta.",
+  "optionsTitleBehaviour": "Behaviour",
+  "optionsTitleBehaviourDescription": "General settings: interface language and how the terminal window opens (pinned open, maximized, multi-line input).",
+  "optionsTitleBehaviourElephant": "Resolve unknown values",
+  "optionsTitleBehaviourElephantHint": "If the current user or database name can't be read from the page, send an extra request to fetch them. A bit slower, but avoids showing them as unknown.",
+  "optionsTitleBehaviourMaximized": "Maximized",
+  "optionsTitleBehaviourMultiline": "Multi-line",
+  "optionsTitleBehaviourPinned": "Pinned",
+  "optionsTitleCommandAssistant": "Command Assistant",
+  "optionsTitleCommandAssistantDescription": "Controls the suggestions dropdown that appears while you type a command.",
+  "optionsTitleCommandAssistantDynOptionsDisabled": "Disable dynamic options",
+  "optionsTitleCommandAssistantDynOptionsDisabledHint": "Dynamic options are suggestions fetched from the database (e.g. record names or model names). Disable this if they make the assistant feel slow.",
+  "optionsTitleCommandAssistantMatchMode": "Match mode",
+  "optionsTitleCommandAssistantMatchModeHint": "How suggestions are filtered against what you've typed: only options starting with it, or options containing it anywhere.",
+  "optionsTitleCommandAssistantMatchModeIncludes": "Includes",
+  "optionsTitleCommandAssistantMatchModeStartsWith": "Starts with",
+  "optionsTitleCommandAssistantMaxResults": "Max. results",
+  "optionsTitleCommandAssistantMaxResultsHint": "Maximum number of suggestions shown at once in the dropdown.",
+  "optionsTitleDeveloperZone": "Developer Zone",
+  "optionsTitleDeveloperZoneDescription": "Options for developers of OdooTerminal itself. Most users can leave these off.",
+  "optionsTitleDeveloperZoneModeConsoleErrors": "Show errors in the browser console",
+  "optionsTitleDeveloperZoneModeIgnoreCompChecks": "Disable Odoo version checking",
+  "optionsTitleDeveloperZoneModeTests": "Use OdooTerminalTests",
+  "optionsTitleInitCommands": "Init Commands",
+  "optionsTitleInitCommandsDescription": "These commands run automatically every time the terminal starts, in order, one per line. Useful for things like clearing the screen or opening a specific view.",
   "optionsTitleMCPServers": "MCP Servers",
   "optionsTitleMCPServersAdd": "Add",
   "optionsTitleMCPServersDescription": "Connect the AI agent to remote MCP (Model Context Protocol) servers. Tools exposed by enabled servers are offered to the agent alongside its built-in tools.",
@@ -1781,62 +1497,62 @@
   "optionsTitleMCPServersRemove": "Remove server?",
   "optionsTitleMCPServersRemoveConfirm": "Remove this MCP server connection?",
   "optionsTitleMCPServersUrl": "URL",
-  "optionsTitleMisc": "Varios",
-  "optionsTitleMiscDescription": "Otros ajustes de visualización y de comandos que no encajan en otro apartado.",
-  "optionsTitleMiscHighlightWords": "Palabras resaltadas",
-  "optionsTitleMiscHighlightWordsList": "Lista de palabras resaltadas",
-  "optionsTitleMiscHighlightWordsListHint": "Palabras separadas por comas que se resaltarán en la salida del terminal cuando la opción \"Palabras resaltadas\" esté activada.",
+  "optionsTitleMisc": "Misc",
+  "optionsTitleMiscDescription": "Other display and command settings that don't fit elsewhere.",
+  "optionsTitleMiscHighlightWords": "Highlight Words",
+  "optionsTitleMiscHighlightWordsList": "Highlight Words List",
+  "optionsTitleMiscHighlightWordsListHint": "Comma-separated words to highlight in the terminal output when \"Highlight Words\" is enabled above.",
   "optionsTitleMiscLimits": "Limits",
-  "optionsTitleMiscRlimitValue": "Límite de búsqueda por defecto",
-  "optionsTitleMiscRlimitValueHint": "Número máximo de registros que devuelve el comando \"search\" cuando no indicas tú mismo un límite. 0 = sin límite.",
-  "optionsTitleMiscRlimitValuePlaceholder": "Sin límite",
-  "optionsTitleMiscScreenBufferSize": "Tamaño del búfer de pantalla",
-  "optionsTitleMiscScreenBufferSizeHint": "Número máximo de líneas que se conservan en la salida del terminal antes de descartar las más antiguas. Redúcelo si el terminal va lento en sesiones largas. 0 = por defecto ({{default}}).",
-  "optionsTitleMiscShowExecutionTime": "Mostrar tiempo de ejecución",
-  "optionsTitleMiscShowTechnicalModel": "Mostrar nombre técnico del modelo",
-  "optionsTitleMiscShowTechnicalModelDescriptionHint": "Muestra el nombre técnico interno del modelo de Odoo (por ejemplo, \"res.partner\") junto al título de los registros, útil cuando necesitas ese nombre para escribir comandos sobre un modelo concreto.",
-  "optionsTitleMiscShowTechnicalModelHint": "Solo Odoo 17+",
-  "optionsTitleMiscShowTechnicalModelMinVersion": "Versión mínima de Odoo",
-  "optionsTitleShortcuts": "Atajos",
-  "optionsTitleShortcutsAdd": "Añadir",
-  "optionsTitleShortcutsCommand": "Comando",
-  "optionsTitleShortcutsDescription": "Ejecuta un comando del terminal pulsando una combinación de teclas, desde cualquier parte de la página. Para añadir uno: haz clic en el campo \"Pulsa las teclas...\", pulsa la combinación deseada, escribe el comando a ejecutar y pulsa Añadir.",
-  "optionsTitleShortcutsKeybind": "Combinación",
-  "optionsTitleShortcutsPressKeys": "Pulsa las teclas...",
-  "optionsTitleShortcutsRemove": "Eliminar",
-  "optionsTitleTerminalContext": "Contexto del terminal",
-  "optionsTitleTerminalContextDescription": "Datos adicionales clave-valor (el \"contexto\" de Odoo, por ejemplo idioma o active_test) que se añaden automáticamente a cada comando que el terminal envía a Odoo. Escríbelo en formato JSON. La mayoría de usuarios pueden dejarlo con sus valores por defecto.",
-  "optionsTitleTheme": "Tema",
-  "optionsTitleThemeAdd": "Añadir",
+  "optionsTitleMiscRlimitValue": "Default Search Limit",
+  "optionsTitleMiscRlimitValueHint": "Maximum records fetched by the \"search\" command when you don't specify a limit yourself. 0 = no limit.",
+  "optionsTitleMiscRlimitValuePlaceholder": "No limit",
+  "optionsTitleMiscScreenBufferSize": "Screen Buffer Size",
+  "optionsTitleMiscScreenBufferSizeHint": "Maximum number of lines kept in the terminal output before older ones are dropped. Lower it if the terminal feels sluggish with long sessions. 0 = default ({{default}}).",
+  "optionsTitleMiscShowExecutionTime": "Show Execution Time",
+  "optionsTitleMiscShowTechnicalModel": "Show Technical Model Name",
+  "optionsTitleMiscShowTechnicalModelDescriptionHint": "Shows the internal Odoo model name (e.g. \"res.partner\") next to record titles, which you need when writing commands that target a specific model.",
+  "optionsTitleMiscShowTechnicalModelHint": "Odoo 17+ only",
+  "optionsTitleMiscShowTechnicalModelMinVersion": "Minimum Odoo Version",
+  "optionsTitleShortcuts": "Shortcuts",
+  "optionsTitleShortcutsAdd": "Add",
+  "optionsTitleShortcutsCommand": "Command",
+  "optionsTitleShortcutsDescription": "Run a terminal command by pressing a key combination, from anywhere on the page. To add one: click the \"Press keys...\" box, press the combination, type the command to run, then Add.",
+  "optionsTitleShortcutsKeybind": "Keybind",
+  "optionsTitleShortcutsPressKeys": "Press keys...",
+  "optionsTitleShortcutsRemove": "Remove",
+  "optionsTitleTerminalContext": "Terminal Context",
+  "optionsTitleTerminalContextDescription": "Extra key-value data (Odoo's \"context\", e.g. language or active_test) automatically added to every command the terminal sends to Odoo. Write it as JSON. Most users can leave it with its default values.",
+  "optionsTitleTheme": "Theme",
+  "optionsTitleThemeAdd": "Add",
   "optionsTitleThemeColor": "Color",
-  "optionsTitleThemeColorDanger": "Peligro",
-  "optionsTitleThemeColorDark": "Oscuro",
-  "optionsTitleThemeColorDomainHint": "Asigna un color propio a un sitio web concreto, por ejemplo para distinguir a simple vista un entorno de producción de uno de pruebas.",
-  "optionsTitleThemeColorDomainTable": "Colores por sitio",
-  "optionsTitleThemeColorInfo": "Información",
-  "optionsTitleThemeColorLight": "Claro",
-  "optionsTitleThemeColorMuted": "Apagado",
-  "optionsTitleThemeColorPrimary": "Primario",
-  "optionsTitleThemeColorSecondary": "Secundario",
-  "optionsTitleThemeColorSuccess": "Éxito",
-  "optionsTitleThemeColorWarning": "Advertencia",
-  "optionsTitleThemeColorWhite": "Blanco",
-  "optionsTitleThemeColors": "Colores",
-  "optionsTitleThemeDescription": "Personaliza el aspecto del terminal: elige un preajuste o ajusta a tu gusto los colores, las fuentes y la opacidad.",
-  "optionsTitleThemeDomain": "Sitio web",
-  "optionsTitleThemeFontFamily": "Familia de fuentes",
-  "optionsTitleThemeFontSize": "Tamaño de fuente",
-  "optionsTitleThemeFontSizeCA": "Tamaño de fuente (CA)",
-  "optionsTitleThemeFontSizeLarge": "Grande",
-  "optionsTitleThemeFontSizeMedium": "Mediano",
-  "optionsTitleThemeFontSizeSmall": "Pequeño",
-  "optionsTitleThemeFontSizeXSmall": "Muy pequeño",
-  "optionsTitleThemeOpacity": "Opacidad",
-  "optionsTitleThemePreset": "Tema predefinido",
-  "optionsTitleThemePresetCustom": "Personalizado",
-  "optionsTitleThemeRemove": "Eliminar",
-  "optionsUnsavedChanges": "Cambios sin guardar",
-  "optionsWarningAIModelsKeys": "Advertencia: Las claves de API se almacenan en el almacenamiento del navegador.",
+  "optionsTitleThemeColorDanger": "Danger",
+  "optionsTitleThemeColorDark": "Dark",
+  "optionsTitleThemeColorDomainHint": "Give a specific website its own accent color, e.g. to tell a production site apart from a staging one at a glance.",
+  "optionsTitleThemeColorDomainTable": "Per-site Colors",
+  "optionsTitleThemeColorInfo": "Info",
+  "optionsTitleThemeColorLight": "Light",
+  "optionsTitleThemeColorMuted": "Muted",
+  "optionsTitleThemeColorPrimary": "Primary",
+  "optionsTitleThemeColorSecondary": "Secondary",
+  "optionsTitleThemeColorSuccess": "Success",
+  "optionsTitleThemeColorWarning": "Warning",
+  "optionsTitleThemeColorWhite": "White",
+  "optionsTitleThemeColors": "Colors",
+  "optionsTitleThemeDescription": "Customize how the terminal looks: pick a ready-made preset or fine-tune individual colors, fonts and opacity below.",
+  "optionsTitleThemeDomain": "Domain",
+  "optionsTitleThemeFontFamily": "Font Family",
+  "optionsTitleThemeFontSize": "Font Size",
+  "optionsTitleThemeFontSizeCA": "Font Size (CA)",
+  "optionsTitleThemeFontSizeLarge": "Large",
+  "optionsTitleThemeFontSizeMedium": "Medium",
+  "optionsTitleThemeFontSizeSmall": "Small",
+  "optionsTitleThemeFontSizeXSmall": "X-Small",
+  "optionsTitleThemeOpacity": "Opacity",
+  "optionsTitleThemePreset": "Theme Preset",
+  "optionsTitleThemePresetCustom": "Custom",
+  "optionsTitleThemeRemove": "Remove",
+  "optionsUnsavedChanges": "Unsaved changes",
+  "optionsWarningAIModelsKeys": "Warning: API keys are stored in browser storage.",
   "terminal": {
     "ai": {
       "attachExpand": "Click to enlarge",
@@ -1862,11 +1578,11 @@
       "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.",
       "questionAutoDeclined": "[Agent] Question auto-declined (conversation not active): {{question}}",
       "reasoning": {
-        "default": "-- Razonamiento --",
-        "high": "Razonamiento: Alto",
-        "low": "Razonamiento: Bajo",
-        "medium": "Razonamiento: Medio",
-        "off": "Razonamiento: Off"
+        "default": "-- Reasoning --",
+        "high": "Reasoning: High",
+        "low": "Reasoning: Low",
+        "medium": "Reasoning: Medium",
+        "off": "Reasoning: Off"
       },
       "sysprompt": {
         "label": "Custom instructions",
@@ -1876,15 +1592,8 @@
     "close": {
       "prevented": "The terminal has prevented the current tab from closing due to unfinished tasks:"
     },
-    "cmd": {
-      "default": {
-        "definition": "Comando no definido",
-        "detail": "Este comando no tiene información detallada"
-      }
-    },
     "error": {
       "invalidHTTPRequest": "Invalid HTTP Request",
-      "notInitJob": "Unexpected error: can't initialize the job!",
       "notLoaded": "Terminal not loaded",
       "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
     },
@@ -1909,17 +1618,17 @@
       "aborted": "Operation aborted"
     },
     "tooltip": {
-      "aiMode": "Modo IA",
-      "aiReasoning": "Nivel de razonamiento para modelos \"pensantes\" (solo proveedor openai). \"Off\" pide a servidores locales compatibles con OpenAI que se salten el razonamiento interno.",
-      "aiTips": "Consejos de IA",
-      "attachFile": "Adjuntar archivo",
-      "customSystemPrompt": "Prompt del sistema personalizado",
-      "debug": "Alternar modo depuración",
-      "maximize": "Maximizar",
-      "multiLine": "Multilínea",
-      "newConversation": "Nueva conversación",
-      "pin": "Fijar",
-      "reloadShell": "Recargar Shell"
+      "aiMode": "AI Mode",
+      "aiReasoning": "Reasoning effort for \"thinking\" models (openai provider only). \"Off\" asks local OpenAI-compatible servers to skip chain-of-thought.",
+      "aiTips": "AI tips",
+      "attachFile": "Attach file",
+      "customSystemPrompt": "Custom system prompt",
+      "debug": "Toggle debug mode",
+      "maximize": "Maximize",
+      "multiLine": "Multi-line",
+      "newConversation": "New conversation",
+      "pin": "Pin",
+      "reloadShell": "Reload Shell"
     },
     "unknownCommand": "Comando desconocido '{{org_cmd}}' en {{start}}:{{end}}. ¿Quiso decir '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
     "unknownCommandAgentHint": "Comando desconocido '{{org_cmd}}'. No es un comando registrado — consulte la lista de AVAILABLE COMMANDS ya proporcionada, o ejecute 'help --all' para listar todos los comandos.",
@@ -1927,34 +1636,7 @@
     "unregisteredUser": "Usuario sin registrar",
     "watchdog": {
       "historyEmpty": "Todavía no hay mensajes.",
-      "tooltip": "OdooTerminal AI Watchdog — haz clic para ver el historial de mensajes"
-    }
-  },
-  "trash": {
-    "argument": {
-      "invalid": "Tipo de valor no válido para el argumento '{{arg_long_name}}': {{value_type}} no es {{arg_type}}",
-      "noExist": "El argumento '{{arg_name}}' no existe",
-      "requiredNotSet": "¡Argumentos requeridos no establecidos! ({{required_not_set}})"
-    },
-    "exception": {
-      "invalidCommandArgumentsError": "Argumentos de comando no válidos",
-      "invalidCommandArugmentValueError": "¡Valor inesperado '{{arg_value}}'!",
-      "invalidCommandDefinition": "¡Definición de comando no válida!",
-      "invalidInstructionError": "Instrucción no válida",
-      "invalidNameError": "Nombre no válido '{{vname}}' en {{start}}:{{end}}",
-      "invalidTokenError": "Token no válido '{{vname}}' en {{start}}:{{end}}",
-      "invalidValueError": "Valor no válido '{{value}}'",
-      "notExpectedCommandArgumentError": "Argumento '{{arg_name}}' no esperado en {{start}}:{{end}}",
-      "unknownCommandError": "Comando desconocido '{{cmd_name}}' en {{start}}:{{end}}",
-      "unknownNameError": "Nombre desconocido '{{vname}}' en {{start}}:{{end}}",
-      "unknownStoreValue": "Valor de almacenamiento desconocido '{{vname}}'"
-    },
-    "vmachine": {
-      "func": {
-        "definition": "Función interna",
-        "detail": "Función interna"
-      },
-      "unsafeRejected": "Command '{{cmd}}' rejected by user"
+      "tooltip": "OdooTerminal AI Watchdog — click to see the message history"
     }
   },
   "utilInjectResource": {

@@ -59,7 +59,7 @@ import cmdClick from './click';
 import cmdInspect from './inspect';
 import cmdFill from './fill';
 import cmdOptions from './options';
-import type VMachine from '@trash/vmachine';
+import type VMachine from '@tardo/trash/vmachine';
 
 export default function (vm: VMachine) {
   vm.registerCommand('gen', cmdGen());

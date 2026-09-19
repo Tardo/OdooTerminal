@@ -4,8 +4,8 @@
 
 import i18n from 'i18next';
 import MarkdownIt from 'markdown-it';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 // html:false escapes literal HTML in the input instead of passing it through, since the
 // rendered output is inserted into the screen as raw HTML (see Screen#print).

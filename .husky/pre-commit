@@ -1,2 +1,3 @@
+pnpm exec lint-staged
 pnpm run dev:eslint
 pnpm run dev:flowcheck

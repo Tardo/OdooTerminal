@@ -2,7 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import isEmpty from '@trash/utils/is_empty';
+import isEmpty from '@tardo/trash/utils/is_empty';
 import type OdooTerminal from '@odoo/terminal';
 
 class TerminalTestValidationError extends Error {

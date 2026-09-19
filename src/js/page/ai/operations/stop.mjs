@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import {aiRuntime} from '@ai/state';
-import type {CMDCallbackContext} from '@trash/interpreter';
+import type {CMDCallbackContext} from '@tardo/trash/interpreter';
 
 
 export default function cmdAIStop(ctx: CMDCallbackContext): void {

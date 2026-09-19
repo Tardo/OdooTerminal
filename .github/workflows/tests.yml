@@ -81,7 +81,7 @@ jobs:
         if: ${{ matrix.browser == 'firefox' }}
 
       - name: Install browser chrome
-        run: npx @puppeteer/browsers ingstall chrome
+        run: npx @puppeteer/browsers install chrome
         if: ${{ matrix.browser == 'chrome' }}
 
       - name: Run test for ${{ matrix.instance }} (${{ matrix.browser }})

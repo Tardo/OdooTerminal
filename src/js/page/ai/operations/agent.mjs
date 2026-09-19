@@ -18,7 +18,7 @@ import searchRead from '@odoo/orm/search_read';
 import captureScreenshot from '@ai/utils/capture_screenshot';
 import describeCommandError from '@ai/utils/describe_command_error';
 import encodeHTML from '@terminal/utils/encode_html';
-import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 
@@ -421,6 +421,19 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       if (finalText) {
         ctx.screen.eprint(i18n.t('cmdAI.agent.result.header', '--- Agent ---'), false);
         ctx.screen.print(mdConverter.render(finalText), false);
+      } else if (thinkBlocks.length === 0) {
+        // No tool calls, no text, no <think> block: the backend produced nothing usable
+        // (e.g. a weak/quantized local model whose tool-call attempt the server couldn't parse
+        // and silently cancelled — see providers/openai.mjs malformedToolCall). Without this,
+        // the agent just stops with zero output and the user has no idea anything failed.
+        ctx.screen.eprint(
+          i18n.t(
+            'cmdAI.agent.error.emptyResponse',
+            '[Agent] The model returned an empty response (no text, no tool calls). The backend or model likely failed silently — try a different model or check the server logs.',
+          ),
+          false,
+          'error_message',
+        );
       }
       printTokenUsage();
       return messages.slice(1);

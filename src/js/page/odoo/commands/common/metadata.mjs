@@ -6,8 +6,8 @@ import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import {getModelOptions} from './__utils__';
 import renderMetadata from '@odoo/templates/metadata';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 

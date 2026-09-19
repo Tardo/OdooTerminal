@@ -4,6 +4,12 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ---
 
+**15.0.0**
+
+```
+IMP: Use external @Tardo/trash package
+```
+
 **14.0.0**
 
 ```

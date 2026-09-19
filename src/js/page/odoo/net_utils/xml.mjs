@@ -4,7 +4,7 @@
 
 import callModelMulti from '@odoo/osv/call_model_multi';
 import callModel from '@odoo/osv/call_model';
-import isNumber from '@trash/utils/is_number';
+import isNumber from '@tardo/trash/utils/is_number';
 // $FlowFixMe[untyped-type-import]
 // $FlowFixMe[value-as-type]
 import type Recordset from '@terminal/core/recordset';

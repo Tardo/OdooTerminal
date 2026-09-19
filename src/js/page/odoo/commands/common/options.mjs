@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import postMessage from '@common/utils/post_message';
-import type {CMDDef} from '@trash/interpreter';
+import type {CMDDef} from '@tardo/trash/interpreter';
 
 async function cmdOptions() {
   postMessage('ODOO_TERM_OPEN_OPTIONS', {});

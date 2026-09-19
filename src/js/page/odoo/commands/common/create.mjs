@@ -9,8 +9,8 @@ import {getModelOptions} from './__utils__';
 // $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
 import renderRecordCreated from '@odoo/templates/record_created';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdCreateModelRecord(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<> {

@@ -3,9 +3,9 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import {ARG} from '@trash/constants';
+import {ARG} from '@tardo/trash/constants';
 import injectResource from '@terminal/utils/inject_resource';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
 async function cmdLoadResource(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {

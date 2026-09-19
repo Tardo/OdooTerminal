@@ -11,9 +11,9 @@ import callModel from '@odoo/osv/call_model';
 import getContent from '@odoo/utils/get_content';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import file2base64 from '@terminal/utils/file2base64';
-import isEmpty from '@trash/utils/is_empty';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import isEmpty from '@tardo/trash/utils/is_empty';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
 async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {

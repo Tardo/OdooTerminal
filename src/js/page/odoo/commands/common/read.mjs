@@ -8,8 +8,8 @@ import searchRead from '@odoo/orm/search_read';
 import {getModelOptions} from './__utils__';
 // $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 // $FlowFixMe[unclear-type]

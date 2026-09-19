@@ -5,8 +5,8 @@
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
 async function cmdOpenSettings(this: Terminal, kwargs: CMDCallbackArgs): Promise<void> {

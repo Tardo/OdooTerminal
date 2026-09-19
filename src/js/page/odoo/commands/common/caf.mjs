@@ -5,10 +5,10 @@
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import {getModelOptions} from './__utils__';
-import isEmpty from '@trash/utils/is_empty';
+import isEmpty from '@tardo/trash/utils/is_empty';
 import formatCellValue from '@terminal/utils/format_cell_value';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 

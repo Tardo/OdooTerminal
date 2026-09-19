@@ -12,7 +12,7 @@ import func2DCircle from './2d_circle';
 import func2DPoly from './2d_poly';
 import func2DNextFrame from './2d_next_frame';
 import func2DHandleLoop from './2d_handle_loop';
-import type VMachine from '@trash/vmachine';
+import type VMachine from '@tardo/trash/vmachine';
 
 export default function (vm: VMachine) {
   vm.registerCommand('2d_create_window', func2DCreateWindow());

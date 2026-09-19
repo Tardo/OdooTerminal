@@ -8,8 +8,8 @@ import getUrlInfo from '@odoo/utils/get_url_info';
 import getUID from '@odoo/net_utils/get_uid';
 import getUserName from '@odoo/net_utils/get_username';
 import getActiveModalInfo from '@odoo/utils/get_active_modal_info';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdInfo(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<string | number | void> {

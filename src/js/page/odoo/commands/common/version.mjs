@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import getOdooVersionInfo from '@odoo/utils/get_odoo_version_info';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 async function cmdShowOdooVersion(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const version_info = getOdooVersionInfo();

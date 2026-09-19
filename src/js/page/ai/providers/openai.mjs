@@ -232,5 +232,20 @@ export default async function streamRequestOpenAI(
     }
   }
 
+  // Some backends (llama.cpp with gpt-oss/harmony-style native tool-calling) fall back to
+  // streaming the raw, un-parsed chat-template tokens as plain content when a weak/quantized
+  // model produces a tool call the server's grammar can't extract (logged there as
+  // "unparsed peg-native output"). Without this check that garbage is shown to the user as if
+  // it were the model's real final answer, with no indication anything went wrong.
+  if (toolCalls.length === 0 && /<\|(?:start|end|channel|message|constrain)\|>/.test(fullResponse)) {
+    throw new Error(
+      i18n.t(
+        'ai.utils.network.error.malformedToolCall',
+        'The backend returned an unparsed tool-call attempt (raw chat-template tokens) instead of a valid response. ' +
+          'The model likely lacks the capacity for reliable tool calling — try a stronger model or a smaller/simpler prompt.',
+      ),
+    );
+  }
+
   return {text: fullResponse, toolCalls, usage, reasoning: reasoningResponse.length > 0 ? reasoningResponse : undefined};
 }

@@ -4,8 +4,8 @@
 
 import i18n from 'i18next';
 import getUrlInfo from '@odoo/utils/get_url_info';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 async function cmdURL(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<string> {
   let res = '';

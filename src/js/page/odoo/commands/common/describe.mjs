@@ -7,8 +7,8 @@ import searchCount from '@odoo/orm/search_count';
 import searchRead from '@odoo/orm/search_read';
 import getFieldsInfo from '@odoo/orm/get_fields_info';
 import {getModelOptions} from './__utils__';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 const KEY_FIELD_TYPES = new Set(['selection', 'many2one', 'many2many', 'one2many']);

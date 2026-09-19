@@ -2,8 +2,8 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import isEmpty from '@trash/utils/is_empty';
-import isNumber from '@trash/utils/is_number';
+import isEmpty from '@tardo/trash/utils/is_empty';
+import isNumber from '@tardo/trash/utils/is_number';
 
 export type RecordDef = {+id?: number, display_name?: string, [string]: mixed};
 

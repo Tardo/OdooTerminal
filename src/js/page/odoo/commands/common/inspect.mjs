@@ -9,8 +9,8 @@ import getUrlInfo from '@odoo/utils/get_url_info';
 import getFormRecord from '@odoo/utils/get_form_record';
 import getFieldWidgetsInfo from '@odoo/utils/get_field_widgets_info';
 import formatFieldValue from '@odoo/utils/format_field_value';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 const CONTENT_SELECTORS = ['.o_action_manager', '.o_web_client', 'body'];
 

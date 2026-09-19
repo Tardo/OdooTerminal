@@ -11,7 +11,7 @@ import cmdPivot from './pivot';
 import cmdSettings from './settings';
 import cmdView from './view';
 import cmdDoc from './doc';
-import type VMachine from '@trash/vmachine';
+import type VMachine from '@tardo/trash/vmachine';
 
 export default function (vm: VMachine) {
   vm.registerCommand('view', cmdView());

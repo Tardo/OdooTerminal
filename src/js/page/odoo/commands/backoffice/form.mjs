@@ -6,8 +6,8 @@ import i18n from 'i18next';
 import {highlightFormFields, clearFormFieldHighlights, activateNotebookPath} from '@odoo/utils/highlight_form_field';
 import {getFormViewArch, findFieldNotebookPath} from '@odoo/utils/get_form_view_arch';
 import getFormRecord from '@odoo/utils/get_form_record';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
 async function cmdForm(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<{[string]: mixed} | void> {

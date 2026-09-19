@@ -3,12 +3,12 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import {ARG} from '@trash/constants';
-import {FUNCTION_TYPE} from '@trash/function';
-import uniqueId from '@trash/utils/unique_id';
+import {ARG} from '@tardo/trash/constants';
+import {FUNCTION_TYPE} from '@tardo/trash/function';
+import uniqueId from '@common/utils/unique_id';
 import {registerWindow} from './windows';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
-import type VMachine from '@trash/vmachine';
+import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
+import type VMachine from '@tardo/trash/vmachine';
 
 async function func2DCreateWindow(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<HTMLCanvasElement> {
   const canvas = document.createElement('canvas');

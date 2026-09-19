@@ -9,7 +9,7 @@ import prettyObjectString from '@terminal/utils/pretty_object_string';
 import renderTable from './screen_table';
 import renderTableCellRecord from './screen_table_cell_record';
 import renderTableCellRecordId from './screen_table_cell_record_id';
-import FunctionTrash from '@trash/function';
+import FunctionTrash from '@tardo/trash/function';
 // $FlowFixMe[untyped-type-import]
 import type {Record} from '@terminal/core/recordset';
 

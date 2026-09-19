@@ -6,8 +6,8 @@ import i18n from 'i18next';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import cachedCallService from '@odoo/net_utils/cached_call_service';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdLoginAs(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {

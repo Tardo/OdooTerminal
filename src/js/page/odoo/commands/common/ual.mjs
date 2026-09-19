@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdUpdateAppList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {

@@ -3,12 +3,12 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import {ARG} from '@trash/constants';
-import {FUNCTION_TYPE} from '@trash/function';
+import {ARG} from '@tardo/trash/constants';
+import {FUNCTION_TYPE} from '@tardo/trash/function';
 import scheduleDraw from './render_queue';
 import {resolveWindow} from './windows';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
-import type VMachine from '@trash/vmachine';
+import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
+import type VMachine from '@tardo/trash/vmachine';
 
 async function func2DClear(vmachine: VMachine, kwargs: CMDCallbackArgs): Promise<> {
   const canvas = resolveWindow(kwargs.canvas);

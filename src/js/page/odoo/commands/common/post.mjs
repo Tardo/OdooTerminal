@@ -4,8 +4,8 @@
 
 import i18n from 'i18next';
 import getOdooService from '@odoo/utils/get_odoo_service';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 async function cmdPostData(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   if (kwargs.mode === 'odoo') {

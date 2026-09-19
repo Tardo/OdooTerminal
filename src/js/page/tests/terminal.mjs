@@ -3,13 +3,12 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import OdooTerminal from '@odoo/terminal';
-import isEmpty from '@trash/utils/is_empty';
+import isEmpty from '@tardo/trash/utils/is_empty';
 import TestBackend from './test_backend';
 import TestCommon from './test_common';
 import TestCore from './test_core';
-import TestTrash from './test_trash';
 
-const TestSuites = [TestTrash, TestCore, TestCommon, TestBackend];
+const TestSuites = [TestCore, TestCommon, TestBackend];
 
 export default class OdooTerminalTests extends OdooTerminal {
   /**

@@ -6,8 +6,8 @@ import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import {getModelOptions} from '../common/__utils__';
 import getFieldsInfo from '@odoo/orm/get_fields_info';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function assertFieldsExist(

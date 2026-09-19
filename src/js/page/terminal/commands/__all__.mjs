@@ -16,7 +16,7 @@ import cmdToggleTerm from './toggle_term';
 import cmdInput from './input';
 import cmdRun from './run';
 import cmdZip from './zip';
-import type VMachine from '@trash/vmachine';
+import type VMachine from '@tardo/trash/vmachine';
 
 export default function (vm: VMachine) {
   vm.registerCommand('help', cmdHelp());

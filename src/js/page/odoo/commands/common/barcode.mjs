@@ -6,8 +6,8 @@ import i18n from 'i18next';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import asyncSleep from '@terminal/utils/async_sleep';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 const AVAILABLE_BARCODE_COMMANDS = [
   'O-CMD.EDIT',

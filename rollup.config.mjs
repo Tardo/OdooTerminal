@@ -81,10 +81,6 @@ export default [
             replacement: path.resolve('src/js/page/terminal'),
           },
           {
-            find: '@trash',
-            replacement: path.resolve('src/js/page/trash'),
-          },
-          {
             find: '@tests',
             replacement: path.resolve('src/js/page/tests'),
           },

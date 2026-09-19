@@ -3,12 +3,12 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import {ARG} from '@trash/constants';
-import {FUNCTION_TYPE} from '@trash/function';
+import {ARG} from '@tardo/trash/constants';
+import {FUNCTION_TYPE} from '@tardo/trash/function';
 import {resolveWindow} from './windows';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
-import type {default as VMachine, EvalOptions} from '@trash/vmachine';
-import type Frame from '@trash/frame';
+import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
+import type {default as VMachine, EvalOptions} from '@tardo/trash/vmachine';
+import type Frame from '@tardo/trash/frame';
 
 async function func2DHandleLoop(
   vmachine: VMachine,

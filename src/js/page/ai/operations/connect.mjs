@@ -5,7 +5,7 @@
 import i18n from 'i18next';
 import {aiState} from '@ai/state';
 import {checkHostPermission} from '@ai/utils/relay_fetch';
-import type {CMDCallbackArgs, CMDCallbackContext} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext} from '@tardo/trash/interpreter';
 
 
 export default async function cmdAIConnect(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<void> {

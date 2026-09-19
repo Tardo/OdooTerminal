@@ -4,8 +4,8 @@
 
 import i18n from 'i18next';
 import file2file from '@terminal/utils/file2file';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
 async function cmdGenFile(this: Terminal, kwargs: CMDCallbackArgs): Promise<> {

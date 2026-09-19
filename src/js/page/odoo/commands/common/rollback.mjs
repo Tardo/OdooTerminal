@@ -5,8 +5,8 @@
 import i18n from 'i18next';
 // $FlowFixMe[untyped-import]
 import Recordset from '@terminal/core/recordset';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 async function cmdRollback(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   if (!Recordset.isValid(kwargs.recordset)) {

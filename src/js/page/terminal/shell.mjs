@@ -3,12 +3,13 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import VMachine from '@trash/vmachine';
-import Frame from '@trash/frame';
+import VMachine from '@tardo/trash/vmachine';
+import Frame from '@tardo/trash/frame';
 import ProcessJobError from './exceptions/process_job_error';
-import Interpreter from '@trash/interpreter';
-import type {ParserOptions, ParseInfo} from '@trash/interpreter';
-import type {EvalOptions, ProcessCommandJobOptions} from '@trash/vmachine';
+import ExecutionStoppedError from '@tardo/trash/exceptions/execution_stopped_error';
+import Interpreter from '@tardo/trash/interpreter';
+import type {ParserOptions, ParseInfo} from '@tardo/trash/interpreter';
+import type {EvalOptions, ProcessCommandJobOptions} from '@tardo/trash/vmachine';
 
 
 export type ShellCMDCallback = (job_info: JobInfo) => void;
@@ -16,6 +17,7 @@ export type ShellCMDCallback = (job_info: JobInfo) => void;
 export type ShellOptions = {
   invokeExternalCommand: ShellInvokeExternalCallback,
   confirmUnsafe?: (cmdName: string, cmdRaw: string) => Promise<boolean>,
+  // Marks long-running jobs as unhealthy; does not cancel execution. Omit to disable.
   commandTimeout?: number,
   onStartCommand?: ShellCMDCallback,
   onTimeoutCommand?: ShellCMDCallback,
@@ -40,11 +42,8 @@ export type ShellInvokeExternalCallback = (meta: JobMetaInfo) => Promise<mixed>;
 export default class Shell {
   #virtMachine: VMachine;
   #interpreter: Interpreter;
-  #jobs: Array<JobInfo> = [];
+  #jobs: Array<JobInfo | void> = [];
   #options: ShellOptions;
-  // When true, errors in silent commands are still thrown (used by evalAll so
-  // callers like the AI agent can distinguish failure from "no return value").
-  #throwSilentErrors: boolean = false;
 
   constructor(options: ShellOptions) {
     this.#options = {...options};
@@ -53,7 +52,6 @@ export default class Shell {
       processCommandJob: (cmdInfo, silent) => this.#processCommandJob(cmdInfo, silent),
       confirmUnsafe: (name, raw) =>
         this.#options.confirmUnsafe ? this.#options.confirmUnsafe(name, raw) : Promise.resolve(true),
-      silent: false,
     });
   }
 
@@ -70,19 +68,7 @@ export default class Shell {
   }
 
   getActiveJobs(): $ReadOnlyArray<JobInfo> {
-    return this.#jobs.filter(item => item);
-  }
-
-  validateCommand(cmd: string): [?string, ?string] {
-    if (!cmd) {
-      return [undefined, undefined];
-    }
-    const cmd_split = cmd.split(' ');
-    const cmd_name = cmd_split[0];
-    if (!cmd_name) {
-      return [cmd, undefined];
-    }
-    return [cmd, cmd_name];
+    return this.#jobs.filter(item => item !== undefined);
   }
 
   parse(data: string, options?: ParserOptions, level?: number = 0): ParseInfo {
@@ -93,25 +79,21 @@ export default class Shell {
 
   // $FlowFixMe[unclear-type]
   async eval(code: string, options?: Partial<EvalOptions>, isolated_frame?: boolean = false): Promise<any> {
-    if (code?.constructor !== String) {
-      throw new Error('Invalid input!');
-    }
-    const opts: EvalOptions = {
-      aliases: {},
-      isData: false,
-      silent: false,
-      ...options,
-    };
-    const parse_info = this.parse(code, {
-      isData: opts.isData,
-    });
-    const root_frame = isolated_frame ? new Frame() : undefined;
-    return await this.#virtMachine.execute(parse_info, opts, root_frame);
+    return await this.#evaluate(code, options, isolated_frame, false);
   }
 
   // $FlowFixMe[unclear-type]
   async evalAll(code: string, options?: Partial<EvalOptions>, isolated_frame?: boolean = false): Promise<any> {
-    if (code?.constructor !== String) {
+    return await this.#evaluate(code, {...options, throwSilentErrors: true}, isolated_frame, true);
+  }
+
+  async #evaluate(
+    code: string,
+    options: Partial<EvalOptions> | void,
+    isolated_frame: boolean,
+    collect_all: boolean,
+  ): Promise<mixed> {
+    if (typeof code !== 'string') {
       throw new Error('Invalid input!');
     }
     const opts: EvalOptions = {
@@ -124,38 +106,26 @@ export default class Shell {
       isData: opts.isData,
     });
     const root_frame = isolated_frame ? new Frame() : undefined;
-    this.#throwSilentErrors = true;
-    try {
-      return await this.#virtMachine.execute(parse_info, opts, root_frame, true);
-    } finally {
-      this.#throwSilentErrors = false;
-    }
+    return await this.#virtMachine.execute(parse_info, opts, root_frame, collect_all);
   }
 
   async #processCommandJob(command_info: ProcessCommandJobOptions, silent: boolean = false): Promise<mixed> {
     const job_index = this.onStartCommand(command_info);
-    if (job_index === -1) {
-      throw new Error(i18n.t('terminal.error.notInitJob', "Unexpected error: can't initialize the job!"));
-    }
-    let result: mixed = null;
-    let error: mixed = null;
-    let is_failed = false;
     const meta = this.getCommandJobMeta(command_info, job_index, silent);
     try {
-      result = await this.#options.invokeExternalCommand(meta);
+      return await this.#options.invokeExternalCommand(meta);
     } catch (err) {
-      is_failed = true;
+      if (err instanceof ExecutionStoppedError) {
+        throw err;
+      }
       // Keep the original error (e.g. an Odoo RPCError with '.data.name/.message/.debug')
       // instead of flattening it to '.message' — that discards the real server-side
       // reason and leaves only a generic label for both the screen and the AI agent.
-      error = err ?? i18n.t('terminal.error.unknown', '[!] Oops! Unknown error! (no detailed error message given :/)');
+      const error = err ?? i18n.t('terminal.error.unknown', '[!] Oops! Unknown error! (no detailed error message given :/)');
+      throw new ProcessJobError(command_info.cmdName, error);
     } finally {
       this.onFinishCommand(job_index);
     }
-    if (is_failed && (!silent || this.#throwSilentErrors)) {
-      throw new ProcessJobError(command_info.cmdName, error);
-    }
-    return result;
   }
 
   onStartCommand(command_info: ProcessCommandJobOptions): number {
@@ -172,23 +142,34 @@ export default class Shell {
     } else {
       this.#jobs[index] = job_info;
     }
-    job_info.timeout = setTimeout(() => {
-      this.onTimeoutCommand(index);
-    }, this.#options.commandTimeout);
+    if (this.#options.commandTimeout !== undefined) {
+      job_info.timeout = setTimeout(() => {
+        this.onTimeoutCommand(index);
+      }, this.#options.commandTimeout);
+    }
 
     if (typeof this.#options.onStartCommand !== 'undefined') {
-      this.#options.onStartCommand(job_info);
+      try {
+        this.#options.onStartCommand(job_info);
+      } catch (err) {
+        clearTimeout(job_info.timeout);
+        delete this.#jobs[index];
+        throw err;
+      }
     }
     return index;
   }
   onTimeoutCommand(job_index: number) {
-    this.#jobs[job_index].healthy = false;
+    const job_info = this.#jobs[job_index];
+    if (!job_info) return;
+    job_info.healthy = false;
     if (typeof this.#options.onTimeoutCommand !== 'undefined') {
-      this.#options.onTimeoutCommand(this.#jobs[job_index]);
+      this.#options.onTimeoutCommand(job_info);
     }
   }
   onFinishCommand(job_index: number) {
     const job_info = this.#jobs[job_index];
+    if (!job_info) return;
     clearTimeout(job_info.timeout);
     delete this.#jobs[job_index];
     if (typeof this.#options.onFinishCommand !== 'undefined') {

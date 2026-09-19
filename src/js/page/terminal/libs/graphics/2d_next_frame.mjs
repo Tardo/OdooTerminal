@@ -3,8 +3,8 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import {FUNCTION_TYPE} from '@trash/function';
-import type {CMDDef} from '@trash/interpreter';
+import {FUNCTION_TYPE} from '@tardo/trash/function';
+import type {CMDDef} from '@tardo/trash/interpreter';
 
 async function func2DNextFrame(): Promise<number> {
   return new Promise(resolve => window.requestAnimationFrame(resolve));

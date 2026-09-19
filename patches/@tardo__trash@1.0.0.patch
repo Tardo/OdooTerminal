@@ -1,0 +1,70 @@
+diff --git a/dist/vmachine.mjs b/dist/vmachine.mjs
+index 533d0917fbee65264e6c48c57c0e0ca2604dc84d..fe054ae47aefdb69e676652a98b7d651de0dd71c 100644
+--- a/dist/vmachine.mjs
++++ b/dist/vmachine.mjs
+@@ -153,7 +153,7 @@ class VMachine {
+           const internal_cb = cmd_def.callback;
+           internal_res = await internal_cb(this, kwargs, frame, opts);
+         } catch (err) {
+-          if (!silent || err instanceof ExecutionStoppedError) {
++          if (!silent || opts.throwSilentErrors || err instanceof ExecutionStoppedError) {
+             throw err;
+           }
+           return null;
+@@ -168,10 +168,11 @@ class VMachine {
+         cmdDef: cmd_def,
+         kwargs: kwargs,
+         args: frame.stack.map(item => String(item)),
+-        signal: opts.signal
++        signal: opts.signal,
++        executionOptions: opts
+       }, silent);
+     } catch (err) {
+-      if (!silent || err instanceof ExecutionStoppedError) throw err;
++      if (!silent || opts.throwSilentErrors || err instanceof ExecutionStoppedError) throw err;
+       return null;
+     }
+   }
+diff --git a/dist/vmachine.mjs.flow b/dist/vmachine.mjs.flow
+index 730a51d07cbe726c557a64e12eb79c6c519445f0..7053d4c6167768cc4e6cd1c61ca908525533c0ca 100644
+--- a/dist/vmachine.mjs.flow
++++ b/dist/vmachine.mjs.flow
+@@ -32,6 +32,7 @@ export type ProcessCommandJobOptions = {
+   kwargs: CMDCallbackArgs,
+   args: Array<string>,
+   signal?: AbortSignal,
++  executionOptions: EvalOptions,
+ };
+ export type ProcessCommandJobCallback = (options: ProcessCommandJobOptions, silent: boolean) => Promise<mixed>;
+ export type VMachineOptions = {
+@@ -43,6 +44,7 @@ export type VMachineOptions = {
+ };
+ 
+ export type EvalOptions = {
++  throwSilentErrors?: boolean,
+   isData?: boolean,
+   silent?: boolean,
+   aliases?: {[string]: string},
+@@ -215,7 +217,7 @@ export default class VMachine {
+           // $FlowFixMe[class-object-subtyping]
+           internal_res = await internal_cb(this, kwargs, frame, opts);
+         } catch (err) {
+-          if (!silent || err instanceof ExecutionStoppedError) {
++          if (!silent || opts.throwSilentErrors || err instanceof ExecutionStoppedError) {
+             throw err;
+           }
+           return null;
+@@ -233,11 +235,12 @@ export default class VMachine {
+           kwargs: kwargs,
+           args: frame.stack.map(item => String(item)),
+           signal: opts.signal,
++          executionOptions: opts,
+         },
+         silent,
+       );
+     } catch (err) {
+-      if (!silent || err instanceof ExecutionStoppedError) throw err;
++      if (!silent || opts.throwSilentErrors || err instanceof ExecutionStoppedError) throw err;
+       return null;
+     }
+   }

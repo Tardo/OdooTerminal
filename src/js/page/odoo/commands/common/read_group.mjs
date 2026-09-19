@@ -5,8 +5,8 @@
 import i18n from 'i18next';
 import readGroup from '@odoo/orm/read_group';
 import {getModelOptions} from './__utils__';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 const READ_EXCLUDED_KEYS = ["__domain", "__count"];

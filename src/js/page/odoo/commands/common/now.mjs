@@ -6,8 +6,8 @@ import i18n from 'i18next';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getUserTZ from '@odoo/utils/get_user_tz';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 async function cmdNow(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const time = getOdooService('web.time', '@web/core/l10n/dates');

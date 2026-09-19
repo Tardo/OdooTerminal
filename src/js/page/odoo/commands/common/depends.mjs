@@ -8,9 +8,9 @@ import searchRead from '@odoo/orm/search_read';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import renderDependsItem from '@odoo/templates/depends_item';
-import isEmpty from '@trash/utils/is_empty';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import isEmpty from '@tardo/trash/utils/is_empty';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 // function sanitizeCmdModuleDepends(module_name: string) {

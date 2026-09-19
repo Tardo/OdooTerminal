@@ -3,13 +3,13 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import {ARG} from '@trash/constants';
+import {ARG} from '@tardo/trash/constants';
 import cmdAIConnect from '@ai/operations/connect';
 import cmdAIAgent from '@ai/operations/agent';
 import cmdAIStop from '@ai/operations/stop';
 import searchRead from '@odoo/orm/search_read';
 import {DEFAULT_MAX_STEPS, DEFAULT_MAX_TOKENS} from '@ai/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 

@@ -10,9 +10,9 @@ import csvStringify from '@terminal/utils/csv';
 import replacer from '@terminal/utils/stringify_replacer';
 import createZip from '@terminal/utils/zip';
 import xmlStringify from '@odoo/net_utils/xml';
-import uniqueId from '@trash/utils/unique_id';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import uniqueId from '@common/utils/unique_id';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
 const RECORDSET_FORMATS = ['csv', 'xml', 'zip'];

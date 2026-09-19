@@ -2,10 +2,10 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import {getArgumentInfo} from '@trash/argument';
-import {ARG} from '@trash/constants';
-import type {ArgInfo, CMDDef} from '@trash/interpreter';
-import {FUNCTION_TYPE} from '@trash/function';
+import {getArgumentInfo} from '@tardo/trash/argument';
+import {ARG} from '@tardo/trash/constants';
+import type {ArgInfo, CMDDef} from '@tardo/trash/interpreter';
+import {FUNCTION_TYPE} from '@tardo/trash/function';
 import type Terminal from '@odoo/terminal';
 
 

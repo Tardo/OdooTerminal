@@ -4,7 +4,7 @@
 
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import asyncSleep from '@terminal/utils/async_sleep';
-import uniqueId from '@trash/utils/unique_id';
+import uniqueId from '@common/utils/unique_id';
 import TerminalTestSuite from './tests';
 
 export default class TestCommon extends TerminalTestSuite {

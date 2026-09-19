@@ -5,10 +5,10 @@
 import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
-import isEmpty from '@trash/utils/is_empty';
-import {ARG} from '@trash/constants';
+import isEmpty from '@tardo/trash/utils/is_empty';
+import {ARG} from '@tardo/trash/constants';
 import {searchModules} from './__utils__';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {

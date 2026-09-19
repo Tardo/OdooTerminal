@@ -3,11 +3,11 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import {getArgumentInfo} from '@trash/argument';
-import {ARG} from '@trash/constants';
-import {FUNCTION_TYPE} from '@trash/function';
+import {getArgumentInfo} from '@tardo/trash/argument';
+import {ARG} from '@tardo/trash/constants';
+import {FUNCTION_TYPE} from '@tardo/trash/function';
 import {buildCommandPrompt} from '@ai/prompts/trash';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 import type Screen from '@terminal/core/screen';
 

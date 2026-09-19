@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import file2file from '@terminal/utils/file2file';
-import type {CMDDef} from '@trash/interpreter';
+import type {CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
 async function cmdRun(this: Terminal): Promise<> {

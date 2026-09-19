@@ -3,7 +3,7 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import type {CMDCallbackContext} from '@trash/interpreter';
+import type {CMDCallbackContext} from '@tardo/trash/interpreter';
 
 
 export function startRequest(timeoutSecs: ?number): AbortController {

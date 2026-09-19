@@ -5,8 +5,8 @@
 import i18n from 'i18next';
 import getOdooEnv from '@odoo/utils/get_odoo_env';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
-import {ARG} from '@trash/constants';
-import type {CMDCallbackArgs, CMDDef} from '@trash/interpreter';
+import {ARG} from '@tardo/trash/constants';
+import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdNotify(this: Terminal, kwargs: CMDCallbackArgs) {

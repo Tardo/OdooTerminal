@@ -29,7 +29,7 @@ import ElementNotFoundError from '@terminal/exceptions/element_not_found_error';
 import type {RGB} from '@terminal/utils/hex2rgb';
 import type {CMDAssistantOption} from './command_assistant';
 import type {DebounceInnerCallback} from '@terminal/utils/debounce';
-import type {CMDDef, TokenInfo} from '@trash/interpreter';
+import type {CMDDef, TokenInfo} from '@tardo/trash/interpreter';
 
 export type InputInfo = {
   username: string,

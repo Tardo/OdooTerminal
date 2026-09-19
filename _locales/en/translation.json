@@ -1,8 +1,5 @@
 {
   "No": "No",
-  "UnknownNameError": {
-    "invalidName": "<InvalidName>"
-  },
   "Yes": "Yes",
   "ai": {
     "mcp": {
@@ -23,6 +20,7 @@
         "error": {
           "aborted": "Request cancelled.",
           "httpError": "HTTP error {{status}}",
+          "malformedToolCall": "The backend returned an unparsed tool-call attempt (raw chat-template tokens) instead of a valid response. The model likely lacks the capacity for reliable tool calling — try a stronger model or a smaller/simpler prompt.",
           "noStream": "Server did not return a streaming response"
         }
       },
@@ -41,7 +39,7 @@
   },
   "cmd2DCircle": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The color",
       "end-angle": "End angle in degrees",
       "radius": "The radius",
@@ -56,7 +54,7 @@
   },
   "cmd2DClear": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "from-x": "The rect X point",
       "from-y": "The rect Y point",
       "height": "The rect height",
@@ -78,14 +76,14 @@
   },
   "cmd2DDestroyWindow": {
     "args": {
-      "canvas": "The canvas"
+      "canvas": "The canvas or its window id"
     },
     "definition": "Destroy 2D Window",
     "detail": "Destroy 2D Window"
   },
   "cmd2DHandleLoop": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "fun": "The draw function",
       "max-frames": "Stop after this many frames (-1 = unlimited)"
     },
@@ -94,7 +92,7 @@
   },
   "cmd2DLine": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The line color",
       "from-x": "The line from X point",
       "from-y": "The line from Y point",
@@ -111,7 +109,7 @@
   },
   "cmd2DPoly": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The color",
       "fill": "Close the shape and fill it",
       "points": "The list of [x, y] points",
@@ -122,7 +120,7 @@
   },
   "cmd2DRect": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The rect color",
       "height": "The rect height",
       "width": "The rect width",
@@ -139,6 +137,7 @@
         "rejected": "Attachment access rejected by user."
       },
       "error": {
+        "emptyResponse": "[Agent] The model returned an empty response (no text, no tool calls). The backend or model likely failed silently — try a different model or check the server logs.",
         "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
         "notConfigured": "Not connected. Use \"ai connect\" first",
         "requestFailed": "Request failed: "
@@ -616,11 +615,6 @@
       "saved": "Form record saved"
     }
   },
-  "cmdFuncTrash": {
-    "args": {
-      "name": "The function parameter"
-    }
-  },
   "cmdGen": {
     "args": {
       "max": "Max. value",
@@ -707,7 +701,7 @@
       "none": "No buttons found in the current view"
     },
     "definition": "Inspect interactive elements on the current page",
-    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nTypes:\n  page (default) — context overview: model, record id, view type, action id, element counts\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)\n  list — visible rows in the current list view with a \"view\" command per row",
+    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nWhen a modal dialog is open, every type below scopes to it instead of the background page.\nTypes:\n  page (default) — context overview: model, record id, view type, action id, element counts, modal state\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)\n  list — visible rows in the current list view with a \"view\" command per row",
     "dialog": {
       "buttons": "<em>Buttons:</em>",
       "fields": "<em>Fields:</em>",
@@ -1101,13 +1095,6 @@
     "definition": "Open settings page",
     "detail": "Open the Odoo Settings form view for the specified module. Does not return data."
   },
-  "cmdSleep": {
-    "args": {
-      "time": "The time to sleep (in ms)"
-    },
-    "definition": "Sleep",
-    "detail": "Sleep (time in ms)"
-  },
   "cmdSysParam": {
     "args": {
       "key": "Parameter key (required for get/set operations)",
@@ -1339,7 +1326,7 @@
   },
   "func2DText": {
     "args": {
-      "canvas": "The canvas",
+      "canvas": "The canvas or its window id",
       "color": "The text color",
       "font": "The text font",
       "text": "The text",
@@ -1348,277 +1335,6 @@
     },
     "definition": "Draw a text",
     "detail": "Draw a text"
-  },
-  "funcAbs": {
-    "args": {
-      "num": "The number"
-    },
-    "definition": "Absolute value of a number",
-    "detail": "Returns the absolute value of a number."
-  },
-  "funcArrAppend": {
-    "args": {
-      "arr": "The array",
-      "item": "The item to append"
-    },
-    "definition": "Append an item to an array",
-    "detail": "Append an item to the end of an array (mutates it in place)"
-  },
-  "funcArrClone": {
-    "args": {
-      "arr": "The array"
-    },
-    "definition": "Clone an array",
-    "detail": "Return a shallow copy of an array"
-  },
-  "funcArrFilter": {
-    "args": {
-      "arr": "The array",
-      "filter": "The filter function"
-    },
-    "definition": "Filter an array",
-    "detail": "Return a new array containing only the elements for which the filter function returns true"
-  },
-  "funcArrJoin": {
-    "args": {
-      "arr": "The array",
-      "sep": "The separator"
-    },
-    "definition": "Join an array into a string",
-    "detail": "Join all items of an array into a string, separated by the given separator"
-  },
-  "funcArrMap": {
-    "args": {
-      "arr": "The array",
-      "mapper": "The mapper function"
-    },
-    "definition": "Map an array",
-    "detail": "Return a new array with the mapper function applied to each element"
-  },
-  "funcArrPrepend": {
-    "args": {
-      "arr": "The array",
-      "item": "The item to prepend"
-    },
-    "definition": "Prepend an item to an array",
-    "detail": "Insert an item at the beginning of an array (mutates it in place)"
-  },
-  "funcArrReduce": {
-    "args": {
-      "arr": "The array",
-      "initial": "The initial accumulator value",
-      "reducer": "The reducer function"
-    },
-    "definition": "Reduce an array",
-    "detail": "Reduce an array to a single value using the reducer function"
-  },
-  "funcDecode": {
-    "args": {
-      "method": "The method to decode",
-      "value": "The value to decode"
-    },
-    "definition": "Decode",
-    "detail": "Decode data"
-  },
-  "funcDictClone": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Clone a dictionary",
-    "detail": "Return a shallow copy of a dictionary"
-  },
-  "funcDictEntries": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Get the entries of a dictionary",
-    "detail": "Return an array of [key, value] pairs of a dictionary"
-  },
-  "funcDictGet": {
-    "args": {
-      "default": "The default value",
-      "dict": "The dictionary",
-      "key": "The key"
-    },
-    "definition": "Get a value from a dictionary",
-    "detail": "Return the value for the given key, or the default value if the key does not exist"
-  },
-  "funcDictHas": {
-    "args": {
-      "dict": "The dictionary",
-      "key": "The key"
-    },
-    "definition": "Check if a dictionary has a key",
-    "detail": "Return true if the dictionary has the given key"
-  },
-  "funcDictKeys": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Get the keys of a dictionary",
-    "detail": "Return an array with all the keys of a dictionary"
-  },
-  "funcDictMerge": {
-    "args": {
-      "dict": "The dictionary",
-      "other": "The dictionary to merge in"
-    },
-    "definition": "Merge two dictionaries",
-    "detail": "Return a new dictionary with the entries of both dictionaries (the second one takes precedence)"
-  },
-  "funcDictRemove": {
-    "args": {
-      "dict": "The dictionary",
-      "key": "The key"
-    },
-    "definition": "Remove a key from a dictionary",
-    "detail": "Remove the given key from a dictionary (mutates the dictionary in place)"
-  },
-  "funcDictSet": {
-    "args": {
-      "dict": "The dictionary",
-      "key": "The key",
-      "value": "The value"
-    },
-    "definition": "Set a value in a dictionary",
-    "detail": "Set the value for the given key (mutates the dictionary in place)"
-  },
-  "funcDictSize": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Get the number of keys in a dictionary",
-    "detail": "Return the number of keys of a dictionary"
-  },
-  "funcDictValues": {
-    "args": {
-      "dict": "The dictionary"
-    },
-    "definition": "Get the values of a dictionary",
-    "detail": "Return an array with all the values of a dictionary"
-  },
-  "funcEncode": {
-    "args": {
-      "method": "The method to encode",
-      "value": "The value to encode"
-    },
-    "definition": "Encode",
-    "detail": "Encode data"
-  },
-  "funcFetch": {
-    "args": {
-      "timeout": "The timeout",
-      "url": "The fetch options"
-    },
-    "definition": "HTTP requests",
-    "detail": "Interface for making HTTP requests and processing the responses."
-  },
-  "funcFixed": {
-    "args": {
-      "decimals": "The number of decimals",
-      "num": "The number"
-    },
-    "definition": "Round a number to the given decimals, then truncate to integer",
-    "detail": "Round the number using toFixed(decimals) and return the result truncated to an integer"
-  },
-  "funcFloor": {
-    "args": {
-      "num": "The number"
-    },
-    "definition": "Rounds a number DOWN to the nearest integer",
-    "detail": "Rounds a number DOWN to the nearest integer"
-  },
-  "funcPNow": {
-    "definition": "High resolution timestamp in milliseconds",
-    "detail": "High resolution timestamp in milliseconds."
-  },
-  "funcPow": {
-    "args": {
-      "base": "Base",
-      "exponent": "Exponent"
-    },
-    "definition": "Calculate the exponent value of x raised to the power of y",
-    "detail": "Calculate the exponent value of x raised to the power of y"
-  },
-  "funcRand": {
-    "args": {
-      "max": "Max. value",
-      "min": "Min. value"
-    },
-    "definition": "Generate random integers",
-    "detail": "Return random integers"
-  },
-  "funcStrEnds": {
-    "args": {
-      "str": "The string",
-      "suffix": "The suffix to check"
-    },
-    "definition": "Check if a string ends with a suffix",
-    "detail": "Return true if the string ends with the given suffix"
-  },
-  "funcStrIncludes": {
-    "args": {
-      "needle": "The substring to search for",
-      "str": "The string"
-    },
-    "definition": "Check if a string contains a substring",
-    "detail": "Return true if the string contains the given substring"
-  },
-  "funcStrLower": {
-    "args": {
-      "str": "The string"
-    },
-    "definition": "Convert string to lowercase",
-    "detail": "Return the string converted to lowercase"
-  },
-  "funcStrReplace": {
-    "args": {
-      "all": "Replace all occurrences",
-      "replacement": "The replacement string",
-      "search": "The substring to find",
-      "str": "The source string"
-    },
-    "definition": "Replace occurrences in a string",
-    "detail": "Replace the first (or all with -a) occurrences of a substring"
-  },
-  "funcStrSlice": {
-    "args": {
-      "begin": "Start index (inclusive, negative counts from end)",
-      "end": "End index (exclusive, negative counts from end)",
-      "str": "The string"
-    },
-    "definition": "Extract a substring",
-    "detail": "Return the portion of the string from begin to end (exclusive). Negative indices count from the end."
-  },
-  "funcStrSplit": {
-    "args": {
-      "delim": "The delimiter",
-      "str": "The string to split"
-    },
-    "definition": "Split a string into an array",
-    "detail": "Split a string by a delimiter and return an array of substrings"
-  },
-  "funcStrStarts": {
-    "args": {
-      "prefix": "The prefix to check",
-      "str": "The string"
-    },
-    "definition": "Check if a string starts with a prefix",
-    "detail": "Return true if the string starts with the given prefix"
-  },
-  "funcStrTrim": {
-    "args": {
-      "str": "The string"
-    },
-    "definition": "Trim whitespace from both ends of a string",
-    "detail": "Return the string with leading and trailing whitespace removed"
-  },
-  "funcStrUpper": {
-    "args": {
-      "str": "The string"
-    },
-    "definition": "Convert string to uppercase",
-    "detail": "Return the string converted to uppercase"
   },
   "getOdooEnvService": {
     "error": "Service '{{service_name}}' is not available"
@@ -1678,7 +1394,7 @@
   "optionsAIWatchdogEnabled": "Enabled by default",
   "optionsAIWatchdogHint": "No local server configured yet? Add one under the \"AI Providers\" tab, then pick it here.",
   "optionsAIWatchdogManualHint": "Leave this off to keep it opt-in per instance: run \"watchdog -p on\" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with \"-m <model>\"). Turn it off again with \"watchdog -p off\".",
-  "optionsAIWatchdogModel": "Default model",
+  "optionsAIWatchdogModel": "Model",
   "optionsAIWatchdogModelsLoadError": "Could not load models",
   "optionsAIWatchdogNoModel": "-- Default model --",
   "optionsAIWatchdogNoProvider": "-- No provider --",
@@ -1699,7 +1415,7 @@
   "optionsLanguage": "Language",
   "optionsLanguageAuto": "Auto",
   "optionsMCPServersAddRequired": "Name and URL are required",
-  "optionsNoChanges": "No changes",
+  "optionsNoChanges": "All changes saved",
   "optionsReset": "Reset to Defaults",
   "optionsResetConfirm": "This will reset all settings to their default values. Are you sure?",
   "optionsResetDone": "Settings have been reset to defaults",
@@ -1740,7 +1456,7 @@
   "optionsTitleAIModelsDescription": "Define AI provider connections to use in AI mode. The model is picked from AI mode itself, below the provider selector.",
   "optionsTitleAIModelsGrant": "Grant access",
   "optionsTitleAIModelsMaxTokens": "Max tokens",
-  "optionsTitleAIModelsMaxTokensLabel": "Max Tokens",
+  "optionsTitleAIModelsMaxTokensLabel": "Max tokens (0 = default)",
   "optionsTitleAIModelsName": "Name",
   "optionsTitleAIModelsNamePlaceholder": "My Provider",
   "optionsTitleAIModelsProvider": "Provider",
@@ -1765,7 +1481,7 @@
   "optionsTitleCommandAssistantMatchModeStartsWith": "Starts with",
   "optionsTitleCommandAssistantMaxResults": "Max. results",
   "optionsTitleCommandAssistantMaxResultsHint": "Maximum number of suggestions shown at once in the dropdown.",
-  "optionsTitleDeveloperZone": "Extension Developer Zone",
+  "optionsTitleDeveloperZone": "Developer Zone",
   "optionsTitleDeveloperZoneDescription": "Options for developers of OdooTerminal itself. Most users can leave these off.",
   "optionsTitleDeveloperZoneModeConsoleErrors": "Show errors in the browser console",
   "optionsTitleDeveloperZoneModeIgnoreCompChecks": "Disable Odoo version checking",
@@ -1823,7 +1539,7 @@
   "optionsTitleThemeColorWhite": "White",
   "optionsTitleThemeColors": "Colors",
   "optionsTitleThemeDescription": "Customize how the terminal looks: pick a ready-made preset or fine-tune individual colors, fonts and opacity below.",
-  "optionsTitleThemeDomain": "Website",
+  "optionsTitleThemeDomain": "Domain",
   "optionsTitleThemeFontFamily": "Font Family",
   "optionsTitleThemeFontSize": "Font Size",
   "optionsTitleThemeFontSizeCA": "Font Size (CA)",
@@ -1876,15 +1592,8 @@
     "close": {
       "prevented": "The terminal has prevented the current tab from closing due to unfinished tasks:"
     },
-    "cmd": {
-      "default": {
-        "definition": "Undefined command",
-        "detail": "This command hasn't a properly detailed information"
-      }
-    },
     "error": {
       "invalidHTTPRequest": "Invalid HTTP Request",
-      "notInitJob": "Unexpected error: can't initialize the job!",
       "notLoaded": "Terminal not loaded",
       "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
     },
@@ -1928,33 +1637,6 @@
     "watchdog": {
       "historyEmpty": "No messages yet.",
       "tooltip": "OdooTerminal AI Watchdog — click to see the message history"
-    }
-  },
-  "trash": {
-    "argument": {
-      "invalid": "Invalid argument '{{arg_long_name}}' value type: {{value_type}} is not {{arg_type}}",
-      "noExist": "The argument '{{arg_name}}' does not exist",
-      "requiredNotSet": "Required arguments not set! ({{required_not_set}})"
-    },
-    "exception": {
-      "invalidCommandArgumentsError": "Invalid command arguments",
-      "invalidCommandArugmentValueError": "Unexpected '{{arg_value}}' value!",
-      "invalidCommandDefinition": "Invalid command definition!",
-      "invalidInstructionError": "Invalid instruction",
-      "invalidNameError": "Invalid name '{{vname}}' at {{start}}:{{end}}",
-      "invalidTokenError": "Invalid token '{{vname}}' at {{start}}:{{end}}",
-      "invalidValueError": "Invalid value '{{value}}'",
-      "notExpectedCommandArgumentError": "Argument '{{arg_name}}' not expected at {{start}}:{{end}}",
-      "unknownCommandError": "Unknown Command '{{cmd_name}}' at {{start}}:{{end}}",
-      "unknownNameError": "Unknown name '{{vname}}' at {{start}}:{{end}}",
-      "unknownStoreValue": "Unknown store value '{{vname}}'"
-    },
-    "vmachine": {
-      "func": {
-        "definition": "Internal function",
-        "detail": "Internal function"
-      },
-      "unsafeRejected": "Command '{{cmd}}' rejected by user"
     }
   },
   "utilInjectResource": {

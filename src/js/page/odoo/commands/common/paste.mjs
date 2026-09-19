@@ -3,14 +3,14 @@
 // License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import i18n from 'i18next';
-import {ARG} from '@trash/constants';
+import {ARG} from '@tardo/trash/constants';
 import postMessage from '@common/utils/post_message';
 import searchCount from '@odoo/orm/search_count';
 import createRecord from '@odoo/orm/create_record';
 import writeRecord from '@odoo/orm/write_record';
 import Recordset from '@terminal/core/recordset';
-import isEmpty from '@trash/utils/is_empty';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import isEmpty from '@tardo/trash/utils/is_empty';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type {RecordDef} from '@terminal/core/recordset';
 import type Terminal from '@terminal/terminal';
 import type {MessageListenerData} from '@terminal/terminal';

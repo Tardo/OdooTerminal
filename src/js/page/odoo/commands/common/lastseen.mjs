@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import searchRead from '@odoo/orm/search_read';
-import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdLastSeen(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {

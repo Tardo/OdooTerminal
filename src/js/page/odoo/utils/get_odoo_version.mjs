@@ -4,7 +4,7 @@
 
 import getOdooSession from './get_odoo_session';
 import sanitizeOdooVersion from '@common/utils/sanitize_odoo_version';
-import isEmpty from '@trash/utils/is_empty';
+import isEmpty from '@tardo/trash/utils/is_empty';
 
 export type OdooVersionInfo = {
   raw: string,
