@@ -5,6 +5,7 @@
 import i18n from 'i18next';
 import doAction from '@odoo/base/do_action';
 import getParentAdapter from '@odoo/utils/get_parent_adapter';
+import getOdooEnvService from '@odoo/utils/get_odoo_env_service';
 import getOdooService from '@odoo/utils/get_odoo_service';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {getModelOptions} from '../common/__utils__';
@@ -39,11 +40,10 @@ function openSelectCreateDialog(
     return dialog.opened();
   }
 
-  const {Component} = owl;
   const select_create_dialog_obj = getOdooService('@web/views/view_dialogs/select_create_dialog');
   if (typeof select_create_dialog_obj !== 'undefined') {
     const {SelectCreateDialog} = select_create_dialog_obj;
-    Component.env.services.dialog.add(SelectCreateDialog, {
+    getOdooEnvService('dialog').add(SelectCreateDialog, {
       resModel: model,
       domain: domain,
       title: title,
