@@ -19,6 +19,7 @@ import getSessionInfo from '@odoo/net_utils/get_session_info';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import {startTechnicalModelObserver} from '@odoo/page_features/technical_model_name';
 import isBackOffice from '@odoo/utils/is_backoffice';
+import {setTranslator} from '@tardo/trash';
 import registerMathFuncs from '@tardo/trash/core/math/__all__';
 import registerTimeFuncs from '@tardo/trash/core/time/__all__';
 import registerNetFuncs from '@tardo/trash/core/net/__all__';
@@ -133,6 +134,7 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
 }
 
 function initTranslations(langpath: string, lang: string) {
+  setTranslator(i18n.t.bind(i18n));
   const lang_s = lang === 'auto' ? navigator.language : lang;
   return i18n.use(HttpApi).init({
     lng: lang_s,
