@@ -4,6 +4,7 @@
 
 import encodeHTML from '@terminal/utils/encode_html';
 import i18n from 'i18next';
+import renderIcon from './icon';
 
 export default function (PROMPT: string): string {
   return `<div class='terminal-user-input'>
@@ -19,7 +20,7 @@ export default function (PROMPT: string): string {
     </div>
     <div class='terminal-ai-attach-zone'>
       <button id='terminal_ai_attach_btn' class='terminal-ai-attach-btn' type='button' title='${i18n.t('terminal.tooltip.attachFile', 'Attach file')}'>
-        <i class='fa fa-paperclip'></i>
+        ${renderIcon('fa-paperclip')}
       </button>
     </div>
     <div class="terminal-prompt-container terminal-prompt-info">

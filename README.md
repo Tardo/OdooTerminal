@@ -21,7 +21,7 @@ The BFG10k for Odoo developers
 All the power of Odoo json-rpc in a really easy way!
 </p>
 
-This web extension adds a terminal-like to control Odoo (11 to 19). All implemented commands use the tools provided by
+This web extension adds a terminal-like to control Odoo (11 to 20). All implemented commands use the tools provided by
 the Odoo framework. An unwavering policy when developing this extension is to not modify or alter in any way the Odoo
 classes. This sometimes results in certain commands having reduced/increased capabilities depending on the Odoo version.
 
@@ -38,8 +38,8 @@ extension is ~24ms.
 
 # Usage
 
-When you visit an Odoo website, the browser action icon of the extension switches to the enabled state, indicating
-that the extension is ready to use on the current page.
+When you visit an Odoo website, the browser action icon of the extension switches to the enabled state, indicating that
+the extension is ready to use on the current page.
 
 Some commands are not available on the frontend. Use the `help` command to see what is available in the current context.
 
@@ -67,18 +67,18 @@ You can toggle terminal using one of these options:
 > A list is a string of values separated by commas, e.g. `"5, 15, 8"` (quotes included), or the array notation
 > `[5, 15, 8]`.
 
-> Commands can be called without named arguments, e.g.:
-> `create res.partner {name: 'Hipcut', street: 'Mystery street'}`. Positional arguments fill values in the order
-> they are defined. Mixing positional and named arguments is supported as long as the declaration order is respected.
+> Commands can be called without named arguments, e.g.: `create res.partner {name: 'Hipcut', street: 'Mystery street'}`.
+> Positional arguments fill values in the order they are defined. Mixing positional and named arguments is supported as
+> long as the declaration order is respected.
 
 ## Notes
 
-- The extension includes a **Preferences** page where you can add commands to run on every session. This is useful
-  for loading remote scripts or declaring custom aliases.
-- The extension uses an internal terminal context that extends the user context. By default it sets `active_test =
-  false` (see issue #14 for details). This context only affects terminal operations.
-- The screen buffer is capped at 750 lines. Queries returning more than 749 records will be truncated. This limit
-  exists to prevent excessive DOM node accumulation when rendering output as HTML.
+- The extension includes a **Preferences** page where you can add commands to run on every session. This is useful for
+  loading remote scripts or declaring custom aliases.
+- The extension uses an internal terminal context that extends the user context. By default it sets
+  `active_test = false` (see issue #14 for details). This context only affects terminal operations.
+- The screen buffer is capped at 750 lines. Queries returning more than 749 records will be truncated. This limit exists
+  to prevent excessive DOM node accumulation when rendering output as HTML.
 - Keyboard shortcuts can be remapped at `chrome://extensions/shortcuts`.
 
 ---

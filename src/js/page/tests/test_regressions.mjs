@@ -12,8 +12,33 @@ import * as session from '@terminal/core/storage/session';
 import stringifyReplacer from '@terminal/utils/stringify_replacer';
 import uniqueId from '@common/utils/unique_id';
 import streamLines from '@ai/utils/stream_lines';
+import renderIcon from '@terminal/templates/icon';
+import parseHTML from '@terminal/utils/parse_html';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
+import isCompatibleOdooVersion from '@common/utils/is_compatible_odoo_version';
 
 export default class TestRegressions extends TerminalTestSuite {
+  async test_terminal_icons() {
+    for (const version of ['19.0', '20.0', '20.0+e', 'saas~20.0']) {
+      this.assertTrue(isCompatibleOdooVersion(version));
+    }
+    const version = getOdooVersion('major');
+    const modern = typeof version === 'number' && version >= 20;
+    const spinner = parseHTML(renderIcon('fa-cog', 'fa-spin terminal-ai-conv-busy'));
+    this.assertTrue(spinner.classList.contains(modern ? 'oi-spin' : 'fa-spin'));
+    this.assertTrue(spinner.classList.contains('terminal-ai-conv-busy'));
+    const icons = this.terminal.el.querySelectorAll('.terminal-screen-info-zone i');
+    this.assertEqual(icons.length, 6);
+    for (const icon of icons) {
+      const style = getComputedStyle(icon, '::before');
+      this.assertTrue(!['none', 'normal', '""', "''"].includes(style.content), 'Toolbar icon must have a glyph');
+      this.assertTrue(style.fontFamily.includes(modern ? 'Material Symbols' : 'FontAwesome'));
+      // $FlowFixMe[prop-missing] The bundled DOM definitions omit the CSS Font Loading API.
+      const fonts = await document.fonts.load(`${style.fontSize} ${style.fontFamily}`);
+      this.assertTrue(fonts.length > 0, 'Icon font must load');
+    }
+  }
+
   async test_stream_odoo_response() {
     const response = await fetch('/web/login');
     this.assertTrue(response.ok);

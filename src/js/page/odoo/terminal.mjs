@@ -5,6 +5,7 @@
 import i18n from 'i18next';
 import logger from '@common/logger';
 import Terminal from '@terminal/terminal';
+import renderIcon from '@terminal/templates/icon';
 import Longpolling from './longpolling';
 import searchRead from './orm/search_read';
 import ParameterGenerator from './parameter_generator';
@@ -24,7 +25,7 @@ export default class OdooTerminal extends Terminal {
     if (typeof subscription !== 'undefined') {
       section = `${subscription}:`;
     }
-    const head_msg = `<strong>[<i class='fa fa-envelope-o'></i>][${local_now}] ${section}</strong>`;
+    const head_msg = `<strong>[${renderIcon('fa-envelope-o')}][${local_now}] ${section}</strong>`;
     if (notifications.constructor === Object) {
       this.screen.print(head_msg);
       this.screen.print(notifications, false);

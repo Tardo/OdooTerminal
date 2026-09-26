@@ -18,6 +18,7 @@ import searchRead from '@odoo/orm/search_read';
 import captureScreenshot from '@ai/utils/capture_screenshot';
 import describeCommandError from '@ai/utils/describe_command_error';
 import encodeHTML from '@terminal/utils/encode_html';
+import renderIcon from '@terminal/templates/icon';
 import stringifyReplacer from '@terminal/utils/stringify_replacer';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -460,7 +461,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         const safeCmd = encodeHTML(cmd);
         ctx.screen.print(
           i18n.t('cmdAI.agent.result.running', '[Agent] Running: <code>{{cmd}}</code>', {cmd}) +
-            ` <span class='agent-copy o_terminal_click' data-cmd='${safeCmd}' title='Copy'><i class='fa fa-copy'></i></span>`,
+            ` <span class='agent-copy o_terminal_click' data-cmd='${safeCmd}' title='Copy'>${renderIcon('fa-copy')}</span>`,
           false,
         );
 

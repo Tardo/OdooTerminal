@@ -3,6 +3,7 @@
 // License MIT (https://opensource.org/license/mit).
 
 import i18n from 'i18next';
+import renderIcon from './icon';
 
 export default function (): string {
   return (
@@ -11,7 +12,7 @@ export default function (): string {
     "<div class='terminal-ai-idle-orb'>" +
     "<div class='terminal-ai-idle-ring terminal-ai-idle-ring-outer'></div>" +
     "<div class='terminal-ai-idle-ring terminal-ai-idle-ring-inner'></div>" +
-    "<i class='fa fa-magic terminal-ai-idle-icon' aria-hidden='true'></i>" +
+    renderIcon('fa-magic', 'terminal-ai-idle-icon') +
     "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-1' aria-hidden='true'>✦</span>" +
     "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-2' aria-hidden='true'>✦</span>" +
     "<span class='terminal-ai-idle-spark terminal-ai-idle-spark-3' aria-hidden='true'>✦</span>" +
@@ -27,18 +28,18 @@ export default function (): string {
     "<div class='btn btn-sm terminal-ai-sysprompt-btn p-1' role='button' title='" +
     i18n.t('terminal.tooltip.customSystemPrompt', 'Custom system prompt') +
     "'>" +
-    "<i class='fa fa-sliders'></i>" +
+    renderIcon('fa-sliders') +
     '</div>' +
     "<div class='btn btn-sm terminal-ai-help-btn p-1' role='button' title='" +
     i18n.t('terminal.tooltip.aiTips', 'AI tips') +
     "'>" +
-    "<i class='fa fa-question-circle'></i>" +
+    renderIcon('fa-question-circle') +
     '</div>' +
     '</div>' +
     "<div class='btn btn-sm terminal-ai-new-conv p-1' role='button' title='" +
     i18n.t('terminal.tooltip.newConversation', 'New conversation') +
     "'>" +
-    "<i class='fa fa-plus'></i>" +
+    renderIcon('fa-plus') +
     '</div>' +
     '</div>' +
     "<div id='terminal_ai_sysprompt_panel' class='terminal-ai-sysprompt-panel'>" +
@@ -61,7 +62,7 @@ export default function (): string {
       'Reasoning effort for "thinking" models (openai provider only). "Off" asks local OpenAI-compatible servers to skip chain-of-thought.',
     ) +
     "'>" +
-    "<i class='fa fa-tachometer'></i>" +
+    renderIcon('fa-tachometer') +
     "<span class='terminal-ai-reasoning-btn-label'></span>" +
     '</div>' +
     "<div id='terminal_ai_reasoning_menu' class='terminal-ai-reasoning-menu'>" +
@@ -81,27 +82,27 @@ export default function (): string {
     "<div class='btn btn-sm btn-dark terminal-screen-icon-debug p-2' role='button' title='" +
     i18n.t('terminal.tooltip.debug', 'Toggle debug mode') +
     "'>" +
-    "<i class='fa fa-bug'></i>" +
+    renderIcon('fa-bug') +
     '</div>' +
     "<div class='btn btn-sm btn-dark border-warning mr-5 me-5 terminal-screen-icon-reload-shell p-2' role='button' title='" +
     i18n.t('terminal.tooltip.reloadShell', 'Reload Shell') +
     "'>" +
-    "<i class='fa fa-refresh'></i>" +
+    renderIcon('fa-refresh') +
     '</div>' +
     "<div class='btn btn-sm btn-dark terminal-screen-icon-maximize p-2 rounded-left' role='button' title='" +
     i18n.t('terminal.tooltip.maximize', 'Maximize') +
     "'>" +
-    "<i class='fa fa-window-maximize'></i>" +
+    renderIcon('fa-window-maximize') +
     '</div>' +
     "<div class='btn btn-sm btn-dark terminal-screen-icon-pin p-2 rounded-0' role='button' title='" +
     i18n.t('terminal.tooltip.pin', 'Pin') +
     "'>" +
-    "<i class='fa fa-map-pin'></i>" +
+    renderIcon('fa-map-pin') +
     '</div>' +
     "<div class='btn btn-sm btn-dark terminal-multiline p-2 rounded-0' role='button' title='" +
     i18n.t('terminal.tooltip.multiLine', 'Multi-line') +
     "'>" +
-    "<i class='fa fa-code'></i>" +
+    renderIcon('fa-code') +
     '</div>' +
     "<div class='btn btn-sm btn-dark terminal-screen-icon-ai-mode p-2 rounded-right' role='button' title='" +
     i18n.t('terminal.tooltip.aiMode', 'AI Mode') +
@@ -109,7 +110,7 @@ export default function (): string {
     "<span class='terminal-ai-btn-sparkle' aria-hidden='true'>✦</span>" +
     "<span class='terminal-ai-btn-sparkle' aria-hidden='true'>✦</span>" +
     "<span class='terminal-ai-btn-sparkle' aria-hidden='true'>✦</span>" +
-    "<i class='fa fa-magic'></i>" +
+    renderIcon('fa-magic') +
     '</div>' +
     '</div>' +
     '</div>'

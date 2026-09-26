@@ -3,6 +3,7 @@
 // License MIT (https://opensource.org/license/mit).
 
 import i18n from 'i18next';
+import renderIcon from './icon';
 
 export default function (): string {
   return (
@@ -11,7 +12,7 @@ export default function (): string {
     "'>" +
     "<div class='terminal-watchdog-bubble'></div>" +
     "<div class='terminal-watchdog-orb'>" +
-    "<i class='fa fa-magic terminal-watchdog-icon' aria-hidden='true'></i>" +
+    renderIcon('fa-magic', 'terminal-watchdog-icon') +
     '</div>' +
     '</div>'
   );

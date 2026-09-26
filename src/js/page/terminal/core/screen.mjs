@@ -16,6 +16,7 @@ import renderLine from '@terminal/templates/screen_line';
 import renderTable from '@terminal/templates/screen_table';
 import renderUserInput from '@terminal/templates/screen_user_input';
 import parseHTML from '@terminal/utils/parse_html';
+import renderIcon from '@terminal/templates/icon';
 import debounce from '@terminal/utils/debounce';
 import defer from '@terminal/utils/defer';
 import encodeHTML from '@terminal/utils/encode_html';
@@ -431,7 +432,7 @@ export default class Screen {
         return `<span class="terminal-attach-bubble terminal-attach-sent"><img class="terminal-attach-thumb" alt="${escapedName}" src="${src}" /><span class="terminal-attach-name">${escapedName}</span></span>`;
       }
       const icon = this.#mimeToIcon(att.media_type);
-      return `<span class="terminal-attach-bubble terminal-attach-sent"><i class="fa ${icon} terminal-attach-icon"></i><span class="terminal-attach-name">${escapedName}</span></span>`;
+      return `<span class="terminal-attach-bubble terminal-attach-sent">${renderIcon(icon, 'terminal-attach-icon')}<span class="terminal-attach-name">${escapedName}</span></span>`;
     });
     this.print(`<span class="terminal-ai-sent-attachments">${parts.join('')}</span>`);
   }
@@ -791,7 +792,7 @@ export default class Screen {
     const uploadBtn = document.createElement('button');
     uploadBtn.className = 'terminal-ai-attach-submenu-item';
     uploadBtn.type = 'button';
-    uploadBtn.append(...Array.from(parseHTML(`<span><i class='fa fa-upload'></i> ${i18n.t('terminal.ai.attachUpload', 'Upload file')}</span>`).childNodes));
+    uploadBtn.append(...Array.from(parseHTML(`<span>${renderIcon('fa-upload')} ${i18n.t('terminal.ai.attachUpload', 'Upload file')}</span>`).childNodes));
     uploadBtn.addEventListener('click', () => {
       this.#closeAttachMenu();
       if (Object.hasOwn(this.#options, 'onAttachFile') && typeof this.#options.onAttachFile === 'function') {
@@ -806,7 +807,7 @@ export default class Screen {
 
     const groupHeader = document.createElement('div');
     groupHeader.className = 'terminal-ai-attach-submenu-group-header';
-    groupHeader.append(...Array.from(parseHTML(`<span><i class='fa fa-camera'></i> ${i18n.t('terminal.ai.attachScreenshot', 'Screenshot')} <i class='fa fa-caret-right'></i></span>`).childNodes));
+    groupHeader.append(...Array.from(parseHTML(`<span>${renderIcon('fa-camera')} ${i18n.t('terminal.ai.attachScreenshot', 'Screenshot')} ${renderIcon('fa-caret-right')}</span>`).childNodes));
     screenshotGroup.append(groupHeader);
 
     const subMenu = document.createElement('div');
@@ -815,7 +816,7 @@ export default class Screen {
     const viewportBtn = document.createElement('button');
     viewportBtn.className = 'terminal-ai-attach-submenu-item';
     viewportBtn.type = 'button';
-    viewportBtn.append(...Array.from(parseHTML(`<span><i class='fa fa-desktop'></i> ${i18n.t('terminal.ai.attachScreenshotViewport', 'Full viewport')}</span>`).childNodes));
+    viewportBtn.append(...Array.from(parseHTML(`<span>${renderIcon('fa-desktop')} ${i18n.t('terminal.ai.attachScreenshotViewport', 'Full viewport')}</span>`).childNodes));
     viewportBtn.addEventListener('click', () => {
       this.#closeAttachMenu();
       if (Object.hasOwn(this.#options, 'onScreenshotViewport') && typeof this.#options.onScreenshotViewport === 'function') {
@@ -827,7 +828,7 @@ export default class Screen {
     const pickBtn = document.createElement('button');
     pickBtn.className = 'terminal-ai-attach-submenu-item';
     pickBtn.type = 'button';
-    pickBtn.append(...Array.from(parseHTML(`<span><i class='fa fa-crosshairs'></i> ${i18n.t('terminal.ai.attachScreenshotPick', 'Select element')}</span>`).childNodes));
+    pickBtn.append(...Array.from(parseHTML(`<span>${renderIcon('fa-crosshairs')} ${i18n.t('terminal.ai.attachScreenshotPick', 'Select element')}</span>`).childNodes));
     pickBtn.addEventListener('click', () => {
       this.#closeAttachMenu();
       if (Object.hasOwn(this.#options, 'onScreenshotPick') && typeof this.#options.onScreenshotPick === 'function') {
@@ -909,7 +910,7 @@ export default class Screen {
     }
   }
 
-  #mimeToIcon(mediaType: string): string {
+  #mimeToIcon(mediaType: string): Parameters<typeof renderIcon>[0] {
     if (mediaType.startsWith('image/')) {
       return 'fa-file-image-o';
     }
@@ -971,8 +972,7 @@ export default class Screen {
       });
       bubble.append(img, removeBtn, nameEl);
     } else {
-      const icon = document.createElement('i');
-      icon.className = `fa ${this.#mimeToIcon(att.media_type)} terminal-attach-icon`;
+      const icon = parseHTML(renderIcon(this.#mimeToIcon(att.media_type), 'terminal-attach-icon'));
       bubble.append(icon, removeBtn, nameEl);
     }
 
