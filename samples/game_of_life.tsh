@@ -1,7 +1,6 @@
 // min-v 14.1.0; group none
 // Conway's Game of Life
-// Draw calls are batched per frame and the loop is driven by 2d_handle_loop,
-// so rendering stays in sync with the browser drawing cycle.
+// Draw calls are batched per frame; the loop uses browser timestamps to cap rendering at 30 FPS.
 
 $POS_CHECK = [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]]
 $POS_CHECK_LEN = $POS_CHECK['length']
@@ -54,6 +53,7 @@ $NUM_CELLS_ROW = (floor $WIN_WIDTH / $CELL_S)
 $NUM_CELLS_COL = (floor $WIN_HEIGHT / $CELL_S)
 $TOTAL_CELLS = $NUM_CELLS_ROW * $NUM_CELLS_COL
 $MAX_ITERATIONS = 150
+$FRAME_INTERVAL = 1000 / 30
 
 $grid = []
 // Populate Grid
@@ -61,11 +61,27 @@ for ($i = 0; $i < $TOTAL_CELLS; $i += 1) {
   arr_append $grid (rand 0 1)
 }
 
+$last_frame_time = -1
+$iterations = 0
 $draw_frame = function (time, delta, count) {
+  if ($last_frame_time != -1) {
+    $elapsed = $time - $last_frame_time
+    if ($elapsed < $FRAME_INTERVAL) {
+      return
+    }
+    $last_frame_time = $time
+  } else {
+    $last_frame_time = $time
+  }
+
   2d_clear -c $win
   draw_grid_state $grid $NUM_CELLS_ROW $CELL_S
   $grid = (get_new_grid_state $grid $NUM_CELLS_ROW $NUM_CELLS_COL $CELL_S)
+  $iterations += 1
+  if ($iterations >= $MAX_ITERATIONS) {
+    return false
+  }
 }
 
-2d_handle_loop -c $win -f $draw_frame -mf $MAX_ITERATIONS
+2d_handle_loop -c $win -f $draw_frame
 2d_destroy_window $win
