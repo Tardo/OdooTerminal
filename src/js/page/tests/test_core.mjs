@@ -153,9 +153,7 @@ export default class TestCore extends TerminalTestSuite {
     await shell.eval('$reload_probe = 42');
     await shell.eval('function reload_probe_fn() { return 7 }');
     this.assertTrue(Object.hasOwn(previousVM.getRegisteredCmds(), 'reload_probe_fn'));
-    const reloadButton = this.terminal.el.querySelector('.terminal-screen-icon-reload-shell');
-    this.assertTrue(reloadButton instanceof HTMLElement);
-    if (reloadButton instanceof HTMLElement) reloadButton.click();
+    await this.terminal.reloadShell();
 
     this.assertNotEqual(shell.getVM(), previousVM);
     this.assertEqual(shell.getVM().options.maxInstructions, previousVM.options.maxInstructions);
@@ -169,6 +167,8 @@ export default class TestCore extends TerminalTestSuite {
       missing = true;
     }
     this.assertTrue(missing, 'Reload must discard VM globals');
+    this.assertTrue(await this.terminal.execute('$$UID', false, true) > 0);
+    this.assertEqual(await this.terminal.execute('$$UNAME', false, true), 'admin');
   }
 
   async test_print() {

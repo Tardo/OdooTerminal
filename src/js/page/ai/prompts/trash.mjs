@@ -81,13 +81,19 @@ export function buildScriptingPrompt(): string {
     '    for ($i = 0; $i < 10; $i++) { ... }      C-style ($i++ ←→ $i += 1, $i-- ←→ $i -= 1)\n' +
     '    for ($item in $items) { ... }            for-in: $items must be an ARRAY (or string), NOT a dict; "of" does not exist\n' +
     '    break exits the INNERMOST loop only; continue skips to the next iteration.\n' +
-    '    silent before commands inside loops suppresses output clutter.\n' +
+    '    Initialize accumulators BEFORE the loop/block so their values remain available afterwards.\n' +
+    '    Agent calls already suppress command output; silent is NOT error recovery: callback errors still propagate in run_command.\n' +
+    '    Keep loops bounded; execution, collection, string, and nesting limits apply. Prefer filtered queries to fetching everything.\n' +
     '  return: exits the current function (or script) with a value.\n' +
     '\n' +
     '=== 11. FUNCTIONS ===\n' +
     '  * Named (call by name, no $):   function myFunc(a, b) { return $b - $a }   →   myFunc 10 2   → -8\n' +
     '  * Anonymous stored in variable: $fn = function(a, b) { return $b - $a }\n' +
     '      $$fn 10 2   → -8  (COMMAND position)        ($$fn 10 2)   → -8  (inside a subexpression)\n' +
+    '  * TraSH 2.2.0 uses LEXICAL scope: functions capture the environment where they are DEFINED, not caller-local variables.\n' +
+    '      Assignments update the nearest existing binding; parameters shadow outer names. Captured bindings are shared, not copied.\n' +
+    '      Pass caller-specific values as explicit arguments. Closures keep their captured variables after the defining call ends.\n' +
+    '      Named functions cannot replace existing commands. Prefer $fn = function(...) { ... } for helpers you may redefine.\n' +
     '  * $$ call rules — position matters:\n' +
     '    COMMAND position (first token of a statement or after ;): $$fn arg1 arg2 — following tokens are arguments, call fires at end-of-statement.\n' +
     '    ARGUMENT position (NOT the first token) — depends on the function signature:\n' +
@@ -99,15 +105,19 @@ export function buildScriptingPrompt(): string {
     '      calc 5 "test" → 210 (default)        calc 5 "test" 10 → 50\n' +
     '  * Callbacks for higher-order functions:\n' +
     '      Inline anonymous (always correct):  $doubled = (arr_map $nums (function (item) { return $item * 2 }))\n' +
-    '      Variable reference with $ (always correct):  $sq = function (x) { return $x * $x }; $res = (arr_map [1,2,3] $sq)\n' +
-    '      Variable reference with $$ (correct when the function has ≥1 parameters):  (arr_map [1,2,3] $$sq)\n' +
+    '      Prefer $fn for ALL callback references, including zero-parameter callbacks: $sq = function (x) { return $x * $x }; arr_map [1,2,3] $sq\n' +
+    '      $$fn is for invocation; using it for a zero-parameter callback invokes it too early.\n' +
+    '      Callbacks apply parameter validation/defaults; extra helper-supplied arguments are ignored when not declared.\n' +
     '\n' +
     '=== 12. BUILT-IN STDLIB ===\n' +
-    '  Arrays (mutate in-place):\n' +
+    '  Arrays (arr_append/arr_prepend mutate in-place; transformations below return new arrays):\n' +
     '    arr_append $arr $item · arr_prepend $arr $item · $copy = (arr_clone $arr) · $str = (arr_join $arr ",")  (separator optional, default none)\n' +
     '    $res = (arr_map $arr (function (item) { return $item * 2 }))\n' +
     '    $res = (arr_filter $arr (function (item) { return $item > 0 }))\n' +
     '    $res = (arr_reduce $arr 0 (function (a, b) { return $a + $b }))\n' +
+    '    (arr_slice $arr 1 3) → shallow slice [1,3), end optional, negative indices allowed\n' +
+    '    (arr_includes $arr $value) → boolean · (arr_reverse $arr) · (arr_unique $arr) → first occurrence order\n' +
+    '    includes/unique do not coerce types; objects compare by identity. Use plain arrays for these helpers.\n' +
     '  Dictionaries (dict_set/dict_remove mutate in-place, others do not):\n' +
     '    $keys = (dict_keys $dict) · $values = (dict_values $dict) · $pairs = (dict_entries $dict)  → array of [key, value]\n' +
     '    (dict_has $dict "k") → boolean · (dict_get $dict "k" $default) · (dict_size $dict) → number of keys\n' +
@@ -119,25 +129,35 @@ export function buildScriptingPrompt(): string {
     '    (str_includes -s $str -n "needle") · (str_starts -s $str -p "prefix") · (str_ends -s $str -u "suffix")  → booleans\n' +
     '  Math:\n' +
     '    floor -n 12.9 → 12 · abs -n -5 → 5 · pow -b 2 -e 5 → 32 · rand -mi 1 -ma 10 → random integer in [1, 10]\n' +
+    '    ceil -n -1.8 → -1 · round -n -1.5 → -1 (ties toward +infinity) · trunc -n -1.8 → -1\n' +
     '    fixed -n 3.7 -d 0 → 4   (rounds via .toFixed(d), then truncates to INTEGER — never returns decimals)\n' +
     '  Time:      sleep -t 500  (pause 500 ms) · $ts = (pnow)  high-resolution ms timestamp\n' +
     '  Encoding:  $enc = (encode -v "hello" -m b64) · $dec = (decode -v "aGVsbG8=" -m b64)\n' +
-    '  Network:   $res = (fetch -u "/web/dataset/call_kw" -o {method:"POST"} -t 5000) → Response object, or null on timeout. Use with caution.\n' +
+    '  Network:   $res = (fetch -u "/web/dataset/call_kw" -o {method:"POST"} -t 5000) → native Response, or null on timeout. Its inherited methods are not script-accessible; prefer Odoo commands for ORM/RPC data.\n' +
     '\n' +
     '=== 13. COMPLETE EXAMPLES ===\n' +
-    '  // Sum all sale order totals\n' +
-    '  $rows = (search -m sale.order -f amount_total -all)\n' +
+    '  // Conditional value: only the selected branch executes\n' +
+    '  $qty = 0; $total = 120; $average = $qty > 0 ? $total / $qty : 0; $average\n' +
+    '\n' +
+    '  // Lexical closure: the caller parameter does not replace the captured $factor\n' +
+    '  $factor = 2; $scale = function (n) { return $n * $factor }\n' +
+    '  $caller = function (factor) { return ($$scale 3) }; $$caller 100  // returns 6\n' +
+    '\n' +
+    '  // Sum a bounded sample (NOT the full model total); verify amount_total with caf first\n' +
+    '  $rows = (search -m sale.order -f amount_total -l 100)\n' +
     '  $total = 0\n' +
     '  for ($i = 0; $i < $rows["length"]; $i += 1) { $total += $rows[$i]["amount_total"] }\n' +
-    '  print -m "Total: " + $total\n' +
+    '  $total  // expose the computed value to run_command\n' +
     '\n' +
-    '  // Count sale orders per state — array literal + loop + domain variable\n' +
-    '  $states = ["draft", "sale", "done", "cancel"]\n' +
+    '  // Count sale orders per state — use state values verified on this instance\n' +
+    '  $states = ["draft", "sale", "cancel"]\n' +
+    '  $counts = {}\n' +
     '  for ($i = 0; $i < $states["length"]; $i += 1) {\n' +
     '    $s = $states[$i]\n' +
     '    $n = (count -m sale.order -d [["state","=",$s]])\n' +
-    '    print -m $s + ": " + $n\n' +
+    '    $counts[$s] = $n\n' +
     '  }\n' +
+    '  $counts\n' +
     '\n' +
     '  // Create & read back: capture ID from create, then read the record\n' +
     '  $r = (create res.partner -v {name:"Test"})\n' +
@@ -180,25 +200,28 @@ export default function(terminal: Terminal): string {
     .join('\n');
 
   return (
-    'TraSH scripting language — follow strictly:\n' +
+    'TraSH 2.2.0 scripting language with @tardo/trash-stdlib 2.0.0 — follow strictly. This is NOT JavaScript or Python.\n' +
     '\n' +
     '!!! FUNDAMENTAL RULES !!!\n' +
     '\n' +
     '[RULE 1 — SCRIPT RESULTS]\n' +
-    'A CMD script returns the result of EACH top-level statement (one not nested inside an assignment, a subcommand () or a block {}):\n' +
+    'Pass raw TraSH source in run_command.cmd, without a CMD: prefix or Markdown fences.\n' +
+    'A script returns the result of EACH top-level value-producing statement (one not nested inside an assignment, a subcommand () or a block {}):\n' +
     '  • ONE top-level statement → you receive its value directly.\n' +
     '  • TWO OR MORE → you receive a JSON array, one entry per statement, in order.\n' +
     'Assignments ($var = ...) execute but return NOTHING — only assign when $var is reused LATER; a one-off value needs no variable:\n' +
-    '  WRONG:    CMD: $products = (search -m product.product -f name -l 10)             → "(command executed, no return value)"\n' +
-    '  NEEDLESS: CMD: $products = (search -m product.product -f name -l 10); $products  → works, but pointless — nothing reuses $products\n' +
-    '  CORRECT:  CMD: search -m product.product -f name -l 10                           → same result, no $var needed\n' +
-    'ONE CMD per turn — never send multiple CMD lines; combine statements with ";":\n' +
-    '  CMD: search -m res.partner -f name -l 5; count -m res.partner   → [<partners array>, <count>]\n' +
+    '  WRONG:    $products = (search -m product.product -f name -l 10)             → "(command executed, no return value)"\n' +
+    '  NEEDLESS: $products = (search -m product.product -f name -l 10); $products  → works, but pointless — nothing reuses $products\n' +
+    '  CORRECT:  search -m product.product -f name -l 10                           → same result, no $var needed\n' +
+    'Use one run_command call per step; combine known operations with ";", then inspect the result before dependent discovery steps:\n' +
+    '  search -m res.partner -f name -l 5; count -m res.partner   → [<partners array>, <count>]\n' +
+    'For computations, end with $result or a compact dict/array of needed values. Variables persist in this terminal until reset; only reuse bindings you have actually defined.\n' +
     '\n' +
-    '[RULE 2 — NO TERNARY OPERATOR]\n' +
-    '"condition ? a : b" is a SYNTAX ERROR. Use if/else:\n' +
-    '  FORBIDDEN: $val = ($x > 5) ? "big" : "small"\n' +
-    '  REQUIRED:  if ($x > 5) { $val = "big" } else { $val = "small" }\n' +
+    '[RULE 2 — CONDITIONAL EXPRESSIONS]\n' +
+    'TraSH 2.2.0 supports condition ? value_if_true : value_if_false; ONLY the selected branch executes.\n' +
+    '  $val = $x > 5 ? "big" : "small"\n' +
+    'It has lower precedence than arithmetic/comparisons/logic and nests right-to-left. Parenthesize it in command arguments: print -m ($x > 5 ? "big" : "small").\n' +
+    'Use if/elif/else with braces for multi-statement branches.\n' +
     '\n' +
     '[RULE 3 — LOOP FORMS]\n' +
     '  for ($i = 0; $i < 10; $i++) { ... }     C-style\n' +
@@ -206,14 +229,15 @@ export default function(terminal: Terminal): string {
     '"for ($x of ...)" does NOT exist — use "in".\n' +
     '\n' +
     '=== 1. SYNTAX BASICS ===\n' +
-    '  * ";" and newline are equivalent statement separators. Comments: // line   /* block */\n' +
+    '  * ";" and newline are equivalent statement separators. Comments: // line   /* block */ — start at input start or after whitespace, outside strings.\n' +
     '  * Reserved keywords: true false null undefined for function return if elif else silent continue break\n' +
     '\n' +
     '=== 2. LITERALS ===\n' +
     '  * Numbers: 42  -7  3.14 · Strings: "x" or \'x\' (escapes \\" \\\' \\\\ \\n; unknown escapes kept as-is) · true false null undefined\n' +
     '  * Accessing a missing dict key or array index yields undefined (comparable: $d["nope"] == undefined).\n' +
+    '  * Only own properties are readable; inherited JS/DOM methods are unavailable. Keys must be strings/numbers; __proto__, constructor, prototype are forbidden.\n' +
     '  * Arrays [1, [2, 3], "x"] and dicts {key: "val", num: 42} — nesting allowed.\n' +
-    '  * Dict keys can be expressions: {"key" + $suffix: $val}. Subcommands allowed inside literals: {name: (gen -mi 1 -ma 4)}\n' +
+    '  * Dict keys can be expressions: {"key" + $suffix: $val}. Subcommands allowed inside literals: {total: (count -m res.partner)}\n' +
     '\n' +
     '=== 3. VARIABLES ===\n' +
     '  * $var = value · capture command output: $var = (command ...)\n' +
@@ -235,15 +259,16 @@ export default function(terminal: Terminal): string {
     '\n' +
     '=== 6. ARGUMENTS & QUOTING ===\n' +
     '  * Positional args fill in definition order (create res.partner {name: "Test"}); named flags may mix with them if positional order is preserved.\n' +
+    '  * Flags use -short or --long (e.g. -m or --model), NOT -model.\n' +
     '  * QUOTING (MANDATORY): ANY argument value containing spaces MUST be quoted — every command, every argument type.\n' +
     '    CORRECT: search -m res.partner -o "id DESC, name"      WRONG: search -m res.partner -o id DESC, name  ← "DESC," becomes a 3rd arg\n' +
     '  * List arguments, two equivalent forms: name,display_name (items without spaces) or [name, display_name] (bare words are strings; variables need $).\n' +
     '    WRONG: -f name,display name  ← the space makes "name" a 3rd positional arg\n' +
     '\n' +
     '=== 7. SYSTEM HELPERS ($$RMOD, $$RID, $$UID, $$UNAME) ===\n' +
-    '  * Zero-parameter functions, auto-called when used as arguments. NEVER quote them, NEVER embed inside arrays/dicts/domains:\n' +
-    '    CORRECT:   search -m $$RMOD -d [["active","=",true]] · print -m "user: " + $$UNAME\n' +
-    '    FORBIDDEN: [["partner_id","=",$$RID]] → use: $id = $$RID; search -m sale.order -d [["partner_id","=",$id]]\n' +
+    '  * Zero-parameter functions, auto-called in value position, including arrays/dicts/domains. NEVER quote them.\n' +
+    '    search -m $$RMOD -d [["id","=",$$RID]] · {user_id: $$UID} · print -m "user: " + $$UNAME\n' +
+    '    $$RID is the current record ID in $$RMOD, NOT automatically a partner/user ID. Capture once in $id if reused.\n' +
     '\n' +
     '=== 8. SUBCOMMAND CALLS & NESTING ===\n' +
     '  * Wrap in (): $val = (search -m res.partner -l 1) · chain access: (search -m res.partner -f name)[0]["name"]\n' +
@@ -257,10 +282,10 @@ export default function(terminal: Terminal): string {
     '  * MULTI (search without -l 1): count $res["length"] (NEVER $res["ids"]["length"]); items $res[0]["field"]; IDs only $res["ids"] (plain number array).\n' +
     '  * NEVER pass a full recordset to print — extract fields: print -m "x: " + $rs[0]["name"] (or iterate with a for loop).\n' +
     '\n' +
-    '=== DOMAINS (-d/-domain args) ===\n' +
+    '=== DOMAINS (-d/--domain args) ===\n' +
     '  * Array of [field, operator, value] tuples; consecutive tuples are AND by default: [["state","=","draft"],["active","=",true]]\n' +
     '  * OR joins the NEXT two terms (prefix "|", Polish notation), NOT wraps ONE term (prefix "!"):\n' +
-    '    [["|",["priority","=","1"],["priority","=","2"]]]  → priority is 1 OR 2\n' +
+    '    ["|",["priority","=","1"],["priority","=","2"]]  → priority is 1 OR 2\n' +
     '    [["state","=","draft"],"!",["priority","=","0"]]   → state=draft AND NOT priority=0\n' +
     '  * Operators: = != > < >= <= like ilike not like not ilike in not in child_of parent_of\n' +
     '  * Related fields: dot path — [["partner_id.country_id.code","=","ES"]]\n' +
@@ -269,7 +294,7 @@ export default function(terminal: Terminal): string {
     '(§10–§13: control flow, functions, stdlib, examples → load skill "trash-syntax" before writing scripts with loops, functions, or stdlib calls)\n' +
     '\n' +
     '=== AVAILABLE COMMANDS (SYNTAX NOTATION) ===\n' +
-    'Notation: <-flag/name type=default> required, [-flag/name type=default] optional\n' +
+    'Notation: <-flag/name type=default> required, [-flag/name type=default] optional; -flag/name means either -flag or --name, never type the slash.\n' +
     'Types: str, num, flag, dict, any, [x]=list of x, str(a|b)=enum\n' +
     'Core commands — always available, no preloading needed:\n' +
     lines.join('\n') +

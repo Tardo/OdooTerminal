@@ -11,6 +11,7 @@ const content: string =
   'Draw charts and diagrams on a floating canvas window. Origin is top-left, +Y goes DOWN. Colors are CSS strings.\n' +
   '\n' +
   '## Workflow\n' +
+  'Load trash-syntax before using the loops, callbacks, or math helpers below.\n' +
   '```\n' +
   "$win = (2d_create_window -w 500 -h 300 --centered)\n" +
   '// ...draw calls... They are batched and painted automatically on the next browser frame.\n' +
@@ -35,7 +36,7 @@ const content: string =
   '- `2d_circle -c $win -x N -y N -r N -cc COLOR` — filled circle (scatter points). `-sa DEG -ea DEG` draws a pie slice (angles clockwise from 3 o\'clock); `--stroke -w N` outlines instead of filling.\n' +
   '- `2d_text -c $win -t "label" -x N -y N -tc COLOR -f "12px sans-serif"` — text; x/y is the BOTTOM-left of the text.\n' +
   '- `2d_clear -c $win` — clear everything (or a region with -x -y -w -h).\n' +
-  '- `2d_handle_loop -c $win -f $$fn -mf N` — run $$fn once per browser frame (animations, see below).\n' +
+  '- `2d_handle_loop -c $win -f $fn -mf N` — pass the function value, run it once per browser frame (animations, see below).\n' +
   '- `2d_next_frame` — waits for the next browser frame, returns its timestamp in ms. Low-level; prefer 2d_handle_loop for animations.\n' +
   '\n' +
   '## Example: bar chart with labels\n' +
@@ -59,18 +60,19 @@ const content: string =
   '```\n' +
   '$tick = function (time, delta, count) {\n' +
   '  2d_clear -c $win\n' +
-  '  // ...draw this frame. State kept in outer $vars persists between frames.\n' +
+  '  // ...draw this frame. Initialize shared state before defining this lexical closure.\n' +
   '}\n' +
-  '2d_handle_loop -c $win -f $$tick -mf 300\n' +
+  '2d_handle_loop -c $win -f $tick -mf 300\n' +
   '```\n' +
   'The function runs once per browser frame with (time ms, delta ms, frame count); the loop stops at --max-frames, ' +
   'when the window is destroyed, or when the function returns false. It returns the frames run.\n' +
+  'Use $tick, not $$tick, to pass callbacks reliably even when they declare no parameters. Captured outer variables persist between frames; caller-local variables are not visible.\n' +
   'ALWAYS pass -mf (60 frames ≈ 1 s): an unbounded loop would never return control to you.\n';
 
 const skill: SkillDef = {
   name: 'graphics',
   description:
-    '2D drawing on a floating canvas window: bar/line/pie charts, diagrams and animations (2d_rect, 2d_line, 2d_poly, 2d_circle, 2d_text, 2d_next_frame). Load before ANY drawing/chart request.',
+    '2D drawing on a floating canvas window: custom charts, diagrams and animations (2d_rect, 2d_line, 2d_poly, 2d_circle, 2d_text, 2d_next_frame). Load before canvas drawing; native Odoo graph/pivot views do not need this skill.',
   content: (): string => content,
 };
 

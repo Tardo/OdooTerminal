@@ -5,81 +5,8 @@
 import i18n from 'i18next';
 import {DEFAULT_MAX_TOKENS} from '@ai/constants';
 import {backgroundFetch} from '@ai/utils/relay_fetch';
-import {formatHTTPError} from '@ai/utils/network';
-
-
-function toOpenAIMessages(messages: Array<AIMessage>): Array<{[string]: mixed}> {
-  const result: Array<{[string]: mixed}> = [];
-  for (const msg of messages) {
-    const {role, content} = msg;
-    if (typeof content === 'string') {
-      result.push({role, content});
-      continue;
-    }
-    if (role === 'assistant') {
-      let textContent = '';
-      const toolCalls: Array<{[string]: mixed}> = [];
-      for (const block of content) {
-        if (block.type === 'text') {
-          textContent += block.text;
-        } else if (block.type === 'tool_use') {
-          toolCalls.push({
-            id: block.id,
-            type: 'function',
-            function: {name: block.name, arguments: JSON.stringify(block.input)},
-          });
-        }
-      }
-      if (toolCalls.length > 0) {
-        // $FlowFixMe[incompatible-call]
-        result.push({role: 'assistant', content: textContent || null, tool_calls: toolCalls});
-      } else {
-        result.push({role: 'assistant', content: textContent});
-      }
-    } else if (role === 'user') {
-      const textParts: Array<string> = [];
-      const imageParts: Array<{[string]: mixed}> = [];
-      for (const block of content) {
-        if (block.type === 'tool_result') {
-          result.push({role: 'tool', tool_call_id: block.tool_use_id, content: block.content});
-        } else if (block.type === 'text') {
-          textParts.push(block.text);
-        } else if (block.type === 'image') {
-          imageParts.push({
-            type: 'image_url',
-            image_url: {url: `data:${block.source.media_type};base64,${block.source.data}`},
-          });
-        } else if (block.type === 'document') {
-          // OpenAI chat API has no native inline document block; include as text notice
-          textParts.push(`[PDF document attached — inline PDF is not supported by this provider]`);
-        }
-      }
-      if (textParts.length > 0 || imageParts.length > 0) {
-        if (imageParts.length === 0) {
-          result.push({role: 'user', content: textParts.join('')});
-        } else {
-          const parts: Array<{[string]: mixed}> = [];
-          if (textParts.length > 0) {
-            parts.push({type: 'text', text: textParts.join('')});
-          }
-          parts.push(...imageParts);
-          result.push({role: 'user', content: parts});
-        }
-      }
-    } else {
-      // system and other roles: extract text content
-      let textContent = '';
-      for (const block of content) {
-        if (block.type === 'text') {
-          textContent += block.text;
-        }
-      }
-      result.push({role, content: textContent});
-    }
-  }
-  return result;
-}
-
+import streamLines from '@ai/utils/stream_lines';
+import toChatMessages from '@ai/utils/chat_messages';
 
 export default async function streamRequestOpenAI(
   url: string,
@@ -109,7 +36,7 @@ export default async function streamRequestOpenAI(
 
   const body: {[string]: mixed} = {
     model,
-    messages: toOpenAIMessages(messages),
+    messages: toChatMessages(messages),
     stream: true,
     stream_options: {include_usage: true},
     max_tokens: maxTokens !== null && maxTokens !== undefined ? maxTokens : DEFAULT_MAX_TOKENS,
@@ -139,85 +66,52 @@ export default async function streamRequestOpenAI(
     signal,
   );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(formatHTTPError(response.status, errorText));
-  }
-
-  if (!response.body) {
-    throw new Error(i18n.t('ai.utils.network.error.noStream', 'Server did not return a streaming response'));
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
   let fullResponse = '';
-  // Reasoning models on llama.cpp/DeepSeek-style backends stream their chain-of-thought as this
-  // SEPARATE delta field, not inline in `content` — previously dropped entirely, which made a
-  // response that was 100% reasoning look identical to a genuinely empty one. Captured (not fed
-  // to onDelta — it's not the answer) so callers can tell the difference. See reasoningEffort
-  // above to suppress it instead.
+  // Keep reasoning separate from the answer so callers can distinguish reasoning-only replies.
   let reasoningResponse = '';
-  let buffer = '';
   let usage: ?TokenUsage = null;
 
   const toolCallsAccum: Map<number, {id: string, name: string, argsAccum: string}> = new Map();
 
-  while (true) {
-    const {done, value} = await reader.read();
-    if (done) {
-      break;
+  for await (const trimmed of streamLines(response)) {
+    if (!trimmed || trimmed === 'data: [DONE]' || !trimmed.startsWith('data: ')) {
+      continue;
     }
 
-    const chunk = decoder.decode(
-      value !== null && value !== undefined ? value : new Uint8Array(0),
-      {stream: true},
-    );
-
-    buffer += chunk;
-    const lines = buffer.split('\n');
-    buffer = lines.pop() ?? '';
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed === 'data: [DONE]' || !trimmed.startsWith('data: ')) {
+    try {
+      const data = JSON.parse(trimmed.slice(6));
+      if (data.usage) {
+        usage = data.usage;
+      }
+      const delta = data.choices?.[0]?.delta;
+      if (!delta) {
         continue;
       }
-
-      try {
-        const data = JSON.parse(trimmed.slice(6));
-        if (data.usage) {
-          usage = data.usage;
-        }
-        const delta = data.choices?.[0]?.delta;
-        if (!delta) {
-          continue;
-        }
-        if (delta.content) {
-          fullResponse += delta.content;
-          onDelta(delta.content);
-        }
-        if (delta.reasoning_content) {
-          reasoningResponse += delta.reasoning_content;
-        }
-        const tcs = delta.tool_calls;
-        if (Array.isArray(tcs)) {
-          for (const tc of tcs) {
-            const idx: number = tc.index ?? 0;
-            const existing = toolCallsAccum.get(idx);
-            if (existing !== undefined) {
-              existing.argsAccum += tc.function?.arguments ?? '';
-            } else {
-              toolCallsAccum.set(idx, {
-                id: tc.id ?? '',
-                name: tc.function?.name ?? '',
-                argsAccum: tc.function?.arguments ?? '',
-              });
-            }
+      if (delta.content) {
+        fullResponse += delta.content;
+        onDelta(delta.content);
+      }
+      if (delta.reasoning_content) {
+        reasoningResponse += delta.reasoning_content;
+      }
+      const tcs = delta.tool_calls;
+      if (Array.isArray(tcs)) {
+        for (const tc of tcs) {
+          const idx: number = tc.index ?? 0;
+          const existing = toolCallsAccum.get(idx);
+          if (existing !== undefined) {
+            existing.argsAccum += tc.function?.arguments ?? '';
+          } else {
+            toolCallsAccum.set(idx, {
+              id: tc.id ?? '',
+              name: tc.function?.name ?? '',
+              argsAccum: tc.function?.arguments ?? '',
+            });
           }
         }
-      } catch (_) {
-        // Skip unparseable chunks
       }
+    } catch (_) {
+      // Skip unparseable chunks
     }
   }
 
@@ -247,5 +141,10 @@ export default async function streamRequestOpenAI(
     );
   }
 
-  return {text: fullResponse, toolCalls, usage, reasoning: reasoningResponse.length > 0 ? reasoningResponse : undefined};
+  return {
+    text: fullResponse,
+    toolCalls,
+    usage,
+    reasoning: reasoningResponse.length > 0 ? reasoningResponse : undefined,
+  };
 }

@@ -3,38 +3,19 @@
 // License MIT (https://opensource.org/license/mit).
 
 import i18n from 'i18next';
-import debounce from './debounce';
+import pickFile from './pick_file';
 
-export default function <T>(this: T): Promise<string> {
-  const input_elm = window.document.createElement('input');
-  input_elm.type = 'file';
-  document.body?.appendChild(input_elm);
-  // $FlowFixMe[unclear-type]
-  const onBodyFocus = (reject: Function) => {
-    if (!input_elm.value.length) {
-      return reject(i18n.t('file2base64.aborted', 'Aborted by user. No file given...'));
-    }
-  };
-
-  // $FlowFixMe[incompatible-type]
+export default async function (): Promise<string> {
+  const {file} = await pickFile(i18n.t('file2base64.aborted', 'Aborted by user. No file given...'));
   return new Promise((resolve, reject) => {
-    window.addEventListener('focus', debounce(onBodyFocus.bind(this, reject), 200));
-    input_elm.onchange = e => {
-      // $FlowFixMe[prop-missing]
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.readAsBinaryString(file);
+    const reader = new FileReader();
+    reader.readAsBinaryString(file);
 
-      reader.onerror = reject;
-      reader.onabort = reject;
-      reader.onload = readerEvent => {
-        // $FlowFixMe[prop-missing]
-        resolve(btoa(readerEvent.target.result));
-      };
+    reader.onerror = reject;
+    reader.onabort = reject;
+    reader.onload = readerEvent => {
+      // $FlowFixMe[prop-missing]
+      resolve(btoa(readerEvent.target.result));
     };
-    input_elm.click();
-  }).finally(() => {
-    window.removeEventListener('focus', onBodyFocus);
-    document.body?.removeChild(input_elm);
   });
 }

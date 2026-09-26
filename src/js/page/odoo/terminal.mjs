@@ -71,6 +71,11 @@ export default class OdooTerminal extends Terminal {
     await this.execute(codeHelpers, false, true);
   }
 
+  async reloadShell(): Promise<void> {
+    await super.reloadShell();
+    await this.execute(codeHelpers, false, true);
+  }
+
   /**
    * @override
    */

@@ -2,11 +2,9 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
-import i18n from 'i18next';
 import {DEFAULT_MAX_TOKENS} from '@ai/constants';
 import {backgroundFetch} from '@ai/utils/relay_fetch';
-import {formatHTTPError} from '@ai/utils/network';
-
+import streamLines from '@ai/utils/stream_lines';
 
 export default async function streamRequestAnthropic(
   url: string,
@@ -63,19 +61,7 @@ export default async function streamRequestAnthropic(
     signal,
   );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(formatHTTPError(response.status, errorText));
-  }
-
-  if (!response.body) {
-    throw new Error(i18n.t('ai.utils.network.error.noStream', 'Server did not return a streaming response'));
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
   let fullResponse = '';
-  let buffer = '';
   let currentEvent = '';
   let inputTokens = 0;
   let outputTokens = 0;
@@ -85,84 +71,67 @@ export default async function streamRequestAnthropic(
   const toolCalls: Array<AIToolCall> = [];
   const pendingToolCalls: Map<number, {id: string, name: string, jsonAccum: string}> = new Map();
 
-  while (true) {
-    const {done, value} = await reader.read();
-    if (done) {
-      break;
+  for await (const trimmed of streamLines(response)) {
+    if (!trimmed) {
+      currentEvent = '';
+      continue;
+    }
+    if (trimmed.startsWith('event: ')) {
+      currentEvent = trimmed.slice(7);
+      continue;
+    }
+    if (!trimmed.startsWith('data: ')) {
+      continue;
     }
 
-    const chunk = decoder.decode(
-      value !== null && value !== undefined ? value : new Uint8Array(0),
-      {stream: true},
-    );
-
-    buffer += chunk;
-    const lines = buffer.split('\n');
-    buffer = lines.pop() ?? '';
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) {
-        currentEvent = '';
-        continue;
-      }
-      if (trimmed.startsWith('event: ')) {
-        currentEvent = trimmed.slice(7);
-        continue;
-      }
-      if (!trimmed.startsWith('data: ')) {
-        continue;
-      }
-
-      try {
-        const data = JSON.parse(trimmed.slice(6));
-        if (currentEvent === 'message_start') {
-          const msgUsage = data.message?.usage;
-          if (msgUsage) {
-            inputTokens = msgUsage.input_tokens ?? 0;
-            cacheCreationTokens = msgUsage.cache_creation_input_tokens ?? 0;
-            cacheReadTokens = msgUsage.cache_read_input_tokens ?? 0;
+    try {
+      const data = JSON.parse(trimmed.slice(6));
+      if (currentEvent === 'message_start') {
+        const msgUsage = data.message?.usage;
+        if (msgUsage) {
+          inputTokens = msgUsage.input_tokens ?? 0;
+          cacheCreationTokens = msgUsage.cache_creation_input_tokens ?? 0;
+          cacheReadTokens = msgUsage.cache_read_input_tokens ?? 0;
+        }
+      } else if (currentEvent === 'content_block_start' && data.content_block?.type === 'tool_use') {
+        const idx: number = data.index ?? 0;
+        pendingToolCalls.set(idx, {
+          id: data.content_block.id ?? '',
+          name: data.content_block.name ?? '',
+          jsonAccum: '',
+        });
+      } else if (currentEvent === 'content_block_delta') {
+        if (data.delta?.type === 'text_delta') {
+          const delta: string = data.delta.text ?? '';
+          if (delta) {
+            fullResponse += delta;
+            onDelta(delta);
           }
-        } else if (currentEvent === 'content_block_start' && data.content_block?.type === 'tool_use') {
-          const idx: number = data.index ?? 0;
-          pendingToolCalls.set(idx, {
-            id: data.content_block.id ?? '',
-            name: data.content_block.name ?? '',
-            jsonAccum: '',
-          });
-        } else if (currentEvent === 'content_block_delta') {
-          if (data.delta?.type === 'text_delta') {
-            const delta: string = data.delta.text ?? '';
-            if (delta) {
-              fullResponse += delta;
-              onDelta(delta);
-            }
-          } else if (data.delta?.type === 'input_json_delta') {
-            const idx: number = data.index ?? 0;
-            const pending = pendingToolCalls.get(idx);
-            if (pending !== undefined) {
-              pending.jsonAccum += data.delta.partial_json ?? '';
-            }
-          }
-        } else if (currentEvent === 'content_block_stop') {
+        } else if (data.delta?.type === 'input_json_delta') {
           const idx: number = data.index ?? 0;
           const pending = pendingToolCalls.get(idx);
           if (pending !== undefined) {
-            try {
-              // $FlowFixMe[incompatible-type]
-              const input: {[string]: mixed} = JSON.parse(pending.jsonAccum || '{}');
-              toolCalls.push({id: pending.id, name: pending.name, input});
-            } catch (_) {
-              toolCalls.push({id: pending.id, name: pending.name, input: {}});
-            }
-            pendingToolCalls.delete(idx);
+            pending.jsonAccum += data.delta.partial_json ?? '';
           }
-        } else if (currentEvent === 'message_delta') {
-          outputTokens = data.usage?.output_tokens ?? 0;
         }
-      } catch (_) {
-        // Skip unparseable chunks
+      } else if (currentEvent === 'content_block_stop') {
+        const idx: number = data.index ?? 0;
+        const pending = pendingToolCalls.get(idx);
+        if (pending !== undefined) {
+          try {
+            // $FlowFixMe[incompatible-type]
+            const input: {[string]: mixed} = JSON.parse(pending.jsonAccum || '{}');
+            toolCalls.push({id: pending.id, name: pending.name, input});
+          } catch (_) {
+            toolCalls.push({id: pending.id, name: pending.name, input: {}});
+          }
+          pendingToolCalls.delete(idx);
+        }
+      } else if (currentEvent === 'message_delta') {
+        outputTokens = data.usage?.output_tokens ?? 0;
       }
+    } catch (_) {
+      // Skip unparseable chunks
     }
   }
 

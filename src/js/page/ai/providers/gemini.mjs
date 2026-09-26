@@ -5,7 +5,7 @@
 import i18n from 'i18next';
 import {DEFAULT_MAX_TOKENS} from '@ai/constants';
 import {backgroundFetch} from '@ai/utils/relay_fetch';
-import {formatHTTPError} from '@ai/utils/network';
+import streamLines from '@ai/utils/stream_lines';
 
 type GeminiPart = {[string]: mixed};
 type GeminiContent = {role: string, parts: Array<GeminiPart>};
@@ -59,7 +59,10 @@ const DUMMY_THOUGHT_SIGNATURE = 'skip_thought_signature_validator';
 // synthesized on the way in (see streamRequestGemini) and resolved back to names here via a
 // running id->name map built while walking the conversation in order (a tool_use block always
 // precedes the tool_result block that references it).
-function toGeminiContents(messages: Array<AIMessage>): {systemInstruction: ?{parts: Array<{text: string}>}, contents: Array<GeminiContent>} {
+function toGeminiContents(messages: Array<AIMessage>): {
+  systemInstruction: ?{parts: Array<{text: string}>},
+  contents: Array<GeminiContent>,
+} {
   const systemParts: Array<{text: string}> = [];
   const contents: Array<GeminiContent> = [];
   const callNameById: Map<string, string> = new Map();
@@ -83,7 +86,8 @@ function toGeminiContents(messages: Array<AIMessage>): {systemInstruction: ?{par
     }
 
     const role = msg.role === 'assistant' ? 'model' : 'user';
-    const blocks: Array<AIContentBlock> = typeof msg.content === 'string' ? [{type: 'text', text: msg.content}] : msg.content;
+    const blocks: Array<AIContentBlock> =
+      typeof msg.content === 'string' ? [{type: 'text', text: msg.content}] : msg.content;
     const parts: Array<GeminiPart> = [];
 
     for (const block of blocks) {
@@ -150,7 +154,11 @@ export default async function streamRequestGemini(
   if (tools !== null && tools !== undefined && tools.length > 0) {
     body.tools = [
       {
-        functionDeclarations: tools.map(t => ({name: t.name, description: t.description, parameters: sanitizeSchemaForGemini(t.parameters)})),
+        functionDeclarations: tools.map(t => ({
+          name: t.name,
+          description: t.description,
+          parameters: sanitizeSchemaForGemini(t.parameters),
+        })),
       },
     ];
   }
@@ -161,80 +169,51 @@ export default async function streamRequestGemini(
     signal,
   );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(formatHTTPError(response.status, errorText));
-  }
-
-  if (!response.body) {
-    throw new Error(i18n.t('ai.utils.network.error.noStream', 'Server did not return a streaming response'));
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
   let fullResponse = '';
-  let buffer = '';
   let usage: ?TokenUsage = null;
   let blockReason: ?string = null;
   let callIdx = 0;
 
   const toolCalls: Array<AIToolCall> = [];
 
-  while (true) {
-    const {done, value} = await reader.read();
-    if (done) {
-      break;
+  for await (const trimmed of streamLines(response)) {
+    if (!trimmed || !trimmed.startsWith('data: ')) {
+      continue;
     }
 
-    const chunk = decoder.decode(
-      value !== null && value !== undefined ? value : new Uint8Array(0),
-      {stream: true},
-    );
-
-    buffer += chunk;
-    const lines = buffer.split('\n');
-    buffer = lines.pop() ?? '';
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || !trimmed.startsWith('data: ')) {
-        continue;
+    try {
+      const data = JSON.parse(trimmed.slice(6));
+      const reason = data.promptFeedback?.blockReason;
+      if (reason) {
+        blockReason = String(reason);
       }
 
-      try {
-        const data = JSON.parse(trimmed.slice(6));
-        const reason = data.promptFeedback?.blockReason;
-        if (reason) {
-          blockReason = String(reason);
-        }
-
-        const parts = data.candidates?.[0]?.content?.parts;
-        if (Array.isArray(parts)) {
-          for (const part of parts) {
-            if (typeof part.text === 'string' && part.text) {
-              fullResponse += part.text;
-              onDelta(part.text);
-            } else if (part.functionCall) {
-              toolCalls.push({
-                id: `call_${callIdx++}`,
-                name: String(part.functionCall.name ?? ''),
-                input: part.functionCall.args ?? {},
-                thoughtSignature: typeof part.thoughtSignature === 'string' ? part.thoughtSignature : null,
-              });
-            }
+      const parts = data.candidates?.[0]?.content?.parts;
+      if (Array.isArray(parts)) {
+        for (const part of parts) {
+          if (typeof part.text === 'string' && part.text) {
+            fullResponse += part.text;
+            onDelta(part.text);
+          } else if (part.functionCall) {
+            toolCalls.push({
+              id: `call_${callIdx++}`,
+              name: String(part.functionCall.name ?? ''),
+              input: part.functionCall.args ?? {},
+              thoughtSignature: typeof part.thoughtSignature === 'string' ? part.thoughtSignature : null,
+            });
           }
         }
-
-        if (data.usageMetadata) {
-          usage = {
-            prompt_tokens: data.usageMetadata.promptTokenCount ?? 0,
-            completion_tokens: data.usageMetadata.candidatesTokenCount ?? 0,
-            total_tokens: data.usageMetadata.totalTokenCount ?? 0,
-          };
-        }
-      } catch (_) {
-        // Skip unparseable chunks
       }
+
+      if (data.usageMetadata) {
+        usage = {
+          prompt_tokens: data.usageMetadata.promptTokenCount ?? 0,
+          completion_tokens: data.usageMetadata.candidatesTokenCount ?? 0,
+          total_tokens: data.usageMetadata.totalTokenCount ?? 0,
+        };
+      }
+    } catch (_) {
+      // Skip unparseable chunks
     }
   }
 

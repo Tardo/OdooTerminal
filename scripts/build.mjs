@@ -3,11 +3,10 @@
 
 import {execSync} from 'child_process';
 import AdmZip from 'adm-zip';
-import {rimraf} from 'rimraf';
-
+import {rmSync} from 'node:fs';
 
 // Remove 'dist' folder
-rimraf.sync('./dist');
+rmSync('./dist', {recursive: true, force: true});
 // Generate 'dist' files
 execSync('rollup -c');
 // Create Zip
@@ -19,6 +18,6 @@ zip.addLocalFolder('./_locales', './_locales');
 zip.addLocalFolder('./themes', './themes');
 zip.addLocalFile('manifest.json');
 zip.addLocalFile('README.md');
-zip.writeZip("OdooTerminal.zip");
+zip.writeZip('OdooTerminal.zip');
 
-console.log("Build successfully completed");
+console.log('Build successfully completed');

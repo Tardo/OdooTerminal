@@ -3,7 +3,7 @@
 
 import fs from 'fs';
 import {simpleGit} from 'simple-git';
-import minimist from 'minimist';
+import {parseArgs} from 'node:util';
 
 function getCurrentVersion() {
   const data = fs.readFileSync('./manifest.json', 'utf-8');
@@ -35,12 +35,7 @@ function update_version(mode) {
   extension_ver = extension_ver.join('.');
 
   // manifest.json
-  replaceFileVersion(
-    './manifest.json',
-    /"version": "\d+\.\d+\.\d+"/,
-    `"version": "${extension_ver}"`,
-  );
-  // abstract_terminal.js
+  replaceFileVersion('./manifest.json', /"version": "\d+\.\d+\.\d+"/, `"version": "${extension_ver}"`);
   replaceFileVersion(
     './src/js/page/terminal/terminal.mjs',
     /VERSION\s?=\s?'\d+\.\d+\.\d+'/,
@@ -56,14 +51,13 @@ async function gitPush(extension_ver) {
   await git.add('.');
   await git.commit(`[REL] Version ${extension_ver}`);
   await git.push('origin', 'master');
-  await git.addAnnotatedTag(
-    `v${extension_ver}`,
-    `Automatic tag '${extension_ver}'`,
-  );
+  await git.addAnnotatedTag(`v${extension_ver}`, `Automatic tag '${extension_ver}'`);
   await git.pushTags('origin');
 }
 
-const argv = minimist(process.argv.slice(2));
+const {values: argv} = parseArgs({
+  options: {mode: {type: 'string'}, git: {type: 'boolean'}},
+});
 
 const valid_modes = ['major', 'minor', 'patch'];
 if (!argv.mode || !valid_modes.includes(argv.mode)) {

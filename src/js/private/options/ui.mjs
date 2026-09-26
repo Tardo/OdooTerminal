@@ -1,7 +1,6 @@
 // @flow strict
 // Copyright  Taois <taoist.han@vertechs.com>
 // License MIT (https://opensource.org/license/mit).
-// License MIT (https://opensource.org/license/mit).
 
 import {h, type VNode} from 'preact';
 import {signal} from '@preact/signals';

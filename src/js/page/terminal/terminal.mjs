@@ -1536,10 +1536,14 @@ export default class Terminal {
     this.screen.preventLostInputFocus();
   }
 
-  #onClickReloadShell() {
+  async reloadShell(): Promise<void> {
+    this.#shell.resetVM();
+  }
+
+  async #onClickReloadShell() {
     this.screen.refresh();
     this.cleanInputHistory();
-    this.#shell.resetVM();
+    await this.reloadShell();
     this.#updateJobsInfo();
     this.updateAssistantoptions();
     if (!this.#isAIMode) {

@@ -7,8 +7,9 @@ import isEmpty from '@tardo/trash/utils/is_empty';
 import TestBackend from './test_backend';
 import TestCommon from './test_common';
 import TestCore from './test_core';
+import TestRegressions from './test_regressions';
 
-const TestSuites = [TestCore, TestCommon, TestBackend];
+const TestSuites = [TestCore, TestRegressions, TestCommon, TestBackend];
 
 export default class OdooTerminalTests extends OdooTerminal {
   /**

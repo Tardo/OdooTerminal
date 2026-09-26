@@ -29,21 +29,24 @@ Firefox is not currently supported by Puppeteer for extension testing.
 
 ## Unit Tests
 
-Unit tests run inside the browser against a loaded Odoo page. Open the browser console and dispatch one of the
-following events on the terminal element:
+Unit tests run inside the browser against a loaded Odoo page. Open the browser console and dispatch one of the following
+events on the terminal element:
+
+The suites live in `src/js/page/tests/` and also run through `pnpm test` against the Docker Odoo instance. Regression
+checks use the loaded terminal's commands, actual Odoo RPC calls, and native browser APIs.
 
 **Run all tests:**
 
 ```js
-document.querySelector(".o_terminal").dispatchEvent(new Event('start_terminal_tests'))
+document.querySelector('.o_terminal').dispatchEvent(new Event('start_terminal_tests'));
 ```
 
 **Run selected tests:**
 
 ```js
-document.querySelector(".o_terminal").dispatchEvent(
-  new CustomEvent('start_terminal_tests', {detail: 'test_whoami,test_search'})
-)
+document
+  .querySelector('.o_terminal')
+  .dispatchEvent(new CustomEvent('start_terminal_tests', {detail: 'test_whoami,test_search'}));
 ```
 
 ## Untested Commands
@@ -58,6 +61,7 @@ The following commands do not yet have automated test coverage:
 - `lang`
 - `login`
 - `logout`
+- `longpolling` (requires handling delayed bus availability on Odoo 16)
 - `paste`
 - `post`
 - `reload`

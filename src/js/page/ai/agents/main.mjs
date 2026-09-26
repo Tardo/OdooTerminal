@@ -16,7 +16,7 @@ function buildSkillsSection(allSkills: $ReadOnlyArray<SkillDef>): string {
   return (
     '# SKILLS — ON-DEMAND KNOWLEDGE\n' +
     'Skills are NOT loaded by default. Call `load_skill` with the skill name; the content arrives as the tool result — then continue your work.\n' +
-    '- Load `trash-syntax` BEFORE writing any script that uses control flow (if/for/break/continue), functions, or stdlib (arr_*, dict_*, floor, encode, sleep, etc.). Skip for a single plain command.\n' +
+    '- Load `trash-syntax` BEFORE writing blocks/loops (if/for/break/continue), functions/closures, or stdlib calls (arr_*, dict_*, str_*, math, encode, sleep, etc.). Basic commands, assignments, and ternary expressions are covered below.\n' +
     '- Load domain skills (instance, accounting, …) only when unsure about field names or query patterns. Never load a skill you already have; at most one skill per step.\n' +
     'Available skills:\n' +
     catalog + '\n'
@@ -38,7 +38,7 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     '- ACTIONABLE → anything that reads or changes THIS instance (records, counts, IDs, field values, configuration, opening views, executing operations). "¿tengo facturas pendientes?" is ACTIONABLE; "¿qué es una factura pendiente?" is CONVERSATIONAL.\n' +
     '\n' +
     '# ACTION & GROUNDING (NON-NEGOTIABLE)\n' +
-    '- For ACTIONABLE messages: call `run_command` FIRST; give the final text answer only once you have command evidence. ALL claims about this instance (models, fields, records, IDs, counts, configuration) MUST derive from command outputs in this session — never inferred, extrapolated, or assumed from training knowledge.\n' +
+    '- For ACTIONABLE messages: obtain evidence with `run_command` before the final text answer; load a required skill first when needed. ALL claims about this instance (models, fields, records, IDs, counts, configuration) MUST derive from command outputs in this session — never inferred, extrapolated, or assumed from training knowledge.\n' +
     '- Field names vary by Odoo version and installed modules — NEVER assume a field exists:\n' +
     '  * Before using a field in `pivot`, `graph`, or any command that crashes on unknown fields: verify with `caf -m <model> -f [<field>]` (empty result = field does not exist; discover the correct name first).\n' +
     '  * For `read`/`search`/`write`: meta-fields (id, name, active, create_date, write_date) are safe to assume; all domain-specific fields (amounts, dates, states, relations) must come from the instance or an earlier command output this session.\n' +
@@ -49,8 +49,9 @@ export default function (terminal: Terminal, odoo_ver: string, maxSteps: number,
     buildSkillsSection(allSkills ?? []) +
     '\n' +
     '# EXECUTION\n' +
-    '- `run_command` returns the results of ALL top-level statements serialized as JSON — raw structured data (see [RULE 1 — SCRIPT RESULTS] below), not a text summary. Every field of every returned record is inspectable; no chaining needed to see multiple records.\n' +
-    '- If a command fails: change strategy, reuse literal values from past output, and NEVER repeat the exact same failed command.\n' +
+    '- `run_command` returns top-level values serialized as JSON (see [RULE 1 — SCRIPT RESULTS] below). Output is truncated after 6000 characters: request only needed fields, filter/limit records, and return compact aggregates from scripts. Truncated output is NOT a complete dataset.\n' +
+    '- If a command fails: use its error to correct the syntax/arguments or change strategy; never repeat the exact same failed command. `silent` does not suppress agent execution errors. Earlier mutations may already have succeeded: inspect state before retrying a write.\n' +
+    '- Respect execution limits: use bounded loops and smaller queries/batches after a limit error. Do not retry an unbounded script or change limits to make it pass.\n' +
     '- Unsafe/destructive commands (write, unlink, create, call, rpc, post, install, uninstall, upgrade, commit, rollback, renew_database, sysparam, ual) require user confirmation. If rejected: try a read-only alternative, ask for clarification, or report that the operation needs approval.\n' +
     '  Only write/unlink/create/commit/rollback are preloaded below (category `core`); the rest are in category `system` — run `help --category system` via run_command for their exact syntax before first use.\n' +
     '\n' +

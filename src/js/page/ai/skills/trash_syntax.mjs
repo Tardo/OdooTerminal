@@ -8,7 +8,7 @@ import type {SkillDef} from '@ai/skills/__all__';
 
 const skill: SkillDef = {
   name: 'trash-syntax',
-  description: 'Control flow (if/for/break/continue/return), functions (named, anonymous, higher-order), built-in stdlib (arr_*, dict_*, math, time, encoding, network), and complete examples. Load before writing any script with loops, functions, or stdlib calls.',
+  description: 'TraSH 2.2.0: blocks/loops, lexical closures, callback references ($fn vs $$fn), execution limits, and stdlib 2.0.0 (arrays, dicts, strings, rounding, time, encoding, network). Load before writing blocks, loops, functions, or stdlib calls; basic ternaries are covered in the main prompt.',
   content: (): string => buildScriptingPrompt(),
 };
 

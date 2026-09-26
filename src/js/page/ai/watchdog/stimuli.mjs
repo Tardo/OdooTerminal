@@ -51,7 +51,6 @@ export type WatchdogStimulus = {
 // write/create/web_save cover a save (Odoo <=16 direct write/create, Odoo 17+ unified web_save);
 // unlink is a deletion — kept in the same regex/group since it's the same route shape, split
 // into 'save' vs 'delete' stimuli by the caller based on which method matched (see watchSaves).
-// Exported so scripts/check_watchdog_stimuli_regex.mjs can pin this contract down without a browser.
 export const CALL_KW_RE: RegExp = /\/web\/dataset\/call_kw\/([^/]+)\/(write|create|web_save|unlink)\b/;
 const BREADCRUMB_SELECTOR = '.o_breadcrumb .breadcrumb-item, .o_breadcrumb span';
 
@@ -80,8 +79,6 @@ const HOVER_SELECTOR = 'button, .btn, [role="button"], .o_field_widget[name], td
 // count, short enough to still catch a user visibly hesitating over one control.
 const HOVER_DWELL_MS = 2500;
 const NOTIFICATION_SELECTOR = '.o_notification_manager .o_notification';
-// Exported so scripts/check_watchdog_stimuli_regex.mjs can pin this contract down without a browser
-// (see CALL_KW_RE above for why: Flow-typed source can't be node-imported directly).
 export const NOTIFICATION_SEVERITY_RE: RegExp = /danger|warning/i;
 
 let installed = false;
@@ -106,11 +103,11 @@ function shortExcName(name: string): string {
 // A Python traceback reads bottom-up — the line that actually names the raised exception is the
 // LAST one — so truncating one must keep the TAIL, unlike a JS stack (thrown-from frame first),
 // which must keep the HEAD. Getting these backwards silently cuts the one line that explains
-// anything. Pinned in scripts/check_watchdog_stimuli_regex.mjs — keep both in sync on edits.
-function truncateTail(str: string, max: number): string {
+// anything. Regression cases: src/js/page/tests/test_regressions.mjs.
+export function truncateTail(str: string, max: number): string {
   return str.length > max ? `…${str.slice(-max)}` : str;
 }
-function truncateHead(str: string, max: number): string {
+export function truncateHead(str: string, max: number): string {
   return str.length > max ? `${str.slice(0, max)}…` : str;
 }
 
@@ -297,7 +294,7 @@ function hopCause(value: mixed): mixed {
 // back to only the least informative (outermost) one. `stack` keeps the deepest hop that actually
 // had one, since a duck-typed non-Error hop (e.g. a plain RPC error object) won't.
 const MAX_CAUSE_DEPTH = 8;
-function causeChain(err: mixed): {messages: Array<string>, stack: string} {
+export function causeChain(err: mixed): {messages: Array<string>, stack: string} {
   const messages: Array<string> = [];
   let stack = '';
   let current = err;
