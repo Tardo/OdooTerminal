@@ -28,8 +28,11 @@ async function loginAs(login, password) {
 }
 
 describe('OdooTerminal', () => {
+  let optionsUrl;
   beforeAll(async () => {
     await loginAs('admin', 'admin');
+    const worker = await browser.waitForTarget(target => target.type() === 'service_worker');
+    optionsUrl = new URL('/src/html/options.html', worker.url()).href;
   }, 30000);
 
   it('test open terminal', async () => {
@@ -56,4 +59,28 @@ describe('OdooTerminal', () => {
 
     await page.waitForSelector('.o_terminal .terminal-test-ok');
   }, WAIT_MINS * 35);
+
+  it('persists execution controls in extension options', async () => {
+    const options = await browser.newPage();
+    try {
+      await options.goto(optionsUrl);
+      await options.waitForSelector('#sec-execution input');
+      await options.waitForSelector('.loading-overlay', {hidden: true});
+      const inputs = await options.$$eval('#sec-execution input', nodes => nodes.map(node => node.name));
+      expect(inputs).toHaveLength(6);
+      await options.$eval('input[name="execution_max_instructions"]', input => {
+        input.value = '12345';
+        input.dispatchEvent(new Event('change', {bubbles: true}));
+      });
+      await options.waitForSelector('.header-actions .ot-btn-primary:not([disabled])');
+      await options.click('.header-actions .ot-btn-primary');
+      await options.waitForSelector('.header-actions .ot-btn-primary[disabled]:not(:has(.ot-spin-mini))');
+      await options.reload();
+      await options.waitForFunction(() =>
+        document.querySelector('input[name="execution_max_instructions"]')?.value === '12345',
+      );
+    } finally {
+      await options.close();
+    }
+  }, WAIT_MINS);
 });

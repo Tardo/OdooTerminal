@@ -6,10 +6,8 @@ allowBuilds:
   core-js: true
 
 minimumReleaseAgeExclude:
-  - '@tardo/trash@1.0.0'
+  - '@tardo/trash@2.2.0'
+  - '@tardo/trash-stdlib@2.0.0'
 
 overrides:
   jest-environment-puppeteer>jest-environment-node: '^30'
-
-patchedDependencies:
-  '@tardo/trash@1.0.0': patches/@tardo__trash@1.0.0.patch

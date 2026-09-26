@@ -3,21 +3,15 @@
 // License MIT (https://opensource.org/license/mit).
 
 export default function replacer(key: string, value: mixed): mixed {
-  let svalue = value;
-  if (value instanceof Array) {
-    for (const i in value) {
-      // $FlowFixMe[incompatible-use]
-      // $FlowFixMe[incompatible-type]
-      svalue[i] = replacer(key, value[i]);
-    }
+  if (typeof HTMLCanvasElement !== 'undefined' && value instanceof HTMLCanvasElement) {
+    return {type: 'HTMLCanvasElement', id: value.id, width: value.width, height: value.height};
   }
-
   // FIXME: Odoo 18.0 has a limited access in Record objects.
   // This check should be moved to the Odoo “zone” and check the
   // 'Record' type.
   if (value !== null && typeof value === 'object' && Object.hasOwn(value, '_proxy')) {
-    svalue = "##!ProxyObject!##";
+    return '##!ProxyObject!##';
   }
 
-  return svalue;
+  return value;
 }

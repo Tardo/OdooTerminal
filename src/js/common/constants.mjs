@@ -5,6 +5,12 @@
 type SettingType = 'edit' | 'json' | 'check' | 'manual' | 'option' | 'int' | 'color';
 
 export const SETTING_TYPES: {
+  execution_timeout: SettingType,
+  execution_max_instructions: SettingType,
+  execution_max_source_length: SettingType,
+  execution_max_nesting_depth: SettingType,
+  execution_max_collection_length: SettingType,
+  execution_max_string_length: SettingType,
   init_cmds: SettingType,
   term_context: SettingType,
   pinned: SettingType,
@@ -51,6 +57,12 @@ export const SETTING_TYPES: {
   watchdog_reasoning: SettingType,
   watchdog_profile: SettingType,
 } = {
+  execution_timeout: 'int',
+  execution_max_instructions: 'int',
+  execution_max_source_length: 'int',
+  execution_max_nesting_depth: 'int',
+  execution_max_collection_length: 'int',
+  execution_max_string_length: 'int',
   init_cmds: 'edit',
   term_context: 'json',
   pinned: 'check',
@@ -101,6 +113,12 @@ export const SETTING_TYPES: {
 export const SETTING_NAMES: $ReadOnlyArray<string> = Array.from(Object.keys(SETTING_TYPES));
 
 export type ExtensionSettings = {
+  execution_timeout: number,
+  execution_max_instructions: number,
+  execution_max_source_length: number,
+  execution_max_nesting_depth: number,
+  execution_max_collection_length: number,
+  execution_max_string_length: number,
   init_cmds: string,
   term_context: {[string]: mixed},
   pinned: boolean,
@@ -161,6 +179,12 @@ export type ExtensionSettings = {
 };
 
 export const SETTING_DEFAULTS: ExtensionSettings = {
+  execution_timeout: 0,
+  execution_max_instructions: 100000000,
+  execution_max_source_length: 1000000,
+  execution_max_nesting_depth: 100,
+  execution_max_collection_length: 100000,
+  execution_max_string_length: 1000000,
   init_cmds: '',
   term_context: {active_test: false},
   pinned: false,

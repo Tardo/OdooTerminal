@@ -20,13 +20,15 @@ import getOdooSession from '@odoo/utils/get_odoo_session';
 import {startTechnicalModelObserver} from '@odoo/page_features/technical_model_name';
 import isBackOffice from '@odoo/utils/is_backoffice';
 import {setTranslator} from '@tardo/trash';
-import registerMathFuncs from '@tardo/trash/core/math/__all__';
-import registerTimeFuncs from '@tardo/trash/core/time/__all__';
-import registerNetFuncs from '@tardo/trash/core/net/__all__';
-import registerEnDeFuncs from '@tardo/trash/core/ende/__all__';
-import registerStrFuncs from '@tardo/trash/core/str/__all__';
-import registerArrFuncs from '@tardo/trash/core/arr/__all__';
-import registerDictFuncs from '@tardo/trash/core/dict/__all__';
+import {
+  registerArr,
+  registerDict,
+  registerEnde,
+  registerMath,
+  registerNet,
+  registerStr,
+  registerTime,
+} from '@tardo/trash-stdlib';
 import registerCoreCommands from '@terminal/commands/__all__';
 import registerGraphicsFuncs from '@terminal/libs/graphics/__all__';
 import OdooTerminalTests from '@tests/terminal';
@@ -95,14 +97,14 @@ async function postInitTerminal(term_obj: OdooTerminal, config: TerminalOptions)
 }
 
 function loadVMFunctions(vm: VMachine) {
-  registerMathFuncs(vm);
-  registerNetFuncs(vm);
-  registerTimeFuncs(vm);
+  vm.use(registerMath);
+  vm.use(registerNet);
+  vm.use(registerTime);
   registerGraphicsFuncs(vm);
-  registerEnDeFuncs(vm);
-  registerStrFuncs(vm);
-  registerArrFuncs(vm);
-  registerDictFuncs(vm);
+  vm.use(registerEnde);
+  vm.use(registerStr);
+  vm.use(registerArr);
+  vm.use(registerDict);
   registerCoreCommands(vm);
   registerOdooCommonCommands(vm);
   if (isBackOffice()) {
@@ -120,7 +122,7 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   }
   const term_obj = getTerminalObj();
   if (term_obj) {
-    loadVMFunctions(term_obj.getShell().getVM());
+    term_obj.getShell().registerVMCommands(loadVMFunctions);
     let lazy_loader_obj = getOdooService("@web/legacy/js/public/lazyloader");
     if (typeof lazy_loader_obj !== 'undefined') {
       // Caching call: see command implementation for more details.

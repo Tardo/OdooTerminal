@@ -12,7 +12,11 @@ import type Terminal from '@odoo/terminal';
 async function cmdNotify(this: Terminal, kwargs: CMDCallbackArgs) {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number') {
-    if (OdooVerMajor < 17) {
+    if (OdooVerMajor === 11) {
+      const manager = getOdooEnv().notification_manager;
+      const method = kwargs.type === 'warning' || kwargs.type === 'danger' ? 'warn' : 'notify';
+      manager[method](kwargs.title, kwargs.message, kwargs.sticky);
+    } else if (OdooVerMajor < 17) {
       getOdooEnv().services.notification.notify({
         message: kwargs.message,
         title: kwargs.title,

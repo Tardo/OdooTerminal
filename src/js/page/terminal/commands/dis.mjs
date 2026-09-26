@@ -4,6 +4,7 @@
 
 import i18n from 'i18next';
 import {ARG, INSTRUCTION_TYPE} from '@tardo/trash/constants';
+import decodeInstructions from '@terminal/utils/decode_instructions';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
@@ -13,19 +14,18 @@ async function cmdDis(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackC
   const parse_info = this.getShell().parse(kwargs.code);
   const rows: Array<RowInfo> = [];
   const {program} = parse_info;
-  for (const instr of program.instructions) {
+  for (const instr of decodeInstructions(parse_info)) {
     let lvalue: string = '';
     switch (instr.type) {
       case INSTRUCTION_TYPE.LOAD_NAME:
       case INSTRUCTION_TYPE.LOAD_GLOBAL:
-      case INSTRUCTION_TYPE.STORE_NAME:
-      case INSTRUCTION_TYPE.STORE_SUBSCR: {
-        const rec_name = program.names[instr.level][instr.operand];
+      case INSTRUCTION_TYPE.STORE_NAME: {
+        const rec_name = program.constants[instr.operand];
         lvalue = new String(rec_name).toString();
         break;
       }
       case INSTRUCTION_TYPE.LOAD_CONST: {
-        const rec_value = program.values[instr.level][instr.operand];
+        const rec_value = program.constants[instr.operand];
         lvalue = new String(rec_value).toString();
         break;
       }

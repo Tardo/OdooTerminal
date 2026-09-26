@@ -5,6 +5,7 @@
 import isEmpty from '@tardo/trash/utils/is_empty';
 import {getArgumentInfo, getArgumentInfoByName} from '@tardo/trash/argument';
 import {INSTRUCTION_TYPE, LEXER} from '@tardo/trash/constants';
+import decodeInstructions from '@terminal/utils/decode_instructions';
 import type {CMDDef, ArgInfo, ParseInfo} from '@tardo/trash/interpreter';
 import type Shell from '@terminal/shell';
 import type Terminal from '@terminal/terminal';
@@ -210,10 +211,11 @@ export default class CommandAssistant {
     let sel_level = 0;
     let end_i = -1;
     const total_args: {[number]: number} = {};
-    const instr_count = program.instructions.length;
+    const instructions = decodeInstructions(parse_info);
+    const instr_count = instructions.length;
     // Found selected token and EOC/EOL
     for (let index = instr_count - 1; index >= 0 ; --index) {
-      const instr = program.instructions[index];
+      const instr = instructions[index];
       if (instr.level === -1) {
         continue;
       }
@@ -246,7 +248,7 @@ export default class CommandAssistant {
     if (end_i === -1) {
       const pend = instr_count - 3;
       if (pend >= 0) {
-        const instr = program.instructions[pend];
+        const instr = instructions[pend];
         if (instr.type === INSTRUCTION_TYPE.LOAD_ARG || instr.type === INSTRUCTION_TYPE.LOAD_GLOBAL) {
           sel_token_index = -1;
           sel_level = 0;
@@ -256,7 +258,7 @@ export default class CommandAssistant {
     }
 
     for (let cindex = end_i; cindex >= 0; --cindex) {
-      const instr = program.instructions[cindex];
+      const instr = instructions[cindex];
       if (instr.level !== sel_level) {
         continue;
       }

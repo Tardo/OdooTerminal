@@ -5,7 +5,6 @@
 import i18n from 'i18next';
 import {getArgumentInfo} from '@tardo/trash/argument';
 import {ARG} from '@tardo/trash/constants';
-import {FUNCTION_TYPE} from '@tardo/trash/function';
 import {buildCommandPrompt} from '@ai/prompts/trash';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
@@ -65,7 +64,7 @@ async function cmdPrintHelp(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCal
     for (let x = 0; x < sorted_keys_len; ++x) {
       const _cmd = sorted_cmd_keys[x];
       const cmd_def = cmds[_cmd];
-      const is_command = cmd_def.type === FUNCTION_TYPE.Command;
+       const is_command = this.getShell().isHostCommand(_cmd);
       // A category is a self-contained filter: some categories (stdlib, graphics) are
       // entirely Internal-type, so gating them behind --all/--only-internal too would
       // make "help --category stdlib" return nothing by default.

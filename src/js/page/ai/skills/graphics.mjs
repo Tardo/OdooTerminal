@@ -15,7 +15,7 @@ const content: string =
   "$win = (2d_create_window -w 500 -h 300 --centered)\n" +
   '// ...draw calls... They are batched and painted automatically on the next browser frame.\n' +
   '```\n' +
-  'Window size is available as $win[\'width\'] / $win[\'height\'] — use it to scale your drawing.\n' +
+  'The window value is a browser canvas. Keep the width and height you passed to 2d_create_window in variables; TraSH cannot read inherited DOM properties from the canvas.\n' +
   '\n' +
   '## Window lifecycle\n' +
   'Work in ONE window: to redo a drawing, `2d_clear -c $win` and draw again — never open a new window per attempt. ' +
@@ -41,10 +41,11 @@ const content: string =
   '## Example: bar chart with labels\n' +
   '```\n' +
   "$data = [['Jan', 120], ['Feb', 80], ['Mar', 200]]\n" +
-  "$win = (2d_create_window -w 500 -h 300 --centered)\n" +
-  "$H = $win['height']\n" +
+  '$W = 500\n' +
+  '$H = 300\n' +
+  "$win = (2d_create_window -w $W -h $H --centered)\n" +
   '$max = 200\n' +
-  "$bar_w = (floor $win['width'] / $data['length'])\n" +
+  "$bar_w = (floor $W / $data['length'])\n" +
   "for ($i = 0; $i < $data['length']; $i += 1) {\n" +
   '  $bh = (floor (($data[$i][1] * ($H - 40)) / $max))\n' +
   '  $x = $i * $bar_w\n' +

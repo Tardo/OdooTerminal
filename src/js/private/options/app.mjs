@@ -8,6 +8,7 @@ import {useEffect, useState, useRef} from 'preact/hooks';
 import {Button, Tag, Spin, ModalHost, ToastHost, message, confirmDialog} from './ui.mjs';
 
 import BehaviourSection from './components/BehaviourSection.mjs';
+import ExecutionSection from './components/ExecutionSection.mjs';
 import ThemeSection from './components/ThemeSection.mjs';
 import ShortcutsSection from './components/ShortcutsSection.mjs';
 import CommandAssistantSection from './components/CommandAssistantSection.mjs';
@@ -24,6 +25,7 @@ type SectionDef = {id: string, title: () => string, comp: any};
 
 const SECTIONS: Array<SectionDef> = [
   {id: 'behaviour', title: () => t('optionsTitleBehaviour', 'Behaviour'), comp: BehaviourSection},
+  {id: 'execution', title: () => t('optionsTitleExecution', 'Execution control'), comp: ExecutionSection},
   {id: 'theme', title: () => t('optionsTitleTheme', 'Theme'), comp: ThemeSection},
   {id: 'shortcuts', title: () => t('optionsTitleShortcuts', 'Shortcuts'), comp: ShortcutsSection},
   {id: 'command-assistant', title: () => t('optionsTitleCommandAssistant', 'Command Assistant'), comp: CommandAssistantSection},

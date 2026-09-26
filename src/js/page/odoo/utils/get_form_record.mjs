@@ -151,10 +151,12 @@ export default function getFormRecord(): FormRecordAdapter | null {
   // Legacy path (Odoo 11–15): BasicModel via action_manager
   try {
     const root = getOdooRoot();
-    // Odoo 14-15: action_manager exposes currentController.widget directly.
+    // Odoo 14-15 keeps the active controller in controllers[controllerStack.at(-1)].
     // Odoo 11-13: currentController does not exist; probe inner_widget paths.
     // $FlowFixMe[prop-missing]
-    let widget = root.action_manager?.currentController?.widget;
+    const manager = root.action_manager;
+    // $FlowFixMe[prop-missing]
+    let widget = manager?.currentController?.widget ?? manager?.controllers?.[manager.controllerStack?.at(-1)]?.widget;
     if (!widget?.model?.localData || typeof widget.handle !== 'string') {
       widget = findLegacyFormController(root);
     }
@@ -205,6 +207,11 @@ export default function getFormRecord(): FormRecordAdapter | null {
               await modeResult;
             }
             // Let the renderer finish applying the mode change
+            await new Promise(resolve => setTimeout(resolve, 100));
+          } else if (currentMode === 'readonly') {
+            // Odoo 14 exposes the Edit button, but no setMode method on its controller.
+            const editButton = document.querySelector('.o_form_button_edit');
+            if (editButton instanceof HTMLElement) editButton.click();
             await new Promise(resolve => setTimeout(resolve, 100));
           }
           // $FlowFixMe[prop-missing]

@@ -4,13 +4,13 @@
 
 import i18n from 'i18next';
 import file2file from '@terminal/utils/file2file';
-import type {CMDDef} from '@tardo/trash/interpreter';
+import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
 
-async function cmdRun(this: Terminal): Promise<> {
+async function cmdRun(this: Terminal, _kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<> {
   const file_obj = await file2file();
   const file_content = await file_obj.text();
-  return await this.execute(file_content, false, false, true);
+  return await this.execute(file_content, false, ctx.meta.silent, true, false, ctx.meta.info.executionOptions);
 }
 
 export default function (): Partial<CMDDef> {

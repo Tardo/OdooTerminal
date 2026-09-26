@@ -177,9 +177,6 @@ settings:
 overrides:
   jest-environment-puppeteer>jest-environment-node: ^30
 
-patchedDependencies:
-  '@tardo/trash@1.0.0': 9efc115abecb577a451c727287c6b9c2acf83cc4d621348dc2053ced5e9c4f8b
-
 importers:
   .:
     dependencies:
@@ -187,8 +184,11 @@ importers:
         specifier: ^2.11.2
         version: 2.11.2(preact@10.29.8)
       '@tardo/trash':
-        specifier: ^1.0.0
-        version: 1.0.0(patch_hash=9efc115abecb577a451c727287c6b9c2acf83cc4d621348dc2053ced5e9c4f8b)
+        specifier: 2.2.0
+        version: 2.2.0
+      '@tardo/trash-stdlib':
+        specifier: 2.0.0
+        version: 2.0.0(@tardo/trash@2.2.0)
       '@zip.js/zip.js':
         specifier: ^2.15.0
         version: 2.15.0
@@ -1875,9 +1875,15 @@ packages:
       {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
     engines: {node: '>=10'}
 
-  '@tardo/trash@1.0.0':
+  '@tardo/trash-stdlib@2.0.0':
     resolution:
-      {integrity: sha512-Vmkth5L23Fou0TIQ9XCDT1+f/i/Bz1mFQ4oGmI1ZLYtEZEO4/SZnoBwy5+WeefWW8Z5WMoB2CIZS5Rn3VyZNHw==}
+      {integrity: sha512-3F247ICm6grTC2r897Ge5zdpytdpYVh76IxXXXDh8Yxs2Z/isW82ITPr3fi9z/F0mJpmMMILqhqdm4o2P3LKDg==}
+    peerDependencies:
+      '@tardo/trash': ^2.1.1
+
+  '@tardo/trash@2.2.0':
+    resolution:
+      {integrity: sha512-yPoyhXH2ZM+RtYp6UrFotUtWI9fpghz7plWYlVNnlc/jiaNVk/m4doCOI4Gqct6v1Z7+PnMvSKUuhhS0jMJTrw==}
 
   '@tybys/wasm-util@0.10.4':
     resolution:
@@ -7554,7 +7560,11 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tardo/trash@1.0.0(patch_hash=9efc115abecb577a451c727287c6b9c2acf83cc4d621348dc2053ced5e9c4f8b)': {}
+  '@tardo/trash-stdlib@2.0.0(@tardo/trash@2.2.0)':
+    dependencies:
+      '@tardo/trash': 2.2.0
+
+  '@tardo/trash@2.2.0': {}
 
   '@tybys/wasm-util@0.10.4':
     dependencies:

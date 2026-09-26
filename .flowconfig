@@ -1,7 +1,9 @@
 [ignore]
 <PROJECT_ROOT>/node_modules/.*
 !<PROJECT_ROOT>/node_modules/@tardo/trash/.*
+!<PROJECT_ROOT>/node_modules/@tardo/trash-stdlib/.*
 !<PROJECT_ROOT>/node_modules/.pnpm/@tardo\+trash@.*/node_modules/@tardo/trash/.*
+!<PROJECT_ROOT>/node_modules/.pnpm/@tardo\+trash-stdlib@.*/node_modules/@tardo/trash-stdlib/.*
 <PROJECT_ROOT>/src/js/private/options/.*
 
 [include]

@@ -46,10 +46,12 @@ function draw_grid_state(grid: List, width: Number, cell_size: Number) {
   }
 }
 
-$win = (2d_create_window -w 400 -h 400 -ct)
+$WIN_WIDTH = 400
+$WIN_HEIGHT = 400
+$win = (2d_create_window -w $WIN_WIDTH -h $WIN_HEIGHT -ct)
 $CELL_S = 16
-$NUM_CELLS_ROW = (floor $win['width'] / $CELL_S)
-$NUM_CELLS_COL = (floor $win['height'] / $CELL_S)
+$NUM_CELLS_ROW = (floor $WIN_WIDTH / $CELL_S)
+$NUM_CELLS_COL = (floor $WIN_HEIGHT / $CELL_S)
 $TOTAL_CELLS = $NUM_CELLS_ROW * $NUM_CELLS_COL
 $MAX_ITERATIONS = 150
 
@@ -65,5 +67,5 @@ $draw_frame = function (time, delta, count) {
   $grid = (get_new_grid_state $grid $NUM_CELLS_ROW $NUM_CELLS_COL $CELL_S)
 }
 
-2d_handle_loop -c $win -f $$draw_frame -mf $MAX_ITERATIONS
+2d_handle_loop -c $win -f $draw_frame -mf $MAX_ITERATIONS
 2d_destroy_window $win

@@ -23,7 +23,7 @@ export default class TestCommon extends TerminalTestSuite {
     const res = await super.onBeforeTest(arguments);
     if (test_name === 'test_context') {
       const context = await this.terminal.execute('context', false, true);
-      this._orig_context = context;
+      this._orig_context = {...context};
     }
     return res;
   }
@@ -34,7 +34,7 @@ export default class TestCommon extends TerminalTestSuite {
   async onAfterTest(test_name: string): Promise<string> {
     const res = await super.onAfterTest(arguments);
     if (test_name === 'test_context' || test_name === 'test_context_no_arg') {
-      return this.terminal.execute(`context -o set -v '${JSON.stringify(this._orig_context)}'`, false, true);
+      return this.terminal.execute(`context -o set -v ${JSON.stringify(this._orig_context)}`, false, true);
     }
     return res;
   }

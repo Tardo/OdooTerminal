@@ -16,54 +16,7 @@ export default class TestBackend extends TerminalTestSuite {
   async test_graph() {
     await this.terminal.execute('graph -m res.partner', false, true);
     await asyncSleep(2500);
-    this.assertNotEqual(document.querySelector('.o_graph_view, .o_graph'), null);
-  }
-
-  async test_form() {
-    await this.terminal.execute('view -m res.company -i 1', false, true);
-    await asyncSleep(2500);
-    this.assertTrue(this.isFormOpen());
-    await this.terminal.execute('form -o highlight -f name', false, true);
-    this.assertNotEqual(document.getElementById('oterm-highlight-f-name'), null);
-    await this.terminal.execute('form -o clear', false, true);
-    this.assertEqual(document.getElementById('oterm-highlight-f-name'), null);
-
-    // get: read current in-memory field values from the open form.
-    const getResult: mixed = await this.terminal.execute('form -o get -f [name]', false, true);
-    this.assertNotEqual(getResult, null);
-    this.assertTrue(typeof getResult === 'object' && !Array.isArray(getResult));
-    // $FlowFixMe[invalid-in-rhs]
-    this.assertTrue('name' in getResult);
-
-    // The command enters edit mode automatically if needed, then sets the value
-    // in-memory (fires onchanges, does not save to DB).
-    await this.terminal.execute('form -o edit -v {phone: "test-form-edit-555"}', false, true);
-    await asyncSleep(1000);
-
-    // In Odoo 14+, the phone field renders as an <input> in the DOM when in edit
-    // mode. In Odoo 11-13 the field may live in an inactive notebook tab that is
-    // never added to the DOM, so we only assert the visible input for 14+.
-    const odooMajor = getOdooVersion('major');
-    if (typeof odooMajor === 'number' && odooMajor >= 14) {
-      const phoneInput = document.querySelector('.o_field_widget[name="phone"] input');
-      this.assertNotEqual(phoneInput, null);
-      // $FlowFixMe[prop-missing]
-      this.assertEqual(phoneInput?.value, 'test-form-edit-555');
-    }
-
-    // Discard so the DB record is not modified
-    const discardBtn = document.querySelector(
-      '.o_form_button_cancel, .o_form_discard_button, .o_form_button_cancel.btn',
-    );
-    if (discardBtn instanceof HTMLElement) {
-      discardBtn.click();
-      await asyncSleep(500);
-    }
-
-    // Save test: form is clean after discard; OWL records skip the write when
-    // not dirty, legacy forms may reload in-place — both should succeed.
-    await this.terminal.execute('form -o save', false, true);
-    await asyncSleep(1500);
+    this.assertNotEqual(document.querySelector('.o_graph_view, .o_graph, .o_graph_renderer'), null);
   }
 
   async test_settings() {
@@ -224,6 +177,48 @@ export default class TestBackend extends TerminalTestSuite {
       await asyncSleep(2500);
       const views: mixed = await this.terminal.execute('inspect -e view', false, true);
       this.assertTrue(Array.isArray(views), `inspect: view result is not an array: ${String(views)}`);
+    }
+  }
+
+  async test_form() {
+    await this.terminal.execute('view -m res.company -i 1', false, true);
+    await asyncSleep(2500);
+    this.assertTrue(this.isFormOpen());
+    await this.terminal.execute('form -o highlight -f name', false, true);
+    this.assertNotEqual(document.getElementById('oterm-highlight-f-name'), null);
+    await this.terminal.execute('form -o clear', false, true);
+    this.assertEqual(document.getElementById('oterm-highlight-f-name'), null);
+
+    const getResult: mixed = await this.terminal.execute('form -o get -f [name,phone]', false, true);
+    this.assertNotEqual(getResult, null);
+    this.assertTrue(typeof getResult === 'object' && !Array.isArray(getResult));
+    // $FlowFixMe[invalid-in-rhs]
+    this.assertTrue('name' in getResult);
+
+    await this.terminal.execute('form -o edit -v {phone: "test-form-edit-555"}', false, true);
+    await asyncSleep(1000);
+    const odooMajor = getOdooVersion('major');
+    if (typeof odooMajor === 'number' && odooMajor >= 14) {
+      const phoneInput = document.querySelector('.o_field_widget[name="phone"] input, input.o_field_widget[name="phone"]');
+      this.assertNotEqual(phoneInput, null);
+      // $FlowFixMe[prop-missing]
+      this.assertEqual(phoneInput?.value, 'test-form-edit-555');
+    }
+
+    if (odooMajor === 14) {
+      // Discard/Save reload the client on Odoo 14; leave its original value in memory.
+      // $FlowFixMe[incompatible-use]
+      await this.terminal.execute(`form -o edit -v ${JSON.stringify({phone: getResult.phone})}`, false, true);
+    } else {
+      const discardBtn = document.querySelector(
+        '.o_form_button_cancel, .o_form_discard_button, .o_form_button_cancel.btn',
+      );
+      if (discardBtn instanceof HTMLElement) {
+        discardBtn.click();
+        await asyncSleep(500);
+      }
+      await this.terminal.execute('form -o save', false, true);
+      await asyncSleep(1500);
     }
   }
 }

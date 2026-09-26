@@ -85,7 +85,7 @@ export default class TerminalTestSuite {
   isFormOpen(): boolean {
     return (
       document.querySelector(
-        '.o_view_controller .o_form_view,.o_view_manager_content .o_form_view,.o_view_controller .o_form_view_container',
+        '.o_view_controller .o_form_view,.o_view_manager_content .o_form_view,.o_view_controller .o_form_view_container,.o_content > .o_form_view',
       ) !== null
     );
   }

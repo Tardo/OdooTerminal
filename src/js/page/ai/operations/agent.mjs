@@ -18,6 +18,7 @@ import searchRead from '@odoo/orm/search_read';
 import captureScreenshot from '@ai/utils/capture_screenshot';
 import describeCommandError from '@ai/utils/describe_command_error';
 import encodeHTML from '@terminal/utils/encode_html';
+import stringifyReplacer from '@terminal/utils/stringify_replacer';
 import type {CMDCallbackArgs, CMDCallbackContext} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -471,7 +472,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
           const result: mixed = await this.executeAll(cmd, false, true, false, false);
           if (result !== null && result !== undefined) {
             try {
-              const serialized = JSON.stringify(result);
+              const serialized = JSON.stringify(result, stringifyReplacer);
               outputStr = serialized !== undefined ? serialized : String(result);
             } catch (_) {
               outputStr = String(result);

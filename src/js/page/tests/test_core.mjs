@@ -6,6 +6,11 @@ import TerminalTestSuite from './tests';
 import asyncSleep from '@terminal/utils/async_sleep';
 import keyCode from '@terminal/utils/keycode';
 import describeCommandError from '@ai/utils/describe_command_error';
+import Shell from '@terminal/shell';
+import {SETTING_DEFAULTS} from '@common/constants';
+import {registerTime} from '@tardo/trash-stdlib';
+import ExecutionStoppedError from '@tardo/trash/exceptions/execution_stopped_error';
+import type {EvalOptions} from '@tardo/trash/vmachine';
 
 export default class TestCore extends TerminalTestSuite {
   _orig_context: {[string]: mixed} = {};
@@ -29,7 +34,7 @@ export default class TestCore extends TerminalTestSuite {
   async onAfterTest(test_name: string): Promise<string> {
     const res = super.onAfterTest(arguments);
     if (test_name === 'test_context_term') {
-      return this.terminal.execute(`context_term -o set -v '${JSON.stringify(this._orig_context)}'`, false, true);
+      return this.terminal.execute(`context_term -o set -v ${JSON.stringify(this._orig_context)}`, false, true);
     }
     return res;
   }
@@ -49,11 +54,131 @@ export default class TestCore extends TerminalTestSuite {
     await this.terminal.execute('help search', false, true);
     const res = await this.terminal.execute('help --category stdlib', false, true);
     this.assertTrue(res.includes('arr_map'));
+    const doubled = await this.terminal.execute(
+      '$doubled = (arr_map [1,2] (function (item) { return $item * 2 })); $doubled',
+      false,
+      true,
+    );
+    this.assertEqual(doubled[1], 4);
+  }
+
+  async test_execution_controls() {
+    const shell = new Shell({invokeExternalCommand: async () => null});
+    shell.getVM().use(registerTime);
+    shell.configureExecution({...SETTING_DEFAULTS, execution_max_instructions: 20});
+    let stopped = false;
+    try {
+      await shell.eval('for ($i = 0; $i < 100; $i++) { $i }');
+    } catch (err) {
+      stopped = err instanceof ExecutionStoppedError;
+    }
+    this.assertTrue(stopped, 'Instruction budget must stop execution');
+    this.assertEqual(await shell.eval('42'), 42);
+
+    shell.configureExecution({...SETTING_DEFAULTS, execution_timeout: 10});
+    stopped = false;
+    try {
+      await shell.eval('silent sleep 1000');
+    } catch (err) {
+      stopped = err instanceof ExecutionStoppedError;
+    }
+    this.assertTrue(stopped, 'Silent execution must propagate cancellation');
+    this.assertEmpty(shell.getActiveJobs());
+    this.assertEqual(await shell.eval('42'), 42);
+
+    for (const [limits, source] of [
+      [{execution_max_source_length: 4}, '12345'],
+      [{execution_max_nesting_depth: 4}, '[[[[[1]]]]]'],
+      [{execution_max_collection_length: 4}, '[1,2,3,4,5]'],
+      [{execution_max_string_length: 4}, '"abc" + "def"'],
+    ]) {
+      shell.configureExecution({...SETTING_DEFAULTS, ...limits});
+      let rejected = false;
+      try {
+        await shell.eval(source);
+      } catch (_err) {
+        rejected = true;
+      }
+      this.assertTrue(rejected, `${JSON.stringify(limits)} must be enforced`);
+    }
+
+    // Every individual chrono fits, but the combined nested execution does not.
+    stopped = false;
+    try {
+      await this.terminal.execute(
+        'for ($i = 0; $i < 10; $i++) { chrono "for ($j = 0; $j < 10; $j++) { $j }" }',
+        false, true, true, false, {silent: true, maxInstructions: 300},
+      );
+    } catch (err) {
+      stopped = err instanceof ExecutionStoppedError;
+    }
+    this.assertTrue(stopped, 'Nested host calls must share the instruction budget');
+
+    await this.terminal.execute('alias test_budget "for ($j = 0; $j < 10; $j++) { $j }"', false, true);
+    try {
+      stopped = false;
+      try {
+        await this.terminal.execute(
+          'for ($i = 0; $i < 10; $i++) { test_budget }',
+          false, true, true, false,
+          {silent: true, maxInstructions: 300, aliases: {test_budget: 'for ($j = 0; $j < 10; $j++) { $j }'}},
+        );
+      } catch (err) {
+        stopped = err instanceof ExecutionStoppedError;
+      }
+      this.assertTrue(stopped, 'Aliases must share the instruction budget');
+    } finally {
+      await this.terminal.execute('alias -n test_budget', false, true);
+    }
+  }
+
+  async test_terminal_execution_limits_reset() {
+    const options: EvalOptions = {maxInstructions: 10, silent: true};
+    for (let i = 0; i < 2; i++) {
+      this.assertEqual(await this.terminal.execute('1 + 2 + 3 + 4 + 5', false, true, false, false, options), 15);
+    }
+    let stopped = false;
+    try {
+      await this.terminal.execute('for ($i = 0; $i < 100; $i++) { $i }', false, true, false, false, options);
+    } catch (err) {
+      stopped = err instanceof ExecutionStoppedError;
+    }
+    this.assertTrue(stopped);
+    this.assertEqual(await this.terminal.execute('1 + 2 + 3 + 4 + 5', false, true, false, false, options), 15);
+  }
+
+  async test_reload_shell() {
+    const shell = this.terminal.getShell();
+    const previousVM = shell.getVM();
+    await shell.eval('$reload_probe = 42');
+    await shell.eval('function reload_probe_fn() { return 7 }');
+    this.assertTrue(Object.hasOwn(previousVM.getRegisteredCmds(), 'reload_probe_fn'));
+    const reloadButton = this.terminal.el.querySelector('.terminal-screen-icon-reload-shell');
+    this.assertTrue(reloadButton instanceof HTMLElement);
+    if (reloadButton instanceof HTMLElement) reloadButton.click();
+
+    this.assertNotEqual(shell.getVM(), previousVM);
+    this.assertEqual(shell.getVM().options.maxInstructions, previousVM.options.maxInstructions);
+    this.assertTrue(Object.hasOwn(shell.getVM().getRegisteredCmds(), 'help'));
+    this.assertTrue(Object.hasOwn(shell.getVM().getRegisteredCmds(), 'arr_map'));
+    this.assertTrue(!Object.hasOwn(shell.getVM().getRegisteredCmds(), 'reload_probe_fn'));
+    let missing = false;
+    try {
+      await shell.eval('$reload_probe');
+    } catch (_err) {
+      missing = true;
+    }
+    this.assertTrue(missing, 'Reload must discard VM globals');
   }
 
   async test_print() {
     const res = await this.terminal.execute("print -m 'This is a test!'", false, true);
     this.assertEqual(res, 'This is a test!');
+  }
+
+  async test_dis() {
+    const rows = await this.terminal.execute('dis -c "print -m 42"', false, true);
+    this.assertTrue(rows.some(row => row[0] === 'LOAD_CONST' && row[2] === '42' && row[5] === '42'));
   }
 
   async test_load() {

@@ -4,6 +4,7 @@
 
 import i18n from 'i18next';
 import searchRead from '@odoo/orm/search_read';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -11,7 +12,9 @@ async function cmdLastSeen(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
   if (!this.longpolling) {
     throw new Error(i18n.t('cmdLastSeen.error.notAvailable', "Can't use lastseen, 'bus' module is not installed"));
   }
-  return searchRead('bus.presence', [], ['user_id', 'last_presence'], await this.getContext(), {
+  const version = getOdooVersion('major');
+  const model = typeof version === 'number' && version >= 19 ? 'mail.presence' : 'bus.presence';
+  return searchRead(model, [['user_id', '>', 0]], ['user_id', 'last_presence'], await this.getContext(), {
     orderBy: 'last_presence DESC',
   }).then(result => {
     const rows = [];

@@ -10,7 +10,7 @@ import type Terminal from '@terminal/terminal';
 async function cmdChrono(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<number> {
   let time_elapsed_secs = -1;
   const start_time = new Date().getTime();
-  await this.execute(kwargs.cmd, false);
+  await this.execute(kwargs.cmd, false, ctx.meta.silent, false, false, ctx.meta.info.executionOptions);
   time_elapsed_secs = (new Date().getTime() - start_time) / 1000.0;
   ctx.screen.print(
     i18n.t('cmdChrono.result.timeElapsed', "Time elapsed: '{{time_elapsed_secs}}' seconds", {time_elapsed_secs}),

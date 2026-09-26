@@ -1,4 +1,5 @@
 // @flow strict
+import type {EvalOptions} from '@tardo/trash/vmachine';
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
@@ -666,7 +667,7 @@ export default class Terminal {
   }
 
   // $FlowFixMe[unclear-type]
-  async execute(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false, update_input: boolean = true): Promise<any> {
+  async execute(code: string, store: boolean = true, silent: boolean = false, isolated_frame: boolean = false, update_input: boolean = true, execution_options?: EvalOptions): Promise<any> {
     const track_time = this.#config.show_execution_time;
     const t0 = track_time ? performance.now() : 0;
     if (!silent) {
@@ -682,7 +683,8 @@ export default class Terminal {
 
     let cmd_res: mixed;
     try {
-      cmd_res = await this.#shell.eval(code, {
+      cmd_res = await this.#shell.eval(code, execution_options ?? {
+        throwSilentErrors: silent,
         silent: silent,
         aliases: getStorageLocalItem('terminal_aliases', {}),
       }, isolated_frame);
@@ -796,11 +798,7 @@ export default class Terminal {
     const aliases = getStorageLocalItem('terminal_aliases', {});
     if (meta.info.cmdName in aliases) {
       const alias_cmd = this.#parseAlias(aliases, meta.info.cmdName, meta.info.args);
-      return await this.#shell.eval(alias_cmd || "", {
-        ...meta.info.executionOptions,
-        silent: meta.silent,
-        aliases: aliases,
-      });
+      return await this.#shell.eval(alias_cmd || '', meta.info.executionOptions);
     }
 
     if (typeof meta.info.cmdDef.callback === 'undefined') {
@@ -1294,6 +1292,7 @@ export default class Terminal {
       ...config,
     }
     this.#config.term_context = this.#config.term_context || {};
+    this.#shell.configureExecution(this.#config);
     this.userContext = {...this.#config.term_context, ...this.userContext};
   }
 
@@ -1540,7 +1539,7 @@ export default class Terminal {
   #onClickReloadShell() {
     this.screen.refresh();
     this.cleanInputHistory();
-    this.#shell.getVM().cleanGlobals();
+    this.#shell.resetVM();
     this.#updateJobsInfo();
     this.updateAssistantoptions();
     if (!this.#isAIMode) {

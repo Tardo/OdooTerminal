@@ -5,11 +5,18 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {transformSync} from '@babel/core';
 import ExecutionStoppedError from '@tardo/trash/exceptions/execution_stopped_error';
 import {FUNCTION_TYPE} from '@tardo/trash/function';
+import {ARG} from '@tardo/trash/constants';
 
 // Load the actual Flow source without a browser or the translation-extraction plugin.
 const sourceRoot = new URL('../src/', import.meta.url).href;
 registerHooks({
   resolve(specifier, context, nextResolve) {
+    if (specifier === '@common/constants') {
+      specifier = new URL('../src/js/common/constants.mjs', import.meta.url).href;
+    }
+    if (specifier === '@common/utils/unique_id') {
+      specifier = new URL('../src/js/common/utils/unique_id.mjs', import.meta.url).href;
+    }
     if (context.parentURL?.startsWith(sourceRoot) && specifier.startsWith('.') && !specifier.endsWith('.mjs')) {
       specifier += '.mjs';
     }
@@ -108,4 +115,54 @@ const brokenHook = new Shell({
 brokenHook.getVM().registerCommand('fail', {});
 await assert.rejects(brokenHook.eval('fail'), err => err === failure);
 assert.equal(brokenHook.getActiveJobs().length, 0);
+
+const typed = new Shell({invokeExternalCommand: async meta => meta.info.kwargs.value});
+typed.getVM().registerCommand('capture', {args: [[ARG.Any, ['v', 'value'], true, 'Value']]});
+assert.deepEqual(await typed.eval('capture [1, 2]'), [1, 2]);
+assert.deepEqual(await typed.eval('capture {name: "Odoo"}'), {name: 'Odoo'});
+
+// Keep the actual canvas for drawing, while serializing it informatively for display and agent output.
+const {default: createWindow} = await import('../src/js/page/terminal/libs/graphics/2d_create_window.mjs');
+const {default: listWindows} = await import('../src/js/page/terminal/libs/graphics/2d_list_windows.mjs');
+const {default: clearWindow} = await import('../src/js/page/terminal/libs/graphics/2d_clear.mjs');
+const {default: destroyWindow} = await import('../src/js/page/terminal/libs/graphics/2d_destroy_window.mjs');
+const {default: stringifyReplacer} = await import('../src/js/page/terminal/utils/stringify_replacer.mjs');
+const frames = [];
+const clears = [];
+globalThis.window = {requestAnimationFrame: callback => frames.push(callback)};
+globalThis.HTMLCanvasElement = class {
+  classList = {add() {}};
+  style = {};
+  isConnected = true;
+  getContext() {
+    return {clearRect: (...args) => clears.push(args)};
+  }
+  remove() {
+    this.isConnected = false;
+  }
+};
+globalThis.document = {
+  createElement: () => new HTMLCanvasElement(),
+  getElementsByTagName: () => [{appendChild() {}}],
+};
+const graphics = new Shell({invokeExternalCommand: async () => null});
+graphics.getVM().registerCommand('2d_create_window', createWindow());
+graphics.getVM().registerCommand('2d_list_windows', listWindows());
+graphics.getVM().registerCommand('2d_clear', clearWindow());
+graphics.getVM().registerCommand('2d_destroy_window', destroyWindow());
+const win = await graphics.eval('$win = (2d_create_window -w 40 -h 30); $win');
+assert.ok(win instanceof HTMLCanvasElement);
+assert.equal(win.width, 40);
+assert.deepEqual(await graphics.eval('2d_list_windows'), [{id: win.id, width: 40, height: 30}]);
+assert.deepEqual(JSON.parse(JSON.stringify(win, stringifyReplacer)), {
+  type: 'HTMLCanvasElement', id: win.id, width: 40, height: 30,
+});
+const windows = [win];
+JSON.stringify(windows, stringifyReplacer);
+assert.equal(windows[0], win);
+await graphics.eval('2d_clear -c $win');
+frames.shift()(0);
+assert.deepEqual(clears, [[0, 0, 40, 30]]);
+await graphics.eval('2d_destroy_window -c $win');
+assert.deepEqual(await graphics.eval('2d_list_windows'), []);
 console.info('Shell regression checks passed.');
