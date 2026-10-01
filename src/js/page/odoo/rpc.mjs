@@ -147,12 +147,13 @@ function buildQuery(options: Partial<BuildQueryOptions>): BuildQuery {
  * Perform a RPC.  Please note that this is not the preferred way to do a
  * rpc if you are in the context of a widget.  In that case, you should use
  * the this._rpc method.
+ * Normalize legacy jQuery Deferreds to native promises for every caller.
  *
  * @param {Object} params @see buildQuery for a description
  * @param {Object} options
  * @returns {Promise<any>}
  */
-export default function doQuery<T>(params: Partial<BuildQueryOptions>, options: ?{[string]: mixed}): Promise<T> {
+export default async function doQuery<T>(params: Partial<BuildQueryOptions>, options: ?{[string]: mixed}): Promise<T> {
   const query = buildQuery(params);
   const rpc_service = getOdooService('web.ajax', '@web/legacy/js/core/ajax', '@web/core/network/rpc_service', '@web/core/network/rpc');
   if (typeof rpc_service === 'undefined') {

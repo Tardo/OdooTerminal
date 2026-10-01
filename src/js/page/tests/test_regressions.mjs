@@ -16,6 +16,7 @@ import renderIcon from '@terminal/templates/icon';
 import parseHTML from '@terminal/utils/parse_html';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import isCompatibleOdooVersion from '@common/utils/is_compatible_odoo_version';
+import rpcQuery from '@odoo/rpc';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import getSessionInfo from '@odoo/net_utils/get_session_info';
 import Screen, {LINE_SELECTOR} from '@terminal/core/screen';
@@ -68,6 +69,12 @@ export default class TestRegressions extends TerminalTestSuite {
     } finally {
       screen.destroy();
     }
+  }
+
+  async test_rpc_promise() {
+    const request = rpcQuery<number>({model: 'res.partner', method: 'search_count', args: [[]]});
+    this.assertTrue(request instanceof Promise, 'RPCs must return native promises, including on legacy Odoo');
+    this.assertTrue((await request) > 0);
   }
 
   async test_cached_queries() {
