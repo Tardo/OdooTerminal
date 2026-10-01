@@ -409,6 +409,41 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertTrue(res === false, 'Invalid operation should return false');
   }
 
+  async test_sysparam_types() {
+    const version = getOdooVersion('major');
+    const modern = typeof version === 'number' && version >= 20;
+    const key = uniqueId('test_sysparam_types_');
+    try {
+      for (const [type, value] of [
+        ['str', 'text'],
+        ['int', 42],
+        ['int', 0],
+        ['float', 1.5],
+        ['float', 0],
+        ['bool', true],
+        ['bool', false],
+        ['str', ''],
+      ]) {
+        if (!modern && (type === 'bool' || value === '')) continue;
+        this.assertTrue(await this.terminal.execute(
+          `sysparam -o set -k ${key} --type ${type} -v ${JSON.stringify(value)}`, false, true,
+        ));
+        this.assertEqual(
+          await this.terminal.execute(`sysparam -k ${key} -t ${type}`, false, true),
+          modern ? value : String(value),
+        );
+      }
+      this.assertFalse(await this.terminal.execute(`sysparam -o set -k ${key} --type int`, false, true));
+      this.assertFalse(await this.terminal.execute(`sysparam -o set -k ${key} --type invalid -v 1`, false, true));
+      this.assertFalse(await this.terminal.execute(`sysparam -k ${key} --type invalid`, false, true));
+      this.assertFalse(await this.terminal.execute(`sysparam -k ${key}_missing --type bool`, false, true));
+    } finally {
+      await this.terminal.execute(
+        `unlink -m ir.config_parameter -i (call -m ir.config_parameter -c search -a [[[key, =, ${key}]]])`, false, true,
+      );
+    }
+  }
+
   async test_read_group() {
     const version = getOdooVersion('major');
     // Explicit aggregate functions and aliases were introduced after Odoo 11.

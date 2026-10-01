@@ -1099,12 +1099,14 @@
     "args": {
       "key": "Parameter key (required for get/set operations)",
       "operation": "Operation to perform.",
+      "type": "Parameter type for get/set operations (Odoo 20+)",
       "value": "Parameter value (required for set operation)"
     },
     "definition": "Manage system parameters",
     "detail": "Get, set, or list parameters in ir.config_parameter model.",
     "error": {
       "invalidOperation": "Invalid operation. Use 'get', 'set', or 'list'",
+      "invalidType": "Invalid type. Use 'str', 'int', 'float', or 'bool'",
       "listEmpty": "No system parameters found",
       "missingKey": "Key parameter is required for set operation",
       "missingValue": "Value parameter is required for set operation",

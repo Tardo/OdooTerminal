@@ -10,6 +10,8 @@ import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
+const PARAMETER_TYPES = ['str', 'int', 'float', 'bool'];
+
 type SystemParameter = {
   key: string,
   value: string,
@@ -17,8 +19,14 @@ type SystemParameter = {
 
 async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const operation = kwargs.operation || 'get';
+  const type = kwargs.type ?? 'str';
   const version = getOdooVersion('major');
   const useTypedParams = typeof version === 'number' && version >= 20;
+
+  if (!PARAMETER_TYPES.includes(type)) {
+    ctx.screen.printError(i18n.t('cmdSysParam.error.invalidType', "Invalid type. Use 'str', 'int', 'float', or 'bool'"));
+    return false;
+  }
 
   // Operation: list - List all system parameters
   if (operation === 'list') {
@@ -58,19 +66,19 @@ async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
       return false;
     }
 
-    return callModel<string | false>(
+    return callModel<string | number | boolean | null>(
       'ir.config_parameter',
-      useTypedParams ? 'get_str' : 'get_param',
-      [kwargs.key, false],
+      useTypedParams ? `get_${type}` : 'get_param',
+      [kwargs.key, null],
       null,
       await this.getContext(),
     ).then(result => {
-      if (result) {
+      if (result !== null) {
         ctx.screen.print(result);
       } else {
         ctx.screen.printError(i18n.t('cmdSysParam.error.notFound', "Parameter not found"));
       }
-      return result;
+      return result ?? false;
     });
   }
 
@@ -81,14 +89,14 @@ async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
       return false;
     }
 
-    if (!kwargs.value) {
+    if (typeof kwargs.value === 'undefined') {
       ctx.screen.printError(i18n.t('cmdSysParam.error.missingValue', "Value parameter is required for set operation"));
       return false;
     }
 
-    return callModel<SystemParameter>(
+    return callModel<string | number | boolean>(
       'ir.config_parameter',
-      useTypedParams ? 'set_str' : 'set_param',
+      useTypedParams ? `set_${type}` : 'set_param',
       [kwargs.key, kwargs.value],
       null,
       await this.getContext(),
@@ -136,6 +144,7 @@ export default function (): Partial<CMDDef> {
       [ARG.String, ['o', 'operation'], true, i18n.t('cmdSysParam.args.operation', "Operation to perform."), 'get', ['get', 'set', 'list']],
       [ARG.String, ['k', 'key'], false, i18n.t('cmdSysParam.args.key', 'Parameter key (required for get/set operations)')],
       [ARG.String | ARG.Number | ARG.Flag, ['v', 'value'], false, i18n.t('cmdSysParam.args.value', 'Parameter value (required for set operation)')],
+      [ARG.String, ['t', 'type'], false, i18n.t('cmdSysParam.args.type', 'Parameter type for get/set operations (Odoo 20+)'), 'str', PARAMETER_TYPES],
     ],
     example: '-o set -k "account_online_synchronization.proxy_mode" -v sandbox',
   };

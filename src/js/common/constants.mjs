@@ -261,8 +261,8 @@ export const COMPATIBLE_VERSIONS: $ReadOnlyArray<string> = [
   'saas~17',
   '18.',
   'saas~18',
-  '19.0',
-  'saas~19.0',
+  '19.',
+  'saas~19',
   '20.0',
   'saas~20.0',
 ];
