@@ -6,7 +6,7 @@ allowBuilds:
   core-js: true
 
 minimumReleaseAgeExclude:
-  - '@tardo/trash@2.2.0'
+  - '@tardo/trash@2.3.0'
   - '@tardo/trash-stdlib@2.0.0'
 
 overrides:

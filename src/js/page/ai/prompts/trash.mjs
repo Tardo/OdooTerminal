@@ -90,7 +90,7 @@ export function buildScriptingPrompt(): string {
     '  * Named (call by name, no $):   function myFunc(a, b) { return $b - $a }   →   myFunc 10 2   → -8\n' +
     '  * Anonymous stored in variable: $fn = function(a, b) { return $b - $a }\n' +
     '      $$fn 10 2   → -8  (COMMAND position)        ($$fn 10 2)   → -8  (inside a subexpression)\n' +
-    '  * TraSH 2.2.0 uses LEXICAL scope: functions capture the environment where they are DEFINED, not caller-local variables.\n' +
+    '  * TraSH 2.3.0 uses LEXICAL scope: functions capture the environment where they are DEFINED, not caller-local variables.\n' +
     '      Assignments update the nearest existing binding; parameters shadow outer names. Captured bindings are shared, not copied.\n' +
     '      Pass caller-specific values as explicit arguments. Closures keep their captured variables after the defining call ends.\n' +
     '      Named functions cannot replace existing commands. Prefer $fn = function(...) { ... } for helpers you may redefine.\n' +
@@ -200,7 +200,7 @@ export default function(terminal: Terminal): string {
     .join('\n');
 
   return (
-    'TraSH 2.2.0 scripting language with @tardo/trash-stdlib 2.0.0 — follow strictly. This is NOT JavaScript or Python.\n' +
+    'TraSH 2.3.0 scripting language with @tardo/trash-stdlib 2.0.0 — follow strictly. This is NOT JavaScript or Python.\n' +
     '\n' +
     '!!! FUNDAMENTAL RULES !!!\n' +
     '\n' +
@@ -218,7 +218,7 @@ export default function(terminal: Terminal): string {
     'For computations, end with $result or a compact dict/array of needed values. Variables persist in this terminal until reset; only reuse bindings you have actually defined.\n' +
     '\n' +
     '[RULE 2 — CONDITIONAL EXPRESSIONS]\n' +
-    'TraSH 2.2.0 supports condition ? value_if_true : value_if_false; ONLY the selected branch executes.\n' +
+    'TraSH 2.3.0 supports condition ? value_if_true : value_if_false; ONLY the selected branch executes.\n' +
     '  $val = $x > 5 ? "big" : "small"\n' +
     'It has lower precedence than arithmetic/comparisons/logic and nests right-to-left. Parenthesize it in command arguments: print -m ($x > 5 ? "big" : "small").\n' +
     'Use if/elif/else with braces for multi-statement branches.\n' +
@@ -271,6 +271,7 @@ export default function(terminal: Terminal): string {
     '    $$RID is the current record ID in $$RMOD, NOT automatically a partner/user ID. Capture once in $id if reused.\n' +
     '\n' +
     '=== 8. SUBCOMMAND CALLS & NESTING ===\n' +
+    '  * Subcommands used as values run silently and still return their value; nested function calls inherit this silence. In print $$RID or print (rid), only the outer print produces output.\n' +
     '  * Wrap in (): $val = (search -m res.partner -l 1) · chain access: (search -m res.partner -f name)[0]["name"]\n' +
     '  * Inline in args: read res.users -i (search -m res.users -f id)[0]["id"] · inside literals: {total: (count -m res.partner)}\n' +
     '  * A command used as an ARGUMENT VALUE must ALWAYS be wrapped in () — without them the inner command name becomes a literal string and its flags leak into the OUTER command:\n' +

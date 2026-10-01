@@ -125,7 +125,7 @@
   },
   "dependencies": {
     "@preact/signals": "^2.11.2",
-    "@tardo/trash": "2.2.0",
+    "@tardo/trash": "2.3.0",
     "@tardo/trash-stdlib": "2.0.0",
     "@zip.js/zip.js": "^2.15.0",
     "async-mutex": "^0.5.0",

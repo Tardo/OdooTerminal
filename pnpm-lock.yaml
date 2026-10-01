@@ -184,11 +184,11 @@ importers:
         specifier: ^2.11.2
         version: 2.11.2(preact@10.29.8)
       '@tardo/trash':
-        specifier: 2.2.0
-        version: 2.2.0
+        specifier: 2.3.0
+        version: 2.3.0
       '@tardo/trash-stdlib':
         specifier: 2.0.0
-        version: 2.0.0(@tardo/trash@2.2.0)
+        version: 2.0.0(@tardo/trash@2.3.0)
       '@zip.js/zip.js':
         specifier: ^2.15.0
         version: 2.15.0
@@ -1872,9 +1872,9 @@ packages:
     peerDependencies:
       '@tardo/trash': ^2.1.1
 
-  '@tardo/trash@2.2.0':
+  '@tardo/trash@2.3.0':
     resolution:
-      {integrity: sha512-yPoyhXH2ZM+RtYp6UrFotUtWI9fpghz7plWYlVNnlc/jiaNVk/m4doCOI4Gqct6v1Z7+PnMvSKUuhhS0jMJTrw==}
+      {integrity: sha512-1/Nfo07OgKDKA3YjIOJxWVbuSVpnwob5Dz7NEvkNqpMVFhVyczJOvrITww+ljWAeQ0X8hHmhi6f1EF1dRXtUdA==}
 
   '@tybys/wasm-util@0.10.4':
     resolution:
@@ -7540,11 +7540,11 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tardo/trash-stdlib@2.0.0(@tardo/trash@2.2.0)':
+  '@tardo/trash-stdlib@2.0.0(@tardo/trash@2.3.0)':
     dependencies:
-      '@tardo/trash': 2.2.0
+      '@tardo/trash': 2.3.0
 
-  '@tardo/trash@2.2.0': {}
+  '@tardo/trash@2.3.0': {}
 
   '@tybys/wasm-util@0.10.4':
     dependencies:
