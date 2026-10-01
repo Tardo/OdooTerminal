@@ -8,7 +8,7 @@ export default function (): Promise<OdooSessionInfo | void> {
   return cachedCallModelMulti<OdooSessionInfo>(
     'ir_http.session_info',
     'ir.http',
-    [0],
+    [],
     'session_info'
   );
 }

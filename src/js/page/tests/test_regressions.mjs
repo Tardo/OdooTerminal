@@ -84,6 +84,12 @@ export default class TestRegressions extends TerminalTestSuite {
     }
     this.assertEqual(await this.terminal.execute(`true ? 7 : (${code})`, false, true), 7);
     this.assertNotEmpty(await this.terminal.execute('whoami', false, true));
+    // Legacy Odoo opens dialogs for these expected RPC errors.
+    for (const modal of document.querySelectorAll('.modal')) {
+      if (modal instanceof HTMLElement && modal.textContent.includes('odooterminal_missing_model')) {
+        this.closeModal(modal);
+      }
+    }
   }
 
   async test_scripting_prompt_examples() {

@@ -92,22 +92,22 @@ export default class TestCommon extends TerminalTestSuite {
 
   async test_install() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute('install -m transifex', false, true);
-    this.assertEqual(res[0]?.name, 'transifex');
+    const res = await this.terminal.execute('install -m contacts', false, true);
+    this.assertEqual(res[0]?.name, 'contacts');
     await asyncSleep(10000);
   }
 
   async test_upgrade() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute('upgrade -m transifex', false, true);
-    this.assertEqual(res[0]?.name, 'transifex');
+    const res = await this.terminal.execute('upgrade -m contacts', false, true);
+    this.assertEqual(res[0]?.name, 'contacts');
     await asyncSleep(10000);
   }
 
   async test_uninstall() {
     await asyncSleep(10000);
-    const res = await this.terminal.execute('uninstall -m transifex --force', false, true);
-    this.assertEqual(res?.name, 'transifex');
+    const res = await this.terminal.execute('uninstall -m contacts --force', false, true);
+    this.assertEqual(res?.name, 'contacts');
     await asyncSleep(10000);
   }
 
@@ -246,6 +246,7 @@ export default class TestCommon extends TerminalTestSuite {
   async test_depends() {
     const res = await this.terminal.execute('depends -m base', false, true);
     this.assertNotEmpty(res);
+    this.assertTrue(res.some(module => module.name === 'mail'), 'Dependencies must include applications');
   }
 
   async test_ual() {
@@ -269,11 +270,11 @@ export default class TestCommon extends TerminalTestSuite {
   async test_rpc() {
     const res =
       await this.terminal.execute(
-        "rpc -o {route: '/jsonrpc', method: 'server_version', params: {service: 'db'}}",
+        "rpc -o {route: '/jsonrpc', params: {service: 'common', method: 'version', args: []}}",
         false,
         true,
       );
-    this.assertNotEmpty(res);
+    this.assertNotEmpty(res.server_version);
   }
 
   async test_metadata() {
@@ -283,13 +284,18 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_barcode() {
+    const version = getOdooVersion('major');
+    const modern = typeof version === 'number' && version >= 20;
+    const edit = modern ? 'OCDEDIT' : 'O-CMD.EDIT';
+    const discard = modern ? 'OCDDISC' : 'O-CMD.DISCARD';
     let res = await this.terminal.execute('barcode -o info', false, true);
     this.assertNotEmpty(res);
+    this.assertTrue(res.some(line => line.includes(edit)));
     await this.terminal.execute('view -m res.company -i 1', false, true);
     await asyncSleep(2500);
-    res = await this.terminal.execute("barcode -o send -d 'O-CMD.EDIT'", false, true);
+    res = await this.terminal.execute(`barcode -o send -d '${edit}'`, false, true);
     this.assertNotEmpty(res);
-    res = await this.terminal.execute("barcode -o send -d ['O-CMD.DISCARD','O-CMD.EDIT','O-CMD.DISCARD']", false, true);
+    res = await this.terminal.execute(`barcode -o send -d ['${discard}','${edit}','${discard}']`, false, true);
     this.assertNotEmpty(res);
   }
 
@@ -404,9 +410,31 @@ export default class TestCommon extends TerminalTestSuite {
   }
 
   async test_read_group() {
+    const version = getOdooVersion('major');
+    // Explicit aggregate functions and aliases were introduced after Odoo 11.
+    const supportsAggregates = typeof version === 'number' && version >= 12;
     const res = await this.terminal.execute('read_group -m res.partner -g country_id', false, true);
     this.assertTrue(Array.isArray(res));
     this.assertTrue(res.length > 0);
+    const grouped = await this.terminal.execute(
+      `read_group -m res.partner -g is_company -f ${supportsAggregates ? '["id:sum","total:sum(id)",color]' : '[color]'} -d [[id, in, [1,2,3]]]`,
+      false,
+      true,
+    );
+    if (supportsAggregates) {
+      this.assertEqual(grouped.reduce((sum, row) => sum + row.id, 0), 6, JSON.stringify(grouped));
+      this.assertEqual(grouped.reduce((sum, row) => sum + row.total, 0), 6);
+    }
+    this.assertTrue(grouped.every(row => typeof row.color === 'number'));
+    this.assertEmpty(await this.terminal.execute('read_group -m res.partner -g country_id -d [[id, =, 0]]', false, true));
+    if (typeof version === 'number' && version >= 20) {
+      const raw = await this.terminal.execute(
+        'rpc -o {model: "res.partner", method: "read_group", args: [[[id, in, [1,2,3]]], [], ["__count"]], kwargs: {context: {active_test: false}}}',
+        false,
+        true,
+      );
+      this.assertEqual(raw[0][0], 3);
+    }
   }
 
   async test_describe() {

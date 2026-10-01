@@ -5,6 +5,7 @@
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -16,6 +17,8 @@ type SystemParameter = {
 
 async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const operation = kwargs.operation || 'get';
+  const version = getOdooVersion('major');
+  const useTypedParams = typeof version === 'number' && version >= 20;
 
   // Operation: list - List all system parameters
   if (operation === 'list') {
@@ -55,10 +58,10 @@ async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
       return false;
     }
 
-    return callModel<SystemParameter>(
+    return callModel<string | false>(
       'ir.config_parameter',
-      'get_param',
-      [kwargs.key],
+      useTypedParams ? 'get_str' : 'get_param',
+      [kwargs.key, false],
       null,
       await this.getContext(),
     ).then(result => {
@@ -85,7 +88,7 @@ async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
 
     return callModel<SystemParameter>(
       'ir.config_parameter',
-      'set_param',
+      useTypedParams ? 'set_str' : 'set_param',
       [kwargs.key, kwargs.value],
       null,
       await this.getContext(),

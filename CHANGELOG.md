@@ -7,6 +7,8 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 **15.0.0**
 
 ```
+ADD: Support Odoo 20.0
+
 IMP: Use external @Tardo/trash package
 
 UPD: Change license to MIT

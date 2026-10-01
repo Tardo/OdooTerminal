@@ -40,14 +40,15 @@ async function cmdModuleDepends(
   if (typeof OdooVerMajor === 'number') {
     if (OdooVerMajor >= 19) {
       create_params = {
-        show_all: true,
         module_ids: [[6, false, module_ids]],
       };
     } else {
       create_params = {
-        show_all: true,
         module_id: module_ids[0],
       };
+    }
+    if (OdooVerMajor < 20) {
+      create_params = {...create_params, show_all: true};
     }
   }
   const wizard_id = (
@@ -71,6 +72,9 @@ async function cmdModuleDepends(
   if (typeof OdooVerMajor === 'number') {
     if (OdooVerMajor >= 19) {
       impacted_module_ids = wizard_record.impacted_module_ids;
+      if (OdooVerMajor >= 20) {
+        impacted_module_ids = [...impacted_module_ids, ...wizard_record.impacted_application_ids];
+      }
     } else {
       impacted_module_ids = wizard_record.module_ids;
     }

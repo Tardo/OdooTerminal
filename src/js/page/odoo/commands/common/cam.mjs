@@ -4,16 +4,19 @@
 
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {getModelOptions} from './__utils__';
 import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
 async function cmdCheckModelAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
+  const version = getOdooVersion('major');
+  const useHasAccess = typeof version === 'number' && version >= 20;
   return callModel<boolean>(
     kwargs.model,
-    'check_access_rights',
-    [kwargs.operation, false],
+    useHasAccess ? 'has_access' : 'check_access_rights',
+    useHasAccess ? [[], kwargs.operation] : [kwargs.operation, false],
     null,
     await this.getContext(),
   ).then(result => {

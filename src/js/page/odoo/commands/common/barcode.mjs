@@ -38,13 +38,15 @@ function getBarcodeInfo(barcodeService: BarcodeService) {
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 16) {
     return [
       i18n.t('cmdBarcode.result.maxTimeBetweenKeysInMs', 'Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}', {
-        maxTimeBetweenKeysInMs: barcodeService.barcodeService.maxTimeBetweenKeysInMs,
+        maxTimeBetweenKeysInMs: (barcodeService.barcodeService || barcodeService.BarcodePlugin).maxTimeBetweenKeysInMs,
       }),
       i18n.t('cmdBarcode.result.reservedPrefixes', 'Reserved barcode prefixes: {{prefixes}}', {
-        prefixes: 'O-BTN., O-CMD.',
+        prefixes: OdooVerMajor >= 20 ? 'OBT, OCD' : 'O-BTN., O-CMD.',
       }),
       i18n.t('cmdBarcode.result.availableCommands', 'Available commands: {{availableCommands}}', {
-        availableCommands: AVAILABLE_BARCODE_COMMANDS.join(', '),
+        availableCommands: (OdooVerMajor >= 20
+          ? Object.keys(getOdooService('@barcodes/barcode_handlers')?.COMMANDS || {})
+          : AVAILABLE_BARCODE_COMMANDS).join(', '),
       }),
     ];
   }
@@ -65,7 +67,7 @@ function getBarcodeInfo(barcodeService: BarcodeService) {
 }
 
 async function cmdBarcode(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
-  const barcodeService = getOdooService('barcodes.BarcodeEvents', '@barcodes/barcode_service');
+  const barcodeService = getOdooService('barcodes.BarcodeEvents', '@barcodes/barcode_service', '@barcodes/barcode_plugin');
   if (!barcodeService) {
     // Soft-dependency... this don't exists if barcodes module is not installed
     ctx.screen.printError(

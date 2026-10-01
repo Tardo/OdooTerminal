@@ -48,16 +48,18 @@ describe('OdooTerminal', () => {
       document.querySelector('.o_terminal').dispatchEvent(new Event('start_terminal_tests'));
     });
 
-    const result = await page.waitForSelector('.o_terminal .terminal-test-ok,.o_terminal .terminal-test-fail', {
-      timeout: WAIT_MINS * 30,
-    });
-    const text = await page.evaluate(() => {
-      const elm = document.querySelector('.o_terminal #terminal_screen');
-      return elm.textContent;
-    });
-    console.debug('---- TERMINAL OUTPUT:', text); // eslint-disable-line no-console
-
-    expect(await result.evaluate(element => element.classList.contains('terminal-test-ok'))).toBe(true);
+    try {
+      const result = await page.waitForSelector('.o_terminal .terminal-test-ok,.o_terminal .terminal-test-fail', {
+        timeout: WAIT_MINS * 30,
+      });
+      expect(await result.evaluate(element => element.classList.contains('terminal-test-ok'))).toBe(true);
+    } finally {
+      const text = await page.evaluate(() => {
+        const elm = document.querySelector('.o_terminal #terminal_screen');
+        return elm?.textContent;
+      });
+      console.debug('---- TERMINAL OUTPUT:', text); // eslint-disable-line no-console
+    }
   }, WAIT_MINS * 35);
 
   it('persists execution controls in extension options', async () => {

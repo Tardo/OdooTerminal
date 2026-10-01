@@ -13,7 +13,7 @@ const READ_EXCLUDED_KEYS = ["__domain", "__count"];
 
 async function cmdReadGroup(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
   const results = await readGroup(kwargs.model, kwargs.domain, kwargs.field, kwargs.groupby, await this.getContext());
-  if (results) {
+  if (results.length) {
     const heads = Object.keys(results[0]).filter((key) => !READ_EXCLUDED_KEYS.includes(key));
     heads.unshift("Count");
     const rows = [];

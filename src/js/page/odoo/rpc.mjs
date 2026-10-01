@@ -4,6 +4,7 @@
 
 /** This is a clone of Odoo implementation but without data transformations and adapted to new versions */
 import getOdooService from './utils/get_odoo_service';
+import getOdooVersion from './utils/get_odoo_version';
 
 export type BuildQueryOptions = {
   args: $ReadOnlyArray<mixed>,
@@ -75,7 +76,11 @@ function buildQuery(options: Partial<BuildQueryOptions>): BuildQuery {
     }
   }
 
-  if (options.method === 'read_group' || options.method === 'web_read_group') {
+  const version = getOdooVersion('major');
+  if (
+    !(typeof version === 'number' && version >= 20) &&
+    (options.method === 'read_group' || options.method === 'web_read_group')
+  ) {
     if (!(params.args && typeof params.args[0] !== 'undefined')) {
       params.kwargs.domain = options.domain || params.domain || params.kwargs.domain || [];
     }

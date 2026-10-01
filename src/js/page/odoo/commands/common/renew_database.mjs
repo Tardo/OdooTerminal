@@ -4,6 +4,7 @@
 
 import i18n from 'i18next';
 import rpcQuery from '@odoo/rpc';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
@@ -32,9 +33,10 @@ async function cmdRenewDatabase(this: Terminal, kwargs: CMDCallbackArgs, ctx: CM
     params.push({param: 'database.uuid', value: uuid});
   }
 
+  const version = getOdooVersion('major');
   for (const {param, value} of params) {
     await rpcQuery<SystemParameter>({
-      method: 'set_param',
+      method: typeof version === 'number' && version >= 20 ? 'set_str' : 'set_param',
       model: 'ir.config_parameter',
       args: [param, value],
       kwargs: {context: await this.getContext()},
