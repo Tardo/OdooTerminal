@@ -104,7 +104,6 @@ export default class Screen {
   #userInput_el: HTMLElement;
   #promptContainer_els: NodeList<HTMLElement>;
   #interactiveContainer_el: HTMLElement;
-  #prompt_el: HTMLElement;
   #promptInfoContainer_el: HTMLElement;
   #assistant_el: HTMLElement;
   #assistant_desc_el: HTMLElement;
@@ -146,7 +145,9 @@ export default class Screen {
   }
 
   destroy() {
-    // To override
+    this.#wasStart = false;
+    this.#buff.length = 0;
+    this.#closeAttachMenu();
   }
 
   show() {
@@ -182,7 +183,9 @@ export default class Screen {
       return;
     }
     const wrapper = parseHTML(`<div>${html}</div>`);
+    this.#buff.length = 0;
     this.#screen_el.replaceChildren(...Array.from(wrapper.childNodes));
+    this.#lazyVacuum();
     this.scrollDown();
   }
 
@@ -197,9 +200,10 @@ export default class Screen {
     if (!this.#wasStart) {
       return;
     }
+    this.#buff.length = 0;
     this.#screen_el.textContent = '';
     if (Object.hasOwn(this.#options, 'onCleanScreen')) {
-      this.#options.onCleanScreen(this.getContent());
+      this.#options.onCleanScreen('');
     }
   }
 
@@ -374,17 +378,11 @@ export default class Screen {
       this.#flushing = false;
       return;
     }
-    const buff_els = this.#buff.splice(0, this.#max_buff_lines);
-    for (let i = 0; i < buff_els.length; ++i) {
-      this.#screen_el.append(buff_els[i]);
-    }
+    this.#screen_el.append(...this.#buff.splice(0, this.#max_buff_lines));
     this.#lazyVacuum();
     this.scrollDown();
 
     if (this.#buff.length === 0) {
-      if (Object.hasOwn(this.#options, 'onSaveScreen')) {
-        this.#options.onSaveScreen(this.getContent());
-      }
       this.#flushing = false;
     } else {
       window.requestAnimationFrame(() => this.#flush());
@@ -500,6 +498,7 @@ export default class Screen {
     const el = document.createElement('span');
     el.className = cls !== undefined ? `line-text line-br ${cls}` : 'line-text line-br';
     if (this.#wasStart) {
+      this.#drainBuffer();
       this.#screen_el.append(el);
       this.scrollDown();
     }
@@ -753,19 +752,16 @@ export default class Screen {
       return;
     }
 
-    const $lines = Array.from(this.#screen_el.querySelectorAll(LINE_SELECTOR));
-    const diff = $lines.length - this.#max_lines;
-    if (diff > 0) {
-      const nodes = $lines.slice(0, diff);
-      do {
-        const node = nodes.pop();
-        if (node) {
-          const can_be_deleted = node.querySelector('.print-table tbody:empty') || !node.querySelector('.print-table');
-          if (can_be_deleted) {
-            node.remove();
-          }
-        }
-      } while (nodes.length);
+    const lines = this.#screen_el.querySelectorAll(LINE_SELECTOR);
+    for (let i = Math.floor(lines.length - this.#max_lines) - 1; i >= 0; --i) {
+      const node = lines[i];
+      if (node.querySelector('.print-table tbody:empty') || !node.querySelector('.print-table')) {
+        node.remove();
+      }
+    }
+    // Serialize once after a burst, after trimming it to the configured limit.
+    if (this.#screen_el.childNodes.length) {
+      this.#options.onSaveScreen(this.#screen_el.innerHTML);
     }
   }
 
@@ -863,9 +859,7 @@ export default class Screen {
         }
       };
       this.#menuCloseHandler = closeHandler;
-      setTimeout(() => {
-        document.addEventListener('click', closeHandler, true);
-      }, 0);
+      document.addEventListener('click', closeHandler, true);
     }
   }
 
@@ -1034,13 +1028,6 @@ export default class Screen {
     } else {
       throw new ElementNotFoundError('.terminal-prompt-container.terminal-prompt-interactive');
     }
-    elm = this.#userInput_el.querySelector('.terminal-prompt');
-    if (elm) {
-      // $FlowFixMe[incompatible-type]
-      this.#prompt_el = elm;
-    } else {
-      throw new ElementNotFoundError('.terminal-prompt');
-    }
     elm = this.#userInput_el.querySelector('.terminal-prompt-container.terminal-prompt-info');
     if (elm) {
       // $FlowFixMe[incompatible-type]
@@ -1103,7 +1090,7 @@ export default class Screen {
       const cur_value = this.#input_el.value;
       const next_value = `${cur_value}${String.fromCharCode(ev.keyCode)}`.toLowerCase();
       // $FlowFixMe[incompatible-use]
-      const is_invalid = this.#question_active.values.filter(item => item.startsWith(next_value)).length === 0;
+      const is_invalid = !this.#question_active.values.some(item => item.startsWith(next_value));
       if (is_invalid) {
         ev.preventDefault();
       }

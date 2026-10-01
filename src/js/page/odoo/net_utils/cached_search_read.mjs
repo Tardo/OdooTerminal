@@ -2,8 +2,6 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
-// $FlowFixMe[cannot-resolve-module]
-import hash from 'object-hash';
 import searchRead from '@odoo/orm/search_read';
 import type {SearchReadOptions} from '@odoo/orm/search_read';
 
@@ -15,7 +13,7 @@ export type CacheSearchReadOptions = {
 export type CachedSearchReadMapCallback = (item: Object) => Array<mixed>;
 
 // $FlowFixMe[unclear-type]
-const cache: {[string]: Array<Object>} = {};
+const cache: {[string]: Promise<Array<Object>>} = {};
 export default async function (
   cache_name: string,
   model: string,
@@ -27,19 +25,17 @@ export default async function (
   map_func: ?CachedSearchReadMapCallback,
 // $FlowFixMe[unclear-type]
 ): Promise<Array<Object>> {
-  const cache_hash = hash(Array.from(arguments).slice(0, 6));
-  if (options?.force === true || !Object.hasOwn(cache, cache_hash)) {
-    let records: Array<OdooSearchResponse> = [];
-    try {
-      records = await searchRead(model, domain, fields, context, extra_params || {}, {'silent': true});
-    } catch (_err) {
-      // Do nothing
-    }
-    if (map_func) {
-      cache[cache_hash] = records.map(map_func);
-    } else {
-      cache[cache_hash] = records;
-    }
+  // cache_name identifies the projection; force refreshes the same query entry.
+  const key = JSON.stringify([cache_name, model, domain, fields, context, extra_params || {}]);
+  if (options?.force === true || !Object.hasOwn(cache, key)) {
+    const request: typeof cache[string] = searchRead(model, domain, fields, context, extra_params || {}, {silent: true})
+      .then(records => map_func ? records.map(map_func) : records)
+      .catch(() => {
+        // A failed older request must not evict a newer forced refresh.
+        if (cache[key] === request) delete cache[key];
+        return [];
+      });
+    cache[key] = request;
   }
-  return cache[cache_hash];
+  return cache[key];
 }

@@ -29,7 +29,6 @@ import renderWatchdogHistoryItem from './templates/watchdog_history_item';
 import {setWatchdogStimulusHandler, setWatchdogStimulusEnabled} from '@ai/watchdog/stimuli';
 import type {WatchdogStimulus} from '@ai/watchdog/stimuli';
 import {runWatchdogConsult} from '@ai/watchdog/consult';
-import debounce from './utils/debounce';
 import keyCode from './utils/keycode';
 import parseHTML from './utils/parse_html';
 import postMessage from '@common/utils/post_message';
@@ -163,8 +162,7 @@ export default class Terminal {
   #bgAIScreens: Map<string, Screen> = new Map();
   // Most recent printLive() element per conversation (the agent's "Thinking... (Xs)" ticker),
   // so #saveCurrentScreenSnapshot can detach it before serializing — see the comment there.
-  // Superseded automatically each time a new one is created; never explicitly pruned (bounded
-  // by conversation count, same trade-off as #mcpConfirmedServers above).
+  // Superseded automatically each time a new one is created and cleared when the run ends.
   #activeLiveEls: Map<string, HTMLElement> = new Map();
   #aiConvList_el: HTMLElement | void;
   #aiProviderSelect_el: HTMLSelectElement | void;
@@ -492,11 +490,9 @@ export default class Terminal {
       inputMode: this.#config.multiline ? 'multi' : 'single',
       highlightWords: this.#config.hightlight_words ? this.#config.hightlight_words_list : [],
       maxLines: this.#config.screen_buffer_size,
-      onSaveScreen: function (this: Terminal, content: string) {
-        debounce(() => {
-          setStorageSessionItem('terminal_screen', content, err => this.screen.print(err));
-        }, 350);
-      }.bind(this),
+      onSaveScreen: (content: string) => {
+        setStorageSessionItem('terminal_screen', content, err => logger.warn('storage', err));
+      },
       onCleanScreen: () => {
         removeStorageSessionItem('terminal_screen');
       },
@@ -605,11 +601,9 @@ export default class Terminal {
         err => this.screen.printError(err),
       );
     } else if (!this.#isAIMode) {
-      setStorageSessionItem(
-        'terminal_ai_normal_screen',
-        this.screen.getContent(),
-        err => this.screen.printError(err),
-      );
+      const content = this.screen.getContent();
+      setStorageSessionItem('terminal_screen', content, err => logger.warn('storage', err));
+      setStorageSessionItem('terminal_ai_normal_screen', content, err => this.screen.printError(err));
     }
   }
 
@@ -1145,7 +1139,9 @@ export default class Terminal {
       // copy, and the original would then land on top of it in the live screen on the next
       // tick — detach first so only the (about-to-reattach) original ever renders.
       this.#activeLiveEls.get(convId)?.remove();
-      return bg.getContent();
+      const content = bg.getContent();
+      bg.destroy();
+      return content;
     }
     return getStorageSessionItem(`terminal_ai_screen_${convId}`, '');
   }
@@ -2322,6 +2318,10 @@ export default class Terminal {
       removeStorageLocalItem(`terminal_ai_sysprompt_${convId}`);
       removeStorageLocalItem(`terminal_ai_settings_${convId}`);
       removeStorageSessionItem(`terminal_ai_screen_${convId}`);
+      this.#bgAIScreens.get(convId)?.destroy();
+      this.#bgAIScreens.delete(convId);
+      this.#mcpConfirmedServers.delete(convId);
+      this.#activeLiveEls.delete(convId);
       if (this.#activeConvId === convId) {
         const nextId = convs.length > 0 ? convs[0].id : null;
         this.#activeConvId = nextId;

@@ -204,9 +204,6 @@ importers:
       markdown-it:
         specifier: ^14.3.2
         version: 14.3.2
-      object-hash:
-        specifier: ^3.0.0
-        version: 3.0.0
       preact:
         specifier: ^10.29.8
         version: 10.29.8
@@ -4425,11 +4422,6 @@ packages:
   nth-check@2.1.1:
     resolution:
       {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
-
-  object-hash@3.0.0:
-    resolution:
-      {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
-    engines: {node: '>= 6'}
 
   object-keys@1.1.1:
     resolution:
@@ -9852,8 +9844,6 @@ snapshots:
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
-
-  object-hash@3.0.0: {}
 
   object-keys@1.1.1: {}
 

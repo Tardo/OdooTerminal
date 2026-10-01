@@ -4,7 +4,7 @@
 
 import i18n from 'i18next';
 import getOdooSession from '@odoo/utils/get_odoo_session';
-import cachedCallService from '@odoo/net_utils/cached_call_service';
+import callService from '@odoo/osv/call_service';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
@@ -53,9 +53,17 @@ async function cmdLoginAs(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
   return res;
 }
 
+let databases: Promise<Array<string>> | void;
+
 async function getOptions(this: Terminal, arg_name: string) {
   if (arg_name === 'database') {
-    return cachedCallService('options_db_list', 'db', 'list', []);
+    if (!databases) {
+      databases = callService<Array<string>>('db', 'list', []).catch(() => {
+        databases = undefined;
+        return [];
+      });
+    }
+    return databases;
   } else if (arg_name === 'user') {
     return cachedSearchRead(
       'options_res.users_active',
@@ -65,7 +73,7 @@ async function getOptions(this: Terminal, arg_name: string) {
       await this.getContext({active_test: true}),
       undefined,
       {orderBy: 'login ASC'},
-      item => item.name,
+      item => item.login,
     );
   }
   return [];

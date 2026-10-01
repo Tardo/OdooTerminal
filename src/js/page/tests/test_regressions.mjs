@@ -16,8 +16,79 @@ import renderIcon from '@terminal/templates/icon';
 import parseHTML from '@terminal/utils/parse_html';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import isCompatibleOdooVersion from '@common/utils/is_compatible_odoo_version';
+import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import getSessionInfo from '@odoo/net_utils/get_session_info';
+import Screen, {LINE_SELECTOR} from '@terminal/core/screen';
+import asyncSleep from '@terminal/utils/async_sleep';
 
 export default class TestRegressions extends TerminalTestSuite {
+  async test_screen_buffer_lifecycle() {
+    const container = document.createElement('div');
+    const screen = new Screen({host: 'localhost'});
+    const saved: Array<string> = [];
+    screen.start(container, {
+      inputColors: {},
+      inputMode: 'single',
+      maxLines: 5,
+      onCleanScreen: content => this.assertEqual(content, ''),
+      onSaveScreen: content => {
+        saved.push(content);
+      },
+      onInput: () => undefined,
+      onInputKeyUp: () => undefined,
+    });
+    try {
+      screen.print('discard');
+      screen.clean();
+      await new Promise(resolve => window.requestAnimationFrame(resolve));
+      this.assertEqual(screen.getContent(), '');
+      screen.print('discard');
+      screen.setContent('<span>restored</span>');
+      this.assertEqual(screen.getContent(), '<span>restored</span>');
+      screen.clean();
+      for (let i = 0; i < 105; ++i) screen.print(i);
+      const live = screen.printLive();
+      live.update('live');
+      const output = container.querySelector('#terminal_screen');
+      this.assertEqual(output?.lastElementChild, live.el, 'Live output must follow buffered output');
+      await asyncSleep(800);
+      this.assertEqual(output?.querySelectorAll(LINE_SELECTOR).length, 5);
+      this.assertEqual(saved.length, 1, 'A burst must produce one trimmed snapshot');
+      this.assertEqual(saved[0], screen.getContent());
+      screen.print('discard');
+      screen.clean();
+      await asyncSleep(800);
+      this.assertEqual(screen.getContent(), '');
+      this.assertEqual(saved.length, 1, 'Clear must not save discarded output');
+      screen.print('discard');
+      screen.getContent();
+      screen.destroy();
+      await asyncSleep(800);
+      this.assertEqual(saved.length, 1, 'Retired background screens must stop saving');
+    } finally {
+      screen.destroy();
+    }
+  }
+
+  async test_cached_queries() {
+    const name = uniqueId('terminal_test_cache');
+    const read = (limit: number, force: boolean = false) =>
+      cachedSearchRead(name, 'res.partner', [], ['name'], {}, force ? {force: true} : undefined, {limit});
+    const [first, concurrent] = await Promise.all([read(1), read(1)]);
+    this.assertEqual(first.length, 1);
+    this.assertEqual(first, concurrent, 'Concurrent reads must share their RPC result');
+    this.assertEqual((await read(2)).length, 2, 'Pagination must be part of the cache key');
+    const refreshed = await read(1, true);
+    this.assertNotEqual(refreshed, first);
+    this.assertEqual(await read(1), refreshed, 'Force must refresh the ordinary cache entry');
+    const [sessionA, sessionB] = await Promise.all([getSessionInfo(), getSessionInfo()]);
+    this.assertNotEmpty(sessionA);
+    this.assertEqual(sessionA, sessionB);
+    const login = this.terminal.getShell().getVM().getRegisteredCmds().login;
+    const users = await login.options.call(this.terminal, 'user');
+    this.assertTrue(users.includes('admin'), 'Login completion must return the login field');
+  }
+
   async test_terminal_icons() {
     for (const version of ['19.0', '20.0', '20.0+e', 'saas~20.0']) {
       this.assertTrue(isCompatibleOdooVersion(version));
