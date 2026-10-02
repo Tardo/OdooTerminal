@@ -691,11 +691,11 @@ export default class Terminal {
       // error below — printing here would show it on screen as if a real user triggered
       // it, when it's an internal/background operation.
       if (!silent) {
-        this.screen.printError(`${err.name}: ${err.message}`);
         let err_msg = err.data;
+        let similar_cmd;
         if (err.constructor === UnknownCommandError) {
           // Search similar commands
-          const similar_cmd = this.#commandAssistant.searchSimiliarCommand(err.cmd_name);
+          similar_cmd = this.#commandAssistant.searchSimiliarCommand(err.cmd_name);
           if (typeof similar_cmd !== 'undefined') {
             err_msg = i18n.t(
               'terminal.unknownCommand',
@@ -708,6 +708,10 @@ export default class Terminal {
               },
             );
           }
+        }
+        // The suggestion message already says what the plain one does, so don't print both
+        if (typeof similar_cmd === 'undefined') {
+          this.screen.printError(`${err.name}: ${err.message}`);
         }
         this.screen.printError(err_msg, true);
       }
@@ -764,7 +768,6 @@ export default class Terminal {
       // error below — printing here would show it on screen as if a real user triggered
       // it, when it's an internal/background operation.
       if (!silent) {
-        this.screen.printError(`${err.name}: ${err.message}`);
         let err_msg = err.data;
         if (err.constructor === UnknownCommandError && typeof similar_cmd !== 'undefined') {
           err_msg = i18n.t(
@@ -777,6 +780,9 @@ export default class Terminal {
               cmd: similar_cmd,
             },
           );
+        }
+        if (typeof similar_cmd === 'undefined') {
+          this.screen.printError(`${err.name}: ${err.message}`);
         }
         this.screen.printError(err_msg, true);
       }
