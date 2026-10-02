@@ -6,6 +6,7 @@ import TerminalTestSuite from './tests';
 import {buildScriptingPrompt} from '@ai/prompts/trash';
 import describeCommandError from '@ai/utils/describe_command_error';
 import {isNothingReply} from '@ai/watchdog/consult';
+import buildWatchdogSnapshot from '@ai/watchdog/snapshot';
 import {CALL_KW_RE, NOTIFICATION_SEVERITY_RE, truncateTail, truncateHead, causeChain} from '@ai/watchdog/stimuli';
 import * as local from '@terminal/core/storage/local';
 import * as session from '@terminal/core/storage/session';
@@ -244,6 +245,68 @@ export default class TestRegressions extends TerminalTestSuite {
     } finally {
       local.removeStorageItem(key);
       session.removeStorageItem(key);
+    }
+  }
+
+  async test_watchdog_snapshot(): Promise<void> {
+    const root = parseHTML(`<div>
+      <label for="watchdog_customer_0">Customer</label>
+      <div class="o_field_widget o_field_many2one o_required_modifier" name="partner_id">
+        <input id="watchdog_customer_0" value="Azure Interior">
+      </div>
+      <div class="o_field_widget o_field_char o_required_modifier" name="hidden" style="display:none"><input></div>
+      <div class="o_field_widget o_field_char o_required_modifier" name="missing"><input></div>
+      <div class="o_field_widget o_field_boolean o_required_modifier" name="active"><input type="checkbox"></div>
+      <input class="o_field_widget o_field_float o_required_modifier" name="amount" value="0">
+      <div class="o_field_widget o_field_selection" name="state">
+        <select><option value="draft">Draft</option><option value="done" selected>Done</option></select>
+      </div>
+      <div class="o_field_widget o_field_many2many_tags o_required_modifier" name="tags">
+        <span class="o_tag">VIP</span><input>
+      </div>
+      <div class="o_field_widget" name="secret"><input type="password" value="never send"></div>
+      <div class="o_field_widget o_field_one2many" name="order_line">
+        <table class="o_list_table"><thead><tr><th data-name="qty">Quantity</th></tr></thead><tbody>
+          <tr class="o_data_row"><td name="qty"><div class="o_field_widget o_required_modifier" name="qty"><input value="12"></div></td></tr>
+          <tr class="o_data_row" style="display:none"><td name="qty">999</td></tr>
+          <tr class="o_data_row"><td name="qty">3</td></tr>
+        </tbody></table>
+      </div>
+    </div>`);
+    document.body?.append(root);
+    try {
+      const snapshot = buildWatchdogSnapshot(root);
+      const fields = Object.fromEntries(snapshot.fields.map(field => [field.name, field]));
+      this.assertEqual(fields.partner_id.label, 'Customer');
+      this.assertEqual(fields.partner_id.value, 'Azure Interior');
+      this.assertEqual(fields.active.value, 'false');
+      this.assertEqual(fields.amount.value, '0');
+      this.assertEqual(fields.state.value, 'Done');
+      this.assertEqual(fields.tags.value, 'VIP');
+      this.assertEqual(snapshot.missingRequiredLabels.join(','), 'missing');
+      for (const name of ['hidden', 'secret', 'order_line', 'qty']) this.assertFalse(Object.hasOwn(fields, name));
+      this.assertEqual(snapshot.rows.length, 2);
+      this.assertEqual(snapshot.rows[0].list, 'order_line');
+      this.assertEqual(snapshot.rows[0].values['Quantity (qty)'], '12');
+      this.assertEqual(snapshot.rows[1].row, 3);
+      this.assertEqual(snapshot.rows[1].values['Quantity (qty)'], '3');
+      this.assertEqual(snapshot.limitations.length, 0);
+      const input = root.querySelector('td input');
+      if (!(input instanceof HTMLInputElement)) throw new Error('Missing editable line');
+      input.value = '27';
+      this.assertEqual(buildWatchdogSnapshot(root).rows[0].values['Quantity (qty)'], '27');
+      input.value = 'x'.repeat(350);
+      const tbody = root.querySelector('tbody');
+      const row = tbody?.querySelector('tr');
+      if (!tbody || !row) throw new Error('Missing list');
+      for (let i = 0; i < 60; i += 1) tbody.append(row.cloneNode(true));
+      const truncated = buildWatchdogSnapshot(root);
+      this.assertEqual(truncated.rows.length, 60);
+      this.assertTrue(truncated.limitations.includes('2 rows omitted'));
+      this.assertTrue(truncated.limitations.some(note => note.includes('values truncated')));
+      this.assertEqual(truncated.rows[0].values['Quantity (qty)'].length, 301);
+    } finally {
+      root.remove();
     }
   }
 

@@ -1,5 +1,4 @@
 // @flow strict
-import type {EvalOptions} from '@tardo/trash/vmachine';
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
@@ -38,6 +37,7 @@ import captureScreenshot from '@ai/utils/capture_screenshot';
 import listModels from '@ai/utils/list_models';
 import {Mutex} from 'async-mutex';
 import {aiState} from '@ai/state';
+import type {EvalOptions} from '@tardo/trash/vmachine';
 import type {JobMetaInfo} from './shell';
 import type {ExtensionSettings} from '@common/constants';
 import type {CMDAssistantOption} from './core/command_assistant';
@@ -2105,7 +2105,7 @@ export default class Terminal {
       if (this.#watchdogDismissTimer !== null) {
         clearTimeout(this.#watchdogDismissTimer);
       }
-      this.#watchdogDismissTimer = setTimeout(() => this.#hideWatchdog(), 9000);
+      this.#watchdogDismissTimer = setTimeout(() => this.#hideWatchdog(), Math.min(24000, Math.max(9000, text.length * 45)));
     } catch (err) {
       logger.error('watchdog', err);
     } finally {

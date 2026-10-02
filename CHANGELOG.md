@@ -11,6 +11,7 @@ ADD: Support Odoo 20.0
 
 IMP: Use external @Tardo/trash package
 IMP: Command 'sysparam': Value types (odoo 20+)
+IMP: AI Watchdog: Actionable findings with visible field/line values, dialog isolation and fewer speculative warnings
 
 UPD: Change license to MIT
 ```

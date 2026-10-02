@@ -21,6 +21,6 @@ export default function (): Partial<CMDDef> {
     args: [
       [ARG.List | ARG.Any, ['v', 'values'], true, i18n.t('cmdZip.args.values', 'Data to write (must be an array of tuples [filename, filedata, fileoptions])')],
     ],
-    example: "-v [['phones.txt', '000123456\\n000789012\\n'], ['names.txt', 'Lucia\\nAlex\\n']]",
+    example: "-v [['phones.txt', '000123456\\n000789012\\n'], ['names.txt', 'Foo\\nBar\\n']]",
   };
 }
