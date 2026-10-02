@@ -416,7 +416,7 @@ export default class Screen {
   }
 
   printCommand(cmd: string, secured: boolean = false) {
-    this.eprint(secured ? renderPromptCmdHiddenArgs(PROMPT, cmd) : renderPromptCmd(PROMPT, cmd));
+    this.eprint(secured ? renderPromptCmdHiddenArgs(PROMPT, cmd) : renderPromptCmd(PROMPT, cmd), false, 'line-command');
   }
 
   printAttachments(attachments: $ReadOnlyArray<AIAttachment>) {

@@ -23,10 +23,16 @@
 }
 
 .o_terminal {
-  box-shadow: 1px 1px 10px var(--terminal-color-secondary);
-  border: 0 solid var(--terminal-color-muted);
-  border-width: 1px 1px 0 1px;
+  --terminal-border-color: color-mix(in srgb, var(--terminal-color-dark), var(--terminal-color-light) 18%);
+  --terminal-surface-color: color-mix(in srgb, var(--terminal-color-dark), var(--terminal-color-light) 4%);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--terminal-border-color);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  box-sizing: border-box;
   font-family: var(--terminal-screen-font);
+  font-variant-ligatures: none;
+  line-height: 1.5;
   left: 50%;
   position: fixed;
   top: -110%;
@@ -34,8 +40,8 @@
   width: var(--terminal-screen-width);
   z-index: 1100;
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
   transition: 200ms;
   transition-timing-function: ease-out;
   height: var(--terminal-screen-height);
@@ -46,18 +52,27 @@
   width: var(--terminal-screen-width-maximized);
   height: var(--terminal-screen-height-maximized);
   border-width: 0;
+  border-radius: 0;
 }
 
 .o_terminal div#terminal_screen {
-  background-color: var(--terminal-color-dark);
+  background-color: color-mix(
+    in srgb,
+    var(--terminal-color-dark) calc(var(--terminal-screen-opacity) * 100%),
+    transparent
+  );
+  box-sizing: border-box;
   caret-color: var(--terminal-color-white);
-  color: var(--terminal-color-light);
+  color: color-mix(in srgb, var(--terminal-color-light), var(--terminal-color-dark) 8%);
   height: 100%;
-  opacity: var(--terminal-screen-opacity);
-  overflow-y: scroll;
+  min-height: 0;
+  min-width: 0;
+  line-height: 1.55;
+  overflow: auto;
   padding: 0;
   resize: none;
-  scrollbar-color: var(--terminal-color-white) var(--terminal-color-dark);
+  scrollbar-color: var(--terminal-border-color) transparent;
+  scrollbar-width: thin;
   white-space: pre;
 }
 .o_terminal div#terminal_screen::-webkit-scrollbar {
@@ -68,11 +83,17 @@
   background: transparent;
 }
 .o_terminal div#terminal_screen::-webkit-scrollbar-thumb {
-  background-color: var(--terminal-color-white);
+  background-color: var(--terminal-border-color);
+  border-radius: 6px;
+}
+
+.o_terminal ::selection {
+  background-color: color-mix(in srgb, var(--terminal-color-primary) 30%, var(--terminal-color-dark));
+  color: var(--terminal-color-light);
 }
 
 .o_terminal div#terminal_screen hr {
-  border-color: var(--terminal-color-muted);
+  border-color: var(--terminal-border-color);
 }
 
 .o_terminal div#terminal_screen .o_terminal_title {
@@ -81,6 +102,8 @@
 
 .o_terminal div#terminal_screen .o_terminal_click {
   text-decoration: underline;
+  text-decoration-color: var(--terminal-color-muted);
+  text-underline-offset: 3px;
 }
 .o_terminal div#terminal_screen .o_terminal_click:hover {
   cursor: pointer;
@@ -91,10 +114,11 @@
 }
 
 .o_terminal div#terminal_screen .error_message {
-  background-color: var(--terminal-color-danger);
-  padding: 0.3em;
-  border-radius: 3px;
-  margin: 0.3em;
+  background-color: color-mix(in srgb, var(--terminal-color-danger) 12%, var(--terminal-color-dark));
+  border-left: 3px solid var(--terminal-color-danger);
+  padding: 0.65em 0.9em;
+  border-radius: 4px;
+  margin: 0.5em 0;
   display: block;
   overflow: auto;
 }
@@ -111,8 +135,10 @@
   margin-bottom: 3px;
 }
 .o_terminal div#terminal_screen .error_message .card-body {
-  color: black;
-  border-radius: 0;
+  background-color: var(--terminal-surface-color);
+  border-color: var(--terminal-border-color);
+  color: var(--terminal-color-light);
+  border-radius: 4px;
 }
 .o_terminal div#terminal_screen .error_message li[name='debug'] .card-body {
   white-space: pre;
@@ -124,6 +150,23 @@
 
 .o_terminal div#terminal_screen .line-text {
   white-space: normal;
+}
+
+.o_terminal div#terminal_screen .line-command {
+  background-color: var(--terminal-surface-color);
+  border-left: 2px solid var(--terminal-color-info);
+  color: var(--terminal-color-light);
+  display: block;
+  margin: 0.75em 0 0.35em;
+  padding: 0.35em 0.65em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.o_terminal div#terminal_screen .line-command:first-child {
+  margin-top: 0;
+}
+.o_terminal div#terminal_screen .line-command::after {
+  content: none;
 }
 
 .o_terminal div#terminal_screen .line-text .print-table {
@@ -197,13 +240,16 @@
 }
 .o_terminal div#terminal_screen .line-text th,
 .o_terminal div#terminal_screen .line-text td {
-  border: 1px solid var(--terminal-color-muted);
-  padding: 0.3em 0.6em;
+  border: 1px solid var(--terminal-border-color);
+  padding: 0.4em 0.75em;
   text-align: left;
 }
-.o_terminal div#terminal_screen .line-text th {
-  background-color: var(--terminal-color-secondary);
+.o_terminal div#terminal_screen .line-text th,
+.o_terminal div#terminal_screen .print-table th {
+  background-color: color-mix(in srgb, var(--terminal-color-light) 18%, var(--terminal-color-dark));
+  border-bottom: 2px solid color-mix(in srgb, var(--terminal-color-info) 55%, var(--terminal-color-dark));
   color: var(--terminal-color-white);
+  font-weight: bold;
 }
 
 .o_terminal div#terminal_screen .line-pre {
@@ -240,26 +286,18 @@
   0%,
   100% {
     color: var(--terminal-color-info);
-    text-shadow: 0 0 6px var(--terminal-color-info);
   }
   50% {
     color: var(--terminal-color-white);
-    text-shadow:
-      0 0 14px var(--terminal-color-info),
-      0 0 28px var(--terminal-color-info);
   }
 }
 @keyframes o-terminal-verifying {
   0%,
   100% {
     color: var(--terminal-color-warning);
-    text-shadow: 0 0 6px var(--terminal-color-warning);
   }
   50% {
     color: var(--terminal-color-white);
-    text-shadow:
-      0 0 14px var(--terminal-color-warning),
-      0 0 28px var(--terminal-color-warning);
   }
 }
 .o_terminal div#terminal_screen .agent-thinking {
@@ -362,11 +400,14 @@
 }
 
 .o_terminal .terminal-user-input {
-  background-color: var(--terminal-color-dark);
-  border: 1px dotted var(--terminal-color-dark);
-  border-width: 1px 0 0 0;
+  background-color: var(--terminal-surface-color);
+  border-top: 1px solid var(--terminal-border-color);
+  border-radius: inherit;
   color: var(--terminal-color-light);
   display: flex;
+}
+.o_terminal .terminal-user-input:focus-within {
+  border-top-color: var(--terminal-color-info);
 }
 .o_terminal .terminal-user-input.terminal-input-disabled {
   display: none;
@@ -614,9 +655,15 @@
 }
 
 .o_terminal .terminal-user-input > .terminal-prompt-container {
-  padding: 2px 3px;
+  padding: 2px 8px;
   max-width: 15%;
   display: flex;
+}
+.o_terminal .terminal-user-input > .terminal-prompt-container:first-child {
+  border-bottom-left-radius: inherit;
+}
+.o_terminal .terminal-user-input > .terminal-prompt-container.terminal-prompt-host-container {
+  border-bottom-right-radius: inherit;
 }
 .o_terminal .terminal-user-input > .terminal-prompt-container.terminal-prompt-interactive {
   max-width: 30%;
@@ -652,6 +699,7 @@
 .o_terminal .terminal-user-input .rich-input {
   position: relative;
   flex: 1 1 auto;
+  min-width: 0;
   min-height: var(--terminal-input-height);
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input {
@@ -674,12 +722,14 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  padding: 3px;
+  box-sizing: border-box;
+  padding: 3px 8px;
 }
 .o_terminal .terminal-user-input .rich-input > #terminal_input_multi {
   flex: 1 1 auto; /* Here to force BS4 behavior */
   width: 100%;
-  padding: 3px;
+  box-sizing: border-box;
+  padding: 3px 8px;
   border: none;
   overflow: auto;
   outline: none;
@@ -689,17 +739,19 @@
 }
 
 .o_terminal .terminal-user-input input {
-  background-color: var(--terminal-color-dark);
+  background-color: transparent;
   border: 0;
   caret-color: var(--terminal-color-white);
   color: var(--terminal-color-light);
   height: var(--terminal-input-height);
+  font: inherit;
 }
 .o_terminal .terminal-user-input textarea {
-  background-color: var(--terminal-color-dark);
+  background-color: transparent;
   border: 0;
   caret-color: var(--terminal-color-white);
   color: var(--terminal-color-light);
+  font: inherit;
 }
 
 .o_terminal .terminal-user-input input[type='edit'] {
@@ -717,20 +769,19 @@
 }
 
 .o_terminal .print-table thead th {
-  border: 1px solid var(--terminal-color-white);
+  border: 1px solid var(--terminal-border-color);
   border-width: 0 1px 1px 0;
 }
 .o_terminal .print-table tbody td {
-  border: 1px solid var(--terminal-color-white);
+  border: 1px solid var(--terminal-border-color);
   border-width: 1px 1px 0 0;
 }
 .o_terminal .print-table thead th,
 .o_terminal .print-table tbody td {
-  padding: 0.3em;
+  padding: 0.4em 0.75em;
 }
 .o_terminal .print-table tbody tr:hover {
-  background-color: var(--terminal-color-light);
-  color: var(--terminal-color-dark);
+  background-color: var(--terminal-surface-color);
 }
 
 .o_terminal .print-table thead th:last-child,
@@ -739,14 +790,14 @@
 }
 
 .o_terminal .terminal-screen-info-zone {
-  margin: 1em;
+  margin: 0;
   position: absolute;
   right: 1em;
-  top: 0;
+  top: 0.65em;
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 .o_terminal .terminal-screen-info-zone > .btn {
   min-width: 36px;
@@ -1083,7 +1134,7 @@
 }
 
 .o_terminal.terminal-ai-mode {
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 200px minmax(0, 1fr);
 }
 .o_terminal.terminal-ai-mode .terminal-ai-sidebar {
   display: flex;
@@ -1097,11 +1148,8 @@
 .o_terminal.terminal-ai-mode .terminal-user-input {
   grid-column: 2;
   grid-row: 2;
-  background-color: #23203a;
-}
-.o_terminal.terminal-ai-mode .terminal-user-input input,
-.o_terminal.terminal-ai-mode .terminal-user-input textarea {
-  background-color: #23203a;
+  background-color: color-mix(in srgb, var(--terminal-color-info) 6%, var(--terminal-color-dark));
+  border-bottom-left-radius: 0;
 }
 .o_terminal.terminal-ai-mode div#terminal_assistant {
   left: 200px;
