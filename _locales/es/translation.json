@@ -1,1419 +1,1419 @@
 {
   "No": "No",
-  "Yes": "Yes",
+  "Yes": "Sí",
   "ai": {
     "mcp": {
       "error": {
-        "badResponse": "MCP server returned an unparsable response",
-        "toolFailedNoMessage": "Tool returned an error with no message"
+        "badResponse": "El servidor MCP devolvió una respuesta que no se puede analizar",
+        "toolFailedNoMessage": "La herramienta devolvió un error sin mensaje"
       }
     },
     "providers": {
       "gemini": {
         "error": {
-          "blocked": "Gemini blocked the response ({{reason}})"
+          "blocked": "Gemini bloqueó la respuesta ({{reason}})"
         }
       }
     },
     "utils": {
       "network": {
         "error": {
-          "aborted": "Request cancelled.",
-          "httpError": "HTTP error {{status}}",
-          "malformedToolCall": "The backend returned an unparsed tool-call attempt (raw chat-template tokens) instead of a valid response. The model likely lacks the capacity for reliable tool calling — try a stronger model or a smaller/simpler prompt.",
-          "noStream": "Server did not return a streaming response"
+          "aborted": "Solicitud cancelada.",
+          "httpError": "Error HTTP {{status}}",
+          "malformedToolCall": "El backend devolvió un intento de llamada a herramienta sin analizar (tokens crudos de la plantilla de chat) en lugar de una respuesta válida. Es probable que el modelo no sea capaz de llamar a herramientas de forma fiable: prueba con un modelo más potente o con un prompt más pequeño o sencillo.",
+          "noStream": "El servidor no devolvió una respuesta en streaming"
         }
       },
       "relayFetch": {
         "error": {
-          "missingPermission": "Missing browser permission to contact {{url}}. Open the extension's Options page (AI Providers section) and use \"Grant access\" for this URL, then try again.",
-          "unknown": "AI request failed"
+          "missingPermission": "Falta permiso del navegador para contactar con {{url}}. Abre la página de Opciones de la extensión (sección Proveedores de IA) y usa \"Grant access\" para esta URL, luego vuelve a intentarlo.",
+          "unknown": "La solicitud a la IA falló"
         }
       }
     }
   },
-  "cancel": "Cancel",
+  "cancel": "Cancelar",
   "checkStorageError": {
-    "message": "Clear the <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>screen</strong> or/and <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>history</strong> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
-    "warning": "WARNING: "
+    "message": "Borra la <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>pantalla</strong> y/o el <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>historial</strong> para liberar espacio de almacenamiento. <u>Cuota de almacenamiento del navegador superada</u> 😭",
+    "warning": "ADVERTENCIA: "
   },
   "cmd2DCircle": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The color",
-      "end-angle": "End angle in degrees",
-      "radius": "The radius",
-      "start-angle": "Start angle in degrees",
-      "stroke": "Draw the outline instead of filling",
-      "width": "The outline width",
-      "x": "The center X point",
-      "y": "The center Y point"
+      "canvas": "El lienzo o el id de su ventana",
+      "color": "El color",
+      "end-angle": "Ángulo final en grados",
+      "radius": "El radio",
+      "start-angle": "Ángulo inicial en grados",
+      "stroke": "Dibujar el contorno en lugar de rellenar",
+      "width": "El ancho del contorno",
+      "x": "El punto X del centro",
+      "y": "El punto Y del centro"
     },
-    "definition": "Draw a circle or arc",
-    "detail": "Draw a circle, arc or pie slice"
+    "definition": "Dibujar un círculo o arco",
+    "detail": "Dibujar un círculo, arco o sector circular"
   },
   "cmd2DClear": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "from-x": "The rect X point",
-      "from-y": "The rect Y point",
-      "height": "The rect height",
-      "width": "The rect width"
+      "canvas": "El lienzo o el id de su ventana",
+      "from-x": "El punto X del rect",
+      "from-y": "El punto Y del rect",
+      "height": "El alto del rect",
+      "width": "El ancho del rect"
     },
-    "definition": "Clear canvas",
-    "detail": "Clear canvas"
+    "definition": "Limpiar lienzo",
+    "detail": "Limpiar lienzo"
   },
   "cmd2DCreateWindow": {
     "args": {
-      "centered": "Center the canvas on screen",
-      "height": "The canvas height",
-      "posx": "The canvas position X",
-      "posy": "The canvas position Y",
-      "width": "The canvas width"
+      "centered": "Centrar el lienzo en la pantalla",
+      "height": "El alto del lienzo",
+      "posx": "La posición X del lienzo",
+      "posy": "La posición Y del lienzo",
+      "width": "El ancho del lienzo"
     },
-    "definition": "Create 2D Window",
-    "detail": "Create 2D Window"
+    "definition": "Crear ventana 2D",
+    "detail": "Crear ventana 2D"
   },
   "cmd2DDestroyWindow": {
     "args": {
-      "canvas": "The canvas or its window id"
+      "canvas": "El lienzo o el id de su ventana"
     },
-    "definition": "Destroy 2D Window",
-    "detail": "Destroy 2D Window"
+    "definition": "Destruir ventana 2D",
+    "detail": "Destruir ventana 2D"
   },
   "cmd2DHandleLoop": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "fun": "The draw function",
-      "max-frames": "Stop after this many frames (-1 = unlimited)"
+      "canvas": "El lienzo o el id de su ventana",
+      "fun": "La función de dibujo",
+      "max-frames": "Detener tras este número de fotogramas (-1 = ilimitado)"
     },
-    "definition": "Run a graphics loop",
-    "detail": "Call the given function once per browser frame with (time, delta, count). Stops when the window is destroyed, after --max-frames, or when the function returns false. Returns the number of frames run"
+    "definition": "Ejecutar un bucle gráfico",
+    "detail": "Llama a la función indicada una vez por fotograma del navegador con (time, delta, count). Se detiene cuando se destruye la ventana, tras --max-frames o cuando la función devuelve false. Devuelve el número de fotogramas ejecutados"
   },
   "cmd2DLine": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The line color",
-      "from-x": "The line from X point",
-      "from-y": "The line from Y point",
-      "to-x": "The line to X point",
-      "to-y": "The line to Y point",
-      "width": "The line width"
+      "canvas": "El lienzo o el id de su ventana",
+      "color": "El color de la línea",
+      "from-x": "El punto X de inicio de la línea",
+      "from-y": "El punto Y de inicio de la línea",
+      "to-x": "El punto X de fin de la línea",
+      "to-y": "El punto Y de fin de la línea",
+      "width": "El ancho de la línea"
     },
-    "definition": "Draw a line",
-    "detail": "Draw a line"
+    "definition": "Dibujar una línea",
+    "detail": "Dibujar una línea"
   },
   "cmd2DListWindows": {
-    "definition": "List 2D windows",
-    "detail": "List the currently open 2D windows with their unique id, width and height"
+    "definition": "Listar ventanas 2D",
+    "detail": "Lista las ventanas 2D abiertas actualmente con su id único, ancho y alto"
   },
   "cmd2DPoly": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The color",
-      "fill": "Close the shape and fill it",
-      "points": "The list of [x, y] points",
-      "width": "The line width"
+      "canvas": "El lienzo o el id de su ventana",
+      "color": "El color",
+      "fill": "Cerrar la forma y rellenarla",
+      "points": "La lista de puntos [x, y]",
+      "width": "El ancho de línea"
     },
-    "definition": "Draw a polyline or polygon",
-    "detail": "Draw a polyline from a list of [x, y] points. With --fill the shape is closed and filled"
+    "definition": "Dibujar una polilínea o un polígono",
+    "detail": "Dibuja una polilínea a partir de una lista de puntos [x, y]. Con --fill la forma se cierra y se rellena"
   },
   "cmd2DRect": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The rect color",
-      "height": "The rect height",
-      "width": "The rect width",
-      "x": "The rect X point",
-      "y": "The rect Y point"
+      "canvas": "El lienzo o el id de su ventana",
+      "color": "El color del rect",
+      "height": "El alto del rect",
+      "width": "El ancho del rect",
+      "x": "El punto X del rect",
+      "y": "El punto Y del rect"
     },
-    "definition": "Draw a rect",
-    "detail": "Draw a rect"
+    "definition": "Dibujar un rectángulo",
+    "detail": "Dibujar un rectángulo"
   },
   "cmdAI": {
     "agent": {
       "attachment": {
-        "question": "[Agent] Read attachment {{id}} and send its content to the AI — Allow?",
-        "rejected": "Attachment access rejected by user."
+        "question": "[Agente] Leer el adjunto {{id}} y enviar su contenido a la IA — ¿Permitir?",
+        "rejected": "Acceso al adjunto rechazado por el usuario."
       },
       "error": {
-        "emptyResponse": "[Agent] The model returned an empty response (no text, no tool calls). The backend or model likely failed silently — try a different model or check the server logs.",
-        "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
-        "notConfigured": "Not connected. Use \"ai connect\" first",
-        "requestFailed": "Request failed: "
+        "emptyResponse": "[Agente] El modelo devolvió una respuesta vacía (sin texto ni llamadas a herramientas). Es probable que el backend o el modelo haya fallado silenciosamente: prueba con otro modelo o revisa los registros del servidor.",
+        "noPrompt": "No se proporcionó ningún prompt. Usa: ai agent -p \"tu solicitud\"",
+        "notConfigured": "No conectado. Usa \"ai connect\" primero",
+        "requestFailed": "La petición ha fallado: "
       },
       "mcp": {
-        "calling": "[Agent] Calling MCP tool: <code>{{tool}}</code> ({{server}})",
-        "discoveryFailed": "[Agent] MCP server \"{{name}}\" unavailable, skipping: {{error}}",
-        "question": "[Agent] Wants to use tools from MCP server \"{{name}}\" ({{url}}) — Allow for this conversation?",
-        "rejected": "MCP server \"{{name}}\" rejected by user."
+        "calling": "[Agente] Llamando a la herramienta MCP: <code>{{tool}}</code> ({{server}})",
+        "discoveryFailed": "[Agente] Servidor MCP \"{{name}}\" no disponible, se omite: {{error}}",
+        "question": "[Agente] Quiere usar herramientas del servidor MCP \"{{name}}\" ({{url}}) — ¿Permitir durante esta conversación?",
+        "rejected": "Servidor MCP \"{{name}}\" rechazado por el usuario."
       },
       "result": {
-        "cmdReason": "[Agent] {{reason}}",
-        "fetchingAttachment": "[Agent] Fetching attachment {{id}}",
-        "header": "--- Agent ---",
-        "maxSteps": "Agent reached maximum steps without a final answer.",
-        "noReturnValue": "(command executed, no return value)",
-        "running": "[Agent] Running: <code>{{cmd}}</code>",
-        "thinking": "[Agent] Thinking... (step {{step}}/{{max}})"
+        "cmdReason": "[Agente] {{reason}}",
+        "fetchingAttachment": "[Agente] Obteniendo el adjunto {{id}}",
+        "header": "--- Agente ---",
+        "maxSteps": "El agente ha alcanzado el número máximo de pasos sin una respuesta final.",
+        "noReturnValue": "(comando ejecutado, sin valor de retorno)",
+        "running": "[Agente] Ejecutando: <code>{{cmd}}</code>",
+        "thinking": "[Agente] Pensando... (paso {{step}}/{{max}})"
       },
       "screenshot": {
-        "capturing": "[Agent] Capturing screenshot...",
-        "question": "[Agent] Take screenshot{{sel}} — Allow?",
-        "questionWithReason": "[Agent] {{reason}} — Take screenshot{{sel}} — Allow?",
-        "rejected": "Screenshot rejected by user."
+        "capturing": "[Agente] Capturando pantalla...",
+        "question": "[Agente] Capturar pantalla{{sel}} — ¿Permitir?",
+        "questionWithReason": "[Agente] {{reason}} — Capturar pantalla{{sel}} — ¿Permitir?",
+        "rejected": "Captura de pantalla rechazada por el usuario."
       },
       "skill": {
-        "alreadyLoaded": "Skill already loaded: {{name}}",
-        "loading": "[Agent] Loading skill: {{name}}",
-        "unknown": "Skill not found: {{name}}. Available: {{list}}"
+        "alreadyLoaded": "Habilidad ya cargada: {{name}}",
+        "loading": "[Agente] Cargando habilidad: {{name}}",
+        "unknown": "Habilidad no encontrada: {{name}}. Disponibles: {{list}}"
       },
       "unsafe": {
-        "question": "[Agent] Unsafe command: {{cmd}} — Execute?"
+        "question": "[Agente] Comando no seguro: {{cmd}} — ¿Ejecutar?"
       }
     },
     "args": {
-      "apiKey": "API key for authentication",
-      "attachId": "ir.attachment ID to queue as AI input attachment (attach operation)",
-      "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
-      "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
-      "model": "Model name to use",
-      "operation": "operation: connect, agent, attach or stop",
-      "prompt": "The prompt or natural language request to send",
-      "provider": "AI provider: openai (OpenAI-compatible, default), anthropic, gemini or cohere",
-      "reasoning": "Reasoning effort for \"thinking\" models (agent only): off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
-      "timeout": "Max seconds to wait for a response (0 = no limit)",
-      "url": "AI server URL (e.g. http://localhost:8080/v1)"
+      "apiKey": "Clave API para autenticación",
+      "attachId": "ID de ir.attachment a poner en cola como adjunto de entrada de la IA (operación attach)",
+      "maxSteps": "Máx. iteraciones del agente (solo agente, por defecto {{DEFAULT_MAX_STEPS}})",
+      "maxTokens": "Máximo de tokens de salida por solicitud como límite de seguridad de coste (por defecto {{DEFAULT_MAX_TOKENS}})",
+      "model": "Nombre del modelo a usar",
+      "operation": "operación: connect, agent, attach o stop",
+      "prompt": "El prompt o solicitud en lenguaje natural",
+      "provider": "Proveedor de IA: openai (compatible con OpenAI, por defecto), anthropic, gemini o cohere",
+      "reasoning": "Nivel de razonamiento para modelos \"pensantes\" (solo agent): off, low, medium o high. 'off' pide a servidores locales compatibles con OpenAI (llama.cpp, vLLM, ...) que se salten el razonamiento interno — úsalo si un modelo no muestra salida porque gasta toda su respuesta pensando. Por ahora solo con el proveedor openai.",
+      "timeout": "Máx. segundos a esperar respuesta (0 = sin límite)",
+      "url": "URL del servidor de IA (ej. http://localhost:8080/v1)"
     },
     "attach": {
       "error": {
-        "noData": "Attachment {{id}} has no binary data",
-        "noId": "No attachment id provided. Use: ai attach -i <id>",
-        "notFound": "Attachment {{id}} not found"
+        "noData": "El adjunto {{id}} no tiene datos binarios",
+        "noId": "No se indicó el id del adjunto. Usa: ai attach -i <id>",
+        "notFound": "Adjunto {{id}} no encontrado"
       }
     },
     "connect": {
       "error": {
-        "noUrl": "No URL provided. Use: ai connect -u <url>"
+        "noUrl": "No se proporcionó URL. Usa: ai connect -u <url>"
       },
       "result": {
-        "connected": "AI Server connected"
+        "connected": "Servidor de IA conectado"
       },
       "warning": {
-        "missingPermission": "Warning: missing browser permission to contact {{url}}. Open the extension's Options page (AI Providers section) and use \"Grant access\" for this URL before sending requests."
+        "missingPermission": "Advertencia: falta permiso del navegador para contactar con {{url}}. Abre la página de Opciones de la extensión (sección Proveedores de IA) y usa \"Grant access\" para esta URL antes de enviar solicitudes."
       }
     },
-    "definition": "AI assistant (connect & agent)",
-    "detail": "Connect to an AI server (OpenAI-compatible, Anthropic, Gemini or Cohere API), translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively. The openai provider is OpenAI-compatible, so it also covers Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI and similar servers via a custom URL. See the \"watchdog\" command for the opt-in floating AI watchdog that reacts to page activity on its own.",
+    "definition": "Asistente de IA (connect y agent)",
+    "detail": "Conéctate a un servidor de IA (API compatible con OpenAI, Anthropic, Gemini o Cohere), traduce lenguaje natural a comandos de terminal, o ejecuta un agente autónomo que ejecuta comandos de forma iterativa. El proveedor openai es compatible con OpenAI, por lo que también cubre Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI y servidores similares mediante una URL personalizada. Consulta el comando \"watchdog\" para el vigilante de IA flotante y opcional que reacciona por su cuenta a la actividad de la página.",
     "error": {
-      "noSubcommand": "Usage: ai connect|agent|attach|stop ...",
-      "unknownOperation": "Unknown operation: {{sub}}",
-      "usage": "Usage: ai connect|agent|attach|stop ..."
+      "noSubcommand": "Uso: ai connect|agent|attach|stop ...",
+      "unknownOperation": "Operación desconocida: {{sub}}",
+      "usage": "Uso: ai connect|agent|attach|stop ..."
     },
     "stop": {
-      "noRequest": "No active AI request to stop."
+      "noRequest": "No hay ninguna solicitud de IA activa para detener."
     },
     "tokens": {
-      "cache": " · Cache: {{read}} read / {{created}} created",
-      "cacheReadOnly": " · Cache: {{read}} saved",
-      "usage": "Tokens: {{prompt}} in / {{completion}} out ({{total}} total)"
+      "cache": " · Cache: {{read}} leídos / {{created}} creados",
+      "cacheReadOnly": " · Cache: {{read}} ahorrados",
+      "usage": "Tokens: {{prompt}} de entrada / {{completion}} de salida ({{total}} en total)"
     }
   },
   "cmdAction": {
     "args": {
-      "action": "The action to launch<br/>Can be an string, number or object",
-      "options": "The extra options to use"
+      "action": "La acción a iniciar<br/>Puede ser una cadena, un número o un objeto",
+      "options": "Las opciones adicionales para usar"
     },
-    "definition": "Call action",
-    "detail": "Launch any Odoo action by numeric ID, XML-ID string, or action dict. Does not return data."
+    "definition": "Llamar a una acción",
+    "detail": "Lanza cualquier acción de Odoo por ID numérico, XML-ID o diccionario de acción. No devuelve datos."
   },
   "cmdAlias": {
     "args": {
-      "cmd": "The command to run",
-      "name": "The name of the alias"
+      "cmd": "El comando para ejecutar",
+      "name": "El nombre del pseudónimo"
     },
-    "created": "Alias created successfully",
-    "definition": "Create aliases",
-    "detail": "Define aliases to run commands easy. <br><b>WARNING:</b> This command uses 'local storage' to persist the data even if you close the browser. This data can be easy accessed by other computer users. Don't use sensible data if you are using a shared computer.<br><br>Can use positional parameters ($1,$2,$3,$N...)",
-    "example": "-n myalias -c \"print 'Hello, $1!'\"",
-    "invalidAliasName": "Invalid alias name",
-    "notDefined": "No aliases defined.",
-    "notExists": "The selected alias not exists",
-    "removed": "Alias removed successfully"
+    "created": "Pseudónimo creado exitosamente",
+    "definition": "Crear pseudónimos",
+    "detail": "Defina pseudónimos para ejecutar comandos fácilmente. <br><b>ADVERTENCIA:</b> Este comando utiliza 'almacenamiento local' para conservar los datos incluso si cierra el navegador. Otros usuarios del ordenador pueden acceder fácilmente a estos datos. No emplee datos sensibles si está utilizando un ordenador compartido.<br><br>Se pueden usar parámetros posicionales ($1,$2,$3,$N...)",
+    "example": "-n myalias -c \"imprimir '¡Hola, $1!'\"",
+    "invalidAliasName": "Nombre de pseudónimo no válido",
+    "notDefined": "No hay pseudónimos definidos",
+    "notExists": "El pseudónimo seleccionado no existe",
+    "removed": "Pseudónimo eliminado con éxito"
   },
   "cmdBarcode": {
     "args": {
-      "barcodeDelay": "The delay between barcodes reads (in ms)",
-      "data": "The data to send",
-      "operation": "The operation",
-      "pressDelay": "The delay between presskey events (in ms)"
+      "barcodeDelay": "El retraso entre lecturas de códigos de barras (en ms)",
+      "data": "Los datos a enviar",
+      "operation": "La operación",
+      "pressDelay": "El retraso entre eventos de pulsación de tecla (en ms)"
     },
-    "definition": "Operations over barcode",
-    "detail": "See information and send barcode strings",
+    "definition": "Operaciones con el código de barras",
+    "detail": "Ver información y enviar cadenas de códigos de barras",
     "error": {
-      "invalidOperation": "Invalid operation!",
-      "moudeNotAvailable": "The 'barcode' module is not installed/available",
-      "noData": "No data given!"
+      "invalidOperation": "¡Operación no válida!",
+      "moudeNotAvailable": "El módulo 'código de barras' no está instalado/disponible",
+      "noData": "¡No se proporcionaron datos!"
     },
     "result": {
-      "acceptScan": "Currently accepting barcode scanning? {{isAcceptingScan}}",
-      "availableCommands": "Available commands: {{availableCommands}}",
-      "maxTimeBetweenKeysInMs": "Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}",
-      "reservedPrefixes": "Reserved barcode prefixes: {{prefixes}}"
+      "acceptScan": "¿Actualmente acepta escaneo de códigos de barras? {{isAcceptingScan}}",
+      "availableCommands": "Comandos disponibles: {{availableCommands}}",
+      "maxTimeBetweenKeysInMs": "Máx. tiempo entre teclas (ms): {{maxTimeBetweenKeysInMs}}",
+      "reservedPrefixes": "Prefijos de códigos de barras reservados: {{prefixes}}"
     }
   },
   "cmdCaf": {
     "args": {
-      "field": "The field names to request",
-      "filter": "The filter to apply. Example: -fi {required: true}",
-      "model": "The model technical name",
-      "property": "The field properties to display"
+      "field": "Los nombres de los campos a solicitar",
+      "filter": "El filtro a aplicar. Ejemplo: -fi {required: true}",
+      "model": "El nombre técnico del modelo",
+      "property": "Las propiedades del campo a mostrar"
     },
-    "definition": "Show field definitions for a model",
-    "detail": "Return field metadata for the model: type, required, readonly, label, selection values, relation target, etc. To check create/read/write/unlink access rights instead, use cam."
+    "definition": "Mostrar definiciones de campos de un modelo",
+    "detail": "Devuelve metadatos de campos del modelo: tipo, requerido, solo-lectura, etiqueta, valores de selección, modelo relacionado, etc. Para comprobar derechos de acceso (crear/leer/escribir/eliminar) usa cam en su lugar."
   },
   "cmdCall": {
     "args": {
-      "argument": "The arguments list",
-      "call": "The method name to call",
-      "kwarg": "The arguments dictionary",
-      "model": "The model technical name"
+      "argument": "La lista de argumentos",
+      "call": "El nombre del método a llamar",
+      "kwarg": "El diccionario de argumentos",
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "Call model method",
-    "detail": "Call model method. Remember: Methods with @api.model decorator doesn't need the id."
+    "definition": "Llamar a un método de modelo",
+    "detail": "Llamar a un método de modelo. Recuerde: los métodos con el decorador @api.model no necesitan pasar el 'id'"
   },
   "cmdCam": {
     "args": {
-      "model": "The model technical name",
-      "operation": "The operation to do"
+      "model": "El nombre técnico del modelo",
+      "operation": "La operación a realizar"
     },
-    "definition": "Check model access",
-    "detail": "Show access rights for the selected operation on the selected model",
+    "definition": "Consultar acceso al modelo",
+    "detail": "Mostrar derechos de acceso para la operación seleccionada en el modelo seleccionado",
     "result": {
-      "haveAccessRights": "You have access rights for '{{operation}}' on {{model}}",
-      "notAccessRights": "You can't '{{operation}}' on {{model}}"
+      "haveAccessRights": "Tienes derechos de acceso para '{{operation}}' en {{model}}",
+      "notAccessRights": "No puedes '{{operation}}' en {{model}}"
     }
   },
   "cmdChrono": {
     "args": {
-      "cmd": "The command to run"
+      "cmd": "El comando a ejecutar"
     },
-    "definition": "Print the time expended executing a command",
-    "detail": "Print the elapsed time in seconds to execute a command. <br/>Notice that this time includes the time to format the result!",
+    "definition": "Imprimir el tiempo empleado en ejecutar un comando",
+    "detail": "Imprime el tiempo transcurrido en segundos para ejecutar un comando. <br/>¡Observe que este tiempo incluye el tiempo para formatear el resultado!",
     "result": {
-      "timeElapsed": "Time elapsed: '{{time_elapsed_secs}}' seconds"
+      "timeElapsed": "Tiempo transcurrido: '{{time_elapsed_secs}}' segundos"
     }
   },
   "cmdClear": {
     "args": {
-      "section": "The section to clear<br/>- screen: Clean the screen<br/>- history: Clean the command history"
+      "section": "La sección para borrar<br/>- screen: Limpiar la pantalla<br/>- history: Limpiar el historial de comandos"
     },
-    "definition": "Clean terminal section",
-    "detail": "Clean the selected section"
+    "definition": "Limpiar una sección del terminal",
+    "detail": "Limpiar la sección indicada"
   },
   "cmdClick": {
     "args": {
-      "index": "Index of the match to click, 0-based (default: 0)",
-      "list": "List all matches without clicking",
-      "selector": "CSS selector (default: button)",
-      "text": "Button text to match (case-insensitive, partial)"
+      "index": "Índice de la coincidencia sobre la que hacer clic, desde 0 (por defecto: 0)",
+      "list": "Listar todas las coincidencias sin hacer clic",
+      "selector": "Selector CSS (por defecto: button)",
+      "text": "Texto del botón a buscar (sin distinguir mayúsculas, parcial)"
     },
-    "definition": "Click a button or element in the current view",
-    "detail": "Finds and clicks a button or element by visible text or CSS selector. -t matches any button whose text contains the given string (case-insensitive). -s overrides the element selector (default: button). -n picks the nth match (0-based). --list shows all matches without clicking.",
+    "definition": "Hacer clic en un botón o elemento de la vista actual",
+    "detail": "Busca un botón o elemento por su texto visible o selector CSS y hace clic en él. -t coincide con cualquier botón cuyo texto contenga la cadena indicada (sin distinguir mayúsculas). -s sustituye el selector del elemento (por defecto: button). -n elige la n-ésima coincidencia (desde 0). --list muestra todas las coincidencias sin hacer clic.",
     "error": {
-      "indexOutOfRange": "Index {{index}} out of range ({{count}} match(es) found)",
-      "noRoot": "Cannot find Odoo content area",
-      "notFound": "No element found for selector \"{{selector}}\"",
-      "notFoundText": "No button found matching \"{{text}}\"",
-      "notHtmlElement": "Matched element is not clickable"
+      "indexOutOfRange": "Índice {{index}} fuera de rango ({{count}} coincidencia(s) encontrada(s))",
+      "noRoot": "No se encuentra el área de contenido de Odoo",
+      "notFound": "No se encontró ningún elemento para el selector \"{{selector}}\"",
+      "notFoundText": "No se encontró ningún botón que coincida con \"{{text}}\"",
+      "notHtmlElement": "El elemento coincidente no admite clic"
     },
     "result": {
-      "clicked": "Clicked: {{label}}"
+      "clicked": "Clic en: {{label}}"
     }
   },
   "cmdCommit": {
     "args": {
-      "recordset": "The Recordset"
+      "recordset": "El conjunto de registros"
     },
-    "definition": "Commit recordset changes",
-    "detail": "Write recordset changes",
+    "definition": "Confirmar cambios en el conjunto de registros",
+    "detail": "Escribir cambios en el conjunto de registros",
     "error": {
-      "invalidRecordset": "Invalid recordset",
-      "noCommit": "Nothing to commit!",
-      "success": "Records '{{pids}}' of {{model}} updated successfully"
+      "invalidRecordset": "Conjunto de registros no válido",
+      "noCommit": "¡Nada que hacer!",
+      "success": "Registros '{{pids}}' de {{model}} actualizados correctamente"
     }
   },
   "cmdContext": {
     "args": {
-      "operation": "The operation to do",
-      "value": "The values"
+      "operation": "La operación a realizar",
+      "value": "Los valores"
     },
-    "definition": "Operations over session context dictionary",
-    "detail": "Operations over session context dictionary.",
+    "definition": "Operaciones con el contexto de sesión",
+    "detail": "Operaciones con el diccionario de contexto de sesión.",
     "error": {
-      "keyNotPresent": "The selected key is not present in the terminal context",
-      "notSession": "Cannot find session information",
-      "operationNotSupported": "This operation is currently not supported in v15.0+"
+      "keyNotPresent": "La clave seleccionada no está presente en el contexto del terminal",
+      "notSession": "No se puede encontrar información de la sesión",
+      "operationNotSupported": "Esta operación actualmente no es compatible con v15.0+"
     }
   },
   "cmdContextTerm": {
     "args": {
-      "operation": "The operation to do",
-      "value": "The value"
+      "operation": "La operación a realizar",
+      "value": "El valor"
     },
-    "definition": "Operations over terminal context dictionary",
-    "detail": "Operations over terminal context dictionary. This context only affects to the terminal operations.",
+    "definition": "Operaciones con el contexto del terminal",
+    "detail": "Operaciones con el contexto del terminal. Este contexto sólo afecta a las operaciones del terminal",
     "error": {
-      "notPresent": "The selected key is not present in the terminal context"
+      "notPresent": "La clave seleccionada no está presente en el contexto del terminal"
     }
   },
   "cmdCopy": {
     "args": {
-      "data": "The data",
-      "type": "The type of data"
+      "data": "Los datos",
+      "type": "El tipo de datos"
     },
-    "definition": "Copy data to paste them into other instances",
-    "detail": "Copy model records or variables",
+    "definition": "Copiar datos para pegarlos en otras instancias",
+    "detail": "Copiar registros de modelo o variables",
     "result": {
-      "dateCopied": "Data copied!"
+      "dateCopied": "¡Datos copiados!"
     }
   },
   "cmdCount": {
     "args": {
-      "domain": "The domain",
-      "model": "The model technical name",
-      "options": "The options"
+      "domain": "El dominio",
+      "model": "El nombre técnico del modelo",
+      "options": "Las opciones"
     },
-    "definition": "Gets number of records from the given model in the selected domain",
-    "detail": "Gets number of records from the given model in the selected domain",
-    "result": "Result: {{result}}"
+    "definition": "Obtiene la cantidad de registros del modelo dado en el dominio seleccionado",
+    "detail": "Obtiene la cantidad de registros del modelo dado en el dominio seleccionado",
+    "result": "Resultado: {{result}}"
   },
   "cmdCreate": {
     "args": {
-      "model": "The model technical name",
-      "options": "The options",
-      "value": "The values to write"
+      "model": "El nombre técnico del modelo",
+      "options": "Las opciones",
+      "value": "Los valores a escribir"
     },
-    "definition": "Create new record",
-    "detail": "Without -v: opens an empty form view for the model. With -v: creates records directly in the database and returns a Recordset with the new IDs. -v accepts a list of value dicts."
+    "definition": "Crear un nuevo registro",
+    "detail": "Sin -v: abre un formulario vacío para el modelo. Con -v: crea registros directamente en la base de datos y devuelve un Recordset con los nuevos IDs. -v acepta una lista de diccionarios de valores."
   },
   "cmdDBList": {
     "args": {
-      "onlyActive": "Indicates that only print the active database name"
+      "onlyActive": "Indica que solo se imprime el nombre de la base de datos activa"
     },
-    "definition": "Show database names",
-    "detail": "Show database names",
+    "definition": "Mostrar nombres de bases de datos",
+    "detail": "Mostrar nombres de bases de datos",
     "error": {
-      "noDBNames": "Can't get database names",
-      "notSession": "Cannot find session information"
+      "noDBNames": "No se pueden obtener los nombres de las bases de datos",
+      "notSession": "No se puede encontrar la información de la sesión"
     },
     "result": {
-      "activeDatabase": "<strong>{{database}}</strong> (Active Database)"
+      "activeDatabase": "<strong>{{database}}</strong> (base de datos activa)"
     }
   },
   "cmdDateRange": {
     "args": {
-      "domain": "Optional domain filter",
-      "field": "The date or datetime field name",
-      "model": "The model technical name"
+      "domain": "Filtro de dominio opcional",
+      "field": "El nombre del campo de fecha o fecha/hora",
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "Show min/max values for a date or datetime field",
-    "detail": "Returns the minimum and maximum values of a date or datetime field on a model, optionally filtered by a domain. Validates that the field actually exists and is a date/datetime type before querying. Useful to avoid building graphs or reports over an empty or unexpected date range.",
+    "definition": "Mostrar valores mín/máx de un campo fecha o fecha/hora",
+    "detail": "Devuelve los valores mínimo y máximo de un campo de fecha o fecha/hora en un modelo, con filtro de dominio opcional. Valida que el campo exista y sea de tipo fecha/fecha-hora antes de consultar. Útil para evitar construir gráficos o informes sobre un rango de fechas vacío o inesperado.",
     "error": {
-      "notDateField": "Field '{{field}}' is of type '{{type}}', expected date or datetime",
-      "unknownField": "Field '{{field}}' not found in model '{{model}}'"
+      "notDateField": "El campo '{{field}}' es de tipo '{{type}}', se esperaba date o datetime",
+      "unknownField": "El campo '{{field}}' no se encontró en el modelo '{{model}}'"
     },
     "result": {
       "header": "<strong>{{model}}.{{field}}</strong> ({{label}})",
-      "max": "Max: <strong>{{max}}</strong>",
-      "min": "Min: <strong>{{min}}</strong>",
-      "noData": "No data found for <strong>{{model}}.{{field}}</strong>"
+      "max": "Máx: <strong>{{max}}</strong>",
+      "min": "Mín: <strong>{{min}}</strong>",
+      "noData": "No se encontraron datos para <strong>{{model}}.{{field}}</strong>"
     }
   },
   "cmdDebug": {
     "args": {
-      "mode": "The mode<br>- 0: Disabled<br>- 1: Enabled<br>- 2: Enabled with Assets"
+      "mode": "El modo<br>- 0: Deshabilitado<br>- 1: Habilitado<br>- 2: Habilitado con Activos"
     },
-    "definition": "Set debug mode",
-    "detail": "Set the Odoo debug mode and reload the page. Values: 0 = disabled, 1 = enabled, 2 = enabled with assets.",
+    "definition": "Establecer el modo de depuración",
+    "detail": "Establece el modo de depuración de Odoo y recarga la página. Valores: 0 = desactivado, 1 = activado, 2 = activado con recursos.",
     "error": {
-      "invalidDebugMode": "Invalid debug mode"
+      "invalidDebugMode": "Modo de depuración no válido"
     },
     "result": {
-      "disabled": "Debug mode <strong>disabled</strong>",
-      "enabled": "Debug mode <strong>enabled</strong>",
-      "enabledAssets": "Debug mode with assets <strong>enabled</strong>",
-      "reload": "Reloading page..."
+      "disabled": "Modo de depuración <strong>deshabilitado</strong>",
+      "enabled": "Modo de depuración <strong>habilitado</strong>",
+      "enabledAssets": "Modo de depuración con recursos <strong>habilitados</strong>",
+      "reload": "Recargando página..."
     }
   },
   "cmdDepends": {
     "args": {
-      "key": "The key",
-      "module": "The module technical name",
-      "section": "The URL section"
+      "key": "La clave",
+      "module": "El nombre técnico del módulo",
+      "section": "La sección de URL"
     },
-    "definition": "Know modules that depends on the given module",
-    "detail": "Show a list of the modules that depends on the given module",
+    "definition": "Conocer los módulos que dependen del módulo dado",
+    "detail": "Mostrar una lista de los módulos que dependen del módulo dado",
     "error": {
-      "noModulesFound": "No modules found!",
-      "noWizard": "Can't create wizard record!",
-      "notInstalled": "The module '{{module}}' isn't installed"
+      "noModulesFound": "¡No se han encontrado módulos!",
+      "noWizard": "¡No se ha podido crear el registro del asistente!",
+      "notInstalled": "El módulo '{{module}}' no está instalado"
     }
   },
   "cmdDescribe": {
     "args": {
-      "model": "The model technical name"
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "Model profile: count, date range, key fields and selection values",
-    "detail": "Returns a combined profile of the model in one shot: total record count, create_date range (oldest→newest), and a table of key fields (required fields, stored relational fields, selection fields with their possible values). Replaces 3–4 separate commands (caf + count + read_group).",
+    "definition": "Perfil del modelo: contador, rango de fechas, campos clave y valores de selección",
+    "detail": "Devuelve un perfil combinado del modelo en una sola llamada: total de registros, rango de create_date (más antiguo→más reciente) y tabla de campos clave (requeridos, relacionales almacenados, de selección con sus valores). Reemplaza 3–4 comandos separados (caf + count + read_group).",
     "result": {
-      "count": "Total records: <strong>{{count}}</strong>",
-      "dateRange": "Date range: {{min}} → {{max}}",
-      "header": "<strong>Model profile: {{model}}</strong>"
+      "count": "Total de registros: <strong>{{count}}</strong>",
+      "dateRange": "Rango de fechas: {{min}} → {{max}}",
+      "header": "<strong>Perfil del modelo: {{model}}</strong>"
     },
     "table": {
-      "extra": "Relation / Values",
-      "field": "Field",
-      "label": "Label",
+      "extra": "Relación / Valores",
+      "field": "Campo",
+      "label": "Etiqueta",
       "required": "Req",
-      "type": "Type"
+      "type": "Tipo"
     }
   },
   "cmdDiff": {
     "args": {
-      "all": "Show all fields, including those that are identical",
-      "field": "Fields to compare (default: all non-binary). Use '*' for all.",
-      "id": "Two record IDs to compare (e.g. [10, 20])",
-      "model": "The model technical name",
-      "options": "Extra options"
+      "all": "Mostrar todos los campos, incluidos los idénticos",
+      "field": "Campos a comparar (por defecto: todos los no binarios). Usa '*' para todos.",
+      "id": "Dos IDs de registro a comparar (ej. [10, 20])",
+      "model": "El nombre técnico del modelo",
+      "options": "Opciones adicionales"
     },
-    "definition": "Compare two records field by field",
-    "detail": "Fetches two records of the same model and compares every field value. By default shows only fields that differ. Use --all to include matching fields too. Many2one fields are compared by stored ID (not display name) to avoid false positives from renamed related records. Binary fields are excluded.",
+    "definition": "Comparar dos registros campo a campo",
+    "detail": "Obtiene dos registros del mismo modelo y compara cada campo. Por defecto muestra solo los que difieren. Usa --all para incluir también los iguales. Los campos Many2one se comparan por ID almacenado (no por nombre de visualización) para evitar falsos positivos. Los campos binarios se excluyen.",
     "error": {
-      "exactlyTwo": "Exactly two record IDs are required",
-      "notFound": "Record {{id}} not found in '{{model}}'"
+      "exactlyTwo": "Se requieren exactamente dos IDs de registro",
+      "notFound": "Registro {{id}} no encontrado en '{{model}}'"
     },
     "result": {
       "header": "<strong>Diff {{model}}: #{{id_a}} vs #{{id_b}}</strong>",
-      "identical": "Records are <strong>identical</strong> for the requested fields",
-      "summary": "Differing fields: <strong>{{diff}}</strong> / Total: <strong>{{total}}</strong>"
+      "identical": "Los registros son <strong>idénticos</strong> para los campos solicitados",
+      "summary": "Campos distintos: <strong>{{diff}}</strong> / Total: <strong>{{total}}</strong>"
     },
     "table": {
-      "field": "Field",
-      "label": "Label",
-      "type": "Type",
+      "field": "Campo",
+      "label": "Etiqueta",
+      "type": "Tipo",
       "valA": "#{{id}}",
       "valB": "#{{id}}"
     }
   },
   "cmdDis": {
     "args": {
-      "code": "TraSH Code"
+      "code": "Código de TraSH"
     },
-    "definition": "Dissasembler bytecode",
-    "detail": "Shows the bytecode generated for the input",
+    "definition": "Muestra el pseudo-bytecode generado",
+    "detail": "Muestra el pseudo-bytecode generado para la entrada",
     "table": {
-      "instrCode": "Instr. Code",
-      "instrName": "Instr. Name",
-      "level": "Level",
+      "instrCode": "Instr. Código",
+      "instrName": "Instr. Nombre",
+      "level": "Nivel",
       "meta": "Meta",
       "token": "Token",
-      "value": "Name/Value/Argument"
+      "value": "Nombre/Valor/Argumento"
     }
   },
   "cmdDoc": {
     "args": {
-      "method": "The method name",
-      "model": "The model technical name"
+      "method": "El nombre del método",
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "Open technical documentation page",
-    "detail": "Open the built-in technical documentation page (Odoo 19.0+ only). Without -m opens the index. With -m, opens docs for that model. With -me, anchors to that method.",
+    "definition": "Abre la página de documentación técnica",
+    "detail": "Abre la documentación técnica integrada (solo Odoo 19.0+). Sin -m abre el índice. Con -m, abre los docs de ese modelo. Con -me, ancla a ese método.",
     "error": {
-      "incompatibleOdooVersion": "This command is only available in Odoo 19.0+"
+      "incompatibleOdooVersion": "Este comando solo está disponible en Odoo 19.0+"
     }
   },
   "cmdEffect": {
     "args": {
-      "options": "The extra options to use",
-      "type": "The type of the effect"
+      "options": "Las opciones adicionales para usar",
+      "type": "El tipo de efecto"
     },
-    "definition": "Show effect",
-    "detail": "Play a visual UI effect. Without -t, lists all registered effect names. With -t, plays that effect. Available in Odoo 15.0+.",
+    "definition": "Mostrar efecto",
+    "detail": "Reproduce un efecto visual de interfaz. Sin -t, lista todos los efectos disponibles. Con -t, reproduce ese efecto. Disponible en Odoo 15.0+.",
     "error": {
-      "incompatibleOdooVersion": "This command is only available in Odoo 15.0+",
-      "notRegistryService": "Cannot find registry service"
+      "incompatibleOdooVersion": "Este comando solo está disponible en Odoo 15.0+",
+      "notRegistryService": "No se puede encontrar el servicio de registro"
     },
     "result": {
-      "availableEffects": "Available effects:"
+      "availableEffects": "Efectos disponibles:"
     }
   },
   "cmdExportFile": {
     "args": {
-      "delimiter": "The delimiter",
-      "fieldData": "The field representing the file data",
-      "fieldName": "The field representing the file name",
-      "filename": "The filename",
-      "format": "The format to use for exporting",
-      "mimetype": "The MIME type of the file",
-      "noHeader": "Don't use header",
-      "value": "The value to export"
+      "delimiter": "El delimitador",
+      "fieldData": "El campo que representa los datos del archivo",
+      "fieldName": "El campo que representa el nombre del archivo",
+      "filename": "El nombre del archivo",
+      "format": "El formato a utilizar",
+      "mimetype": "El tipo MIME del archivo",
+      "noHeader": "No usar cabecera",
+      "value": "El valor a exportar"
     },
-    "definition": "Export a value to a local file",
-    "detail": "Save a value to disk. Formats: json (any value), csv/xml/zip (Recordset only), raw (binary with custom MIME type). zip exports each record as a separate file using --field-name and --field-data.",
-    "invalidFieldData": "No field named ‘{{fieldData}}’ is found that represent the data",
-    "invalidFieldName": "No field named ‘{{fieldName}}’ is found that represent the name",
-    "invalidValue": "Invalid value: must be a recordset with csv and xml",
-    "resultExported": "Command result exported to '{{filename}}' file"
+    "definition": "Exportar un valor a un archivo local",
+    "detail": "Guarda un valor en disco. Formatos: json (cualquier valor), csv/xml/zip (solo Recordset), raw (binario con tipo MIME personalizado). zip exporta cada registro como un archivo separado usando --field-name y --field-data.",
+    "invalidFieldData": "No se encuentra ningún campo llamado '{{fieldData}}' que represente los datos",
+    "invalidFieldName": "No se encuentra ningún campo llamado '{{fieldName}}' que represente el nombre",
+    "invalidValue": "Valor inválido: se requiere un 'recordset' con csv y xml",
+    "resultExported": "Resultado del comando exportado al archivo '{{filename}}'"
   },
   "cmdExportVar": {
     "args": {
-      "value": "The value to export"
+      "value": "El valor a exportar"
     },
-    "definition": "Exports the command result to a browser console variable",
-    "detail": "Exports the command result to a browser console variable.",
-    "resultExported": "Command result exported! now you can use '{{varname}}' variable in the browser console"
+    "definition": "Exporta el resultado del comando a una variable de consola del navegador",
+    "detail": "Exporta el resultado del comando a una variable de consola del navegador",
+    "resultExported": "¡Resultado del comando exportado! ahora puedes usar la variable '{{varname}}' en la consola del navegador"
   },
   "cmdFill": {
     "args": {
-      "enter": "Dispatch Enter keydown after filling (use for search bars)",
-      "index": "Index of the match to use, 0-based (default: 0)",
-      "selector": "CSS selector of the input element",
-      "value": "Text to fill in"
+      "enter": "Enviar la tecla Enter tras rellenar (para barras de búsqueda)",
+      "index": "Índice de la coincidencia a usar, desde 0 (por defecto: 0)",
+      "selector": "Selector CSS del elemento de entrada",
+      "value": "Texto con el que rellenar"
     },
-    "definition": "Fill a text input, textarea, select, or contenteditable with a value",
-    "detail": "Finds an element by CSS selector and sets its value, then fires input and change events so the framework reacts. Use for inputs that are NOT Odoo form field widgets (search bars, filter boxes, custom HTML inputs). For standard Odoo form fields use \"form -o edit\" instead. -n picks the nth match (0-based). --enter also dispatches an Enter keydown after filling (required for the Odoo search bar to submit the query).",
+    "definition": "Rellenar un campo de texto, textarea, select o contenteditable con un valor",
+    "detail": "Busca un elemento por selector CSS y establece su valor, luego dispara los eventos input y change para que el framework reaccione. Úsalo para campos que NO son widgets de campos de formulario de Odoo (barras de búsqueda, cajas de filtro, inputs HTML personalizados). Para los campos de formulario estándar de Odoo usa \"form -o edit\". -n elige la n-ésima coincidencia (desde 0). --enter también envía la tecla Enter tras rellenar (necesario para que la barra de búsqueda de Odoo ejecute la consulta).",
     "error": {
-      "indexOutOfRange": "Index {{index}} out of range ({{count}} match(es) found)",
-      "noRoot": "Cannot find Odoo content area",
-      "noSelector": "A CSS selector is required (-s)",
-      "notFillable": "Element matched by \"{{selector}}\" is not a fillable input (input, textarea, select, or contenteditable)",
-      "notFound": "No element found for selector \"{{selector}}\""
+      "indexOutOfRange": "Índice {{index}} fuera de rango ({{count}} coincidencia(s) encontrada(s))",
+      "noRoot": "No se encuentra el área de contenido de Odoo",
+      "noSelector": "Se requiere un selector CSS (-s)",
+      "notFillable": "El elemento coincidente con \"{{selector}}\" no es un campo rellenable (input, textarea, select o contenteditable)",
+      "notFound": "No se encontró ningún elemento para el selector \"{{selector}}\""
     },
     "result": {
-      "filled": "Filled \"{{selector}}\"{{enter}} with: {{value}}"
+      "filled": "Rellenado \"{{selector}}\"{{enter}} con: {{value}}"
     }
   },
   "cmdForm": {
     "args": {
-      "field": "The field technical name(s)",
-      "operation": "The operation to perform",
-      "value": "The field values to set (for the edit operation)"
+      "field": "El/los nombre(s) técnico(s) del campo",
+      "operation": "La operación a realizar",
+      "value": "Los valores de campo a establecer (para la operación edit)"
     },
-    "definition": "Interact with the current form view (get, edit, save, highlight, clear)",
-    "detail": "get: returns in-memory field values. edit: sets field values in the open form in-memory record (fires onchanges, does not save). save: persists the current form record to the database. highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).",
+    "definition": "Interactuar con el formulario actual (get, edit, save, highlight, clear)",
+    "detail": "get: devuelve los valores actuales en memoria de los campos indicados. edit: establece valores en el registro en memoria del formulario abierto (ejecuta onchanges, no guarda). save: persiste el registro del formulario en la base de datos. highlight: marca visualmente un campo, activando su pestaña si está oculto. clear: elimina los resaltados (todos o solo -f si se indica).",
     "error": {
-      "fieldNotFound": "No form field '{{field}}' found in the current view",
-      "fieldRequired": "A field name is required for the highlight operation",
-      "fieldsRequired": "At least one field name is required for the get operation (use -f [field1, field2])",
-      "noFormView": "No editable form view found in the current page",
-      "valuesRequired": "Values dict is required for the edit operation (use -v {field: value, ...})"
+      "fieldNotFound": "No se encontró el campo '{{field}}' en la vista actual",
+      "fieldRequired": "Se requiere un nombre de campo para la operación highlight",
+      "fieldsRequired": "Se requiere al menos un nombre de campo para la operación get (usa -f [campo1, campo2])",
+      "noFormView": "No se encontró un formulario editable en la página actual",
+      "valuesRequired": "Se requiere un diccionario de valores para la operación edit (usa -v {campo: valor, ...})"
     },
     "result": {
-      "cleared": "Field highlights cleared",
-      "edited": "Updated {{count}} field(s) in the current form",
-      "highlighted": "Highlighted {{count}} field(s) '{{field}}'",
-      "saved": "Form record saved"
+      "cleared": "Resaltados de campos eliminados",
+      "edited": "{{count}} campo(s) actualizados en el formulario actual",
+      "highlighted": "{{count}} campo(s) '{{field}}' resaltados",
+      "saved": "Registro del formulario guardado"
     }
   },
   "cmdGen": {
     "args": {
-      "max": "Max. value",
-      "min": "Min. value",
-      "type": "Generator type"
+      "max": "Máx. valor",
+      "min": "Mín. valor",
+      "type": "Tipo de generador"
     },
-    "definition": "Generate random values",
-    "detail": "Generate numbers, strings, url's, dates, etc..."
+    "definition": "Generar valores aleatorios",
+    "detail": "Genera números, cadenas, URL, fechas, etc..."
   },
   "cmdGenFile": {
     "args": {
-      "name": "The File object file name",
-      "options": "The File object options"
+      "name": "El nombre del archivo del objeto Archivo",
+      "options": "Las opciones del objeto Archivo"
     },
-    "definition": "Generate a File object",
-    "detail": "Open a browser file dialog and instanciates a File object with the content of the selected file"
+    "definition": "Generar un objeto de archivo",
+    "detail": "Abra un cuadro de diálogo de archivo del navegador e instancia un objeto Archivo con el contenido del archivo seleccionado"
   },
   "cmdGraph": {
     "args": {
-      "domain": "The domain filter",
-      "groupby": "Fields to group by",
-      "measure": "The measure field (plain field name, e.g. amount_total — NOT sum:amount_total)",
-      "model": "The model technical name",
-      "name": "The view title",
-      "type": "The chart type"
+      "domain": "El filtro de dominio",
+      "groupby": "Campos para agrupar",
+      "measure": "El campo de medida (nombre simple del campo, p. ej. amount_total — NO sum:amount_total)",
+      "model": "El nombre técnico del modelo",
+      "name": "El título de la vista",
+      "type": "El tipo de gráfico"
     },
-    "definition": "Open graph view",
-    "detail": "Open a customized graph view for a model. To retrieve grouped data without opening a view, use the read_group command instead.",
+    "definition": "Abrir vista gráfica",
+    "detail": "Abre una vista de gráfico personalizada para un modelo. Para obtener datos agrupados sin abrir una vista, usa el comando read_group.",
     "error": {
-      "measurePrefix": "Measure field must be a plain field name (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
-      "unknownFields": "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields."
+      "measurePrefix": "El campo de medida debe ser un nombre de campo simple (ej. 'amount_total'), no con prefijo de agregación (ej. 'sum:amount_total')",
+      "unknownFields": "{{arg}}: campo(s) no encontrado(s) en '{{model}}': {{fields}}. Usa 'caf -m {{model}}' para listar los campos disponibles."
     },
     "result": {
-      "name": "Graph View"
+      "name": "Vista de Gráfico"
     }
   },
   "cmdHelp": {
     "args": {
-      "all": "Show all commands",
-      "category": "Filter commands by category",
-      "cmd": "The command to consult",
-      "onlyInternal": "Show only internal commands"
+      "all": "Mostrar todos los comandos",
+      "category": "Filtrar comandos por categoría",
+      "cmd": "El comando a consultar",
+      "onlyInternal": "Mostrar solo comandos internos"
     },
-    "definition": "Print this help or command detailed info",
-    "detail": "Show commands and a quick definition.<br/>- <> ~> Required Parameter<br/>- [] ~> Optional Parameter",
+    "definition": "Imprima esta ayuda o información detallada",
+    "detail": "Muestra comandos y una definición rápida.<br/>- <> ~> Parámetro requerido<br/>- [] ~> Parámetro opcional",
     "error": {
-      "categoryEmpty": "No commands found in category '{{category}}'. Available: {{list}}",
-      "commandNotExist": "'{{cmd}}' command doesn't exist"
+      "categoryEmpty": "No se encontraron comandos en la categoría '{{category}}'. Disponibles: {{list}}",
+      "commandNotExist": "El comando '{{cmd}}' no existe"
     },
     "result": {
-      "arguments": "ARGUMENTS",
-      "description": "DESCRIPTION",
-      "example": "EXAMPLE",
-      "name": "NAME"
+      "arguments": "ARGUMENTOS",
+      "description": "DESCRIPCIÓN",
+      "example": "EJEMPLO",
+      "name": "NOMBRE"
     }
   },
   "cmdInfo": {
     "args": {
-      "activeId": "The active record id",
-      "activeModel": "The active record model",
-      "userId": "The user id",
-      "userLogin": "The user login"
+      "activeId": "El 'id' del registro activo",
+      "activeModel": "El nombre técnico del modelo del registro activo",
+      "userId": "El 'id' del usuario",
+      "userLogin": "El nombre de inicio de sesión del usuario"
     },
-    "definition": "Get session information",
-    "detail": "Return one piece of current session/page data. Use exactly one flag: --user-id (numeric user ID), --user-login (login name), --active-id (record ID from the current view), --active-model (model from the current view)."
+    "definition": "Obtener información de la sesión",
+    "detail": "Devuelve un dato de la sesión/página actual. Usa exactamente un flag: --user-id (ID numérico del usuario), --user-login (nombre de login), --active-id (ID del registro en la vista actual), --active-model (modelo del registro en la vista actual)."
   },
   "cmdInput": {
     "args": {
-      "choices": "The choices",
-      "default": "The default choice",
-      "question": "The question"
+      "choices": "Las opciones",
+      "default": "La elección predeterminada",
+      "question": "La pregunta"
     },
-    "definition": "Requests user input",
-    "detail": "Returns the data entered by the user."
+    "definition": "Solicita datos de entrada al usuario",
+    "detail": "Devuelve los datos ingresados por el usuario"
   },
   "cmdInspect": {
     "args": {
-      "typeElement": "Element type to inspect"
+      "typeElement": "Tipo de elemento a inspeccionar"
     },
     "breadcrumb": {
-      "none": "No breadcrumb navigation found"
+      "none": "No se encontró navegación de migas de pan"
     },
     "button": {
-      "none": "No buttons found in the current view"
+      "none": "No se encontraron botones en la vista actual"
     },
-    "definition": "Inspect interactive elements on the current page",
-    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nWhen a modal dialog is open, every type below scopes to it instead of the background page.\nTypes:\n  page (default) — context overview: model, record id, view type, action id, element counts, modal state\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)\n  list — visible rows in the current list view with a \"view\" command per row",
+    "definition": "Inspeccionar los elementos interactivos de la página actual",
+    "detail": "Lista los elementos del tipo indicado junto con el comando de terminal para interactuar con cada uno. Para uso con LLM: llama primero a inspect y después usa los comandos generados.\nCuando hay un diálogo modal abierto, todos los tipos siguientes se aplican a él en lugar de a la página de fondo.\nTipos:\n  page (por defecto) — resumen del contexto: modelo, id del registro, tipo de vista, id de acción, número de elementos, estado del modal\n  button — todos los botones con un comando \"click\" listo para usar\n  field — campos de formulario de Odoo con un comando \"form\"\n  tab — pestañas del notebook con un comando \"click\"\n  menu — elementos del menú superior con un comando \"click\"\n  statusbar — botones de estado del flujo de trabajo con un comando \"click\"\n  view — selector de vistas (lista/kanban/formulario/…) con un comando \"click\"\n  dialog — botones y campos del diálogo abierto actualmente\n  breadcrumb — enlaces de navegación hacia atrás con un comando \"click\"\n  record — valores de los campos del registro de formulario actual (en memoria)\n  list — filas visibles de la vista de lista actual con un comando \"view\" por fila",
     "dialog": {
-      "buttons": "<em>Buttons:</em>",
-      "fields": "<em>Fields:</em>",
-      "none": "No dialog is currently open",
-      "title": "Dialog: <strong>{{title}}</strong>"
+      "buttons": "<em>Botones:</em>",
+      "fields": "<em>Campos:</em>",
+      "none": "No hay ningún diálogo abierto actualmente",
+      "title": "Diálogo: <strong>{{title}}</strong>"
     },
     "error": {
-      "noRoot": "Cannot find Odoo content area",
-      "unknownType": "Unknown element type: {{type}}"
+      "noRoot": "No se encuentra el área de contenido de Odoo",
+      "unknownType": "Tipo de elemento desconocido: {{type}}"
     },
     "field": {
-      "none": "No form fields found in the current view"
+      "none": "No se encontraron campos de formulario en la vista actual"
     },
     "list": {
-      "none": "No list rows found in the current view"
+      "none": "No se encontraron filas de lista en la vista actual"
     },
     "menu": {
-      "none": "No menu items found"
+      "none": "No se encontraron elementos de menú"
     },
     "page": {
-      "actionId": "Action ID: {{id}}",
-      "breadcrumb": "Breadcrumb: {{path}}",
-      "counts": "Elements — buttons: {{b}}, fields: {{f}}, tabs: {{t}}, statusbar states: {{s}}",
-      "modalOpen": "Modal open: <strong>{{title}}</strong> — other types now inspect the modal, not the background page",
-      "model": "Model: <strong>{{model}}</strong>",
-      "pageTitle": "Title: <em>{{title}}</em>",
-      "recordId": "Record ID: <strong>{{id}}</strong>",
-      "title": "Page Overview",
+      "actionId": "ID de acción: {{id}}",
+      "breadcrumb": "Migas de pan: {{path}}",
+      "counts": "Elementos — botones: {{b}}, campos: {{f}}, pestañas: {{t}}, estados de la barra de estado: {{s}}",
+      "modalOpen": "Modal abierto: <strong>{{title}}</strong> — los demás tipos inspeccionan ahora el modal, no la página de fondo",
+      "model": "Modelo: <strong>{{model}}</strong>",
+      "pageTitle": "Título: <em>{{title}}</em>",
+      "recordId": "ID del registro: <strong>{{id}}</strong>",
+      "title": "Resumen de la página",
       "url": "URL: {{url}}",
-      "viewType": "View type: {{type}}"
+      "viewType": "Tipo de vista: {{type}}"
     },
     "record": {
-      "none": "No form record found in the current view"
+      "none": "No se encontró ningún registro de formulario en la vista actual"
     },
     "statusbar": {
-      "none": "No status bar found in the current view"
+      "none": "No se encontró barra de estado en la vista actual"
     },
     "tab": {
-      "none": "No notebook tabs found in the current view"
+      "none": "No se encontraron pestañas de notebook en la vista actual"
     },
     "table": {
-      "active": "Active",
-      "clickCmd": "click command",
-      "current": "Current",
-      "disabled": "Dis.",
-      "formCmd": "form command",
+      "active": "Activo",
+      "clickCmd": "comando click",
+      "current": "Actual",
+      "disabled": "Desact.",
+      "formCmd": "comando form",
       "id": "ID",
       "index": "#",
-      "label": "Label",
-      "name": "Field",
-      "preview": "Cell values (field: value)",
+      "label": "Etiqueta",
+      "name": "Campo",
+      "preview": "Valores de celda (campo: valor)",
       "required": "Req",
-      "text": "Text",
-      "type": "Type",
-      "value": "Value",
-      "viewCmd": "view command"
+      "text": "Texto",
+      "type": "Tipo",
+      "value": "Valor",
+      "viewCmd": "comando view"
     },
     "view": {
-      "none": "No view switcher found (may be single-view action)"
+      "none": "No se encontró selector de vistas (puede ser una acción de vista única)"
     }
   },
   "cmdInstall": {
     "args": {
-      "module": "The module technical name"
+      "module": "El nombre técnico del módulo"
     },
-    "definition": "Install a module",
-    "detail": "Launch module installation process.",
+    "definition": "Instalar un módulo",
+    "detail": "Iniciar el proceso de instalación del módulo",
     "error": {
-      "moduleNotExist": "'{{module}}' modules doesn't exist",
-      "moduleNotInstalled": "Unexpected error. Modules not installed"
+      "moduleNotExist": "Los módulos '{{module}}' no existen",
+      "moduleNotInstalled": "Error inesperado. Módulos no instalados"
     },
     "result": {
-      "success": "{{modules}} modules successfully installed"
+      "success": "{{modules}} módulos instalados correctamente"
     }
   },
   "cmdJSTest": {
     "args": {
-      "device": "The device to test",
-      "module": "The module technical name"
+      "device": "El dispositivo a probar",
+      "module": "El nombre técnico del módulo"
     },
-    "definition": "Launch JS Tests",
-    "detail": "Runs js tests in desktop or mobile mode for the selected module."
+    "definition": "Lanzar pruebas JS",
+    "detail": "Ejecuta pruebas js en modo de escritorio o móvil para el módulo seleccionado"
   },
   "cmdJobs": {
-    "definition": "Display running jobs",
-    "detail": "Display running jobs",
+    "definition": "Mostrar trabajos en ejecución",
+    "detail": "Mostrar trabajos en ejecución",
     "result": {
-      "timeout": "This job is taking a long time"
+      "timeout": "Este trabajo está tomando mucho tiempo"
     }
   },
   "cmdJson": {
     "args": {
-      "data": "The data to send",
-      "endpoint": "The endpoint"
+      "data": "Los datos a enviar",
+      "endpoint": "El 'endpoint'"
     },
-    "definition": "Send POST JSON",
-    "detail": "Sends HTTP POST 'application/json' request"
+    "definition": "Enviar datos JSON",
+    "detail": "Envía una solicitud HTTP POST 'aplicación/json'"
   },
   "cmdLang": {
     "args": {
-      "format": "The format to use",
-      "lang": "The language<br/>Can use '__new__' for new language (empty translation template)",
-      "module": "The technical module name",
-      "name": "The language name",
-      "noOverwrite": "Flag to indicate don't overwrite current translations",
-      "operation": "The operation"
+      "format": "El formato a utilizar",
+      "lang": "El idioma<br/>Puede usar '__new__' para el nuevo idioma (plantilla de traducción vacía)",
+      "module": "El nombre técnico del módulo",
+      "name": "El nombre del idioma",
+      "noOverwrite": "Marcar para indicar que no se sobrescriban las traducciones actuales",
+      "operation": "La operación"
     },
-    "definition": "Operations over translations",
-    "detail": "export: downloads a .po/.csv translation file for a module. import: uploads a translation file from disk. list: prints installed language codes and names. Without extra args, export/import open the Odoo wizard instead.",
+    "definition": "Operaciones con las traducciones",
+    "detail": "export: descarga un archivo .po/.csv de traducción para un módulo. import: sube un archivo de traducción. list: muestra los códigos e idiomas instalados. Sin argumentos adicionales, export/import abren el asistente de Odoo.",
     "error": {
-      "exportInvalidArguments": "'export' operation needs the following arguments: --lang, --format, --module",
-      "importInvalidArguments": "'import' operation needs the following arguments: --name, --lang, --format, --module",
-      "invalidOperation": "Invalid operation!",
-      "noModulesFound": "No modules found!",
-      "noWizard": "Can't create wizard record!"
+      "exportInvalidArguments": "La operación 'export' necesita los siguientes argumentos: --lang, --format, --module",
+      "importInvalidArguments": "La operación de 'import' necesita los siguientes argumentos: --name, --lang, --format, --module",
+      "invalidOperation": "¡Operación no válida!",
+      "noModulesFound": "¡No se encontraron módulos!",
+      "noWizard": "¡No se ha podido crear un registro de asistente!"
     },
     "result": {
-      "success": "Language file imported successfully"
+      "success": "Archivo de idioma importado exitosamente"
     }
   },
   "cmdLastSeen": {
-    "definition": "Know user presence",
-    "detail": "Show users last seen",
+    "definition": "Conocer la presencia de los usuarios",
+    "detail": "Mostrar usuarios vistos por última vez",
     "error": {
-      "notAvailable": "Can't use lastseen, 'bus' module is not installed"
+      "notAvailable": "No se puede usar la 'lastseen', el módulo 'bus' no está instalado"
     },
     "table": {
-      "lastSeen": "Last Seen",
-      "userID": "User ID",
-      "userName": "User Name"
+      "lastSeen": "Visto por última vez",
+      "userID": "ID de usuario",
+      "userName": "Nombre de usuario"
     }
   },
   "cmdLoad": {
     "args": {
-      "type": "The type of the asset",
-      "url": "The URL of the asset"
+      "type": "El tipo de activo",
+      "url": "La URL del recurso"
     },
-    "definition": "Load external resource",
-    "detail": "Load external source (javascript & css)"
+    "definition": "Cargar recurso externo",
+    "detail": "Cargar fuente externa (javascript y css)"
   },
   "cmdLogin": {
     "args": {
-      "database": "The database<br/>Can be '*' to use current database",
-      "noReload": "No reload",
-      "password": "The password",
-      "user": "The login<br/>Can be optionally preceded by the '#' character and it will be used for password too"
+      "database": "La base de datos<br/>Puede ser '*' para usar la base de datos actual",
+      "noReload": "Sin recarga",
+      "password": "La contraseña",
+      "user": "El inicio de sesión<br/>Puede ir precedido opcionalmente del carácter '#' y también se utilizará como contraseña"
     },
-    "definition": "Login as...",
-    "detail": "Login as selected user.",
+    "definition": "Inicia sesión como...",
+    "detail": "Inicie sesión como el usuario indicado",
     "error": {
-      "notSession": "Cannot find session information",
-      "unknownDB": "Unknown active database. Try using '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>' command."
+      "notSession": "No se pudo encontrar información de la sesión",
+      "unknownDB": "Base de datos activa desconocida. Intente utilizar el comando '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>'"
     },
     "result": {
-      "success": "Successfully logged as '{{login}}'"
+      "success": "Se ha iniciado sesión correctamente como '{{login}}'"
     }
   },
   "cmdLogout": {
-    "definition": "Log out",
-    "detail": "Session log out",
+    "definition": "Finalizar la sesión",
+    "detail": "Cerrar sesión",
     "error": {
-      "notSession": "Cannot find session information"
+      "notSession": "No se pudo encontrar información de la sesión"
     },
     "result": {
-      "success": "Logged out"
+      "success": "Sesión cerrada"
     }
   },
   "cmdLongpolling": {
     "args": {
-      "operation": "The operation to do<br>- verbose > Print incoming notificacions<br>- off > Stop verbose mode<br>- add_channel > Add a channel to listen<br>- del_channel > Delete a listening channel<br>- start > Start client longpolling service<br> - stop > Stop client longpolling service",
-      "param": "The parameter"
+      "operation": "La operación a realizar<br>- verbose > Imprime las notificaciones entrantes<br>- off > Detener modo 'verbose'<br>- add_channel > Agregar un canal para escuchar<br>- del_channel > Eliminar un canal de la escucha<br>- start > Iniciar servicio de 'longpolling' del cliente<br> - stop > Detener el servicio de 'longpolling' del cliente",
+      "param": "El parámetro"
     },
-    "definition": "Long-Polling operations",
-    "detail": "Operations over long-polling.",
+    "definition": "Operaciones de 'longpolling'",
+    "detail": "Operaciones de 'longpolling'",
     "error": {
-      "invalidChannel": "Invalid channel name",
-      "invalidSubscription": "Invalid subscription name",
-      "notAvailable": "Can't use longpolling, 'bus' module is not installed"
+      "invalidChannel": "Nombre de canal no válido",
+      "invalidSubscription": "Nombre de suscripción no válido",
+      "notAvailable": "No se puede utilizar el 'longpolling', el módulo 'bus' no está instalado"
     },
     "result": {
-      "join": "Joined the '{{channel_name}}' channel",
-      "leave": "Leave the '{{channel_name}}' channel",
-      "start": "Longpolling started",
-      "stop": "Longpolling stopped",
-      "subscribe": "Subscribed to '{{subscription}}'",
-      "unsubscribe": "Unsubscribed from '{{subscription}}'",
-      "verboseDisabled": "Now long-polling verbose mode is disabled",
-      "verboseEnabled": "Now long-polling is in verbose mode"
+      "join": "Se unió al canal '{{channel_name}}'",
+      "leave": "Abandonar el canal '{{channel_name}}'",
+      "start": "Longpolling iniciado",
+      "stop": "Longpolling detenido",
+      "subscribe": "Suscrito a '{{subscription}}'",
+      "unsubscribe": "Dado de baja de '{{subscription}}'",
+      "verboseDisabled": "El modo detallado de longpolling está ahora deshabilitado",
+      "verboseEnabled": "El longpolling está ahora en modo detallado"
     }
   },
   "cmdMarkdown": {
     "args": {
-      "text": "The markdown text to convert"
+      "text": "El texto markdown a convertir"
     },
-    "definition": "Renders markdown as HTML",
-    "detail": "Converts the given markdown text to HTML using markdown-it and prints the result"
+    "definition": "Renderiza markdown como HTML",
+    "detail": "Convierte el texto markdown indicado a HTML usando markdown-it y muestra el resultado"
   },
   "cmdMetadata": {
     "args": {
-      "id": "The record id",
-      "model": "The record model"
+      "id": "El 'id' del registro",
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "View record metadata",
-    "detail": "Show ORM metadata for a record: create_uid, create_date, write_uid, write_date, noupdate flag, and XML ID.",
+    "definition": "Ver metadatos del registro",
+    "detail": "Muestra los metadatos ORM de un registro: create_uid, create_date, write_uid, write_date, flag noupdate y XML ID.",
     "error": {
-      "notFound": "Can't found any metadata for the given id"
+      "notFound": "No se pueden encontrar metadatos para el 'id' proporcionado"
     }
   },
   "cmdNotify": {
     "args": {
-      "buttons": "The buttons",
-      "className": "The className",
-      "message": "The message",
-      "sticky": "Is sticky",
-      "subtitle": "The subtitle",
-      "title": "The title",
-      "type": "The type"
+      "buttons": "Los botones",
+      "className": "El nombre de clase",
+      "message": "El mensaje",
+      "sticky": "Es persistente",
+      "subtitle": "El subtítulo",
+      "title": "El título",
+      "type": "El tipo"
     },
-    "definition": "Shows a notification",
-    "detail": "Displays a notification with a custom message"
+    "definition": "Muestra una notificación",
+    "detail": "Muestra una notificación con un mensaje personalizado"
   },
   "cmdNow": {
     "args": {
-      "type": "Date type",
-      "tz": "Use timezone"
+      "type": "Tipo de fecha",
+      "tz": "Usar zona horaria"
     },
-    "definition": "Current time",
-    "detail": "Prints the current time",
+    "definition": "Hora actual",
+    "detail": "Imprime la hora actual",
     "error": {
-      "notViewDialogsService": "Cannot find time service"
+      "notViewDialogsService": "No se pudo encontrar el servicio de hora"
     }
   },
   "cmdOptions": {
-    "definition": "Open extension options",
-    "detail": "Open the OdooTerminal extension options page."
+    "definition": "Abrir opciones de la extensión",
+    "detail": "Abre la página de opciones de la extensión OdooTerminal."
   },
   "cmdPaste": {
     "args": {
-      "merge": "Try to merge data (if the type is 'model')",
-      "yes": "Don't show questions"
+      "merge": "Intentar fusionar los datos (si el tipo es 'model')",
+      "yes": "No mostrar preguntas"
     },
-    "definition": "Pastes copied data",
-    "detail": "Paste model records or variables",
+    "definition": "Pega los datos copiados",
+    "detail": "Pegar registros del modelo o variables",
     "error": {
-      "invalidData": "Invalid data to paste! No model defined",
-      "noData": "No data to copy!"
+      "invalidData": "¡Datos no válidos para pegar! Ningún modelo definido",
+      "noData": "¡No hay datos para copiar!"
     },
     "question": {
-      "continue": "This will modify the '{{model}}' model. Continue?"
+      "continue": "Esto modificará el modelo '{{model}}'. ¿Continuar?"
     }
   },
   "cmdPivot": {
     "args": {
-      "col": "Fields to group by in columns",
-      "domain": "The domain filter",
-      "measure": "Fields to use as measures (plain field names, e.g. amount_total — NOT sum:amount_total)",
-      "model": "The model technical name",
-      "name": "The view title",
-      "row": "Fields to group by in rows"
+      "col": "Campos para agrupar en columnas",
+      "domain": "El filtro de dominio",
+      "measure": "Campos a usar como medidas (nombres simples de campo, p. ej. amount_total — NO sum:amount_total)",
+      "model": "El nombre técnico del modelo",
+      "name": "El título de la vista",
+      "row": "Campos para agrupar en filas"
     },
-    "definition": "Open pivot view",
-    "detail": "Open a customized pivot view for a model. To retrieve aggregated data without opening a view, use the read_group command instead.",
+    "definition": "Abrir vista pivot",
+    "detail": "Abre una vista pivot personalizada para un modelo. Para obtener datos agregados sin abrir una vista, usa el comando read_group.",
     "error": {
-      "measurePrefix": "Measure fields must be plain field names (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
-      "unknownFields": "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields."
+      "measurePrefix": "Los campos de medida deben ser nombres de campo simples (ej. 'amount_total'), no con prefijo de agregación (ej. 'sum:amount_total')",
+      "unknownFields": "{{arg}}: campo(s) no encontrado(s) en '{{model}}': {{fields}}. Usa 'caf -m {{model}}' para listar los campos disponibles."
     },
     "result": {
-      "name": "Pivot View"
+      "name": "Vista Pivot"
     }
   },
   "cmdPost": {
     "args": {
-      "data": "The data",
-      "endpoit": "The endpoint",
-      "mode": "The mode"
+      "data": "Los datos",
+      "endpoit": "El 'endpoint'",
+      "mode": "El modo"
     },
-    "definition": "Send POST request",
-    "detail": "Send POST request to selected endpoint"
+    "definition": "Enviar solicitud POST",
+    "detail": "Enviar solicitud POST al 'endpoint' seleccionado"
   },
   "cmdPrint": {
     "args": {
-      "msg": "The message to print"
+      "msg": "El mensaje a imprimir"
     },
-    "definition": "Print a message",
-    "detail": "Eval parameters and print the result."
+    "definition": "Imprimir un mensaje",
+    "detail": "Evalúa los parámetros e imprime el resultado"
   },
   "cmdRead": {
     "args": {
-      "field": "The fields to request<br/>Can use '*' to show all fields",
-      "id": "The record id's",
-      "model": "The model technical name",
-      "options": "The options",
-      "readBinary": "Don't filter binary fields"
+      "field": "Los campos a solicitar<br/>Puede usar '*' para mostrar todos los campos",
+      "id": "La identificación del registro",
+      "model": "El nombre técnico del modelo",
+      "options": "Las opciones",
+      "readBinary": "No filtrar campos binarios"
     },
-    "definition": "Fetch records by ID",
-    "detail": "Fetch one or more records by known ID(s) and return a Recordset. Use when you already have the record ID(s). Use search to find records by domain filter instead."
+    "definition": "Obtener registros por ID",
+    "detail": "Obtiene uno o más registros por ID(s) conocidos y devuelve un Recordset. Úsalo cuando ya tienes los IDs. Usa search para buscar por filtro de dominio."
   },
   "cmdReadGroup": {
     "args": {
-      "domain": "The domain filter",
-      "field": "Fields to aggregate (measures). Omit to get only counts.",
-      "groupby": "Fields to group by",
-      "model": "The model technical name"
+      "domain": "El filtro de dominio",
+      "field": "Campos a agregar (medidas). Omitir para obtener solo conteos.",
+      "groupby": "Campos para agrupar",
+      "model": "El nombre técnico del modelo"
     },
-    "definition": "Fetch grouped and aggregated data from a model",
-    "detail": "Run an ORM read_group on a model and return the aggregated results. Each result row contains the groupby field values, the aggregated measure values, and __count. Use this instead of search when you need sums, counts, or averages per group."
+    "definition": "Obtener datos agrupados y agregados de un modelo",
+    "detail": "Ejecuta un read_group ORM sobre un modelo y devuelve los resultados agregados. Cada fila contiene los valores de los campos de agrupación, los valores de medidas agregadas y __count. Úsalo en lugar de search cuando necesitas sumas, conteos o medias por grupo."
   },
   "cmdRef": {
     "args": {
-      "xmlid": "The XML-ID"
+      "xmlid": "El ID-XML"
     },
-    "definition": "Show the referenced model and id of the given xmlid's",
-    "detail": "Show the referenced model and id of the given xmlid's",
+    "definition": "Mostrar el nombre técnico del modelo y el 'id' del xmlid dado",
+    "detail": "Mostrar el nombre técnico del modelo y el 'id' del xmlid dado",
     "table": {
-      "resID": "Res. ID",
-      "resModel": "Res. Model",
-      "xmlID": "XML ID"
+      "resID": "Res. Id.",
+      "resModel": "Res. Modelo",
+      "xmlID": "ID-XML"
     }
   },
   "cmdReload": {
-    "definition": "Reload current page",
-    "detail": "Reload current page."
+    "definition": "Recargar la página actual",
+    "detail": "Recargar la página actual"
   },
   "cmdRenewDatabase": {
     "args": {
-      "dbuuid": "Renew the uuid of the database",
-      "expires_in": "Set in days the delay before database expiration."
+      "dbuuid": "Renovar el UUID de la base de datos",
+      "expires_in": "Establecer en días el tiempo antes de la expiración de la base de datos"
     },
-    "definition": "Renew the database",
-    "detail": "Re-generate a new uuid and expiration date for your development database.",
+    "definition": "Renovar la base de datos",
+    "detail": "Re-generar un nuevo UUID y fecha de expiración para tu base de datos de desarrollo",
     "result": {
-      "success": "Database renewed successfully",
-      "success_date": "New expiration date {{formattedExpirationDate}}.",
-      "success_with_uuid": "New uuid {{uuid}}."
+      "success": "Base de datos renovada con éxito",
+      "success_date": "Nueva fecha de expiración: {{formattedExpirationDate}}",
+      "success_with_uuid": "Nuevo UUID: {{uuid}}"
     }
   },
   "cmdRollback": {
     "args": {
-      "recordset": "The Recordset"
+      "recordset": "El conjunto de registros"
     },
-    "definition": "Revert recordset changes",
-    "detail": "Undo recordset changes",
+    "definition": "Revertir cambios en el conjunto de registros",
+    "detail": "Deshacer cambios en el conjunto de registros",
     "error": {
-      "invalidRecordset": "Invalid recordset"
+      "invalidRecordset": "Conjunto de registros no válido"
     },
     "result": {
-      "success": "Recordset changes undone"
+      "success": "Cambios en el conjunto de registros deshechos"
     }
   },
   "cmdRpc": {
     "args": {
-      "options": "The rpc query options"
+      "options": "Las opciones de consulta rpc"
     },
-    "definition": "Execute raw rpc",
-    "detail": "Execute raw rpc"
+    "definition": "Ejecutar rpc sin formato",
+    "detail": "Ejecutar rpc sin formato"
   },
   "cmdRun": {
-    "definition": "Run a TraSH script",
-    "detail": "Run a TraSH script"
+    "definition": "Ejecutar un script TraSH",
+    "detail": "Ejecutar un script TraSH"
   },
   "cmdSearch": {
     "args": {
-      "all": "Show all records (not truncated)",
-      "domain": "The domain",
-      "field": "The field names to request<br/>Can use '*' to show all fields of the model",
-      "limit": "The limit of records to request",
-      "model": "The model technical name",
-      "more": "Flag to indicate that show more results",
-      "offset": "The offset (from)<br/>Can be zero (no limit)",
-      "options": "The options",
-      "order": "The sort order. MUST be quoted because it contains spaces: -o \"name ASC\" or -o \"id DESC, name\"",
-      "readBinary": "Don't filter binary fields"
+      "all": "Mostrar todos los registros (no truncados)",
+      "domain": "El dominio",
+      "field": "Los nombres de los campos a solicitar<br/>Puede usar '*' para mostrar todos los campos del modelo",
+      "limit": "El límite de registros a solicitar",
+      "model": "El nombre técnico del modelo",
+      "more": "Marcar para indicar que se muestran más resultados",
+      "offset": "El desplazamiento (desde)<br/>Puede ser cero (sin límite)",
+      "options": "Las opciones",
+      "order": "El orden de clasificación. DEBE ir entre comillas porque contiene espacios: -o \"name ASC\" o -o \"id DESC, name\"",
+      "readBinary": "No filtrar campos binarios"
     },
-    "definition": "Search model record/s",
-    "detail": "Launch orm search query",
+    "definition": "Buscar registro/s de modelo",
+    "detail": "Iniciar consulta de búsqueda de registros de modelo",
     "error": {
-      "noMoreResults": "There are no more results to print",
-      "resultTruncated": "<strong class='text-warning'>Result truncated to {{len}} records!</strong> The query is too big to be displayed entirely."
+      "noMoreResults": "No hay más resultados para imprimir",
+      "resultTruncated": "<strong class='text-warning'>¡Resultado truncado a {{len}} registros!</strong> La consulta es demasiado grande para mostrarse en su totalidad"
     },
     "question": {
-      "showMore": "There are still results to print ({{len}} records). Show more?"
+      "showMore": "Aún quedan resultados por imprimir ({{len}} registros). ¿Mostrar más?"
     },
     "result": {
-      "count": "Records count: {{count}}"
+      "count": "Recuento de registros: {{count}}"
     }
   },
   "cmdSettings": {
     "args": {
-      "module": "The module technical name"
+      "module": "El nombre técnico del módulo"
     },
-    "definition": "Open settings page",
-    "detail": "Open the Odoo Settings form view for the specified module. Does not return data."
+    "definition": "Abrir la página de configuración",
+    "detail": "Abre la vista de formulario de Configuración de Odoo para el módulo indicado. No devuelve datos."
   },
   "cmdSysParam": {
     "args": {
-      "key": "Parameter key (required for get/set operations)",
-      "operation": "Operation to perform.",
-      "type": "Parameter type for get/set operations (Odoo 20+)",
-      "value": "Parameter value (required for set operation)"
+      "key": "Clave del parámetro (requerido para operaciones get/set)",
+      "operation": "Operación a realizar",
+      "type": "Tipo de parámetro para las operaciones get/set (Odoo 20+)",
+      "value": "Valor del parámetro (requerido para la operación set)"
     },
-    "definition": "Manage system parameters",
-    "detail": "Get, set, or list parameters in ir.config_parameter model.",
+    "definition": "Gestionar parámetros del sistema",
+    "detail": "Obtener, establecer o listar parámetros en el modelo ir.config_parameter",
     "error": {
-      "invalidOperation": "Invalid operation. Use 'get', 'set', or 'list'",
-      "invalidType": "Invalid type. Use 'str', 'int', 'float', or 'bool'",
-      "listEmpty": "No system parameters found",
-      "missingKey": "Key parameter is required for set operation",
-      "missingValue": "Value parameter is required for set operation",
-      "noUpdate": "Failed to update the parameter",
-      "notFound": "Parameter not found"
+      "invalidOperation": "Operación no válida. Use 'get', 'set', o 'list'",
+      "invalidType": "Tipo no válido. Usa 'str', 'int', 'float' o 'bool'",
+      "listEmpty": "No se encontraron parámetros del sistema",
+      "missingKey": "Se requiere el parámetro clave para la operación set",
+      "missingValue": "Se requiere el parámetro valor para la operación set",
+      "noUpdate": "Error al actualizar el parámetro",
+      "notFound": "Parámetro no encontrado"
     },
     "result": {
-      "success": "Parameter set successfully"
+      "success": "Parámetro establecido exitosamente"
     },
     "table": {
-      "param": "Parameter",
-      "value": "Value"
+      "param": "Parámetro",
+      "value": "Valor"
     }
   },
   "cmdToggleTerm": {
     "args": {
-      "force": "Force show/hide"
+      "force": "Forzar mostrar/ocultar"
     },
-    "definition": "Toggle terminal visibility",
-    "detail": "Toggle terminal visibility"
+    "definition": "Alternar visibilidad de terminal",
+    "detail": "Alternar visibilidad de terminal"
   },
   "cmdTour": {
     "args": {
-      "clear": "Clear the state tour",
-      "name": "The tour technical name",
-      "onlyActive": "Filter only active"
+      "clear": "Limpiar el 'tour'",
+      "name": "El nombre técnico del 'tour'",
+      "onlyActive": "Filtrar solo activos"
     },
-    "definition": "Launch Tour",
-    "detail": "Runs the selected tour. If no tour given, prints all available tours.",
+    "definition": "Lanzar 'tours'",
+    "detail": "Ejecuta el 'tour' seleccionado. Si no se proporciona ningún 'tour', imprime todos los 'tours' disponibles",
     "error": {
-      "notAccesible": "tour not accesible! Can't use it in this moment.",
-      "notAvailable": "This is not available on Odoo <17.0",
-      "notExist": "The given tour doesn't exist!"
+      "notAccesible": "¡Tour no accesible! No se puede usar en este momento",
+      "notAvailable": "Esto no está disponible en Odoo <17.0",
+      "notExist": "¡El 'tour' indicado no existe!"
     },
     "result": {
-      "clean": "Tour '{{name}}' clean",
-      "empty": "The tour list is empty",
-      "running": "Running tour..."
+      "clean": "Tour '{{name}}' limpio",
+      "empty": "La lista de 'tours' está vacía",
+      "running": "Ejecutando el 'tour'..."
     }
   },
   "cmdURL": {
-    "definition": "Get URL parameters",
-    "detail": "Extract a component from the current page URL. Use -s href for the full URL, -s hash -k model to read the model in the hash, -s search -k <param> for query string values.",
+    "definition": "Obtener parámetros de la URL",
+    "detail": "Extrae un componente de la URL de la página actual. Usa -s href para la URL completa, -s hash -k model para el modelo en el hash, -s search -k <param> para parámetros de query string.",
     "error": {
-      "notKey": "A key has not been provided"
+      "notKey": "No se ha proporcionado una clave"
     }
   },
   "cmdUal": {
-    "definition": "Update apps list",
-    "detail": "Refresh the module registry by scanning the addons path for new or updated modules. Required before installing a module that was just added to the filesystem.",
+    "definition": "Actualizar la lista de aplicaciones",
+    "detail": "Recarga el registro de módulos buscando módulos nuevos o actualizados en el path de addons. Necesario antes de instalar un módulo recién añadido al sistema de archivos.",
     "error": {
-      "noUpdate": "Can't update the apps list!"
+      "noUpdate": "¡No pudo actualizar la lista de aplicaciones!"
     },
     "result": {
-      "success": "The apps list has been updated successfully"
+      "success": "La lista de aplicaciones se ha actualizado correctamente"
     }
   },
   "cmdUhg": {
     "args": {
-      "group": "The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'"
+      "group": "El nombre técnico del grupo<br/>Un grupo puede ir precedido opcionalmente de '!' para indicar 'no está en el grupo'"
     },
-    "definition": "Check if user is in the selected groups",
-    "detail": "Check if user is in the selected groups."
+    "definition": "Comprobar si el usuario está en los grupos seleccionados",
+    "detail": "Compruebe si el usuario está en los grupos seleccionados"
   },
   "cmdUninstall": {
     "args": {
-      "force": "Forced mode",
-      "module": "The module technical name"
+      "force": "Modo forzado",
+      "module": "El nombre técnico del módulo"
     },
-    "definition": "Uninstall a module",
-    "detail": "Launch module deletion process.",
+    "definition": "Desinstalar un módulo",
+    "detail": "Iniciar el proceso de eliminación del módulo",
     "error": {
-      "canceled": "Operation cancelled",
-      "notExist": "'{{module}}' module doesn't exists"
+      "canceled": "Operación cancelada",
+      "notExist": "El módulo '{{module}}' no existe"
     },
     "question": {
-      "continue": "Do you want to continue?"
+      "continue": "¿Quieres continuar?"
     },
     "result": {
-      "success": "'{{module}}' ({{name}}) module successfully uninstalled",
-      "willRemoved": "This operation will remove these modules too:"
+      "success": "Módulo '{{module}}' ({{name}}) desinstalado exitosamente",
+      "willRemoved": "Esta operación también eliminará estos módulos:"
     }
   },
   "cmdUnlink": {
     "args": {
-      "id": "The record id's",
-      "model": "The model technical name",
-      "options": "The options"
+      "id": "El 'id' del registro",
+      "model": "El nombre técnico del modelo",
+      "options": "Las opciones"
     },
-    "definition": "Unlink record",
-    "detail": "Delete a record.",
+    "definition": "Eliminar un registro",
+    "detail": "Eliminar un registro",
     "result": {
-      "success": "{{model}} record deleted successfully"
+      "success": "{{model}} registro eliminado correctamente"
     }
   },
   "cmdUpgrade": {
     "args": {
-      "module": "The module technical name"
+      "module": "El nombre técnico del módulo"
     },
-    "definition": "Upgrade a module",
-    "detail": "Launch upgrade module process.",
+    "definition": "Actualizar un módulo",
+    "detail": "Iniciar el proceso de actualización del módulo",
     "error": {
-      "notExist": "'{{module}}' modules doesn't exist",
-      "notUpgraded": "Unexpected error. Module not upgraded"
+      "notExist": "Los módulos '{{module}}' no existen",
+      "notUpgraded": "Error inesperado. Módulo no actualizado"
     },
     "result": {
-      "sucess": "'{{modules}}' modules successfully upgraded"
+      "sucess": "Los módulos '{{modules}}' se actualizaron correctamente"
     }
   },
   "cmdVersion": {
-    "definition": "Know Odoo version",
-    "detail": "Shows Odoo version",
+    "definition": "Imprime la versión de Odoo",
+    "detail": "Muestra la versión de Odoo",
     "error": {
-      "notVersionInfo": "Cannot find version information"
+      "notVersionInfo": "No pudo encontrar la información de la versión"
     }
   },
   "cmdView": {
     "args": {
-      "domain": "The domain filter for the record picker",
-      "id": "The record id",
-      "model": "The model technical name",
-      "ref": "The view reference name"
+      "domain": "El filtro de dominio para el selector de registros",
+      "id": "El 'id' del registro",
+      "model": "El nombre técnico del modelo",
+      "ref": "El nombre de referencia de la vista"
     },
-    "definition": "View model record/s",
-    "detail": "With -i: opens that record in its form view. Without -i: shows a record picker dialog filtered by -d domain. Does not return data.",
+    "definition": "Ver registros de modelo",
+    "detail": "Con -i: abre ese registro en su vista de formulario. Sin -i: muestra un diálogo selector de registros filtrado por el dominio -d. No devuelve datos.",
     "error": {
-      "notViewDialogsService": "Cannot find view dialog service"
+      "notViewDialogsService": "No se pudo encontrar el servicio de visualización de diálogo"
     },
     "result": {
-      "selectRecord": "Select a record",
-      "viewRecord": "View Record"
+      "selectRecord": "Seleccione un registro",
+      "viewRecord": "Ver registro"
     }
   },
   "cmdWatchdog": {
     "args": {
-      "model": "Model name to use for the watchdog",
-      "profile": "Watchdog persona: technical (default), accounting or sales — changes the vocabulary/focus of its verdicts. Only the technical profile explains exceptions (RPC/JS errors); the other profiles don't react to them (Odoo's own on-screen error message is unaffected either way).",
-      "reasoning": "Reasoning effort for \"thinking\" models: off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
-      "state": "Turn the watchdog on or off for this instance"
+      "model": "Nombre del modelo a usar para el vigilante",
+      "profile": "Personalidad del vigilante: técnico (por defecto), contable o comercial — cambia el vocabulario/enfoque de sus veredictos. Solo el perfil técnico explica las excepciones (errores de RPC/JS); los demás perfiles no reaccionan a ellas (el mensaje de error que muestra el propio Odoo en pantalla no se ve afectado).",
+      "reasoning": "Nivel de razonamiento para modelos \"pensantes\": off, low, medium o high. 'off' pide a servidores locales compatibles con OpenAI (llama.cpp, vLLM, ...) que se salten el razonamiento interno — úsalo si un modelo no muestra salida porque gasta toda su respuesta pensando. Por ahora solo con el proveedor openai.",
+      "state": "Activa o desactiva el vigilante para esta instancia"
     },
-    "definition": "Opt-in floating AI watchdog that reacts to page activity on its own",
-    "detail": "An opt-in floating AI watchdog that reacts on its own: every time it detects a save, a deletion, an opened record, a field edit (form or list line), a lingering hover over a button or field, a warning/error message from Odoo, or an exception (an RPC error from a save/delete, or an uncaught JS error on the page — explained with a root-cause read, technical profile only, see \"-pf\" below), it automatically sends a one-shot, read-only consult (no run_command, cannot change anything) to the AI and peeks from the right edge with a short verdict. Since this fires constantly and can burn tokens fast, use a local model for it: \"watchdog -p on -m <local-model>\". \"-m\" alone (without \"-p\") just changes the model without touching on/off. \"-pf <profile>\" picks who it writes for: technical (default, also the only profile that explains exceptions), accounting or sales. Clicking the watchdog never calls the AI and never registers its notes into the terminal/agent conversation — it just expands the bubble in place to show the watchdog's own message history; click again to collapse. If a \"thinking\" model shows nothing, set \"-r off\" so it skips chain-of-thought instead of spending its reply budget on it. Needs its own connection: configure a provider + model under the extension's Options page → AI Watchdog (independent from the \"ai\" command's connection).",
+    "definition": "Vigilante de IA flotante y opcional que reacciona por su cuenta a la actividad de la página",
+    "detail": "Un vigilante de IA flotante y opcional que reacciona por su cuenta: cada vez que detecta un guardado, una eliminación, un registro abierto, la edición de un campo (de formulario o de una línea de lista), que el cursor se demore sobre un botón o un campo, un mensaje de aviso/error de Odoo, o una excepción (un error de RPC de un guardado/eliminación, o un error de JS no capturado en la página — explicada con un análisis de causa raíz, solo en el perfil técnico, ver \"-pf\" más abajo), envía automáticamente una consulta de un solo turno, solo lectura (sin run_command, no puede cambiar nada) a la IA y asoma por el borde derecho con un veredicto breve. Como esto se dispara constantemente y puede consumir tokens muy rápido, usa un modelo local para ello: \"watchdog -p on -m <modelo-local>\". \"-m\" solo (sin \"-p\") cambia el modelo sin tocar el on/off. \"-pf <perfil>\" elige para quién escribe: técnico (por defecto, además el único perfil que explica excepciones), contable o comercial. Hacer clic en el vigilante nunca llama a la IA ni registra sus notas en la conversación del terminal/agente — solo despliega la burbuja en el sitio para mostrar el historial de mensajes del vigilante; vuelve a hacer clic para contraerla. Si un modelo \"pensante\" no muestra nada, pon \"-r off\" para que se salte el razonamiento interno en vez de gastar en él toda su respuesta. Necesita su propia conexión: configura un proveedor y modelo en la página de Opciones de la extensión → AI Watchdog (independiente de la conexión del comando \"ai\").",
     "model": {
-      "notSet": "(not set)"
+      "notSet": "(sin configurar)"
     },
-    "noProvider": "No dedicated provider is configured for the watchdog yet, so it has nothing to call. The watchdog never borrows the AI sidebar's active connection — open the extension's Options page → AI Watchdog and pick a provider + model there (add one under \"AI Providers\" first if you haven't). That choice is remembered per instance too, so this is a one-time step.",
+    "noProvider": "Todavía no hay un proveedor dedicado configurado para el vigilante, así que no tiene a quién consultar. El vigilante nunca toma prestada la conexión activa de la barra lateral de IA — abre la página de Opciones de la extensión → AI Watchdog y elige ahí un proveedor y un modelo (añade uno en \"Proveedores de IA\" primero si aún no lo has hecho). Esa elección también se recuerda por instancia, así que es un paso único.",
     "reasoning": {
-      "default": "default",
-      "hint": "Tip: if the watchdog sometimes shows nothing, your model may be spending its whole reply on internal reasoning before answering. Try \"watchdog -r off\" (or a non-thinking model for this slot)."
+      "default": "por defecto",
+      "hint": "Consejo: si el vigilante a veces no muestra nada, puede que tu modelo esté gastando toda su respuesta en razonamiento interno antes de contestar. Prueba \"watchdog -r off\" (o un modelo no pensante para este puesto)."
     },
     "status": {
-      "off": "Watchdog mode: off (model for when enabled: {{model}})",
-      "on": "Watchdog mode: on for this instance (saved locally — survives closing the browser, no need to redo this or reconnect next time). Model: {{model}}. Profile: {{profile}}. Reasoning: {{reasoning}}."
+      "off": "Modo vigilante: desactivado (modelo cuando se active: {{model}})",
+      "on": "Modo vigilante: activado para esta instancia (guardado localmente — sobrevive a cerrar el navegador, no hace falta repetir esto ni reconectar la próxima vez). Modelo: {{model}}. Perfil: {{profile}}. Razonamiento: {{reasoning}}."
     },
-    "tokenWarning": "⚠ High token usage: the watchdog calls the AI automatically on EVERY save, field edit, record you open, lingering hover over a button, and Odoo warning/error message — with no manual step in between. Only use this with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended."
+    "tokenWarning": "⚠ Alto consumo de tokens: el vigilante llama a la IA automáticamente en CADA guardado, edición de campo, registro que abras, demora del cursor sobre un botón y mensaje de aviso/error de Odoo — sin ningún paso manual de por medio. Úsalo solo con un modelo local (Ollama, llama.cpp, etc.) — NO se recomienda con un proveedor de pago en la nube, donde puede generar una factura considerable sin que te des cuenta."
   },
   "cmdWhoami": {
-    "definition": "Know current user login",
-    "detail": "Shows current user login",
+    "definition": "Conocer el nombre de inicio de sesión del usuario actual",
+    "detail": "Muestra el nombre de inicio de sesión del usuario actual",
     "error": {
-      "noLogin": "Oops! can't get the login :/"
+      "noLogin": "¡Ups! no se pudo iniciar sesión :/"
     }
   },
   "cmdWrite": {
     "args": {
-      "id": "The record id's",
-      "model": "The model technical name",
-      "options": "The options",
-      "value": "The values to write"
+      "id": "El 'id' del registro",
+      "model": "El nombre técnico del modelo",
+      "options": "Las opciones",
+      "value": "Los valores a escribir"
     },
-    "definition": "Update record values",
-    "detail": "Update record values.",
+    "definition": "Actualizar valores de registro",
+    "detail": "Actualizar valores de registro",
     "result": {
-      "success": "{{model}} record updated successfully"
+      "success": "{{model}} registro actualizado correctamente"
     }
   },
   "cmdWs": {
     "args": {
-      "data": "The data",
-      "endpoint": "The endpoint",
-      "noTls": "Don't use TLS",
-      "operation": "The operation",
-      "websocket": "The websocket object"
+      "data": "Los datos",
+      "endpoint": "El 'endpoint'",
+      "noTls": "No usar TLS",
+      "operation": "La operación",
+      "websocket": "El objeto websocket"
     },
-    "definition": "Open a web socket",
-    "detail": "Open a web socket",
+    "definition": "Abrir un socket web",
+    "detail": "Abrir un socket web",
     "error": {
-      "invalidOperation": "Invalid operation",
-      "noEndpoint": "Need an endpoint to connect",
-      "noWebsocket": "Need a websocket to operate"
+      "invalidOperation": "Operación no válida",
+      "noEndpoint": "Se necesita un 'endpoint' para conectarse",
+      "noWebsocket": "Se necesita un websocket para operar"
     },
     "result": {
-      "connectionClosed": "[{{url}}] Connection closed cleanly, code={{code}} reason={{reason}}",
-      "connectionDied": "[{{url}}] Connection died",
-      "connectionError": "Need a websocket to operate",
-      "connectionEstablished": "[{{url}}] Connection established"
+      "connectionClosed": "[{{url}}] Conexión cerrada limpiamente, código={{code}} motivo={{reason}}",
+      "connectionDied": "[{{url}}] La conexión se ha perdido",
+      "connectionError": "Se necesita un websocket para operar",
+      "connectionEstablished": "[{{url}}] Conexión establecida"
     }
   },
   "cmdZip": {
     "args": {
-      "values": "Data to write (must be an array of tuples [filename, filedata, fileoptions])"
+      "values": "Datos a escribir (debe ser una lista de tuplas [nombre_de_archivo, datos, opciones])"
     },
-    "definition": "Create zip file",
-    "detail": "To learn about the available options, check out the zip.js help"
+    "definition": "Crear archivo zip",
+    "detail": "Para conocer las opciones disponibles, consulta la ayuda de zip.js"
   },
   "file2attachment": {
-    "aborted": "Aborted by user. No file given...",
-    "noFile": "No file selected"
+    "aborted": "Cancelado por el usuario. No se indicó ningún archivo...",
+    "noFile": "Ningún archivo seleccionado"
   },
   "file2base64": {
-    "aborted": "Aborted by user. No file given..."
+    "aborted": "Cancelado por el usuario. No se proporcionó ningún archivo..."
   },
   "file2file": {
-    "aborted": "Aborted by user. No file given..."
+    "aborted": "Cancelado por el usuario. No se proporcionó ningún archivo..."
   },
   "func2DNextFrame": {
-    "definition": "Wait for the next animation frame",
-    "detail": "Waits until the browser is ready to paint the next frame and returns its timestamp. Use it to pace animation loops instead of sleep."
+    "definition": "Esperar al siguiente fotograma de animación",
+    "detail": "Espera hasta que el navegador esté listo para pintar el siguiente fotograma y devuelve su marca de tiempo. Úsalo para marcar el ritmo de los bucles de animación en lugar de sleep."
   },
   "func2DText": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The text color",
-      "font": "The text font",
-      "text": "The text",
-      "x": "The text X point",
-      "y": "The text Y point"
+      "canvas": "El lienzo o el id de su ventana",
+      "color": "El color del texto",
+      "font": "La fuente del texto",
+      "text": "El texto",
+      "x": "El punto X del texto",
+      "y": "El punto Y del texto"
     },
-    "definition": "Draw a text",
-    "detail": "Draw a text"
+    "definition": "Dibujar un texto",
+    "detail": "Dibujar un texto"
   },
   "getOdooEnvService": {
-    "error": "Service '{{service_name}}' is not available"
+    "error": "El servicio '{{service_name}}' no está disponible"
   },
   "loader": {
-    "cantInitTerm": "Can't initilize terminal",
-    "testsEnabled": "Tests Enabled"
+    "cantInitTerm": "No se puede inicializar el terminal",
+    "testsEnabled": "Pruebas habilitadas"
   },
   "longpolling": {
     "error": {
-      "invalidVersion": "This operation is not valid in the current Odoo version",
-      "notAvailable": "bus service not available"
+      "invalidVersion": "Esta operación no es válida para la versión actual de Odoo",
+      "notAvailable": "El servicio 'bus' no está disponible"
     }
   },
   "odoo": {
     "error": {
-      "notRoot": "Cannot find root object"
+      "notRoot": "No se puede encontrar el objeto raíz"
     },
     "longpolling": {
       "error": {
-        "init": "Can't initilize longpolling: ",
-        "read": "** Reading Error! **"
+        "init": "No se puede inicializar el 'longpolling':",
+        "read": "** ¡Error de lectura! **"
       },
-      "new": "New Longpolling Notification:"
+      "new": "Nueva notificación de 'longpolling':"
     },
     "templates": {
       "metadata": {
-        "createDate": "Create Date",
-        "createUID": "Create UID",
-        "noUpdate": "No Update",
-        "writeDate": "Write Date",
-        "writeUID": "Write UID",
-        "xmlID": "XML-ID"
+        "createDate": "Fecha de creación",
+        "createUID": "UID de creación",
+        "noUpdate": "Sin actualización",
+        "writeDate": "Fecha de escritura",
+        "writeUID": "UID de escritura",
+        "xmlID": "ID-XML"
       },
       "recordCreated": {
-        "sucess": "{{model}} record(s) created successfully: {{- links}}"
+        "sucess": "{{model}} registro(s) creado(s) correctamente: {{- links}}"
       },
       "whoami": {
-        "activeCompany": "Active Company",
-        "inCompanies": "In Companies",
-        "inGroups": "In Groups",
-        "login": "Login",
-        "partner": "Partner",
-        "user": "User"
+        "activeCompany": "Empresa activa",
+        "inCompanies": "En empresas",
+        "inGroups": "En grupos",
+        "login": "Inicio de sesión",
+        "partner": "Contacto",
+        "user": "Usuario"
       }
     }
   },
-  "ok": "OK",
-  "optionsAIModelsAddRequired": "Name and URL are required",
-  "optionsAIModelsGrantDenied": "Access denied",
-  "optionsAIModelsGrantError": "Error granting access",
-  "optionsAIModelsGrantSuccess": "Access granted",
-  "optionsAIModelsGrantedLabel": "Access granted",
-  "optionsAIModelsLoadMissingURL": "Enter URL first",
-  "optionsAISkillsAddRequired": "Name, Description and Content are required",
-  "optionsAIWatchdogDescription": "A floating watchdog that reacts on its own to page activity (save/open/edit/hover/Odoo messages) with a short, read-only AI verdict — it never runs commands or changes anything. This sets the default for every Odoo instance the extension runs on; each instance can still override the model locally with the \"watchdog\" terminal command.",
-  "optionsAIWatchdogEnabled": "Enabled by default",
-  "optionsAIWatchdogHint": "No local server configured yet? Add one under the \"AI Providers\" tab, then pick it here.",
-  "optionsAIWatchdogManualHint": "Leave this off to keep it opt-in per instance: run \"watchdog -p on\" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with \"-m <model>\"). Turn it off again with \"watchdog -p off\".",
-  "optionsAIWatchdogModel": "Model",
-  "optionsAIWatchdogModelsLoadError": "Could not load models",
-  "optionsAIWatchdogNoModel": "-- Default model --",
-  "optionsAIWatchdogNoProvider": "-- No provider --",
-  "optionsAIWatchdogProfile": "Profile",
-  "optionsAIWatchdogProfileAccounting": "Accounting",
-  "optionsAIWatchdogProfileHint": "Changes the verdicts' focus and vocabulary (e.g. accounting totals/taxes vs. sales/customer data). Required-field checks always apply regardless of profile. Only the Technical profile explains exceptions (RPC errors from a failed save/delete, or uncaught JS errors) — the other profiles don't react to them (Odoo's own on-screen error message is unaffected either way). Can also be overridden per instance with \"watchdog -pf <profile>\".",
-  "optionsAIWatchdogProfileSales": "Sales",
-  "optionsAIWatchdogProfileTechnical": "Technical (default)",
-  "optionsAIWatchdogProvider": "Provider",
-  "optionsAIWatchdogReasoning": "Reasoning",
-  "optionsAIWatchdogReasoningDefault": "-- Default (no override) --",
-  "optionsAIWatchdogReasoningHigh": "High",
-  "optionsAIWatchdogReasoningHint": "If the watchdog sometimes shows nothing, your model may be a \"thinking\" model spending its whole reply on internal reasoning — try \"Off\". Only applies to OpenAI-compatible servers (local llama.cpp/vLLM/Ollama, etc.); can also be overridden per instance with \"watchdog -r <level>\".",
-  "optionsAIWatchdogReasoningLow": "Low",
-  "optionsAIWatchdogReasoningMedium": "Medium",
-  "optionsAIWatchdogReasoningOff": "Off (skip chain-of-thought)",
-  "optionsAIWatchdogTokenWarning": "⚠ High token usage: it calls the AI automatically on EVERY save, field edit, record you open, lingering hover over a button, and Odoo warning/error message — with no manual step in between. Only use it with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended.",
+  "ok": "Aceptar",
+  "optionsAIModelsAddRequired": "Nombre y URL son obligatorios",
+  "optionsAIModelsGrantDenied": "Acceso denegado",
+  "optionsAIModelsGrantError": "Error al conceder acceso",
+  "optionsAIModelsGrantSuccess": "Acceso concedido",
+  "optionsAIModelsGrantedLabel": "Acceso concedido",
+  "optionsAIModelsLoadMissingURL": "Introduce la URL primero",
+  "optionsAISkillsAddRequired": "Nombre, Descripción y Contenido son obligatorios",
+  "optionsAIWatchdogDescription": "Un vigilante flotante que reacciona por su cuenta a la actividad de la página (guardar/abrir/editar/cursor sobre un botón/mensajes de Odoo) con un veredicto breve de solo lectura de la IA — nunca ejecuta comandos ni cambia nada. Esto fija el valor por defecto para todas las instancias de Odoo en las que corra la extensión; cada instancia puede seguir anulando el modelo localmente con el comando de terminal \"watchdog\".",
+  "optionsAIWatchdogEnabled": "Activado por defecto",
+  "optionsAIWatchdogHint": "¿Aún no tienes un servidor local configurado? Añade uno en la pestaña \"Proveedores de IA\" y luego elígelo aquí.",
+  "optionsAIWatchdogManualHint": "Déjalo desactivado para que sea opcional por instancia: ejecuta \"watchdog -p on\" en el terminal de cualquier instancia de Odoo para activarlo solo ahí (usará el proveedor/modelo elegidos abajo, salvo que los sobrescribas con \"-m <modelo>\"). Desactívalo de nuevo con \"watchdog -p off\".",
+  "optionsAIWatchdogModel": "Modelo",
+  "optionsAIWatchdogModelsLoadError": "No se pudieron cargar los modelos",
+  "optionsAIWatchdogNoModel": "-- Modelo por defecto --",
+  "optionsAIWatchdogNoProvider": "-- Sin proveedor --",
+  "optionsAIWatchdogProfile": "Perfil",
+  "optionsAIWatchdogProfileAccounting": "Contable",
+  "optionsAIWatchdogProfileHint": "Cambia el enfoque y el vocabulario de los veredictos (p. ej. totales/impuestos contables frente a datos de cliente/venta). Las comprobaciones de campos obligatorios siempre se aplican, sea cual sea el perfil. Solo el perfil Técnico explica las excepciones (errores de RPC de un guardado/eliminación fallidos, o errores de JS no capturados) — los demás perfiles no reaccionan a ellas (el mensaje de error que muestra el propio Odoo en pantalla no se ve afectado). También se puede forzar por instancia con \"watchdog -pf <perfil>\".",
+  "optionsAIWatchdogProfileSales": "Comercial",
+  "optionsAIWatchdogProfileTechnical": "Técnico (por defecto)",
+  "optionsAIWatchdogProvider": "Proveedor",
+  "optionsAIWatchdogReasoning": "Razonamiento",
+  "optionsAIWatchdogReasoningDefault": "-- Por defecto (sin forzar) --",
+  "optionsAIWatchdogReasoningHigh": "Alto",
+  "optionsAIWatchdogReasoningHint": "Si el vigilante a veces no muestra nada, puede que tu modelo sea \"pensante\" y gaste toda su respuesta en razonamiento interno — prueba \"Off\". Solo aplica a servidores compatibles con OpenAI (llama.cpp/vLLM/Ollama locales, etc.); también se puede forzar por instancia con \"watchdog -r <nivel>\".",
+  "optionsAIWatchdogReasoningLow": "Bajo",
+  "optionsAIWatchdogReasoningMedium": "Medio",
+  "optionsAIWatchdogReasoningOff": "Off (sin razonamiento)",
+  "optionsAIWatchdogTokenWarning": "⚠ Alto consumo de tokens: llama a la IA automáticamente en CADA guardado, edición de campo, registro que abras, demora del cursor sobre un botón y mensaje de aviso/error de Odoo — sin ningún paso manual de por medio. Úsalo solo con un modelo local (Ollama, llama.cpp, etc.) — NO se recomienda con un proveedor de pago en la nube, donde puede generar una factura considerable sin que te des cuenta.",
   "optionsExecutionCollection": "Longitud máxima de las colecciones",
   "optionsExecutionHint": "Las llamadas anidadas comparten el presupuesto de instrucciones. La cancelación por tiempo es cooperativa: una operación del host ya iniciada puede terminar antes de que se detenga la ejecución.",
   "optionsExecutionInstructions": "Máximo de instrucciones de la máquina virtual",
@@ -1421,224 +1421,224 @@
   "optionsExecutionSource": "Longitud máxima del código fuente (unidades UTF-16)",
   "optionsExecutionString": "Longitud máxima de las cadenas (unidades UTF-16)",
   "optionsExecutionTimeout": "Tiempo máximo de ejecución (ms; 0 lo desactiva)",
-  "optionsLanguage": "Language",
-  "optionsLanguageAuto": "Auto",
-  "optionsMCPServersAddRequired": "Name and URL are required",
-  "optionsNoChanges": "All changes saved",
-  "optionsReset": "Reset to Defaults",
-  "optionsResetConfirm": "This will reset all settings to their default values. Are you sure?",
-  "optionsResetDone": "Settings have been reset to defaults",
-  "optionsResetFailed": "Failed to reset settings",
-  "optionsSave": "Save Settings",
-  "optionsSaveFailed": "Failed to save settings",
-  "optionsSaved": "Settings saved successfully",
-  "optionsSubtitle": "Settings & Configuration",
-  "optionsTableEmpty": "No data",
-  "optionsTermContextInvalidJson": "Invalid JSON format",
-  "optionsThemePresetDark": "Dark",
+  "optionsLanguage": "Idioma",
+  "optionsLanguageAuto": "Automático",
+  "optionsMCPServersAddRequired": "El nombre y la URL son obligatorios",
+  "optionsNoChanges": "Todos los cambios guardados",
+  "optionsReset": "Restablecer a valores por defecto",
+  "optionsResetConfirm": "Esto restablecerá todas las configuraciones a sus valores predeterminados. ¿Estás seguro?",
+  "optionsResetDone": "Las configuraciones se han restablecido a los valores predeterminados",
+  "optionsResetFailed": "Error al restablecer la configuración",
+  "optionsSave": "Guardar configuración",
+  "optionsSaveFailed": "Error al guardar la configuración",
+  "optionsSaved": "Configuración guardada correctamente",
+  "optionsSubtitle": "Configuración y ajustes",
+  "optionsTableEmpty": "Sin datos",
+  "optionsTermContextInvalidJson": "Formato JSON no válido",
+  "optionsThemePresetDark": "Oscuro",
   "optionsThemePresetHacker": "Hacker",
-  "optionsThemePresetLight": "Light",
+  "optionsThemePresetLight": "Claro",
   "optionsThemePresetMatrix": "Matrix",
   "optionsThemePresetOdoo": "Odoo",
-  "optionsThemePresetTech": "Tech",
-  "optionsTipAIModelsCapabilities": "Tip: Pick a model that supports tool use, vision, and extended thinking when selecting it in AI mode.",
-  "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\". The agent asks for permission once per server per conversation.",
-  "optionsTitleAI": "AI",
-  "optionsTitleAICustomSkills": "AI Skills",
-  "optionsTitleAICustomSkillsAdd": "Add",
-  "optionsTitleAICustomSkillsContentLabel": "Content",
-  "optionsTitleAICustomSkillsContentPlaceholder": "Write the skill content in plain text or markdown.",
-  "optionsTitleAICustomSkillsDescription": "Define custom skill modules available to the AI agent.",
-  "optionsTitleAICustomSkillsDescription2": "Description",
-  "optionsTitleAICustomSkillsDescriptionLabel": "Description",
-  "optionsTitleAICustomSkillsDescriptionPlaceholder": "One-line description for the AI",
-  "optionsTitleAICustomSkillsExport": "Export",
-  "optionsTitleAICustomSkillsImport": "Import",
-  "optionsTitleAICustomSkillsName": "Name",
-  "optionsTitleAICustomSkillsNameLabel": "Name",
+  "optionsThemePresetTech": "Tecnológico",
+  "optionsTipAIModelsCapabilities": "Consejo: Elige un modelo que admita uso de herramientas, visión y pensamiento extendido al seleccionarlo en modo IA.",
+  "optionsTipMCPServersScope": "Consejo: las herramientas MCP solo están disponibles en \"ai agent\". El agente pide permiso una vez por servidor y conversación.",
+  "optionsTitleAI": "IA",
+  "optionsTitleAICustomSkills": "Habilidades de IA",
+  "optionsTitleAICustomSkillsAdd": "Añadir",
+  "optionsTitleAICustomSkillsContentLabel": "Contenido",
+  "optionsTitleAICustomSkillsContentPlaceholder": "Escribe el contenido de la habilidad en texto plano o markdown.",
+  "optionsTitleAICustomSkillsDescription": "Define módulos de habilidades personalizadas disponibles para el agente de IA.",
+  "optionsTitleAICustomSkillsDescription2": "Descripción",
+  "optionsTitleAICustomSkillsDescriptionLabel": "Descripción",
+  "optionsTitleAICustomSkillsDescriptionPlaceholder": "Una breve descripción para la IA",
+  "optionsTitleAICustomSkillsExport": "Exportar",
+  "optionsTitleAICustomSkillsImport": "Importar",
+  "optionsTitleAICustomSkillsName": "Nombre",
+  "optionsTitleAICustomSkillsNameLabel": "Nombre",
   "optionsTitleAICustomSkillsNamePlaceholder": "my-skill",
-  "optionsTitleAICustomSkillsRemoveConfirm": "Remove this skill?",
-  "optionsTitleAIModels": "AI Providers",
-  "optionsTitleAIModelsAPIKey": "API Key",
-  "optionsTitleAIModelsAdd": "Add",
-  "optionsTitleAIModelsAdvanced": "Advanced options",
-  "optionsTitleAIModelsDescription": "Define AI provider connections to use in AI mode. The model is picked from AI mode itself, below the provider selector.",
-  "optionsTitleAIModelsGrant": "Grant access",
-  "optionsTitleAIModelsMaxTokens": "Max tokens",
-  "optionsTitleAIModelsMaxTokensLabel": "Max tokens (0 = default)",
-  "optionsTitleAIModelsName": "Name",
-  "optionsTitleAIModelsNamePlaceholder": "My Provider",
-  "optionsTitleAIModelsProvider": "Provider",
-  "optionsTitleAIModelsRemove": "Remove provider?",
-  "optionsTitleAIModelsRemoveConfirm": "Remove this AI provider connection?",
-  "optionsTitleAIModelsTimeout": "Timeout (s)",
-  "optionsTitleAIWatchdog": "AI Watchdog",
-  "optionsTitleBehaviour": "Behaviour",
-  "optionsTitleBehaviourDescription": "General settings: interface language and how the terminal window opens (pinned open, maximized, multi-line input).",
-  "optionsTitleBehaviourElephant": "Resolve unknown values",
-  "optionsTitleBehaviourElephantHint": "If the current user or database name can't be read from the page, send an extra request to fetch them. A bit slower, but avoids showing them as unknown.",
-  "optionsTitleBehaviourMaximized": "Maximized",
-  "optionsTitleBehaviourMultiline": "Multi-line",
-  "optionsTitleBehaviourPinned": "Pinned",
-  "optionsTitleCommandAssistant": "Command Assistant",
-  "optionsTitleCommandAssistantDescription": "Controls the suggestions dropdown that appears while you type a command.",
-  "optionsTitleCommandAssistantDynOptionsDisabled": "Disable dynamic options",
-  "optionsTitleCommandAssistantDynOptionsDisabledHint": "Dynamic options are suggestions fetched from the database (e.g. record names or model names). Disable this if they make the assistant feel slow.",
-  "optionsTitleCommandAssistantMatchMode": "Match mode",
-  "optionsTitleCommandAssistantMatchModeHint": "How suggestions are filtered against what you've typed: only options starting with it, or options containing it anywhere.",
-  "optionsTitleCommandAssistantMatchModeIncludes": "Includes",
-  "optionsTitleCommandAssistantMatchModeStartsWith": "Starts with",
-  "optionsTitleCommandAssistantMaxResults": "Max. results",
-  "optionsTitleCommandAssistantMaxResultsHint": "Maximum number of suggestions shown at once in the dropdown.",
-  "optionsTitleDeveloperZone": "Developer Zone",
-  "optionsTitleDeveloperZoneDescription": "Options for developers of OdooTerminal itself. Most users can leave these off.",
-  "optionsTitleDeveloperZoneModeConsoleErrors": "Show errors in the browser console",
-  "optionsTitleDeveloperZoneModeIgnoreCompChecks": "Disable Odoo version checking",
-  "optionsTitleDeveloperZoneModeTests": "Use OdooTerminalTests",
+  "optionsTitleAICustomSkillsRemoveConfirm": "¿Eliminar esta habilidad?",
+  "optionsTitleAIModels": "Proveedores de IA",
+  "optionsTitleAIModelsAPIKey": "Clave de API",
+  "optionsTitleAIModelsAdd": "Añadir",
+  "optionsTitleAIModelsAdvanced": "Opciones avanzadas",
+  "optionsTitleAIModelsDescription": "Define conexiones a proveedores de IA para usarlas en modo IA. El modelo se selecciona desde el propio modo IA, debajo del selector de proveedor.",
+  "optionsTitleAIModelsGrant": "Conceder acceso",
+  "optionsTitleAIModelsMaxTokens": "Tokens máx.",
+  "optionsTitleAIModelsMaxTokensLabel": "Máx. tokens (0 = por defecto)",
+  "optionsTitleAIModelsName": "Nombre",
+  "optionsTitleAIModelsNamePlaceholder": "Mi proveedor",
+  "optionsTitleAIModelsProvider": "Proveedor",
+  "optionsTitleAIModelsRemove": "¿Eliminar proveedor?",
+  "optionsTitleAIModelsRemoveConfirm": "¿Eliminar esta conexión de proveedor de IA?",
+  "optionsTitleAIModelsTimeout": "Tiempo de espera (s)",
+  "optionsTitleAIWatchdog": "Vigilante de IA",
+  "optionsTitleBehaviour": "Comportamiento",
+  "optionsTitleBehaviourDescription": "Ajustes generales: idioma de la interfaz y cómo se abre la ventana del terminal (fijado, maximizado, entrada multilínea).",
+  "optionsTitleBehaviourElephant": "Resolver valores desconocidos",
+  "optionsTitleBehaviourElephantHint": "Si el usuario actual o el nombre de la base de datos no se pueden leer directamente de la página, se envía una petición adicional para obtenerlos. Es un poco más lento, pero evita que aparezcan como desconocidos.",
+  "optionsTitleBehaviourMaximized": "Maximizado",
+  "optionsTitleBehaviourMultiline": "Multilínea",
+  "optionsTitleBehaviourPinned": "Fijado",
+  "optionsTitleCommandAssistant": "Asistente de comandos",
+  "optionsTitleCommandAssistantDescription": "Controla el desplegable de sugerencias que aparece mientras escribes un comando.",
+  "optionsTitleCommandAssistantDynOptionsDisabled": "Desactivar opciones dinámicas",
+  "optionsTitleCommandAssistantDynOptionsDisabledHint": "Las opciones dinámicas son sugerencias obtenidas de la base de datos (por ejemplo, nombres de registros o de modelos). Desactívalas si notas el asistente lento.",
+  "optionsTitleCommandAssistantMatchMode": "Modo de coincidencia",
+  "optionsTitleCommandAssistantMatchModeHint": "Cómo se filtran las sugerencias según lo que has escrito: solo opciones que empiecen por ello, u opciones que lo contengan en cualquier parte.",
+  "optionsTitleCommandAssistantMatchModeIncludes": "Contiene",
+  "optionsTitleCommandAssistantMatchModeStartsWith": "Empieza por",
+  "optionsTitleCommandAssistantMaxResults": "Resultados máx.",
+  "optionsTitleCommandAssistantMaxResultsHint": "Número máximo de sugerencias que se muestran a la vez en el desplegable.",
+  "optionsTitleDeveloperZone": "Zona de desarrollador",
+  "optionsTitleDeveloperZoneDescription": "Opciones para desarrolladores de OdooTerminal. La mayoría de usuarios pueden dejarlas desactivadas.",
+  "optionsTitleDeveloperZoneModeConsoleErrors": "Mostrar errores en la consola del navegador",
+  "optionsTitleDeveloperZoneModeIgnoreCompChecks": "Desactivar comprobación de versión de Odoo",
+  "optionsTitleDeveloperZoneModeTests": "Usar OdooTerminalTests",
   "optionsTitleExecution": "Control de ejecución",
-  "optionsTitleInitCommands": "Init Commands",
-  "optionsTitleInitCommandsDescription": "These commands run automatically every time the terminal starts, in order, one per line. Useful for things like clearing the screen or opening a specific view.",
-  "optionsTitleMCPServers": "MCP Servers",
-  "optionsTitleMCPServersAdd": "Add",
-  "optionsTitleMCPServersDescription": "Connect the AI agent to remote MCP (Model Context Protocol) servers. Tools exposed by enabled servers are offered to the agent alongside its built-in tools.",
-  "optionsTitleMCPServersEnabled": "Enabled",
-  "optionsTitleMCPServersName": "Name",
-  "optionsTitleMCPServersNamePlaceholder": "My MCP Server",
-  "optionsTitleMCPServersRemove": "Remove server?",
-  "optionsTitleMCPServersRemoveConfirm": "Remove this MCP server connection?",
+  "optionsTitleInitCommands": "Comandos de inicio",
+  "optionsTitleInitCommandsDescription": "Estos comandos se ejecutan automáticamente cada vez que arranca el terminal, en orden, uno por línea. Útil para cosas como limpiar la pantalla o abrir una vista concreta.",
+  "optionsTitleMCPServers": "Servidores MCP",
+  "optionsTitleMCPServersAdd": "Añadir",
+  "optionsTitleMCPServersDescription": "Conecta el agente de IA a servidores MCP (Model Context Protocol) remotos. Las herramientas expuestas por los servidores habilitados se ofrecen al agente junto con sus herramientas integradas.",
+  "optionsTitleMCPServersEnabled": "Habilitado",
+  "optionsTitleMCPServersName": "Nombre",
+  "optionsTitleMCPServersNamePlaceholder": "Mi servidor MCP",
+  "optionsTitleMCPServersRemove": "¿Eliminar servidor?",
+  "optionsTitleMCPServersRemoveConfirm": "¿Eliminar esta conexión con el servidor MCP?",
   "optionsTitleMCPServersUrl": "URL",
-  "optionsTitleMisc": "Misc",
-  "optionsTitleMiscDescription": "Other display and command settings that don't fit elsewhere.",
-  "optionsTitleMiscHighlightWords": "Highlight Words",
-  "optionsTitleMiscHighlightWordsList": "Highlight Words List",
-  "optionsTitleMiscHighlightWordsListHint": "Comma-separated words to highlight in the terminal output when \"Highlight Words\" is enabled above.",
-  "optionsTitleMiscLimits": "Limits",
-  "optionsTitleMiscRlimitValue": "Default Search Limit",
-  "optionsTitleMiscRlimitValueHint": "Maximum records fetched by the \"search\" command when you don't specify a limit yourself. 0 = no limit.",
-  "optionsTitleMiscRlimitValuePlaceholder": "No limit",
-  "optionsTitleMiscScreenBufferSize": "Screen Buffer Size",
-  "optionsTitleMiscScreenBufferSizeHint": "Maximum number of lines kept in the terminal output before older ones are dropped. Lower it if the terminal feels sluggish with long sessions. 0 = default ({{default}}).",
-  "optionsTitleMiscShowExecutionTime": "Show Execution Time",
-  "optionsTitleMiscShowTechnicalModel": "Show Technical Model Name",
-  "optionsTitleMiscShowTechnicalModelDescriptionHint": "Shows the internal Odoo model name (e.g. \"res.partner\") next to record titles, which you need when writing commands that target a specific model.",
-  "optionsTitleMiscShowTechnicalModelHint": "Odoo 17+ only",
-  "optionsTitleMiscShowTechnicalModelMinVersion": "Minimum Odoo Version",
-  "optionsTitleShortcuts": "Shortcuts",
-  "optionsTitleShortcutsAdd": "Add",
-  "optionsTitleShortcutsCommand": "Command",
-  "optionsTitleShortcutsDescription": "Run a terminal command by pressing a key combination, from anywhere on the page. To add one: click the \"Press keys...\" box, press the combination, type the command to run, then Add.",
-  "optionsTitleShortcutsKeybind": "Keybind",
-  "optionsTitleShortcutsPressKeys": "Press keys...",
-  "optionsTitleShortcutsRemove": "Remove",
-  "optionsTitleTerminalContext": "Terminal Context",
-  "optionsTitleTerminalContextDescription": "Extra key-value data (Odoo's \"context\", e.g. language or active_test) automatically added to every command the terminal sends to Odoo. Write it as JSON. Most users can leave it with its default values.",
-  "optionsTitleTheme": "Theme",
-  "optionsTitleThemeAdd": "Add",
+  "optionsTitleMisc": "Varios",
+  "optionsTitleMiscDescription": "Otros ajustes de visualización y de comandos que no encajan en otro apartado.",
+  "optionsTitleMiscHighlightWords": "Palabras resaltadas",
+  "optionsTitleMiscHighlightWordsList": "Lista de palabras resaltadas",
+  "optionsTitleMiscHighlightWordsListHint": "Palabras separadas por comas que se resaltarán en la salida del terminal cuando la opción \"Palabras resaltadas\" esté activada.",
+  "optionsTitleMiscLimits": "Límites",
+  "optionsTitleMiscRlimitValue": "Límite de búsqueda por defecto",
+  "optionsTitleMiscRlimitValueHint": "Número máximo de registros que devuelve el comando \"search\" cuando no indicas tú mismo un límite. 0 = sin límite.",
+  "optionsTitleMiscRlimitValuePlaceholder": "Sin límite",
+  "optionsTitleMiscScreenBufferSize": "Tamaño del búfer de pantalla",
+  "optionsTitleMiscScreenBufferSizeHint": "Número máximo de líneas que se conservan en la salida del terminal antes de descartar las más antiguas. Redúcelo si el terminal va lento en sesiones largas. 0 = por defecto ({{default}}).",
+  "optionsTitleMiscShowExecutionTime": "Mostrar tiempo de ejecución",
+  "optionsTitleMiscShowTechnicalModel": "Mostrar nombre técnico del modelo",
+  "optionsTitleMiscShowTechnicalModelDescriptionHint": "Muestra el nombre técnico interno del modelo de Odoo (por ejemplo, \"res.partner\") junto al título de los registros, útil cuando necesitas ese nombre para escribir comandos sobre un modelo concreto.",
+  "optionsTitleMiscShowTechnicalModelHint": "Solo Odoo 17+",
+  "optionsTitleMiscShowTechnicalModelMinVersion": "Versión mínima de Odoo",
+  "optionsTitleShortcuts": "Atajos",
+  "optionsTitleShortcutsAdd": "Añadir",
+  "optionsTitleShortcutsCommand": "Comando",
+  "optionsTitleShortcutsDescription": "Ejecuta un comando del terminal pulsando una combinación de teclas, desde cualquier parte de la página. Para añadir uno: haz clic en el campo \"Pulsa las teclas...\", pulsa la combinación deseada, escribe el comando a ejecutar y pulsa Añadir.",
+  "optionsTitleShortcutsKeybind": "Combinación",
+  "optionsTitleShortcutsPressKeys": "Pulsa las teclas...",
+  "optionsTitleShortcutsRemove": "Eliminar",
+  "optionsTitleTerminalContext": "Contexto del terminal",
+  "optionsTitleTerminalContextDescription": "Datos adicionales clave-valor (el \"contexto\" de Odoo, por ejemplo idioma o active_test) que se añaden automáticamente a cada comando que el terminal envía a Odoo. Escríbelo en formato JSON. La mayoría de usuarios pueden dejarlo con sus valores por defecto.",
+  "optionsTitleTheme": "Tema",
+  "optionsTitleThemeAdd": "Añadir",
   "optionsTitleThemeColor": "Color",
-  "optionsTitleThemeColorDanger": "Danger",
-  "optionsTitleThemeColorDark": "Dark",
-  "optionsTitleThemeColorDomainHint": "Give a specific website its own accent color, e.g. to tell a production site apart from a staging one at a glance.",
-  "optionsTitleThemeColorDomainTable": "Per-site Colors",
-  "optionsTitleThemeColorInfo": "Info",
-  "optionsTitleThemeColorLight": "Light",
-  "optionsTitleThemeColorMuted": "Muted",
-  "optionsTitleThemeColorPrimary": "Primary",
-  "optionsTitleThemeColorSecondary": "Secondary",
-  "optionsTitleThemeColorSuccess": "Success",
-  "optionsTitleThemeColorWarning": "Warning",
-  "optionsTitleThemeColorWhite": "White",
-  "optionsTitleThemeColors": "Colors",
-  "optionsTitleThemeDescription": "Customize how the terminal looks: pick a ready-made preset or fine-tune individual colors, fonts and opacity below.",
-  "optionsTitleThemeDomain": "Domain",
-  "optionsTitleThemeFontFamily": "Font Family",
-  "optionsTitleThemeFontSize": "Font Size",
-  "optionsTitleThemeFontSizeCA": "Font Size (CA)",
-  "optionsTitleThemeFontSizeLarge": "Large",
-  "optionsTitleThemeFontSizeMedium": "Medium",
-  "optionsTitleThemeFontSizeSmall": "Small",
-  "optionsTitleThemeFontSizeXSmall": "X-Small",
-  "optionsTitleThemeOpacity": "Opacity",
-  "optionsTitleThemePreset": "Theme Preset",
-  "optionsTitleThemePresetCustom": "Custom",
-  "optionsTitleThemeRemove": "Remove",
-  "optionsUnsavedChanges": "Unsaved changes",
-  "optionsWarningAIModelsKeys": "Warning: API keys are stored in browser storage.",
+  "optionsTitleThemeColorDanger": "Peligro",
+  "optionsTitleThemeColorDark": "Oscuro",
+  "optionsTitleThemeColorDomainHint": "Asigna un color propio a un sitio web concreto, por ejemplo para distinguir a simple vista un entorno de producción de uno de pruebas.",
+  "optionsTitleThemeColorDomainTable": "Colores por sitio",
+  "optionsTitleThemeColorInfo": "Información",
+  "optionsTitleThemeColorLight": "Claro",
+  "optionsTitleThemeColorMuted": "Apagado",
+  "optionsTitleThemeColorPrimary": "Primario",
+  "optionsTitleThemeColorSecondary": "Secundario",
+  "optionsTitleThemeColorSuccess": "Éxito",
+  "optionsTitleThemeColorWarning": "Advertencia",
+  "optionsTitleThemeColorWhite": "Blanco",
+  "optionsTitleThemeColors": "Colores",
+  "optionsTitleThemeDescription": "Personaliza el aspecto del terminal: elige un preajuste o ajusta a tu gusto los colores, las fuentes y la opacidad.",
+  "optionsTitleThemeDomain": "Dominio",
+  "optionsTitleThemeFontFamily": "Familia de fuentes",
+  "optionsTitleThemeFontSize": "Tamaño de fuente",
+  "optionsTitleThemeFontSizeCA": "Tamaño de fuente (CA)",
+  "optionsTitleThemeFontSizeLarge": "Grande",
+  "optionsTitleThemeFontSizeMedium": "Mediano",
+  "optionsTitleThemeFontSizeSmall": "Pequeño",
+  "optionsTitleThemeFontSizeXSmall": "Muy pequeño",
+  "optionsTitleThemeOpacity": "Opacidad",
+  "optionsTitleThemePreset": "Tema predefinido",
+  "optionsTitleThemePresetCustom": "Personalizado",
+  "optionsTitleThemeRemove": "Eliminar",
+  "optionsUnsavedChanges": "Cambios sin guardar",
+  "optionsWarningAIModelsKeys": "Advertencia: Las claves de API se almacenan en el almacenamiento del navegador.",
   "terminal": {
     "ai": {
-      "attachExpand": "Click to enlarge",
-      "attachRemove": "Remove attachment",
-      "attachScreenshot": "Screenshot",
-      "attachScreenshotPick": "Select element",
-      "attachScreenshotViewport": "Full viewport",
-      "attachUpload": "Upload file",
-      "busyBlocked": "[!] Can't send: an AI request is already running (see the conversation list). Wait for it to finish or switch to it.",
-      "busyDeleteBlocked": "[!] Can't delete: this conversation still has an AI request running.",
-      "experimentalWarning": "This mode is experimental; use it with extreme caution.",
-      "helpTip1": "One topic per conversation — start a new one for each task.",
-      "helpTip2": "History is auto-compressed when context fills up, but shorter conversations always cost fewer tokens.",
-      "helpTip3": "Be specific and concise — vague prompts waste tokens and give worse results.",
-      "helpTip4": "Delete old conversations you no longer need.",
-      "helpTip5": "Attach files only when strictly necessary.",
-      "helpTitle": "Tips to save tokens",
-      "modelsLoadError": "Could not load the models list ({{error}}). Grant access to this URL in the extension options (AI Providers section) and try again.",
-      "newConversation": "New conversation",
-      "noConversationsHint": "Create a new conversation to start",
-      "noModelsHint": "Configure AI providers in the extension options",
-      "notConnected": "AI not connected. Use \"ai connect\" first.",
-      "privacyWarning": "Privacy notice: conversations are stored in browser storage and can be read by anyone with access to this computer.",
-      "questionAutoDeclined": "[Agent] Question auto-declined (conversation not active): {{question}}",
+      "attachExpand": "Clic para ampliar",
+      "attachRemove": "Eliminar adjunto",
+      "attachScreenshot": "Captura de pantalla",
+      "attachScreenshotPick": "Seleccionar elemento",
+      "attachScreenshotViewport": "Vista completa",
+      "attachUpload": "Subir archivo",
+      "busyBlocked": "[!] No se puede enviar: ya hay una solicitud de IA en curso (consulta la lista de conversaciones). Espera a que termine o cambia a ella.",
+      "busyDeleteBlocked": "[!] No se puede eliminar: esta conversación todavía tiene una solicitud de IA en curso.",
+      "experimentalWarning": "Este modo es experimental; úsalo con extrema precaución.",
+      "helpTip1": "Un tema por conversación — empieza una nueva para cada tarea.",
+      "helpTip2": "El historial se comprime automáticamente cuando se llena el contexto, pero las conversaciones cortas siempre cuestan menos tokens.",
+      "helpTip3": "Sé específico y conciso — los mensajes vagos desperdician tokens y dan peores resultados.",
+      "helpTip4": "Elimina las conversaciones antiguas que ya no necesites.",
+      "helpTip5": "Adjunta archivos solo cuando sea estrictamente necesario.",
+      "helpTitle": "Consejos para ahorrar tokens",
+      "modelsLoadError": "No se pudo cargar la lista de modelos ({{error}}). Concede acceso a esta URL en las opciones de la extensión (sección Proveedores de IA) e inténtalo de nuevo.",
+      "newConversation": "Nueva conversación",
+      "noConversationsHint": "Crea una nueva conversación para empezar",
+      "noModelsHint": "Configura los proveedores de IA en las opciones de la extensión",
+      "notConnected": "IA no conectada. Usa \"ai connect\" primero.",
+      "privacyWarning": "Aviso de privacidad: las conversaciones se almacenan en el almacenamiento del navegador y pueden ser leídas por cualquier persona con acceso a este ordenador.",
+      "questionAutoDeclined": "[Agente] Pregunta rechazada automáticamente (conversación no activa): {{question}}",
       "reasoning": {
-        "default": "-- Reasoning --",
-        "high": "Reasoning: High",
-        "low": "Reasoning: Low",
-        "medium": "Reasoning: Medium",
-        "off": "Reasoning: Off"
+        "default": "-- Razonamiento --",
+        "high": "Razonamiento: Alto",
+        "low": "Razonamiento: Bajo",
+        "medium": "Razonamiento: Medio",
+        "off": "Razonamiento: Off"
       },
       "sysprompt": {
-        "label": "Custom instructions",
-        "placeholder": "Extra instructions for the AI in this conversation..."
+        "label": "Instrucciones personalizadas",
+        "placeholder": "Instrucciones adicionales para la IA en esta conversación..."
       }
     },
     "close": {
-      "prevented": "The terminal has prevented the current tab from closing due to unfinished tasks:"
+      "prevented": "El terminal ha impedido que la pestaña actual se cierre debido a tareas inacabadas:"
     },
     "error": {
-      "invalidHTTPRequest": "Invalid HTTP Request",
-      "notLoaded": "Terminal not loaded",
-      "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
+      "invalidHTTPRequest": "Solicitud HTTP no válida",
+      "notLoaded": "Terminal no cargada",
+      "unknown": "[!] ¡Vaya! ¡Error desconocido! (no se proporcionó mensaje de error detallado :/)"
     },
     "exception": {
-      "ElementNotFoundError": "Element not found error ({{selector}})!",
-      "ElementNotFoundTemplateError": "No elements found!",
-      "InvalidElementTemplateError": "Invalid element in template!",
-      "ProcessJobError": "Error executing '{{cmd_name}}'",
-      "TooManyElementsTemplateError": "Too many elements in the template to be assigned to one element!"
+      "ElementNotFoundError": "Error: elemento no encontrado ({{selector}})!",
+      "ElementNotFoundTemplateError": "¡No se encontraron elementos!",
+      "InvalidElementTemplateError": "¡Elemento no válido en la plantilla!",
+      "ProcessJobError": "Error al ejecutar '{{cmd_name}}'",
+      "TooManyElementsTemplateError": "¡Demasiados elementos en la plantilla para asignar a uno solo!"
     },
     "info": {
       "ai": {
-        "waiting": "AI thinking..."
+        "waiting": "La IA está pensando..."
       },
       "job": {
-        "running": "Running {{count}} command(s)",
-        "unhealthy": " ({{count_unhealthy}} unhealthy)"
+        "running": "Ejecutando {{count}} comando(s)",
+        "unhealthy": "({{count_unhealthy}} no saludable)"
       }
     },
-    "notLoaded": "Terminal not loaded",
+    "notLoaded": "Terminal no cargada",
     "question": {
-      "aborted": "Operation aborted"
+      "aborted": "Operación abortada"
     },
     "tooltip": {
-      "aiMode": "AI Mode",
-      "aiReasoning": "Reasoning effort for \"thinking\" models (openai provider only). \"Off\" asks local OpenAI-compatible servers to skip chain-of-thought.",
-      "aiTips": "AI tips",
-      "attachFile": "Attach file",
-      "customSystemPrompt": "Custom system prompt",
-      "debug": "Toggle debug mode",
-      "maximize": "Maximize",
-      "multiLine": "Multi-line",
-      "newConversation": "New conversation",
-      "pin": "Pin",
-      "reloadShell": "Reload Shell"
+      "aiMode": "Modo IA",
+      "aiReasoning": "Nivel de razonamiento para modelos \"pensantes\" (solo proveedor openai). \"Off\" pide a servidores locales compatibles con OpenAI que se salten el razonamiento interno.",
+      "aiTips": "Consejos de IA",
+      "attachFile": "Adjuntar archivo",
+      "customSystemPrompt": "Prompt del sistema personalizado",
+      "debug": "Alternar modo depuración",
+      "maximize": "Maximizar",
+      "multiLine": "Multilínea",
+      "newConversation": "Nueva conversación",
+      "pin": "Fijar",
+      "reloadShell": "Recargar Shell"
     },
     "unknownCommand": "Comando desconocido '{{org_cmd}}' en {{start}}:{{end}}. ¿Quiso decir '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'?",
     "unknownCommandAgentHint": "Comando desconocido '{{org_cmd}}'. No es un comando registrado — consulte la lista de AVAILABLE COMMANDS ya proporcionada, o ejecute 'help --all' para listar todos los comandos.",
@@ -1646,12 +1646,12 @@
     "unregisteredUser": "Usuario sin registrar",
     "watchdog": {
       "historyEmpty": "Todavía no hay mensajes.",
-      "tooltip": "OdooTerminal AI Watchdog — click to see the message history"
+      "tooltip": "OdooTerminal AI Watchdog — haz clic para ver el historial de mensajes"
     }
   },
   "utilInjectResource": {
     "error": {
-      "invalidType": "Invalid resource type"
+      "invalidType": "Tipo de recurso no válido"
     }
   }
 }

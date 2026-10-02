@@ -1,134 +1,134 @@
 {
-  "No": "No",
-  "Yes": "Yes",
+  "No": "否",
+  "Yes": "是",
   "ai": {
     "mcp": {
       "error": {
-        "badResponse": "MCP server returned an unparsable response",
-        "toolFailedNoMessage": "Tool returned an error with no message"
+        "badResponse": "MCP 服务器返回了无法解析的响应",
+        "toolFailedNoMessage": "工具返回了错误，但没有附带消息"
       }
     },
     "providers": {
       "gemini": {
         "error": {
-          "blocked": "Gemini blocked the response ({{reason}})"
+          "blocked": "Gemini 拦截了响应（{{reason}}）"
         }
       }
     },
     "utils": {
       "network": {
         "error": {
-          "aborted": "Request cancelled.",
-          "httpError": "HTTP error {{status}}",
-          "malformedToolCall": "The backend returned an unparsed tool-call attempt (raw chat-template tokens) instead of a valid response. The model likely lacks the capacity for reliable tool calling — try a stronger model or a smaller/simpler prompt.",
-          "noStream": "Server did not return a streaming response"
+          "aborted": "请求已取消。",
+          "httpError": "HTTP 错误 {{status}}",
+          "malformedToolCall": "后端返回了未解析的工具调用尝试（原始聊天模板标记），而不是有效响应。该模型可能无法可靠地调用工具——请尝试更强的模型或更短、更简单的提示词。",
+          "noStream": "服务器未返回流式响应"
         }
       },
       "relayFetch": {
         "error": {
-          "missingPermission": "Missing browser permission to contact {{url}}. Open the extension's Options page (AI Providers section) and use \"Grant access\" for this URL, then try again.",
-          "unknown": "AI request failed"
+          "missingPermission": "缺少联系 {{url}} 的浏览器权限。请打开扩展的选项页面（AI 模型部分）并为此 URL 使用\"授权访问\"，然后重试。",
+          "unknown": "AI 请求失败"
         }
       }
     }
   },
-  "cancel": "Cancel",
+  "cancel": "取消",
   "checkStorageError": {
-    "message": "Clear the <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>screen</strong> or/and <strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>history</strong> to free storage space. Browser <u>Storage Quota Exceeded</u> 😭",
-    "warning": "WARNING: "
+    "message": "请<strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear screen'>清屏</strong>或/和<strong class='o_terminal_click o_terminal_cmd text-danger' data-cmd='clear history'>清除历史</strong>以释放存储空间。浏览器 <u>存储配额已超出</u> 😭",
+    "warning": "警告："
   },
   "cmd2DCircle": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The color",
-      "end-angle": "End angle in degrees",
-      "radius": "The radius",
-      "start-angle": "Start angle in degrees",
-      "stroke": "Draw the outline instead of filling",
-      "width": "The outline width",
-      "x": "The center X point",
-      "y": "The center Y point"
+      "canvas": "画布或其窗口 ID",
+      "color": "颜色",
+      "end-angle": "结束角度（度）",
+      "radius": "半径",
+      "start-angle": "起始角度（度）",
+      "stroke": "绘制轮廓而不是填充",
+      "width": "轮廓宽度",
+      "x": "圆心 X 坐标",
+      "y": "圆心 Y 坐标"
     },
-    "definition": "Draw a circle or arc",
-    "detail": "Draw a circle, arc or pie slice"
+    "definition": "绘制圆或圆弧",
+    "detail": "绘制圆、圆弧或扇形"
   },
   "cmd2DClear": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "from-x": "The rect X point",
-      "from-y": "The rect Y point",
-      "height": "The rect height",
-      "width": "The rect width"
+      "canvas": "画布或其窗口 ID",
+      "from-x": "矩形 X 起点",
+      "from-y": "矩形 Y 起点",
+      "height": "矩形高度",
+      "width": "矩形宽度"
     },
-    "definition": "Clear canvas",
-    "detail": "Clear canvas"
+    "definition": "清除画布",
+    "detail": "清除画布"
   },
   "cmd2DCreateWindow": {
     "args": {
-      "centered": "Center the canvas on screen",
-      "height": "The canvas height",
-      "posx": "The canvas position X",
-      "posy": "The canvas position Y",
-      "width": "The canvas width"
+      "centered": "将画布居中显示在屏幕上",
+      "height": "画布高度",
+      "posx": "画布位置 X",
+      "posy": "画布位置 Y",
+      "width": "画布宽度"
     },
-    "definition": "Create 2D Window",
-    "detail": "Create 2D Window"
+    "definition": "创建 2D 窗口",
+    "detail": "创建 2D 窗口"
   },
   "cmd2DDestroyWindow": {
     "args": {
-      "canvas": "The canvas or its window id"
+      "canvas": "画布或其窗口 ID"
     },
-    "definition": "Destroy 2D Window",
-    "detail": "Destroy 2D Window"
+    "definition": "销毁 2D 窗口",
+    "detail": "销毁 2D 窗口"
   },
   "cmd2DHandleLoop": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "fun": "The draw function",
-      "max-frames": "Stop after this many frames (-1 = unlimited)"
+      "canvas": "画布或其窗口 ID",
+      "fun": "绘制函数",
+      "max-frames": "达到此帧数后停止（-1 = 不限）"
     },
-    "definition": "Run a graphics loop",
-    "detail": "Call the given function once per browser frame with (time, delta, count). Stops when the window is destroyed, after --max-frames, or when the function returns false. Returns the number of frames run"
+    "definition": "运行图形循环",
+    "detail": "每个浏览器帧调用一次指定函数，参数为 (time, delta, count)。窗口被销毁、达到 --max-frames 或函数返回 false 时停止。返回已运行的帧数"
   },
   "cmd2DLine": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The line color",
-      "from-x": "The line from X point",
-      "from-y": "The line from Y point",
-      "to-x": "The line to X point",
-      "to-y": "The line to Y point",
-      "width": "The line width"
+      "canvas": "画布或其窗口 ID",
+      "color": "线条颜色",
+      "from-x": "线条起点 X",
+      "from-y": "线条起点 Y",
+      "to-x": "线条终点 X",
+      "to-y": "线条终点 Y",
+      "width": "线条宽度"
     },
-    "definition": "Draw a line",
-    "detail": "Draw a line"
+    "definition": "绘制线条",
+    "detail": "绘制线条"
   },
   "cmd2DListWindows": {
-    "definition": "List 2D windows",
-    "detail": "List the currently open 2D windows with their unique id, width and height"
+    "definition": "列出 2D 窗口",
+    "detail": "列出当前打开的 2D 窗口及其唯一 ID、宽度和高度"
   },
   "cmd2DPoly": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The color",
-      "fill": "Close the shape and fill it",
-      "points": "The list of [x, y] points",
-      "width": "The line width"
+      "canvas": "画布或其窗口 ID",
+      "color": "颜色",
+      "fill": "闭合图形并填充",
+      "points": "[x, y] 点列表",
+      "width": "线宽"
     },
-    "definition": "Draw a polyline or polygon",
-    "detail": "Draw a polyline from a list of [x, y] points. With --fill the shape is closed and filled"
+    "definition": "绘制折线或多边形",
+    "detail": "根据 [x, y] 点列表绘制折线。使用 --fill 时图形会被闭合并填充"
   },
   "cmd2DRect": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The rect color",
-      "height": "The rect height",
-      "width": "The rect width",
-      "x": "The rect X point",
-      "y": "The rect Y point"
+      "canvas": "画布或其窗口 ID",
+      "color": "矩形颜色",
+      "height": "矩形高度",
+      "width": "矩形宽度",
+      "x": "矩形 X 起点",
+      "y": "矩形 Y 起点"
     },
-    "definition": "Draw a rect",
-    "detail": "Draw a rect"
+    "definition": "绘制矩形",
+    "detail": "绘制矩形"
   },
   "cmdAI": {
     "agent": {
@@ -137,16 +137,16 @@
         "rejected": "附件访问被用户拒绝。"
       },
       "error": {
-        "emptyResponse": "[Agent] The model returned an empty response (no text, no tool calls). The backend or model likely failed silently — try a different model or check the server logs.",
-        "noPrompt": "No prompt provided. Use: ai agent -p \"your request\"",
+        "emptyResponse": "[Agent] 模型返回了空响应（没有文本，也没有工具调用）。后端或模型可能静默失败——请尝试其他模型或检查服务器日志。",
+        "noPrompt": "未提供提示词。使用方法：ai agent -p \"your request\"",
         "notConfigured": "未连接。请先使用 \"ai connect\"",
         "requestFailed": "请求失败："
       },
       "mcp": {
-        "calling": "[Agent] Calling MCP tool: <code>{{tool}}</code> ({{server}})",
-        "discoveryFailed": "[Agent] MCP server \"{{name}}\" unavailable, skipping: {{error}}",
-        "question": "[Agent] Wants to use tools from MCP server \"{{name}}\" ({{url}}) — Allow for this conversation?",
-        "rejected": "MCP server \"{{name}}\" rejected by user."
+        "calling": "[Agent] 正在调用 MCP 工具：<code>{{tool}}</code>（{{server}}）",
+        "discoveryFailed": "[Agent] MCP 服务器“{{name}}”不可用，已跳过：{{error}}",
+        "question": "[Agent] 想要使用 MCP 服务器“{{name}}”（{{url}}）的工具 — 在本次对话中允许？",
+        "rejected": "MCP 服务器“{{name}}”已被用户拒绝。"
       },
       "result": {
         "cmdReason": "[Agent] {{reason}}",
@@ -173,45 +173,45 @@
       }
     },
     "args": {
-      "apiKey": "API key for authentication",
-      "attachId": "ir.attachment ID to queue as AI input attachment (attach operation)",
-      "maxSteps": "Max agent iterations (agent only, default {{DEFAULT_MAX_STEPS}})",
-      "maxTokens": "Max output tokens per request as a cost safety limit (default {{DEFAULT_MAX_TOKENS}})",
-      "model": "Model name to use",
-      "operation": "operation: connect, agent, attach or stop",
-      "prompt": "The prompt or natural language request to send",
-      "provider": "AI provider: openai (OpenAI-compatible, default), anthropic, gemini or cohere",
-      "reasoning": "Reasoning effort for \"thinking\" models (agent only): off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
-      "timeout": "Max seconds to wait for a response (0 = no limit)",
-      "url": "AI server URL (e.g. http://localhost:8080/v1)"
+      "apiKey": "用于认证的 API 密钥",
+      "attachId": "ir.attachment ID，用作 AI 输入附件（attach 操作）",
+      "maxSteps": "Agent 最大迭代次数（仅 agent，默认 {{DEFAULT_MAX_STEPS}}）",
+      "maxTokens": "每次请求的最大输出 token 数（成本安全限制，默认 {{DEFAULT_MAX_TOKENS}}）",
+      "model": "使用的模型名称",
+      "operation": "操作：connect、chat 或 exec",
+      "prompt": "要发送的提示词或自然语言请求",
+      "provider": "AI 提供商：openai（兼容 OpenAI，默认）、anthropic、gemini 或 cohere",
+      "reasoning": "Reasoning effort for \"thinking\" models (agent and watchdog): off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
+      "timeout": "等待响应的最大秒数（0 = 无限制）",
+      "url": "AI 服务器 URL（例如 http://localhost:8080/v1）"
     },
     "attach": {
       "error": {
-        "noData": "Attachment {{id}} has no binary data",
-        "noId": "No attachment id provided. Use: ai attach -i <id>",
-        "notFound": "Attachment {{id}} not found"
+        "noData": "附件 {{id}} 没有二进制数据",
+        "noId": "未提供附件 ID。使用方法：ai attach -i <id>",
+        "notFound": "附件 {{id}} 未找到"
       }
     },
     "connect": {
       "error": {
-        "noUrl": "No URL provided. Use: ai connect -u <url>"
+        "noUrl": "未提供 URL。使用方法：ai connect -u <url>"
       },
       "result": {
-        "connected": "AI Server connected"
+        "connected": "AI 服务器已连接"
       },
       "warning": {
-        "missingPermission": "Warning: missing browser permission to contact {{url}}. Open the extension's Options page (AI Providers section) and use \"Grant access\" for this URL before sending requests."
+        "missingPermission": "警告：缺少联系 {{url}} 的浏览器权限。请在发送请求前打开扩展的选项页面（AI 模型部分）并为此 URL 使用\"授权访问\"。"
       }
     },
-    "definition": "AI assistant (connect & agent)",
-    "detail": "Connect to an AI server (OpenAI-compatible, Anthropic, Gemini or Cohere API), translate natural language into terminal commands, or run an autonomous agent that executes commands iteratively. The openai provider is OpenAI-compatible, so it also covers Groq, Mistral, DeepSeek, Ollama, OpenRouter, xAI and similar servers via a custom URL. See the \"watchdog\" command for the opt-in floating AI watchdog that reacts to page activity on its own.",
+    "definition": "AI 助手（connect、chat 和 exec）",
+    "detail": "连接到 AI 服务器（兼容 OpenAI、Anthropic、Gemini 或 Cohere 的 API）进行对话、将自然语言转换为终端命令，或运行能够迭代执行命令的自主 Agent。openai 提供商兼容 OpenAI，因此通过自定义 URL 也可用于 Groq、Mistral、DeepSeek、Ollama、OpenRouter、xAI 等类似服务器。",
     "error": {
-      "noSubcommand": "Usage: ai connect|agent|attach|stop ...",
-      "unknownOperation": "Unknown operation: {{sub}}",
-      "usage": "Usage: ai connect|agent|attach|stop ..."
+      "noSubcommand": "用法：ai connect|chat|exec|stop ...",
+      "unknownOperation": "未知操作：{{sub}}",
+      "usage": "用法：ai connect|chat|exec|stop ..."
     },
     "stop": {
-      "noRequest": "No active AI request to stop."
+      "noRequest": "没有活跃的 AI 请求可停止。"
     },
     "tokens": {
       "cache": " · 缓存：{{read}} 已读 / {{created}} 已创建",
@@ -221,11 +221,11 @@
   },
   "cmdAction": {
     "args": {
-      "action": "The action to launch<br/>Can be an string, number or object",
-      "options": "The extra options to use"
+      "action": "要启动的动作<br/>可以是字符串、数字或对象",
+      "options": "使用的额外选项"
     },
-    "definition": "Call action",
-    "detail": "Launch any Odoo action by numeric ID, XML-ID string, or action dict. Does not return data."
+    "definition": "调用动作",
+    "detail": "通过数字 ID、XML-ID 字符串或动作字典启动任意 Odoo 动作。不返回数据。"
   },
   "cmdAlias": {
     "args": {
@@ -243,55 +243,55 @@
   },
   "cmdBarcode": {
     "args": {
-      "barcodeDelay": "The delay between barcodes reads (in ms)",
-      "data": "The data to send",
-      "operation": "The operation",
-      "pressDelay": "The delay between presskey events (in ms)"
+      "barcodeDelay": "条码读取间隔（毫秒）",
+      "data": "要发送的数据",
+      "operation": "操作",
+      "pressDelay": "按键事件间隔（毫秒）"
     },
-    "definition": "Operations over barcode",
-    "detail": "See information and send barcode strings",
+    "definition": "条码操作",
+    "detail": "查看信息和发送条码字符串",
     "error": {
-      "invalidOperation": "Invalid operation!",
-      "moudeNotAvailable": "The 'barcode' module is not installed/available",
-      "noData": "No data given!"
+      "invalidOperation": "无效操作！",
+      "moudeNotAvailable": "'barcode' 模块未安装/不可用",
+      "noData": "未提供数据！"
     },
     "result": {
-      "acceptScan": "Currently accepting barcode scanning? {{isAcceptingScan}}",
-      "availableCommands": "Available commands: {{availableCommands}}",
-      "maxTimeBetweenKeysInMs": "Max. time between keys (ms): {{maxTimeBetweenKeysInMs}}",
-      "reservedPrefixes": "Reserved barcode prefixes: {{prefixes}}"
+      "acceptScan": "当前是否接受条码扫描？{{isAcceptingScan}}",
+      "availableCommands": "可用命令：{{availableCommands}}",
+      "maxTimeBetweenKeysInMs": "按键间最大时间（毫秒）：{{maxTimeBetweenKeysInMs}}",
+      "reservedPrefixes": "保留的条码前缀：{{prefixes}}"
     }
   },
   "cmdCaf": {
     "args": {
-      "field": "The field names to request",
-      "filter": "The filter to apply. Example: -fi {required: true}",
-      "model": "The model technical name",
-      "property": "The field properties to display"
+      "field": "要请求的字段名称",
+      "filter": "要应用的过滤器",
+      "model": "模型技术名称",
+      "property": "要显示的字段属性"
     },
-    "definition": "Show field definitions for a model",
-    "detail": "Return field metadata for the model: type, required, readonly, label, selection values, relation target, etc. To check create/read/write/unlink access rights instead, use cam."
+    "definition": "显示模型的字段定义",
+    "detail": "返回模型的字段元数据：类型、必填、只读、标签、选择值、关联目标等。要检查创建/读取/写入/删除访问权限，请使用 cam。"
   },
   "cmdCall": {
     "args": {
-      "argument": "The arguments list",
-      "call": "The method name to call",
-      "kwarg": "The arguments dictionary",
-      "model": "The model technical name"
+      "argument": "参数列表",
+      "call": "要调用的方法名称",
+      "kwarg": "参数字典",
+      "model": "模型技术名称"
     },
-    "definition": "Call model method",
-    "detail": "Call model method. Remember: Methods with @api.model decorator doesn't need the id."
+    "definition": "调用模型方法",
+    "detail": "调用模型方法。注意：带有 @api.model 装饰器的方法不需要 id。"
   },
   "cmdCam": {
     "args": {
-      "model": "The model technical name",
-      "operation": "The operation to do"
+      "model": "模型技术名称",
+      "operation": "要执行的操作"
     },
-    "definition": "Check model access",
-    "detail": "Show access rights for the selected operation on the selected model",
+    "definition": "检查模型访问权限",
+    "detail": "显示所选模型上所选操作的访问权限",
     "result": {
-      "haveAccessRights": "You have access rights for '{{operation}}' on {{model}}",
-      "notAccessRights": "You can't '{{operation}}' on {{model}}"
+      "haveAccessRights": "您在 {{model}} 上有 '{{operation}}' 的访问权限",
+      "notAccessRights": "您无法在 {{model}} 上执行 '{{operation}}'"
     }
   },
   "cmdChrono": {
@@ -313,47 +313,47 @@
   },
   "cmdClick": {
     "args": {
-      "index": "Index of the match to click, 0-based (default: 0)",
-      "list": "List all matches without clicking",
-      "selector": "CSS selector (default: button)",
-      "text": "Button text to match (case-insensitive, partial)"
+      "index": "要点击的匹配项索引，从 0 开始（默认：0）",
+      "list": "列出所有匹配项但不点击",
+      "selector": "CSS 选择器（默认：button）",
+      "text": "要匹配的按钮文本（不区分大小写，部分匹配）"
     },
-    "definition": "Click a button or element in the current view",
-    "detail": "Finds and clicks a button or element by visible text or CSS selector. -t matches any button whose text contains the given string (case-insensitive). -s overrides the element selector (default: button). -n picks the nth match (0-based). --list shows all matches without clicking.",
+    "definition": "点击当前视图中的按钮或元素",
+    "detail": "通过可见文本或 CSS 选择器查找并点击按钮或元素。-t 匹配文本包含给定字符串的任意按钮（不区分大小写）。-s 覆盖元素选择器（默认：button）。-n 选择第 n 个匹配项（从 0 开始）。--list 显示所有匹配项但不点击。",
     "error": {
-      "indexOutOfRange": "Index {{index}} out of range ({{count}} match(es) found)",
-      "noRoot": "Cannot find Odoo content area",
-      "notFound": "No element found for selector \"{{selector}}\"",
-      "notFoundText": "No button found matching \"{{text}}\"",
-      "notHtmlElement": "Matched element is not clickable"
+      "indexOutOfRange": "索引 {{index}} 超出范围（找到 {{count}} 个匹配项）",
+      "noRoot": "无法找到 Odoo 内容区域",
+      "notFound": "未找到选择器 \"{{selector}}\" 对应的元素",
+      "notFoundText": "未找到匹配 \"{{text}}\" 的按钮",
+      "notHtmlElement": "匹配的元素不可点击"
     },
     "result": {
-      "clicked": "Clicked: {{label}}"
+      "clicked": "已点击：{{label}}"
     }
   },
   "cmdCommit": {
     "args": {
-      "recordset": "The Recordset"
+      "recordset": "记录集"
     },
-    "definition": "Commit recordset changes",
-    "detail": "Write recordset changes",
+    "definition": "提交记录集更改",
+    "detail": "写入记录集更改",
     "error": {
-      "invalidRecordset": "Invalid recordset",
-      "noCommit": "Nothing to commit!",
-      "success": "Records '{{pids}}' of {{model}} updated successfully"
+      "invalidRecordset": "无效的记录集",
+      "noCommit": "没有需要提交的内容！",
+      "success": "{{model}} 的记录 '{{pids}}' 更新成功"
     }
   },
   "cmdContext": {
     "args": {
-      "operation": "The operation to do",
-      "value": "The values"
+      "operation": "要执行的操作",
+      "value": "值"
     },
-    "definition": "Operations over session context dictionary",
-    "detail": "Operations over session context dictionary.",
+    "definition": "会话上下文字典操作",
+    "detail": "会话上下文字典操作。",
     "error": {
-      "keyNotPresent": "The selected key is not present in the terminal context",
-      "notSession": "Cannot find session information",
-      "operationNotSupported": "This operation is currently not supported in v15.0+"
+      "keyNotPresent": "所选键不在终端上下文中",
+      "notSession": "无法找到会话信息",
+      "operationNotSupported": "此操作在 v15.0+ 中暂不支持"
     }
   },
   "cmdContextTerm": {
@@ -369,139 +369,139 @@
   },
   "cmdCopy": {
     "args": {
-      "data": "The data",
-      "type": "The type of data"
+      "data": "数据",
+      "type": "数据类型"
     },
-    "definition": "Copy data to paste them into other instances",
-    "detail": "Copy model records or variables",
+    "definition": "复制数据以粘贴到其他实例",
+    "detail": "复制模型记录或变量",
     "result": {
-      "dateCopied": "Data copied!"
+      "dateCopied": "数据已复制！"
     }
   },
   "cmdCount": {
     "args": {
-      "domain": "The domain",
-      "model": "The model technical name",
-      "options": "The options"
+      "domain": "域",
+      "model": "模型技术名称",
+      "options": "选项"
     },
-    "definition": "Gets number of records from the given model in the selected domain",
-    "detail": "Gets number of records from the given model in the selected domain",
-    "result": "Result: {{result}}"
+    "definition": "获取指定模型在选定域中的记录数",
+    "detail": "获取指定模型在选定域中的记录数",
+    "result": "结果：{{result}}"
   },
   "cmdCreate": {
     "args": {
-      "model": "The model technical name",
-      "options": "The options",
-      "value": "The values to write"
+      "model": "模型技术名称",
+      "options": "选项",
+      "value": "要写入的值"
     },
-    "definition": "Create new record",
-    "detail": "Without -v: opens an empty form view for the model. With -v: creates records directly in the database and returns a Recordset with the new IDs. -v accepts a list of value dicts."
+    "definition": "创建新记录",
+    "detail": "不带 -v：打开模型的空白表单视图。带 -v：直接在数据库中创建记录并返回包含新 ID 的 Recordset。-v 接受值字典列表。"
   },
   "cmdDBList": {
     "args": {
-      "onlyActive": "Indicates that only print the active database name"
+      "onlyActive": "仅打印活动数据库名称"
     },
-    "definition": "Show database names",
-    "detail": "Show database names",
+    "definition": "显示数据库名称",
+    "detail": "显示数据库名称",
     "error": {
-      "noDBNames": "Can't get database names",
-      "notSession": "Cannot find session information"
+      "noDBNames": "无法获取数据库名称",
+      "notSession": "无法找到会话信息"
     },
     "result": {
-      "activeDatabase": "<strong>{{database}}</strong> (Active Database)"
+      "activeDatabase": "<strong>{{database}}</strong>（活动数据库）"
     }
   },
   "cmdDateRange": {
     "args": {
-      "domain": "Optional domain filter",
-      "field": "The date or datetime field name",
-      "model": "The model technical name"
+      "domain": "可选的域过滤器",
+      "field": "日期或日期时间字段名称",
+      "model": "模型技术名称"
     },
-    "definition": "Show min/max values for a date or datetime field",
-    "detail": "Returns the minimum and maximum values of a date or datetime field on a model, optionally filtered by a domain. Validates that the field actually exists and is a date/datetime type before querying. Useful to avoid building graphs or reports over an empty or unexpected date range.",
+    "definition": "显示日期或日期时间字段的最小/最大值",
+    "detail": "返回模型中日期或日期时间字段的最小值和最大值，可选地通过域过滤。在查询前验证字段是否存在且为日期/日期时间类型。用于避免在空或意外的日期范围上构建图表或报告。",
     "error": {
-      "notDateField": "Field '{{field}}' is of type '{{type}}', expected date or datetime",
-      "unknownField": "Field '{{field}}' not found in model '{{model}}'"
+      "notDateField": "字段 '{{field}}' 的类型为 '{{type}}'，期望为 date 或 datetime",
+      "unknownField": "在模型 '{{model}}' 中未找到字段 '{{field}}'"
     },
     "result": {
-      "header": "<strong>{{model}}.{{field}}</strong> ({{label}})",
-      "max": "Max: <strong>{{max}}</strong>",
-      "min": "Min: <strong>{{min}}</strong>",
-      "noData": "No data found for <strong>{{model}}.{{field}}</strong>"
+      "header": "<strong>{{model}}.{{field}}</strong>（{{label}}）",
+      "max": "最大值：<strong>{{max}}</strong>",
+      "min": "最小值：<strong>{{min}}</strong>",
+      "noData": "未找到 <strong>{{model}}.{{field}}</strong> 的数据"
     }
   },
   "cmdDebug": {
     "args": {
-      "mode": "The mode<br>- 0: Disabled<br>- 1: Enabled<br>- 2: Enabled with Assets"
+      "mode": "模式<br>- 0：禁用<br>- 1：启用<br>- 2：启用并加载资源"
     },
-    "definition": "Set debug mode",
-    "detail": "Set the Odoo debug mode and reload the page. Values: 0 = disabled, 1 = enabled, 2 = enabled with assets.",
+    "definition": "设置调试模式",
+    "detail": "设置 Odoo 调试模式并重新加载页面。值：0 = 禁用，1 = 启用，2 = 启用并加载资源。",
     "error": {
-      "invalidDebugMode": "Invalid debug mode"
+      "invalidDebugMode": "无效的调试模式"
     },
     "result": {
-      "disabled": "Debug mode <strong>disabled</strong>",
-      "enabled": "Debug mode <strong>enabled</strong>",
-      "enabledAssets": "Debug mode with assets <strong>enabled</strong>",
-      "reload": "Reloading page..."
+      "disabled": "调试模式<strong>已禁用</strong>",
+      "enabled": "调试模式<strong>已启用</strong>",
+      "enabledAssets": "调试模式（含资源）<strong>已启用</strong>",
+      "reload": "正在重新加载页面..."
     }
   },
   "cmdDepends": {
     "args": {
-      "key": "The key",
-      "module": "The module technical name",
-      "section": "The URL section"
+      "key": "键",
+      "module": "模块技术名称",
+      "section": "URL 部分"
     },
-    "definition": "Know modules that depends on the given module",
-    "detail": "Show a list of the modules that depends on the given module",
+    "definition": "查看依赖于给定模块的模块",
+    "detail": "显示依赖于给定模块的模块列表",
     "error": {
-      "noModulesFound": "No modules found!",
-      "noWizard": "Can't create wizard record!",
-      "notInstalled": "The module '{{module}}' isn't installed"
+      "noModulesFound": "未找到模块！",
+      "noWizard": "无法创建向导记录！",
+      "notInstalled": "模块 '{{module}}' 未安装"
     }
   },
   "cmdDescribe": {
     "args": {
-      "model": "The model technical name"
+      "model": "模型技术名称"
     },
-    "definition": "Model profile: count, date range, key fields and selection values",
-    "detail": "Returns a combined profile of the model in one shot: total record count, create_date range (oldest→newest), and a table of key fields (required fields, stored relational fields, selection fields with their possible values). Replaces 3–4 separate commands (caf + count + read_group).",
+    "definition": "模型概况：记录数、日期范围、关键字段和选择值",
+    "detail": "一次性返回模型的综合概况：总记录数、create_date 范围（最早→最新），以及关键字段表（必填字段、存储的关系字段、带可能值的选择字段）。替代 3-4 个单独命令（caf + count + read_group）。",
     "result": {
-      "count": "Total records: <strong>{{count}}</strong>",
-      "dateRange": "Date range: {{min}} → {{max}}",
-      "header": "<strong>Model profile: {{model}}</strong>"
+      "count": "总记录数：<strong>{{count}}</strong>",
+      "dateRange": "日期范围：{{min}} → {{max}}",
+      "header": "<strong>模型概况：{{model}}</strong>"
     },
     "table": {
-      "extra": "Relation / Values",
-      "field": "Field",
-      "label": "Label",
-      "required": "Req",
-      "type": "Type"
+      "extra": "关联 / 值",
+      "field": "字段",
+      "label": "标签",
+      "required": "必填",
+      "type": "类型"
     }
   },
   "cmdDiff": {
     "args": {
-      "all": "Show all fields, including those that are identical",
-      "field": "Fields to compare (default: all non-binary). Use '*' for all.",
-      "id": "Two record IDs to compare (e.g. [10, 20])",
-      "model": "The model technical name",
-      "options": "Extra options"
+      "all": "显示所有字段，包括相同的字段",
+      "field": "要比较的字段（默认：所有非二进制字段）。使用 '*' 表示全部。",
+      "id": "要比较的两个记录 ID（例如 [10, 20]）",
+      "model": "模型技术名称",
+      "options": "额外选项"
     },
-    "definition": "Compare two records field by field",
-    "detail": "Fetches two records of the same model and compares every field value. By default shows only fields that differ. Use --all to include matching fields too. Many2one fields are compared by stored ID (not display name) to avoid false positives from renamed related records. Binary fields are excluded.",
+    "definition": "逐字段比较两条记录",
+    "detail": "获取同一模型的两条记录并比较每个字段值。默认仅显示不同的字段。使用 --all 包括相同的字段。Many2one 字段按存储的 ID（而非显示名称）比较，以避免因重命名关联记录而产生误报。二进制字段被排除。",
     "error": {
-      "exactlyTwo": "Exactly two record IDs are required",
-      "notFound": "Record {{id}} not found in '{{model}}'"
+      "exactlyTwo": "需要恰好两个记录 ID",
+      "notFound": "记录 {{id}} 在 '{{model}}' 中未找到"
     },
     "result": {
-      "header": "<strong>Diff {{model}}: #{{id_a}} vs #{{id_b}}</strong>",
-      "identical": "Records are <strong>identical</strong> for the requested fields",
-      "summary": "Differing fields: <strong>{{diff}}</strong> / Total: <strong>{{total}}</strong>"
+      "header": "<strong>比较 {{model}}：#{{id_a}} vs #{{id_b}}</strong>",
+      "identical": "记录在请求的字段上<strong>完全相同</strong>",
+      "summary": "不同字段：<strong>{{diff}}</strong> / 总计：<strong>{{total}}</strong>"
     },
     "table": {
-      "field": "Field",
-      "label": "Label",
-      "type": "Type",
+      "field": "字段",
+      "label": "标签",
+      "type": "类型",
       "valA": "#{{id}}",
       "valB": "#{{id}}"
     }
@@ -523,47 +523,47 @@
   },
   "cmdDoc": {
     "args": {
-      "method": "The method name",
-      "model": "The model technical name"
+      "method": "方法名称",
+      "model": "模型技术名称"
     },
-    "definition": "Open technical documentation page",
-    "detail": "Open the built-in technical documentation page (Odoo 19.0+ only). Without -m opens the index. With -m, opens docs for that model. With -me, anchors to that method.",
+    "definition": "打开技术文档页面",
+    "detail": "打开内置技术文档页面（仅 Odoo 19.0+）。不带 -m 打开索引。带 -m 打开该模型的文档。带 -me 锚定到该方法。",
     "error": {
-      "incompatibleOdooVersion": "This command is only available in Odoo 19.0+"
+      "incompatibleOdooVersion": "此命令仅在 Odoo 19.0+ 中可用"
     }
   },
   "cmdEffect": {
     "args": {
-      "options": "The extra options to use",
-      "type": "The type of the effect"
+      "options": "使用的额外选项",
+      "type": "效果类型"
     },
-    "definition": "Show effect",
-    "detail": "Play a visual UI effect. Without -t, lists all registered effect names. With -t, plays that effect. Available in Odoo 15.0+.",
+    "definition": "显示效果",
+    "detail": "播放视觉 UI 效果。不带 -t 列出所有已注册的效果名称。带 -t 播放该效果。Odoo 15.0+ 可用。",
     "error": {
-      "incompatibleOdooVersion": "This command is only available in Odoo 15.0+",
-      "notRegistryService": "Cannot find registry service"
+      "incompatibleOdooVersion": "此命令仅在 Odoo 15.0+ 中可用",
+      "notRegistryService": "无法找到注册表服务"
     },
     "result": {
-      "availableEffects": "Available effects:"
+      "availableEffects": "可用效果："
     }
   },
   "cmdExportFile": {
     "args": {
-      "delimiter": "The delimiter",
-      "fieldData": "The field representing the file data",
-      "fieldName": "The field representing the file name",
-      "filename": "The filename",
-      "format": "The format to use for exporting",
-      "mimetype": "The MIME type of the file",
-      "noHeader": "Don't use header",
-      "value": "The value to export"
+      "delimiter": "分隔符",
+      "fieldData": "表示文件数据的字段",
+      "fieldName": "表示文件名的字段",
+      "filename": "文件名",
+      "format": "导出使用的格式",
+      "mimetype": "文件的 MIME 类型",
+      "noHeader": "不使用表头",
+      "value": "要导出的值"
     },
-    "definition": "Export a value to a local file",
-    "detail": "Save a value to disk. Formats: json (any value), csv/xml/zip (Recordset only), raw (binary with custom MIME type). zip exports each record as a separate file using --field-name and --field-data.",
-    "invalidFieldData": "No field named ‘{{fieldData}}’ is found that represent the data",
-    "invalidFieldName": "No field named ‘{{fieldName}}’ is found that represent the name",
-    "invalidValue": "Invalid value: must be a recordset with csv and xml",
-    "resultExported": "Command result exported to '{{filename}}' file"
+    "definition": "将值导出到本地文件",
+    "detail": "将值保存到磁盘。格式：json（任意值）、csv/xml/zip（仅 Recordset）、raw（带自定义 MIME 类型的二进制）。zip 使用 --field-name 和 --field-data 将每条记录导出为单独的文件。",
+    "invalidFieldData": "未找到名为 '{{fieldData}}' 的字段来表示数据",
+    "invalidFieldName": "未找到名为 '{{fieldName}}' 的字段来表示名称",
+    "invalidValue": "无效的值：csv 和 xml 必须是记录集",
+    "resultExported": "命令结果已导出到 '{{filename}}' 文件"
   },
   "cmdExportVar": {
     "args": {
@@ -575,54 +575,54 @@
   },
   "cmdFill": {
     "args": {
-      "enter": "Dispatch Enter keydown after filling (use for search bars)",
-      "index": "Index of the match to use, 0-based (default: 0)",
-      "selector": "CSS selector of the input element",
-      "value": "Text to fill in"
+      "enter": "填充后触发 Enter 键事件（用于搜索栏）",
+      "index": "要使用的匹配项索引，从 0 开始（默认：0）",
+      "selector": "输入元素的 CSS 选择器",
+      "value": "要填入的文本"
     },
-    "definition": "Fill a text input, textarea, select, or contenteditable with a value",
-    "detail": "Finds an element by CSS selector and sets its value, then fires input and change events so the framework reacts. Use for inputs that are NOT Odoo form field widgets (search bars, filter boxes, custom HTML inputs). For standard Odoo form fields use \"form -o edit\" instead. -n picks the nth match (0-based). --enter also dispatches an Enter keydown after filling (required for the Odoo search bar to submit the query).",
+    "definition": "在文本输入框、文本区域、选择器或可编辑区域中填充值",
+    "detail": "通过 CSS 选择器查找元素并设置其值，然后触发 input 和 change 事件以便框架响应。用于非 Odoo 表单字段控件的输入（搜索栏、过滤框、自定义 HTML 输入）。对于标准 Odoo 表单字段，请使用 \"form -o edit\"。-n 选择第 n 个匹配项（从 0 开始）。--enter 还会在填充后触发 Enter 键事件（Odoo 搜索栏提交查询所需）。",
     "error": {
-      "indexOutOfRange": "Index {{index}} out of range ({{count}} match(es) found)",
-      "noRoot": "Cannot find Odoo content area",
-      "noSelector": "A CSS selector is required (-s)",
-      "notFillable": "Element matched by \"{{selector}}\" is not a fillable input (input, textarea, select, or contenteditable)",
-      "notFound": "No element found for selector \"{{selector}}\""
+      "indexOutOfRange": "索引 {{index}} 超出范围（找到 {{count}} 个匹配项）",
+      "noRoot": "无法找到 Odoo 内容区域",
+      "noSelector": "需要 CSS 选择器（-s）",
+      "notFillable": "\"{{selector}}\" 匹配的元素不是可填充的输入（input、textarea、select 或 contenteditable）",
+      "notFound": "未找到选择器 \"{{selector}}\" 对应的元素"
     },
     "result": {
-      "filled": "Filled \"{{selector}}\"{{enter}} with: {{value}}"
+      "filled": "已填充 \"{{selector}}\"{{enter}}，内容：{{value}}"
     }
   },
   "cmdForm": {
     "args": {
-      "field": "The field technical name(s)",
-      "operation": "The operation to perform",
-      "value": "The field values to set (for the edit operation)"
+      "field": "字段技术名称",
+      "operation": "要执行的操作",
+      "value": "要设置的字段值（用于 edit 操作）"
     },
-    "definition": "Interact with the current form view (get, edit, save, highlight, clear)",
-    "detail": "get: returns in-memory field values. edit: sets field values in the open form in-memory record (fires onchanges, does not save). save: persists the current form record to the database. highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).",
+    "definition": "与当前表单视图交互（get、edit、save、highlight、clear）",
+    "detail": "get：返回内存中的字段值。edit：在打开的表单内存记录中设置字段值（触发 onchange，不保存）。save：将当前表单记录持久化到数据库。highlight：视觉标记字段，必要时激活其笔记本标签页。clear：移除高亮（所有字段，或仅 -f 指定的字段）。",
     "error": {
-      "fieldNotFound": "No form field '{{field}}' found in the current view",
-      "fieldRequired": "A field name is required for the highlight operation",
-      "fieldsRequired": "At least one field name is required for the get operation (use -f [field1, field2])",
-      "noFormView": "No editable form view found in the current page",
-      "valuesRequired": "Values dict is required for the edit operation (use -v {field: value, ...})"
+      "fieldNotFound": "在当前视图中未找到表单字段 '{{field}}'",
+      "fieldRequired": "highlight 操作需要字段名称",
+      "fieldsRequired": "get 操作需要至少一个字段名称（使用 -f [field1, field2]）",
+      "noFormView": "在当前页面中未找到可编辑的表单视图",
+      "valuesRequired": "edit 操作需要值字典（使用 -v {field: value, ...}）"
     },
     "result": {
-      "cleared": "Field highlights cleared",
-      "edited": "Updated {{count}} field(s) in the current form",
-      "highlighted": "Highlighted {{count}} field(s) '{{field}}'",
-      "saved": "Form record saved"
+      "cleared": "字段高亮已清除",
+      "edited": "已更新当前表单中的 {{count}} 个字段",
+      "highlighted": "已高亮 {{count}} 个字段 '{{field}}'",
+      "saved": "表单记录已保存"
     }
   },
   "cmdGen": {
     "args": {
-      "max": "Max. value",
-      "min": "Min. value",
-      "type": "Generator type"
+      "max": "最大值",
+      "min": "最小值",
+      "type": "生成器类型"
     },
-    "definition": "Generate random values",
-    "detail": "Generate numbers, strings, url's, dates, etc..."
+    "definition": "生成随机值",
+    "detail": "生成数字、字符串、URL、日期等..."
   },
   "cmdGenFile": {
     "args": {
@@ -634,34 +634,34 @@
   },
   "cmdGraph": {
     "args": {
-      "domain": "The domain filter",
-      "groupby": "Fields to group by",
-      "measure": "The measure field (plain field name, e.g. amount_total — NOT sum:amount_total)",
-      "model": "The model technical name",
-      "name": "The view title",
-      "type": "The chart type"
+      "domain": "域过滤器",
+      "groupby": "分组字段",
+      "measure": "度量字段",
+      "model": "模型技术名称",
+      "name": "视图标题",
+      "type": "图表类型"
     },
-    "definition": "Open graph view",
-    "detail": "Open a customized graph view for a model. To retrieve grouped data without opening a view, use the read_group command instead.",
+    "definition": "打开图形视图",
+    "detail": "打开模型的自定义图形视图。要获取分组数据而不打开视图，请使用 read_group 命令。",
     "error": {
-      "measurePrefix": "Measure field must be a plain field name (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
-      "unknownFields": "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields."
+      "measurePrefix": "度量字段必须是纯字段名称（例如 'amount_total'），不能带聚合前缀（例如 'sum:amount_total'）",
+      "unknownFields": "{{arg}}：在 '{{model}}' 中未找到字段：{{fields}}。使用 'caf -m {{model}}' 列出可用字段。"
     },
     "result": {
-      "name": "Graph View"
+      "name": "图形视图"
     }
   },
   "cmdHelp": {
     "args": {
       "all": "显示所有命令",
-      "category": "Filter commands by category",
+      "category": "按类别筛选命令",
       "cmd": "要查询的命令",
       "onlyInternal": "仅显示内部命令"
     },
     "definition": "打印此帮助或命令详细信息",
     "detail": "显示命令及快速定义。<br/>- <> ~> 必需参数<br/>- [] ~> 可选参数",
     "error": {
-      "categoryEmpty": "No commands found in category '{{category}}'. Available: {{list}}",
+      "categoryEmpty": "在类别“{{category}}”中未找到命令。可用类别：{{list}}",
       "commandNotExist": "'{{cmd}}' 命令不存在"
     },
     "result": {
@@ -673,13 +673,13 @@
   },
   "cmdInfo": {
     "args": {
-      "activeId": "The active record id",
-      "activeModel": "The active record model",
-      "userId": "The user id",
-      "userLogin": "The user login"
+      "activeId": "活动记录 ID",
+      "activeModel": "活动记录模型",
+      "userId": "用户 ID",
+      "userLogin": "用户登录名"
     },
-    "definition": "Get session information",
-    "detail": "Return one piece of current session/page data. Use exactly one flag: --user-id (numeric user ID), --user-login (login name), --active-id (record ID from the current view), --active-model (model from the current view)."
+    "definition": "获取会话信息",
+    "detail": "返回当前会话/页面的某项数据。请使用恰好一个标志：--user-id（数字用户 ID）、--user-login（登录名）、--active-id（当前视图的记录 ID）、--active-model（当前视图的模型）。"
   },
   "cmdInput": {
     "args": {
@@ -692,98 +692,98 @@
   },
   "cmdInspect": {
     "args": {
-      "typeElement": "Element type to inspect"
+      "typeElement": "要检查的元素类型"
     },
     "breadcrumb": {
-      "none": "No breadcrumb navigation found"
+      "none": "未找到面包屑导航"
     },
     "button": {
-      "none": "No buttons found in the current view"
+      "none": "当前视图中未找到按钮"
     },
-    "definition": "Inspect interactive elements on the current page",
-    "detail": "Lists elements of the given type with the terminal command to interact with each one. For LLM use: call inspect first, then use the generated commands.\nWhen a modal dialog is open, every type below scopes to it instead of the background page.\nTypes:\n  page (default) — context overview: model, record id, view type, action id, element counts, modal state\n  button — all buttons with a ready-to-use \"click\" command\n  field — Odoo form fields with a \"form\" command\n  tab — notebook tabs with a \"click\" command\n  menu — top navbar menu items with a \"click\" command\n  statusbar — workflow state buttons with a \"click\" command\n  view — view switcher (list/kanban/form/…) with a \"click\" command\n  dialog — buttons and fields of the currently open dialog\n  breadcrumb — back-navigation links with a \"click\" command\n  record — current form record field values (in-memory)\n  list — visible rows in the current list view with a \"view\" command per row",
+    "definition": "检查当前页面上的交互元素",
+    "detail": "列出指定类型的元素，并给出与每个元素交互的终端命令。供 LLM 使用：先调用 inspect，再使用生成的命令。\n当模态对话框打开时，下列所有类型都作用于该对话框，而不是背景页面。\n类型：\n  page（默认）— 上下文概览：模型、记录 ID、视图类型、动作 ID、元素数量、模态状态\n  button — 所有按钮，附带可直接使用的“click”命令\n  field — Odoo 表单字段，附带“form”命令\n  tab — notebook 标签页，附带“click”命令\n  menu — 顶部导航栏菜单项，附带“click”命令\n  statusbar — 工作流状态按钮，附带“click”命令\n  view — 视图切换器（列表/看板/表单/…），附带“click”命令\n  dialog — 当前打开的对话框中的按钮和字段\n  breadcrumb — 返回导航链接，附带“click”命令\n  record — 当前表单记录的字段值（内存中）\n  list — 当前列表视图中的可见行，每行附带“view”命令",
     "dialog": {
-      "buttons": "<em>Buttons:</em>",
-      "fields": "<em>Fields:</em>",
-      "none": "No dialog is currently open",
-      "title": "Dialog: <strong>{{title}}</strong>"
+      "buttons": "<em>按钮：</em>",
+      "fields": "<em>字段：</em>",
+      "none": "当前没有打开的对话框",
+      "title": "对话框：<strong>{{title}}</strong>"
     },
     "error": {
-      "noRoot": "Cannot find Odoo content area",
-      "unknownType": "Unknown element type: {{type}}"
+      "noRoot": "无法找到 Odoo 内容区域",
+      "unknownType": "未知元素类型：{{type}}"
     },
     "field": {
-      "none": "No form fields found in the current view"
+      "none": "当前视图中未找到表单字段"
     },
     "list": {
-      "none": "No list rows found in the current view"
+      "none": "当前视图中未找到列表行"
     },
     "menu": {
-      "none": "No menu items found"
+      "none": "未找到菜单项"
     },
     "page": {
-      "actionId": "Action ID: {{id}}",
-      "breadcrumb": "Breadcrumb: {{path}}",
-      "counts": "Elements — buttons: {{b}}, fields: {{f}}, tabs: {{t}}, statusbar states: {{s}}",
-      "modalOpen": "Modal open: <strong>{{title}}</strong> — other types now inspect the modal, not the background page",
-      "model": "Model: <strong>{{model}}</strong>",
-      "pageTitle": "Title: <em>{{title}}</em>",
-      "recordId": "Record ID: <strong>{{id}}</strong>",
-      "title": "Page Overview",
-      "url": "URL: {{url}}",
-      "viewType": "View type: {{type}}"
+      "actionId": "动作 ID：{{id}}",
+      "breadcrumb": "面包屑：{{path}}",
+      "counts": "元素 — 按钮：{{b}}，字段：{{f}}，标签页：{{t}}，状态栏状态：{{s}}",
+      "modalOpen": "模态框已打开：<strong>{{title}}</strong> — 其他类型现在检查的是该模态框，而不是背景页面",
+      "model": "模型：<strong>{{model}}</strong>",
+      "pageTitle": "标题：<em>{{title}}</em>",
+      "recordId": "记录 ID：<strong>{{id}}</strong>",
+      "title": "页面概览",
+      "url": "URL：{{url}}",
+      "viewType": "视图类型：{{type}}"
     },
     "record": {
-      "none": "No form record found in the current view"
+      "none": "当前视图中未找到表单记录"
     },
     "statusbar": {
-      "none": "No status bar found in the current view"
+      "none": "当前视图中未找到状态栏"
     },
     "tab": {
-      "none": "No notebook tabs found in the current view"
+      "none": "当前视图中未找到笔记本标签页"
     },
     "table": {
-      "active": "Active",
-      "clickCmd": "click command",
-      "current": "Current",
-      "disabled": "Dis.",
-      "formCmd": "form command",
+      "active": "活动",
+      "clickCmd": "click 命令",
+      "current": "当前",
+      "disabled": "禁用",
+      "formCmd": "form 命令",
       "id": "ID",
       "index": "#",
-      "label": "Label",
-      "name": "Field",
-      "preview": "Cell values (field: value)",
-      "required": "Req",
-      "text": "Text",
-      "type": "Type",
-      "value": "Value",
-      "viewCmd": "view command"
+      "label": "标签",
+      "name": "字段",
+      "preview": "单元格值（字段: 值）",
+      "required": "必填",
+      "text": "文本",
+      "type": "类型",
+      "value": "值",
+      "viewCmd": "view 命令"
     },
     "view": {
-      "none": "No view switcher found (may be single-view action)"
+      "none": "未找到视图切换器（可能是单视图动作）"
     }
   },
   "cmdInstall": {
     "args": {
-      "module": "The module technical name"
+      "module": "模块技术名称"
     },
-    "definition": "Install a module",
-    "detail": "Launch module installation process.",
+    "definition": "安装模块",
+    "detail": "启动模块安装过程。",
     "error": {
-      "moduleNotExist": "'{{module}}' modules doesn't exist",
-      "moduleNotInstalled": "Unexpected error. Modules not installed"
+      "moduleNotExist": "'{{module}}' 模块不存在",
+      "moduleNotInstalled": "意外错误。模块未安装"
     },
     "result": {
-      "success": "{{modules}} modules successfully installed"
+      "success": "{{modules}} 模块安装成功"
     }
   },
   "cmdJSTest": {
     "args": {
-      "device": "The device to test",
-      "module": "The module technical name"
+      "device": "测试设备",
+      "module": "模块技术名称"
     },
-    "definition": "Launch JS Tests",
-    "detail": "Runs js tests in desktop or mobile mode for the selected module."
+    "definition": "启动 JS 测试",
+    "detail": "以桌面或移动模式运行所选模块的 js 测试。"
   },
   "cmdJobs": {
     "definition": "显示正在运行的任务",
@@ -794,44 +794,44 @@
   },
   "cmdJson": {
     "args": {
-      "data": "The data to send",
-      "endpoint": "The endpoint"
+      "data": "要发送的数据",
+      "endpoint": "端点"
     },
-    "definition": "Send POST JSON",
-    "detail": "Sends HTTP POST 'application/json' request"
+    "definition": "发送 POST JSON",
+    "detail": "发送 HTTP POST 'application/json' 请求"
   },
   "cmdLang": {
     "args": {
-      "format": "The format to use",
-      "lang": "The language<br/>Can use '__new__' for new language (empty translation template)",
-      "module": "The technical module name",
-      "name": "The language name",
-      "noOverwrite": "Flag to indicate don't overwrite current translations",
-      "operation": "The operation"
+      "format": "使用的格式",
+      "lang": "语言<br/>可使用 '__new__' 创建新语言（空翻译模板）",
+      "module": "模块技术名称",
+      "name": "语言名称",
+      "noOverwrite": "不覆盖当前翻译的标志",
+      "operation": "操作"
     },
-    "definition": "Operations over translations",
-    "detail": "export: downloads a .po/.csv translation file for a module. import: uploads a translation file from disk. list: prints installed language codes and names. Without extra args, export/import open the Odoo wizard instead.",
+    "definition": "翻译操作",
+    "detail": "export：下载模块的 .po/.csv 翻译文件。import：从磁盘上传翻译文件。list：打印已安装的语言代码和名称。不带额外参数时，export/import 打开 Odoo 向导。",
     "error": {
-      "exportInvalidArguments": "'export' operation needs the following arguments: --lang, --format, --module",
-      "importInvalidArguments": "'import' operation needs the following arguments: --name, --lang, --format, --module",
-      "invalidOperation": "Invalid operation!",
-      "noModulesFound": "No modules found!",
-      "noWizard": "Can't create wizard record!"
+      "exportInvalidArguments": "'export' 操作需要以下参数：--lang、--format、--module",
+      "importInvalidArguments": "'import' 操作需要以下参数：--name、--lang、--format、--module",
+      "invalidOperation": "无效操作！",
+      "noModulesFound": "未找到模块！",
+      "noWizard": "无法创建向导记录！"
     },
     "result": {
-      "success": "Language file imported successfully"
+      "success": "语言文件导入成功"
     }
   },
   "cmdLastSeen": {
-    "definition": "Know user presence",
-    "detail": "Show users last seen",
+    "definition": "查看用户在线状态",
+    "detail": "显示用户最后在线时间",
     "error": {
-      "notAvailable": "Can't use lastseen, 'bus' module is not installed"
+      "notAvailable": "无法使用 lastseen，'bus' 模块未安装"
     },
     "table": {
-      "lastSeen": "Last Seen",
-      "userID": "User ID",
-      "userName": "User Name"
+      "lastSeen": "最后在线",
+      "userID": "用户 ID",
+      "userName": "用户名"
     }
   },
   "cmdLoad": {
@@ -844,142 +844,142 @@
   },
   "cmdLogin": {
     "args": {
-      "database": "The database<br/>Can be '*' to use current database",
-      "noReload": "No reload",
-      "password": "The password",
-      "user": "The login<br/>Can be optionally preceded by the '#' character and it will be used for password too"
+      "database": "数据库<br/>可使用 '*' 表示当前数据库",
+      "noReload": "不重新加载",
+      "password": "密码",
+      "user": "登录名<br/>可选择以 '#' 字符开头，此时也将用作密码"
     },
-    "definition": "Login as...",
-    "detail": "Login as selected user.",
+    "definition": "以...身份登录",
+    "detail": "以所选用户身份登录。",
     "error": {
-      "notSession": "Cannot find session information",
-      "unknownDB": "Unknown active database. Try using '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>' command."
+      "notSession": "无法找到会话信息",
+      "unknownDB": "未知的活动数据库。尝试使用 '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>' 命令。"
     },
     "result": {
-      "success": "Successfully logged as '{{login}}'"
+      "success": "已成功登录为 '{{login}}'"
     }
   },
   "cmdLogout": {
-    "definition": "Log out",
-    "detail": "Session log out",
+    "definition": "登出",
+    "detail": "退出会话",
     "error": {
-      "notSession": "Cannot find session information"
+      "notSession": "无法找到会话信息"
     },
     "result": {
-      "success": "Logged out"
+      "success": "已登出"
     }
   },
   "cmdLongpolling": {
     "args": {
-      "operation": "The operation to do<br>- verbose > Print incoming notificacions<br>- off > Stop verbose mode<br>- add_channel > Add a channel to listen<br>- del_channel > Delete a listening channel<br>- start > Start client longpolling service<br> - stop > Stop client longpolling service",
-      "param": "The parameter"
+      "operation": "要执行的操作<br>- verbose > 打印传入通知<br>- off > 关闭详细模式<br>- add_channel > 添加监听频道<br>- del_channel > 删除监听频道<br>- start > 启动客户端长轮询服务<br> - stop > 停止客户端长轮询服务",
+      "param": "参数"
     },
-    "definition": "Long-Polling operations",
-    "detail": "Operations over long-polling.",
+    "definition": "长轮询操作",
+    "detail": "长轮询操作。",
     "error": {
-      "invalidChannel": "Invalid channel name",
-      "invalidSubscription": "Invalid subscription name",
-      "notAvailable": "Can't use longpolling, 'bus' module is not installed"
+      "invalidChannel": "无效的频道名称",
+      "invalidSubscription": "无效的订阅名称",
+      "notAvailable": "无法使用长轮询，'bus' 模块未安装"
     },
     "result": {
-      "join": "Joined the '{{channel_name}}' channel",
-      "leave": "Leave the '{{channel_name}}' channel",
-      "start": "Longpolling started",
-      "stop": "Longpolling stopped",
-      "subscribe": "Subscribed to '{{subscription}}'",
-      "unsubscribe": "Unsubscribed from '{{subscription}}'",
-      "verboseDisabled": "Now long-polling verbose mode is disabled",
-      "verboseEnabled": "Now long-polling is in verbose mode"
+      "join": "已加入 '{{channel_name}}' 频道",
+      "leave": "已离开 '{{channel_name}}' 频道",
+      "start": "长轮询已启动",
+      "stop": "长轮询已停止",
+      "subscribe": "已订阅 '{{subscription}}'",
+      "unsubscribe": "已取消订阅 '{{subscription}}'",
+      "verboseDisabled": "长轮询详细模式已关闭",
+      "verboseEnabled": "长轮询已进入详细模式"
     }
   },
   "cmdMarkdown": {
     "args": {
-      "text": "The markdown text to convert"
+      "text": "要转换的 markdown 文本"
     },
-    "definition": "Renders markdown as HTML",
-    "detail": "Converts the given markdown text to HTML using markdown-it and prints the result"
+    "definition": "将 markdown 渲染为 HTML",
+    "detail": "使用 markdown-it 将给定的 markdown 文本转换为 HTML 并输出结果"
   },
   "cmdMetadata": {
     "args": {
-      "id": "The record id",
-      "model": "The record model"
+      "id": "记录 ID",
+      "model": "记录模型"
     },
-    "definition": "View record metadata",
-    "detail": "Show ORM metadata for a record: create_uid, create_date, write_uid, write_date, noupdate flag, and XML ID.",
+    "definition": "查看记录元数据",
+    "detail": "显示记录的 ORM 元数据：create_uid、create_date、write_uid、write_date、noupdate 标志和 XML ID。",
     "error": {
-      "notFound": "Can't found any metadata for the given id"
+      "notFound": "无法找到给定 ID 的任何元数据"
     }
   },
   "cmdNotify": {
     "args": {
-      "buttons": "The buttons",
-      "className": "The className",
-      "message": "The message",
-      "sticky": "Is sticky",
-      "subtitle": "The subtitle",
-      "title": "The title",
-      "type": "The type"
+      "buttons": "按钮",
+      "className": "CSS 类名",
+      "message": "消息",
+      "sticky": "是否固定",
+      "subtitle": "副标题",
+      "title": "标题",
+      "type": "类型"
     },
-    "definition": "Shows a notification",
-    "detail": "Displays a notification with a custom message"
+    "definition": "显示通知",
+    "detail": "显示带有自定义消息的通知"
   },
   "cmdNow": {
     "args": {
-      "type": "Date type",
-      "tz": "Use timezone"
+      "type": "日期类型",
+      "tz": "使用时区"
     },
-    "definition": "Current time",
-    "detail": "Prints the current time",
+    "definition": "当前时间",
+    "detail": "打印当前时间",
     "error": {
-      "notViewDialogsService": "Cannot find time service"
+      "notViewDialogsService": "无法找到时间服务"
     }
   },
   "cmdOptions": {
-    "definition": "Open extension options",
-    "detail": "Open the OdooTerminal extension options page."
+    "definition": "打开扩展选项",
+    "detail": "打开 OdooTerminal 扩展选项页面。"
   },
   "cmdPaste": {
     "args": {
-      "merge": "Try to merge data (if the type is 'model')",
-      "yes": "Don't show questions"
+      "merge": "尝试合并数据（如果类型为 'model'）",
+      "yes": "不显示确认提示"
     },
-    "definition": "Pastes copied data",
-    "detail": "Paste model records or variables",
+    "definition": "粘贴已复制的数据",
+    "detail": "粘贴模型记录或变量",
     "error": {
-      "invalidData": "Invalid data to paste! No model defined",
-      "noData": "No data to copy!"
+      "invalidData": "粘贴的数据无效！未定义模型",
+      "noData": "没有可复制的数据！"
     },
     "question": {
-      "continue": "This will modify the '{{model}}' model. Continue?"
+      "continue": "这将修改 '{{model}}' 模型。是否继续？"
     }
   },
   "cmdPivot": {
     "args": {
-      "col": "Fields to group by in columns",
-      "domain": "The domain filter",
-      "measure": "Fields to use as measures (plain field names, e.g. amount_total — NOT sum:amount_total)",
-      "model": "The model technical name",
-      "name": "The view title",
-      "row": "Fields to group by in rows"
+      "col": "按列分组的字段",
+      "domain": "域过滤器",
+      "measure": "用作度量的字段",
+      "model": "模型技术名称",
+      "name": "视图标题",
+      "row": "按行分组的字段"
     },
-    "definition": "Open pivot view",
-    "detail": "Open a customized pivot view for a model. To retrieve aggregated data without opening a view, use the read_group command instead.",
+    "definition": "打开数据透视视图",
+    "detail": "打开模型的自定义数据透视视图。要获取聚合数据而不打开视图，请使用 read_group 命令。",
     "error": {
-      "measurePrefix": "Measure fields must be plain field names (e.g. 'amount_total'), not aggregation-prefixed (e.g. 'sum:amount_total')",
-      "unknownFields": "{{arg}}: field(s) not found on '{{model}}': {{fields}}. Use 'caf -m {{model}}' to list available fields."
+      "measurePrefix": "度量字段必须是纯字段名称（例如 'amount_total'），不能带聚合前缀（例如 'sum:amount_total'）",
+      "unknownFields": "{{arg}}：在 '{{model}}' 中未找到字段：{{fields}}。使用 'caf -m {{model}}' 列出可用字段。"
     },
     "result": {
-      "name": "Pivot View"
+      "name": "数据透视视图"
     }
   },
   "cmdPost": {
     "args": {
-      "data": "The data",
-      "endpoit": "The endpoint",
-      "mode": "The mode"
+      "data": "数据",
+      "endpoit": "端点",
+      "mode": "模式"
     },
-    "definition": "Send POST request",
-    "detail": "Send POST request to selected endpoint"
+    "definition": "发送 POST 请求",
+    "detail": "向所选端点发送 POST 请求"
   },
   "cmdPrint": {
     "args": {
@@ -990,73 +990,73 @@
   },
   "cmdRead": {
     "args": {
-      "field": "The fields to request<br/>Can use '*' to show all fields",
-      "id": "The record id's",
-      "model": "The model technical name",
-      "options": "The options",
-      "readBinary": "Don't filter binary fields"
+      "field": "要请求的字段<br/>可使用 '*' 显示所有字段",
+      "id": "记录 ID",
+      "model": "模型技术名称",
+      "options": "选项",
+      "readBinary": "不过滤二进制字段"
     },
-    "definition": "Fetch records by ID",
-    "detail": "Fetch one or more records by known ID(s) and return a Recordset. Use when you already have the record ID(s). Use search to find records by domain filter instead."
+    "definition": "按 ID 获取记录",
+    "detail": "通过已知 ID 获取一条或多条记录并返回 Recordset。当您已有记录 ID 时使用。要通过域过滤器查找记录，请使用 search。"
   },
   "cmdReadGroup": {
     "args": {
-      "domain": "The domain filter",
-      "field": "Fields to aggregate (measures). Omit to get only counts.",
-      "groupby": "Fields to group by",
-      "model": "The model technical name"
+      "domain": "域过滤器",
+      "field": "要聚合的字段（度量）。省略则仅获取计数。",
+      "groupby": "分组字段",
+      "model": "模型技术名称"
     },
-    "definition": "Fetch grouped and aggregated data from a model",
-    "detail": "Run an ORM read_group on a model and return the aggregated results. Each result row contains the groupby field values, the aggregated measure values, and __count. Use this instead of search when you need sums, counts, or averages per group."
+    "definition": "从模型获取分组和聚合数据",
+    "detail": "在模型上运行 ORM read_group 并返回聚合结果。每行结果包含分组字段值、聚合度量值和 __count。当需要每个组的总和、计数或平均值时，使用此命令替代 search。"
   },
   "cmdRef": {
     "args": {
-      "xmlid": "The XML-ID"
+      "xmlid": "XML-ID"
     },
-    "definition": "Show the referenced model and id of the given xmlid's",
-    "detail": "Show the referenced model and id of the given xmlid's",
+    "definition": "显示给定 XML-ID 引用的模型和 ID",
+    "detail": "显示给定 XML-ID 引用的模型和 ID",
     "table": {
-      "resID": "Res. ID",
-      "resModel": "Res. Model",
+      "resID": "资源 ID",
+      "resModel": "资源模型",
       "xmlID": "XML ID"
     }
   },
   "cmdReload": {
-    "definition": "Reload current page",
-    "detail": "Reload current page."
+    "definition": "重新加载当前页面",
+    "detail": "重新加载当前页面。"
   },
   "cmdRenewDatabase": {
     "args": {
-      "dbuuid": "Renew the uuid of the database",
-      "expires_in": "Set in days the delay before database expiration."
+      "dbuuid": "更新数据库的 UUID",
+      "expires_in": "设置数据库过期前的延迟天数。"
     },
-    "definition": "Renew the database",
-    "detail": "Re-generate a new uuid and expiration date for your development database.",
+    "definition": "续期数据库",
+    "detail": "为您的开发数据库重新生成新的 UUID 和过期日期。",
     "result": {
-      "success": "Database renewed successfully",
-      "success_date": "New expiration date {{formattedExpirationDate}}.",
-      "success_with_uuid": "New uuid {{uuid}}."
+      "success": "数据库续期成功",
+      "success_date": "新过期日期 {{formattedExpirationDate}}。",
+      "success_with_uuid": "新 UUID {{uuid}}。"
     }
   },
   "cmdRollback": {
     "args": {
-      "recordset": "The Recordset"
+      "recordset": "记录集"
     },
-    "definition": "Revert recordset changes",
-    "detail": "Undo recordset changes",
+    "definition": "回滚记录集更改",
+    "detail": "撤销记录集更改",
     "error": {
-      "invalidRecordset": "Invalid recordset"
+      "invalidRecordset": "无效的记录集"
     },
     "result": {
-      "success": "Recordset changes undone"
+      "success": "记录集更改已回滚"
     }
   },
   "cmdRpc": {
     "args": {
-      "options": "The rpc query options"
+      "options": "RPC 查询选项"
     },
-    "definition": "Execute raw rpc",
-    "detail": "Execute raw rpc"
+    "definition": "执行原始 RPC",
+    "detail": "执行原始 RPC"
   },
   "cmdRun": {
     "definition": "运行 TraSH 脚本",
@@ -1064,61 +1064,61 @@
   },
   "cmdSearch": {
     "args": {
-      "all": "Show all records (not truncated)",
-      "domain": "The domain",
-      "field": "The field names to request<br/>Can use '*' to show all fields of the model",
-      "limit": "The limit of records to request",
-      "model": "The model technical name",
-      "more": "Flag to indicate that show more results",
-      "offset": "The offset (from)<br/>Can be zero (no limit)",
-      "options": "The options",
-      "order": "The sort order. MUST be quoted because it contains spaces: -o \"name ASC\" or -o \"id DESC, name\"",
-      "readBinary": "Don't filter binary fields"
+      "all": "显示所有记录（不截断）",
+      "domain": "域",
+      "field": "要请求的字段名称<br/>可使用 '*' 显示模型的所有字段",
+      "limit": "要请求的记录数限制",
+      "model": "模型技术名称",
+      "more": "显示更多结果的标志",
+      "offset": "偏移量（起始位置）<br/>可以是零（无限制）",
+      "options": "选项",
+      "order": "排序方式。必须加引号因为包含空格：-o \"name ASC\" 或 -o \"id DESC, name\"",
+      "readBinary": "不过滤二进制字段"
     },
-    "definition": "Search model record/s",
-    "detail": "Launch orm search query",
+    "definition": "搜索模型记录",
+    "detail": "启动 ORM 搜索查询",
     "error": {
-      "noMoreResults": "There are no more results to print",
-      "resultTruncated": "<strong class='text-warning'>Result truncated to {{len}} records!</strong> The query is too big to be displayed entirely."
+      "noMoreResults": "没有更多结果可打印",
+      "resultTruncated": "<strong class='text-warning'>结果已截断为 {{len}} 条记录！</strong>查询结果过大无法完整显示。"
     },
     "question": {
-      "showMore": "There are still results to print ({{len}} records). Show more?"
+      "showMore": "还有 {{len}} 条结果可打印。是否显示更多？"
     },
     "result": {
-      "count": "Records count: {{count}}"
+      "count": "记录数：{{count}}"
     }
   },
   "cmdSettings": {
     "args": {
-      "module": "The module technical name"
+      "module": "模块技术名称"
     },
-    "definition": "Open settings page",
-    "detail": "Open the Odoo Settings form view for the specified module. Does not return data."
+    "definition": "打开设置页面",
+    "detail": "打开指定模块的 Odoo 设置表单视图。不返回数据。"
   },
   "cmdSysParam": {
     "args": {
-      "key": "Parameter key (required for get/set operations)",
-      "operation": "Operation to perform.",
-      "type": "Parameter type for get/set operations (Odoo 20+)",
-      "value": "Parameter value (required for set operation)"
+      "key": "参数键（get/set 操作必需）",
+      "operation": "要执行的操作。",
+      "type": "get/set 操作的参数类型（Odoo 20+）",
+      "value": "参数值（set 操作必需）"
     },
-    "definition": "Manage system parameters",
-    "detail": "Get, set, or list parameters in ir.config_parameter model.",
+    "definition": "管理系统参数",
+    "detail": "在 ir.config_parameter 模型中获取、设置或列出参数。",
     "error": {
-      "invalidOperation": "Invalid operation. Use 'get', 'set', or 'list'",
-      "invalidType": "Invalid type. Use 'str', 'int', 'float', or 'bool'",
-      "listEmpty": "No system parameters found",
-      "missingKey": "Key parameter is required for set operation",
-      "missingValue": "Value parameter is required for set operation",
-      "noUpdate": "Failed to update the parameter",
-      "notFound": "Parameter not found"
+      "invalidOperation": "无效操作。使用 'get'、'set' 或 'list'",
+      "invalidType": "类型无效。请使用 'str'、'int'、'float' 或 'bool'",
+      "listEmpty": "未找到系统参数",
+      "missingKey": "set 操作需要键参数",
+      "missingValue": "set 操作需要值参数",
+      "noUpdate": "更新参数失败",
+      "notFound": "参数未找到"
     },
     "result": {
-      "success": "Parameter set successfully"
+      "success": "参数设置成功"
     },
     "table": {
-      "param": "Parameter",
-      "value": "Value"
+      "param": "参数",
+      "value": "值"
     }
   },
   "cmdToggleTerm": {
@@ -1130,179 +1130,179 @@
   },
   "cmdTour": {
     "args": {
-      "clear": "Clear the state tour",
-      "name": "The tour technical name",
-      "onlyActive": "Filter only active"
+      "clear": "清除巡检状态",
+      "name": "巡检技术名称",
+      "onlyActive": "仅过滤活动的"
     },
-    "definition": "Launch Tour",
-    "detail": "Runs the selected tour. If no tour given, prints all available tours.",
+    "definition": "启动巡检",
+    "detail": "运行所选巡检。如果未指定巡检，则打印所有可用巡检。",
     "error": {
-      "notAccesible": "tour not accesible! Can't use it in this moment.",
-      "notAvailable": "This is not available on Odoo <17.0",
-      "notExist": "The given tour doesn't exist!"
+      "notAccesible": "巡检不可访问！当前无法使用。",
+      "notAvailable": "此功能在 Odoo <17.0 中不可用",
+      "notExist": "给定的巡检不存在！"
     },
     "result": {
-      "clean": "Tour '{{name}}' clean",
-      "empty": "The tour list is empty",
-      "running": "Running tour..."
+      "clean": "巡检 '{{name}}' 已清除",
+      "empty": "巡检列表为空",
+      "running": "正在运行巡检..."
     }
   },
   "cmdURL": {
-    "definition": "Get URL parameters",
-    "detail": "Extract a component from the current page URL. Use -s href for the full URL, -s hash -k model to read the model in the hash, -s search -k <param> for query string values.",
+    "definition": "获取 URL 参数",
+    "detail": "从当前页面 URL 中提取组件。使用 -s href 获取完整 URL，-s hash -k model 读取 hash 中的模型，-s search -k <param> 获取查询字符串值。",
     "error": {
-      "notKey": "A key has not been provided"
+      "notKey": "未提供键"
     }
   },
   "cmdUal": {
-    "definition": "Update apps list",
-    "detail": "Refresh the module registry by scanning the addons path for new or updated modules. Required before installing a module that was just added to the filesystem.",
+    "definition": "更新应用列表",
+    "detail": "通过扫描插件路径扫描新模块或更新模块来刷新模块注册表。在安装刚添加到文件系统的模块之前需要执行此操作。",
     "error": {
-      "noUpdate": "Can't update the apps list!"
+      "noUpdate": "无法更新应用列表！"
     },
     "result": {
-      "success": "The apps list has been updated successfully"
+      "success": "应用列表已成功更新"
     }
   },
   "cmdUhg": {
     "args": {
-      "group": "The technical name of the group<br/>A group can be optionally preceded by '!' to say 'is not in group'"
+      "group": "组的技术名称<br/>组名可选择以 '!' 开头表示\"不在该组中\""
     },
-    "definition": "Check if user is in the selected groups",
-    "detail": "Check if user is in the selected groups."
+    "definition": "检查用户是否在所选组中",
+    "detail": "检查用户是否在所选组中。"
   },
   "cmdUninstall": {
     "args": {
-      "force": "Forced mode",
-      "module": "The module technical name"
+      "force": "强制模式",
+      "module": "模块技术名称"
     },
-    "definition": "Uninstall a module",
-    "detail": "Launch module deletion process.",
+    "definition": "卸载模块",
+    "detail": "启动模块删除过程。",
     "error": {
-      "canceled": "Operation cancelled",
-      "notExist": "'{{module}}' module doesn't exists"
+      "canceled": "操作已取消",
+      "notExist": "'{{module}}' 模块不存在"
     },
     "question": {
-      "continue": "Do you want to continue?"
+      "continue": "是否继续？"
     },
     "result": {
-      "success": "'{{module}}' ({{name}}) module successfully uninstalled",
-      "willRemoved": "This operation will remove these modules too:"
+      "success": "'{{module}}'（{{name}}）模块卸载成功",
+      "willRemoved": "此操作还将移除以下模块："
     }
   },
   "cmdUnlink": {
     "args": {
-      "id": "The record id's",
-      "model": "The model technical name",
-      "options": "The options"
+      "id": "记录 ID",
+      "model": "模型技术名称",
+      "options": "选项"
     },
-    "definition": "Unlink record",
-    "detail": "Delete a record.",
+    "definition": "删除记录",
+    "detail": "删除记录。",
     "result": {
-      "success": "{{model}} record deleted successfully"
+      "success": "{{model}} 记录删除成功"
     }
   },
   "cmdUpgrade": {
     "args": {
-      "module": "The module technical name"
+      "module": "模块技术名称"
     },
-    "definition": "Upgrade a module",
-    "detail": "Launch upgrade module process.",
+    "definition": "升级模块",
+    "detail": "启动模块升级过程。",
     "error": {
-      "notExist": "'{{module}}' modules doesn't exist",
-      "notUpgraded": "Unexpected error. Module not upgraded"
+      "notExist": "'{{module}}' 模块不存在",
+      "notUpgraded": "意外错误。模块未升级"
     },
     "result": {
-      "sucess": "'{{modules}}' modules successfully upgraded"
+      "sucess": "'{{modules}}' 模块升级成功"
     }
   },
   "cmdVersion": {
-    "definition": "Know Odoo version",
-    "detail": "Shows Odoo version",
+    "definition": "查看 Odoo 版本",
+    "detail": "显示 Odoo 版本",
     "error": {
-      "notVersionInfo": "Cannot find version information"
+      "notVersionInfo": "无法找到版本信息"
     }
   },
   "cmdView": {
     "args": {
-      "domain": "The domain filter for the record picker",
-      "id": "The record id",
-      "model": "The model technical name",
-      "ref": "The view reference name"
+      "domain": "记录选择器的域过滤器",
+      "id": "记录 ID",
+      "model": "模型技术名称",
+      "ref": "视图引用名称"
     },
-    "definition": "View model record/s",
-    "detail": "With -i: opens that record in its form view. Without -i: shows a record picker dialog filtered by -d domain. Does not return data.",
+    "definition": "查看模型记录",
+    "detail": "带 -i：在表单视图中打开该记录。不带 -i：显示记录选择器对话框。不返回数据。",
     "error": {
-      "notViewDialogsService": "Cannot find view dialog service"
+      "notViewDialogsService": "无法找到视图对话框服务"
     },
     "result": {
-      "selectRecord": "Select a record",
-      "viewRecord": "View Record"
+      "selectRecord": "选择记录",
+      "viewRecord": "查看记录"
     }
   },
   "cmdWatchdog": {
     "args": {
-      "model": "Model name to use for the watchdog",
-      "profile": "Watchdog persona: technical (default), accounting or sales — changes the vocabulary/focus of its verdicts. Only the technical profile explains exceptions (RPC/JS errors); the other profiles don't react to them (Odoo's own on-screen error message is unaffected either way).",
-      "reasoning": "Reasoning effort for \"thinking\" models: off, low, medium or high. 'off' asks local OpenAI-compatible servers (llama.cpp, vLLM, ...) to skip chain-of-thought — use it if a model shows no output because it spends its whole reply thinking. openai provider only for now.",
-      "state": "Turn the watchdog on or off for this instance"
+      "model": "看门狗使用的模型名称",
+      "profile": "看门狗角色：technical（默认）、accounting 或 sales——会改变其判断的用词和侧重点。只有 technical 角色会解释异常（RPC/JS 错误）；其他角色不会对异常做出反应（无论如何，Odoo 自身的屏幕错误消息不受影响）。",
+      "reasoning": "“思考”模型的推理强度：off、low、medium 或 high。“off”会要求本地 OpenAI 兼容服务器（llama.cpp、vLLM 等）跳过思维链——如果某个模型把整个回复都用于思考而没有输出，请使用它。目前仅支持 openai 提供商。",
+      "state": "为此实例开启或关闭看门狗"
     },
-    "definition": "Opt-in floating AI watchdog that reacts to page activity on its own",
-    "detail": "An opt-in floating AI watchdog that reacts on its own: every time it detects a save, a deletion, an opened record, a field edit (form or list line), a lingering hover over a button or field, a warning/error message from Odoo, or an exception (an RPC error from a save/delete, or an uncaught JS error on the page — explained with a root-cause read, technical profile only, see \"-pf\" below), it automatically sends a one-shot, read-only consult (no run_command, cannot change anything) to the AI and peeks from the right edge with a short verdict. Since this fires constantly and can burn tokens fast, use a local model for it: \"watchdog -p on -m <local-model>\". \"-m\" alone (without \"-p\") just changes the model without touching on/off. \"-pf <profile>\" picks who it writes for: technical (default, also the only profile that explains exceptions), accounting or sales. Clicking the watchdog never calls the AI and never registers its notes into the terminal/agent conversation — it just expands the bubble in place to show the watchdog's own message history; click again to collapse. If a \"thinking\" model shows nothing, set \"-r off\" so it skips chain-of-thought instead of spending its reply budget on it. Needs its own connection: configure a provider + model under the extension's Options page → AI Watchdog (independent from the \"ai\" command's connection).",
+    "definition": "可选启用的浮动 AI 看门狗，会自行对页面活动做出反应",
+    "detail": "一个可选启用的浮动 AI 看门狗，会自行做出反应：每当它检测到保存、删除、打开记录、字段编辑（表单或列表行）、在按钮或字段上停留悬停、Odoo 的警告/错误消息，或异常（保存/删除产生的 RPC 错误，或页面上未捕获的 JS 错误——会给出根因分析，仅限 technical 角色，见下方“-pf”）时，它会自动向 AI 发送一次性的只读咨询（不含 run_command，无法更改任何内容），并从右边缘探出，给出简短的结论。由于它会频繁触发，可能快速消耗 token，建议使用本地模型：“watchdog -p on -m <本地模型>”。仅使用“-m”（不带“-p”）只会更改模型，不会改变开关状态。“-pf <角色>”选择它面向的对象：technical（默认，也是唯一会解释异常的角色）、accounting 或 sales。点击看门狗不会调用 AI，也不会把它的笔记写入终端/代理对话——只会就地展开气泡以显示看门狗自己的消息历史；再次点击即可收起。如果“思考”模型没有任何输出，请设置“-r off”，让它跳过思维链，而不是把回复预算花在思考上。它需要独立的连接：请在扩展的选项页面 → AI 看门狗 中配置提供商和模型（与“ai”命令的连接相互独立）。",
     "model": {
-      "notSet": "(not set)"
+      "notSet": "（未设置）"
     },
-    "noProvider": "No dedicated provider is configured for the watchdog yet, so it has nothing to call. The watchdog never borrows the AI sidebar's active connection — open the extension's Options page → AI Watchdog and pick a provider + model there (add one under \"AI Providers\" first if you haven't). That choice is remembered per instance too, so this is a one-time step.",
+    "noProvider": "尚未为看门狗配置专用提供商，因此无可调用的对象。看门狗不会借用 AI 侧边栏当前的连接——请打开扩展的选项页面 → AI 看门狗，并在那里选择提供商和模型（如果还没有，请先在“AI 模型”下添加）。该选择也会按实例记住，因此只需设置一次。",
     "reasoning": {
-      "default": "default",
-      "hint": "Tip: if the watchdog sometimes shows nothing, your model may be spending its whole reply on internal reasoning before answering. Try \"watchdog -r off\" (or a non-thinking model for this slot)."
+      "default": "默认",
+      "hint": "提示：如果看门狗有时没有任何显示，可能是你的模型把整个回复都用在了回答之前的内部推理上。请尝试“watchdog -r off”（或为此槽位使用非思考模型）。"
     },
     "status": {
-      "off": "Watchdog mode: off (model for when enabled: {{model}})",
-      "on": "Watchdog mode: on for this instance (saved locally — survives closing the browser, no need to redo this or reconnect next time). Model: {{model}}. Profile: {{profile}}. Reasoning: {{reasoning}}."
+      "off": "看门狗模式：关闭（启用时使用的模型：{{model}}）",
+      "on": "看门狗模式：已为此实例开启（本地保存——关闭浏览器后依然有效，下次无需重复设置或重新连接）。模型：{{model}}。角色：{{profile}}。推理：{{reasoning}}。"
     },
-    "tokenWarning": "⚠ High token usage: the watchdog calls the AI automatically on EVERY save, field edit, record you open, lingering hover over a button, and Odoo warning/error message — with no manual step in between. Only use this with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended."
+    "tokenWarning": "⚠ token 用量很高：看门狗会在每次保存、字段编辑、打开记录、在按钮上停留悬停以及 Odoo 警告/错误消息时自动调用 AI——中间没有任何手动步骤。请仅配合本地模型（Ollama、llama.cpp 等）使用——不建议配合付费云端提供商使用，无人值守时可能产生高额费用。"
   },
   "cmdWhoami": {
-    "definition": "Know current user login",
-    "detail": "Shows current user login",
+    "definition": "查看当前用户登录名",
+    "detail": "显示当前用户登录名",
     "error": {
-      "noLogin": "Oops! can't get the login :/"
+      "noLogin": "哎呀！无法获取登录名 :/"
     }
   },
   "cmdWrite": {
     "args": {
-      "id": "The record id's",
-      "model": "The model technical name",
-      "options": "The options",
-      "value": "The values to write"
+      "id": "记录 ID",
+      "model": "模型技术名称",
+      "options": "选项",
+      "value": "要写入的值"
     },
-    "definition": "Update record values",
-    "detail": "Update record values.",
+    "definition": "更新记录值",
+    "detail": "更新记录值。",
     "result": {
-      "success": "{{model}} record updated successfully"
+      "success": "{{model}} 记录更新成功"
     }
   },
   "cmdWs": {
     "args": {
-      "data": "The data",
-      "endpoint": "The endpoint",
-      "noTls": "Don't use TLS",
-      "operation": "The operation",
-      "websocket": "The websocket object"
+      "data": "数据",
+      "endpoint": "端点",
+      "noTls": "不使用 TLS",
+      "operation": "操作",
+      "websocket": "WebSocket 对象"
     },
-    "definition": "Open a web socket",
-    "detail": "Open a web socket",
+    "definition": "打开 WebSocket",
+    "detail": "打开 WebSocket",
     "error": {
-      "invalidOperation": "Invalid operation",
-      "noEndpoint": "Need an endpoint to connect",
-      "noWebsocket": "Need a websocket to operate"
+      "invalidOperation": "无效操作",
+      "noEndpoint": "需要端点才能连接",
+      "noWebsocket": "需要 WebSocket 才能操作"
     },
     "result": {
-      "connectionClosed": "[{{url}}] Connection closed cleanly, code={{code}} reason={{reason}}",
-      "connectionDied": "[{{url}}] Connection died",
-      "connectionError": "Need a websocket to operate",
-      "connectionEstablished": "[{{url}}] Connection established"
+      "connectionClosed": "[{{url}}] 连接已正常关闭，代码={{code}} 原因={{reason}}",
+      "connectionDied": "[{{url}}] 连接已断开",
+      "connectionError": "需要 WebSocket 才能操作",
+      "connectionEstablished": "[{{url}}] 连接已建立"
     }
   },
   "cmdZip": {
@@ -1313,33 +1313,33 @@
     "detail": "有关可用选项，请参阅 JSZip 帮助：https://stuk.github.io/jszip"
   },
   "file2attachment": {
-    "aborted": "Aborted by user. No file given...",
-    "noFile": "No file selected"
+    "aborted": "用户已中止。未提供文件...",
+    "noFile": "未选择文件"
   },
   "file2base64": {
-    "aborted": "Aborted by user. No file given..."
+    "aborted": "用户已中止。未提供文件..."
   },
   "file2file": {
-    "aborted": "Aborted by user. No file given..."
+    "aborted": "用户已中止。未提供文件..."
   },
   "func2DNextFrame": {
-    "definition": "Wait for the next animation frame",
-    "detail": "Waits until the browser is ready to paint the next frame and returns its timestamp. Use it to pace animation loops instead of sleep."
+    "definition": "等待下一个动画帧",
+    "detail": "等待浏览器准备好绘制下一帧并返回其时间戳。用它来控制动画循环的节奏，而不是使用 sleep。"
   },
   "func2DText": {
     "args": {
-      "canvas": "The canvas or its window id",
-      "color": "The text color",
-      "font": "The text font",
-      "text": "The text",
-      "x": "The text X point",
-      "y": "The text Y point"
+      "canvas": "画布或其窗口 ID",
+      "color": "文本颜色",
+      "font": "文本字体",
+      "text": "文本",
+      "x": "文本 X 坐标",
+      "y": "文本 Y 坐标"
     },
-    "definition": "Draw a text",
-    "detail": "Draw a text"
+    "definition": "绘制文本",
+    "detail": "绘制文本"
   },
   "getOdooEnvService": {
-    "error": "Service '{{service_name}}' is not available"
+    "error": "服务 '{{service_name}}' 不可用"
   },
   "loader": {
     "cantInitTerm": "无法初始化终端",
@@ -1364,215 +1364,215 @@
     },
     "templates": {
       "metadata": {
-        "createDate": "Create Date",
-        "createUID": "Create UID",
-        "noUpdate": "No Update",
-        "writeDate": "Write Date",
-        "writeUID": "Write UID",
+        "createDate": "创建日期",
+        "createUID": "创建者 UID",
+        "noUpdate": "不更新",
+        "writeDate": "修改日期",
+        "writeUID": "修改者 UID",
         "xmlID": "XML-ID"
       },
       "recordCreated": {
-        "sucess": "{{model}} record(s) created successfully: {{- links}}"
+        "sucess": "{{model}} 记录创建成功：{{- links}}"
       },
       "whoami": {
-        "activeCompany": "Active Company",
-        "inCompanies": "In Companies",
-        "inGroups": "In Groups",
-        "login": "Login",
-        "partner": "Partner",
-        "user": "User"
+        "activeCompany": "活动公司",
+        "inCompanies": "所属公司",
+        "inGroups": "所属组",
+        "login": "登录名",
+        "partner": "合作伙伴",
+        "user": "用户"
       }
     }
   },
-  "ok": "OK",
-  "optionsAIModelsAddRequired": "Name and URL are required",
-  "optionsAIModelsGrantDenied": "Access denied",
-  "optionsAIModelsGrantError": "Error granting access",
-  "optionsAIModelsGrantSuccess": "Access granted",
-  "optionsAIModelsGrantedLabel": "Access granted",
-  "optionsAIModelsLoadMissingURL": "Enter URL first",
-  "optionsAISkillsAddRequired": "Name, Description and Content are required",
-  "optionsAIWatchdogDescription": "A floating watchdog that reacts on its own to page activity (save/open/edit/hover/Odoo messages) with a short, read-only AI verdict — it never runs commands or changes anything. This sets the default for every Odoo instance the extension runs on; each instance can still override the model locally with the \"watchdog\" terminal command.",
-  "optionsAIWatchdogEnabled": "Enabled by default",
-  "optionsAIWatchdogHint": "No local server configured yet? Add one under the \"AI Providers\" tab, then pick it here.",
-  "optionsAIWatchdogManualHint": "Leave this off to keep it opt-in per instance: run \"watchdog -p on\" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with \"-m <model>\"). Turn it off again with \"watchdog -p off\".",
-  "optionsAIWatchdogModel": "Model",
-  "optionsAIWatchdogModelsLoadError": "Could not load models",
-  "optionsAIWatchdogNoModel": "-- Default model --",
-  "optionsAIWatchdogNoProvider": "-- No provider --",
-  "optionsAIWatchdogProfile": "Profile",
-  "optionsAIWatchdogProfileAccounting": "Accounting",
-  "optionsAIWatchdogProfileHint": "Changes the verdicts' focus and vocabulary (e.g. accounting totals/taxes vs. sales/customer data). Required-field checks always apply regardless of profile. Only the Technical profile explains exceptions (RPC errors from a failed save/delete, or uncaught JS errors) — the other profiles don't react to them (Odoo's own on-screen error message is unaffected either way). Can also be overridden per instance with \"watchdog -pf <profile>\".",
-  "optionsAIWatchdogProfileSales": "Sales",
-  "optionsAIWatchdogProfileTechnical": "Technical (default)",
-  "optionsAIWatchdogProvider": "Provider",
-  "optionsAIWatchdogReasoning": "Reasoning",
-  "optionsAIWatchdogReasoningDefault": "-- Default (no override) --",
-  "optionsAIWatchdogReasoningHigh": "High",
-  "optionsAIWatchdogReasoningHint": "If the watchdog sometimes shows nothing, your model may be a \"thinking\" model spending its whole reply on internal reasoning — try \"Off\". Only applies to OpenAI-compatible servers (local llama.cpp/vLLM/Ollama, etc.); can also be overridden per instance with \"watchdog -r <level>\".",
-  "optionsAIWatchdogReasoningLow": "Low",
-  "optionsAIWatchdogReasoningMedium": "Medium",
-  "optionsAIWatchdogReasoningOff": "Off (skip chain-of-thought)",
-  "optionsAIWatchdogTokenWarning": "⚠ High token usage: it calls the AI automatically on EVERY save, field edit, record you open, lingering hover over a button, and Odoo warning/error message — with no manual step in between. Only use it with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended.",
-  "optionsExecutionCollection": "Maximum collection length",
-  "optionsExecutionHint": "Nested calls share the instruction budget. Timeout cancellation is cooperative: a host operation already in progress may finish before execution stops.",
-  "optionsExecutionInstructions": "Maximum VM instructions",
-  "optionsExecutionNesting": "Maximum parser nesting depth",
-  "optionsExecutionSource": "Maximum source length (UTF-16 units)",
-  "optionsExecutionString": "Maximum string length (UTF-16 units)",
-  "optionsExecutionTimeout": "Execution timeout (ms; 0 disables)",
-  "optionsLanguage": "Language",
-  "optionsLanguageAuto": "Auto",
-  "optionsMCPServersAddRequired": "Name and URL are required",
-  "optionsNoChanges": "All changes saved",
-  "optionsReset": "Reset to Defaults",
-  "optionsResetConfirm": "This will reset all settings to their default values. Are you sure?",
-  "optionsResetDone": "Settings have been reset to defaults",
-  "optionsResetFailed": "Failed to reset settings",
-  "optionsSave": "Save Settings",
-  "optionsSaveFailed": "Failed to save settings",
-  "optionsSaved": "Settings saved successfully",
-  "optionsSubtitle": "Settings & Configuration",
-  "optionsTableEmpty": "No data",
-  "optionsTermContextInvalidJson": "Invalid JSON format",
-  "optionsThemePresetDark": "Dark",
-  "optionsThemePresetHacker": "Hacker",
-  "optionsThemePresetLight": "Light",
+  "ok": "确定",
+  "optionsAIModelsAddRequired": "名称、URL 和模型为必填项",
+  "optionsAIModelsGrantDenied": "授权被拒绝",
+  "optionsAIModelsGrantError": "授权出错",
+  "optionsAIModelsGrantSuccess": "授权成功",
+  "optionsAIModelsGrantedLabel": "已授权",
+  "optionsAIModelsLoadMissingURL": "请先输入 URL",
+  "optionsAISkillsAddRequired": "名称、描述和内容为必填项",
+  "optionsAIWatchdogDescription": "A floating watchdog that reacts on its own to page activity (save/open) with a short, read-only AI verdict — it never runs commands or changes anything. This sets the default for every Odoo instance the extension runs on; each instance can still override it locally with the \"ai watchdog\" terminal command.",
+  "optionsAIWatchdogEnabled": "默认启用",
+  "optionsAIWatchdogHint": "It fires on every save/open, so a cloud model can burn through tokens fast — a local server (Ollama, llama.cpp, etc.) set up as an AI provider is strongly recommended here.",
+  "optionsAIWatchdogManualHint": "Leave this off to keep it opt-in per instance: run \"ai watchdog -p on\" in the terminal on any Odoo instance to turn it on just there (it will use the provider/model picked below unless overridden with \"-m <model>\"). Turn it off again with \"ai watchdog -p off\".",
+  "optionsAIWatchdogModel": "模型",
+  "optionsAIWatchdogModelsLoadError": "无法加载模型",
+  "optionsAIWatchdogNoModel": "-- 默认模型 --",
+  "optionsAIWatchdogNoProvider": "-- 无提供商 --",
+  "optionsAIWatchdogProfile": "角色",
+  "optionsAIWatchdogProfileAccounting": "会计",
+  "optionsAIWatchdogProfileHint": "Changes the verdicts' focus and vocabulary (e.g. accounting totals/taxes vs. sales/customer data). Required-field checks always apply regardless of profile. Can also be overridden per instance with \"ai watchdog -pf <profile>\".",
+  "optionsAIWatchdogProfileSales": "销售",
+  "optionsAIWatchdogProfileTechnical": "技术（默认）",
+  "optionsAIWatchdogProvider": "提供商",
+  "optionsAIWatchdogReasoning": "推理",
+  "optionsAIWatchdogReasoningDefault": "-- 默认（不覆盖）--",
+  "optionsAIWatchdogReasoningHigh": "高",
+  "optionsAIWatchdogReasoningHint": "If the watchdog sometimes shows nothing, your model may be a \"thinking\" model spending its whole reply on internal reasoning — try \"Off\". Only applies to OpenAI-compatible servers (local llama.cpp/vLLM/Ollama, etc.); can also be overridden per instance with \"ai watchdog -r <level>\".",
+  "optionsAIWatchdogReasoningLow": "低",
+  "optionsAIWatchdogReasoningMedium": "中",
+  "optionsAIWatchdogReasoningOff": "关闭（跳过思维链）",
+  "optionsAIWatchdogTokenWarning": "⚠ High token usage: it calls the AI automatically on EVERY save and every record you open, with no manual step in between. Only use it with a local model (Ollama, llama.cpp, etc.) — it is NOT recommended with a paid cloud provider, where it can run up a large bill unattended.",
+  "optionsExecutionCollection": "集合最大长度",
+  "optionsExecutionHint": "嵌套调用共享指令预算。超时取消是协作式的：已在进行的宿主操作可能会在执行停止前完成。",
+  "optionsExecutionInstructions": "VM 最大指令数",
+  "optionsExecutionNesting": "解析器最大嵌套深度",
+  "optionsExecutionSource": "源码最大长度（UTF-16 单元）",
+  "optionsExecutionString": "字符串最大长度（UTF-16 单元）",
+  "optionsExecutionTimeout": "执行超时（毫秒；0 表示禁用）",
+  "optionsLanguage": "语言",
+  "optionsLanguageAuto": "自动",
+  "optionsMCPServersAddRequired": "名称和 URL 为必填项",
+  "optionsNoChanges": "所有更改已保存",
+  "optionsReset": "恢复默认设置",
+  "optionsResetConfirm": "这将把所有设置恢复为默认值。确定吗？",
+  "optionsResetDone": "设置已恢复为默认值",
+  "optionsResetFailed": "重置设置失败",
+  "optionsSave": "保存设置",
+  "optionsSaveFailed": "保存设置失败",
+  "optionsSaved": "设置已成功保存",
+  "optionsSubtitle": "设置与配置",
+  "optionsTableEmpty": "暂无数据",
+  "optionsTermContextInvalidJson": "无效的 JSON 格式",
+  "optionsThemePresetDark": "深色",
+  "optionsThemePresetHacker": "黑客",
+  "optionsThemePresetLight": "浅色",
   "optionsThemePresetMatrix": "Matrix",
   "optionsThemePresetOdoo": "Odoo",
-  "optionsThemePresetTech": "Tech",
-  "optionsTipAIModelsCapabilities": "Tip: Pick a model that supports tool use, vision, and extended thinking when selecting it in AI mode.",
-  "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\". The agent asks for permission once per server per conversation.",
+  "optionsThemePresetTech": "科技",
+  "optionsTipAIModelsCapabilities": "提示：使用支持工具调用、视觉和扩展思考的模型。",
+  "optionsTipMCPServersScope": "Tip: MCP tools are only available in \"ai agent\", not \"ai chat\". The agent asks for permission once per server per conversation.",
   "optionsTitleAI": "AI",
-  "optionsTitleAICustomSkills": "AI Skills",
-  "optionsTitleAICustomSkillsAdd": "Add",
-  "optionsTitleAICustomSkillsContentLabel": "Content",
-  "optionsTitleAICustomSkillsContentPlaceholder": "Write the skill content in plain text or markdown.",
-  "optionsTitleAICustomSkillsDescription": "Define custom skill modules available to the AI agent.",
-  "optionsTitleAICustomSkillsDescription2": "Description",
-  "optionsTitleAICustomSkillsDescriptionLabel": "Description",
-  "optionsTitleAICustomSkillsDescriptionPlaceholder": "One-line description for the AI",
-  "optionsTitleAICustomSkillsExport": "Export",
-  "optionsTitleAICustomSkillsImport": "Import",
-  "optionsTitleAICustomSkillsName": "Name",
-  "optionsTitleAICustomSkillsNameLabel": "Name",
+  "optionsTitleAICustomSkills": "AI 技能",
+  "optionsTitleAICustomSkillsAdd": "添加",
+  "optionsTitleAICustomSkillsContentLabel": "内容",
+  "optionsTitleAICustomSkillsContentPlaceholder": "用纯文本或 Markdown 编写技能内容。",
+  "optionsTitleAICustomSkillsDescription": "定义可供 AI 代理使用的自定义技能模块。",
+  "optionsTitleAICustomSkillsDescription2": "描述",
+  "optionsTitleAICustomSkillsDescriptionLabel": "描述",
+  "optionsTitleAICustomSkillsDescriptionPlaceholder": "给 AI 的一行描述",
+  "optionsTitleAICustomSkillsExport": "导出",
+  "optionsTitleAICustomSkillsImport": "导入",
+  "optionsTitleAICustomSkillsName": "名称",
+  "optionsTitleAICustomSkillsNameLabel": "名称",
   "optionsTitleAICustomSkillsNamePlaceholder": "my-skill",
-  "optionsTitleAICustomSkillsRemoveConfirm": "Remove this skill?",
-  "optionsTitleAIModels": "AI Providers",
-  "optionsTitleAIModelsAPIKey": "API Key",
-  "optionsTitleAIModelsAdd": "Add",
-  "optionsTitleAIModelsAdvanced": "Advanced options",
-  "optionsTitleAIModelsDescription": "Define AI provider connections to use in AI mode. The model is picked from AI mode itself, below the provider selector.",
-  "optionsTitleAIModelsGrant": "Grant access",
-  "optionsTitleAIModelsMaxTokens": "Max tokens",
-  "optionsTitleAIModelsMaxTokensLabel": "Max tokens (0 = default)",
-  "optionsTitleAIModelsName": "Name",
-  "optionsTitleAIModelsNamePlaceholder": "My Provider",
-  "optionsTitleAIModelsProvider": "Provider",
-  "optionsTitleAIModelsRemove": "Remove provider?",
-  "optionsTitleAIModelsRemoveConfirm": "Remove this AI provider connection?",
-  "optionsTitleAIModelsTimeout": "Timeout (s)",
-  "optionsTitleAIWatchdog": "AI Watchdog",
-  "optionsTitleBehaviour": "Behaviour",
-  "optionsTitleBehaviourDescription": "General settings: interface language and how the terminal window opens (pinned open, maximized, multi-line input).",
-  "optionsTitleBehaviourElephant": "Resolve unknown values",
-  "optionsTitleBehaviourElephantHint": "If the current user or database name can't be read from the page, send an extra request to fetch them. A bit slower, but avoids showing them as unknown.",
-  "optionsTitleBehaviourMaximized": "Maximized",
-  "optionsTitleBehaviourMultiline": "Multi-line",
-  "optionsTitleBehaviourPinned": "Pinned",
-  "optionsTitleCommandAssistant": "Command Assistant",
-  "optionsTitleCommandAssistantDescription": "Controls the suggestions dropdown that appears while you type a command.",
-  "optionsTitleCommandAssistantDynOptionsDisabled": "Disable dynamic options",
-  "optionsTitleCommandAssistantDynOptionsDisabledHint": "Dynamic options are suggestions fetched from the database (e.g. record names or model names). Disable this if they make the assistant feel slow.",
-  "optionsTitleCommandAssistantMatchMode": "Match mode",
-  "optionsTitleCommandAssistantMatchModeHint": "How suggestions are filtered against what you've typed: only options starting with it, or options containing it anywhere.",
-  "optionsTitleCommandAssistantMatchModeIncludes": "Includes",
-  "optionsTitleCommandAssistantMatchModeStartsWith": "Starts with",
-  "optionsTitleCommandAssistantMaxResults": "Max. results",
-  "optionsTitleCommandAssistantMaxResultsHint": "Maximum number of suggestions shown at once in the dropdown.",
-  "optionsTitleDeveloperZone": "Developer Zone",
-  "optionsTitleDeveloperZoneDescription": "Options for developers of OdooTerminal itself. Most users can leave these off.",
-  "optionsTitleDeveloperZoneModeConsoleErrors": "Show errors in the browser console",
-  "optionsTitleDeveloperZoneModeIgnoreCompChecks": "Disable Odoo version checking",
-  "optionsTitleDeveloperZoneModeTests": "Use OdooTerminalTests",
-  "optionsTitleExecution": "Execution control",
-  "optionsTitleInitCommands": "Init Commands",
-  "optionsTitleInitCommandsDescription": "These commands run automatically every time the terminal starts, in order, one per line. Useful for things like clearing the screen or opening a specific view.",
-  "optionsTitleMCPServers": "MCP Servers",
-  "optionsTitleMCPServersAdd": "Add",
-  "optionsTitleMCPServersDescription": "Connect the AI agent to remote MCP (Model Context Protocol) servers. Tools exposed by enabled servers are offered to the agent alongside its built-in tools.",
-  "optionsTitleMCPServersEnabled": "Enabled",
-  "optionsTitleMCPServersName": "Name",
-  "optionsTitleMCPServersNamePlaceholder": "My MCP Server",
-  "optionsTitleMCPServersRemove": "Remove server?",
-  "optionsTitleMCPServersRemoveConfirm": "Remove this MCP server connection?",
+  "optionsTitleAICustomSkillsRemoveConfirm": "删除此技能？",
+  "optionsTitleAIModels": "AI 模型",
+  "optionsTitleAIModelsAPIKey": "API 密钥",
+  "optionsTitleAIModelsAdd": "添加",
+  "optionsTitleAIModelsAdvanced": "高级选项",
+  "optionsTitleAIModelsDescription": "定义在 AI 模式下使用的 AI 模型配置。",
+  "optionsTitleAIModelsGrant": "授权访问",
+  "optionsTitleAIModelsMaxTokens": "最大 Token 数",
+  "optionsTitleAIModelsMaxTokensLabel": "最大 token 数（0 = 默认）",
+  "optionsTitleAIModelsName": "名称",
+  "optionsTitleAIModelsNamePlaceholder": "我的模型",
+  "optionsTitleAIModelsProvider": "提供商",
+  "optionsTitleAIModelsRemove": "删除模型？",
+  "optionsTitleAIModelsRemoveConfirm": "删除此 AI 模型配置？",
+  "optionsTitleAIModelsTimeout": "超时（秒）",
+  "optionsTitleAIWatchdog": "AI 看门狗",
+  "optionsTitleBehaviour": "行为",
+  "optionsTitleBehaviourDescription": "常规设置：界面语言，以及终端窗口的打开方式（固定显示、最大化、多行输入）。",
+  "optionsTitleBehaviourElephant": "解析未知值",
+  "optionsTitleBehaviourElephantHint": "当页面中无法直接读取当前用户或数据库名称时，发送一次额外的请求来获取它们。速度会略慢，但可以避免显示为“未知”。",
+  "optionsTitleBehaviourMaximized": "最大化",
+  "optionsTitleBehaviourMultiline": "多行",
+  "optionsTitleBehaviourPinned": "固定",
+  "optionsTitleCommandAssistant": "命令助手",
+  "optionsTitleCommandAssistantDescription": "控制输入命令时出现的建议下拉列表。",
+  "optionsTitleCommandAssistantDynOptionsDisabled": "禁用动态选项",
+  "optionsTitleCommandAssistantDynOptionsDisabledHint": "动态选项是从数据库中获取的建议（例如记录名称或模型名称）。如果助手感觉变慢，可以禁用它。",
+  "optionsTitleCommandAssistantMatchMode": "匹配模式",
+  "optionsTitleCommandAssistantMatchModeHint": "建议如何根据你输入的内容进行筛选：仅匹配以其开头的选项，或匹配包含它的任意位置的选项。",
+  "optionsTitleCommandAssistantMatchModeIncludes": "包含",
+  "optionsTitleCommandAssistantMatchModeStartsWith": "前缀匹配",
+  "optionsTitleCommandAssistantMaxResults": "最大结果数",
+  "optionsTitleCommandAssistantMaxResultsHint": "下拉列表中一次最多显示的建议数量。",
+  "optionsTitleDeveloperZone": "开发者专区",
+  "optionsTitleDeveloperZoneDescription": "面向 OdooTerminal 扩展开发者的选项。大多数用户无需开启。",
+  "optionsTitleDeveloperZoneModeConsoleErrors": "在浏览器控制台显示错误",
+  "optionsTitleDeveloperZoneModeIgnoreCompChecks": "禁用 Odoo 版本检查",
+  "optionsTitleDeveloperZoneModeTests": "使用 OdooTerminalTests",
+  "optionsTitleExecution": "执行控制",
+  "optionsTitleInitCommands": "初始化命令",
+  "optionsTitleInitCommandsDescription": "这些命令会在终端每次启动时自动按顺序执行，每行一条。适合用来清屏或打开某个特定视图等操作。",
+  "optionsTitleMCPServers": "MCP 服务器",
+  "optionsTitleMCPServersAdd": "添加",
+  "optionsTitleMCPServersDescription": "将 AI 代理连接到远程 MCP（Model Context Protocol）服务器。已启用服务器提供的工具会与内置工具一起提供给代理。",
+  "optionsTitleMCPServersEnabled": "已启用",
+  "optionsTitleMCPServersName": "名称",
+  "optionsTitleMCPServersNamePlaceholder": "我的 MCP 服务器",
+  "optionsTitleMCPServersRemove": "删除服务器？",
+  "optionsTitleMCPServersRemoveConfirm": "删除此 MCP 服务器连接？",
   "optionsTitleMCPServersUrl": "URL",
-  "optionsTitleMisc": "Misc",
-  "optionsTitleMiscDescription": "Other display and command settings that don't fit elsewhere.",
-  "optionsTitleMiscHighlightWords": "Highlight Words",
-  "optionsTitleMiscHighlightWordsList": "Highlight Words List",
-  "optionsTitleMiscHighlightWordsListHint": "Comma-separated words to highlight in the terminal output when \"Highlight Words\" is enabled above.",
-  "optionsTitleMiscLimits": "Limits",
-  "optionsTitleMiscRlimitValue": "Default Search Limit",
-  "optionsTitleMiscRlimitValueHint": "Maximum records fetched by the \"search\" command when you don't specify a limit yourself. 0 = no limit.",
-  "optionsTitleMiscRlimitValuePlaceholder": "No limit",
-  "optionsTitleMiscScreenBufferSize": "Screen Buffer Size",
-  "optionsTitleMiscScreenBufferSizeHint": "Maximum number of lines kept in the terminal output before older ones are dropped. Lower it if the terminal feels sluggish with long sessions. 0 = default ({{default}}).",
-  "optionsTitleMiscShowExecutionTime": "Show Execution Time",
-  "optionsTitleMiscShowTechnicalModel": "Show Technical Model Name",
-  "optionsTitleMiscShowTechnicalModelDescriptionHint": "Shows the internal Odoo model name (e.g. \"res.partner\") next to record titles, which you need when writing commands that target a specific model.",
-  "optionsTitleMiscShowTechnicalModelHint": "Odoo 17+ only",
-  "optionsTitleMiscShowTechnicalModelMinVersion": "Minimum Odoo Version",
-  "optionsTitleShortcuts": "Shortcuts",
-  "optionsTitleShortcutsAdd": "Add",
-  "optionsTitleShortcutsCommand": "Command",
-  "optionsTitleShortcutsDescription": "Run a terminal command by pressing a key combination, from anywhere on the page. To add one: click the \"Press keys...\" box, press the combination, type the command to run, then Add.",
-  "optionsTitleShortcutsKeybind": "Keybind",
-  "optionsTitleShortcutsPressKeys": "Press keys...",
-  "optionsTitleShortcutsRemove": "Remove",
-  "optionsTitleTerminalContext": "Terminal Context",
-  "optionsTitleTerminalContextDescription": "Extra key-value data (Odoo's \"context\", e.g. language or active_test) automatically added to every command the terminal sends to Odoo. Write it as JSON. Most users can leave it with its default values.",
-  "optionsTitleTheme": "Theme",
-  "optionsTitleThemeAdd": "Add",
-  "optionsTitleThemeColor": "Color",
-  "optionsTitleThemeColorDanger": "Danger",
-  "optionsTitleThemeColorDark": "Dark",
-  "optionsTitleThemeColorDomainHint": "Give a specific website its own accent color, e.g. to tell a production site apart from a staging one at a glance.",
-  "optionsTitleThemeColorDomainTable": "Per-site Colors",
-  "optionsTitleThemeColorInfo": "Info",
-  "optionsTitleThemeColorLight": "Light",
-  "optionsTitleThemeColorMuted": "Muted",
-  "optionsTitleThemeColorPrimary": "Primary",
-  "optionsTitleThemeColorSecondary": "Secondary",
-  "optionsTitleThemeColorSuccess": "Success",
-  "optionsTitleThemeColorWarning": "Warning",
-  "optionsTitleThemeColorWhite": "White",
-  "optionsTitleThemeColors": "Colors",
-  "optionsTitleThemeDescription": "Customize how the terminal looks: pick a ready-made preset or fine-tune individual colors, fonts and opacity below.",
-  "optionsTitleThemeDomain": "Domain",
-  "optionsTitleThemeFontFamily": "Font Family",
-  "optionsTitleThemeFontSize": "Font Size",
-  "optionsTitleThemeFontSizeCA": "Font Size (CA)",
-  "optionsTitleThemeFontSizeLarge": "Large",
-  "optionsTitleThemeFontSizeMedium": "Medium",
-  "optionsTitleThemeFontSizeSmall": "Small",
-  "optionsTitleThemeFontSizeXSmall": "X-Small",
-  "optionsTitleThemeOpacity": "Opacity",
-  "optionsTitleThemePreset": "Theme Preset",
-  "optionsTitleThemePresetCustom": "Custom",
-  "optionsTitleThemeRemove": "Remove",
-  "optionsUnsavedChanges": "Unsaved changes",
-  "optionsWarningAIModelsKeys": "Warning: API keys are stored in browser storage.",
+  "optionsTitleMisc": "其他设置",
+  "optionsTitleMiscDescription": "其他未归入别处的显示与命令相关设置。",
+  "optionsTitleMiscHighlightWords": "高亮单词",
+  "optionsTitleMiscHighlightWordsList": "高亮单词列表",
+  "optionsTitleMiscHighlightWordsListHint": "以逗号分隔的单词列表，当上方“高亮单词”开启时，会在终端输出中高亮显示这些单词。",
+  "optionsTitleMiscLimits": "限制",
+  "optionsTitleMiscRlimitValue": "默认搜索上限",
+  "optionsTitleMiscRlimitValueHint": "当你没有自行指定限制时，“search”命令返回的最大记录数。0 表示不限制。",
+  "optionsTitleMiscRlimitValuePlaceholder": "不限制",
+  "optionsTitleMiscScreenBufferSize": "屏幕缓冲区大小",
+  "optionsTitleMiscScreenBufferSizeHint": "终端输出中保留的最大行数，超出后会丢弃较早的内容。如果长时间会话中终端变卡顿，可以调低此值。0 = 默认值（{{default}}）。",
+  "optionsTitleMiscShowExecutionTime": "显示执行时间",
+  "optionsTitleMiscShowTechnicalModel": "显示模型技术名称",
+  "optionsTitleMiscShowTechnicalModelDescriptionHint": "在记录标题旁显示 Odoo 内部模型技术名称（例如 “res.partner”），当你需要针对某个具体模型编写命令时会用到它。",
+  "optionsTitleMiscShowTechnicalModelHint": "仅适用于 Odoo 17+",
+  "optionsTitleMiscShowTechnicalModelMinVersion": "最低 Odoo 版本",
+  "optionsTitleShortcuts": "快捷键",
+  "optionsTitleShortcutsAdd": "添加",
+  "optionsTitleShortcutsCommand": "命令",
+  "optionsTitleShortcutsDescription": "通过按下组合键在页面任意位置运行一条终端命令。添加方法：点击“按下按键...”输入框，按下想要的组合键，输入要执行的命令，然后点击添加。",
+  "optionsTitleShortcutsKeybind": "组合键",
+  "optionsTitleShortcutsPressKeys": "按下按键...",
+  "optionsTitleShortcutsRemove": "移除",
+  "optionsTitleTerminalContext": "终端上下文",
+  "optionsTitleTerminalContextDescription": "附加的键值数据（Odoo 的“上下文”，例如语言或 active_test），会自动附加到终端发送给 Odoo 的每个命令中。请使用 JSON 格式填写。大多数用户保留默认值即可。",
+  "optionsTitleTheme": "主题",
+  "optionsTitleThemeAdd": "添加",
+  "optionsTitleThemeColor": "颜色",
+  "optionsTitleThemeColorDanger": "危险",
+  "optionsTitleThemeColorDark": "深色",
+  "optionsTitleThemeColorDomainHint": "为特定网站设置专属强调色，例如方便一眼区分生产环境和测试环境。",
+  "optionsTitleThemeColorDomainTable": "按网站设置颜色",
+  "optionsTitleThemeColorInfo": "信息",
+  "optionsTitleThemeColorLight": "浅色",
+  "optionsTitleThemeColorMuted": "柔和",
+  "optionsTitleThemeColorPrimary": "主要",
+  "optionsTitleThemeColorSecondary": "次要",
+  "optionsTitleThemeColorSuccess": "成功",
+  "optionsTitleThemeColorWarning": "警告",
+  "optionsTitleThemeColorWhite": "白色",
+  "optionsTitleThemeColors": "颜色",
+  "optionsTitleThemeDescription": "自定义终端外观：选择一个预设主题，或在下方精细调整颜色、字体和不透明度。",
+  "optionsTitleThemeDomain": "域名",
+  "optionsTitleThemeFontFamily": "字体",
+  "optionsTitleThemeFontSize": "字号",
+  "optionsTitleThemeFontSizeCA": "命令助手字号",
+  "optionsTitleThemeFontSizeLarge": "大",
+  "optionsTitleThemeFontSizeMedium": "中",
+  "optionsTitleThemeFontSizeSmall": "小",
+  "optionsTitleThemeFontSizeXSmall": "特小",
+  "optionsTitleThemeOpacity": "不透明度",
+  "optionsTitleThemePreset": "主题预设",
+  "optionsTitleThemePresetCustom": "自定义",
+  "optionsTitleThemeRemove": "删除",
+  "optionsUnsavedChanges": "有未保存的更改",
+  "optionsWarningAIModelsKeys": "警告：API 密钥存储在浏览器存储中。",
   "terminal": {
     "ai": {
-      "attachExpand": "Click to enlarge",
-      "attachRemove": "Remove attachment",
-      "attachScreenshot": "Screenshot",
-      "attachScreenshotPick": "Select element",
-      "attachScreenshotViewport": "Full viewport",
-      "attachUpload": "Upload file",
-      "busyBlocked": "[!] Can't send: an AI request is already running (see the conversation list). Wait for it to finish or switch to it.",
-      "busyDeleteBlocked": "[!] Can't delete: this conversation still has an AI request running.",
+      "attachExpand": "点击放大",
+      "attachRemove": "移除附件",
+      "attachScreenshot": "屏幕截图",
+      "attachScreenshotPick": "选择元素",
+      "attachScreenshotViewport": "整个视口",
+      "attachUpload": "上传文件",
+      "busyBlocked": "[!] 无法发送：已有 AI 请求正在运行（见对话列表）。请等待其完成或切换到该对话。",
+      "busyDeleteBlocked": "[!] 无法删除：此对话仍有 AI 请求正在运行。",
       "experimentalWarning": "此模式为实验性功能，请谨慎使用",
       "helpTip1": "每次对话一个主题 — 为每个任务新建对话。",
       "helpTip2": "上下文满时会自动压缩历史记录，但较短的对话始终消耗更少的 token。",
@@ -1580,19 +1580,19 @@
       "helpTip4": "删除不再需要的旧对话。",
       "helpTip5": "仅在严格必要时附加文件。",
       "helpTitle": "节省 token 的技巧",
-      "modelsLoadError": "Could not load the models list ({{error}}). Grant access to this URL in the extension options (AI Providers section) and try again.",
+      "modelsLoadError": "无法加载模型列表（{{error}}）。请在扩展选项（AI 模型部分）中授予对此 URL 的访问权限，然后重试。",
       "newConversation": "新建对话",
       "noConversationsHint": "新建一个对话开始",
       "noModelsHint": "请在扩展选项中配置 AI 模型",
       "notConnected": "AI 未连接。请先使用 \"ai connect\"。",
       "privacyWarning": "隐私提示：对话存储在浏览器存储中，任何有权访问此计算机的人都可以读取。",
-      "questionAutoDeclined": "[Agent] Question auto-declined (conversation not active): {{question}}",
+      "questionAutoDeclined": "[Agent] 问题已自动拒绝（对话未处于活动状态）：{{question}}",
       "reasoning": {
-        "default": "-- Reasoning --",
-        "high": "Reasoning: High",
-        "low": "Reasoning: Low",
-        "medium": "Reasoning: Medium",
-        "off": "Reasoning: Off"
+        "default": "-- 推理 --",
+        "high": "推理：高",
+        "low": "推理：低",
+        "medium": "推理：中",
+        "off": "推理：关闭"
       },
       "sysprompt": {
         "label": "自定义指令",
@@ -1603,16 +1603,16 @@
       "prevented": "由于未完成的任务，终端已阻止当前标签页关闭："
     },
     "error": {
-      "invalidHTTPRequest": "Invalid HTTP Request",
+      "invalidHTTPRequest": "无效的 HTTP 请求",
       "notLoaded": "终端未加载",
-      "unknown": "[!] Oops! Unknown error! (no detailed error message given :/)"
+      "unknown": "[!] 哎呀！未知错误！（没有详细的错误信息 :/）"
     },
     "exception": {
-      "ElementNotFoundError": "Element not found error ({{selector}})!",
-      "ElementNotFoundTemplateError": "No elements found!",
-      "InvalidElementTemplateError": "Invalid element in template!",
-      "ProcessJobError": "Error executing '{{cmd_name}}'",
-      "TooManyElementsTemplateError": "Too many elements in the template to be assigned to one element!"
+      "ElementNotFoundError": "元素未找到错误（{{selector}}）！",
+      "ElementNotFoundTemplateError": "未找到元素！",
+      "InvalidElementTemplateError": "模板中的元素无效！",
+      "ProcessJobError": "执行 '{{cmd_name}}' 时出错",
+      "TooManyElementsTemplateError": "模板中的元素过多，无法分配给一个元素！"
     },
     "info": {
       "ai": {
@@ -1628,30 +1628,30 @@
       "aborted": "操作已中止"
     },
     "tooltip": {
-      "aiMode": "AI Mode",
-      "aiReasoning": "Reasoning effort for \"thinking\" models (openai provider only). \"Off\" asks local OpenAI-compatible servers to skip chain-of-thought.",
-      "aiTips": "AI tips",
-      "attachFile": "Attach file",
-      "customSystemPrompt": "Custom system prompt",
-      "debug": "Toggle debug mode",
-      "maximize": "Maximize",
-      "multiLine": "Multi-line",
-      "newConversation": "New conversation",
-      "pin": "Pin",
-      "reloadShell": "Reload Shell"
+      "aiMode": "AI 模式",
+      "aiReasoning": "“思考”模型的推理强度（仅限 openai 提供商）。“关闭”会要求本地 OpenAI 兼容服务器跳过思维链。",
+      "aiTips": "AI 提示",
+      "attachFile": "附加文件",
+      "customSystemPrompt": "自定义系统提示词",
+      "debug": "切换调试模式",
+      "maximize": "最大化",
+      "multiLine": "多行",
+      "newConversation": "新建对话",
+      "pin": "固定",
+      "reloadShell": "重载 Shell"
     },
     "unknownCommand": "未知命令 '{{org_cmd}}'，位于 {{start}}:{{end}}。您是否想输入 '<strong class='o_terminal_click o_terminal_cmd' data-cmd='help {{cmd}}'>{{cmd}}</strong>'？",
     "unknownCommandAgentHint": "未知命令 '{{org_cmd}}'。它不是已注册的命令 — 请查阅已提供的 AVAILABLE COMMANDS 列表，或运行 'help --all' 列出所有命令。",
     "unknownCommandSuggestion": "未知命令 '{{org_cmd}}'。您是否想输入 '{{cmd}}'？如果不是，请运行 'help --all' 列出所有命令。",
     "unregisteredUser": "未注册用户",
     "watchdog": {
-      "historyEmpty": "No messages yet.",
-      "tooltip": "OdooTerminal AI Watchdog — click to see the message history"
+      "historyEmpty": "暂无消息。",
+      "tooltip": "OdooTerminal — click for a hint about what just happened"
     }
   },
   "utilInjectResource": {
     "error": {
-      "invalidType": "Invalid resource type"
+      "invalidType": "无效的资源类型"
     }
   }
 }
