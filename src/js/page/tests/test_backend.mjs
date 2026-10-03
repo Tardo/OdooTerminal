@@ -39,6 +39,20 @@ export default class TestBackend extends TerminalTestSuite {
     this.assertTrue(this.isFormOpen());
   }
 
+  async test_qview_open() {
+    const odooMajor = getOdooVersion('major');
+    if (typeof odooMajor !== 'number' || odooMajor < 16) {
+      return;
+    }
+    await this.terminal.execute(
+      `qview -a "<t t-name='tm.open'><div class='tm_qview_open'>qview</div></t>"`,
+      false,
+      true,
+    );
+    await asyncSleep(1500);
+    this.assertNotEqual(document.querySelector('.tm_qview_open'), null);
+  }
+
   async test_effect() {
     await this.terminal.execute("effect -t rainbow_man -o {message: 'I hope everything works correctly'}", false, true);
   }

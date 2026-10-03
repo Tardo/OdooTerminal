@@ -5,6 +5,7 @@
 import i18n from 'i18next';
 import {getArgumentInfo} from '@tardo/trash/argument';
 import {ARG} from '@tardo/trash/constants';
+import encodeHTML from '@terminal/utils/encode_html';
 import {buildCommandPrompt} from '@ai/prompts/trash';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@terminal/terminal';
@@ -51,7 +52,7 @@ async function printHelpDetailed(screen: Screen, cmd: string, cmd_def: CMDDef) {
   screen.print(`<div class="terminal-info-section">${arg_info_str}</div>`);
   if (cmd_def.example) {
     screen.eprint(i18n.t('cmdHelp.result.example', 'EXAMPLE'));
-    screen.print(`<div class="terminal-info-section">${cmd} ${cmd_def.example}</div>`);
+    screen.print(`<div class="terminal-info-section">${encodeHTML(`${cmd} ${cmd_def.example}`)}</div>`);
   }
 }
 

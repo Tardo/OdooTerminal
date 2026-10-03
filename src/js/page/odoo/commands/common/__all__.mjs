@@ -29,6 +29,7 @@ import cmdNow from './now';
 import cmdPost from './post';
 import cmdRead from './read';
 import cmdReadGroup from './read_group';
+import cmdQView from './qview';
 import cmdRef from './ref';
 import cmdReload from './reload';
 import cmdRollback from './rollback';
@@ -94,6 +95,7 @@ export default function (vm: VMachine) {
   vm.registerCommand('ual', cmdUal());
   vm.registerCommand('logout', cmdLogout());
   vm.registerCommand('count', cmdCount());
+  vm.registerCommand('qview', cmdQView());
   vm.registerCommand('ref', cmdRef());
   vm.registerCommand('rpc', cmdRpc());
   vm.registerCommand('markdown', cmdMarkdown());

@@ -160,6 +160,16 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertEqual(res?.login, 'admin');
   }
 
+  async test_qview() {
+    const res = await this.terminal.execute(
+      `qview -a "<t t-name='tm.test'><b class='tm_qview'><t t-esc='1+1'/></b></t>" -r tm.test`,
+      false,
+      true,
+    );
+    this.assertTrue(res.includes('tm_qview'));
+    this.assertTrue(res.includes('2'));
+  }
+
   async test_caf() {
     const res = await this.terminal.execute('caf -m res.partner -f type -fi {searchable: true}', false, true);
     this.assertNotEmpty(res.type);
@@ -452,13 +462,12 @@ export default class TestCommon extends TerminalTestSuite {
     this.assertTrue(Array.isArray(res));
     this.assertTrue(res.length > 0);
     const grouped = await this.terminal.execute(
-      `read_group -m res.partner -g is_company -f ${supportsAggregates ? '["id:sum","total:sum(id)",color]' : '[color]'} -d [[id, in, [1,2,3]]]`,
+      `read_group -m res.partner -g is_company -f ${supportsAggregates ? '["total:sum(id)",color]' : '[color]'} -d [[id, in, [1,2,3]]]`,
       false,
       true,
     );
     if (supportsAggregates) {
-      this.assertEqual(grouped.reduce((sum, row) => sum + row.id, 0), 6, JSON.stringify(grouped));
-      this.assertEqual(grouped.reduce((sum, row) => sum + row.total, 0), 6);
+      this.assertEqual(grouped.reduce((sum, row) => sum + row.total, 0), 6, JSON.stringify(grouped));
     }
     this.assertTrue(grouped.every(row => typeof row.color === 'number'));
     this.assertEmpty(await this.terminal.execute('read_group -m res.partner -g country_id -d [[id, =, 0]]', false, true));

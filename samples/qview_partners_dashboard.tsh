@@ -1,0 +1,43 @@
+// min-v 16.0.0; group none
+// Volatile QWeb dashboard (qview): nothing is saved in the database, it lives until the page is reloaded.
+// Shows the companies/customers with their contacts using a base template + a second template that
+// is reused with t-call, conditional classes (t-att-class), t-set and values computed here (-v).
+
+$odoo_ver = (version)
+if ($odoo_ver[0] < 16) {
+    print "Needs Odoo 16+ (OWL client actions)"
+    return -1
+}
+
+print "Collecting stats..."
+$total = (count -m res.partner -d [['active', '=', true]])
+$companies = (count -m res.partner -d [['is_company', '=', true]])
+$no_email = (count -m res.partner -d [['email', '=', false]])
+$stats = {total: $total, companies: $companies, no_email: $no_email}
+
+// Second template: one table row per partner (called from the main one)
+$row = "<t t-name='tm.partner_row'>"
+$row += "<tr t-att-class=\"p.is_company ? 'table-primary fw-bold' : ''\">"
+$row += "<td><t t-esc='p.name'/></td>"
+$row += "<td><t t-if='p.email'><t t-esc='p.email'/></t><t t-else=''><span class='text-danger'>-</span></t></td>"
+$row += "<td><t t-esc='p.phone || \"\"'/></td>"
+$row += "<td class='text-end'><t t-esc='p.child_ids.length'/></td>"
+$row += "</tr></t>"
+
+// Main template
+$main = "<t t-name='tm.partners_dashboard'>"
+$main += "<div class='o_action p-4 overflow-auto'>"
+$main += "<h2>Partners dashboard</h2>"
+$main += "<div class='d-flex gap-3 my-3'>"
+$main += "<t t-foreach='Object.entries(this.stats)' t-as='kv' t-key='kv[0]'>"
+$main += "<div class='card p-3 text-center'><div class='fs-1' t-esc='kv[1]'/><small t-esc='kv[0]'/></div>"
+$main += "</t></div>"
+$main += "<t t-set='shown' t-value='this.docs.slice(0, 50)'/>"
+$main += "<table class='table table-sm table-hover'>"
+$main += "<thead><tr><th>Name</th><th>Email</th><th>Phone</th><th class='text-end'>Contacts</th></tr></thead>"
+$main += "<tbody><t t-foreach='shown' t-as='p' t-key='p.id'><t t-call='tm.partner_row'/></t></tbody>"
+$main += "</table>"
+$main += "<small class='text-muted'>Showing <t t-esc='shown.length'/> of <t t-esc='this.docs.length'/></small>"
+$main += "</div></t>"
+
+qview -a ($row + $main) -t tm.partners_dashboard -m res.partner -v {stats: $stats}

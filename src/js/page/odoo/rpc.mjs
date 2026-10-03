@@ -64,7 +64,7 @@ function buildQuery(options: Partial<BuildQueryOptions>): BuildQuery {
     params.kwargs = {
       ...(params.kwargs || {}),
       ...options.kwargs,
-    }
+    };
     params.kwargs.context = options.context || params.context || params.kwargs.context;
 
     // Compatibility with Odoo 12.0-
@@ -155,14 +155,27 @@ function buildQuery(options: Partial<BuildQueryOptions>): BuildQuery {
  */
 export default async function doQuery<T>(params: Partial<BuildQueryOptions>, options: ?{[string]: mixed}): Promise<T> {
   const query = buildQuery(params);
-  const rpc_service = getOdooService('web.ajax', '@web/legacy/js/core/ajax', '@web/core/network/rpc_service', '@web/core/network/rpc');
+  const rpc_service = getOdooService(
+    'web.ajax',
+    '@web/legacy/js/core/ajax',
+    '@web/core/network/rpc_service',
+    '@web/core/network/rpc',
+  );
   if (typeof rpc_service === 'undefined') {
     return Promise.reject();
   }
-  if (Object.hasOwn(rpc_service, 'rpc')) {
-    return rpc_service.rpc(query.route, query.params, options);
-  } else if (Object.hasOwn(rpc_service, 'jsonrpc')) {
-    return rpc_service.jsonrpc(query.route, query.params, options);
+  try {
+    if (Object.hasOwn(rpc_service, 'rpc')) {
+      return await rpc_service.rpc(query.route, query.params, options);
+    } else if (Object.hasOwn(rpc_service, 'jsonrpc')) {
+      return await rpc_service.jsonrpc(query.route, query.params, options);
+    }
+    return await rpc_service.jsonRpc(query.route, 'call', query.params, options);
+  } catch (err) {
+    // Legacy (jQuery) rejections are `{message: <RPCError>, event}`: hand the real error to the caller
+    // $FlowFixMe[incompatible-use]
+    throw err && typeof err === 'object' && 'event' in err && err.message && typeof err.message === 'object'
+      ? err.message
+      : err;
   }
-  return rpc_service.jsonRpc(query.route, 'call', query.params, options);
 }

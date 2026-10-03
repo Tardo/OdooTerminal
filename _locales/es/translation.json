@@ -988,6 +988,26 @@
     "definition": "Imprimir un mensaje",
     "detail": "Evalúa los parámetros e imprime el resultado"
   },
+  "cmdQView": {
+    "args": {
+      "arch": "The QWeb templates (elements with t-name)",
+      "ids": "The record IDs for -m (default: first 80)",
+      "model": "Model whose records are passed to the render as `docs`",
+      "render": "Template to print as HTML in the terminal instead of opening it",
+      "target": "Where to open it",
+      "template": "Template to open (default: the first registered one)",
+      "values": "Extra render values"
+    },
+    "definition": "Register a volatile QWeb view (nothing is saved in the database)",
+    "detail": "Registers QWeb templates in the web client for the current page session only. t-inherit/t-extend templates extend existing ones. The view is opened as a client action (Odoo 16+; -t opens an already registered one, -r prints the HTML instead); t-inherit extensions apply the next time the target template is rendered (e.g. reopen the view); with -m the model records are passed as `docs`. In Owl 3 (Odoo 19+) access the values through `this` (e.g. this.docs).",
+    "error": {
+      "noRender": "Cannot render: QWeb renderer not found",
+      "noTemplate": "No template found: use <t t-name=\"...\">",
+      "nothingToDo": "Use -a to register templates and/or -t to open one",
+      "unsupported": "This Odoo version does not expose its QWeb templates registry"
+    },
+    "registered": "Registered: {{names}}"
+  },
   "cmdRead": {
     "args": {
       "field": "Los campos a solicitar<br/>Puede usar '*' para mostrar todos los campos",

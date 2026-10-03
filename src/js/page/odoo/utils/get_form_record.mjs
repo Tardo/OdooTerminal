@@ -36,20 +36,29 @@ function findLegacyFormController(root: Object): Object | null {
   return null;
 }
 
-// OWL (Odoo 16+): walk the component tree looking for a component whose
-// model.root has an update() method — that's the FormController's record.
+// OWL (Odoo 15+): walk the component tree looking for a component whose model.root has an update() method —
+// that's the FormController's record (16+) — or a legacy FormController behind a ViewAdapter (`widget`, 15).
+// Owl 1 (15) keeps components in `__owl__.children`, Owl 2 (16+) keeps nodes holding `.component`.
 // $FlowFixMe[unclear-type]
-function findOwlFormRoot(component: Object | null, depth: number): Object | null {
-  if (!component || depth > 20) {
+function findOwlFormRoot(component: Object | null, depth: number, legacy: boolean = false): Object | null {
+  if (!component || depth > 30) {
     return null;
   }
   try {
-    // $FlowFixMe[prop-missing]
-    const model = component.model;
-    // $FlowFixMe[prop-missing]
-    if (model?.root && typeof model.root.update === 'function') {
+    if (legacy) {
       // $FlowFixMe[prop-missing]
-      return model.root;
+      const widget = component.widget;
+      if (widget?.model?.localData && typeof widget.handle === 'string') {
+        return widget;
+      }
+    } else {
+      // $FlowFixMe[prop-missing]
+      const model = component.model;
+      // $FlowFixMe[prop-missing]
+      if (model?.root && typeof model.root.update === 'function') {
+        // $FlowFixMe[prop-missing]
+        return model.root;
+      }
     }
   } catch (_e) {
     // ignore
@@ -58,12 +67,29 @@ function findOwlFormRoot(component: Object | null, depth: number): Object | null
   const children = component.__owl__?.children ?? {};
   for (const child of Object.values(children)) {
     // $FlowFixMe[prop-missing]
-    const result = findOwlFormRoot(child?.component ?? null, depth + 1);
+    const result = findOwlFormRoot(child?.component ?? child ?? null, depth + 1, legacy);
     if (result !== null) {
       return result;
     }
   }
   return null;
+}
+
+// The service lookup may hand back a legacy adapter instead of the WebClient: also try the debug root.
+// $FlowFixMe[unclear-type]
+function getOwlRoots(): Array<Object> {
+  const roots = [];
+  try {
+    roots.push(getOdooRoot());
+  } catch (_e) {
+    // no service root
+  }
+  // $FlowFixMe[prop-missing]
+  const debugRoot = typeof odoo !== 'undefined' ? odoo.__WOWL_DEBUG__?.root : null;
+  if (debugRoot && !roots.includes(debugRoot)) {
+    roots.push(debugRoot);
+  }
+  return roots;
 }
 
 // For any many2one field whose value is a bare integer, fetch the display_name
@@ -114,8 +140,13 @@ export type FormRecordAdapter = {
 export default function getFormRecord(): FormRecordAdapter | null {
   // OWL path (Odoo 16+)
   try {
-    const root = getOdooRoot();
-    const record = findOwlFormRoot(root, 0);
+    // $FlowFixMe[unclear-type]
+    let found: Object | null = null;
+    for (const root of getOwlRoots()) {
+      found = findOwlFormRoot(root, 0);
+      if (found !== null) break;
+    }
+    const record = found;
     if (record !== null) {
       return {
         read: fields => {
@@ -159,6 +190,13 @@ export default function getFormRecord(): FormRecordAdapter | null {
     let widget = manager?.currentController?.widget ?? manager?.controllers?.[manager.controllerStack?.at(-1)]?.widget;
     if (!widget?.model?.localData || typeof widget.handle !== 'string') {
       widget = findLegacyFormController(root);
+    }
+    if (!widget?.model?.localData || typeof widget.handle !== 'string') {
+      // Odoo 15: the legacy controller lives behind a ViewAdapter of the OWL action container
+      for (const owlRoot of getOwlRoots()) {
+        widget = findOwlFormRoot(owlRoot, 0, true);
+        if (widget) break;
+      }
     }
     if (widget?.model && typeof widget.handle === 'string') {
       return {

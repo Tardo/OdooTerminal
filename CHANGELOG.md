@@ -8,6 +8,7 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ```
 ADD: Support Odoo 20.0
+ADD: command 'qview': Create volatile qweb-client views
 
 IMP: Use external @Tardo/trash package
 IMP: Command 'sysparam': Value types (odoo 20+)
