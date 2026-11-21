@@ -307,6 +307,29 @@ export default class CommandAssistant {
     };
   }
 
+  // The argument whose value is being typed (used to show its expected format)
+  getEditingArgument(data: string, caret_pos: number): ArgInfo | void {
+    const input_info = this.getInputInfo(data, caret_pos);
+    if (isEmpty(input_info) || input_info.index.current === input_info.index.cmd) {
+      return;
+    }
+    const command_info = input_info.token.cmd
+      ? this.#shell.getVM().getRegisteredCmds()[input_info.token.cmd]
+      : undefined;
+    const in_value =
+      (input_info.index.current - 1 === input_info.index.arg && input_info.token.arg) ||
+      (!input_info.token.arg && input_info.total_args === 0);
+    if (!command_info || !in_value) {
+      return;
+    }
+    const arg_key = input_info.token.arg || input_info.index.current - 1;
+    return (
+      (typeof arg_key === 'number'
+        ? getArgumentInfo(command_info.args[arg_key])
+        : getArgumentInfoByName(command_info.args, arg_key)) ?? undefined
+    );
+  }
+
   async getAvailableOptions(
     data: string,
     caret_pos: number,

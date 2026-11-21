@@ -1620,6 +1620,9 @@
         "placeholder": "Instrucciones adicionales para la IA en esta conversación..."
       }
     },
+    "assistant": {
+      "format": "Formato"
+    },
     "close": {
       "prevented": "El terminal ha impedido que la pestaña actual se cierre debido a tareas inacabadas:"
     },

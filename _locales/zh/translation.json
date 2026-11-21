@@ -1620,6 +1620,9 @@
         "placeholder": "此对话中给 AI 的额外指令..."
       }
     },
+    "assistant": {
+      "format": "格式"
+    },
     "close": {
       "prevented": "由于未完成的任务，终端已阻止当前标签页关闭："
     },

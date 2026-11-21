@@ -1620,6 +1620,9 @@
         "placeholder": "Extra instructions for the AI in this conversation..."
       }
     },
+    "assistant": {
+      "format": "Format"
+    },
     "close": {
       "prevented": "The terminal has prevented the current tab from closing due to unfinished tasks:"
     },

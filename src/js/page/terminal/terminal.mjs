@@ -41,6 +41,7 @@ import type {EvalOptions} from '@tardo/trash/vmachine';
 import type {JobMetaInfo} from './shell';
 import type {ExtensionSettings} from '@common/constants';
 import type {CMDAssistantOption} from './core/command_assistant';
+import type {ArgInfo} from '@tardo/trash/interpreter';
 export type TerminalOptions = {
   ...ExtensionSettings,
 };
@@ -123,6 +124,7 @@ export default class Terminal {
   #commandAssistant: CommandAssistant;
   #assistantOptions: Array<CMDAssistantOption>;
   #assistantOptionsTotalCount = 0;
+  #assistantEditingArg: ArgInfo | void;
   #selAssistanOption: number = -1;
 
   #wasStart = false;
@@ -1310,10 +1312,15 @@ export default class Terminal {
     return this.#mutexAvailableOptions
       .runExclusive(async () => {
         const user_input = this.screen.getUserInput();
+        this.#assistantEditingArg = undefined;
         if (typeof user_input === 'undefined' || user_input.length === 0) {
           // $FlowFixMe[missing-empty-array-annot]
           return [];
         }
+        this.#assistantEditingArg = this.#commandAssistant.getEditingArgument(
+          user_input,
+          this.screen.getInputCaretStartPos(),
+        );
         return await this.#commandAssistant.getAvailableOptions(
           user_input,
           this.screen.getInputCaretStartPos(),
@@ -1329,6 +1336,7 @@ export default class Terminal {
           this.#assistantOptions,
           this.#selAssistanOption,
           this.#assistantOptionsTotalCount,
+          this.#assistantEditingArg,
         );
       });
   }
@@ -1692,6 +1700,7 @@ export default class Terminal {
       this.#assistantOptions,
       this.#selAssistanOption,
       this.#assistantOptionsTotalCount,
+      this.#assistantEditingArg,
     );
   }
 
