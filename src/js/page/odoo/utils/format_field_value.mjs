@@ -12,6 +12,10 @@ export default function formatFieldValue(raw: mixed): string {
     // many2one: [id, display_name]
     return String(raw[1] ?? raw[0]);
   }
+  if (typeof raw === 'object' && typeof raw.display_name === 'string' && 'id' in raw) {
+    // many2one (Odoo 19+): {id, display_name}
+    return raw.display_name;
+  }
   if (typeof raw === 'object') {
     // Some field values (e.g. an OWL datapoint/reactive record with parent<->children back-
     // references) are genuinely circular — JSON.stringify throws on those ("cyclic object value"

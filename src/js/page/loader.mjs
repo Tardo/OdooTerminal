@@ -123,7 +123,7 @@ async function initTerminal(config: TerminalOptions, info: {[string]: mixed}) {
   const term_obj = getTerminalObj();
   if (term_obj) {
     term_obj.getShell().registerVMCommands(loadVMFunctions);
-    let lazy_loader_obj = getOdooService("@web/legacy/js/public/lazyloader");
+    let lazy_loader_obj = getOdooService("@web/legacy/js/public/lazyloader", "@web/public/lazyloader");
     if (typeof lazy_loader_obj !== 'undefined') {
       // Caching call: see command implementation for more details.
       await getUID(config.elephant);

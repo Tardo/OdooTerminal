@@ -15,12 +15,19 @@ import type Terminal from '@odoo/terminal';
 async function cmdUserHasGroups(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 18) {
-    return callModelMulti<boolean>('res.users', [await getUID(true)], 'has_group', [kwargs.group.join(',')], null, await this.getContext()).then(
-      result => {
-        ctx.screen.print(result);
-        return result;
-      },
+    // has_group only takes one group: emulate user_has_groups ('!' negates, any match wins)
+    const uid = await getUID(true);
+    const context = await this.getContext();
+    const results = await Promise.all(
+      kwargs.group.map(async (group: string) => {
+        const negate = group.startsWith('!');
+        const res = await callModelMulti<boolean>('res.users', [uid], 'has_group', [negate ? group.substr(1) : group], null, context);
+        return negate ? !res : res;
+      }),
     );
+    const result = results.some(Boolean);
+    ctx.screen.print(result);
+    return result;
   }
   return callModel<boolean>('res.users', 'user_has_groups', [kwargs.group.join(',')], null, await this.getContext()).then(
     result => {

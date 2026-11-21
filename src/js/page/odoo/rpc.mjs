@@ -77,10 +77,9 @@ function buildQuery(options: Partial<BuildQueryOptions>): BuildQuery {
   }
 
   const version = getOdooVersion('major');
-  if (
-    !(typeof version === 'number' && version >= 20) &&
-    (options.method === 'read_group' || options.method === 'web_read_group')
-  ) {
+  // Old (fields/lazy/orderby) signatures: read_group until 19, web_read_group until 18
+  const ver = typeof version === 'number' ? version : 0;
+  if ((options.method === 'read_group' && ver < 20) || (options.method === 'web_read_group' && ver < 19)) {
     if (!(params.args && typeof params.args[0] !== 'undefined')) {
       params.kwargs.domain = options.domain || params.domain || params.kwargs.domain || [];
     }

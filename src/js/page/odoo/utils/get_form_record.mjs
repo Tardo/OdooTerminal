@@ -4,6 +4,7 @@
 
 import getOdooRoot from './get_odoo_root';
 import callModel from '@odoo/osv/call_model';
+import getOdooVersion from './get_odoo_version';
 
 type FieldDef = {type?: string, relation?: string};
 
@@ -95,6 +96,12 @@ function getOwlRoots(): Array<Object> {
 // For any many2one field whose value is a bare integer, fetch the display_name
 // and convert to [id, display_name] — the canonical Odoo wire format understood
 // by both RelationalModel.root.update and legacy trigger_up('field_changed').
+// Odoo 19+ Record expects many2one values as {id, display_name}, older versions as [id, display_name]
+function m2oValue(id: number, display_name: string): mixed {
+  const ver = getOdooVersion('major');
+  return typeof ver === 'number' && ver >= 19 ? {id, display_name} : [id, display_name];
+}
+
 async function enrichMany2oneValues(
   fields: {[string]: FieldDef},
   changes: {[string]: mixed},
@@ -117,10 +124,13 @@ async function enrichMany2oneValues(
           context,
         );
         const displayName: mixed = rows[0]?.display_name;
-        result[fieldName] = [value, typeof displayName === 'string' ? displayName : String(value)];
+        result[fieldName] = m2oValue(value, typeof displayName === 'string' ? displayName : String(value));
       } catch (_e) {
-        result[fieldName] = [value, String(value)];
+        result[fieldName] = m2oValue(value, String(value));
       }
+    } else if (fieldDef?.type === 'many2one' && Array.isArray(value) && typeof value[0] === 'number') {
+      // Given as [id, display_name]
+      result[fieldName] = m2oValue(value[0], String(value[1] ?? value[0]));
     } else {
       result[fieldName] = value;
     }

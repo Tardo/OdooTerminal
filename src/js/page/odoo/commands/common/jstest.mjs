@@ -5,6 +5,7 @@
 import i18n from 'i18next';
 import {ARG} from '@tardo/trash/constants';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
+import getOdooVersion from '@odoo/utils/get_odoo_version';
 import type {CMDCallbackArgs, CMDDef} from '@tardo/trash/interpreter';
 import type Terminal from '@odoo/terminal';
 
@@ -14,6 +15,21 @@ async function cmdJSTest(kwargs: CMDCallbackArgs) {
     mod = '';
   }
   let url = '/web/tests';
+  const OdooVerMajor = getOdooVersion('major');
+  if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 18) {
+    // Hoot: the module is the '@module' suite, filtered by its hash id (see web/tests/test_js.py)
+    url += `?preset=${kwargs.device}`;
+    if (mod) {
+      let hash = 0;
+      const suite = `@${String(mod)}`;
+      for (let i = 0; i < suite.length; ++i) {
+        hash = (Math.imul(hash, 31) + suite.charCodeAt(i)) >>> 0;
+      }
+      url += `&id=${hash.toString(16).padStart(8, '0')}`;
+    }
+    window.location = url;
+    return;
+  }
   if (kwargs.device === 'mobile') {
     url += '/mobile';
   }

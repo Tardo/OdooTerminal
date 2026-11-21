@@ -852,6 +852,7 @@
     "definition": "Inicia sesión como...",
     "detail": "Inicie sesión como el usuario indicado",
     "error": {
+      "mfa": "No se puede iniciar sesión: el usuario requiere un paso de autenticación adicional (2FA). Usa /web/login.",
       "notSession": "No se pudo encontrar información de la sesión",
       "unknownDB": "Base de datos activa desconocida. Intente utilizar el comando '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>'"
     },

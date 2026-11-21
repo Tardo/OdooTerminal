@@ -5,12 +5,13 @@
 import i18n from 'i18next';
 import getSessionInfo from '@odoo/net_utils/get_session_info';
 import getOdooSession from '@odoo/utils/get_odoo_session';
+import {getOdooUserContext} from '@odoo/utils/get_odoo_user';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
 async function cmdContextOperation(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<mixed> {
-  let user_context = getOdooSession()?.user_context ?? (await getSessionInfo())?.user_context;
+  let user_context = getOdooSession()?.user_context ?? getOdooUserContext() ?? (await getSessionInfo())?.user_context;
   if (typeof user_context === 'undefined') {
     throw new Error(
       i18n.t('cmdContext.error.notSession', 'Cannot find session information')

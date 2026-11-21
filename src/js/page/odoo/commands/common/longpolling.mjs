@@ -49,11 +49,11 @@ async function cmdLongpolling(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDC
     if (kwargs.operation === 'subscribe') {
       // $FlowFixMe[incompatible-use]
       this.longpolling.subscribe(subs_name);
-      ctx.screen.print(i18n.t('cmdLongpolling.result.subscribe', "Subscribed to '{{subscription}}'"), {subscription: subs_name});
+      ctx.screen.print(i18n.t('cmdLongpolling.result.subscribe', "Subscribed to '{{subscription}}'", {subscription: subs_name}));
     } else {
       // $FlowFixMe[incompatible-use]
       this.longpolling.unsubscribe(subs_name);
-      ctx.screen.print(i18n.t('cmdLongpolling.result.unsubscribe', "Unsubscribed from '{{subscription}}'"), {subscription: subs_name});
+      ctx.screen.print(i18n.t('cmdLongpolling.result.unsubscribe', "Unsubscribed from '{{subscription}}'", {subscription: subs_name}));
     }
   }
 }

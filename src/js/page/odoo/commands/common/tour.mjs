@@ -9,6 +9,9 @@ import getOdooService from '@odoo/utils/get_odoo_service';
 import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
 
+// Odoo 18, 19, 20
+const TOUR_STATE_MODULES = ['@web_tour/tour_service/tour_state', '@web_tour/js/tour_state', '@web_tour/tour_state'];
+
 function getTourObj() {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
@@ -27,11 +30,16 @@ function getTourNames(only_active: boolean = false): $ReadOnlyArray<string> {
   const OdooVerMajor = getOdooVersion('major');
   if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 17) {
     if (only_active) {
-      const tour_state_obj = getOdooService('@web_tour/tour_service/tour_state');
+      const tour_state_obj = getOdooService(...TOUR_STATE_MODULES);
       if (!tour_state_obj) {
         throw new Error(i18n.t('cmdTour.error.notAccesible', "tour not accesible! Can't use it in this moment."));
       }
       const {tourState} = tour_state_obj;
+      // Odoo 19+ only keeps one running tour
+      if (typeof tourState.getActiveTourNames !== 'function') {
+        const current = tourState.getCurrentTour();
+        return current ? [current] : [];
+      }
       return tourState.getActiveTourNames();
     }
     if (typeof tour_obj.getSortedTours === 'function') {
@@ -68,7 +76,7 @@ function runTour(name: string) {
 async function cmdRunTour(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   if (kwargs.name) {
     if (kwargs.clear) {
-      const tour_state_obj = getOdooService('@web_tour/tour_service/tour_state');
+      const tour_state_obj = getOdooService(...TOUR_STATE_MODULES);
       if (!tour_state_obj) {
         throw new Error(i18n.t('cmdTour.error.notAccesible', "tour not accesible! Can't use it in this moment."));
       }
