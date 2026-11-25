@@ -139,6 +139,7 @@ export default class Terminal {
   #assistantOptionsTrailingPending: boolean = false;
 
   #isAIMode: boolean = false;
+  #isTrustedSite: boolean = false;
   // Installed by the AI agent for the duration of a run so unsafe commands are
   // confirmed at their real invocation point (see Shell/VMachine wiring). Null
   // for manual/init execution, which runs unsafe commands without prompting
@@ -270,6 +271,10 @@ export default class Terminal {
     // $FlowFixMe[method-unbinding]
     this.el.addEventListener('toggle', this.#onTerminalToggle.bind(this));
 
+    this.el.querySelector('.terminal-ai-untrusted-options')?.addEventListener('click', () => {
+      postMessage('ODOO_TERM_OPEN_OPTIONS', {});
+    });
+
     // AI sidebar state
     const aiConvListEl = this.el.querySelector('#terminal_ai_conv_list');
     if (aiConvListEl instanceof HTMLElement) {
@@ -371,6 +376,14 @@ export default class Terminal {
     window.addEventListener('click', this.onCoreClick.bind(this));
     // $FlowFixMe[method-unbinding]
     window.addEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
+    // $FlowFixMe[method-unbinding]
+    this.addMessageListener('ODOO_TERM_TRUST_RESULT', this.#onTrustResult.bind(this));
+    // The user may come back from adding the site in the options page
+    window.addEventListener('focus', () => {
+      if (this.#isAIMode && !this.#isTrustedSite) {
+        postMessage('ODOO_TERM_TRUST_CHECK', {});
+      }
+    });
     this.#bindElListeners();
     this.#isAIMode = getStorageSessionItem('terminal_ai_mode', false);
     this.#activeConvId = getStorageSessionItem('terminal_ai_active_conv', null);
@@ -387,7 +400,7 @@ export default class Terminal {
       this.#renderAIConvList();
       this.#syncSyspromptPanel();
       this.#syncAIRunSettingsForConv(this.#activeConvId);
-      this.#ensureAIModelsLoaded();
+      this.#checkTrustedSite();
     }
     this.#updateAIIdleEffect();
 
@@ -530,21 +543,6 @@ export default class Terminal {
     this.#commandAssistant = new CommandAssistant(this);
     this.#bindScreen();
     this.onStart();
-  }
-
-  // The terminal object should be never destroyed
-  end() {
-    if (typeof this.#observer !== 'undefined') {
-      this.#observer.disconnect();
-    }
-    // $FlowFixMe[method-unbinding]
-    window.removeEventListener('keydown', this.#onCoreKeyDown.bind(this));
-    // $FlowFixMe[method-unbinding]
-    window.removeEventListener('click', this.onCoreClick.bind(this));
-    // $FlowFixMe[method-unbinding]
-    window.removeEventListener('beforeunload', this.#onCoreBeforeUnload.bind(this), true);
-    // $FlowFixMe[method-unbinding]
-    this.el.removeEventListener('toggle', this.#onTerminalToggle.bind(this));
   }
 
   /* BASIC FUNCTIONS */
@@ -1846,6 +1844,30 @@ export default class Terminal {
     this.#applyAIModel(selectEl.value);
   }
 
+  #checkTrustedSite() {
+    this.#isTrustedSite = false;
+    postMessage('ODOO_TERM_TRUST_CHECK', {});
+  }
+
+  async #onTrustResult(data: MessageListenerData): Promise<mixed> {
+    this.#isTrustedSite = data.trusted === true;
+    const warning = this.el.querySelector('.terminal-ai-untrusted');
+    if (warning) {
+      const text = warning.querySelector('.terminal-ai-untrusted-text');
+      if (text) {
+        text.textContent = i18n.t(
+          'terminal.ai.untrusted.warning',
+          'This site is not trusted: the AI will not work here. Add {{origin}} to "Trusted Sites" in the extension options.',
+          {origin: window.location.origin, interpolation: {escapeValue: false}},
+        );
+      }
+      warning.toggleAttribute('hidden', this.#isTrustedSite);
+    }
+    if (this.#isTrustedSite && this.#isAIMode) {
+      this.#ensureAIModelsLoaded();
+    }
+  }
+
   // Fetches the live model list for the given provider the first time it's needed
   // (provider switch, or entering AI mode) instead of on every page load.
   #ensureAIModelsLoaded() {
@@ -2034,7 +2056,7 @@ export default class Terminal {
         this.#syncInputDisabled();
         this.#syncSyspromptPanel();
         this.#syncAIRunSettingsForConv(activeId);
-        this.#ensureAIModelsLoaded();
+        this.#checkTrustedSite();
       } else {
         this.el.classList.remove('terminal-ai-mode');
         target.classList.remove('btn-light');

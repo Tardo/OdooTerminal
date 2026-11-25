@@ -2,6 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
+import encodeHTML from '@terminal/utils/encode_html';
 import i18n from 'i18next';
 import {getStorageItem, setStorageItem} from '@terminal/core/storage/local';
 import isEmpty from '@tardo/trash/utils/is_empty';
@@ -17,7 +18,7 @@ async function cmdAlias(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbac
     } else {
       for (const alias_name in aliases) {
         // $FlowFixMe[invalid-computed-prop]
-        ctx.screen.print(` - ${alias_name}  <small class="text-muted"><i>${aliases[alias_name]}</i></small>`);
+        ctx.screen.print(` - ${encodeHTML(alias_name)}  <small class="text-muted"><i>${encodeHTML(aliases[alias_name])}</i></small>`);
       }
     }
     return aliases;

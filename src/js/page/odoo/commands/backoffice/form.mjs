@@ -114,6 +114,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdForm.definition', 'Interact with the current form view (get, edit, save, highlight, clear)'),
     callback: cmdForm,
+    unsafe: true,
     detail: i18n.t(
       'cmdForm.detail',
       'get: returns in-memory field values. edit: sets field values in the open form in-memory record (fires onchanges, does not save). save: persists the current form record to the database. highlight: visually marks a field, activating its notebook tab if needed. clear: removes highlights (all fields, or just -f if given).',

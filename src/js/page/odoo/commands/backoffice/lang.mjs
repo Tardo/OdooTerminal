@@ -136,7 +136,7 @@ async function cmdLang(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallback
       await this.getContext(),
     );
     for (const lang of langs) {
-      ctx.screen.print(` - ${lang[0]} (${lang[1]})`);
+      ctx.screen.eprint(` - ${lang[0]} (${lang[1]})`);
     }
     return langs;
   }
@@ -175,6 +175,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdLang.definition', 'Operations over translations'),
     category: 'system',
     callback: cmdLang,
+    unsafe: true,
     options: getOptions,
     detail: i18n.t('cmdLang.detail', 'export: downloads a .po/.csv translation file for a module. import: uploads a translation file from disk. list: prints installed language codes and names. Without extra args, export/import open the Odoo wizard instead.'),
     args: [

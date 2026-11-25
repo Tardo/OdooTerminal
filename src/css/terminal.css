@@ -1460,6 +1460,28 @@
   color: var(--terminal-color-primary);
 }
 
+.o_terminal .terminal-ai-untrusted {
+  border: 1px solid var(--terminal-color-warning);
+  color: var(--terminal-color-warning);
+  font-size: x-small;
+  margin: 8px;
+  overflow-wrap: anywhere;
+  padding: 8px;
+}
+.o_terminal .terminal-ai-untrusted[hidden] {
+  display: none;
+}
+.o_terminal .terminal-ai-untrusted button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  text-decoration: underline;
+}
+
 /* === AI Mode button === */
 .o_terminal .terminal-screen-icon-ai-mode {
   overflow: visible !important;

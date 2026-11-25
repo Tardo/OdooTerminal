@@ -65,6 +65,7 @@ export function useSettings(): SettingsStore {
       // Ensure array-type settings are always arrays (migration from older versions)
       if (!Array.isArray(next.ai_models)) next.ai_models = [];
       if (!Array.isArray(next.ai_custom_skills)) next.ai_custom_skills = [];
+      if (!Array.isArray(next.trusted_origins)) next.trusted_origins = [];
       settings.value = next;
       takeSnapshot();
       hasChanges.value = false;

@@ -26,8 +26,10 @@
       },
       "relayFetch": {
         "error": {
+          "endpoint": "{{url}} no corresponde a ningún proveedor de IA ni servidor MCP configurado en las opciones de la extensión.",
           "missingPermission": "Falta permiso del navegador para contactar con {{url}}. Abre la página de Opciones de la extensión (sección Proveedores de IA) y usa \"Grant access\" para esta URL, luego vuelve a intentarlo.",
-          "unknown": "La solicitud a la IA falló"
+          "unknown": "La solicitud a la IA falló",
+          "untrusted": "Este sitio no puede usar la IA. Añade {{url}} a \"Sitios de confianza\" en las opciones de la extensión e inténtalo de nuevo."
         }
       }
     }
@@ -1582,6 +1584,11 @@
   "optionsTitleThemePreset": "Tema predefinido",
   "optionsTitleThemePresetCustom": "Personalizado",
   "optionsTitleThemeRemove": "Eliminar",
+  "optionsTitleTrustedSites": "Sitios de confianza",
+  "optionsTitleTrustedSitesDescription": "Solo estos sitios pueden usar tus proveedores de IA y servidores MCP, hacer capturas de pantalla y usar los comandos \"copy\" y \"paste\".",
+  "optionsTrustedSitesAdd": "Añadir sitio",
+  "optionsTrustedSitesInvalid": "Introduce una URL completa (p. ej. https://mi.odoo.com)",
+  "optionsTrustedSitesUrl": "URL del sitio",
   "optionsUnsavedChanges": "Cambios sin guardar",
   "optionsWarningAIModelsKeys": "Advertencia: Las claves de API se almacenan en el almacenamiento del navegador.",
   "terminal": {
@@ -1618,6 +1625,10 @@
       "sysprompt": {
         "label": "Instrucciones personalizadas",
         "placeholder": "Instrucciones adicionales para la IA en esta conversación..."
+      },
+      "untrusted": {
+        "openOptions": "Abrir las opciones de la extensión",
+        "warning": "Este sitio no es de confianza: la IA no funcionará aquí. Añade {{origin}} a \"Sitios de confianza\" en las opciones de la extensión."
       }
     },
     "assistant": {

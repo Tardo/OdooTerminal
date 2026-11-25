@@ -20,6 +20,9 @@ import isCompatibleOdooVersion from '@common/utils/is_compatible_odoo_version';
 import rpcQuery from '@odoo/rpc';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import getSessionInfo from '@odoo/net_utils/get_session_info';
+import {compressHistory} from '@ai/utils/compress_history';
+import {buildMCPToolName, parseJSONRPCBody} from '@ai/mcp/client';
+import {isTrustedOrigin, redactSettings, resolveHeaders} from '@shared/relay_policy';
 import Screen, {LINE_SELECTOR} from '@terminal/core/screen';
 import asyncSleep from '@terminal/utils/async_sleep';
 
@@ -70,6 +73,73 @@ export default class TestRegressions extends TerminalTestSuite {
     } finally {
       screen.destroy();
     }
+  }
+
+  async test_parse_html_sanitize() {
+    const el = parseHTML('<span><img src="x" onerror="alert(1)"><a href=" java\nscript:alert(1)">a</a><b>b</b><script>1</script></span>');
+    this.assertEqual(el.querySelector('img')?.hasAttribute('onerror'), false);
+    this.assertEqual(el.querySelector('a')?.hasAttribute('href'), false);
+    this.assertEqual(el.querySelector('script'), null);
+    this.assertEqual(el.querySelector('b')?.textContent, 'b');
+  }
+
+  async test_ai_compress_history() {
+    const messages: Array<AIMessage> = ['system', 'old question', 'old answer', 'current question'].map(content => ({role: 'user', content}));
+    for (let i = 0; i < 6; ++i) {
+      messages.push({role: 'assistant', content: `call ${i}`}, {role: 'user', content: `result ${i}`});
+    }
+    const res = compressHistory(messages, 3).map(msg => msg.content);
+    this.assertEqual(res[0], 'system');
+    this.assertEqual(res[1], 'current question');
+    this.assertEqual(res[2], 'call 2');
+    this.assertEqual(res.length, 10);
+  }
+
+  async test_ai_mcp_client() {
+    const raw = 'data: {"method":"notifications/progress"}\n\ndata: {"id":7,"result":"ok"}\n\n';
+    // $FlowFixMe[incompatible-use]
+    this.assertEqual(parseJSONRPCBody(raw, 'text/event-stream', 7)?.result, 'ok');
+    const used: Map<string, mixed> = new Map();
+    const long_name = 'x'.repeat(80);
+    for (let i = 0; i < 3; ++i) {
+      const name = buildMCPToolName('srv', long_name, used);
+      this.assertTrue(name.length <= 64 && !used.has(name));
+      used.set(name, true);
+    }
+  }
+
+  async test_relay_policy() {
+    const settings = {
+      ai_models: [{name: 'My AI', url: 'https://ai.test/v1/', api_key: 'SECRET'}],
+      mcp_servers: [],
+      trusted_origins: ['https://odoo.test'],
+    };
+    const redacted = redactSettings(settings);
+    this.assertFalse(JSON.stringify(redacted).includes('SECRET'));
+    this.assertEqual(redacted.trusted_origins.length, 0);
+    const headers = {Authorization: `Bearer ${redacted.ai_models[0].api_key}`};
+    this.assertEqual(resolveHeaders('https://ai.test/v1/models', headers, settings)?.Authorization, 'Bearer SECRET');
+    for (const url of ['https://ai.test/v1/../x', 'https://ai.test/v10', 'https://ai.test.evil/v1/x', 'http://ai.test/v1/x']) {
+      this.assertEqual(resolveHeaders(url, headers, settings), null, url);
+    }
+    this.assertTrue(isTrustedOrigin('https://odoo.test/web#x', settings));
+    this.assertFalse(isTrustedOrigin('https://odoo.test.evil/', settings));
+  }
+
+  async test_agent_unsafe_commands() {
+    const cmds = this.terminal.getShell().getVM().getRegisteredCmds();
+    for (const name of ['write', 'create', 'unlink', 'call', 'paste', 'click', 'fill', 'login', 'qview', 'form', 'lang']) {
+      if (Object.hasOwn(cmds, name)) {
+        this.assertEqual(cmds[name].unsafe, true, name);
+      }
+    }
+  }
+
+  // Needs this site in the "Trusted Sites" option
+  async test_copy_paste() {
+    await this.terminal.execute(`copy -d "${'x'.repeat(9000)}"`, false, true);
+    const res = await this.terminal.execute('paste', false, true);
+    this.assertEqual(res?.length, 9000);
   }
 
   async test_rpc_promise() {

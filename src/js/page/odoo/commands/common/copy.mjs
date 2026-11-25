@@ -12,18 +12,23 @@ import type Terminal from '@odoo/terminal';
 function onMessageCopyDone(
   this: Terminal,
   resolve: (mixed) => void,
+  reject: (Error) => void,
   ctx: CMDCallbackContext,
   data: {[string]: mixed},
 ): Promise<> {
   // This is necessary due to 'bound' function usage
-  this.removeMessageListener('ODOO_TERM_COPY_DONE', onMessageCopyDone.bind(this, resolve, ctx));
+  this.removeMessageListener('ODOO_TERM_COPY_DONE', onMessageCopyDone.bind(this, resolve, reject, ctx));
+  if (typeof data.error === 'string') {
+    // $FlowFixMe[incompatible-type]
+    return reject(new Error(data.error));
+  }
   ctx.screen.print(i18n.t('cmdCopy.result.dateCopied', 'Data copied!'));
   // $FlowFixMe[incompatible-type]
   return resolve(data.values);
 }
 
 function cmdCopy(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<> {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     const vals: {[string]: mixed} = {
       type: 'var',
       data: JSON.stringify(kwargs.data),
@@ -33,8 +38,8 @@ function cmdCopy(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContex
       vals.type = 'model';
       vals.model = kwargs.data.model;
     }
-    this.addMessageListener('ODOO_TERM_COPY_DONE', onMessageCopyDone.bind(this, resolve, ctx));
-    postMessage('ODOO_TERM_COPY', vals);
+    this.addMessageListener('ODOO_TERM_COPY_DONE', onMessageCopyDone.bind(this, resolve, reject, ctx));
+    postMessage('ODOO_TERM_COPY', {values: vals});
   });
 }
 
@@ -47,6 +52,6 @@ export default function (): Partial<CMDDef> {
       [ARG.Any, ['d', 'data'], true, i18n.t('cmdCopy.args.data', 'The data')],
       [ARG.String, ['t', 'type'], false, i18n.t('cmdCopy.args.type', 'The type of data'), 'auto', ['auto', 'var']],
     ],
-    example: '-t model -d (search res.partner -f *)',
+    example: '-d (search res.partner -f *)',
   };
 }

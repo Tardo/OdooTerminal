@@ -29,6 +29,8 @@ import type Terminal from '@odoo/terminal';
 // model writes instead of passing them through. heading/lheading/table are all styled in
 // terminal.css, so they're left enabled.
 const mdConverter = new MarkdownIt({breaks: true, html: false});
+// Images load on render: a prompt injection could use the URL to leak data.
+mdConverter.disable('image');
 
 const AGENT_TOOLS: Array<AIToolDef> = [
   {
@@ -90,6 +92,18 @@ const AGENT_TOOLS: Array<AIToolDef> = [
 
 
 export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promise<Array<AIMessage>> {
+  const run = new AbortController();
+  aiRuntime.run = run;
+  try {
+    return await runAgent.call(this, kwargs, ctx, run.signal);
+  } finally {
+    if (aiRuntime.run === run) {
+      aiRuntime.run = null;
+    }
+  }
+}
+
+async function runAgent(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext, runSignal: AbortSignal): Promise<Array<AIMessage>> {
   if (aiState.url === null || aiState.url === undefined) {
     throw new Error(i18n.t('cmdAI.agent.error.notConfigured', 'Not connected. Use "ai connect" first'));
   }
@@ -201,7 +215,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
       const tools = await listMCPTools(server, discovery.signal);
       const slug = slugifyServerName(server.name);
       for (const tool of tools) {
-        const fullName = buildMCPToolName(slug, tool.name);
+        const fullName = buildMCPToolName(slug, tool.name, mcpToolMap);
         mcpToolMap.set(fullName, {server, toolName: tool.name});
         mcpToolDefs.push({
           name: fullName,
@@ -258,6 +272,7 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     {role: 'user', content: userContent},
   ];
 
+  let currentUserIdx = messages.length - 1;
   const loadedSkills: Set<string> = new Set();
   let cmdExecutedCount = 0;
   let cmdSuccessCount = 0;
@@ -331,6 +346,15 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
   startThinking(1);
 
   for (let step = 0; step < maxSteps; step++) {
+    if (runSignal.aborted) {
+      if (thinkTimer !== null) {
+        clearInterval(thinkTimer);
+      }
+      thinkLive?.update(thinkingBaseMsg);
+      ctx.screen.print(i18n.t('ai.utils.network.error.aborted', 'Request cancelled.'));
+      printTokenUsage();
+      return messages.slice(1);
+    }
     aiRuntime.controller = startRequest(timeoutSecs);
 
     let text = '';
@@ -447,6 +471,11 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
     const siblingDocBlocks: Array<AIContentBlock> = [];
 
     for (const tc of toolCalls) {
+      if (runSignal.aborted) {
+        // Every tool call needs its result to keep the history valid
+        toolResults.push({type: 'tool_result', tool_use_id: tc.id, content: 'Cancelled by the user.'});
+        continue;
+      }
       if (tc.name === 'run_command') {
         const cmd = String(tc.input.cmd ?? '').trim();
         const reason = String(tc.input.reason ?? '');
@@ -677,6 +706,8 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
         );
 
         const callController = startRequest(server.timeout || 30);
+        const abortCall = () => callController.abort('user');
+        runSignal.addEventListener('abort', abortCall);
         try {
           const {text: mcpText, isError} = await callMCPTool(server, toolName, tc.input, callController.signal);
           let outputStr = mcpText || (isError ? 'MCP tool failed with no message' : '(no output)');
@@ -695,6 +726,8 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
             tool_use_id: tc.id,
             content: `MCP tool call failed: ${err.message}`,
           });
+        } finally {
+          runSignal.removeEventListener('abort', abortCall);
         }
 
       } else {
@@ -762,7 +795,8 @@ export default async function cmdAIAgent(this: Terminal, kwargs: CMDCallbackArgs
 
     // Compress history when approaching the provider's context window limit.
     if (shouldCompress(lastContextSize, aiState.provider)) {
-      const compressed = compressHistory(messages);
+      const compressed = compressHistory(messages, currentUserIdx);
+      currentUserIdx = 1;
       messages.splice(0, messages.length, ...compressed);
       if (aiState.provider === 'anthropic') {
         rollingBreakpointMsgIdx = messages.length - 1;

@@ -2,6 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
+import encodeHTML from '@terminal/utils/encode_html';
 import i18n from 'i18next';
 
 export default function (
@@ -13,11 +14,11 @@ export default function (
   xmlid: string,
 ): string {
   return (
-    `<span class='text-info'>${i18n.t('odoo.templates.metadata.createUID', 'Create UID')}</span>: ${create_uid}<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.createUID', 'Create UID')}</span>: ${encodeHTML(String(create_uid))}<br>` +
     `<span class='text-info'>${i18n.t('odoo.templates.metadata.createDate', 'Create Date')}</span>: ${create_date}<br>` +
-    `<span class='text-info'>${i18n.t('odoo.templates.metadata.writeUID', 'Write UID')}</span>: ${write_uid}<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.writeUID', 'Write UID')}</span>: ${encodeHTML(String(write_uid))}<br>` +
     `<span class='text-info'>${i18n.t('odoo.templates.metadata.writeDate', 'Write Date')}</span>: ${write_date}<br>` +
     `<span class='text-info'>${i18n.t('odoo.templates.metadata.noUpdate', 'No Update')}</span>: ${noupdate ? i18n.t('Yes', 'Yes') : i18n.t('No', 'No')}<br>` +
-    `<span class='text-info'>${i18n.t('odoo.templates.metadata.xmlID', 'XML-ID')}</span>: ${xmlid}`
+    `<span class='text-info'>${i18n.t('odoo.templates.metadata.xmlID', 'XML-ID')}</span>: ${encodeHTML(String(xmlid))}`
   );
 }

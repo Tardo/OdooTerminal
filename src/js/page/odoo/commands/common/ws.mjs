@@ -18,7 +18,7 @@ async function cmdWebSocket(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
       socket.send('initialized');
     };
     socket.onmessage = ev => {
-      ctx.screen.print(`[${url}] ${new String(ev.data).toString()}`);
+      ctx.screen.eprint(`[${url}] ${new String(ev.data).toString()}`);
     };
     socket.onclose = ev => {
       if (ev.wasClean) {

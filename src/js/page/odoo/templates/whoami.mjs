@@ -2,6 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
+import encodeHTML from '@terminal/utils/encode_html';
 import i18n from 'i18next';
 
 export default function (
@@ -14,10 +15,10 @@ export default function (
   groups: $ReadOnlyArray<string>,
 ): string {
   return (
-    `<span class='text-info'>${i18n.t('odoo.templates.whoami.login', 'Login')}</span>: ${login}<br>` +
-    `<span class='text-info'>${i18n.t('odoo.templates.whoami.user', 'User')}</span>: ${display_name} (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.users ${user_id}'>#${user_id}</span>)<br>` +
-    `<span class='text-info'>${i18n.t('odoo.templates.whoami.partner', 'Partner')}</span>: ${partner[1]} (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.partner ${partner[0]}'>#${partner[0]}</span>)<br>` +
-    `<span class='text-info'>${i18n.t('odoo.templates.whoami.activeCompany', 'Active Company')}</span>: ${company[1]} (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.company ${company[0]}'>#${company[0]}</span>)<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.whoami.login', 'Login')}</span>: ${encodeHTML(login)}<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.whoami.user', 'User')}</span>: ${encodeHTML(display_name)} (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.users ${user_id}'>#${user_id}</span>)<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.whoami.partner', 'Partner')}</span>: ${encodeHTML(partner[1])} (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.partner ${partner[0]}'>#${partner[0]}</span>)<br>` +
+    `<span class='text-info'>${i18n.t('odoo.templates.whoami.activeCompany', 'Active Company')}</span>: ${encodeHTML(company[1])} (<span class='o_terminal_click o_terminal_cmd' data-cmd='view res.company ${company[0]}'>#${company[0]}</span>)<br>` +
     `<span class='text-info'>${i18n.t('odoo.templates.whoami.inCompanies', 'In Companies')}</span>: ${companies.join('')}<br>` +
     `<span class='text-info'>${i18n.t('odoo.templates.whoami.inGroups', 'In Groups')}</span>: ${groups.join()}`
   );

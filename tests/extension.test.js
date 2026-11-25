@@ -43,6 +43,49 @@ describe('OdooTerminal', () => {
     await page.waitForSelector('#terminal', {visible: true});
   });
 
+  it('protects the API keys and requires trusted sites', async () => {
+    const options = await browser.newPage();
+    await options.goto(optionsUrl);
+    await options.evaluate(() =>
+      chrome.storage.local.set({ai_models: [{name: 'x', url: 'https://ai.test', api_key: 'SECRET'}]}),
+    );
+    const ask = (type, reply) =>
+      page.evaluate(
+        (msg_type, reply_type) =>
+          new Promise(resolve => {
+            window.addEventListener('message', function onMessage(ev) {
+              if (ev.data.type === reply_type) {
+                window.removeEventListener('message', onMessage);
+                resolve(JSON.stringify(ev.data));
+              }
+            });
+            window.postMessage({type: msg_type, requestId: 'test', url: 'https://ai.test/x', method: 'GET', headers: {}}, '*');
+          }),
+        type,
+        reply,
+      );
+    try {
+      await page.evaluate(() => document.querySelector('.terminal-screen-icon-ai-mode').click());
+      await page.waitForSelector('.terminal-ai-untrusted:not([hidden])');
+      await options.evaluate(() => chrome.storage.sync.set({trusted_origins: ['http://localhost:8069']}));
+      await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+      await page.waitForSelector('.terminal-ai-untrusted[hidden]');
+      await page.evaluate(() => document.querySelector('.terminal-screen-icon-ai-mode').click());
+      await options.evaluate(() => chrome.storage.sync.set({trusted_origins: []}));
+      expect(await ask('ODOO_TERM_PASTE', 'ODOO_TERM_PASTE_DONE')).toContain('Untrusted site');
+      expect(await ask('ODOO_TERM_AI_FETCH_START', 'ODOO_TERM_AI_FETCH_ERROR')).toContain('untrusted');
+      // Last: the reply makes the loader initialize again
+      const config = await ask('ODOO_TERM_START', 'ODOO_TERM_CONFIG');
+      expect(config).toContain('ai.test');
+      expect(config).not.toContain('SECRET');
+      await options.evaluate(() => chrome.storage.sync.set({trusted_origins: ['http://localhost:8069']}));
+    } finally {
+      await options.close();
+      await page.reload();
+      await page.waitForSelector('#terminal');
+    }
+  }, WAIT_MINS);
+
   it('test all', async () => {
     await page.evaluate(() => {
       document.querySelector('.o_terminal').dispatchEvent(new Event('start_terminal_tests'));

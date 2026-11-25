@@ -54,7 +54,7 @@ async function cmdClick(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext): Promi
   if (listMode) {
     elements.forEach((el, i) => {
       const label = (el.textContent ?? '').trim();
-      ctx.screen.print(`[${i}] ${label.length > 0 ? label : el.tagName.toLowerCase()}`);
+      ctx.screen.eprint(`[${i}] ${label.length > 0 ? label : el.tagName.toLowerCase()}`);
     });
     return elements.length;
   }
@@ -85,6 +85,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdClick.definition', 'Click a button or element in the current view'),
     callback: cmdClick,
+    unsafe: true,
     detail: i18n.t(
       'cmdClick.detail',
       'Finds and clicks a button or element by visible text or CSS selector. -t matches any button whose text contains the given string (case-insensitive). -s overrides the element selector (default: button). -n picks the nth match (0-based). --list shows all matches without clicking.',

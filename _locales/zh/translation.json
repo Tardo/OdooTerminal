@@ -26,8 +26,10 @@
       },
       "relayFetch": {
         "error": {
+          "endpoint": "{{url}} 与扩展选项页中配置的任何 AI 提供商或 MCP 服务器都不匹配。",
           "missingPermission": "缺少联系 {{url}} 的浏览器权限。请打开扩展的选项页面（AI 模型部分）并为此 URL 使用\"授权访问\"，然后重试。",
-          "unknown": "AI 请求失败"
+          "unknown": "AI 请求失败",
+          "untrusted": "此网站无法使用 AI。请在扩展选项页的“受信任的网站”中添加 {{url}}，然后重试。"
         }
       }
     }
@@ -1582,6 +1584,11 @@
   "optionsTitleThemePreset": "主题预设",
   "optionsTitleThemePresetCustom": "自定义",
   "optionsTitleThemeRemove": "删除",
+  "optionsTitleTrustedSites": "受信任的网站",
+  "optionsTitleTrustedSitesDescription": "只有这些网站可以使用您的 AI 提供商和 MCP 服务器、截图以及使用 \"copy\" 和 \"paste\" 命令。",
+  "optionsTrustedSitesAdd": "添加网站",
+  "optionsTrustedSitesInvalid": "请输入完整的 URL（例如 https://my.odoo.com）",
+  "optionsTrustedSitesUrl": "网站 URL",
   "optionsUnsavedChanges": "有未保存的更改",
   "optionsWarningAIModelsKeys": "警告：API 密钥存储在浏览器存储中。",
   "terminal": {
@@ -1618,6 +1625,10 @@
       "sysprompt": {
         "label": "自定义指令",
         "placeholder": "此对话中给 AI 的额外指令..."
+      },
+      "untrusted": {
+        "openOptions": "打开扩展选项",
+        "warning": "此网站不受信任：AI 在此无法使用。请在扩展选项的“受信任的网站”中添加 {{origin}}。"
       }
     },
     "assistant": {

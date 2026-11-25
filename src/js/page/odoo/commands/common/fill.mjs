@@ -100,6 +100,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdFill.definition', 'Fill a text input, textarea, select, or contenteditable with a value'),
     callback: cmdFill,
+    unsafe: true,
     detail: i18n.t(
       'cmdFill.detail',
       'Finds an element by CSS selector and sets its value, then fires input and change events so the framework reacts. ' +

@@ -8,9 +8,10 @@ import type {CMDCallbackContext} from '@tardo/trash/interpreter';
 
 
 export default function cmdAIStop(ctx: CMDCallbackContext): void {
-  if (aiRuntime.controller === null || aiRuntime.controller === undefined) {
+  if (!aiRuntime.run && !aiRuntime.controller) {
     ctx.screen.print(i18n.t('cmdAI.stop.noRequest', 'No active AI request to stop.'));
     return;
   }
-  aiRuntime.controller.abort('user');
+  aiRuntime.run?.abort('user');
+  aiRuntime.controller?.abort('user');
 }

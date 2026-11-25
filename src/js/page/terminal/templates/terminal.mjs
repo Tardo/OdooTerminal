@@ -47,6 +47,12 @@ export default function (): string {
     "<textarea id='terminal_ai_sysprompt' class='terminal-ai-sysprompt-textarea' rows='6'></textarea>" +
     '</div>' +
     "<div id='terminal_ai_help_popup' class='terminal-ai-help-popup'></div>" +
+    "<div class='terminal-ai-untrusted' role='alert' hidden>" +
+    "<span class='terminal-ai-untrusted-text'></span>" +
+    "<button class='terminal-ai-untrusted-options'>" +
+    i18n.t('terminal.ai.untrusted.openOptions', 'Open the extension options') +
+    '</button>' +
+    '</div>' +
     "<div class='terminal-ai-model-selector'>" +
     "<select id='terminal_ai_provider_select' class='terminal-ai-model-select'>" +
     "<option value=''>-- No provider --</option>" +

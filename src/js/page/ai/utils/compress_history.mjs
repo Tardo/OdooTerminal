@@ -40,17 +40,11 @@ export function shouldCompress(contextSize: number, provider: ?string): boolean 
   return contextSize >= limit;
 }
 
-// Trims the oldest tool-call rounds from messages to reduce context size.
-// Layout: [system, initial_user, assistant1, user1, assistant2, user2, ...]
-// Keeps system + initial_user + last COMPRESS_KEEP_ROUNDS assistant/user pairs.
+// Trims the oldest messages to reduce context size.
+// Layout: [system, ...previous turns, current_user, assistant1, user1, assistant2, user2, ...]
+// Keeps system + current_user + last COMPRESS_KEEP_ROUNDS assistant/user pairs.
 // Drops only complete pairs to preserve role alternation.
-export function compressHistory(messages: Array<AIMessage>): Array<AIMessage> {
-  const prefix = messages.slice(0, 2); // [system, initial_user]
-  const rounds = messages.slice(2);    // alternating [assistant, user, ...]
-
-  if (rounds.length <= COMPRESS_KEEP_ROUNDS * 2) {
-    return messages;
-  }
-
-  return [...prefix, ...rounds.slice(-COMPRESS_KEEP_ROUNDS * 2)];
+export function compressHistory(messages: Array<AIMessage>, currentUserIdx: number): Array<AIMessage> {
+  const rounds = messages.slice(currentUserIdx + 1); // alternating [assistant, user, ...]
+  return [messages[0], messages[currentUserIdx], ...rounds.slice(-COMPRESS_KEEP_ROUNDS * 2)];
 }

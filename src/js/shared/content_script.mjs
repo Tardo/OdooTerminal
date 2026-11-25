@@ -9,6 +9,7 @@ import {InstanceContext, updateContext} from './context';
 import type {Context} from './context';
 import {injectPageScript, injector} from './injector';
 import type {InjectorResources} from './injector';
+import {isTrustedOrigin, redactSettings} from './relay_policy';
 import {getStorageSync, setStorageSync} from './storage';
 
 const LOADER_RESOURCES: InjectorResources = {
@@ -21,6 +22,13 @@ export function updateInstanceContext(odoo_info?: Context) {
     message: 'update_terminal_badge_info',
     context: InstanceContext,
   });
+}
+
+async function checkTrustedSite(): Promise<void> {
+  const items = await getStorageSync(['trusted_origins']);
+  if (!isTrustedOrigin(window.location.href, items)) {
+    throw new Error(`Untrusted site: add ${window.location.origin} to "Trusted Sites" in the extension options`);
+  }
 }
 
 /**
@@ -49,23 +57,27 @@ function onWindowMessage(event: MessageEvent) {
     // Load Init Commands
     getStorageSync(SETTING_NAMES).then(items => {
       postMessage('ODOO_TERM_CONFIG', {
-        config: {...items},
+        config: redactSettings(items),
         info: InstanceContext,
         langpath: decodeURI(ubrowser.runtime.getURL('_locales/{{lng}}/{{ns}}.json')),
       });
     });
   } else if (ev_data.type === 'ODOO_TERM_COPY') {
     // User by 'copy' command
-    setStorageSync({
-      terminal_copy_data: ev_data.values,
-    }).then(() => {
-      postMessage('ODOO_TERM_COPY_DONE', ev_data.values);
-    });
+    checkTrustedSite()
+      .then(() => setStorageSync({terminal_copy_data: ev_data.values}))
+      .then(() => postMessage('ODOO_TERM_COPY_DONE', {values: ev_data.values}))
+      .catch(err => postMessage('ODOO_TERM_COPY_DONE', {error: String(err.message || err)}));
   } else if (ev_data.type === 'ODOO_TERM_PASTE') {
     // User by 'paste' command
-    getStorageSync(['terminal_copy_data']).then(items => {
-      postMessage('ODOO_TERM_PASTE_DONE', items.terminal_copy_data);
-    });
+    checkTrustedSite()
+      .then(() => getStorageSync(['terminal_copy_data']))
+      .then(items => postMessage('ODOO_TERM_PASTE_DONE', {values: items.terminal_copy_data}))
+      .catch(err => postMessage('ODOO_TERM_PASTE_DONE', {error: String(err.message || err)}));
+  } else if (ev_data.type === 'ODOO_TERM_TRUST_CHECK') {
+    checkTrustedSite()
+      .then(() => postMessage('ODOO_TERM_TRUST_RESULT', {trusted: true}))
+      .catch(() => postMessage('ODOO_TERM_TRUST_RESULT', {trusted: false}));
   } else if (ev_data.type === 'ODOO_TERM_SCREENSHOT_REQ') {
     ubrowser.runtime.sendMessage({message: 'capture_screenshot'});
   } else if (ev_data.type === 'ODOO_TERM_OPEN_OPTIONS') {

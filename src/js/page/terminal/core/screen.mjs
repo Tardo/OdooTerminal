@@ -15,6 +15,7 @@ import renderAssistantArgOptionList from '@terminal/templates/screen_assistant_p
 import renderLine from '@terminal/templates/screen_line';
 import renderTable from '@terminal/templates/screen_table';
 import renderUserInput from '@terminal/templates/screen_user_input';
+import formatCellValue from '@terminal/utils/format_cell_value';
 import parseHTML from '@terminal/utils/parse_html';
 import renderIcon from '@terminal/templates/icon';
 import debounce from '@terminal/utils/debounce';
@@ -461,9 +462,9 @@ export default class Screen {
         encodeHTML(error.data.name),
         encodeHTML(error.data.message),
         error_id,
-        error.data.exception_type || error.data.type,
-        error.data.context && JSON.stringify(error.data.context),
-        error.data.arguments && JSON.stringify(error.data.arguments),
+        encodeHTML(String(error.data.exception_type || error.data.type || '')),
+        error.data.context && encodeHTML(JSON.stringify(error.data.context)),
+        error.data.arguments && encodeHTML(JSON.stringify(error.data.arguments)),
         error.data.debug && encodeHTML(error.data.debug),
       );
     // $FlowFixMe[incompatible-use]
@@ -485,8 +486,8 @@ export default class Screen {
         encodeHTML(debug_error.data.message),
         error_id,
         encodeHTML(debug_error.message),
-        debug_error.data.context && JSON.stringify(debug_error.data.context),
-        debug_error.data.arguments && JSON.stringify(debug_error.data.arguments),
+        debug_error.data.context && encodeHTML(JSON.stringify(debug_error.data.context)),
+        debug_error.data.arguments && encodeHTML(JSON.stringify(debug_error.data.arguments)),
         encodeHTML(debug_error.data.debug || ''),
       );
     } else if (typeof error === 'object') {
@@ -501,7 +502,7 @@ export default class Screen {
   }
 
   printTable(columns: $ReadOnlyArray<string>, rows: $ReadOnlyArray<$ReadOnlyArray<string>>, cls: string) {
-    this.print(renderTable(columns, rows, cls));
+    this.print(renderTable(columns, rows.map(cells => cells.map(cell => formatCellValue(cell ?? ''))), cls));
   }
 
   printLive(cls?: string): {update: (html: string) => void, el: HTMLSpanElement} {

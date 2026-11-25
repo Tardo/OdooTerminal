@@ -2,6 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
+import encodeHTML from '@terminal/utils/encode_html';
 import i18n from 'i18next';
 import callModelMulti from '@odoo/osv/call_model_multi';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
@@ -26,7 +27,7 @@ async function cmdUninstallModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: 
       // $FlowFixMe[missing-local-annot]
       }> = res.filter(item => item.id !== modue_infos[0].id);
       if (!isEmpty(depends)) {
-        const depend_name_lines = depends.map(item => `${item.display_name} [<span class='o_terminal_click o_terminal_cmd' data-cmd='view ir.module.module ${item.id}'>#${item.id}</span>]`);
+        const depend_name_lines = depends.map(item => `${encodeHTML(item.display_name)} [<span class='o_terminal_click o_terminal_cmd' data-cmd='view ir.module.module ${item.id}'>#${item.id}</span>]`);
         ctx.screen.print(i18n.t('cmdUninstall.result.willRemoved', 'This operation will remove these modules too:'));
         ctx.screen.print(depend_name_lines);
         const res_quest = await ctx.screen.showQuestion(

@@ -37,10 +37,15 @@ export function slugifyServerName(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9_-]/g, '_') || 'server';
 }
 
-export function buildMCPToolName(serverSlug: string, toolName: string): string {
+export function buildMCPToolName(serverSlug: string, toolName: string, used: $ReadOnlyMap<string, mixed>): string {
   const safeToolName = toolName.replace(/[^a-zA-Z0-9_-]/g, '_');
   const full = `mcp__${serverSlug}__${safeToolName}`;
-  return full.length > MAX_TOOL_NAME_LENGTH ? full.slice(0, MAX_TOOL_NAME_LENGTH) : full;
+  let name = full.slice(0, MAX_TOOL_NAME_LENGTH);
+  for (let i = 2; used.has(name); i += 1) {
+    const suffix = `_${i}`;
+    name = full.slice(0, MAX_TOOL_NAME_LENGTH - suffix.length) + suffix;
+  }
+  return name;
 }
 
 function buildHeaders(server: MCPServerConfig, sessionId: ?string): {[string]: string} {
@@ -74,7 +79,8 @@ async function readFullText(response: RelayFetchResponse): Promise<string> {
   return text;
 }
 
-function parseJSONRPCBody(raw: string, contentType: string): mixed {
+// With an id, skips the notifications and requests that the server can stream before the response.
+export function parseJSONRPCBody(raw: string, contentType: string, id?: number): mixed {
   if (!raw) {
     return null;
   }
@@ -86,7 +92,10 @@ function parseJSONRPCBody(raw: string, contentType: string): mixed {
         continue;
       }
       try {
-        return JSON.parse(dataLines.map(line => line.slice(5).trim()).join('\n'));
+        const message = JSON.parse(dataLines.map(line => line.slice(5).trim()).join('\n'));
+        if (id === undefined || (message?.id === id && !message.method)) {
+          return message;
+        }
       } catch (_) {
         // keep looking at the next frame
       }
@@ -141,7 +150,7 @@ async function sendJSONRPC(
   }
 
   const raw = await readFullText(response);
-  const parsed = parseJSONRPCBody(raw, response.headers['content-type'] ?? '');
+  const parsed = parseJSONRPCBody(raw, response.headers['content-type'] ?? '', id);
   if (parsed === null || typeof parsed !== 'object') {
     throw new Error(i18n.t('ai.mcp.error.badResponse', 'MCP server returned an unparsable response'));
   }
@@ -242,8 +251,17 @@ function toToolInfo(raw: mixed): ?MCPToolInfo {
 
 export async function listMCPTools(server: MCPServerConfig, signal: AbortSignal): Promise<Array<MCPToolInfo>> {
   return withSession(server, signal, async sessionId => {
-    const {result} = await sendJSONRPC(server, 'tools/list', {}, nextId(), sessionId, signal);
-    const rawTools = result !== null && typeof result === 'object' && Array.isArray(result.tools) ? result.tools : [];
+    const rawTools: Array<mixed> = [];
+    let cursor: mixed;
+    do {
+      const params = cursor === undefined ? {} : {cursor};
+      const {result} = await sendJSONRPC(server, 'tools/list', params, nextId(), sessionId, signal);
+      const page = result !== null && typeof result === 'object' ? result : {};
+      if (Array.isArray(page.tools)) {
+        rawTools.push(...page.tools);
+      }
+      cursor = page.nextCursor;
+    } while (typeof cursor === 'string' && cursor !== '');
     return rawTools.map(toToolInfo).filter(Boolean);
   });
 }

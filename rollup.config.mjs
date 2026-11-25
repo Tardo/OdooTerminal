@@ -80,6 +80,11 @@ export default [
             find: '@terminal',
             replacement: path.resolve('src/js/page/terminal'),
           },
+          // Production builds don't ship the test suites
+          is_production && {
+            find: '@tests/terminal',
+            replacement: path.resolve('src/js/page/odoo/terminal.mjs'),
+          },
           {
             find: '@tests',
             replacement: path.resolve('src/js/page/tests'),
@@ -92,7 +97,7 @@ export default [
             find: '@i18n',
             replacement: path.resolve('_locales/'),
           },
-        ],
+        ].filter(Boolean),
       }),
 
       nodeResolve({

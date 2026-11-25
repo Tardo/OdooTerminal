@@ -7,9 +7,17 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 **15.0.1**
 
 ```
+ADD: Options: Trusted Sites. AI, MCP, screenshots, 'copy' and 'paste' need the site to be added there
+
 IMP: Argument format hits in the assistant (thanks to @u0f) (pr #154)
 
 FIX: Recordset: Read properties from TraSH ('ids', 'length', records and fields)
+FIX: Security: API keys are no longer sent to the pages nor synced to the browser account
+FIX: Security: Sanitize the HTML printed in the terminal
+FIX: AI Mode: Ask before run 'paste', 'click', 'fill', 'login', 'qview', 'form' and 'lang'
+FIX: AI Mode: Keep the current question when compressing the history, 'ai stop' while running tools
+FIX: AI Mode: MCP streamed notifications, paginated tools and duplicated tool names
+FIX: Commands 'copy', 'paste' and 'call' (user context)
 FIX: 18, 19 and 20 compatibility (thanks to @u0f) (pr #154)
 ```
 

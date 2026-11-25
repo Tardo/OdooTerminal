@@ -26,8 +26,10 @@
       },
       "relayFetch": {
         "error": {
+          "endpoint": "{{url}} doesn't match any AI provider or MCP server configured in the extension's Options page.",
           "missingPermission": "Missing browser permission to contact {{url}}. Open the extension's Options page (AI Providers section) and use \"Grant access\" for this URL, then try again.",
-          "unknown": "AI request failed"
+          "unknown": "AI request failed",
+          "untrusted": "This site can't use the AI. Add {{url}} to \"Trusted Sites\" in the extension's Options page, then try again."
         }
       }
     }
@@ -1582,6 +1584,11 @@
   "optionsTitleThemePreset": "Theme Preset",
   "optionsTitleThemePresetCustom": "Custom",
   "optionsTitleThemeRemove": "Remove",
+  "optionsTitleTrustedSites": "Trusted Sites",
+  "optionsTitleTrustedSitesDescription": "Only these sites can use your AI providers and MCP servers, take screenshots and use the \"copy\" and \"paste\" commands.",
+  "optionsTrustedSitesAdd": "Add site",
+  "optionsTrustedSitesInvalid": "Enter a full URL (e.g. https://my.odoo.com)",
+  "optionsTrustedSitesUrl": "Site URL",
   "optionsUnsavedChanges": "Unsaved changes",
   "optionsWarningAIModelsKeys": "Warning: API keys are stored in browser storage.",
   "terminal": {
@@ -1618,6 +1625,10 @@
       "sysprompt": {
         "label": "Custom instructions",
         "placeholder": "Extra instructions for the AI in this conversation..."
+      },
+      "untrusted": {
+        "openOptions": "Open the extension options",
+        "warning": "This site is not trusted: the AI will not work here. Add {{origin}} to \"Trusted Sites\" in the extension options."
       }
     },
     "assistant": {

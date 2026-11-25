@@ -13,6 +13,7 @@ import ThemeSection from './components/ThemeSection.mjs';
 import ShortcutsSection from './components/ShortcutsSection.mjs';
 import CommandAssistantSection from './components/CommandAssistantSection.mjs';
 import AISection from './components/AISection.mjs';
+import TrustedSitesSection from './components/TrustedSitesSection.mjs';
 import InitCommandsSection from './components/InitCommandsSection.mjs';
 import TerminalContextSection from './components/TerminalContextSection.mjs';
 import DeveloperZoneSection from './components/DeveloperZoneSection.mjs';
@@ -30,6 +31,7 @@ const SECTIONS: Array<SectionDef> = [
   {id: 'shortcuts', title: () => t('optionsTitleShortcuts', 'Shortcuts'), comp: ShortcutsSection},
   {id: 'command-assistant', title: () => t('optionsTitleCommandAssistant', 'Command Assistant'), comp: CommandAssistantSection},
   {id: 'ai', title: () => t('optionsTitleAI', 'AI'), comp: AISection},
+  {id: 'trusted-sites', title: () => t('optionsTitleTrustedSites', 'Trusted Sites'), comp: TrustedSitesSection},
   {id: 'init-commands', title: () => t('optionsTitleInitCommands', 'Init Commands'), comp: InitCommandsSection},
   {id: 'terminal-context', title: () => t('optionsTitleTerminalContext', 'Terminal Context'), comp: TerminalContextSection},
   {id: 'developer-zone', title: () => t('optionsTitleDeveloperZone', 'Developer Zone'), comp: DeveloperZoneSection},

@@ -11,7 +11,7 @@ export default function DeveloperZoneSection({settings, mutate}: any) {
   return h(Card, {title: t('optionsTitleDeveloperZone', 'Extension Developer Zone'), class: 'ot-card'},
     h('p', {class: 'ot-hint'}, t('optionsTitleDeveloperZoneDescription', 'Options for developers of OdooTerminal itself. Most users can leave these off.')),
     h('div', {class: 'ot-check-stack'},
-      h(Checkbox, {checked: settings.devmode_tests, 'onUpdate:checked': (v: boolean) => mutate((s: any) => { s.devmode_tests = v; })},
+      process.env.NODE_ENV !== 'production' && h(Checkbox, {checked: settings.devmode_tests, 'onUpdate:checked': (v: boolean) => mutate((s: any) => { s.devmode_tests = v; })},
         t('optionsTitleDeveloperZoneModeTests', 'Use OdooTerminalTests')),
       h(Checkbox, {checked: settings.devmode_ignore_comp_checks, 'onUpdate:checked': (v: boolean) => mutate((s: any) => { s.devmode_ignore_comp_checks = v; })},
         t('optionsTitleDeveloperZoneModeIgnoreCompChecks', 'Disable Odoo version checking')),

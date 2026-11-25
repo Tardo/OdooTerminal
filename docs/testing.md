@@ -32,6 +32,8 @@ Firefox is not currently supported by Puppeteer for extension testing.
 Unit tests run inside the browser against a loaded Odoo page. Open the browser console and dispatch one of the following
 events on the terminal element:
 
+Test suites are only included in development builds. `test_copy_paste` needs the site in the "Trusted Sites" option.
+
 The suites live in `src/js/page/tests/` and also run through `pnpm test` against the Docker Odoo instance. Regression
 checks use the loaded terminal's commands, actual Odoo RPC calls, and native browser APIs.
 
@@ -54,7 +56,6 @@ document
 The following commands do not yet have automated test coverage:
 
 - `clear`
-- `copy`
 - `debug`
 - `exportfile`
 - `jstest`
@@ -62,7 +63,6 @@ The following commands do not yet have automated test coverage:
 - `login`
 - `logout`
 - `longpolling` (requires handling delayed bus availability on Odoo 16)
-- `paste`
 - `post`
 - `reload`
 - `tour` (partial)

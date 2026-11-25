@@ -2,6 +2,7 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
+import encodeHTML from '@terminal/utils/encode_html';
 import i18n from 'i18next';
 import callService from '@odoo/osv/call_service';
 import getOdooSession from '@odoo/utils/get_odoo_session';
@@ -39,7 +40,7 @@ async function cmdShowDBList(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCa
           i18n.t('cmdDBList.result.activeDatabase', '<strong>{{database}}</strong> (Active Database)', {database}),
         );
       } else {
-        s_databases.push(database);
+        s_databases.push(encodeHTML(database));
       }
       ++index;
     }

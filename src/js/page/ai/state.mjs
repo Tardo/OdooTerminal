@@ -14,4 +14,5 @@ export const aiState: AIState = {
 
 export const aiRuntime: AIRuntime = {
   controller: null,
+  run: null,
 };

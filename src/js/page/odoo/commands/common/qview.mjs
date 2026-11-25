@@ -131,6 +131,7 @@ export default function (): Partial<CMDDef> {
   return {
     definition: i18n.t('cmdQView.definition', 'Register a volatile QWeb view (nothing is saved in the database)'),
     callback: cmdQView,
+    unsafe: true,
     detail: i18n.t(
       'cmdQView.detail',
       'Registers QWeb templates in the web client for the current page session only. t-inherit/t-extend templates extend existing ones. The view is opened as a client action (Odoo 16+; -t opens an already registered one, -r prints the HTML instead); t-inherit extensions apply the next time the target template is rendered (e.g. reopen the view); with -m the model records are passed as `docs`. In Owl 3 (Odoo 19+) access the values through `this` (e.g. this.docs).',

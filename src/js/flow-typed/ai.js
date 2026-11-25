@@ -61,7 +61,10 @@ declare type AIStreamResult = {
 };
 
 declare type AIRuntime = {
+  // In-flight provider request
   controller: ?AbortController,
+  // Whole agent run: stays set while tools are running
+  run: ?AbortController,
 };
 
 declare type AIConversation = {

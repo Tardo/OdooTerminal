@@ -77,16 +77,22 @@ function onMessagePasteDone(
   this: Terminal,
   ctx: CMDCallbackContext,
   resolve: (mixed) => void,
-  reject: (string) => void,
+  reject: (string | Error) => void,
   merge: boolean,
   no_questions: boolean,
-  values: MessageListenerData,
+  message: MessageListenerData,
 ): Promise<> {
   // This is necessary due to 'bound' function usage
   this.removeMessageListener(
     'ODOO_TERM_PASTE_DONE',
-    onMessagePasteDone.bind(this, ctx.screen, resolve, reject, merge, no_questions, values),
+    onMessagePasteDone.bind(this, ctx, resolve, reject, merge, no_questions),
   );
+  if (typeof message.error === 'string') {
+    // $FlowFixMe[incompatible-type]
+    return reject(new Error(message.error));
+  }
+  // $FlowFixMe[unclear-type]
+  const values: Object = message.values;
   if (isEmpty(values) || isEmpty(values.data)) {
     ctx.screen.printError(i18n.t('cmdPaste.error.noData', 'No data to copy!'));
     // $FlowFixMe[incompatible-type]
@@ -112,7 +118,8 @@ function onMessagePasteDone(
         'y',
       );
     }
-    prom
+    // $FlowFixMe[incompatible-type]
+    return prom
       .then(res => {
         if (res === 'y') {
           if (merge) {
@@ -150,6 +157,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdPaste.definition', 'Pastes copied data'),
     category: 'devtools',
     callback: cmdPaste,
+    unsafe: true,
     detail: i18n.t('cmdPaste.detail', 'Paste model records or variables'),
     args: [
       [

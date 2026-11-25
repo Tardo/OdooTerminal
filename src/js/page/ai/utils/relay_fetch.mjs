@@ -105,6 +105,24 @@ function buildFetchError(code: mixed, url: mixed, error: mixed): Error {
       ),
     );
   }
+  if (code === 'untrusted') {
+    return new Error(
+      i18n.t(
+        'ai.utils.relayFetch.error.untrusted',
+        'This site can\'t use the AI. Add {{url}} to "Trusted Sites" in the extension\'s Options page, then try again.',
+        {url: String(url ?? ''), interpolation: {escapeValue: false}},
+      ),
+    );
+  }
+  if (code === 'endpoint') {
+    return new Error(
+      i18n.t(
+        'ai.utils.relayFetch.error.endpoint',
+        "{{url}} doesn't match any AI provider or MCP server configured in the extension's Options page.",
+        {url: String(url ?? ''), interpolation: {escapeValue: false}},
+      ),
+    );
+  }
   return new Error(String(error ?? i18n.t('ai.utils.relayFetch.error.unknown', 'AI request failed')));
 }
 

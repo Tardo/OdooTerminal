@@ -74,7 +74,7 @@ async function cmdSysParam(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCall
       await this.getContext(),
     ).then(result => {
       if (result !== null) {
-        ctx.screen.print(result);
+        ctx.screen.eprint(result);
       } else {
         ctx.screen.printError(i18n.t('cmdSysParam.error.notFound', "Parameter not found"));
       }

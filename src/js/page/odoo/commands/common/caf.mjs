@@ -2,10 +2,12 @@
 // Copyright  Alexandre Díaz <dev@redneboa.es>
 // License MIT (https://opensource.org/license/mit).
 
+import encodeHTML from '@terminal/utils/encode_html';
 import i18n from 'i18next';
 import callModel from '@odoo/osv/call_model';
 import {getModelOptions} from './__utils__';
 import isEmpty from '@tardo/trash/utils/is_empty';
+import renderTable from '@terminal/templates/screen_table';
 import formatCellValue from '@terminal/utils/format_cell_value';
 import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
@@ -46,7 +48,7 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
     const field = s_keys[x];
     const fieldDef = s_result[field];
     if (fieldDef.required) {
-      rows[row_index].push(`* <strong class='text-info'>${field}</strong>`);
+      rows[row_index].push(`* <strong class='text-info'>${encodeHTML(field)}</strong>`);
     } else {
       rows[row_index].push(field);
     }
@@ -56,7 +58,7 @@ async function cmdCheckFieldAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx:
       rows[row_index].push(formatCellValue(value));
     }
   }
-  ctx.screen.printTable(['field', ...kwargs.property], rows);
+  ctx.screen.print(renderTable(['field', ...kwargs.property], rows));
   return s_result;
 }
 

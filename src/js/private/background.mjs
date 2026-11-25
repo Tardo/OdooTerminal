@@ -15,7 +15,8 @@ import {SETTING_DEFAULTS, SETTING_NAMES, VERSION_COLOR} from '@common/constants'
 import sanitizeOdooVersion from '@common/utils/sanitize_odoo_version';
 import {ubrowser} from '@shared/constants';
 import {hasHostPermission} from '@shared/host_permissions';
-import {getStorageSync, setStorageSync} from '@shared/storage';
+import {POLICY_SETTINGS, isTrustedOrigin, resolveHeaders, toOrigin} from '@shared/relay_policy';
+import {getStorageSync, migrateLocalStorage, setStorageSync} from '@shared/storage';
 import {sendInternalMessage} from '@shared/tabs';
 
 // Requests in flight for the AI fetch relay, keyed by requestId, so 'ai_fetch_abort'
@@ -60,20 +61,29 @@ function sendAIMessage(tabId: number, type: string, requestId: string, extra?: {
  * Streams the decoded response back to the calling tab as a sequence of messages.
  */
 // $FlowFixMe[unclear-type]
-async function handleAIFetchStart(request: Object, tabId: number) {
-  const {requestId, url, method, headers, body} = request;
-
-  const allowed = await hasHostPermission(url);
-  if (!allowed) {
-    sendAIMessage(tabId, 'ai_fetch_error', requestId, {code: 'permission', url});
-    return;
-  }
-
+async function handleAIFetchStart(request: Object, sender: Object) {
+  const {requestId, url, method, body} = request;
+  const tabId: number = sender.tab.id;
   const controller = new AbortController();
   aiFetchControllers.set(requestId, controller);
   startAIKeepAlive();
 
   try {
+    const settings = await getStorageSync(POLICY_SETTINGS);
+    if (!isTrustedOrigin(sender.url, settings)) {
+      sendAIMessage(tabId, 'ai_fetch_error', requestId, {code: 'untrusted', url: toOrigin(sender.url)});
+      return;
+    }
+    const headers = resolveHeaders(url, request.headers, settings);
+    if (headers === null) {
+      sendAIMessage(tabId, 'ai_fetch_error', requestId, {code: 'endpoint', url});
+      return;
+    }
+    if (!(await hasHostPermission(url))) {
+      sendAIMessage(tabId, 'ai_fetch_error', requestId, {code: 'permission', url});
+      return;
+    }
+
     const response = await fetch(url, {method, headers, body, signal: controller.signal});
 
     sendAIMessage(tabId, 'ai_fetch_headers', requestId, {
@@ -105,6 +115,10 @@ async function handleAIFetchStart(request: Object, tabId: number) {
       if (chunk) {
         sendAIMessage(tabId, 'ai_fetch_chunk', requestId, {chunk});
       }
+    }
+    const tail = decoder.decode();
+    if (tail) {
+      sendAIMessage(tabId, 'ai_fetch_chunk', requestId, {chunk: tail});
     }
     sendAIMessage(tabId, 'ai_fetch_done', requestId);
   } catch (err) {
@@ -161,8 +175,22 @@ function onInternalMessage(request: Object, sender: Object) {
     ubrowser.runtime.openOptionsPage();
   } else if (request.message === 'capture_screenshot') {
     const tabId: number = sender.tab.id;
-    // $FlowFixMe[prop-missing]
-    ubrowser.tabs.captureVisibleTab(null, {format: 'png'})
+    getStorageSync(POLICY_SETTINGS)
+      .then(settings => {
+        if (!isTrustedOrigin(sender.url, settings)) {
+          throw new Error(`Untrusted site: add ${sender.url} to "Trusted Sites" in the extension options`);
+        }
+        // $FlowFixMe[prop-missing]
+        return ubrowser.tabs.get(tabId);
+      })
+      .then(tab => {
+        // captureVisibleTab captures the active tab, not the one that sent the request
+        if (!tab.active) {
+          throw new Error('The tab is not active');
+        }
+        // $FlowFixMe[prop-missing]
+        return ubrowser.tabs.captureVisibleTab(tab.windowId, {format: 'png'});
+      })
       .then((dataUrl: string) => {
         ubrowser.tabs.sendMessage(tabId, {message: 'screenshot_result', dataUrl}).catch(() => undefined);
       })
@@ -177,14 +205,14 @@ function onInternalMessage(request: Object, sender: Object) {
       sendAIMessage(tabId, 'ai_permission_result', request.requestId, {granted});
     });
   } else if (request.message === 'ai_fetch_start') {
-    handleAIFetchStart(request, sender.tab.id);
+    handleAIFetchStart(request, sender);
   } else if (request.message === 'ai_fetch_abort') {
     aiFetchControllers.get(request.requestId)?.abort();
   }
 }
 
 function onInstalled() {
-  getStorageSync(SETTING_NAMES).then(items => {
+  migrateLocalStorage().then(() => getStorageSync(SETTING_NAMES)).then(items => {
     // $FlowFixMe[unclear-type]
     const to_update: Object = {};
     for (const setting_name of SETTING_NAMES) {

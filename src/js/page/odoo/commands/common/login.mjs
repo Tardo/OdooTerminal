@@ -115,6 +115,7 @@ export default function (): Partial<CMDDef> {
     definition: i18n.t('cmdLogin.definition', 'Login as...'),
     category: 'system',
     callback: cmdLoginAs,
+    unsafe: true,
     options: getOptions,
     detail: i18n.t('cmdLogin.detail', 'Login as selected user.'),
     args: [
