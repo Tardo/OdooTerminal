@@ -27,6 +27,11 @@ async function loginAs(login, password) {
   }
 }
 
+// '#terminal' exists before the terminal binds its listeners: events sent earlier are lost
+async function waitForTerminal() {
+  await page.waitForFunction(() => document.querySelector('.terminal-ai-sysprompt-label')?.textContent);
+}
+
 describe('OdooTerminal', () => {
   let optionsUrl;
   beforeAll(async () => {
@@ -36,7 +41,7 @@ describe('OdooTerminal', () => {
   }, 30000);
 
   it('test open terminal', async () => {
-    await page.waitForSelector('#terminal');
+    await waitForTerminal();
     await page.evaluate(() => {
       document.querySelector('.o_terminal').dispatchEvent(new Event('toggle'));
     });
@@ -65,6 +70,8 @@ describe('OdooTerminal', () => {
         reply,
       );
     try {
+      // Puppeteer waits stall in background tabs
+      await page.bringToFront();
       await page.evaluate(() => document.querySelector('.terminal-screen-icon-ai-mode').click());
       await page.waitForSelector('.terminal-ai-untrusted:not([hidden])');
       await options.evaluate(() => chrome.storage.sync.set({trusted_origins: ['http://localhost:8069']}));
@@ -79,10 +86,11 @@ describe('OdooTerminal', () => {
       expect(config).toContain('ai.test');
       expect(config).not.toContain('SECRET');
       await options.evaluate(() => chrome.storage.sync.set({trusted_origins: ['http://localhost:8069']}));
+      expect(await ask('ODOO_TERM_TRUST_CHECK', 'ODOO_TERM_TRUST_RESULT')).toContain('"trusted":true');
     } finally {
       await options.close();
       await page.reload();
-      await page.waitForSelector('#terminal');
+      await waitForTerminal();
     }
   }, WAIT_MINS);
 

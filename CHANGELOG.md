@@ -4,7 +4,7 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ---
 
-**15.0.1**
+**16.0.0**
 
 ```
 ADD: Options: Trusted Sites. AI, MCP, screenshots, 'copy' and 'paste' need the site to be added there
