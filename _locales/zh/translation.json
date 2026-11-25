@@ -852,6 +852,7 @@
     "definition": "以...身份登录",
     "detail": "以所选用户身份登录。",
     "error": {
+      "mfa": "无法登录：该用户需要额外的身份验证步骤 (2FA)。请改用 /web/login。",
       "notSession": "无法找到会话信息",
       "unknownDB": "未知的活动数据库。尝试使用 '<span class='o_terminal_click o_terminal_cmd' data-cmd='dblist'>dblist</span>' 命令。"
     },
@@ -1618,6 +1619,9 @@
         "label": "自定义指令",
         "placeholder": "此对话中给 AI 的额外指令..."
       }
+    },
+    "assistant": {
+      "format": "格式"
     },
     "close": {
       "prevented": "由于未完成的任务，终端已阻止当前标签页关闭："

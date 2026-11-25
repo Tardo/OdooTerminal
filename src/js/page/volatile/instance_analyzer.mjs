@@ -7,7 +7,7 @@ import postMessage from '@common/utils/post_message';
 import getOdooVersion from '@odoo/utils/get_odoo_version';
 import {InstanceContext, updateContext} from '@shared/context'; // This is the page context! not the content context :)
 
-type NetVersionInfo = [number, number, string, number];
+type NetVersionInfo = [number, number, number, string, number, string];
 
 const ODOO_OBJ: {[string]: mixed} = window.odoo;
 
@@ -21,8 +21,8 @@ function _updateContextServerInfo(ver: string, ver_info?: NetVersionInfo) {
         raw: ver,
         major: ver_info[0],
         minor: ver_info[1],
-        status: ver_info[2],
-        statusLevel: ver_info[3],
+        status: ver_info[3],
+        statusLevel: ver_info[4],
       },
     });
   } else {

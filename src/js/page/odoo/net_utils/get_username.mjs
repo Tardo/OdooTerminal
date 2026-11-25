@@ -4,11 +4,17 @@
 
 import getSessionInfo from './get_session_info';
 import getOdooSession from '@odoo/utils/get_odoo_session';
+import getOdooUser from '@odoo/utils/get_odoo_user';
 
 export default async function (use_net: boolean = false): Promise<string> {
   let username = getOdooSession()?.username;
   if (typeof username === 'string') {
     return username;
+  }
+  // Odoo 18+ moves it to the user service
+  const login = getOdooUser()?.login;
+  if (typeof login === 'string' && login !== '') {
+    return login;
   }
   if (use_net) {
     const session_info = await getSessionInfo();

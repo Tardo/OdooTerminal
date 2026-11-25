@@ -12,7 +12,8 @@ import type Terminal from '@odoo/terminal';
 
 async function cmdCheckModelAccess(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
   const version = getOdooVersion('major');
-  const useHasAccess = typeof version === 'number' && version >= 20;
+  // check_access_rights is deprecated since 18.0 and removed in 20.0
+  const useHasAccess = typeof version === 'number' && version >= 18;
   return callModel<boolean>(
     kwargs.model,
     useHasAccess ? 'has_access' : 'check_access_rights',

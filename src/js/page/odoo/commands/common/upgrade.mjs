@@ -31,7 +31,8 @@ async function cmdUpgradeModule(this: Terminal, kwargs: CMDCallbackArgs, ctx: CM
       },
       res => {
         throw new Error(
-          res?.message?.data?.message ||
+          res?.data?.message ||
+            res?.message?.data?.message ||
             i18n.t('cmdUpgrade.error.notUpgraded', 'Unexpected error. Module not upgraded'),
         );
       },

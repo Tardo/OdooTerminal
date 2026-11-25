@@ -13,6 +13,7 @@ import type OdooTerminal from '@odoo/terminal';
 
 export default class Longpolling {
   #terminal: OdooTerminal;
+  #subscriptions: Map<string, (data: $ReadOnlyArray<OdooLongpollingItem>) => void> = new Map();
 
   constructor(terminal: OdooTerminal) {
     this.#terminal = terminal;
@@ -62,7 +63,14 @@ export default class Longpolling {
   subscribe(name: string): mixed {
     const OdooVerMajor = getOdooVersion('major');
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 18) {
-      return this.#getBusService().subscribe(name);
+      if (!this.#subscriptions.has(name)) {
+        // The bus calls the callback on every notification: it can't be undefined
+        // $FlowFixMe[method-unbinding]
+        const callback = this.#onBusNotification.bind(this, name);
+        this.#subscriptions.set(name, callback);
+        this.#getBusService().subscribe(name, callback);
+      }
+      return;
     }
     throw new Error(i18n.t('longpolling.error.invalidVersion', 'This operation is not valid in the current Odoo version'));
   }
@@ -70,7 +78,9 @@ export default class Longpolling {
   unsubscribe(name: string): mixed {
     const OdooVerMajor = getOdooVersion('major');
     if (typeof OdooVerMajor === 'number' && OdooVerMajor >= 18) {
-      return this.#getBusService().unsubscribe(name);
+      const callback = this.#subscriptions.get(name);
+      this.#subscriptions.delete(name);
+      return this.#getBusService().unsubscribe(name, callback);
     }
     throw new Error(i18n.t('longpolling.error.invalidVersion', 'This operation is not valid in the current Odoo version'));
   }

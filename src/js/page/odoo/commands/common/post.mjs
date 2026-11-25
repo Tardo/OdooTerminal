@@ -16,20 +16,30 @@ async function cmdPostData(kwargs: CMDCallbackArgs, ctx: CMDCallbackContext) {
         return result;
       });
     }
-    // $FlowFixMe[prop-missing]
-    return $.post(kwargs.endpoint, {
-      ...kwargs.data,
-      csrf_token: odoo.csrf_token,
-    }, (result: mixed) => {
-      ctx.screen.eprint(result, false, 'line-pre');
-      return result;
-    });
+    return postForm(kwargs.endpoint, {...kwargs.data, csrf_token: odoo.csrf_token}, ctx);
   }
-  // $FlowFixMe[prop-missing]
-  return $.post(kwargs.endpoint, kwargs.data, (result: mixed) => {
-    ctx.screen.eprint(result, false, 'line-pre');
-    return result;
-  });
+  return postForm(kwargs.endpoint, kwargs.data, ctx);
+}
+
+// Same as jQuery.post (form-urlencoded) without jQuery (removed in Odoo 20)
+async function postForm(endpoint: string, data: {[string]: mixed}, ctx: CMDCallbackContext): Promise<mixed> {
+  const body = new URLSearchParams();
+  for (const [key, value] of Object.entries(data || {})) {
+    body.append(key, typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value));
+  }
+  const response = await fetch(endpoint, {method: 'POST', body});
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+  const text = await response.text();
+  let result: mixed = text;
+  try {
+    result = JSON.parse(text);
+  } catch (_err) {
+    // not json
+  }
+  ctx.screen.eprint(result, false, 'line-pre');
+  return result;
 }
 
 export default function (): Partial<CMDDef> {

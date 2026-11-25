@@ -5,6 +5,7 @@
 import i18n from 'i18next';
 import getOdooSession from '@odoo/utils/get_odoo_session';
 import callService from '@odoo/osv/call_service';
+import rpcQuery from '@odoo/rpc';
 import cachedSearchRead from '@odoo/net_utils/cached_search_read';
 import {ARG} from '@tardo/trash/constants';
 import type {CMDCallbackArgs, CMDCallbackContext, CMDDef} from '@tardo/trash/interpreter';
@@ -26,8 +27,21 @@ async function cmdLoginAs(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
     passwd = login;
   }
   if (db === '*') {
-    // $FlowFixMe[invalid-compare]
-    if (session.db === null || typeof session.db === 'undefined' || !session.db) {
+    // Frontend pages (e.g. /web/login) don't expose the db in the session (Odoo 17+)
+    const db_input = document.querySelector('form [name="db"]');
+    let cur_db: string = '';
+    if (typeof session.db === 'string') {
+      cur_db = session.db;
+    } else if (db_input instanceof HTMLInputElement || db_input instanceof HTMLSelectElement) {
+      cur_db = db_input.value;
+    }
+    if (cur_db === '') {
+      const dbs = await callService<Array<string>>('db', 'list', []).catch(() => []);
+      if (dbs.length === 1) {
+        cur_db = dbs[0];
+      }
+    }
+    if (cur_db === '') {
       throw new Error(
         i18n.t(
           'cmdLogin.error.unknownDB',
@@ -37,10 +51,27 @@ async function cmdLoginAs(this: Terminal, kwargs: CMDCallbackArgs, ctx: CMDCallb
         ),
       );
     }
-    db = session.db;
+    db = cur_db;
   }
 
-  const res = await session._session_authenticate(db, login, passwd);
+  let res;
+  if (typeof session._session_authenticate === 'function') {
+    res = await session._session_authenticate(db, login, passwd);
+  } else {
+    // Odoo 17+: the session is plain data, call the controller directly
+    res = await rpcQuery<{uid: number | null, ...}>({
+      route: '/web/session/authenticate',
+      params: {db, login, password: passwd},
+    });
+    if (typeof res?.uid !== 'number') {
+      throw new Error(
+        i18n.t(
+          'cmdLogin.error.mfa',
+          "Can't login: the user requires an extra authentication step (2FA). Use /web/login instead.",
+        ),
+      );
+    }
+  }
   ctx.screen.updateInputInfo({username: login});
   ctx.screen.print(
     i18n.t('cmdLogin.result.success', "Successfully logged as '{{login}}'", {

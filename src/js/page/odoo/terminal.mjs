@@ -11,6 +11,7 @@ import searchRead from './orm/search_read';
 import ParameterGenerator from './parameter_generator';
 import renderWelcome from './templates/welcome';
 import getOdooSession from './utils/get_odoo_session';
+import {getOdooUserContext} from './utils/get_odoo_user';
 import getSessionInfo from './net_utils/get_session_info';
 import codeHelpers from './base/helpers';
 import cmdAIAgent from '@ai/operations/agent';
@@ -50,7 +51,8 @@ export default class OdooTerminal extends Terminal {
   // eslint-disable-next-line no-unused-vars
   async getContext(extra_context: ?{[string]: mixed}): Promise<OdooSessionInfoUserContext> {
     const context = await super.getContext(arguments);
-    const sess_user_ctx = getOdooSession()?.user_context ?? (await getSessionInfo())?.user_context ?? {};
+    const sess_user_ctx =
+      getOdooSession()?.user_context ?? getOdooUserContext() ?? (await getSessionInfo())?.user_context ?? {};
     return {
       ...sess_user_ctx,
       ...context,

@@ -30,7 +30,8 @@ import ElementNotFoundError from '@terminal/exceptions/element_not_found_error';
 import type {RGB} from '@terminal/utils/hex2rgb';
 import type {CMDAssistantOption} from './command_assistant';
 import type {DebounceInnerCallback} from '@terminal/utils/debounce';
-import type {CMDDef, TokenInfo} from '@tardo/trash/interpreter';
+import type {ArgInfo, CMDDef, TokenInfo} from '@tardo/trash/interpreter';
+import describeArgument from '@terminal/utils/describe_argument';
 
 export type InputInfo = {
   username: string,
@@ -280,6 +281,7 @@ export default class Screen {
     options: $ReadOnlyArray<CMDAssistantOption>,
     selected_option_index: number,
     total_options_count: number,
+    editing_arg?: ArgInfo,
   ) {
     if (!this.#wasStart || this.#options.inputMode === 'multi') {
       return;
@@ -307,8 +309,16 @@ export default class Screen {
       if (opt.is_command) {
         this.#assistant_desc_el.textContent = opt.description;
       } else {
-        this.#assistant_desc_el.textContent = `${opt.type}. ${opt.description}`;
+        const arg_name = opt.is_argument ? (opt.string ?? '').replace(/^--/, '') : (editing_arg?.names.long ?? '');
+        this.#assistant_desc_el.textContent = describeArgument(opt.type, arg_name, opt.description);
       }
+    } else if (editing_arg) {
+      // Typing a free value (dicts, domains, lists...): show the expected format
+      this.#assistant_desc_el.textContent = describeArgument(
+        editing_arg.type,
+        editing_arg.names.long,
+        editing_arg.description,
+      );
     } else {
       this.#assistant_desc_el.textContent = '';
     }
