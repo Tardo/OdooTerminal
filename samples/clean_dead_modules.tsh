@@ -4,10 +4,13 @@
 
 print "Searching modules..."
 $mods = (search ir.module.module -f icon,display_name -d [['state', '=', 'uninstalled']])
-$dmods = (arr_filter $mods function(item) { 
+$dmods = []
+for ($item in $mods) {
     $ficon = (fetch -u $item['icon'] -o {method: 'HEAD'})
-    return ($ficon['status'] != 200)
-})
+    if ($ficon['status'] != 200) {
+        arr_append $dmods $item
+    }
+}
 $dmods_len = $dmods['length']
 if ($dmods_len == 0) {
     print "Nothing to do :)"

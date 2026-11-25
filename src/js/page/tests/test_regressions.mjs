@@ -201,6 +201,21 @@ export default class TestRegressions extends TerminalTestSuite {
     }
   }
 
+  async test_recordset_subscript() {
+    const source =
+      '$rs = (search -m res.partner -f name -l 2); $one = (search -m res.partner -f name -l 1); ' +
+      "$ids = []; for ($rec in $rs) { arr_append $ids $rec['id'] }; " +
+      "[$rs['length'], $rs['ids'], $ids, $rs[1]['id'], $rs['model'], $one['id'], $rs['toJSON']]";
+    const [length, ids, iter_ids, last_id, model, one_id, hidden] = await this.terminal.execute(source, false, true);
+    this.assertEqual(length, 2);
+    this.assertEqual(ids.length, 2);
+    this.assertEqual(JSON.stringify(iter_ids), JSON.stringify(ids));
+    this.assertEqual(last_id, ids[1]);
+    this.assertEqual(model, 'res.partner');
+    this.assertEqual(one_id, ids[0]);
+    this.assertTrue(typeof hidden === 'undefined');
+  }
+
   async test_graphics_native_canvas() {
     const canvas = await this.terminal.execute(
       '$regression_canvas = (2d_create_window -w 40 -h 30); $regression_canvas',

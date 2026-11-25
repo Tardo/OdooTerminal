@@ -158,6 +158,22 @@ const RecordsetHandler = {
     // $FlowFixMe[prop-missing]
     return Reflect.set(target.records, prop, value);
   },
+  // TraSH only reads own properties (Object.hasOwn), so expose the readable ones explicitly
+  getOwnPropertyDescriptor(
+    target: {...},
+    prop: string | symbol,
+  ): {configurable: boolean, enumerable: boolean} | void {
+    // $FlowFixMe[prop-missing]
+    const records = target.records;
+    const is_own =
+      prop === 'ids' ||
+      prop === 'length' ||
+      prop === 'model' ||
+      prop === 'fieldNames' ||
+      Object.hasOwn(records, prop) ||
+      (records.length === 1 && Object.hasOwn(records[0].toJSON(), prop));
+    return is_own ? {configurable: true, enumerable: true} : undefined;
+  },
 };
 
 export default class Recordset {
