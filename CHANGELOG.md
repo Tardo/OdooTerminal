@@ -9,6 +9,7 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 ```
 IMP: Argument format hits in the assistant (thanks to @u0f) (pr #154)
 
+FIX: Recordset: Read properties from TraSH ('ids', 'length', records and fields)
 FIX: 18, 19 and 20 compatibility (thanks to @u0f) (pr #154)
 ```
 
