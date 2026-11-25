@@ -4,6 +4,14 @@ Entry prefixes: `ADD` new feature — `IMP` improvement — `FIX` bug fix — `U
 
 ---
 
+**15.0.1**
+
+```
+IMP: Argument format hits in the assistant (thanks to @u0f) (pr #154)
+
+FIX: 18, 19 and 20 compatibility (thanks to @u0f) (pr #154)
+```
+
 **15.0.0**
 
 ```
