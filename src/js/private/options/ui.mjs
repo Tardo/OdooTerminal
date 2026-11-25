@@ -240,7 +240,7 @@ export function Table(props: any): VNode {
   const rows = props.dataSource || [];
   return h('div', {class: `ot-table-wrap${props.size ? ` ot-table-${props.size}` : ''}`, style: props.style},
     h('table', {class: 'ot-table'},
-      h('thead', null, h('tr', null, columns.map((c: any) => h('th', {style: c.width ? {width: c.width} : null}, c.title)))),
+      h('thead', null, h('tr', null, columns.map((c: any) => h('th', {style: c.width ? {width: `${c.width}px`} : null}, c.title)))),
       h('tbody', null,
         rows.length === 0
           ? h('tr', null, h('td', {class: 'ot-table-empty', colSpan: columns.length}, props.emptyText || t('optionsTableEmpty', 'No data')))
