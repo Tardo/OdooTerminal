@@ -97,7 +97,7 @@ export const ScreenCommandSilentHandler = {
 };
 
 export default class Terminal {
-  VERSION = '15.0.0';
+  VERSION = '16.0.0';
 
   userContext: {[string]: mixed} = {};
 
